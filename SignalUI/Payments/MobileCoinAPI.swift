@@ -205,75 +205,6 @@ public class MobileCoinAPI {
         return result
     }
 
-    struct PreparedTransaction: PreparedPayment {
-        let transaction: MobileCoin.Transaction
-        let receipt: MobileCoin.Receipt
-        let feeAmount: TSPaymentAmount
-    }
-
-    func prepareTransaction(paymentAmount: TSPaymentAmount,
-                            recipientPublicAddress: MobileCoin.PublicAddress,
-                            shouldUpdateBalance: Bool) -> Promise<PreparedTransaction> {
-        Logger.verbose("")
-
-        Logger.verbose("paymentAmount: \(paymentAmount.picoMob)")
-
-        let client = self.client
-
-        return firstly(on: DispatchQueue.global()) { () throws -> Promise<Void> in
-            guard shouldUpdateBalance else {
-                return Promise.value(())
-            }
-            return firstly(on: DispatchQueue.global()) { () throws -> Promise<TSPaymentAmount> in
-                // prepareTransaction() will fail if local balance is not yet known.
-                self.getLocalBalance()
-            }.done(on: DispatchQueue.global()) { (balance: TSPaymentAmount) in
-                Logger.verbose("balance: \(balance.picoMob)")
-            }
-        }.then(on: DispatchQueue.global()) { () -> Promise<TSPaymentAmount> in
-            return Promise.wrapAsync {
-                try await self.getEstimatedFee(forPaymentAmount: paymentAmount)
-            }
-        }.then(on: DispatchQueue.global()) { (estimatedFeeAmount: TSPaymentAmount) -> Promise<PreparedTransaction> in
-            Logger.verbose("estimatedFeeAmount: \(estimatedFeeAmount.picoMob)")
-            guard paymentAmount.isValidAmount(canBeEmpty: false) else {
-                throw OWSAssertionError("Invalid amount.")
-            }
-            guard estimatedFeeAmount.isValidAmount(canBeEmpty: false) else {
-                throw OWSAssertionError("Invalid fee.")
-            }
-
-            let (promise, future) = Promise<PreparedTransaction>.pending()
-            // We don't need to support amountPicoMobHigh.
-            client.prepareTransaction(to: recipientPublicAddress,
-                                      amount: Amount(paymentAmount.picoMob, in: .MOB),
-                                      fee: estimatedFeeAmount.picoMob) { (result: Swift.Result<PendingSinglePayloadTransaction,
-                                                                                                TransactionPreparationError>) in
-                switch result {
-                case .success(let payload):
-                    let transaction = payload.transaction
-                    let receipt = payload.receipt
-                    let finalFeeAmount = TSPaymentAmount(currency: .mobileCoin,
-                                                         picoMob: transaction.fee)
-                    owsAssertDebug(estimatedFeeAmount == finalFeeAmount)
-                    let preparedTransaction = PreparedTransaction(transaction: transaction,
-                                                                  receipt: receipt,
-                                                                  feeAmount: finalFeeAmount)
-                    future.resolve(preparedTransaction)
-                case .failure(let error):
-                    let error = Self.convertMCError(error: error)
-                    future.reject(error)
-                }
-            }
-            return promise
-        }.recover(on: DispatchQueue.global()) { (error: Error) -> Promise<PreparedTransaction> in
-            owsFailDebugUnlessMCNetworkFailure(error)
-            throw error
-        }.timeout(seconds: Self.timeoutDuration, description: "prepareTransaction") { () -> Error in
-            PaymentsError.timeout
-        }
-    }
-
     // TODO: Are we always going to use _minimum_ fee?
     private static let feeLevel: MobileCoin.FeeLevel = .minimum
 
@@ -453,12 +384,12 @@ extension MobileCoin.PublicAddress {
 // MARK: -
 
 extension TSPaymentAddress {
-    func asPublicAddress() throws -> MobileCoin.PublicAddress {
-        guard currency == .mobileCoin else {
+    func asAddress() throws -> String {
+        guard currency == .bitcoin else {
             throw PaymentsError.invalidCurrency
         }
-        guard let address = MobileCoin.PublicAddress(serializedData: mobileCoinPublicAddressData) else {
-            throw OWSAssertionError("Invalid mobileCoinPublicAddressData.")
+        guard let address = String(data: mobileCoinPublicAddressData, encoding: .utf8) else {
+            throw OWSAssertionError("Invalid bitcoin address utf-8.")
         }
         return address
     }

@@ -32,6 +32,8 @@ public class ProfileFetcherJob {
     private let tsAccountManager: any TSAccountManager
     private let udManager: any OWSUDManager
     private let versionedProfiles: any VersionedProfiles
+    private let profileKeyVersion: String?
+    private let profileFullUpdateOnFetch: Bool
 
     init(
         serviceId: ServiceId,
@@ -48,7 +50,9 @@ public class ProfileFetcherJob {
         syncManager: any SyncManagerProtocol,
         tsAccountManager: any TSAccountManager,
         udManager: any OWSUDManager,
-        versionedProfiles: any VersionedProfiles
+        versionedProfiles: any VersionedProfiles,
+        profileKeyVersion: String?,
+        profileAutoUpdate: Bool
     ) {
         self.serviceId = serviceId
         self.groupIdContext = groupIdContext
@@ -65,6 +69,8 @@ public class ProfileFetcherJob {
         self.tsAccountManager = tsAccountManager
         self.udManager = udManager
         self.versionedProfiles = versionedProfiles
+        self.profileKeyVersion = profileKeyVersion
+        self.profileFullUpdateOnFetch = profileAutoUpdate
     }
 
     // MARK: -
@@ -77,7 +83,7 @@ public class ProfileFetcherJob {
 
         let localIdentifiers = try tsAccountManager.localIdentifiersWithMaybeSneakyTransaction(authedAccount: authedAccount)
         do {
-            let fetchedProfile = try await requestProfile(localIdentifiers: localIdentifiers)
+            let fetchedProfile = try await requestProfile(localIdentifiers: localIdentifiers, profileKeyVersion: profileKeyVersion)
             try await updateProfile(fetchedProfile: fetchedProfile, localIdentifiers: localIdentifiers)
             return fetchedProfile
         } catch ProfileRequestError.notFound {
@@ -91,10 +97,10 @@ public class ProfileFetcherJob {
         }
     }
 
-    private func requestProfile(localIdentifiers: LocalIdentifiers) async throws -> FetchedProfile {
+    private func requestProfile(localIdentifiers: LocalIdentifiers, profileKeyVersion: String?) async throws -> FetchedProfile {
         do {
             return try await Retry.performWithBackoff(maxAttempts: 3) {
-                return try await requestProfileAttempt(localIdentifiers: localIdentifiers)
+                return try await requestProfileAttempt(localIdentifiers: localIdentifiers, profileKeyVersion: profileKeyVersion)
             }
         } catch where error.httpStatusCode == 401 {
             throw ProfileRequestError.notAuthorized
@@ -105,7 +111,7 @@ public class ProfileFetcherJob {
         }
     }
 
-    private func requestProfileAttempt(localIdentifiers: LocalIdentifiers) async throws -> FetchedProfile {
+    private func requestProfileAttempt(localIdentifiers: LocalIdentifiers, profileKeyVersion: String?) async throws -> FetchedProfile {
         let serviceId = self.serviceId
         let versionedProfiles = self.versionedProfiles
 
@@ -116,6 +122,7 @@ public class ProfileFetcherJob {
             let versionedProfileRequest = try versionedProfiles.versionedProfileRequest(
                 for: versionedFetchParameters.aci,
                 profileKey: versionedFetchParameters.profileKey,
+                profileKeyVersion: profileKeyVersion,
                 shouldRequestCredential: versionedFetchParameters.shouldRequestCredential,
                 udAccessKey: versionedFetchParameters.auth?.key,
                 auth: self.authedAccount.chatServiceAuth
@@ -411,6 +418,20 @@ public class ProfileFetcherJob {
         let serviceId = profile.serviceId
 
         await db.awaitableWrite { transaction in
+            // Update payment address in any case
+            defer {
+                let paymentAddress = fetchedProfile.decryptedProfile?.paymentAddress(identityKey: fetchedProfile.identityKey)
+                self.paymentsHelper.setArePaymentsEnabled(
+                    for: serviceId,
+                    hasPaymentsEnabled: paymentAddress != nil,
+                    transaction: transaction
+                )
+            }
+            
+            guard profileFullUpdateOnFetch else {
+                return
+            }
+            
             if let aci = serviceId as? Aci {
                 self.updateUnidentifiedAccess(
                     aci: aci,
@@ -475,13 +496,6 @@ public class ProfileFetcherJob {
 
             let identityManager = DependenciesBridge.shared.identityManager
             identityManager.saveIdentityKey(profile.identityKey, for: serviceId, tx: transaction)
-
-            let paymentAddress = fetchedProfile.decryptedProfile?.paymentAddress(identityKey: fetchedProfile.identityKey)
-            self.paymentsHelper.setArePaymentsEnabled(
-                for: serviceId,
-                hasPaymentsEnabled: paymentAddress != nil,
-                transaction: transaction
-            )
         }
     }
 

@@ -24,8 +24,9 @@ class HomeTabBarController: UITabBarController {
 
     enum Tabs: Int {
         case chatList = 0
-        case calls = 1
-        case stories = 2
+        case payments = 1
+        case calls = 2
+        case stories = 3
 
         var title: String {
             switch self {
@@ -33,6 +34,11 @@ class HomeTabBarController: UITabBarController {
                 return OWSLocalizedString(
                     "CHAT_LIST_TITLE_INBOX",
                     comment: "Title for the chat list's default mode."
+                )
+            case .payments:
+                return OWSLocalizedString(
+                    "SETTINGS_PAYMENTS_TITLE",
+                    comment: "Title for the payments."
                 )
             case .calls:
                 return OWSLocalizedString(
@@ -51,6 +57,8 @@ class HomeTabBarController: UITabBarController {
             switch self {
             case .chatList:
                 return UIImage(imageLiteralResourceName: "tab-chats")
+            case .payments:
+                return UIImage(imageLiteralResourceName: "wallet-icon-black").resizedImage(to: CGSize(width: 40, height: 40))
             case .calls:
                 return UIImage(named: "tab-calls")
             case .stories:
@@ -62,6 +70,8 @@ class HomeTabBarController: UITabBarController {
             switch self {
             case .chatList:
                 return UIImage(named: "tab-chats")
+            case .payments:
+                return UIImage(named: "wallet-icon-black")?.resizedImage(to: CGSize(width: 40, height: 40))
             case .calls:
                 return UIImage(named: "tab-calls")
             case .stories:
@@ -81,6 +91,8 @@ class HomeTabBarController: UITabBarController {
             switch self {
             case .chatList:
                 return "chats"
+            case .payments:
+                return "wallet"
             case .calls:
                 return "calls"
             case .stories:
@@ -92,6 +104,10 @@ class HomeTabBarController: UITabBarController {
     lazy var chatListViewController = ChatListViewController(chatListMode: .inbox, appReadiness: appReadiness)
     lazy var chatListNavController = OWSNavigationController(rootViewController: chatListViewController)
     lazy var chatListTabBarItem = Tabs.chatList.tabBarItem
+    
+    lazy var walletViewController = PaymentsSettingsViewController(mode: .inAppSettings, appReadiness: appReadiness)
+    lazy var walletNavController = OWSNavigationController(rootViewController: walletViewController)
+    lazy var walletTabBarItem = Tabs.payments.tabBarItem
 
     // No need to share spoiler render state across the whole app.
     lazy var storiesViewController = StoriesViewController(
@@ -205,6 +221,8 @@ class HomeTabBarController: UITabBarController {
         switch tab {
         case .chatList:
             return (chatListNavController, chatListTabBarItem)
+        case .payments:
+            return (walletNavController, walletTabBarItem)
         case .calls:
             return (callsListNavController, callsListTabBarItem)
         case .stories:
@@ -213,7 +231,7 @@ class HomeTabBarController: UITabBarController {
     }
 
     private func tabsToShow(areStoriesEnabled: Bool) -> [Tabs] {
-        var tabs = [Tabs.chatList, Tabs.calls]
+        var tabs = [Tabs.chatList, Tabs.payments, Tabs.calls]
         if areStoriesEnabled {
             tabs.append(Tabs.stories)
         }
@@ -355,6 +373,8 @@ extension HomeTabBarController: UITabBarControllerDelegate {
             switch selectedHomeTab {
             case .chatList:
                 tableView = chatListViewController.tableView
+            case .payments:
+                tableView = walletViewController.tableView
             case .stories:
                 tableView = storiesViewController.tableView
             case .calls:

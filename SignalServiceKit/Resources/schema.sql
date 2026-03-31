@@ -127,6 +127,7 @@ CREATE
             ,"expireTimerVersion" INTEGER
             ,"isSmsMessageRestoredFromBackup" BOOLEAN DEFAULT 0
             ,"isPoll" BOOLEAN DEFAULT 0
+            ,"isStarred" BOOLEAN DEFAULT 0
         )
 ;
 

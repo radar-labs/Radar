@@ -5,6 +5,7 @@
 
 import Foundation
 public import LibSignalClient
+import CryptoKit
 
 public struct VersionedProfileRequest {
     public let aci: Aci
@@ -112,7 +113,7 @@ public class VersionedProfilesImpl: VersionedProfiles {
     }
 
     // MARK: - Update
-
+    
     public func updateProfile(
         profileGivenName: OWSUserProfile.NameComponent?,
         profileFamilyName: OWSUserProfile.NameComponent?,
@@ -121,7 +122,36 @@ public class VersionedProfilesImpl: VersionedProfiles {
         profileAvatarMutation: VersionedProfileAvatarMutation,
         visibleBadgeIds: [String],
         profileKey: Aes256Key,
-        authedAccount: AuthedAccount
+        authedAccount: AuthedAccount,
+    ) async throws -> VersionedProfileUpdate {
+        let tsAccountManager = DependenciesBridge.shared.tsAccountManager
+        let localAci = try tsAccountManager.localIdentifiersWithMaybeSneakyTransaction(authedAccount: authedAccount).aci
+        let localProfileKey = try self.parseProfileKey(profileKey: profileKey)
+        let profileKeyVersionString = try localProfileKey.getProfileKeyVersion(userId: localAci).asHexadecimalString()
+        
+        return try await updateProfileWithProfileKeyVersion(
+            profileKeyVersionString,
+            profileGivenName: profileGivenName,
+            profileFamilyName: profileFamilyName,
+            profileBio: profileBio,
+            profileBioEmoji: profileBioEmoji,
+            profileAvatarMutation: profileAvatarMutation,
+            visibleBadgeIds: visibleBadgeIds,
+            profileKey: profileKey,
+            authedAccount: authedAccount
+        )
+    }
+
+    public func updateProfileWithProfileKeyVersion(
+        _ profileKeyVersion: String,
+        profileGivenName: OWSUserProfile.NameComponent?,
+        profileFamilyName: OWSUserProfile.NameComponent?,
+        profileBio: String?,
+        profileBioEmoji: String?,
+        profileAvatarMutation: VersionedProfileAvatarMutation,
+        visibleBadgeIds: [String],
+        profileKey: Aes256Key,
+        authedAccount: AuthedAccount,
     ) async throws -> VersionedProfileUpdate {
         let tsAccountManager = DependenciesBridge.shared.tsAccountManager
         let localAci = try tsAccountManager.localIdentifiersWithMaybeSneakyTransaction(authedAccount: authedAccount).aci
@@ -194,9 +224,6 @@ public class VersionedProfilesImpl: VersionedProfiles {
             SSKEnvironment.shared.udManagerRef.phoneNumberSharingMode(tx: tx).orDefault == .everybody
         })
 
-        let profileKeyVersion = try localProfileKey.getProfileKeyVersion(userId: localAci)
-        let profileKeyVersionString = try profileKeyVersion.asHexadecimalString()
-
         let hasAvatar: Bool
         let sameAvatar: Bool
         switch profileAvatarMutation {
@@ -220,7 +247,7 @@ public class VersionedProfilesImpl: VersionedProfiles {
             paymentAddress: paymentAddressValue,
             phoneNumberSharing: phoneNumberSharingValue,
             visibleBadgeIds: visibleBadgeIds,
-            version: profileKeyVersionString,
+            version: profileKeyVersion,
             commitment: commitmentData,
             auth: authedAccount.chatServiceAuth
         )
@@ -258,6 +285,7 @@ public class VersionedProfilesImpl: VersionedProfiles {
     public func versionedProfileRequest(
         for aci: Aci,
         profileKey: ProfileKey,
+        profileKeyVersion: String? = nil,
         shouldRequestCredential: Bool,
         udAccessKey: SMKUDAccessKey?,
         auth chatServiceAuth: ChatServiceAuth
@@ -277,12 +305,18 @@ public class VersionedProfilesImpl: VersionedProfiles {
         } else {
             auth = .identified(chatServiceAuth)
         }
-
+        
+        let profileKeyVersion = if let profileKeyVersion = profileKeyVersion {
+            profileKeyVersion
+        } else {
+            try profileKey.getProfileKeyVersion(userId: aci).asHexadecimalString()
+        }
+        
         return VersionedProfileRequest(
             aci: aci,
             request: OWSRequestFactory.getVersionedProfileRequest(
                 aci: aci,
-                profileKeyVersion: try profileKey.getProfileKeyVersion(userId: aci).asHexadecimalString(),
+                profileKeyVersion: profileKeyVersion,
                 credentialRequest: try requestContext?.getRequest().serialize(),
                 auth: auth
             ),

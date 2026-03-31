@@ -16,6 +16,7 @@ protocol MessageActionsDelegate: AnyObject {
     func messageActionsEditItem(_ itemViewModel: CVItemViewModelImpl)
     func messageActionsShowPaymentDetails(_ itemViewModel: CVItemViewModelImpl)
     func messageActionsEndPoll(_ itemViewModel: CVItemViewModelImpl)
+    func messageActionsStarItem(_ itemViewModel: CVItemViewModelImpl)
 }
 
 // MARK: -
@@ -179,6 +180,21 @@ struct MessageActionBuilder {
             }
         )
     }
+    
+    static func star(itemViewModel: CVItemViewModelImpl, delegate: MessageActionsDelegate) -> MessageAction {
+        let isStarred = (itemViewModel.interaction as? TSMessage)?.isStarred ?? false
+        let title = isStarred ? "UNSTAR" : "STAR"
+        
+        return MessageAction(isStarred ? .unstar : .star,
+                             accessibilityLabel: OWSLocalizedString(title, comment: "Action sheet button title"),
+                             accessibilityIdentifier: UIView.accessibilityIdentifier(containerName: "message_action", name: "star"),
+                             contextMenuTitle: OWSLocalizedString(title,  comment: "Context menu button title"),
+                             contextMenuAttributes: [],
+                             block: { [weak delegate] (_) in
+                                delegate?.messageActionsStarItem(itemViewModel)
+
+        })
+    }
 }
 
 class MessageActions: NSObject {
@@ -201,6 +217,9 @@ class MessageActions: NSObject {
             let replyAction = MessageActionBuilder.reply(itemViewModel: itemViewModel, delegate: delegate)
             actions.append(replyAction)
         }
+        
+        let starAction = MessageActionBuilder.star(itemViewModel: itemViewModel, delegate: delegate)
+        actions.append(starAction)
 
         if itemViewModel.canForwardMessage {
             actions.append(MessageActionBuilder.forwardMessage(itemViewModel: itemViewModel, delegate: delegate))

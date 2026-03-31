@@ -1,6 +1,10 @@
 PODS:
   - blurhash (0.0.1)
   - BonMot (6.0.0)
+  - breez_sdk_sparkFFI (0.9.1)
+  - BreezSdkSpark (0.9.1):
+    - breez_sdk_sparkFFI (= 0.9.1)
+    - Swift-BigInt (~> 2.0)
   - CocoaLumberjack (3.7.4):
     - CocoaLumberjack/Core (= 3.7.4)
   - CocoaLumberjack/Core (3.7.4)
@@ -28,11 +32,12 @@ PODS:
   - Mantle (2.1.0):
     - Mantle/extobjc (= 2.1.0)
   - Mantle/extobjc (2.1.0)
+  - MnemonicSwift (2.2.4)
   - MobileCoin/CoreHTTP (6.0.3):
     - LibMobileCoin/CoreHTTP (~> 6.0.0-pre1)
     - Logging (~> 1.4)
   - PureLayout (3.1.4)
-  - Reachability (3.7.6)
+  - Reachability (3.7.7)
   - SDWebImage (5.21.2):
     - SDWebImage/Core (= 5.21.2)
   - SDWebImage/Core (5.21.2)
@@ -47,11 +52,13 @@ PODS:
   - SQLCipher/common (4.6.1)
   - SQLCipher/standard (4.6.1):
     - SQLCipher/common
+  - Swift-BigInt (2.4.0)
   - SwiftProtobuf (1.31.1)
 
 DEPENDENCIES:
   - blurhash (from `./ThirdParty/blurhash.podspec`)
   - BonMot
+  - BreezSdkSpark (from `https://github.com/breez/breez-sdk-spark-swift.git`, tag `0.9.1`)
   - CocoaLumberjack
   - GRDB.swift/SQLCipher
   - LibMobileCoin/CoreHTTP (from `https://github.com/signalapp/libmobilecoin-ios-artifacts`, tag `signal/6.0.2`)
@@ -61,32 +68,40 @@ DEPENDENCIES:
   - libwebp
   - lottie-ios
   - Mantle (from `https://github.com/signalapp/Mantle`, branch `signal-master`)
+  - MnemonicSwift (from `https://github.com/zcash/swift-bip39`, tag `2.2.5`)
   - MobileCoin/CoreHTTP (from `https://github.com/mobilecoinofficial/MobileCoin-Swift`, tag `v6.0.3`)
   - PureLayout
-  - Reachability
+  - Reachability (~> 3.7.7)
   - SDWebImage
   - SDWebImageWebPCoder
   - SignalRingRTC (from `https://github.com/signalapp/ringrtc`, tag `v2.59.3`)
   - SQLCipher (from `https://github.com/signalapp/sqlcipher.git`, tag `v4.6.1-f_barrierfsync`)
+  - Swift-BigInt (= 2.4.0)
   - SwiftProtobuf (= 1.31.1)
 
 SPEC REPOS:
   trunk:
     - BonMot
+    - breez_sdk_sparkFFI
     - CocoaLumberjack
     - GRDB.swift
     - libwebp
     - Logging
     - lottie-ios
+    - MnemonicSwift
     - PureLayout
     - Reachability
     - SDWebImage
     - SDWebImageWebPCoder
+    - Swift-BigInt
     - SwiftProtobuf
 
 EXTERNAL SOURCES:
   blurhash:
     :podspec: "./ThirdParty/blurhash.podspec"
+  BreezSdkSpark:
+    :git: https://github.com/breez/breez-sdk-spark-swift.git
+    :tag: 0.9.1
   LibMobileCoin:
     :git: https://github.com/signalapp/libmobilecoin-ios-artifacts
     :submodules: true
@@ -100,6 +115,9 @@ EXTERNAL SOURCES:
   Mantle:
     :branch: signal-master
     :git: https://github.com/signalapp/Mantle
+  MnemonicSwift:
+    :git: https://github.com/zcash/swift-bip39
+    :tag: 2.2.5
   MobileCoin:
     :git: https://github.com/mobilecoinofficial/MobileCoin-Swift
     :tag: v6.0.3
@@ -114,6 +132,9 @@ CHECKOUT OPTIONS:
   blurhash:
     :commit: 890ffdab14207154819415da7e6c969e9dfff0e9
     :git: https://github.com/signalapp/blurhash
+  BreezSdkSpark:
+    :git: https://github.com/breez/breez-sdk-spark-swift.git
+    :tag: 0.9.1
   LibMobileCoin:
     :git: https://github.com/signalapp/libmobilecoin-ios-artifacts
     :submodules: true
@@ -127,6 +148,9 @@ CHECKOUT OPTIONS:
   Mantle:
     :commit: e7e46253bb01ce39525d90aa69ed9e85e758bfc4
     :git: https://github.com/signalapp/Mantle
+  MnemonicSwift:
+    :git: https://github.com/zcash/swift-bip39
+    :tag: 2.2.5
   MobileCoin:
     :git: https://github.com/mobilecoinofficial/MobileCoin-Swift
     :tag: v6.0.3
@@ -140,6 +164,8 @@ CHECKOUT OPTIONS:
 SPEC CHECKSUMS:
   blurhash: f588a9d659f4c742a325bbbbd438d1ef3c34af19
   BonMot: fb2b6a2209cb3149aca37b7131d49c051c04ae86
+  breez_sdk_sparkFFI: 2adb546ea38e7a4df697b89685ef38a8ca9f0128
+  BreezSdkSpark: e21117a4e49a9882be5fb7aafa715ec373e04daf
   CocoaLumberjack: 543c79c114dadc3b1aba95641d8738b06b05b646
   GRDB.swift: 1395cb3556df6b16ed69dfc74c3886abc75d2825
   LibMobileCoin: 8503f567fa32184a5be7bc038fbd727747dd9991
@@ -149,15 +175,17 @@ SPEC CHECKSUMS:
   Logging: beeb016c9c80cf77042d62e83495816847ef108b
   lottie-ios: fcb5e73e17ba4c983140b7d21095c834b3087418
   Mantle: 2fa750afa478cd625a94230fbf1c13462f29395b
+  MnemonicSwift: 40ba76b951b75b32e2719df989b4d6da5798fe26
   MobileCoin: cd7f49d6eaa2d362e4c9f8324cae0cc3bc3c53b5
   PureLayout: f08c01b8dec00bb14a1fefa3de4c7d9c265df85e
-  Reachability: fd0ecd23705e2599e4cceeb943222ae02296cbc6
+  Reachability: 8bf74b755b2993968c344b465c13e602db2b1044
   SDWebImage: 9f177d83116802728e122410fb25ad88f5c7608a
   SDWebImageWebPCoder: e38c0a70396191361d60c092933e22c20d5b1380
   SignalRingRTC: 8fa61457ba96231dcf8913bfd2a53d8a1aa0e510
   SQLCipher: ff2f045b20d675a73a70f7329395ddd4a2580063
+  Swift-BigInt: 39035927416daca0ff0ee7949f5fef18b3a1a7db
   SwiftProtobuf: e02f51c8c2df5845657aee2d4de9d61bf50ef788
 
-PODFILE CHECKSUM: 7768f2076408c283c171af57dc3901c3a2de2bb4
+PODFILE CHECKSUM: 5b6ec0116ca2385ec88273da5d59184ffc4b79d7
 
-COCOAPODS: 1.15.2
+COCOAPODS: 1.16.2

@@ -59,6 +59,8 @@ static const NSUInteger OWSMessageSchemaVersion = 4;
 
 @property (nonatomic) BOOL isPoll;
 
+@property (nonatomic) BOOL isStarred;
+
 @end
 
 #pragma mark -
@@ -132,6 +134,7 @@ static const NSUInteger OWSMessageSchemaVersion = 4;
                isGroupStoryReply:(BOOL)isGroupStoryReply
                           isPoll:(BOOL)isPoll
   isSmsMessageRestoredFromBackup:(BOOL)isSmsMessageRestoredFromBackup
+                       isStarred:(BOOL)isStarred
               isViewOnceComplete:(BOOL)isViewOnceComplete
                isViewOnceMessage:(BOOL)isViewOnceMessage
                      linkPreview:(nullable OWSLinkPreview *)linkPreview
@@ -167,6 +170,7 @@ static const NSUInteger OWSMessageSchemaVersion = 4;
     _isGroupStoryReply = isGroupStoryReply;
     _isPoll = isPoll;
     _isSmsMessageRestoredFromBackup = isSmsMessageRestoredFromBackup;
+    _isStarred = isStarred;
     _isViewOnceComplete = isViewOnceComplete;
     _isViewOnceMessage = isViewOnceMessage;
     _linkPreview = linkPreview;
@@ -455,6 +459,15 @@ static const NSUInteger OWSMessageSchemaVersion = 4;
     OWSAssertDebug(transaction);
 
     [self anyUpdateMessageWithTransaction:transaction block:^(TSMessage *message) { message.isPoll = isPoll; }];
+}
+
+// MARK: - Starred Message
+
+- (void)updateWithIsStarred:(BOOL)isStarred transaction:(DBWriteTransaction *)transaction
+{
+    OWSAssertDebug(transaction);
+
+    [self anyUpdateMessageWithTransaction:transaction block:^(TSMessage *message) { message.isStarred = isStarred; }];
 }
 
 #ifdef TESTABLE_BUILD

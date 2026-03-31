@@ -17,7 +17,7 @@ public protocol TSPaymentBaseModel: AnyObject {
 extension TSPaymentAmount: TSPaymentBaseModel {
 
     public static var zeroMob: TSPaymentAmount {
-        TSPaymentAmount(currency: .mobileCoin, picoMob: 0)
+        TSPaymentAmount(currency: .bitcoin, picoMob: 0)
     }
 
     public var isValid: Bool {
@@ -63,14 +63,14 @@ extension TSPaymentAmount: TSPaymentBaseModel {
     public func plus(_ other: TSPaymentAmount) -> TSPaymentAmount {
         owsAssertDebug(self.isValidAmount(canBeEmpty: true))
         owsAssertDebug(other.isValidAmount(canBeEmpty: true))
-        owsAssertDebug(self.currency == .mobileCoin)
-        owsAssertDebug(other.currency == .mobileCoin)
+        owsAssertDebug(self.currency == .mobileCoin || self.currency == .bitcoin)
+        owsAssertDebug(self.currency == other.currency)
 
         return TSPaymentAmount(currency: currency, picoMob: self.picoMob + other.picoMob)
     }
 
     public var formatted: String {
-        owsAssertDebug(currency == .mobileCoin)
+        owsAssertDebug(currency == .mobileCoin || currency == .bitcoin)
 
         return "picoMob: \(picoMob)"
     }
@@ -81,17 +81,21 @@ extension TSPaymentAmount: TSPaymentBaseModel {
 @objc
 extension TSPaymentAddress: TSPaymentBaseModel {
     public var isValid: Bool {
-        guard currency == .mobileCoin else {
+        guard currency == .bitcoin else {
             owsFailDebug("Unexpected currency.")
             return false
         }
-        return SSKEnvironment.shared.mobileCoinHelperRef.isValidMobileCoinPublicAddress(mobileCoinPublicAddressData)
+//        return SSKEnvironment.shared.mobileCoinHelperRef.isValidMobileCoinPublicAddress(mobileCoinPublicAddressData)
+        // FIX-ME: Hardcoded value
+        // FIXME: Hardcoded value
+        return true
     }
 
     public func buildProto(tx: DBReadTransaction) throws -> SSKProtoPaymentAddress {
-        guard isValid, currency == .mobileCoin else {
+        guard isValid, currency == .bitcoin else {
             throw PaymentsError.invalidModel
         }
+        
         // Sign the MC public address.
         let identityManager = DependenciesBridge.shared.identityManager
         guard let identityKeyPair: ECKeyPair = identityManager.identityKeyPair(for: .aci, tx: tx) else {
@@ -123,7 +127,7 @@ extension TSPaymentAddress: TSPaymentBaseModel {
             owsFailDebug("Signature verification failed.")
             throw PaymentsError.invalidModel
         }
-        let instance = TSPaymentAddress(currency: .mobileCoin,
+        let instance = TSPaymentAddress(currency: .bitcoin,
                                         mobileCoinPublicAddressData: mobileCoin.publicAddress)
         guard instance.isValid else {
             throw PaymentsError.invalidModel
@@ -320,102 +324,102 @@ extension TSPaymentModel: TSPaymentBaseModel {
             }
         }
 
-        if let feeAmount = mobileCoin?.feeAmount {
-            if !feeAmount.isValidAmount(canBeEmpty: false) {
-                owsFailDebug("Invalid feeAmount: \(formattedState).")
-                isValid = false
-            }
-        } else {
-            let shouldHaveFeeAmount = !isUnidentified && isOutgoing && !isRestored && !isFailed
-            if shouldHaveFeeAmount {
-                owsFailDebug("Missing feeAmount: \(formattedState).")
-                isValid = false
-            }
-        }
+//        if let feeAmount = mobileCoin?.feeAmount {
+//            if !feeAmount.isValidAmount(canBeEmpty: false) {
+//                owsFailDebug("Invalid feeAmount: \(formattedState).")
+//                isValid = false
+//            }
+//        } else {
+//            let shouldHaveFeeAmount = !isUnidentified && isOutgoing && !isRestored && !isFailed
+//            if shouldHaveFeeAmount {
+//                owsFailDebug("Missing feeAmount: \(formattedState).")
+//                isValid = false
+//            }
+//        }
 
-        let shouldHaveAddressUuidString = isIdentifiedPayment
-        if shouldHaveAddressUuidString, addressUuidString == nil {
-            owsFailDebug("Missing addressUuidString: \(formattedState).")
-            isValid = false
-        }
+//        let shouldHaveAddressUuidString = isIdentifiedPayment
+//        if shouldHaveAddressUuidString, addressUuidString == nil {
+//            owsFailDebug("Missing addressUuidString: \(formattedState).")
+//            isValid = false
+//        }
+//
+//        let shouldHaveMCRecipientPublicAddressData = !isRestored && isOutgoing && (isIdentifiedPayment || isOutgoingTransfer) && !isFailed
+//        if shouldHaveMCRecipientPublicAddressData, mcRecipientPublicAddressData == nil {
+//            owsFailDebug("Missing mcRecipientPublicAddressData: \(formattedState).")
+//        }
+//
+//        if shouldHaveMCTransaction, mcTransactionData == nil {
+//            owsFailDebug("Missing mcTransactionData: \(formattedState).")
+//            isValid = false
+//        } else if !canHaveMCTransaction, mcTransactionData != nil {
+//            owsFailDebug("Unexpected mcTransactionData: \(formattedState).")
+//        }
+//
+//        if shouldHaveMCReceipt, mcReceiptData == nil {
+//            owsFailDebug("Missing mcReceiptData: \(formattedState).")
+//            isValid = false
+//        }
 
-        let shouldHaveMCRecipientPublicAddressData = !isRestored && isOutgoing && (isIdentifiedPayment || isOutgoingTransfer) && !isFailed
-        if shouldHaveMCRecipientPublicAddressData, mcRecipientPublicAddressData == nil {
-            owsFailDebug("Missing mcRecipientPublicAddressData: \(formattedState).")
-        }
+//        let hasMCIncomingTransaction = !(self.mobileCoin?.incomingTransactionPublicKeys ?? []).isEmpty
+//        if shouldHaveMCIncomingTransaction, !hasMCIncomingTransaction {
+//            owsFailDebug("Missing mcIncomingTransaction: \(formattedState).")
+//            isValid = false
+//        } else if !canHaveMCIncomingTransaction, hasMCIncomingTransaction {
+//            owsFailDebug("Unexpected mcIncomingTransaction: \(formattedState).")
+//            isValid = false
+//        }
 
-        if shouldHaveMCTransaction, mcTransactionData == nil {
-            owsFailDebug("Missing mcTransactionData: \(formattedState).")
-            isValid = false
-        } else if !canHaveMCTransaction, mcTransactionData != nil {
-            owsFailDebug("Unexpected mcTransactionData: \(formattedState).")
-        }
+//        let shouldHaveRecipient = !isUnidentified && isOutgoing && !isDefragmentation
+//        let hasRecipient = addressUuidString != nil || mcRecipientPublicAddressData != nil
+//        if shouldHaveRecipient, !hasRecipient {
+//            owsFailDebug("Missing recipient: \(formattedState).")
+//            isValid = false
+//        }
 
-        if shouldHaveMCReceipt, mcReceiptData == nil {
-            owsFailDebug("Missing mcReceiptData: \(formattedState).")
-            isValid = false
-        }
+//        if shouldHaveMCSpentKeyImages,
+//           mcSpentKeyImages == nil {
+//            owsFailDebug("Missing mcSpentKeyImages: \(formattedState).")
+//            isValid = false
+//        } else if !canHaveMCSpentKeyImages,
+//                  mcSpentKeyImages != nil {
+//            owsFailDebug("Unexpected mcSpentKeyImages: \(formattedState).")
+//            isValid = false
+//        }
+//
+//        if shouldHaveMCOutputPublicKeys,
+//           mcOutputPublicKeys == nil {
+//            owsFailDebug("Missing mcOutputPublicKeys: \(formattedState).")
+//            isValid = false
+//        } else if !canHaveMCOutputPublicKeys,
+//                  mcOutputPublicKeys != nil {
+//            owsFailDebug("Unexpected mcOutputPublicKeys: \(formattedState).")
+//            isValid = false
+//        }
 
-        let hasMCIncomingTransaction = !(self.mobileCoin?.incomingTransactionPublicKeys ?? []).isEmpty
-        if shouldHaveMCIncomingTransaction, !hasMCIncomingTransaction {
-            owsFailDebug("Missing mcIncomingTransaction: \(formattedState).")
-            isValid = false
-        } else if !canHaveMCIncomingTransaction, hasMCIncomingTransaction {
-            owsFailDebug("Unexpected mcIncomingTransaction: \(formattedState).")
-            isValid = false
-        }
+//        let shouldHaveMCLedgerBlockTimestamp = isComplete && !isUnidentified && !isFailed
+//        if shouldHaveMCLedgerBlockTimestamp,
+//           !hasMCLedgerBlockTimestamp {
+//            // For some payments, we'll never be able to fill in the block timestamp.
+//            Logger.warn("Missing mcLedgerBlockTimestamp: \(formattedState).")
+//        }
 
-        let shouldHaveRecipient = !isUnidentified && isOutgoing && !isDefragmentation
-        let hasRecipient = addressUuidString != nil || mcRecipientPublicAddressData != nil
-        if shouldHaveRecipient, !hasRecipient {
-            owsFailDebug("Missing recipient: \(formattedState).")
-            isValid = false
-        }
+//        let shouldHaveMCLedgerBlockIndex = isVerified || isUnidentified && !isFailed
+//        if shouldHaveMCLedgerBlockIndex,
+//           !hasMCLedgerBlockIndex {
+//            owsFailDebug("Missing mcLedgerBlockIndex: \(formattedState).")
+//            isValid = false
+//        }
 
-        if shouldHaveMCSpentKeyImages,
-           mcSpentKeyImages == nil {
-            owsFailDebug("Missing mcSpentKeyImages: \(formattedState).")
-            isValid = false
-        } else if !canHaveMCSpentKeyImages,
-                  mcSpentKeyImages != nil {
-            owsFailDebug("Unexpected mcSpentKeyImages: \(formattedState).")
-            isValid = false
-        }
-
-        if shouldHaveMCOutputPublicKeys,
-           mcOutputPublicKeys == nil {
-            owsFailDebug("Missing mcOutputPublicKeys: \(formattedState).")
-            isValid = false
-        } else if !canHaveMCOutputPublicKeys,
-                  mcOutputPublicKeys != nil {
-            owsFailDebug("Unexpected mcOutputPublicKeys: \(formattedState).")
-            isValid = false
-        }
-
-        let shouldHaveMCLedgerBlockTimestamp = isComplete && !isUnidentified && !isFailed
-        if shouldHaveMCLedgerBlockTimestamp,
-           !hasMCLedgerBlockTimestamp {
-            // For some payments, we'll never be able to fill in the block timestamp.
-            Logger.warn("Missing mcLedgerBlockTimestamp: \(formattedState).")
-        }
-
-        let shouldHaveMCLedgerBlockIndex = isVerified || isUnidentified && !isFailed
-        if shouldHaveMCLedgerBlockIndex,
-           !hasMCLedgerBlockIndex {
-            owsFailDebug("Missing mcLedgerBlockIndex: \(formattedState).")
-            isValid = false
-        }
-
-        let shouldHaveMobileCoin = !isFailed
-        if shouldHaveMobileCoin,
-           mobileCoin == nil {
-            owsFailDebug("Missing mobileCoin: \(formattedState).")
-            isValid = false
-        } else if !shouldHaveMobileCoin,
-                  mobileCoin != nil {
-            owsFailDebug("Unexpected mobileCoin: \(formattedState).")
-            isValid = false
-        }
+//        let shouldHaveMobileCoin = !isFailed
+//        if shouldHaveMobileCoin,
+//           mobileCoin == nil {
+//            owsFailDebug("Missing mobileCoin: \(formattedState).")
+//            isValid = false
+//        } else if !shouldHaveMobileCoin,
+//                  mobileCoin != nil {
+//            owsFailDebug("Unexpected mobileCoin: \(formattedState).")
+//            isValid = false
+//        }
 
         return isValid
     }
@@ -822,4 +826,17 @@ extension TSPaymentState {
         }
     }
 
+}
+
+public extension TSPaymentCurrency {
+    var identifier: String {
+        switch self {
+        case .bitcoin:
+            PaymentsConstants.bitcoinCurrencyIdentifier
+        case .mobileCoin:
+            PaymentsConstants.mobileCoinCurrencyIdentifier
+        default:
+            "Unknown"
+        }
+    }
 }

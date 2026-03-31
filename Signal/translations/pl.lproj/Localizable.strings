@@ -6007,8 +6007,8 @@
 /* Payments in-chat message shown if a payment fails to send, bottom half. */
 "PAYMENTS_IN_CHAT_FAILURE_MESSAGE_BOTTOM" = "Dotknij, aby dowiedzieć się więcej";
 
-/* Payments in-chat message shown if a payment fails to send, top part. Embeds {{ number, amount of MOB coin not sent }} */
-"PAYMENTS_IN_CHAT_FAILURE_MESSAGE_TOP" = "%1$@ MOB – nie wysłano";
+/* Payments in-chat message shown if a payment fails to send, top part. Embeds {{ number, amount of BTC coin not sent }} */
+"PAYMENTS_IN_CHAT_FAILURE_MESSAGE_TOP" = "%1$@ BTC – nie wysłano";
 
 /* Status indicator for invalid payments which could not be processed. */
 "PAYMENTS_INFO_UNAVAILABLE_MESSAGE" = "NIEDOSTĘPNE";
@@ -8009,7 +8009,7 @@
 "SETTINGS_PAYMENTS_ADD_MONEY" = "Dodaj środki";
 
 /* Explanation of the process for adding money in the 'add money' settings view. */
-"SETTINGS_PAYMENTS_ADD_MONEY_DESCRIPTION" = "Aby dodać środki, wyślij walutę MobileCoin na adres swojego portfela. Zaloguj się w kantorze obsługującym MobileCoin, wymień tam pieniądze, a następnie zeskanuj kod QR lub skopiuj adres portfela.";
+"SETTINGS_PAYMENTS_ADD_MONEY_DESCRIPTION" = "Aby dodać środki, wyślij walutę Bitcoin over Lightning na adres swojego portfela. Zaloguj się w kantorze obsługującym Bitcoin over Lightning, wymień tam pieniądze, a następnie zeskanuj kod QR lub skopiuj adres portfela.";
 
 /* Indicator that the payments wallet address has been copied to the pasteboard. */
 "SETTINGS_PAYMENTS_ADD_MONEY_WALLET_ADDRESS_COPIED" = "Adres portfela skopiowany";
@@ -8417,7 +8417,7 @@
 "SETTINGS_PAYMENTS_TRANSFER_OUT_PLACEHOLDER" = "Do: Zeskanuj lub podaj adres portfela";
 
 /* Label for 'transfer currency out' view in the payment settings. */
-"SETTINGS_PAYMENTS_TRANSFER_OUT_TITLE" = "Przenieś do kantoru";
+"SETTINGS_PAYMENTS_TRANSFER_OUT_TITLE" = "Przenieś na zewnątrz";
 
 /* Label for the 'transfer to exchange' button in the payment settings. */
 "SETTINGS_PAYMENTS_TRANSFER_TO_EXCHANGE" = "Przenieś do kantoru";

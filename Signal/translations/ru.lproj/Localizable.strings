@@ -6007,7 +6007,7 @@
 /* Payments in-chat message shown if a payment fails to send, bottom half. */
 "PAYMENTS_IN_CHAT_FAILURE_MESSAGE_BOTTOM" = "Показать подробности";
 
-/* Payments in-chat message shown if a payment fails to send, top part. Embeds {{ number, amount of MOB coin not sent }} */
+/* Payments in-chat message shown if a payment fails to send, top part. Embeds {{ number, amount of BTC coin not sent }} */
 "PAYMENTS_IN_CHAT_FAILURE_MESSAGE_TOP" = "Не отправлено %1$@ MOB";
 
 /* Status indicator for invalid payments which could not be processed. */
@@ -8009,7 +8009,7 @@
 "SETTINGS_PAYMENTS_ADD_MONEY" = "Пополнить";
 
 /* Explanation of the process for adding money in the 'add money' settings view. */
-"SETTINGS_PAYMENTS_ADD_MONEY_DESCRIPTION" = "Чтобы пополнить баланс, отправьте MobileCoin на адрес своего кошелька. Начните транзакцию в своей учётной записи на бирже, которая поддерживает MobileCoin, затем просканируйте QR-код или скопируйте адрес своего кошелька.";
+"SETTINGS_PAYMENTS_ADD_MONEY_DESCRIPTION" = "Чтобы пополнить баланс, отправьте Bitcoin over Lightning на адрес своего кошелька. Начните транзакцию в своей учётной записи на бирже, которая поддерживает Bitcoin over Lightning, затем просканируйте QR-код или скопируйте адрес своего кошелька.";
 
 /* Indicator that the payments wallet address has been copied to the pasteboard. */
 "SETTINGS_PAYMENTS_ADD_MONEY_WALLET_ADDRESS_COPIED" = "Адрес кошелька скопирован";
@@ -8417,7 +8417,7 @@
 "SETTINGS_PAYMENTS_TRANSFER_OUT_PLACEHOLDER" = "Кому: Просканируйте или введите адрес кошелька";
 
 /* Label for 'transfer currency out' view in the payment settings. */
-"SETTINGS_PAYMENTS_TRANSFER_OUT_TITLE" = "Перевести на биржу";
+"SETTINGS_PAYMENTS_TRANSFER_OUT_TITLE" = "Перевести на адрес";
 
 /* Label for the 'transfer to exchange' button in the payment settings. */
 "SETTINGS_PAYMENTS_TRANSFER_TO_EXCHANGE" = "Перевести на биржу";

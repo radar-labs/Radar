@@ -6007,8 +6007,8 @@
 /* Payments in-chat message shown if a payment fails to send, bottom half. */
 "PAYMENTS_IN_CHAT_FAILURE_MESSAGE_BOTTOM" = "Trykk for detaljer.";
 
-/* Payments in-chat message shown if a payment fails to send, top part. Embeds {{ number, amount of MOB coin not sent }} */
-"PAYMENTS_IN_CHAT_FAILURE_MESSAGE_TOP" = "%1$@ MOB kunne ikke sendes";
+/* Payments in-chat message shown if a payment fails to send, top part. Embeds {{ number, amount of BTC coin not sent }} */
+"PAYMENTS_IN_CHAT_FAILURE_MESSAGE_TOP" = "%1$@ BTC kunne ikke sendes";
 
 /* Status indicator for invalid payments which could not be processed. */
 "PAYMENTS_INFO_UNAVAILABLE_MESSAGE" = "UTILGJENGELIG";
@@ -6092,10 +6092,10 @@
 "PAYMENTS_NEW_PAYMENT_ERROR_CONNECTIVITY_FAILURE" = "Kunne ikke kontakte tjenesten";
 
 /* Indicates that a payment failed due to insufficient funds. */
-"PAYMENTS_NEW_PAYMENT_ERROR_INSUFFICIENT_FUNDS" = "Du har ikke nok MOB til å gjennomføre denne betalingen.";
+"PAYMENTS_NEW_PAYMENT_ERROR_INSUFFICIENT_FUNDS" = "Du har ikke nok BTC til å gjennomføre denne betalingen.";
 
 /* Indicates that a payment failed due to insufficient funds. Embeds {{ current balance }}. */
-"PAYMENTS_NEW_PAYMENT_ERROR_INSUFFICIENT_FUNDS_FORMAT" = "Du har ikke nok MOB til å gjennomføre denne betalingen. Saldoen din er %1$@.";
+"PAYMENTS_NEW_PAYMENT_ERROR_INSUFFICIENT_FUNDS_FORMAT" = "Du har ikke nok BTC til å gjennomføre denne betalingen. Saldoen din er %1$@.";
 
 /* Indicates that a payment failed due to being invalid. */
 "PAYMENTS_NEW_PAYMENT_ERROR_INVALID_TRANSACTION" = "Ugyldig transaksjon";
@@ -8009,7 +8009,7 @@
 "SETTINGS_PAYMENTS_ADD_MONEY" = "Legg til penger";
 
 /* Explanation of the process for adding money in the 'add money' settings view. */
-"SETTINGS_PAYMENTS_ADD_MONEY_DESCRIPTION" = "Send MobileCoin til lommebokadressen din for å overføre penger. Åpne en ny transaksjon fra kontoen din med MobilCoin, og skann QR-koden eller kopier lommebokadressen din.";
+"SETTINGS_PAYMENTS_ADD_MONEY_DESCRIPTION" = "Send Bitcoin over Lightning til lommebokadressen din for å overføre penger. Åpne en ny transaksjon fra kontoen din med Bitcoin over Lightning, og skann QR-koden eller kopier lommebokadressen din.";
 
 /* Indicator that the payments wallet address has been copied to the pasteboard. */
 "SETTINGS_PAYMENTS_ADD_MONEY_WALLET_ADDRESS_COPIED" = "Lommebokadresse kopiert";
@@ -8216,7 +8216,7 @@
 "SETTINGS_PAYMENTS_PAYMENT_DETAILS_STATUS_FOOTER_DEFRAGMENTATION" = "\"Myntoppryddingsgebyr\" belastes når myntene i din besittelse ikke kan kombineres for å fullføre en transaksjon. Oppryddingen vil tillate deg å fortsette å sende betalinger.";
 
 /* Message for the 'insufficient balance for payment' alert. Embeds: {{ The current payments balance }}. */
-"SETTINGS_PAYMENTS_PAYMENT_INSUFFICIENT_BALANCE_ALERT_MESSAGE_FORMAT" = "Du har ikke nok MOB til å gjennomføre denne betalingen. Saldoen din er %1$@.";
+"SETTINGS_PAYMENTS_PAYMENT_INSUFFICIENT_BALANCE_ALERT_MESSAGE_FORMAT" = "Du har ikke nok BTC til å gjennomføre denne betalingen. Saldoen din er %1$@.";
 
 /* Title for the 'insufficient balance for payment' alert. */
 "SETTINGS_PAYMENTS_PAYMENT_INSUFFICIENT_BALANCE_ALERT_TITLE" = "Utilstrekkelig balanse";
@@ -8417,7 +8417,7 @@
 "SETTINGS_PAYMENTS_TRANSFER_OUT_PLACEHOLDER" = "Til: Skann eller skriv inn lommebokadresse";
 
 /* Label for 'transfer currency out' view in the payment settings. */
-"SETTINGS_PAYMENTS_TRANSFER_OUT_TITLE" = "Overfør til veksling";
+"SETTINGS_PAYMENTS_TRANSFER_OUT_TITLE" = "Overfør til ekstern";
 
 /* Label for the 'transfer to exchange' button in the payment settings. */
 "SETTINGS_PAYMENTS_TRANSFER_TO_EXCHANGE" = "Overfør til veksling";

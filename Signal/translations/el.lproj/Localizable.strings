@@ -6007,8 +6007,8 @@
 /* Payments in-chat message shown if a payment fails to send, bottom half. */
 "PAYMENTS_IN_CHAT_FAILURE_MESSAGE_BOTTOM" = "Πάτα για λεπτομέρειες";
 
-/* Payments in-chat message shown if a payment fails to send, top part. Embeds {{ number, amount of MOB coin not sent }} */
-"PAYMENTS_IN_CHAT_FAILURE_MESSAGE_TOP" = "%1$@ MOB δεν στάλθηκε";
+/* Payments in-chat message shown if a payment fails to send, top part. Embeds {{ number, amount of BTC coin not sent }} */
+"PAYMENTS_IN_CHAT_FAILURE_MESSAGE_TOP" = "%1$@ BTC δεν στάλθηκε";
 
 /* Status indicator for invalid payments which could not be processed. */
 "PAYMENTS_INFO_UNAVAILABLE_MESSAGE" = "ΔΕΝ ΔΙΑΤΙΘΕΤΑΙ";
@@ -6092,10 +6092,10 @@
 "PAYMENTS_NEW_PAYMENT_ERROR_CONNECTIVITY_FAILURE" = "Δεν ήταν δυνατή η επικοινωνία με την υπηρεσία";
 
 /* Indicates that a payment failed due to insufficient funds. */
-"PAYMENTS_NEW_PAYMENT_ERROR_INSUFFICIENT_FUNDS" = "Δεν έχετε αρκετά MOB για να ολοκληρώσετε αυτή την πληρωμή.";
+"PAYMENTS_NEW_PAYMENT_ERROR_INSUFFICIENT_FUNDS" = "Δεν έχετε αρκετά BTC για να ολοκληρώσετε αυτή την πληρωμή.";
 
 /* Indicates that a payment failed due to insufficient funds. Embeds {{ current balance }}. */
-"PAYMENTS_NEW_PAYMENT_ERROR_INSUFFICIENT_FUNDS_FORMAT" = "Δεν έχετε αρκετά MOB για να ολοκληρώσετε αυτήν την πληρωμή. Το τρέχον υπόλοιπό σας είναι %1$@.";
+"PAYMENTS_NEW_PAYMENT_ERROR_INSUFFICIENT_FUNDS_FORMAT" = "Δεν έχετε αρκετά BTC για να ολοκληρώσετε αυτήν την πληρωμή. Το τρέχον υπόλοιπό σας είναι %1$@.";
 
 /* Indicates that a payment failed due to being invalid. */
 "PAYMENTS_NEW_PAYMENT_ERROR_INVALID_TRANSACTION" = "Μη έγκυρη συναλλαγή";
@@ -8009,7 +8009,7 @@
 "SETTINGS_PAYMENTS_ADD_MONEY" = "Προσθήκη Χρημάτων";
 
 /* Explanation of the process for adding money in the 'add money' settings view. */
-"SETTINGS_PAYMENTS_ADD_MONEY_DESCRIPTION" = "Για να προσθέσετε χρήματα, στείλτε MobileCoin στη διεύθυνση του πορτοφολιού σας. Ξεκινήστε μια συναλλαγή από τον λογαριασμό σας σε ένα ανταλλακτήριο που υποστηρίζει MobileCoin και στη συνέχεια σαρώστε τον κωδικό QR ή αντιγράψτε τη διεύθυνση του πορτοφολιού σας.";
+"SETTINGS_PAYMENTS_ADD_MONEY_DESCRIPTION" = "Για να προσθέσετε χρήματα, στείλτε Bitcoin over Lightning στη διεύθυνση του πορτοφολιού σας. Ξεκινήστε μια συναλλαγή από τον λογαριασμό σας σε ένα ανταλλακτήριο που υποστηρίζει Bitcoin over Lightning και στη συνέχεια σαρώστε τον κωδικό QR ή αντιγράψτε τη διεύθυνση του πορτοφολιού σας.";
 
 /* Indicator that the payments wallet address has been copied to the pasteboard. */
 "SETTINGS_PAYMENTS_ADD_MONEY_WALLET_ADDRESS_COPIED" = "Η διεύθυνση πορτοφολιού αντιγράφηκε";
@@ -8216,7 +8216,7 @@
 "SETTINGS_PAYMENTS_PAYMENT_DETAILS_STATUS_FOOTER_DEFRAGMENTATION" = "Ένα «τέλος καθαρισμού κερμάτων» χρεώνεται όταν τα κέρματα που έχετε στην κατοχή σας δεν μπορούν να συνδυαστούν για να ολοκληρωθεί μια συναλλαγή. Ο καθαρισμός θα σας επιτρέψει να συνεχίσετε να στέλνετε πληρωμές.";
 
 /* Message for the 'insufficient balance for payment' alert. Embeds: {{ The current payments balance }}. */
-"SETTINGS_PAYMENTS_PAYMENT_INSUFFICIENT_BALANCE_ALERT_MESSAGE_FORMAT" = "Δεν έχετε αρκετά MOB για να ολοκληρώσετε αυτήν την πληρωμή. Το τρέχον υπόλοιπό σας είναι %1$@.";
+"SETTINGS_PAYMENTS_PAYMENT_INSUFFICIENT_BALANCE_ALERT_MESSAGE_FORMAT" = "Δεν έχετε αρκετά BTC για να ολοκληρώσετε αυτήν την πληρωμή. Το τρέχον υπόλοιπό σας είναι %1$@.";
 
 /* Title for the 'insufficient balance for payment' alert. */
 "SETTINGS_PAYMENTS_PAYMENT_INSUFFICIENT_BALANCE_ALERT_TITLE" = "Μη Επαρκές Υπόλοιπο";
@@ -8417,7 +8417,7 @@
 "SETTINGS_PAYMENTS_TRANSFER_OUT_PLACEHOLDER" = "Προς: Σαρώστε ή εισαγάγετε διεύθυνση πορτοφολιού";
 
 /* Label for 'transfer currency out' view in the payment settings. */
-"SETTINGS_PAYMENTS_TRANSFER_OUT_TITLE" = "Μεταφορά για Ανταλλαγή";
+"SETTINGS_PAYMENTS_TRANSFER_OUT_TITLE" = "Μεταφορά σε εξωτερικό";
 
 /* Label for the 'transfer to exchange' button in the payment settings. */
 "SETTINGS_PAYMENTS_TRANSFER_TO_EXCHANGE" = "Μεταφορά σε Ανταλλακτήριο";

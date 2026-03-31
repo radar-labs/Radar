@@ -6007,8 +6007,8 @@
 /* Payments in-chat message shown if a payment fails to send, bottom half. */
 "PAYMENTS_IN_CHAT_FAILURE_MESSAGE_BOTTOM" = "Додирните да видите детаље";
 
-/* Payments in-chat message shown if a payment fails to send, top part. Embeds {{ number, amount of MOB coin not sent }} */
-"PAYMENTS_IN_CHAT_FAILURE_MESSAGE_TOP" = "%1$@ MOB није послато";
+/* Payments in-chat message shown if a payment fails to send, top part. Embeds {{ number, amount of BTC coin not sent }} */
+"PAYMENTS_IN_CHAT_FAILURE_MESSAGE_TOP" = "%1$@ BTC није послато";
 
 /* Status indicator for invalid payments which could not be processed. */
 "PAYMENTS_INFO_UNAVAILABLE_MESSAGE" = "НИЈЕ ДОСТУПНО";
@@ -8009,7 +8009,7 @@
 "SETTINGS_PAYMENTS_ADD_MONEY" = "Додај средства";
 
 /* Explanation of the process for adding money in the 'add money' settings view. */
-"SETTINGS_PAYMENTS_ADD_MONEY_DESCRIPTION" = "Да бисте додали средства, пошаљите MobileCoin на своју адресу новчаника. Покрените трансакцију са свог налога на берзи која подржава MobileCoin, а затим скенирајте QR код или копирајте вашу адресу новчаника.";
+"SETTINGS_PAYMENTS_ADD_MONEY_DESCRIPTION" = "Да бисте додали средства, пошаљите Bitcoin over Lightning на своју адресу новчаника. Покрените трансакцију са свог налога на берзи која подржава Bitcoin over Lightning, а затим скенирајте QR код или копирајте вашу адресу новчаника.";
 
 /* Indicator that the payments wallet address has been copied to the pasteboard. */
 "SETTINGS_PAYMENTS_ADD_MONEY_WALLET_ADDRESS_COPIED" = "Адреса новчаника је копирана";
@@ -8417,7 +8417,7 @@
 "SETTINGS_PAYMENTS_TRANSFER_OUT_PLACEHOLDER" = "Прималац: Скенирајте или унесите адресу новчаника";
 
 /* Label for 'transfer currency out' view in the payment settings. */
-"SETTINGS_PAYMENTS_TRANSFER_OUT_TITLE" = "Пренесите на берзу";
+"SETTINGS_PAYMENTS_TRANSFER_OUT_TITLE" = "Пренос на екстерно";
 
 /* Label for the 'transfer to exchange' button in the payment settings. */
 "SETTINGS_PAYMENTS_TRANSFER_TO_EXCHANGE" = "Пренесите на берзу";

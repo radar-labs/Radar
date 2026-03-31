@@ -191,108 +191,110 @@ extension ArchivedPayment {
 
 extension TSPaymentModel {
     func asArchivedPayment() -> ArchivedPayment {
-
-        var identifier: ArchivedPayment.TransactionIdentifier?
-        if let incomingTransactionPublicKeys = mobileCoin?.incomingTransactionPublicKeys {
-            identifier = ArchivedPayment.TransactionIdentifier(
-                publicKey: incomingTransactionPublicKeys,
-                keyImages: nil
-            )
-        } else if (mcOutputPublicKeys?.nilIfEmpty != nil || mcSpentKeyImages?.nilIfEmpty != nil) {
-            if (mcOutputPublicKeys?.nilIfEmpty == nil || mcSpentKeyImages?.nilIfEmpty == nil) {
-                owsFailDebug("one of public Keys or spent keys is nil")
-                identifier = nil
-            } else {
-                identifier = ArchivedPayment.TransactionIdentifier(
-                    publicKey: nil,
-                    keyImages: mcSpentKeyImages
-                )
-            }
-        }
-
-        let status: ArchivedPayment.Status = {
-            guard !isFailed else { return .error }
-            switch paymentState {
-            case .incomingComplete,
-                    .incomingVerified,
-                    .incomingUnverified,
-                    .outgoingComplete,
-                    .outgoingVerified,
-                    .outgoingUnverified:
-                return .successful
-            case .outgoingSent,
-                    .outgoingSending:
-                return .submitted
-            case .outgoingUnsubmitted:
-                return .initial
-            case .incomingFailed,
-                    .outgoingFailed:
-                owsFailDebug("Invalid failure state in success path")
-                return .initial
-            @unknown default:
-                owsFailDebug("Encountered invalid payment state")
-                return .initial
-            }
-        }()
-
-        let failureReason: ArchivedPayment.FailureReason = {
-            guard isFailed else { return .none }
-            switch paymentFailure {
-            case .insufficientFunds:
-                return .insufficientFundsFailure
-            case .notificationSendFailed:
-                return .networkFailure
-            case .expired,
-                    .invalid,
-                    .validationFailed,
-                    .unknown,
-                    .none:
-                return .genericFailure
-            @unknown default:
-                owsFailDebug("Encountered invalid payment state")
-                return .genericFailure
-            }
-        }()
-
-        let direction: ArchivedPayment.Direction = {
-            switch paymentState {
-            case .incomingComplete,
-                 .incomingVerified,
-                 .incomingUnverified,
-                 .incomingFailed,
-                 .outgoingFailed:
-                return .incoming
-            case .outgoingComplete,
-                 .outgoingVerified,
-                 .outgoingUnverified,
-                 .outgoingUnsubmitted,
-                 .outgoingSent,
-                 .outgoingSending:
-                return .outgoing
-            @unknown default:
-                owsFailDebug("Encountered invalid payment state")
-                return .unknown
-            }
-        }()
-
-        let formattedAmount = paymentAmount.map {PaymentsFormat.format(paymentAmount: $0, isShortForm: true)}
-        let formattedFee = mobileCoin?.feeAmount.map {PaymentsFormat.format(paymentAmount: $0, isShortForm: true)}
-
-        return ArchivedPayment(
-            amount: formattedAmount,
-            fee: formattedFee,
-            note: memoMessage,
-            mobileCoinIdentification: identifier,
-            status: status,
-            failureReason: failureReason,
-            direction: direction,
-            timestamp: createdTimestamp,
-            blockIndex: mcLedgerBlockIndex,
-            blockTimestamp: mcLedgerBlockTimestamp,
-            transaction: mcTransactionData,
-            receipt: mcReceiptData,
-            senderOrRecipientAci: senderOrRecipientAci?.wrappedAciValue,
-            interactionUniqueId: interactionUniqueId
-        )
+        // FIX-ME: Unimplemented
+        // exit(-1)
+        fatalError("Unimplemented")
+//        var identifier: ArchivedPayment.TransactionIdentifier?
+//        if let incomingTransactionPublicKeys = mobileCoin?.incomingTransactionPublicKeys {
+//            identifier = ArchivedPayment.TransactionIdentifier(
+//                publicKey: incomingTransactionPublicKeys,
+//                keyImages: nil
+//            )
+//        } else if (mcOutputPublicKeys?.nilIfEmpty != nil || mcSpentKeyImages?.nilIfEmpty != nil) {
+//            if (mcOutputPublicKeys?.nilIfEmpty == nil || mcSpentKeyImages?.nilIfEmpty == nil) {
+//                owsFailDebug("one of public Keys or spent keys is nil")
+//                identifier = nil
+//            } else {
+//                identifier = ArchivedPayment.TransactionIdentifier(
+//                    publicKey: nil,
+//                    keyImages: mcSpentKeyImages
+//                )
+//            }
+//        }
+//
+//        let status: ArchivedPayment.Status = {
+//            guard !isFailed else { return .error }
+//            switch paymentState {
+//            case .incomingComplete,
+//                    .incomingVerified,
+//                    .incomingUnverified,
+//                    .outgoingComplete,
+//                    .outgoingVerified,
+//                    .outgoingUnverified:
+//                return .successful
+//            case .outgoingSent,
+//                    .outgoingSending:
+//                return .submitted
+//            case .outgoingUnsubmitted:
+//                return .initial
+//            case .incomingFailed,
+//                    .outgoingFailed:
+//                owsFailDebug("Invalid failure state in success path")
+//                return .initial
+//            @unknown default:
+//                owsFailDebug("Encountered invalid payment state")
+//                return .initial
+//            }
+//        }()
+//
+//        let failureReason: ArchivedPayment.FailureReason = {
+//            guard isFailed else { return .none }
+//            switch paymentFailure {
+//            case .insufficientFunds:
+//                return .insufficientFundsFailure
+//            case .notificationSendFailed:
+//                return .networkFailure
+//            case .expired,
+//                    .invalid,
+//                    .validationFailed,
+//                    .unknown,
+//                    .none:
+//                return .genericFailure
+//            @unknown default:
+//                owsFailDebug("Encountered invalid payment state")
+//                return .genericFailure
+//            }
+//        }()
+//
+//        let direction: ArchivedPayment.Direction = {
+//            switch paymentState {
+//            case .incomingComplete,
+//                 .incomingVerified,
+//                 .incomingUnverified,
+//                 .incomingFailed,
+//                 .outgoingFailed:
+//                return .incoming
+//            case .outgoingComplete,
+//                 .outgoingVerified,
+//                 .outgoingUnverified,
+//                 .outgoingUnsubmitted,
+//                 .outgoingSent,
+//                 .outgoingSending:
+//                return .outgoing
+//            @unknown default:
+//                owsFailDebug("Encountered invalid payment state")
+//                return .unknown
+//            }
+//        }()
+//
+//        let formattedAmount = paymentAmount.map {PaymentsFormat.format(paymentAmount: $0, isShortForm: true)}
+//        let formattedFee = mobileCoin?.feeAmount.map {PaymentsFormat.format(paymentAmount: $0, isShortForm: true)}
+//
+//        return ArchivedPayment(
+//            amount: formattedAmount,
+//            fee: formattedFee,
+//            note: memoMessage,
+//            mobileCoinIdentification: identifier,
+//            status: status,
+//            failureReason: failureReason,
+//            direction: direction,
+//            timestamp: createdTimestamp,
+//            blockIndex: mcLedgerBlockIndex,
+//            blockTimestamp: mcLedgerBlockTimestamp,
+//            transaction: mcTransactionData,
+//            receipt: mcReceiptData,
+//            senderOrRecipientAci: senderOrRecipientAci?.wrappedAciValue,
+//            interactionUniqueId: interactionUniqueId
+//        )
     }
 }

@@ -68,12 +68,12 @@ class PaymentsDetailViewController: OWSTableViewController2 {
 
         contents.add(buildStatusSection())
 
-        if
-            DebugFlags.internalSettings,
-            let payment = paymentItem as? PaymentsHistoryModelItem
-        {
-            contents.add(buildInternalSection(paymentModel: payment.paymentModel))
-        }
+//        if
+//            DebugFlags.internalSettings,
+//            let payment = paymentItem as? PaymentsHistoryModelItem
+//        {
+//            contents.add(buildInternalSection(paymentModel: payment.paymentModel))
+//        }
 
         self.contents = contents
     }
@@ -185,60 +185,6 @@ class PaymentsDetailViewController: OWSTableViewController2 {
 
         let paymentItem = self.paymentItem
 
-        // Block
-        if
-            paymentItem.isUnidentified,
-            let index = paymentItem.ledgerBlockIndex,
-            index > 0
-        {
-            section.add(buildStatusItem(topText: OWSLocalizedString("SETTINGS_PAYMENTS_PAYMENT_DETAILS_BLOCK_INDEX",
-                                                                   comment: "Label for the 'MobileCoin block index' in the payment details view in the app settings."),
-                                        bottomText: OWSFormat.formatUInt64(index)))
-        }
-
-        // Type/Amount
-        if
-            let value = paymentItem.formattedPaymentAmount,
-           !paymentItem.isFailed
-        {
-            let title: String
-            if let senderOrRecipientAddress = paymentItem.address {
-                let username = SSKEnvironment.shared.databaseStorageRef.read { tx in
-                    return SSKEnvironment.shared.contactManagerRef.displayName(for: senderOrRecipientAddress, tx: tx).resolvedValue()
-                }
-                let titleFormat: String = {
-                    switch paymentItem {
-                    case let item where item.isIncoming:
-                        return OWSLocalizedString(
-                            "SETTINGS_PAYMENTS_PAYMENT_DETAILS_RECEIVED_FORMAT",
-                            comment: "Format for indicator that you received a payment in the payment details view in the app settings. Embeds: {{ the user who sent you the payment }}."
-                        )
-                    case let item where item.paymentState.messageReceiptStatus == .sending:
-                        return OWSLocalizedString(
-                            "SETTINGS_PAYMENTS_PAYMENT_DETAILS_SENDING_FORMAT",
-                            comment: "Format for indicator that you sent a payment in the payment details view in the app settings. Embeds: {{ the user who you sent the payment to }}."
-                        )
-                    default:
-                        return OWSLocalizedString(
-                            "SETTINGS_PAYMENTS_PAYMENT_DETAILS_SENT_FORMAT",
-                            comment: "Format for indicator that you sent a payment in the payment details view in the app settings. Embeds: {{ the user who you sent the payment to }}."
-                        )
-                    }
-                }()
-                title = String(format: titleFormat, username)
-            } else {
-                if paymentItem.isIncoming {
-                    title = OWSLocalizedString("SETTINGS_PAYMENTS_PAYMENT_DETAILS_RECEIVED",
-                                              comment: "Indicates that you received a payment in the payment details view in the app settings.")
-                } else {
-                    title = OWSLocalizedString("SETTINGS_PAYMENTS_PAYMENT_DETAILS_SENT",
-                                              comment: "Indicates that you sent a payment in the payment details view in the app settings.")
-                }
-            }
-
-            section.add(buildStatusItem(topText: title, bottomText: value))
-        }
-
         // Fee
         if paymentItem.isOutgoing,
            let feeAmount = paymentItem.formattedFeeAmount, !paymentItem.isFailed {
@@ -307,22 +253,6 @@ class PaymentsDetailViewController: OWSTableViewController2 {
                 )
             )
         }
-
-        let footerText = (paymentItem.isDefragmentation
-                            ? OWSLocalizedString("SETTINGS_PAYMENTS_PAYMENT_DETAILS_STATUS_FOOTER_DEFRAGMENTATION",
-                                                comment: "Footer string for the status section of the payment details view in the app settings for defragmentation transactions.")
-                            : OWSLocalizedString("SETTINGS_PAYMENTS_PAYMENT_DETAILS_STATUS_FOOTER",
-                                                comment: "Footer string for the status section of the payment details view in the app settings."))
-        let footerLabel = PaymentsViewUtils.buildTextWithLearnMoreLinkTextView(
-            text: footerText,
-            font: .dynamicTypeCaption1Clamped,
-            learnMoreUrl: URL.Support.Payments.details)
-        let footerStack = UIStackView(arrangedSubviews: [footerLabel])
-        footerStack.axis = .vertical
-        footerStack.alignment = .fill
-        footerStack.layoutMargins = .init(hMargin: Self.cellHInnerMargin, vMargin: 12)
-        footerStack.isLayoutMarginsRelativeArrangement = true
-        section.customFooterView = footerStack
 
         return section
     }
@@ -465,15 +395,27 @@ class PaymentsDetailViewController: OWSTableViewController2 {
         amountLabel.font = UIFont.regularFont(ofSize: 54)
         amountLabel.textAlignment = .center
         amountLabel.adjustsFontSizeToFitWidth = true
+        
+        let fiatAmountLabel = UILabel()
+        fiatAmountLabel.textColor = Theme.primaryTextColor
+        fiatAmountLabel.font = UIFont.regularFont(ofSize: 18)
+        fiatAmountLabel.textAlignment = .center
+        fiatAmountLabel.adjustsFontSizeToFitWidth = true
 
         let amountWrapper = UIView.container()
-        amountWrapper.addSubview(amountLabel)
-        amountLabel.autoPinEdgesToSuperviewEdges()
+        let stackView = UIStackView()
+        stackView.axis = .vertical
+        stackView.addArrangedSubview(amountLabel)
+        stackView.addArrangedSubview(fiatAmountLabel)
+        amountWrapper.addSubview(stackView)
+        stackView.autoPinEdgesToSuperviewEdges()
 
         if paymentItem.isFailed {
             amountLabel.alpha = 0.3
+            fiatAmountLabel.alpha = 0.3
         } else if !paymentItem.paymentState.isVerified {
             amountLabel.alpha = 0.5
+            fiatAmountLabel.alpha = 0.5
         }
 
         if let amount = paymentItem.attributedPaymentAmount {
@@ -485,6 +427,10 @@ class PaymentsDetailViewController: OWSTableViewController2 {
             amountWrapper.addSubview(activityIndicator)
             activityIndicator.autoCenterInSuperview()
             activityIndicator.startAnimating()
+        }
+        
+        if let fiatAmount = paymentItem.formattedFiatPaymentAmount {
+            fiatAmountLabel.text = fiatAmount
         }
 
         return amountWrapper

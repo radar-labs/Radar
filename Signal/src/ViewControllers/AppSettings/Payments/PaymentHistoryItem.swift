@@ -41,6 +41,10 @@ public protocol PaymentsHistoryItem {
     var attributedPaymentAmount: NSAttributedString? { get }
 
     var formattedPaymentAmount: String? { get }
+    
+    var formattedTotalPaymentAmount: String? { get }
+    
+    var formattedFiatPaymentAmount: String? { get }
 
     func statusDescription(isLongForm: Bool) -> String?
 

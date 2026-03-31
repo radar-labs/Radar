@@ -6007,8 +6007,8 @@
 /* Payments in-chat message shown if a payment fails to send, bottom half. */
 "PAYMENTS_IN_CHAT_FAILURE_MESSAGE_BOTTOM" = "Ketik untuk butiran";
 
-/* Payments in-chat message shown if a payment fails to send, top part. Embeds {{ number, amount of MOB coin not sent }} */
-"PAYMENTS_IN_CHAT_FAILURE_MESSAGE_TOP" = "%1$@ MOB Tidak dihantar";
+/* Payments in-chat message shown if a payment fails to send, top part. Embeds {{ number, amount of BTC coin not sent }} */
+"PAYMENTS_IN_CHAT_FAILURE_MESSAGE_TOP" = "%1$@ BTC Tidak dihantar";
 
 /* Status indicator for invalid payments which could not be processed. */
 "PAYMENTS_INFO_UNAVAILABLE_MESSAGE" = "TIDAK TERSEDIA";
@@ -6092,10 +6092,10 @@
 "PAYMENTS_NEW_PAYMENT_ERROR_CONNECTIVITY_FAILURE" = "Tidak dapat menghubungi perkhidmatan";
 
 /* Indicates that a payment failed due to insufficient funds. */
-"PAYMENTS_NEW_PAYMENT_ERROR_INSUFFICIENT_FUNDS" = "Anda tidak mempunyai MOB yang mencukupi untuk menyelesaikan pembayaran ini.";
+"PAYMENTS_NEW_PAYMENT_ERROR_INSUFFICIENT_FUNDS" = "Anda tidak mempunyai BTC yang mencukupi untuk menyelesaikan pembayaran ini.";
 
 /* Indicates that a payment failed due to insufficient funds. Embeds {{ current balance }}. */
-"PAYMENTS_NEW_PAYMENT_ERROR_INSUFFICIENT_FUNDS_FORMAT" = "Anda tidak mempunyai MOB yang mencukupi untuk menyelesaikan pembayaran ini. Baki semasa anda ialah %1$@.";
+"PAYMENTS_NEW_PAYMENT_ERROR_INSUFFICIENT_FUNDS_FORMAT" = "Anda tidak mempunyai BTC yang mencukupi untuk menyelesaikan pembayaran ini. Baki semasa anda ialah %1$@.";
 
 /* Indicates that a payment failed due to being invalid. */
 "PAYMENTS_NEW_PAYMENT_ERROR_INVALID_TRANSACTION" = "Transaksi tidak sah";
@@ -8009,7 +8009,7 @@
 "SETTINGS_PAYMENTS_ADD_MONEY" = "Tambah Dana";
 
 /* Explanation of the process for adding money in the 'add money' settings view. */
-"SETTINGS_PAYMENTS_ADD_MONEY_DESCRIPTION" = "Untuk menambah dana, hantar MobileCoin ke alamat dompet anda. Mulakan transaksi daripada akaun anda di pertukaran yang menyokong MobileCoin, kemudian imbas kod QR atau salin alamat dompet anda.";
+"SETTINGS_PAYMENTS_ADD_MONEY_DESCRIPTION" = "Untuk menambah dana, hantar Bitcoin over Lightning ke alamat dompet anda. Mulakan transaksi daripada akaun anda di pertukaran yang menyokong Bitcoin over Lightning, kemudian imbas kod QR atau salin alamat dompet anda.";
 
 /* Indicator that the payments wallet address has been copied to the pasteboard. */
 "SETTINGS_PAYMENTS_ADD_MONEY_WALLET_ADDRESS_COPIED" = "Alamat Dompet telah Disalin";
@@ -8216,7 +8216,7 @@
 "SETTINGS_PAYMENTS_PAYMENT_DETAILS_STATUS_FOOTER_DEFRAGMENTATION" = "\"Bayaran pembersihan syiling\" dikenakan apabila duit syiling yang anda miliki tidak dapat digabungkan untuk menyelesaikan transaksi. Pembersihan akan membenarkan anda terus menghantar pembayaran.";
 
 /* Message for the 'insufficient balance for payment' alert. Embeds: {{ The current payments balance }}. */
-"SETTINGS_PAYMENTS_PAYMENT_INSUFFICIENT_BALANCE_ALERT_MESSAGE_FORMAT" = "Anda tidak mempunyai MOB yang mencukupi untuk menyelesaikan pembayaran ini. Baki semasa anda ialah %1$@.";
+"SETTINGS_PAYMENTS_PAYMENT_INSUFFICIENT_BALANCE_ALERT_MESSAGE_FORMAT" = "Anda tidak mempunyai BTC yang mencukupi untuk menyelesaikan pembayaran ini. Baki semasa anda ialah %1$@.";
 
 /* Title for the 'insufficient balance for payment' alert. */
 "SETTINGS_PAYMENTS_PAYMENT_INSUFFICIENT_BALANCE_ALERT_TITLE" = "Baki Tidak Mencukupi";
@@ -8417,7 +8417,7 @@
 "SETTINGS_PAYMENTS_TRANSFER_OUT_PLACEHOLDER" = "Kepada: Imbas atau masukkan alamat dompet";
 
 /* Label for 'transfer currency out' view in the payment settings. */
-"SETTINGS_PAYMENTS_TRANSFER_OUT_TITLE" = "Pindah ke Pertukaran";
+"SETTINGS_PAYMENTS_TRANSFER_OUT_TITLE" = "Pindahkan ke Luaran";
 
 /* Label for the 'transfer to exchange' button in the payment settings. */
 "SETTINGS_PAYMENTS_TRANSFER_TO_EXCHANGE" = "Pindah ke Pertukaran";

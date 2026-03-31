@@ -208,6 +208,7 @@ extension ConversationViewController {
         var viewControllers = viewControllersUpToSelf
 
         let settingsView = ConversationSettingsViewController(
+            appReadiness: appReadiness,
             threadViewModel: threadViewModel,
             isSystemContact: conversationViewModel.isSystemContact,
             spoilerState: viewState.spoilerState

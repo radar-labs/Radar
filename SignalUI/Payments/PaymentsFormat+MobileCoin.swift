@@ -11,7 +11,11 @@ public extension PaymentsFormat {
     static func formatInChatSuccess(
         paymentAmount: TSPaymentAmount
     ) -> NSAttributedString {
-        formatInChat(
+        if PaymentsImpl.isSatoshiAmountTypeEnabled() {
+            return inChatSuccessAmountBuilder("\(paymentAmount.picoMob)")
+        }
+        
+        return formatInChat(
             paymentAmount: paymentAmount,
             amountBuilder: inChatSuccessAmountBuilder(_:)
         )
@@ -20,16 +24,20 @@ public extension PaymentsFormat {
     static func formatInChatFailure(
         paymentAmount: TSPaymentAmount
     ) -> NSAttributedString {
-        formatInChat(
+        if PaymentsImpl.isSatoshiAmountTypeEnabled() {
+            return inChatFailureAmountBuilder("\(paymentAmount.picoMob)")
+        }
+        
+        return formatInChat(
             paymentAmount: paymentAmount,
             amountBuilder: inChatFailureAmountBuilder(_:)
         )
     }
 
     static func inChatSuccessAmountBuilder(_ amount: String) -> NSAttributedString {
-        let firstAttributes: [NSAttributedString.Key: Any] = [.font: UIFont.dynamicTypeLargeTitle1Clamped.withSize(32)]
+        let firstAttributes: [NSAttributedString.Key: Any] = [.font: UIFont.dynamicTypeLargeTitle1Clamped.withSize(20)]
 
-        let startingFont = UIFont.dynamicTypeLargeTitle1Clamped.withSize(32)
+        let startingFont = UIFont.dynamicTypeLargeTitle1Clamped.withSize(20)
         let traits = [UIFontDescriptor.TraitKey.weight: UIFont.Weight.thin]
         let thinFontDescriptor = startingFont.fontDescriptor.addingAttributes(
             [UIFontDescriptor.AttributeName.traits: traits]
@@ -39,7 +47,12 @@ public extension PaymentsFormat {
         let secondAttributes: [NSAttributedString.Key: Any] = [.font: newThinFont]
 
         let firstString = NSMutableAttributedString(string: amount, attributes: firstAttributes)
-        let secondString = NSMutableAttributedString(string: " MOB", attributes: secondAttributes)
+        let currencyIdentifier = if PaymentsImpl.isSatoshiAmountTypeEnabled() {
+            "sats"
+        } else {
+            "BTC"
+        }
+        let secondString = NSMutableAttributedString(string: " \(currencyIdentifier)", attributes: secondAttributes)
 
         // NOTE: not RTL-friendly. Maybe fix this if it comes up.
         firstString.append(secondString)
@@ -80,16 +93,56 @@ public extension PaymentsFormat {
                                  isShortForm: Bool,
                                  paymentType: TSPaymentType? = nil,
                                  withSpace: Bool = false) -> NSAttributedString {
-        guard paymentAmount.currency == .mobileCoin else {
+        switch paymentAmount.currency {
+        case .bitcoin:
+            let bitcoinString = if PaymentsImpl.isSatoshiAmountTypeEnabled() {
+                "\(paymentAmount.picoMob)"
+            } else {
+                format(paymentAmount: paymentAmount,
+                       isShortForm: isShortForm,
+                       withPaymentType: paymentType)
+            }
+            
+            return attributedFormat(bitcoinString: bitcoinString,
+                                    withSpace: withSpace)
+        case .mobileCoin:
+            return attributedFormat(mobileCoinString: format(paymentAmount: paymentAmount,
+                                                             isShortForm: isShortForm,
+                                                             withPaymentType: paymentType),
+                                    withSpace: withSpace)
+        default:
             owsFailDebug("Unknown currency.")
             return NSAttributedString(string: OWSLocalizedString("PAYMENTS_CURRENCY_UNKNOWN",
                                                                 comment: "Indicator for unknown currency."))
         }
-
-        return attributedFormat(mobileCoinString: format(paymentAmount: paymentAmount,
-                                                         isShortForm: isShortForm,
-                                                         withPaymentType: paymentType),
-                                withSpace: withSpace)
+    }
+    
+    static func attributedFormat(currency: TSPaymentCurrency,
+                                 input: String,
+                                 withSpace: Bool = false) -> NSAttributedString? {
+        switch currency {
+        case .mobileCoin:
+            attributedFormat(mobileCoinString: input,
+                             withSpace: withSpace)
+        case .bitcoin:
+            attributedFormat(bitcoinString: input,
+                             withSpace: withSpace)
+        default:
+            nil
+        }
+    }
+    
+    static func attributedFormat(bitcoinString: String,
+                                 withSpace: Bool = false) -> NSAttributedString {
+        let currencyCode = if PaymentsImpl.isSatoshiAmountTypeEnabled() {
+            PaymentsConstants.satoshiCurrencyIdentifier
+        } else {
+            PaymentsConstants.bitcoinCurrencyIdentifier
+        }
+        
+        return attributedFormat(currencyString: bitcoinString,
+                         currencyCode: currencyCode,
+                         withSpace: withSpace)
     }
 
     static func attributedFormat(mobileCoinString: String,

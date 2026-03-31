@@ -131,6 +131,8 @@ public enum ThemeIcon: UInt {
     case contextMenuVoiceCall
     case contextMenuVideoCall
     case contextMenuMessage
+    case contextMenuStarEmpty
+    case contextMenuStarFill
 
     case composeNewGroupLarge
     case composeFindByUsernameLarge
@@ -200,13 +202,20 @@ public extension Theme {
     }
 
     class func iconImage(_ icon: ThemeIcon, isDarkThemeEnabled: Bool) -> UIImage {
-        let name = iconName(icon, isDarkThemeEnabled: isDarkThemeEnabled)
-        guard let image = UIImage(named: name) else {
-            owsFailDebug("image was unexpectedly nil: \(name)")
-            return UIImage()
-        }
+        switch icon {
+        case .contextMenuStarEmpty:
+            return UIImage(systemName: "star") ?? UIImage()
+        case .contextMenuStarFill:
+            return UIImage(systemName: "star.fill") ?? UIImage()
+        default:
+            let name = iconName(icon, isDarkThemeEnabled: isDarkThemeEnabled)
+            guard let image = UIImage(named: name) else {
+                owsFailDebug("image was unexpectedly nil: \(name)")
+                return UIImage()
+            }
 
-        return image
+            return image
+        }
     }
 
     class func iconName(_ icon: ThemeIcon) -> String {
@@ -466,6 +475,10 @@ public extension Theme {
             return "video-light"
         case .contextMenuMessage:
             return "chat-light"
+        case .contextMenuStarEmpty:
+            return "star"
+        case .contextMenuStarFill:
+            return "star.fill"
 
             // Empty chat list
         case .composeNewGroupLarge:

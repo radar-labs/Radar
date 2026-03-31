@@ -93,8 +93,9 @@ public class PaymentModelCell: UITableViewCell {
 
         // We don't want to render the amount for incoming
         // transactions until they are verified.
-        amountLabel.text = paymentItem.formattedPaymentAmount
-
+        amountLabel.text = paymentItem.formattedTotalPaymentAmount
+        amountLabel.font = amountLabel.font.withSize(10)
+        
         arrangedSubviews.append(vStack)
         arrangedSubviews.append(amountLabel)
         hStack.removeAllSubviews()

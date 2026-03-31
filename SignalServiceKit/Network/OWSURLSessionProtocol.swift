@@ -239,6 +239,7 @@ public extension OWSURLSessionProtocol {
         progress: OWSProgressSource? = nil
     ) async throws -> OWSUrlDownloadResponse {
         let request = try self.endpoint.buildRequest(urlString, method: method, headers: headers, body: body)
+        print("request: \(request)")
         return try await self.performDownload(request: request, progress: progress)
     }
 }

@@ -70,6 +70,7 @@
     "InteractionRecord.isLocalChange": 25,
     "InteractionRecord.isPoll": 74,
     "InteractionRecord.isSmsMessageRestoredFromBackup": 73,
+    "InteractionRecord.isStarred": 75,
     "InteractionRecord.isViewOnceComplete": 26,
     "InteractionRecord.isViewOnceMessage": 27,
     "InteractionRecord.isVoiceMessage": 28,

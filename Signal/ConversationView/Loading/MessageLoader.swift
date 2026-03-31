@@ -41,6 +41,8 @@ class MessageLoader {
     /// If true, there might be newer messages that could be loaded. If false,
     /// we believe we've loaded all the way to the end of the chat.
     private(set) public var canLoadNewer = true
+    
+    public let onlyStarred: Bool
 
     /// Initializes a MessageLoader.
     ///
@@ -55,10 +57,12 @@ class MessageLoader {
     /// any of the subsequent fetchers.
     public init(
         batchFetcher: MessageLoaderBatchFetcher,
-        interactionFetchers: [MessageLoaderInteractionFetcher]
+        interactionFetchers: [MessageLoaderInteractionFetcher],
+        onlyStarred: Bool = false
     ) {
         self.batchFetcher = batchFetcher
         self.interactionFetchers = interactionFetchers
+        self.onlyStarred = onlyStarred
     }
 
     // The smaller this number is, the faster the conversation can display.
@@ -386,9 +390,11 @@ class SDSInteractionFetcherImpl: MessageLoaderInteractionFetcher {
 
 class ConversationViewBatchFetcher: MessageLoaderBatchFetcher {
     private let interactionFinder: InteractionFinder
+    private let onlyStarred: Bool
 
-    init(interactionFinder: InteractionFinder) {
+    init(interactionFinder: InteractionFinder, onlyStarred: Bool) {
         self.interactionFinder = interactionFinder
+        self.onlyStarred = onlyStarred
     }
 
     func fetchUniqueIds(
@@ -399,7 +405,8 @@ class ConversationViewBatchFetcher: MessageLoaderBatchFetcher {
         try interactionFinder.fetchUniqueIdsForConversationView(
             rowIdFilter: filter,
             limit: limit,
-            tx: tx
+            tx: tx,
+            onlyStarred: onlyStarred
         )
     }
 }

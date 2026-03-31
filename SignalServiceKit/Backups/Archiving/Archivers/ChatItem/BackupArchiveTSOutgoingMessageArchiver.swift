@@ -571,7 +571,8 @@ extension BackupArchiveTSOutgoingMessageArchiver: BackupArchive.TSMessageEditHis
                 linkPreview: nil,
                 messageSticker: nil,
                 giftBadge: nil,
-                isPoll: false // TODO(KC): fill in once polls are implemented in backups
+                isPoll: false, // TODO(KC): fill in once polls are implemented in backups
+                isStarred: false
             )
 
             switch contents {

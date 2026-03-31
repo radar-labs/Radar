@@ -48,6 +48,7 @@ extension ConversationSettingsViewController {
         addNicknameItemIfNecessary(to: mainSection)
         addColorAndWallpaperSettingsItem(to: mainSection)
         if !isNoteToSelf { addSoundAndNotificationSettingsItem(to: mainSection) }
+        addStarredMessagesItem(to: mainSection)
         addSafetyNumberItemIfNecessary(to: mainSection)
 
         contents.add(mainSection)
@@ -59,7 +60,9 @@ extension ConversationSettingsViewController {
 
         // Group sections
         if let groupModel = currentGroupModel, !groupModel.isPlaceholder {
-            contents.add(buildGroupMembershipSection(groupModel: groupModel, sectionIndex: contents.sections.count))
+            contents.add(
+                buildGroupMembershipSection(
+                    groupModel: groupModel, sectionIndex: contents.sections.count))
 
             if let groupModelV2 = groupModel as? TSGroupModelV2 {
                 buildGroupSettingsSection(groupModelV2: groupModelV2, contents: contents)
@@ -69,8 +72,7 @@ extension ConversationSettingsViewController {
         }
 
         // Bottom sections
-        if
-            !isNoteToSelf,
+        if !isNoteToSelf,
             !thread.isGroupV1Thread
         {
             contents.add(buildBlockAndLeaveSection())
@@ -197,41 +199,44 @@ extension ConversationSettingsViewController {
         }
 
         for callRow in callRows {
-            stackView.addArrangedSubview({
-                let hStack = UIStackView()
-                hStack.axis = .horizontal
-                hStack.spacing = 6
-                hStack.addArrangedSubview(UIImageView.withTemplateIcon(
-                    callRow.icon,
-                    tintColor: Theme.primaryTextColor,
-                    constrainedTo: .square(16)
-                ))
-                hStack.tintColor = Theme.primaryTextColor
+            stackView.addArrangedSubview(
+                {
+                    let hStack = UIStackView()
+                    hStack.axis = .horizontal
+                    hStack.spacing = 6
+                    hStack.addArrangedSubview(
+                        UIImageView.withTemplateIcon(
+                            callRow.icon,
+                            tintColor: Theme.primaryTextColor,
+                            constrainedTo: .square(16)
+                        ))
+                    hStack.tintColor = Theme.primaryTextColor
 
-                let descriptionLabel = UILabel()
-                descriptionLabel.font = .dynamicTypeSubheadline
-                descriptionLabel.textColor = Theme.primaryTextColor
-                descriptionLabel.text = callRow.description
-                hStack.addArrangedSubview(descriptionLabel)
+                    let descriptionLabel = UILabel()
+                    descriptionLabel.font = .dynamicTypeSubheadline
+                    descriptionLabel.textColor = Theme.primaryTextColor
+                    descriptionLabel.text = callRow.description
+                    hStack.addArrangedSubview(descriptionLabel)
 
-                hStack.addArrangedSubview(UIView.hStretchingSpacer())
+                    hStack.addArrangedSubview(UIView.hStretchingSpacer())
 
-                let timestampLabel = UILabel()
-                timestampLabel.font = .dynamicTypeSubheadline
-                timestampLabel.textColor = Theme.secondaryTextAndIconColor
-                timestampLabel.text = callRow.timestamp
-                hStack.addArrangedSubview(timestampLabel)
+                    let timestampLabel = UILabel()
+                    timestampLabel.font = .dynamicTypeSubheadline
+                    timestampLabel.textColor = Theme.secondaryTextAndIconColor
+                    timestampLabel.text = callRow.timestamp
+                    hStack.addArrangedSubview(timestampLabel)
 
-                return hStack
-            }())
+                    return hStack
+                }())
         }
 
-        section.add(.init(customCellBlock: {
-            let cell = OWSTableItem.newCell()
-            cell.contentView.addSubview(stackView)
-            stackView.autoPinEdgesToSuperviewMargins()
-            return cell
-        }))
+        section.add(
+            .init(customCellBlock: {
+                let cell = OWSTableItem.newCell()
+                cell.contentView.addSubview(stackView)
+                stackView.autoPinEdgesToSuperviewMargins()
+                return cell
+            }))
 
         return section
     }
@@ -247,63 +252,69 @@ extension ConversationSettingsViewController {
             comment: "Header title for the section showing all media in conversation settings"
         )
 
-        section.add(.init(
-            customCellBlock: { [weak self] in
-                let cell = OWSTableItem.newCell()
-                guard let self = self else { return cell }
+        section.add(
+            .init(
+                customCellBlock: { [weak self] in
+                    let cell = OWSTableItem.newCell()
+                    guard let self = self else { return cell }
 
-                let stackView = UIStackView()
-                stackView.axis = .horizontal
-                stackView.spacing = 5
-                cell.contentView.addSubview(stackView)
-                stackView.autoPinEdges(toSuperviewMarginsExcludingEdge: .bottom)
+                    let stackView = UIStackView()
+                    stackView.axis = .horizontal
+                    stackView.spacing = 5
+                    cell.contentView.addSubview(stackView)
+                    stackView.autoPinEdges(toSuperviewMarginsExcludingEdge: .bottom)
 
-                let totalSpacerSize = CGFloat(self.maximumRecentMedia - 1) * stackView.spacing
-                let availableWidth = self.view.width - ((Self.cellHInnerMargin * 2) + self.cellOuterInsets.totalWidth + self.view.safeAreaInsets.totalWidth)
-                let imageWidth = (availableWidth - totalSpacerSize) / CGFloat(self.maximumRecentMedia)
+                    let totalSpacerSize = CGFloat(self.maximumRecentMedia - 1) * stackView.spacing
+                    let availableWidth =
+                        self.view.width
+                        - ((Self.cellHInnerMargin * 2) + self.cellOuterInsets.totalWidth
+                            + self.view.safeAreaInsets.totalWidth)
+                    let imageWidth =
+                        (availableWidth - totalSpacerSize) / CGFloat(self.maximumRecentMedia)
 
-                for (attachmentStream, imageView) in self.recentMedia.orderedValues {
-                    let button = OWSButton { [weak self] in
-                        self?.showMediaPageView(for: attachmentStream)
+                    for (attachmentStream, imageView) in self.recentMedia.orderedValues {
+                        let button = OWSButton { [weak self] in
+                            self?.showMediaPageView(for: attachmentStream)
+                        }
+                        stackView.addArrangedSubview(button)
+                        button.autoSetDimensions(to: CGSize(square: imageWidth))
+
+                        imageView.backgroundColor = .ows_middleGray
+
+                        button.addSubview(imageView)
+                        imageView.autoPinEdgesToSuperviewEdges()
+
+                        let overlayView = UIView()
+                        overlayView.isUserInteractionEnabled = false
+                        overlayView.backgroundColor = .ows_blackAlpha05
+                        overlayView.layer.cornerRadius = imageView.layer.cornerRadius
+                        overlayView.clipsToBounds = true
+                        button.addSubview(overlayView)
+                        overlayView.autoPinEdgesToSuperviewEdges()
                     }
-                    stackView.addArrangedSubview(button)
-                    button.autoSetDimensions(to: CGSize(square: imageWidth))
 
-                    imageView.backgroundColor = .ows_middleGray
+                    if self.recentMedia.count < self.maximumRecentMedia {
+                        stackView.addArrangedSubview(.hStretchingSpacer())
+                        stackView.autoPinEdge(toSuperviewMargin: .bottom)
+                    } else {
+                        let seeAllLabel = UILabel()
+                        seeAllLabel.textColor = Theme.primaryTextColor
+                        seeAllLabel.font = OWSTableItem.primaryLabelFont
+                        seeAllLabel.text = CommonStrings.seeAllButton
 
-                    button.addSubview(imageView)
-                    imageView.autoPinEdgesToSuperviewEdges()
+                        seeAllLabel.autoSetDimension(
+                            .height, toSize: OWSTableItem.primaryLabelFont.lineHeight)
+                        cell.contentView.addSubview(seeAllLabel)
+                        seeAllLabel.autoPinEdges(toSuperviewMarginsExcludingEdge: .top)
+                        seeAllLabel.autoPinEdge(.top, to: .bottom, of: stackView, withOffset: 14)
+                    }
 
-                    let overlayView = UIView()
-                    overlayView.isUserInteractionEnabled = false
-                    overlayView.backgroundColor = .ows_blackAlpha05
-                    overlayView.layer.cornerRadius = imageView.layer.cornerRadius
-                    overlayView.clipsToBounds = true
-                    button.addSubview(overlayView)
-                    overlayView.autoPinEdgesToSuperviewEdges()
+                    return cell
+                },
+                actionBlock: { [weak self] in
+                    self?.showMediaGallery()
                 }
-
-                if self.recentMedia.count < self.maximumRecentMedia {
-                    stackView.addArrangedSubview(.hStretchingSpacer())
-                    stackView.autoPinEdge(toSuperviewMargin: .bottom)
-                } else {
-                    let seeAllLabel = UILabel()
-                    seeAllLabel.textColor = Theme.primaryTextColor
-                    seeAllLabel.font = OWSTableItem.primaryLabelFont
-                    seeAllLabel.text = CommonStrings.seeAllButton
-
-                    seeAllLabel.autoSetDimension(.height, toSize: OWSTableItem.primaryLabelFont.lineHeight)
-                    cell.contentView.addSubview(seeAllLabel)
-                    seeAllLabel.autoPinEdges(toSuperviewMarginsExcludingEdge: .top)
-                    seeAllLabel.autoPinEdge(.top, to: .bottom, of: stackView, withOffset: 14)
-                }
-
-                return cell
-            },
-            actionBlock: { [weak self] in
-                self?.showMediaGallery()
-            }
-        ))
+            ))
 
         contents.add(section)
     }
@@ -312,44 +323,55 @@ extension ConversationSettingsViewController {
         guard !thread.isNoteToSelf, isContactThread else { return }
         guard let contactAddress = (thread as? TSContactThread)?.contactAddress else { return }
 
-        let (visibleBadges, shortName) = SSKEnvironment.shared.databaseStorageRef.read { tx -> ([OWSUserProfileBadgeInfo], String) in
+        let (visibleBadges, shortName) = SSKEnvironment.shared.databaseStorageRef.read {
+            tx -> ([OWSUserProfileBadgeInfo], String) in
             let visibleBadges: [OWSUserProfileBadgeInfo] = {
                 let tsAccountManager = DependenciesBridge.shared.tsAccountManager
                 guard let localIdentifiers = tsAccountManager.localIdentifiers(tx: tx) else {
                     return []
                 }
-                let address = OWSUserProfile.internalAddress(for: contactAddress, localIdentifiers: localIdentifiers)
+                let address = OWSUserProfile.internalAddress(
+                    for: contactAddress, localIdentifiers: localIdentifiers)
                 guard let userProfile = OWSUserProfile.getUserProfile(for: address, tx: tx) else {
                     return []
                 }
                 return userProfile.visibleBadges
             }()
-            let shortName = SSKEnvironment.shared.contactManagerRef.displayName(for: contactAddress, tx: tx).resolvedValue(useShortNameIfAvailable: true)
+            let shortName = SSKEnvironment.shared.contactManagerRef.displayName(
+                for: contactAddress, tx: tx
+            ).resolvedValue(useShortNameIfAvailable: true)
             return (visibleBadges, shortName)
         }
         guard !visibleBadges.isEmpty else { return }
 
         availableBadges = visibleBadges
-        contents.add(.init(
-            title: OWSLocalizedString("CONVERSATION_SETTINGS_BADGES_HEADER", comment: "Header title for a contact's badges in conversation settings"),
-            items: [
-                OWSTableItem(customCellBlock: { [weak self] in
-                    let cell = OWSTableItem.newCell()
-                    guard let self = self else { return cell }
-                    let collectionView = BadgeCollectionView(dataSource: self)
-                    collectionView.badgeSelectionMode = .detailsSheet(owner: .remote(shortName: shortName))
+        contents.add(
+            .init(
+                title: OWSLocalizedString(
+                    "CONVERSATION_SETTINGS_BADGES_HEADER",
+                    comment: "Header title for a contact's badges in conversation settings"),
+                items: [
+                    OWSTableItem(
+                        customCellBlock: { [weak self] in
+                            let cell = OWSTableItem.newCell()
+                            guard let self = self else { return cell }
+                            let collectionView = BadgeCollectionView(dataSource: self)
+                            collectionView.badgeSelectionMode = .detailsSheet(
+                                owner: .remote(shortName: shortName))
 
-                    cell.contentView.addSubview(collectionView)
-                    collectionView.autoPinEdgesToSuperviewMargins()
+                            cell.contentView.addSubview(collectionView)
+                            collectionView.autoPinEdgesToSuperviewMargins()
 
-                    // Pre-layout the collection view so the UITableView caches the correct resolved
-                    // autolayout height.
-                    collectionView.layoutIfNeeded()
+                            // Pre-layout the collection view so the UITableView caches the correct resolved
+                            // autolayout height.
+                            collectionView.layoutIfNeeded()
 
-                    return cell
-                }, actionBlock: nil)
-            ],
-            footerTitle: OWSLocalizedString("CONVERSATION_SETTINGS_BADGES_FOOTER", comment: "Footer string for a contact's badges in conversation settings"))
+                            return cell
+                        }, actionBlock: nil)
+                ],
+                footerTitle: OWSLocalizedString(
+                    "CONVERSATION_SETTINGS_BADGES_FOOTER",
+                    comment: "Footer string for a contact's badges in conversation settings"))
         )
     }
 
@@ -363,7 +385,8 @@ extension ConversationSettingsViewController {
                 icon: .contactInfoSafetyNumber,
                 withText: OWSLocalizedString(
                     "VERIFY_PRIVACY",
-                    comment: "Label for button or row which allows users to verify the safety number of another user."
+                    comment:
+                        "Label for button or row which allows users to verify the safety number of another user."
                 ),
                 actionBlock: { [weak self] in
                     self?.showVerificationView()
@@ -412,49 +435,82 @@ extension ConversationSettingsViewController {
     }
 
     private func addColorAndWallpaperSettingsItem(to section: OWSTableSection) {
-        section.add(OWSTableItem(customCellBlock: { [weak self] in
-            guard let self = self else {
-                owsFailDebug("Missing self")
-                return OWSTableItem.newCell()
-            }
+        section.add(
+            OWSTableItem(
+                customCellBlock: { [weak self] in
+                    guard let self = self else {
+                        owsFailDebug("Missing self")
+                        return OWSTableItem.newCell()
+                    }
 
-            let cell = OWSTableItem.buildCell(
-                icon: .chatSettingsWallpaper,
-                itemName: OWSLocalizedString(
-                    "SETTINGS_ITEM_COLOR_AND_WALLPAPER",
-                    comment: "Label for settings view that allows user to change the chat color and wallpaper."
-                ),
-                accessoryType: .disclosureIndicator,
-                accessibilityIdentifier: UIView.accessibilityIdentifier(in: self, name: "color_and_wallpaper")
-            )
-            return cell
-        },
-        actionBlock: { [weak self] in
-            self?.showColorAndWallpaperSettingsView()
-        }))
+                    let cell = OWSTableItem.buildCell(
+                        icon: .chatSettingsWallpaper,
+                        itemName: OWSLocalizedString(
+                            "SETTINGS_ITEM_COLOR_AND_WALLPAPER",
+                            comment:
+                                "Label for settings view that allows user to change the chat color and wallpaper."
+                        ),
+                        accessoryType: .disclosureIndicator,
+                        accessibilityIdentifier: UIView.accessibilityIdentifier(
+                            in: self, name: "color_and_wallpaper")
+                    )
+                    return cell
+                },
+                actionBlock: { [weak self] in
+                    self?.showColorAndWallpaperSettingsView()
+                }))
     }
 
     private func addSoundAndNotificationSettingsItem(to section: OWSTableSection) {
-        section.add(OWSTableItem(customCellBlock: { [weak self] in
-            guard let self = self else {
-                owsFailDebug("Missing self")
-                return OWSTableItem.newCell()
-            }
+        section.add(
+            OWSTableItem(
+                customCellBlock: { [weak self] in
+                    guard let self = self else {
+                        owsFailDebug("Missing self")
+                        return OWSTableItem.newCell()
+                    }
 
-            let cell = OWSTableItem.buildCell(
-                icon: .chatSettingsMessageSound,
-                itemName: OWSLocalizedString(
-                    "SOUND_AND_NOTIFICATION_SETTINGS",
-                    comment: "table cell label in conversation settings"
-                ),
-                accessoryType: .disclosureIndicator,
-                accessibilityIdentifier: UIView.accessibilityIdentifier(in: self, name: "sound_and_notifications")
-            )
-            return cell
-        },
-        actionBlock: { [weak self] in
-            self?.showSoundAndNotificationsSettingsView()
-        }))
+                    let cell = OWSTableItem.buildCell(
+                        icon: .chatSettingsMessageSound,
+                        itemName: OWSLocalizedString(
+                            "SOUND_AND_NOTIFICATION_SETTINGS",
+                            comment: "table cell label in conversation settings"
+                        ),
+                        accessoryType: .disclosureIndicator,
+                        accessibilityIdentifier: UIView.accessibilityIdentifier(
+                            in: self, name: "sound_and_notifications")
+                    )
+                    return cell
+                },
+                actionBlock: { [weak self] in
+                    self?.showSoundAndNotificationsSettingsView()
+                }))
+    }
+
+    private func addStarredMessagesItem(to section: OWSTableSection) {
+        section.add(
+            OWSTableItem(
+                customCellBlock: { [weak self] in
+                    guard let self = self else {
+                        owsFailDebug("Missing self")
+                        return OWSTableItem.newCell()
+                    }
+
+                    let cell = OWSTableItem.buildCell(
+                        icon: .contextMenuStarFill,
+                        itemName: OWSLocalizedString(
+                            "STARRED_MESSAGES",
+                            comment: "table cell label in conversation settings"
+                        ),
+                        accessoryType: .disclosureIndicator,
+                        accessibilityIdentifier: UIView.accessibilityIdentifier(
+                            in: self, name: "starred_messages")
+                    )
+                    return cell
+                },
+                actionBlock: { [weak self] in
+                    self?.showStarredMessagesView()
+                }))
     }
 
     private func addDisappearingMessagesItem(to section: OWSTableSection) {
@@ -463,38 +519,46 @@ extension ConversationSettingsViewController {
         let disappearingMessagesConfiguration = self.disappearingMessagesConfiguration
         let thread = self.thread
 
-        section.add(.init(
-            customCellBlock: { [weak self] in
-                guard let self = self else { return UITableViewCell() }
-                let cell = OWSTableItem.buildCell(
-                    icon: disappearingMessagesConfiguration.isEnabled
-                        ? .chatSettingsTimerOn
-                        : .chatSettingsTimerOff,
-                    itemName: OWSLocalizedString(
-                        "DISAPPEARING_MESSAGES",
-                        comment: "table cell label in conversation settings"
-                    ),
-                    accessoryText: disappearingMessagesConfiguration.isEnabled
-                        ? DateUtil.formatDuration(seconds: disappearingMessagesConfiguration.durationSeconds, useShortFormat: true)
-                        : CommonStrings.switchOff,
-                    accessoryType: .disclosureIndicator,
-                    customColor: canEditConversationAttributes ? nil : Theme.secondaryTextAndIconColor,
-                    accessibilityIdentifier: UIView.accessibilityIdentifier(in: self, name: "disappearing_messages")
-                )
-                cell.isUserInteractionEnabled = canEditConversationAttributes
-                return cell
-            }, actionBlock: { [weak self] in
-                let vc = DisappearingMessagesTimerSettingsViewController(
-                    initialConfiguration: disappearingMessagesConfiguration,
-                    settingsMode: .chat(thread: thread),
-                ) { configuration in
-                    self?.disappearingMessagesConfiguration = configuration
-                    self?.updateTableContents()
-                    NotificationCenter.default.post(name: ChatListViewController.clearSearch, object: nil)
+        section.add(
+            .init(
+                customCellBlock: { [weak self] in
+                    guard let self = self else { return UITableViewCell() }
+                    let cell = OWSTableItem.buildCell(
+                        icon: disappearingMessagesConfiguration.isEnabled
+                            ? .chatSettingsTimerOn
+                            : .chatSettingsTimerOff,
+                        itemName: OWSLocalizedString(
+                            "DISAPPEARING_MESSAGES",
+                            comment: "table cell label in conversation settings"
+                        ),
+                        accessoryText: disappearingMessagesConfiguration.isEnabled
+                            ? DateUtil.formatDuration(
+                                seconds: disappearingMessagesConfiguration.durationSeconds,
+                                useShortFormat: true)
+                            : CommonStrings.switchOff,
+                        accessoryType: .disclosureIndicator,
+                        customColor: canEditConversationAttributes
+                            ? nil : Theme.secondaryTextAndIconColor,
+                        accessibilityIdentifier: UIView.accessibilityIdentifier(
+                            in: self, name: "disappearing_messages")
+                    )
+                    cell.isUserInteractionEnabled = canEditConversationAttributes
+                    return cell
+                },
+                actionBlock: { [weak self] in
+                    let vc = DisappearingMessagesTimerSettingsViewController(
+                        initialConfiguration: disappearingMessagesConfiguration,
+                        settingsMode: .chat(thread: thread),
+                    ) { configuration in
+                        self?.disappearingMessagesConfiguration = configuration
+                        self?.updateTableContents()
+                        NotificationCenter.default.post(
+                            name: ChatListViewController.clearSearch, object: nil)
+                    }
+                    self?.presentFormSheet(
+                        OWSNavigationController(rootViewController: vc), animated: true)
                 }
-                self?.presentFormSheet(OWSNavigationController(rootViewController: vc), animated: true)
-            }
-        ))
+            ))
     }
 
     private func addNicknameItemIfNecessary(to section: OWSTableSection) {
@@ -502,31 +566,34 @@ extension ConversationSettingsViewController {
             !self.thread.isNoteToSelf,
             let thread = self.thread as? TSContactThread
         else { return }
-        section.add(.item(
-            icon: .buttonEdit,
-            name: OWSLocalizedString(
-                "NICKNAME_BUTTON_TITLE",
-                comment: "Title for the table cell in conversation settings for presenting the profile nickname editor."
-            ),
-            accessoryType: .disclosureIndicator,
-            actionBlock: { [weak self] in
-                guard let self else { return }
-                let db = DependenciesBridge.shared.db
+        section.add(
+            .item(
+                icon: .buttonEdit,
+                name: OWSLocalizedString(
+                    "NICKNAME_BUTTON_TITLE",
+                    comment:
+                        "Title for the table cell in conversation settings for presenting the profile nickname editor."
+                ),
+                accessoryType: .disclosureIndicator,
+                actionBlock: { [weak self] in
+                    guard let self else { return }
+                    let db = DependenciesBridge.shared.db
 
-                let nicknameEditor = db.read { tx in
-                    NicknameEditorViewController.create(
-                        for: thread.contactAddress,
-                        context: .init(
-                            db: db,
-                            nicknameManager: DependenciesBridge.shared.nicknameManager
-                        ),
-                        tx: tx
-                    )
-                }
-                guard let nicknameEditor else { return }
-                let navigationController = OWSNavigationController(rootViewController: nicknameEditor)
-                self.presentFormSheet(navigationController, animated: true)
-            }))
+                    let nicknameEditor = db.read { tx in
+                        NicknameEditorViewController.create(
+                            for: thread.contactAddress,
+                            context: .init(
+                                db: db,
+                                nicknameManager: DependenciesBridge.shared.nicknameManager
+                            ),
+                            tx: tx
+                        )
+                    }
+                    guard let nicknameEditor else { return }
+                    let navigationController = OWSNavigationController(
+                        rootViewController: nicknameEditor)
+                    self.presentFormSheet(navigationController, animated: true)
+                }))
     }
 
     // MARK: Bottom sections
@@ -535,91 +602,114 @@ extension ConversationSettingsViewController {
         let section = OWSTableSection()
 
         if isGroupThread, isLocalUserFullOrInvitedMember {
-            section.add(OWSTableItem(customCellBlock: { [weak self] in
-                guard let self = self else {
-                    owsFailDebug("Missing self")
-                    return OWSTableItem.newCell()
-                }
+            section.add(
+                OWSTableItem(
+                    customCellBlock: { [weak self] in
+                        guard let self = self else {
+                            owsFailDebug("Missing self")
+                            return OWSTableItem.newCell()
+                        }
 
-                return OWSTableItem.buildCell(
-                    icon: .groupInfoLeaveGroup,
-                    itemName: OWSLocalizedString(
-                        "LEAVE_GROUP_ACTION",
-                        comment: "table cell label in conversation settings"
-                    ),
-                    customColor: UIColor.ows_accentRed,
-                    accessibilityIdentifier: UIView.accessibilityIdentifier(in: self, name: "leave_group")
-                )
-            },
-            actionBlock: { [weak self] in
-                self?.didTapLeaveGroup()
-            }))
+                        return OWSTableItem.buildCell(
+                            icon: .groupInfoLeaveGroup,
+                            itemName: OWSLocalizedString(
+                                "LEAVE_GROUP_ACTION",
+                                comment: "table cell label in conversation settings"
+                            ),
+                            customColor: UIColor.ows_accentRed,
+                            accessibilityIdentifier: UIView.accessibilityIdentifier(
+                                in: self, name: "leave_group")
+                        )
+                    },
+                    actionBlock: { [weak self] in
+                        self?.didTapLeaveGroup()
+                    }))
         }
 
-        section.add(OWSTableItem(customCellBlock: { [weak self] in
-            guard let self = self else {
-                owsFailDebug("Missing self")
-                return OWSTableItem.newCell()
-            }
+        section.add(
+            OWSTableItem(
+                customCellBlock: { [weak self] in
+                    guard let self = self else {
+                        owsFailDebug("Missing self")
+                        return OWSTableItem.newCell()
+                    }
 
-            let cellTitle: String
-            var customColor: UIColor?
-            if self.threadViewModel.isBlocked {
-                cellTitle =
-                    (self.thread.isGroupThread
-                        ? OWSLocalizedString("CONVERSATION_SETTINGS_UNBLOCK_GROUP",
-                                            comment: "Label for 'unblock group' action in conversation settings view.")
-                        : OWSLocalizedString("CONVERSATION_SETTINGS_UNBLOCK_USER",
-                                            comment: "Label for 'unblock user' action in conversation settings view."))
-            } else {
-                cellTitle =
-                    (self.thread.isGroupThread
-                        ? OWSLocalizedString("CONVERSATION_SETTINGS_BLOCK_GROUP",
-                                            comment: "Label for 'block group' action in conversation settings view.")
-                        : OWSLocalizedString("CONVERSATION_SETTINGS_BLOCK_USER",
-                                            comment: "Label for 'block user' action in conversation settings view."))
-                customColor = UIColor.ows_accentRed
-            }
-            let cell = OWSTableItem.buildCell(
-                icon: .chatSettingsBlock,
-                itemName: cellTitle,
-                customColor: customColor,
-                accessibilityIdentifier: UIView.accessibilityIdentifier(in: self, name: "block")
-            )
-            return cell
-        },
-        actionBlock: { [weak self] in
-            if self?.threadViewModel.isBlocked == true {
-                self?.didTapUnblockThread()
-            } else {
-                self?.didTapBlockThread()
-            }
-        }))
+                    let cellTitle: String
+                    var customColor: UIColor?
+                    if self.threadViewModel.isBlocked {
+                        cellTitle =
+                            (self.thread.isGroupThread
+                                ? OWSLocalizedString(
+                                    "CONVERSATION_SETTINGS_UNBLOCK_GROUP",
+                                    comment:
+                                        "Label for 'unblock group' action in conversation settings view."
+                                )
+                                : OWSLocalizedString(
+                                    "CONVERSATION_SETTINGS_UNBLOCK_USER",
+                                    comment:
+                                        "Label for 'unblock user' action in conversation settings view."
+                                ))
+                    } else {
+                        cellTitle =
+                            (self.thread.isGroupThread
+                                ? OWSLocalizedString(
+                                    "CONVERSATION_SETTINGS_BLOCK_GROUP",
+                                    comment:
+                                        "Label for 'block group' action in conversation settings view."
+                                )
+                                : OWSLocalizedString(
+                                    "CONVERSATION_SETTINGS_BLOCK_USER",
+                                    comment:
+                                        "Label for 'block user' action in conversation settings view."
+                                ))
+                        customColor = UIColor.ows_accentRed
+                    }
+                    let cell = OWSTableItem.buildCell(
+                        icon: .chatSettingsBlock,
+                        itemName: cellTitle,
+                        customColor: customColor,
+                        accessibilityIdentifier: UIView.accessibilityIdentifier(
+                            in: self, name: "block")
+                    )
+                    return cell
+                },
+                actionBlock: { [weak self] in
+                    if self?.threadViewModel.isBlocked == true {
+                        self?.didTapUnblockThread()
+                    } else {
+                        self?.didTapBlockThread()
+                    }
+                }))
 
         let hasReportedSpam = SSKEnvironment.shared.databaseStorageRef.read { tx in
-            return InteractionFinder(threadUniqueId: thread.uniqueId).hasUserReportedSpam(transaction: tx)
+            return InteractionFinder(threadUniqueId: thread.uniqueId).hasUserReportedSpam(
+                transaction: tx)
         }
 
         if !hasReportedSpam {
-            section.add(OWSTableItem(customCellBlock: { [weak self] in
-                guard let self = self else {
-                    owsFailDebug("Missing self")
-                    return OWSTableItem.newCell()
-                }
+            section.add(
+                OWSTableItem(
+                    customCellBlock: { [weak self] in
+                        guard let self = self else {
+                            owsFailDebug("Missing self")
+                            return OWSTableItem.newCell()
+                        }
 
-                return OWSTableItem.buildCell(
-                    icon: .spam,
-                    itemName: OWSLocalizedString(
-                        "CONVERSATION_SETTINGS_REPORT_SPAM",
-                        comment: "Label for 'report spam' action in conversation settings view."
-                    ),
-                    customColor: UIColor.ows_accentRed,
-                    accessibilityIdentifier: UIView.accessibilityIdentifier(in: self, name: "report_spam")
-                )
-            },
-            actionBlock: { [weak self] in
-                self?.didTapReportSpam()
-            }))
+                        return OWSTableItem.buildCell(
+                            icon: .spam,
+                            itemName: OWSLocalizedString(
+                                "CONVERSATION_SETTINGS_REPORT_SPAM",
+                                comment:
+                                    "Label for 'report spam' action in conversation settings view."
+                            ),
+                            customColor: UIColor.ows_accentRed,
+                            accessibilityIdentifier: UIView.accessibilityIdentifier(
+                                in: self, name: "report_spam")
+                        )
+                    },
+                    actionBlock: { [weak self] in
+                        self?.didTapReportSpam()
+                    }))
         }
 
         return section
@@ -628,76 +718,91 @@ extension ConversationSettingsViewController {
     private func buildInternalSection() -> OWSTableSection {
         let section = OWSTableSection()
 
-        section.add(OWSTableItem(customCellBlock: { [weak self] in
-            guard let self = self else {
-                owsFailDebug("Missing self")
-                return OWSTableItem.newCell()
-            }
+        section.add(
+            OWSTableItem(
+                customCellBlock: { [weak self] in
+                    guard let self = self else {
+                        owsFailDebug("Missing self")
+                        return OWSTableItem.newCell()
+                    }
 
-            return OWSTableItem.buildCell(
-                icon: .settingsAdvanced,
-                itemName: "Internal",
-                accessoryType: .disclosureIndicator,
-                accessibilityIdentifier: UIView.accessibilityIdentifier(in: self, name: "internal")
-            )
-        },
-        actionBlock: { [weak self] in
-            self?.didTapInternalSettings()
-        }))
+                    return OWSTableItem.buildCell(
+                        icon: .settingsAdvanced,
+                        itemName: "Internal",
+                        accessoryType: .disclosureIndicator,
+                        accessibilityIdentifier: UIView.accessibilityIdentifier(
+                            in: self, name: "internal")
+                    )
+                },
+                actionBlock: { [weak self] in
+                    self?.didTapInternalSettings()
+                }))
 
         return section
     }
 
     // MARK: Group sections
 
-    private func buildGroupMembershipSection(groupModel: TSGroupModel, sectionIndex: Int) -> OWSTableSection {
+    private func buildGroupMembershipSection(groupModel: TSGroupModel, sectionIndex: Int)
+        -> OWSTableSection
+    {
         let section = OWSTableSection()
-        section.separatorInsetLeading = Self.cellHInnerMargin + CGFloat(AvatarBuilder.smallAvatarSizePoints) + ContactCellView.avatarTextHSpacing
+        section.separatorInsetLeading =
+            Self.cellHInnerMargin + CGFloat(AvatarBuilder.smallAvatarSizePoints)
+            + ContactCellView.avatarTextHSpacing
 
         let groupMembership = groupModel.groupMembership
 
         // "Add Members" cell.
         if canEditConversationMembership {
-            section.add(OWSTableItem(customCellBlock: { [weak self] in
-                guard let self = self else {
-                    owsFailDebug("Missing self")
-                    return OWSTableItem.newCell()
-                }
-                let cell = OWSTableItem.newCell()
-                cell.preservesSuperviewLayoutMargins = true
-                cell.contentView.preservesSuperviewLayoutMargins = true
+            section.add(
+                OWSTableItem(
+                    customCellBlock: { [weak self] in
+                        guard let self = self else {
+                            owsFailDebug("Missing self")
+                            return OWSTableItem.newCell()
+                        }
+                        let cell = OWSTableItem.newCell()
+                        cell.preservesSuperviewLayoutMargins = true
+                        cell.contentView.preservesSuperviewLayoutMargins = true
 
-                let iconView = OWSTableItem.buildIconInCircleView(
-                    icon: .groupInfoAddMembers,
-                    iconSize: AvatarBuilder.smallAvatarSizePoints,
-                    innerIconSize: 20,
-                    iconTintColor: Theme.primaryTextColor
-                )
+                        let iconView = OWSTableItem.buildIconInCircleView(
+                            icon: .groupInfoAddMembers,
+                            iconSize: AvatarBuilder.smallAvatarSizePoints,
+                            innerIconSize: 20,
+                            iconTintColor: Theme.primaryTextColor
+                        )
 
-                let rowLabel = UILabel()
-                rowLabel.text = OWSLocalizedString("CONVERSATION_SETTINGS_ADD_MEMBERS",
-                                                  comment: "Label for 'add members' button in conversation settings view.")
-                rowLabel.textColor = Theme.primaryTextColor
-                rowLabel.font = OWSTableItem.primaryLabelFont
-                rowLabel.lineBreakMode = .byTruncatingTail
+                        let rowLabel = UILabel()
+                        rowLabel.text = OWSLocalizedString(
+                            "CONVERSATION_SETTINGS_ADD_MEMBERS",
+                            comment: "Label for 'add members' button in conversation settings view."
+                        )
+                        rowLabel.textColor = Theme.primaryTextColor
+                        rowLabel.font = OWSTableItem.primaryLabelFont
+                        rowLabel.lineBreakMode = .byTruncatingTail
 
-                let contentRow = UIStackView(arrangedSubviews: [ iconView, rowLabel ])
-                contentRow.spacing = self.iconSpacingSmall
+                        let contentRow = UIStackView(arrangedSubviews: [iconView, rowLabel])
+                        contentRow.spacing = self.iconSpacingSmall
 
-                cell.contentView.addSubview(contentRow)
-                contentRow.autoPinWidthToSuperviewMargins()
-                contentRow.autoPinHeightToSuperview(withMargin: 7)
+                        cell.contentView.addSubview(contentRow)
+                        contentRow.autoPinWidthToSuperviewMargins()
+                        contentRow.autoPinHeightToSuperview(withMargin: 7)
 
-                return cell
-            }, actionBlock: { [weak self] in
-                                        self?.showAddMembersView()
-            }))
+                        return cell
+                    },
+                    actionBlock: { [weak self] in
+                        self?.showAddMembersView()
+                    }))
         }
 
         let totalMemberCount = sortedGroupMembers.count
 
-        let format = OWSLocalizedString("CONVERSATION_SETTINGS_MEMBERS_SECTION_TITLE_%d", tableName: "PluralAware",
-                                       comment: "Format for the section title of the 'members' section in conversation settings view. Embeds: {{ the number of group members }}.")
+        let format = OWSLocalizedString(
+            "CONVERSATION_SETTINGS_MEMBERS_SECTION_TITLE_%d", tableName: "PluralAware",
+            comment:
+                "Format for the section title of the 'members' section in conversation settings view. Embeds: {{ the number of group members }}."
+        )
         section.headerTitle = String.localizedStringWithFormat(format, totalMemberCount)
 
         var membersToRender = sortedGroupMembers
@@ -715,104 +820,122 @@ extension ConversationSettingsViewController {
             }
 
             let isLocalUser = memberAddress.isLocalAddress
-            section.add(OWSTableItem(customCellBlock: { [weak self] in
-                guard let self = self else {
-                    owsFailDebug("Missing self")
-                    return OWSTableItem.newCell()
-                }
-                let tableView = self.tableView
-                guard let cell = tableView.dequeueReusableCell(withIdentifier: ContactTableViewCell.reuseIdentifier) as? ContactTableViewCell else {
-                    owsFailDebug("Missing cell.")
-                    return UITableViewCell()
-                }
+            section.add(
+                OWSTableItem(
+                    customCellBlock: { [weak self] in
+                        guard let self = self else {
+                            owsFailDebug("Missing self")
+                            return OWSTableItem.newCell()
+                        }
+                        let tableView = self.tableView
+                        guard
+                            let cell = tableView.dequeueReusableCell(
+                                withIdentifier: ContactTableViewCell.reuseIdentifier)
+                                as? ContactTableViewCell
+                        else {
+                            owsFailDebug("Missing cell.")
+                            return UITableViewCell()
+                        }
 
-                SSKEnvironment.shared.databaseStorageRef.read { transaction in
-                    let configuration = ContactCellConfiguration(address: memberAddress, localUserDisplayMode: .asLocalUser)
-                    let isGroupAdmin = groupMembership.isFullMemberAndAdministrator(memberAddress)
-                    let isVerified = verificationState == .verified
-                    let isNoLongerVerified = verificationState == .noLongerVerified
-                    let isBlocked = SSKEnvironment.shared.blockingManagerRef.isAddressBlocked(memberAddress, transaction: transaction)
-                    if isGroupAdmin {
-                        configuration.accessoryMessage = OWSLocalizedString("GROUP_MEMBER_ADMIN_INDICATOR",
-                                                                           comment: "Label indicating that a group member is an admin.")
-                    } else if isNoLongerVerified {
-                        configuration.accessoryMessage = OWSLocalizedString("CONTACT_CELL_IS_NO_LONGER_VERIFIED",
-                                                                           comment: "An indicator that a contact is no longer verified.")
-                    } else if isBlocked {
-                        configuration.accessoryMessage = MessageStrings.conversationIsBlocked
-                    }
+                        SSKEnvironment.shared.databaseStorageRef.read { transaction in
+                            let configuration = ContactCellConfiguration(
+                                address: memberAddress, localUserDisplayMode: .asLocalUser)
+                            let isGroupAdmin = groupMembership.isFullMemberAndAdministrator(
+                                memberAddress)
+                            let isVerified = verificationState == .verified
+                            let isNoLongerVerified = verificationState == .noLongerVerified
+                            let isBlocked = SSKEnvironment.shared.blockingManagerRef
+                                .isAddressBlocked(memberAddress, transaction: transaction)
+                            if isGroupAdmin {
+                                configuration.accessoryMessage = OWSLocalizedString(
+                                    "GROUP_MEMBER_ADMIN_INDICATOR",
+                                    comment: "Label indicating that a group member is an admin.")
+                            } else if isNoLongerVerified {
+                                configuration.accessoryMessage = OWSLocalizedString(
+                                    "CONTACT_CELL_IS_NO_LONGER_VERIFIED",
+                                    comment: "An indicator that a contact is no longer verified.")
+                            } else if isBlocked {
+                                configuration.accessoryMessage =
+                                    MessageStrings.conversationIsBlocked
+                            }
 
-                    if isLocalUser {
-                        cell.selectionStyle = .none
-                    } else {
-                        cell.selectionStyle = .default
-                    }
+                            if isLocalUser {
+                                cell.selectionStyle = .none
+                            } else {
+                                cell.selectionStyle = .default
+                            }
 
-                    if isVerified {
-                        configuration.useVerifiedSubtitle()
-                    } else if
-                        !memberAddress.isLocalAddress,
-                        let bioForDisplay = SSKEnvironment.shared.profileManagerImplRef.userProfile(for: memberAddress, tx: transaction)?.bioForDisplay
-                    {
-                        configuration.attributedSubtitle = NSAttributedString(string: bioForDisplay)
-                    } else {
-                        owsAssertDebug(configuration.attributedSubtitle == nil)
-                    }
+                            if isVerified {
+                                configuration.useVerifiedSubtitle()
+                            } else if !memberAddress.isLocalAddress,
+                                let bioForDisplay = SSKEnvironment.shared.profileManagerImplRef
+                                    .userProfile(for: memberAddress, tx: transaction)?.bioForDisplay
+                            {
+                                configuration.attributedSubtitle = NSAttributedString(
+                                    string: bioForDisplay)
+                            } else {
+                                owsAssertDebug(configuration.attributedSubtitle == nil)
+                            }
 
-                    let isSystemContact = SSKEnvironment.shared.contactManagerRef.fetchSignalAccount(for: memberAddress, transaction: transaction) != nil
-                    configuration.shouldShowContactIcon = isSystemContact
+                            let isSystemContact =
+                                SSKEnvironment.shared.contactManagerRef.fetchSignalAccount(
+                                    for: memberAddress, transaction: transaction) != nil
+                            configuration.shouldShowContactIcon = isSystemContact
 
-                    cell.configure(configuration: configuration, transaction: transaction)
-                }
+                            cell.configure(configuration: configuration, transaction: transaction)
+                        }
 
-                return cell
-            }, actionBlock: { [weak self] in
-                                        self?.didSelectGroupMember(memberAddress)
-            }))
+                        return cell
+                    },
+                    actionBlock: { [weak self] in
+                        self?.didSelectGroupMember(memberAddress)
+                    }))
         }
 
         if hasMoreMembers {
             let offset = canEditConversationMembership ? 1 : 0
-            let expandedMemberIndices = ((membersToRender.count + offset)..<(totalMemberCount + offset)).map {
-                IndexPath(row: $0, section: sectionIndex)
-            }
-
-            section.add(OWSTableItem(
-                customCellBlock: { [weak self] in
-                    guard let self = self else {
-                        owsFailDebug("Missing self")
-                        return OWSTableItem.newCell()
-                    }
-                    let cell = OWSTableItem.newCell()
-                    cell.preservesSuperviewLayoutMargins = true
-                    cell.contentView.preservesSuperviewLayoutMargins = true
-
-                    let iconView = OWSTableItem.buildIconInCircleView(
-                        icon: .groupInfoShowAllMembers,
-                        iconSize: AvatarBuilder.smallAvatarSizePoints,
-                        innerIconSize: 20,
-                        iconTintColor: Theme.primaryTextColor
-                    )
-
-                    let rowLabel = UILabel()
-                    rowLabel.text = CommonStrings.seeAllButton
-                    rowLabel.textColor = Theme.primaryTextColor
-                    rowLabel.font = OWSTableItem.primaryLabelFont
-                    rowLabel.lineBreakMode = .byTruncatingTail
-
-                    let contentRow = UIStackView(arrangedSubviews: [ iconView, rowLabel ])
-                    contentRow.spacing = self.iconSpacingSmall
-
-                    cell.contentView.addSubview(contentRow)
-                    contentRow.autoPinWidthToSuperviewMargins()
-                    contentRow.autoPinHeightToSuperview(withMargin: 7)
-
-                    return cell
-                },
-                actionBlock: { [weak self] in
-                    self?.showAllGroupMembers(revealingIndices: expandedMemberIndices)
+            let expandedMemberIndices =
+                ((membersToRender.count + offset)..<(totalMemberCount + offset)).map {
+                    IndexPath(row: $0, section: sectionIndex)
                 }
-            ))
+
+            section.add(
+                OWSTableItem(
+                    customCellBlock: { [weak self] in
+                        guard let self = self else {
+                            owsFailDebug("Missing self")
+                            return OWSTableItem.newCell()
+                        }
+                        let cell = OWSTableItem.newCell()
+                        cell.preservesSuperviewLayoutMargins = true
+                        cell.contentView.preservesSuperviewLayoutMargins = true
+
+                        let iconView = OWSTableItem.buildIconInCircleView(
+                            icon: .groupInfoShowAllMembers,
+                            iconSize: AvatarBuilder.smallAvatarSizePoints,
+                            innerIconSize: 20,
+                            iconTintColor: Theme.primaryTextColor
+                        )
+
+                        let rowLabel = UILabel()
+                        rowLabel.text = CommonStrings.seeAllButton
+                        rowLabel.textColor = Theme.primaryTextColor
+                        rowLabel.font = OWSTableItem.primaryLabelFont
+                        rowLabel.lineBreakMode = .byTruncatingTail
+
+                        let contentRow = UIStackView(arrangedSubviews: [iconView, rowLabel])
+                        contentRow.spacing = self.iconSpacingSmall
+
+                        cell.contentView.addSubview(contentRow)
+                        contentRow.autoPinWidthToSuperviewMargins()
+                        contentRow.autoPinHeightToSuperview(withMargin: 7)
+
+                        return cell
+                    },
+                    actionBlock: { [weak self] in
+                        self?.showAllGroupMembers(revealingIndices: expandedMemberIndices)
+                    }
+                ))
         }
 
         return section
@@ -824,31 +947,37 @@ extension ConversationSettingsViewController {
     ) {
         let section = OWSTableSection()
 
-        let groupLinkStatus = (groupModelV2.isGroupInviteLinkEnabled
-                               ? CommonStrings.switchOn
-                               : CommonStrings.switchOff)
-        section.add(OWSTableItem.disclosureItem(
-            icon: .groupInfoGroupLink,
-            withText: OWSLocalizedString(
-                "CONVERSATION_SETTINGS_GROUP_LINK",
-                comment: "Label for 'group link' action in conversation settings view."
-            ),
-            accessoryText: groupLinkStatus,
-            actionBlock: { [weak self] in
-                self?.showGroupLinkView()
-            })
+        let groupLinkStatus =
+            (groupModelV2.isGroupInviteLinkEnabled
+                ? CommonStrings.switchOn
+                : CommonStrings.switchOff)
+        section.add(
+            OWSTableItem.disclosureItem(
+                icon: .groupInfoGroupLink,
+                withText: OWSLocalizedString(
+                    "CONVERSATION_SETTINGS_GROUP_LINK",
+                    comment: "Label for 'group link' action in conversation settings view."
+                ),
+                accessoryText: groupLinkStatus,
+                actionBlock: { [weak self] in
+                    self?.showGroupLinkView()
+                })
         )
 
-        let itemTitle = OWSLocalizedString("CONVERSATION_SETTINGS_MEMBER_REQUESTS_AND_INVITES",
-                                          comment: "Label for 'member requests & invites' action in conversation settings view.")
-        let invitedOrRequestingCount = groupModelV2.groupMembership.invitedMembers.count + groupModelV2.groupMembership.requestingMembers.count
-        section.add(OWSTableItem.disclosureItem(
-            icon: .groupInfoRequestAndInvites,
-            withText: itemTitle,
-            accessoryText: OWSFormat.formatInt(invitedOrRequestingCount),
-            actionBlock: { [weak self] in
-                self?.showMemberRequestsAndInvitesView()
-            })
+        let itemTitle = OWSLocalizedString(
+            "CONVERSATION_SETTINGS_MEMBER_REQUESTS_AND_INVITES",
+            comment: "Label for 'member requests & invites' action in conversation settings view.")
+        let invitedOrRequestingCount =
+            groupModelV2.groupMembership.invitedMembers.count
+            + groupModelV2.groupMembership.requestingMembers.count
+        section.add(
+            OWSTableItem.disclosureItem(
+                icon: .groupInfoRequestAndInvites,
+                withText: itemTitle,
+                accessoryText: OWSFormat.formatInt(invitedOrRequestingCount),
+                actionBlock: { [weak self] in
+                    self?.showMemberRequestsAndInvitesView()
+                })
         )
 
         if canEditPermissions {
@@ -856,13 +985,14 @@ extension ConversationSettingsViewController {
                 "CONVERSATION_SETTINGS_PERMISSIONS",
                 comment: "Label for 'permissions' action in conversation settings view."
             )
-            section.add(OWSTableItem.disclosureItem(
-                icon: .groupInfoPermissions,
-                withText: itemTitle,
-                actionBlock: { [weak self] in
-                    self?.showPermissionsSettingsView()
-                }
-            ))
+            section.add(
+                OWSTableItem.disclosureItem(
+                    icon: .groupInfoPermissions,
+                    withText: itemTitle,
+                    actionBlock: { [weak self] in
+                        self?.showPermissionsSettingsView()
+                    }
+                ))
         }
 
         contents.add(section)
@@ -870,54 +1000,63 @@ extension ConversationSettingsViewController {
 
     private func buildMutualGroupsSection(sectionIndex: Int) -> OWSTableSection {
         let section = OWSTableSection()
-        section.separatorInsetLeading = Self.cellHInnerMargin + CGFloat(AvatarBuilder.smallAvatarSizePoints) + ContactCellView.avatarTextHSpacing
+        section.separatorInsetLeading =
+            Self.cellHInnerMargin + CGFloat(AvatarBuilder.smallAvatarSizePoints)
+            + ContactCellView.avatarTextHSpacing
 
         // "Add to a Group" cell.
-        section.add(OWSTableItem(
-            customCellBlock: { [weak self] in
-                guard let self = self else {
-                    owsFailDebug("Missing self")
-                    return OWSTableItem.newCell()
+        section.add(
+            OWSTableItem(
+                customCellBlock: { [weak self] in
+                    guard let self = self else {
+                        owsFailDebug("Missing self")
+                        return OWSTableItem.newCell()
+                    }
+                    let cell = OWSTableItem.newCell()
+                    cell.preservesSuperviewLayoutMargins = true
+                    cell.contentView.preservesSuperviewLayoutMargins = true
+
+                    let iconView = OWSTableItem.buildIconInCircleView(
+                        icon: .groupInfoAddMembers,
+                        iconSize: AvatarBuilder.smallAvatarSizePoints,
+                        innerIconSize: 20,
+                        iconTintColor: Theme.primaryTextColor
+                    )
+
+                    let rowLabel = UILabel()
+                    rowLabel.text = OWSLocalizedString(
+                        "ADD_TO_GROUP_TITLE", comment: "Title of the 'add to group' view.")
+                    rowLabel.textColor = Theme.primaryTextColor
+                    rowLabel.font = OWSTableItem.primaryLabelFont
+                    rowLabel.lineBreakMode = .byTruncatingTail
+
+                    let contentRow = UIStackView(arrangedSubviews: [iconView, rowLabel])
+                    contentRow.spacing = self.iconSpacingSmall
+
+                    cell.contentView.addSubview(contentRow)
+                    contentRow.autoPinWidthToSuperviewMargins()
+                    contentRow.autoPinHeightToSuperview(withMargin: 7)
+
+                    return cell
+                },
+                actionBlock: { [weak self] in
+                    self?.showAddToGroupView()
                 }
-                let cell = OWSTableItem.newCell()
-                cell.preservesSuperviewLayoutMargins = true
-                cell.contentView.preservesSuperviewLayoutMargins = true
-
-                let iconView = OWSTableItem.buildIconInCircleView(
-                    icon: .groupInfoAddMembers,
-                    iconSize: AvatarBuilder.smallAvatarSizePoints,
-                    innerIconSize: 20,
-                    iconTintColor: Theme.primaryTextColor
-                )
-
-                let rowLabel = UILabel()
-                rowLabel.text = OWSLocalizedString("ADD_TO_GROUP_TITLE", comment: "Title of the 'add to group' view.")
-                rowLabel.textColor = Theme.primaryTextColor
-                rowLabel.font = OWSTableItem.primaryLabelFont
-                rowLabel.lineBreakMode = .byTruncatingTail
-
-                let contentRow = UIStackView(arrangedSubviews: [ iconView, rowLabel ])
-                contentRow.spacing = self.iconSpacingSmall
-
-                cell.contentView.addSubview(contentRow)
-                contentRow.autoPinWidthToSuperviewMargins()
-                contentRow.autoPinHeightToSuperview(withMargin: 7)
-
-                return cell
-            },
-            actionBlock: { [weak self] in
-                self?.showAddToGroupView()
-            }
-        ))
+            ))
 
         if mutualGroupThreads.count > 0 {
-            let headerFormat = OWSLocalizedString("CONVERSATION_SETTINGS_MUTUAL_GROUPS_SECTION_TITLE_%d", tableName: "PluralAware",
-                                                 comment: "Format for the section title of the 'mutual groups' section in conversation settings view. Embeds: {{ the number of shared groups }}."
+            let headerFormat = OWSLocalizedString(
+                "CONVERSATION_SETTINGS_MUTUAL_GROUPS_SECTION_TITLE_%d", tableName: "PluralAware",
+                comment:
+                    "Format for the section title of the 'mutual groups' section in conversation settings view. Embeds: {{ the number of shared groups }}."
             )
-            section.headerTitle = String.localizedStringWithFormat(headerFormat, mutualGroupThreads.count)
+            section.headerTitle = String.localizedStringWithFormat(
+                headerFormat, mutualGroupThreads.count)
         } else {
-            section.headerTitle = OWSLocalizedString("CONVERSATION_SETTINGS_NO_MUTUAL_GROUPS_SECTION_TITLE",
-                                                    comment: "Section title of the 'mutual groups' section in conversation settings view when the contact shares no mutual groups."
+            section.headerTitle = OWSLocalizedString(
+                "CONVERSATION_SETTINGS_NO_MUTUAL_GROUPS_SECTION_TITLE",
+                comment:
+                    "Section title of the 'mutual groups' section in conversation settings view when the contact shares no mutual groups."
             )
         }
 
@@ -931,62 +1070,65 @@ extension ConversationSettingsViewController {
         }
 
         for groupThread in groupThreadsToRender {
-            section.add(OWSTableItem(
-                customCellBlock: {
-                    let cell = GroupTableViewCell()
-                    cell.configure(thread: groupThread)
-                    return cell
-                },
-                actionBlock: {
-                    SignalApp.shared.presentConversationForThread(
-                        threadUniqueId: groupThread.uniqueId,
-                        animated: true
-                    )
-                }
-            ))
+            section.add(
+                OWSTableItem(
+                    customCellBlock: {
+                        let cell = GroupTableViewCell()
+                        cell.configure(thread: groupThread)
+                        return cell
+                    },
+                    actionBlock: {
+                        SignalApp.shared.presentConversationForThread(
+                            threadUniqueId: groupThread.uniqueId,
+                            animated: true
+                        )
+                    }
+                ))
         }
 
         if hasMoreGroups {
-            let expandedGroupIndices = ((groupThreadsToRender.count + 1)..<(mutualGroupThreads.count + 1)).map {
-                IndexPath(row: $0, section: sectionIndex)
-            }
-
-            section.add(OWSTableItem(
-                customCellBlock: { [weak self] in
-                    guard let self = self else {
-                        owsFailDebug("Missing self")
-                        return OWSTableItem.newCell()
-                    }
-                    let cell = OWSTableItem.newCell()
-                    cell.preservesSuperviewLayoutMargins = true
-                    cell.contentView.preservesSuperviewLayoutMargins = true
-
-                    let iconView = OWSTableItem.buildIconInCircleView(
-                        icon: .groupInfoShowAllMembers,
-                        iconSize: AvatarBuilder.smallAvatarSizePoints,
-                        innerIconSize: 20,
-                        iconTintColor: Theme.primaryTextColor
-                    )
-
-                    let rowLabel = UILabel()
-                    rowLabel.text = CommonStrings.seeAllButton
-                    rowLabel.textColor = Theme.primaryTextColor
-                    rowLabel.font = OWSTableItem.primaryLabelFont
-                    rowLabel.lineBreakMode = .byTruncatingTail
-
-                    let contentRow = UIStackView(arrangedSubviews: [ iconView, rowLabel ])
-                    contentRow.spacing = self.iconSpacingSmall
-
-                    cell.contentView.addSubview(contentRow)
-                    contentRow.autoPinWidthToSuperviewMargins()
-                    contentRow.autoPinHeightToSuperview(withMargin: 7)
-
-                    return cell
-                },
-                actionBlock: { [weak self] in
-                    self?.showAllMutualGroups(revealingIndices: expandedGroupIndices)
+            let expandedGroupIndices =
+                ((groupThreadsToRender.count + 1)..<(mutualGroupThreads.count + 1)).map {
+                    IndexPath(row: $0, section: sectionIndex)
                 }
-            ))
+
+            section.add(
+                OWSTableItem(
+                    customCellBlock: { [weak self] in
+                        guard let self = self else {
+                            owsFailDebug("Missing self")
+                            return OWSTableItem.newCell()
+                        }
+                        let cell = OWSTableItem.newCell()
+                        cell.preservesSuperviewLayoutMargins = true
+                        cell.contentView.preservesSuperviewLayoutMargins = true
+
+                        let iconView = OWSTableItem.buildIconInCircleView(
+                            icon: .groupInfoShowAllMembers,
+                            iconSize: AvatarBuilder.smallAvatarSizePoints,
+                            innerIconSize: 20,
+                            iconTintColor: Theme.primaryTextColor
+                        )
+
+                        let rowLabel = UILabel()
+                        rowLabel.text = CommonStrings.seeAllButton
+                        rowLabel.textColor = Theme.primaryTextColor
+                        rowLabel.font = OWSTableItem.primaryLabelFont
+                        rowLabel.lineBreakMode = .byTruncatingTail
+
+                        let contentRow = UIStackView(arrangedSubviews: [iconView, rowLabel])
+                        contentRow.spacing = self.iconSpacingSmall
+
+                        cell.contentView.addSubview(contentRow)
+                        contentRow.autoPinWidthToSuperviewMargins()
+                        contentRow.autoPinHeightToSuperview(withMargin: 7)
+
+                        return cell
+                    },
+                    actionBlock: { [weak self] in
+                        self?.showAllMutualGroups(revealingIndices: expandedGroupIndices)
+                    }
+                ))
         }
 
         return section

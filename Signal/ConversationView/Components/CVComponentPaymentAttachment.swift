@@ -159,7 +159,7 @@ public class CVComponentPaymentAttachment: CVComponentBase, CVComponent {
             return NSAttributedString(string: text)
         }
 
-        let amount = TSPaymentAmount(currency: .mobileCoin, picoMob: mob)
+        let amount = TSPaymentAmount(currency: .bitcoin, picoMob: mob)
         switch status {
         case .failed:
             return PaymentsFormat.formatInChatFailure(paymentAmount: amount)

@@ -724,7 +724,7 @@ struct CVItemModelBuilder: CVItemBuilding {
 
 private extension MessageLoader {
     var shouldShowThreadDetails: Bool {
-        !canLoadOlder
+        !canLoadOlder && !onlyStarred
     }
 
     func shouldShowDefaultDisappearingMessageTimer(thread: TSThread, transaction: DBReadTransaction) -> Bool {

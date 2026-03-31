@@ -6007,8 +6007,8 @@
 /* Payments in-chat message shown if a payment fails to send, bottom half. */
 "PAYMENTS_IN_CHAT_FAILURE_MESSAGE_BOTTOM" = "تفصیلات کے لئے ٹیپ کریں";
 
-/* Payments in-chat message shown if a payment fails to send, top part. Embeds {{ number, amount of MOB coin not sent }} */
-"PAYMENTS_IN_CHAT_FAILURE_MESSAGE_TOP" = "%1$@ MOB نہیں بھیجی گئے";
+/* Payments in-chat message shown if a payment fails to send, top part. Embeds {{ number, amount of BTC coin not sent }} */
+"PAYMENTS_IN_CHAT_FAILURE_MESSAGE_TOP" = "%1$@ BTC نہیں بھیجی گئے";
 
 /* Status indicator for invalid payments which could not be processed. */
 "PAYMENTS_INFO_UNAVAILABLE_MESSAGE" = "عدم دستیاب";
@@ -6092,10 +6092,10 @@
 "PAYMENTS_NEW_PAYMENT_ERROR_CONNECTIVITY_FAILURE" = "سروس سے رابطہ نہیں ہوسکا";
 
 /* Indicates that a payment failed due to insufficient funds. */
-"PAYMENTS_NEW_PAYMENT_ERROR_INSUFFICIENT_FUNDS" = "آپ کے پاس اس ادائیگی کو مکمل کرنے کے لئے اتنی MOB نہیں ہے۔";
+"PAYMENTS_NEW_PAYMENT_ERROR_INSUFFICIENT_FUNDS" = "آپ کے پاس اس ادائیگی کو مکمل کرنے کے لئے اتنی BTC نہیں ہے۔";
 
 /* Indicates that a payment failed due to insufficient funds. Embeds {{ current balance }}. */
-"PAYMENTS_NEW_PAYMENT_ERROR_INSUFFICIENT_FUNDS_FORMAT" = "آپ کے پاس اس ادائیگی کو مکمل کرنے کے لئے اتنی MOB نہیں ہے۔ آپ کا موجودہ بیلنس%1$@ ہے۔";
+"PAYMENTS_NEW_PAYMENT_ERROR_INSUFFICIENT_FUNDS_FORMAT" = "آپ کے پاس اس ادائیگی کو مکمل کرنے کے لئے اتنی BTC نہیں ہے۔ آپ کا موجودہ بیلنس%1$@ ہے۔";
 
 /* Indicates that a payment failed due to being invalid. */
 "PAYMENTS_NEW_PAYMENT_ERROR_INVALID_TRANSACTION" = "غلط ٹرانزیکشن";
@@ -8009,7 +8009,7 @@
 "SETTINGS_PAYMENTS_ADD_MONEY" = "فنڈز شامل کریں";
 
 /* Explanation of the process for adding money in the 'add money' settings view. */
-"SETTINGS_PAYMENTS_ADD_MONEY_DESCRIPTION" = "فنڈز شامل کرنے کے لئے ، اپنے Wallet کے پتے پر موبائل کوائن بھیجیں۔ اپنے تبادلے سے اپنے اکاؤنٹ سے لین دین شروع کریں جو موبائل کوائن کو سپورٹ کرتا ہے ، پھر کیو آر کوڈ اسکین کریں یا اپنے بٹوے کے پتے کو کاپی کریں۔";
+"SETTINGS_PAYMENTS_ADD_MONEY_DESCRIPTION" = "فنڈز شامل کرنے کے لئے ، اپنےبٹ کوائن لائٹننگ پر والیٹ ایڈریس پر بھیجیں۔ اپنے اکاؤنٹ سے ایک ایسے تبادلے پر ٹرانزیکشن شروع کریں جو Lightning پر Bitcoin کو سپورٹ کرتا ہو، پھر QR کوڈ اسکین کریں یا اپنے بٹوے کا پتہ کاپی کریں۔";
 
 /* Indicator that the payments wallet address has been copied to the pasteboard. */
 "SETTINGS_PAYMENTS_ADD_MONEY_WALLET_ADDRESS_COPIED" = "Wallet کا پتہ کاپی کیا گیا";
@@ -8216,7 +8216,7 @@
 "SETTINGS_PAYMENTS_PAYMENT_DETAILS_STATUS_FOOTER_DEFRAGMENTATION" = "جب آپ کے پاس موجود سکے کو ٹرانزیکشن کو مکمل کرنے کے لئے جوڑ نہیں کیا جاسکتا ہے تو \"Coin cleanup fee\" وصول کی جاتی ہے۔ Cleanup آپ کو ادائیگی بھیجنا جاری رکھنے کی اجازت دے گی۔";
 
 /* Message for the 'insufficient balance for payment' alert. Embeds: {{ The current payments balance }}. */
-"SETTINGS_PAYMENTS_PAYMENT_INSUFFICIENT_BALANCE_ALERT_MESSAGE_FORMAT" = "آپ کے پاس اس ادائیگی کو مکمل کرنے کے لئے اتنی MOB نہیں ہے۔ آپ کا موجودہ بیلنس%1$@ ہے۔";
+"SETTINGS_PAYMENTS_PAYMENT_INSUFFICIENT_BALANCE_ALERT_MESSAGE_FORMAT" = "آپ کے پاس اس ادائیگی کو مکمل کرنے کے لئے اتنی BTC نہیں ہے۔ آپ کا موجودہ بیلنس%1$@ ہے۔";
 
 /* Title for the 'insufficient balance for payment' alert. */
 "SETTINGS_PAYMENTS_PAYMENT_INSUFFICIENT_BALANCE_ALERT_TITLE" = "ناکافی بیلنس";
@@ -8417,7 +8417,7 @@
 "SETTINGS_PAYMENTS_TRANSFER_OUT_PLACEHOLDER" = "To: Wallet کا پتہ سکین کریں یا درج کریں";
 
 /* Label for 'transfer currency out' view in the payment settings. */
-"SETTINGS_PAYMENTS_TRANSFER_OUT_TITLE" = "ایکسچینج میں منتقل کریں";
+"SETTINGS_PAYMENTS_TRANSFER_OUT_TITLE" = "بیرونی میں منتقل کریں۔";
 
 /* Label for the 'transfer to exchange' button in the payment settings. */
 "SETTINGS_PAYMENTS_TRANSFER_TO_EXCHANGE" = "ایکسچینج میں منتقل کریں";

@@ -75,6 +75,10 @@ public class SendPaymentViewController: OWSViewController {
     private var isUsingPresentedStyle: Bool {
         return presentingViewController != nil
     }
+    
+    private var isSatoshiEnabled: Bool {
+        PaymentsImpl.isSatoshiAmountTypeEnabled()
+    }
 
     public init(
         recipient: SendPaymentRecipient,
@@ -86,19 +90,20 @@ public class SendPaymentViewController: OWSViewController {
         self.mode = mode
         self.isOutgoingTransfer = isOutgoingTransfer
 
-        if Self.wasLastPaymentInFiat,
-           let defaultFiatAmount = Amounts.defaultFiatAmount {
+        if PaymentsImpl.isSatoshiAmountTypeEnabled() {
+            amounts.set(currentAmount: Amounts.defaultSatoshiAmount, otherCurrencyAmount: nil)
+        } else if Self.wasLastPaymentInFiat, let defaultFiatAmount = Amounts.defaultFiatAmount {
             amounts.set(currentAmount: defaultFiatAmount, otherCurrencyAmount: nil)
         } else {
             amounts.set(currentAmount: Amounts.defaultMCAmount, otherCurrencyAmount: nil)
         }
-
+    
         if let initialPaymentAmount = initialPaymentAmount {
-            owsAssertDebug(initialPaymentAmount.currency == .mobileCoin)
+            owsAssertDebug(initialPaymentAmount.currency == .bitcoin)
 
             if let amountString = PaymentsFormat.formatAsDoubleString(picoMob: initialPaymentAmount.picoMob) {
                 let inputString = InputString.parseString(amountString, isFiat: false)
-                amounts.set(currentAmount: .mobileCoin(inputString: inputString,
+                amounts.set(currentAmount: .cryptoCurrency(inputString: inputString,
                                                        exactAmount: initialPaymentAmount),
                             otherCurrencyAmount: nil)
             } else {
@@ -216,7 +221,7 @@ public class SendPaymentViewController: OWSViewController {
                             throw ProfileRequestError.notFound
                         }
                         let profileFetcher = SSKEnvironment.shared.profileFetcherRef
-                        _ = try await profileFetcher.fetchProfile(for: serviceId)
+                        _ = try await profileFetcher.fetchProfileWithLightningBitcoinAddress(for: serviceId)
 
                         modalActivityIndicator.dismiss {
                             Self.presentAfterRecipientCheck(
@@ -752,7 +757,7 @@ public class SendPaymentViewController: OWSViewController {
         bigAmountLabel.attributedText = amount.formatAsKeyboardInputAttributed(withSpace: false)
 
         switch amount {
-        case .mobileCoin:
+        case .cryptoCurrency:
             if let otherCurrencyAmount = self.otherCurrencyAmount,
                let currencyConversion = otherCurrencyAmount.currencyConversion {
                 let formattedAmount = otherCurrencyAmount.formatForDisplay(withSpace: true).string
@@ -784,6 +789,30 @@ public class SendPaymentViewController: OWSViewController {
                 enableSmallLabel(Self.formatWithConversionFreshness(formattedAmount: formattedAmount,
                                                                     currencyConversion: currencyConversion,
                                                                     isZero: isZero))
+            }
+        case .satoshi:
+            if let otherCurrencyAmount = self.otherCurrencyAmount,
+               let currencyConversion = otherCurrencyAmount.currencyConversion {
+                let formattedAmount = otherCurrencyAmount.formatForDisplay(withSpace: true).string
+                enableSmallLabel(Self.formatWithConversionFreshness(
+                    formattedAmount: formattedAmount,
+                    currencyConversion: currencyConversion,
+                    isZero: isZero
+                ))
+            } else if let currencyConversion = currentCurrencyConversion,
+                      let fiatAmount = currencyConversion.convertToFiatCurrency(paymentAmount: parsedPaymentAmount),
+                      let fiatString = PaymentsFormat.attributedFormat(
+                          fiatCurrencyAmount: fiatAmount,
+                          currencyCode: currencyConversion.currencyCode,
+                          withSpace: true
+                      ) {
+                enableSmallLabel(Self.formatWithConversionFreshness(
+                    formattedAmount: fiatString.string,
+                    currencyConversion: currencyConversion,
+                    isZero: isZero
+                ))
+            } else {
+                hideConversionLabelOrShowWarning()
             }
         }
     }
@@ -827,10 +856,12 @@ public class SendPaymentViewController: OWSViewController {
             return amount
         }
         switch amount {
-        case .mobileCoin:
+        case .cryptoCurrency:
             return amount
         case .fiatCurrency(let inputString, _):
             return .fiatCurrency(inputString: inputString, currencyConversion: currencyConversion)
+        case .satoshi:
+            return amount
         }
     }
 
@@ -847,7 +878,7 @@ public class SendPaymentViewController: OWSViewController {
         }
 
         switch amount {
-        case .mobileCoin:
+        case .cryptoCurrency:
             if let currencyConversion = currentCurrencyConversion,
                let fiatCurrencyAmount = currencyConversion.convertToFiatCurrency(paymentAmount: parsedPaymentAmount),
                let fiatString = PaymentsFormat.formatAsDoubleString(fiatCurrencyAmount) {
@@ -861,16 +892,47 @@ public class SendPaymentViewController: OWSViewController {
             }
         case .fiatCurrency(_, let currencyConversion):
             let paymentAmount = currencyConversion.convertFromFiatCurrencyToMOB(amount.asDouble)
-            if let mobString = PaymentsFormat.formatAsDoubleString(picoMob: paymentAmount.picoMob) {
-                // Store the otherCurrencyAmount.
-                amounts.set(currentAmount: .mobileCoin(inputString: InputString.parseString(mobString,
-                                                                                            isFiat: false),
-                                                       exactAmount: nil),
-                            otherCurrencyAmount: self.amount)
-            } else {
-                owsFailDebug("Could not switch from fiat currency.")
-                resetContents()
-            }
+                if isSatoshiEnabled {
+                    let satoshi = PaymentsConstants.convertPicoMobToSatoshi(paymentAmount.picoMob)
+                    let satoshiString = "\(satoshi)"
+                    amounts.set(
+                        currentAmount: .satoshi(
+                            inputString: InputString.parseString(satoshiString, isFiat: false, isSatoshi: true)
+                        ),
+                        otherCurrencyAmount: self.amount
+                    )
+                } else {
+                    if let mobString = PaymentsFormat.formatAsDoubleString(picoMob: paymentAmount.picoMob) {
+                        amounts.set(
+                            currentAmount: .cryptoCurrency(
+                                inputString: InputString.parseString(mobString, isFiat: false),
+                                exactAmount: nil
+                            ),
+                            otherCurrencyAmount: self.amount
+                        )
+                    } else {
+                        owsFailDebug("Could not switch from fiat currency.")
+                        resetContents()
+                    }
+                }
+        case .satoshi:
+            guard let currencyConversion = currentCurrencyConversion else {
+                    owsFailDebug("No currency conversion available for satoshi swap.")
+                    return
+                }
+                let paymentAmount = parsedPaymentAmount
+                if let fiatCurrencyAmount = currencyConversion.convertToFiatCurrency(paymentAmount: paymentAmount),
+                   let fiatString = PaymentsFormat.formatAsDoubleString(fiatCurrencyAmount) {
+                    amounts.set(
+                        currentAmount: .fiatCurrency(
+                            inputString: InputString.parseString(fiatString, isFiat: true),
+                            currencyConversion: currencyConversion
+                        ),
+                        otherCurrencyAmount: self.amount
+                    )
+                } else {
+                    owsFailDebug("Could not convert satoshi to fiat currency.")
+                }
         }
     }
 
@@ -940,8 +1002,6 @@ public class SendPaymentViewController: OWSViewController {
                 AssertIsOnMainThread()
                 if case PaymentsError.insufficientFunds = error {
                     Logger.warn("Error: \(error)")
-                } else {
-                    owsFailDebugUnlessMCNetworkFailure(error)
                 }
 
                 modalActivityIndicator.dismiss {
@@ -1138,6 +1198,10 @@ fileprivate extension SendPaymentViewController {
     }
 
     private func keyboardPressedDecimal() {
+        if case .satoshi = amount {
+            return
+        }
+        
         let inputString = amount.inputString.append(.decimal)
         updateAmountString(inputString)
     }
@@ -1149,28 +1213,35 @@ fileprivate extension SendPaymentViewController {
 
     private func updateAmountString(_ inputString: InputString) {
         switch amount {
-        case .mobileCoin:
-            amounts.set(currentAmount: .mobileCoin(inputString: inputString,
-                                                   exactAmount: nil),
+        case .cryptoCurrency:
+            amounts.set(currentAmount: .cryptoCurrency(inputString: inputString,
+                                                       exactAmount: nil),
                         otherCurrencyAmount: nil)
         case .fiatCurrency(_, let oldCurrencyConversion):
             let newCurrencyConversion = self.currentCurrencyConversion ?? oldCurrencyConversion
             amounts.set(currentAmount: .fiatCurrency(inputString: inputString,
                                                      currencyConversion: newCurrencyConversion),
                         otherCurrencyAmount: nil)
+        case .satoshi:
+            amounts.set(currentAmount: .satoshi(inputString: inputString),
+                        otherCurrencyAmount: nil)
         }
     }
 
     private var parsedPaymentAmount: TSPaymentAmount {
         switch amount {
-        case .mobileCoin(_, let exactAmount):
+        case .cryptoCurrency(_, let exactAmount):
             if let exactAmount = exactAmount {
                 return exactAmount
             }
             let picoMob = PaymentsConstants.convertMobToPicoMob(amount.asDouble)
-            return TSPaymentAmount(currency: .mobileCoin, picoMob: picoMob)
+            return TSPaymentAmount(currency: .bitcoin, picoMob: picoMob)
         case .fiatCurrency(_, let currencyConversion):
             return currencyConversion.convertFromFiatCurrencyToMOB(amount.asDouble)
+        case .satoshi:
+            let satoshi = UInt64(amount.asDouble)
+            let picoMob = PaymentsConstants.convertSatoshiToPicoMob(satoshi)
+            return TSPaymentAmount(currency: .bitcoin, picoMob: picoMob)
         }
     }
 }
@@ -1222,12 +1293,13 @@ extension SendPaymentViewController: SendPaymentCompletionDelegate {
 private enum Amount {
     // inputString should be a raw double strings: e.g. 123456.789.
     // It should not be formatted: e.g. 123,456.789
-    case mobileCoin(inputString: InputString, exactAmount: TSPaymentAmount?)
+    case cryptoCurrency(inputString: InputString, exactAmount: TSPaymentAmount?)
     case fiatCurrency(inputString: InputString, currencyConversion: CurrencyConversionInfo)
-
+    case satoshi(inputString: InputString)
+    
     var isFiat: Bool {
         switch self {
-        case .mobileCoin:
+        case .cryptoCurrency, .satoshi:
             return false
         case .fiatCurrency:
             return true
@@ -1236,25 +1308,37 @@ private enum Amount {
 
     var isZero: Bool {
         switch self {
-        case .mobileCoin(let inputString, _):
+        case .cryptoCurrency(let inputString, _):
             return inputString.isZero
         case .fiatCurrency(let inputString, _):
+            return inputString.isZero
+        case .satoshi(let inputString):
             return inputString.isZero
         }
     }
 
     var inputString: InputString {
         switch self {
-        case .mobileCoin(let inputString, _):
+        case .cryptoCurrency(let inputString, _):
             return inputString
         case .fiatCurrency(let inputString, _):
             return inputString
+        case .satoshi(let inputString):
+            return inputString
         }
     }
+    
+    var isSatoshi: Bool {
+        guard case .satoshi = self else {
+            return false
+        }
+        
+        return true
+   }
 
     var currencyConversion: CurrencyConversionInfo? {
         switch self {
-        case .mobileCoin:
+        case .cryptoCurrency, .satoshi:
             return nil
         case .fiatCurrency(_, let currencyConversion):
             return currencyConversion
@@ -1267,13 +1351,13 @@ private enum Amount {
 
     var formatForDisplay: String {
         switch self {
-        case .mobileCoin:
-            guard let mobString = PaymentsFormat.format(mob: asDouble,
-                                                        isShortForm: false) else {
-                owsFailDebug("Couldn't format MOB string: \(inputString.asString(formatMode: .parsing))")
+        case .cryptoCurrency:
+            guard let cryptoCurrencyAmountString = PaymentsFormat.format(mob: asDouble,
+                                                                         isShortForm: false) else {
+                owsFailDebug("Couldn't format crypto currency amount string: \(inputString.asString(formatMode: .parsing))")
                 return inputString.asString(formatMode: .display)
             }
-            return mobString
+            return cryptoCurrencyAmountString
         case .fiatCurrency:
             guard let fiatString = PaymentsFormat.format(fiatCurrencyAmount: asDouble,
                                                          minimumFractionDigits: 0) else {
@@ -1281,6 +1365,9 @@ private enum Amount {
                 return inputString.asString(formatMode: .display)
             }
             return fiatString
+        case .satoshi:
+            let satoshi = UInt64(exactly: asDouble) ?? UInt64(asDouble)
+            return "\(satoshi)"
         }
     }
 
@@ -1290,25 +1377,29 @@ private enum Amount {
 
     func formatForDisplay(withSpace: Bool) -> NSAttributedString {
         switch self {
-        case .mobileCoin:
-            return PaymentsFormat.attributedFormat(mobileCoinString: formatForDisplay,
-                                                   withSpace: withSpace)
+        case .cryptoCurrency:
+            return PaymentsFormat.attributedFormat(bitcoinString: formatForDisplay,
+                                                       withSpace: withSpace)
         case .fiatCurrency(_, let currencyConversion):
             return PaymentsFormat.attributedFormat(currencyString: formatForDisplay,
                                                    currencyCode: currencyConversion.currencyCode,
                                                    withSpace: withSpace)
+        case .satoshi:
+            return PaymentsFormat.attributedFormat(satoshiString: formatForDisplay, withSpace: withSpace)
         }
     }
 
     func formatAsKeyboardInputAttributed(withSpace: Bool) -> NSAttributedString {
         switch self {
-        case .mobileCoin:
-            return PaymentsFormat.attributedFormat(mobileCoinString: formatAsKeyboardInput,
-                                                   withSpace: withSpace)
+        case .cryptoCurrency:
+            return PaymentsFormat.attributedFormat(bitcoinString: formatAsKeyboardInput,
+                                                       withSpace: withSpace)
         case .fiatCurrency(_, let currencyConversion):
             return PaymentsFormat.attributedFormat(currencyString: formatAsKeyboardInput,
                                                    currencyCode: currencyConversion.currencyCode,
                                                    withSpace: withSpace)
+        case .satoshi:
+            return PaymentsFormat.attributedFormat(satoshiString: formatAsKeyboardInput, withSpace: withSpace)
         }
     }
 }
@@ -1326,8 +1417,12 @@ private class Amounts {
     weak var delegate: AmountsDelegate?
 
     public static var defaultMCAmount: Amount {
-        .mobileCoin(inputString: InputString.defaultString(isFiat: false),
+        .cryptoCurrency(inputString: InputString.defaultString(isFiat: false),
                     exactAmount: nil)
+    }
+    
+    public static var defaultSatoshiAmount: Amount {
+        .satoshi(inputString: InputString.defaultString(isFiat: false, isSatoshi: true))
     }
 
     public static var defaultFiatAmount: Amount? {
@@ -1352,7 +1447,11 @@ private class Amounts {
     }
 
     func reset() {
-        set(currentAmount: Self.defaultMCAmount, otherCurrencyAmount: nil)
+        if PaymentsImpl.isSatoshiAmountTypeEnabled() {
+            set(currentAmount: Self.defaultSatoshiAmount, otherCurrencyAmount: nil)
+        } else {
+            set(currentAmount: Self.defaultMCAmount, otherCurrencyAmount: nil)
+        }
     }
 }
 
@@ -1363,7 +1462,9 @@ extension SendPaymentViewController: AmountsDelegate {
         guard isViewLoaded else {
             return
         }
-        if oldValue.isFiat != newValue.isFiat {
+        let didChangeAmountType = (oldValue.isFiat != newValue.isFiat)
+                               || (oldValue.isSatoshi != newValue.isSatoshi)
+        if didChangeAmountType {
             updateContents()
         } else {
             updateAmountLabels()
@@ -1408,10 +1509,12 @@ private enum InputChar: Equatable {
 private struct InputString: Equatable {
     let chars: [InputChar]
     let isFiat: Bool
+    let isSatoshi: Bool
 
-    init(_ chars: [InputChar], isFiat: Bool) {
+    init(_ chars: [InputChar], isFiat: Bool, isSatoshi: Bool = false) {
         self.chars = chars
         self.isFiat = isFiat
+        self.isSatoshi = isSatoshi
     }
 
     static func forDouble(_ value: Double, isFiat: Bool) -> InputString {
@@ -1422,8 +1525,8 @@ private struct InputString: Equatable {
         return parseString(stringValue, isFiat: isFiat)
     }
 
-    static func parseString(_ stringValue: String, isFiat: Bool) -> InputString {
-        var result = InputString.defaultString(isFiat: isFiat)
+    static func parseString(_ stringValue: String, isFiat: Bool, isSatoshi: Bool = false) -> InputString {
+        var result = InputString.defaultString(isFiat: isFiat, isSatoshi: isSatoshi)
         for char in stringValue {
             let charString = String(char)
             if charString == InputChar.decimal.asString(formatMode: .parsing) {
@@ -1438,8 +1541,8 @@ private struct InputString: Equatable {
     }
 
     static var defaultChar: InputChar { .digit(digit: "0") }
-    static func defaultString(isFiat: Bool) -> InputString {
-        InputString([defaultChar], isFiat: isFiat)
+    static func defaultString(isFiat: Bool, isSatoshi: Bool = false) -> InputString {
+        InputString([defaultChar], isFiat: isFiat, isSatoshi: isSatoshi)
     }
 
     func append(_ char: InputChar) -> InputString {
@@ -1450,17 +1553,17 @@ private struct InputString: Equatable {
                 //
                 // "00" should be "0"
                 // "01" should be "1"
-                if self == Self.defaultString(isFiat: isFiat) {
-                    return InputString([char], isFiat: isFiat)
+                if self == Self.defaultString(isFiat: isFiat, isSatoshi: isSatoshi) {
+                    return InputString([char], isFiat: isFiat, isSatoshi: isSatoshi)
                 } else {
-                    return InputString(chars + [char], isFiat: isFiat)
+                    return InputString(chars + [char], isFiat: isFiat, isSatoshi: isSatoshi)
                 }
             case .decimal:
                 if hasDecimal {
                     // Don't allow two decimals.
                     return self
                 } else {
-                    return InputString(chars + [char], isFiat: isFiat)
+                    return InputString(chars + [char], isFiat: isFiat, isSatoshi: isSatoshi)
                 }
             }
         }()
@@ -1474,9 +1577,10 @@ private struct InputString: Equatable {
     func removeLastChar() -> InputString {
         if chars.count > 1 {
             return InputString(Array(chars.prefix(chars.count - 1)),
-                               isFiat: isFiat)
+                               isFiat: isFiat,
+                               isSatoshi: isSatoshi)
         } else {
-            return Self.defaultString(isFiat: isFiat)
+            return Self.defaultString(isFiat: isFiat, isSatoshi: isSatoshi)
         }
     }
 
@@ -1503,22 +1607,28 @@ private struct InputString: Equatable {
         return false
     }
 
-    static func maxDigitsBeforeDecimal(isFiat: Bool) -> UInt {
+    static func maxDigitsBeforeDecimal(isFiat: Bool, isSatoshi: Bool) -> UInt {
+        if isSatoshi {
+            return PaymentsConstants.maxSatoshiDigits
+        }
         // Max transaction size: 1 billion MOB.
         return isFiat ? 9 : PaymentsConstants.maxMobNonDecimalDigits
     }
 
-    static func maxDigitsAfterDecimal(isFiat: Bool) -> UInt {
-        // picoMob
-        isFiat ? 2 : 12
+    static func maxDigitsAfterDecimal(isFiat: Bool, isSatoshi: Bool = false) -> UInt {
+        if isSatoshi {
+            return 0
+        }
+        
+        return isFiat ? 2 : 8
     }
 
     var maxDigitsBeforeDecimal: UInt {
-        Self.maxDigitsBeforeDecimal(isFiat: isFiat)
+        Self.maxDigitsBeforeDecimal(isFiat: isFiat, isSatoshi: isSatoshi)
     }
 
     var maxDigitsAfterDecimal: UInt {
-        Self.maxDigitsAfterDecimal(isFiat: isFiat)
+        Self.maxDigitsAfterDecimal(isFiat: isFiat, isSatoshi: isSatoshi)
     }
 
     var digitsBeforeDecimal: [String] {
@@ -1656,5 +1766,45 @@ class SpacerFactory {
     func finalizeSpacers() {
         UIView.matchWidthsOfViews(hSpacers)
         UIView.matchHeightsOfViews(vSpacers)
+    }
+}
+
+extension PaymentsFormat {
+
+    public static func formatSatoshi(_ satoshi: UInt64) -> String? {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        formatter.groupingSeparator = PaymentsConstants.groupingSeparator
+        formatter.groupingSize = PaymentsConstants.groupingSize
+        formatter.usesGroupingSeparator = true
+        formatter.minimumFractionDigits = 0
+        formatter.maximumFractionDigits = 0
+        return formatter.string(from: NSNumber(value: satoshi))
+    }
+
+    public static func attributedFormat(
+        satoshiString: String,
+        withSpace: Bool
+    ) -> NSAttributedString {
+        let text = NSMutableAttributedString()
+        let currencyCode = PaymentsConstants.satoshiCurrencyIdentifier
+
+        text.append(NSAttributedString(string: satoshiString, attributes: [
+            .foregroundColor: Theme.primaryTextColor
+        ]))
+        
+        text.append(NSAttributedString(string: withSpace ? " \(currencyCode)" : currencyCode, attributes: [
+            .foregroundColor: Theme.secondaryTextAndIconColor
+        ]))
+
+        return text
+    }
+
+    public static func attributedFormatSatoshi(
+        _ satoshi: UInt64,
+        withSpace: Bool
+    ) -> NSAttributedString? {
+        guard let formatted = formatSatoshi(satoshi) else { return nil }
+        return attributedFormat(satoshiString: formatted, withSpace: withSpace)
     }
 }

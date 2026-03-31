@@ -1344,7 +1344,8 @@ public final class MessageReceiver {
             messageSticker: messageStickerBuilder?.info,
             giftBadge: giftBadge,
             paymentNotification: paymentModels?.notification,
-            isPoll: pollCreate != nil
+            isPoll: pollCreate != nil,
+            isStarred: false
         )
         let message = messageBuilder.build()
 

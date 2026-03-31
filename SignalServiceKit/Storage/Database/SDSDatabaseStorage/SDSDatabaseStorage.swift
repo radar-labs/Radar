@@ -107,8 +107,8 @@ public class SDSDatabaseStorage: NSObject, DB {
         // (e.g. SQLite connection) in the GRDB pool ends up "stale" after
         // a schema migration and does not reflect the migrations.
         grdbStorage.pool.releaseMemory()
-        weak var weakPool = grdbStorage.pool
-        weak var weakGrdbStorage = grdbStorage
+        weak let weakPool = grdbStorage.pool
+        weak let weakGrdbStorage = grdbStorage
         owsAssertDebug(weakPool != nil)
         owsAssertDebug(weakGrdbStorage != nil)
         grdbStorage = try GRDBDatabaseStorageAdapter(

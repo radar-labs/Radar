@@ -97,7 +97,7 @@ NS_ASSUME_NONNULL_BEGIN
                         memoMessage:(nullable NSString *)memoMessage
                            isUnread:(BOOL)isUnread
                 interactionUniqueId:(nullable NSString *)interactionUniqueId
-                         mobileCoin:(MobileCoinPayment *)mobileCoin NS_DESIGNATED_INITIALIZER;
+                         mobileCoin:(nullable MobileCoinPayment *)mobileCoin NS_DESIGNATED_INITIALIZER;
 
 // --- CODE GENERATION MARKER
 
@@ -123,6 +123,10 @@ NS_ASSUME_NONNULL_BEGIN
                      paymentType:(TSPaymentType)paymentType
                requestUuidString:(nullable NSString *)requestUuidString
 NS_DESIGNATED_INITIALIZER NS_SWIFT_NAME(init(grdbId:uniqueId:addressUuidString:createdTimestamp:interactionUniqueId:isUnread:mcLedgerBlockIndex:mcReceiptData:mcTransactionData:memoMessage:mobileCoin:paymentAmount:paymentFailure:paymentState:paymentType:requestUuidString:));
+
+- (void)updateWithTransactionData:(NSData *)transactionData transaction:(DBWriteTransaction *)transaction;
+
+- (void)updateWithReceiptData:(NSData *)receiptData transaction:(DBWriteTransaction *)transaction;
 
 // clang-format on
 

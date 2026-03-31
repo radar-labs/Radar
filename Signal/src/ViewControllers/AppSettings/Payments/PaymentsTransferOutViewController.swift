@@ -5,6 +5,7 @@
 
 import Lottie
 import MobileCoin
+import BreezSdkSpark
 public import SignalServiceKit
 public import SignalUI
 
@@ -104,8 +105,6 @@ public class PaymentsTransferOutViewController: OWSTableViewController2 {
         let contents = OWSTableContents()
 
         let section = OWSTableSection()
-        section.footerTitle = OWSLocalizedString("SETTINGS_PAYMENTS_TRANSFER_OUT_FOOTER",
-                                                comment: "Footer of the 'transfer currency out' view in the payment settings.")
         let addressTextfield = self.addressTextfield
 
         let iconView = UIImageView.withTemplateImageName("qr_code", tintColor: Theme.primaryIconColor)
@@ -143,24 +142,24 @@ public class PaymentsTransferOutViewController: OWSTableViewController2 {
 
     @objc
     private func didTapNext() {
-        guard let publicAddress = tryToParseAddress() else {
+        guard let inputType = tryToParseAddress() else {
             OWSActionSheets.showActionSheet(title: OWSLocalizedString("SETTINGS_PAYMENTS_TRANSFER_OUT_INVALID_PUBLIC_ADDRESS_TITLE",
-                                                                     comment: "Title for error alert indicating that MobileCoin public address is not valid."),
+                                                                     comment: "Title for error alert indicating that Bitcoin over Lightning public address is not valid."),
                                             message: OWSLocalizedString("SETTINGS_PAYMENTS_TRANSFER_OUT_INVALID_PUBLIC_ADDRESS",
                                                                        comment: "Error indicating that MobileCoin public address is not valid."))
             return
         }
-        let recipientAddressBase58 = PaymentsImpl.formatAsBase58(publicAddress: publicAddress)
-        guard let localWalletAddressBase58 = SUIEnvironment.shared.paymentsRef.walletAddressBase58(),
-              localWalletAddressBase58 != recipientAddressBase58 else {
+        let recipientAddress = PaymentsImpl.format(inputType: inputType)
+        guard let localWalletLightningAddress = SUIEnvironment.shared.paymentsRef.walletLightningAddress(),
+              localWalletLightningAddress != recipientAddress else {
             OWSActionSheets.showActionSheet(title: OWSLocalizedString("SETTINGS_PAYMENTS_TRANSFER_OUT_INVALID_PUBLIC_ADDRESS_TITLE",
-                                                                     comment: "Title for error alert indicating that MobileCoin public address is not valid."),
+                                                                     comment: "Title for error alert indicating that Bitcoin over Lightning public address is not valid."),
                                             message: OWSLocalizedString("SETTINGS_PAYMENTS_TRANSFER_OUT_CANNOT_SEND_TO_SELF",
                                                                        comment: "Error indicating that it is not valid to send yourself a payment."))
             return
         }
 
-        let recipient: SendPaymentRecipientImpl = .publicAddress(publicAddress: publicAddress)
+        let recipient: SendPaymentRecipientImpl = .publicAddress(inputType: inputType)
         let view = SendPaymentViewController(recipient: recipient,
                                              initialPaymentAmount: transferAmount,
                                              isOutgoingTransfer: true,
@@ -169,11 +168,11 @@ public class PaymentsTransferOutViewController: OWSTableViewController2 {
         navigationController?.pushViewController(view, animated: true)
     }
 
-    private func tryToParseAddress() -> MobileCoin.PublicAddress? {
+    private func tryToParseAddress() -> InputType? {
         guard let text = addressTextfield.text?.ows_stripped() else {
             return nil
         }
-        if let publicAddress = PaymentsImpl.parse(publicAddressBase58: text) {
+        if let publicAddress = PaymentsImpl.parse(input: text) {
             return publicAddress
         }
         owsFailDebug("Could not parse value.")

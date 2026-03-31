@@ -55,8 +55,10 @@ public struct PaymentsHistoryModelItem: PaymentsHistoryItem {
             paymentAmount: fee,
             isShortForm: false,
             withCurrencyCode: true,
-            withSpace: true)
+            withSpace: true,
+            isSatoshi: PaymentsImpl.isSatoshiAmountTypeEnabled())
     }
+    
 
     public var paymentType: TSPaymentType {
         paymentModel.paymentType
@@ -121,6 +123,45 @@ public struct PaymentsHistoryModelItem: PaymentsHistoryItem {
             withSpace: false,
             withPaymentType: paymentModel.paymentType
         )
+    }
+    
+    public var formattedTotalPaymentAmount: String? {
+        guard
+            let paymentAmount = paymentModel.paymentAmount,
+            !paymentAmount.isZero
+        else {
+            return nil
+        }
+        
+        var totalAmount = paymentAmount
+        if let feeAmount = paymentModel.mobileCoin?.feeAmount {
+            totalAmount = totalAmount.plus(feeAmount)
+        }
+        
+        return PaymentsFormat.format(
+            paymentAmount: totalAmount,
+            isShortForm: false,
+            withCurrencyCode: true,
+            withSpace: false,
+            withPaymentType: paymentModel.paymentType,
+            isSatoshi: PaymentsImpl.isSatoshiAmountTypeEnabled()
+        )
+    }
+    
+    public var formattedFiatPaymentAmount: String? {
+        let localCurrencyCode = SSKEnvironment.shared.paymentsCurrenciesRef.currentCurrencyCode
+        guard let currencyConversionInfo = SSKEnvironment.shared.paymentsCurrenciesRef.conversionInfo(forCurrencyCode: localCurrencyCode)  else {
+            return nil
+        }
+        
+        guard
+            let paymentAmount = self.paymentModel.paymentAmount,
+            let fiatAmountString = PaymentsFormat.formatAsFiatCurrency(paymentAmount: paymentAmount,
+                                                                       currencyConversionInfo: currencyConversionInfo) else {
+            return nil
+        }
+        
+        return "\(fiatAmountString) \(localCurrencyCode)"
     }
 
     public func statusDescription(isLongForm: Bool) -> String? {

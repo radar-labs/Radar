@@ -51,7 +51,7 @@ public extension ConversationViewController {
     func ensureBottomViewType() {
         AssertIsOnMainThread()
 
-        guard viewState.selectionAnimationState == .idle else {
+        guard viewState.selectionAnimationState == .idle && !self.onlyStarred else {
             return
         }
 

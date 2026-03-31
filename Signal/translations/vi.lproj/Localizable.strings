@@ -6007,7 +6007,7 @@
 /* Payments in-chat message shown if a payment fails to send, bottom half. */
 "PAYMENTS_IN_CHAT_FAILURE_MESSAGE_BOTTOM" = "Nhấn để biết chi tiết";
 
-/* Payments in-chat message shown if a payment fails to send, top part. Embeds {{ number, amount of MOB coin not sent }} */
+/* Payments in-chat message shown if a payment fails to send, top part. Embeds {{ number, amount of BTC coin not sent }} */
 "PAYMENTS_IN_CHAT_FAILURE_MESSAGE_TOP" = "Gửi không thành công %1$@ MOB";
 
 /* Status indicator for invalid payments which could not be processed. */
@@ -6092,10 +6092,10 @@
 "PAYMENTS_NEW_PAYMENT_ERROR_CONNECTIVITY_FAILURE" = "Không thể liên lạc dịch vụ";
 
 /* Indicates that a payment failed due to insufficient funds. */
-"PAYMENTS_NEW_PAYMENT_ERROR_INSUFFICIENT_FUNDS" = "Bạn không có đủ MOB để hoàn tất thanh toán này.";
+"PAYMENTS_NEW_PAYMENT_ERROR_INSUFFICIENT_FUNDS" = "Bạn không có đủ BTC để hoàn tất thanh toán này.";
 
 /* Indicates that a payment failed due to insufficient funds. Embeds {{ current balance }}. */
-"PAYMENTS_NEW_PAYMENT_ERROR_INSUFFICIENT_FUNDS_FORMAT" = "Bạn không có đủ MOB để hoàn tất thanh toán này. Số dư hiện tại của bạn là %1$@.";
+"PAYMENTS_NEW_PAYMENT_ERROR_INSUFFICIENT_FUNDS_FORMAT" = "Bạn không có đủ BTC để hoàn tất thanh toán này. Số dư hiện tại của bạn là %1$@.";
 
 /* Indicates that a payment failed due to being invalid. */
 "PAYMENTS_NEW_PAYMENT_ERROR_INVALID_TRANSACTION" = "Giao dịch không hợp lệ";
@@ -8009,7 +8009,7 @@
 "SETTINGS_PAYMENTS_ADD_MONEY" = "Thêm quỹ";
 
 /* Explanation of the process for adding money in the 'add money' settings view. */
-"SETTINGS_PAYMENTS_ADD_MONEY_DESCRIPTION" = "Để thêm quỹ, gửi MobileCoin vào địa chỉ ví của bạn. Bắt đầu một giao dịch từ tài khoản của bạn trên một sàn trao đổi có hỗ trợ MobileCoin, sau đó quét mã QR hoặc sao chép địa chỉ ví của bạn.";
+"SETTINGS_PAYMENTS_ADD_MONEY_DESCRIPTION" = "Để thêm quỹ, gửi Bitcoin over Lightning  vào địa chỉ ví của bạn. Bắt đầu một giao dịch từ tài khoản của bạn trên một sàn trao đổi có hỗ trợ Bitcoin over Lightning , sau đó quét mã QR hoặc sao chép địa chỉ ví của bạn.";
 
 /* Indicator that the payments wallet address has been copied to the pasteboard. */
 "SETTINGS_PAYMENTS_ADD_MONEY_WALLET_ADDRESS_COPIED" = "Địa chỉ ví đã được sao chép";
@@ -8216,7 +8216,7 @@
 "SETTINGS_PAYMENTS_PAYMENT_DETAILS_STATUS_FOOTER_DEFRAGMENTATION" = "\"Phí dọn dẹp đồng xu\" được tính khi những đồng xu bạn sở hữu không thể được gộp để hoàn tất một giao dịch. Việc dọn dẹp sẽ cho phép bạn tiếp tục gửi thanh toán.";
 
 /* Message for the 'insufficient balance for payment' alert. Embeds: {{ The current payments balance }}. */
-"SETTINGS_PAYMENTS_PAYMENT_INSUFFICIENT_BALANCE_ALERT_MESSAGE_FORMAT" = "Bạn không có đủ MOB để hoàn tất thanh toán này. Số dư hiện tại của bạn là %1$@.";
+"SETTINGS_PAYMENTS_PAYMENT_INSUFFICIENT_BALANCE_ALERT_MESSAGE_FORMAT" = "Bạn không có đủ BTC để hoàn tất thanh toán này. Số dư hiện tại của bạn là %1$@.";
 
 /* Title for the 'insufficient balance for payment' alert. */
 "SETTINGS_PAYMENTS_PAYMENT_INSUFFICIENT_BALANCE_ALERT_TITLE" = "Số dư Không đủ";
@@ -8417,7 +8417,7 @@
 "SETTINGS_PAYMENTS_TRANSFER_OUT_PLACEHOLDER" = "Đến: Quét hoặc nhập địa chỉ ví";
 
 /* Label for 'transfer currency out' view in the payment settings. */
-"SETTINGS_PAYMENTS_TRANSFER_OUT_TITLE" = "Chuyển khoản sang Sàn trao đổi";
+"SETTINGS_PAYMENTS_TRANSFER_OUT_TITLE" = "Chuyển sang bên ngoài";
 
 /* Label for the 'transfer to exchange' button in the payment settings. */
 "SETTINGS_PAYMENTS_TRANSFER_TO_EXCHANGE" = "Chuyển khoản sang Sàn trao đổi";

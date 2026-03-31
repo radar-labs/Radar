@@ -147,7 +147,7 @@ class SendPaymentHelper {
         let format = OWSLocalizedString("PAYMENTS_NEW_PAYMENT_BALANCE_FORMAT",
                                        comment: "Format for the 'balance' indicator. Embeds {{ the current payments balance }}.")
         balanceLabel.text = String(format: format,
-                                   Self.formatMobileCoinAmount(maximumPaymentAmount))
+                                   Self.formatCryptoCoinAmount(maximumPaymentAmount))
     }
 
     private func updateMaximumPaymentAmount() {
@@ -157,10 +157,10 @@ class SendPaymentHelper {
                 self?.maximumPaymentAmount = maximumPaymentAmount
                 self?.delegate?.balanceDidChange()
             } catch PaymentsError.insufficientFunds {
-                self?.maximumPaymentAmount = TSPaymentAmount(currency: .mobileCoin, picoMob: 0)
+                self?.maximumPaymentAmount = TSPaymentAmount(currency: .bitcoin, picoMob: 0)
                 self?.delegate?.balanceDidChange()
             } catch {
-                owsFailDebugUnlessMCNetworkFailure(error)
+                owsFailDebug("Unexpected error: \(error)")
             }
         }
 
@@ -191,18 +191,29 @@ class SendPaymentHelper {
         delegate?.currencyConversionDidChange()
     }
 
-    public static func formatMobileCoinAmount(_ paymentAmount: TSPaymentAmount) -> String {
+    public static func formatCryptoCoinAmount(_ paymentAmount: TSPaymentAmount) -> String {
         owsAssertDebug(paymentAmount.isValidAmount(canBeEmpty: true))
-        owsAssertDebug(paymentAmount.currency == .mobileCoin)
+        owsAssertDebug(paymentAmount.currency == .mobileCoin || paymentAmount.currency == .bitcoin)
         owsAssertDebug(paymentAmount.picoMob >= 0)
 
         let formattedAmount = PaymentsFormat.format(paymentAmount: paymentAmount,
                                                     isShortForm: false)
+        let currencyIdentifier = if PaymentsImpl.isSatoshiAmountTypeEnabled() {
+            PaymentsConstants.satoshiCurrencyIdentifier
+        } else {
+            paymentAmount.currency.identifier
+        }
+        let balanceAmount = if PaymentsImpl.isSatoshiAmountTypeEnabled() {
+            "\(paymentAmount.picoMob)"
+        } else {
+            formattedAmount
+        }
+        
         let format = OWSLocalizedString("PAYMENTS_NEW_PAYMENT_CURRENCY_FORMAT",
                                        comment: "Format for currency amounts in the 'send payment' UI. Embeds {{ %1$@ the current payments balance, %2$@ the currency indicator }}.")
         return String(format: format,
-                      formattedAmount,
-                      PaymentsConstants.mobileCoinCurrencyIdentifier)
+                      balanceAmount,
+                      currencyIdentifier)
     }
 }
 
@@ -226,6 +237,6 @@ extension SendPaymentHelperDelegate {
     }
 
     func formatMobileCoinAmount(_ paymentAmount: TSPaymentAmount) -> String {
-        SendPaymentHelper.formatMobileCoinAmount(paymentAmount)
+        SendPaymentHelper.formatCryptoCoinAmount(paymentAmount)
     }
 }

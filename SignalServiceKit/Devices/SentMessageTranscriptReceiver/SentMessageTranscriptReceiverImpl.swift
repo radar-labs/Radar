@@ -219,7 +219,8 @@ public class SentMessageTranscriptReceiverImpl: SentMessageTranscriptReceiver {
             linkPreview: linkPreviewBuilder?.info,
             messageSticker: messageStickerBuilder?.info,
             giftBadge: messageParams.giftBadge,
-            isPoll: messageParams.makePollCreateBuilder != nil
+            isPoll: messageParams.makePollCreateBuilder != nil,
+            isStarred: false
         )
         var outgoingMessage = interactionStore.buildOutgoingMessage(builder: outgoingMessageBuilder, tx: tx)
 

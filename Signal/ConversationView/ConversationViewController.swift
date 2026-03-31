@@ -44,6 +44,7 @@ public final class ConversationViewController: OWSViewController {
     public let layout: ConversationViewLayout
     public let collectionView: ConversationCollectionView
     public let searchController: ConversationSearchController
+    public let onlyStarred: Bool
 
     var selectionToolbar: MessageActionsToolbar?
 
@@ -65,6 +66,7 @@ public final class ConversationViewController: OWSViewController {
         threadViewModel: ThreadViewModel,
         action: ConversationViewAction,
         focusMessageId: String?,
+        onlyStarred: Bool = false,
         tx: DBReadTransaction
     ) -> ConversationViewController {
         let thread = threadViewModel.threadRecord
@@ -110,7 +112,8 @@ public final class ConversationViewController: OWSViewController {
             scrollToMessageId: scrollToMessageId,
             oldestUnreadMessage: oldestUnreadMessage,
             chatColor: chatColor,
-            wallpaperViewBuilder: wallpaperViewBuilder
+            wallpaperViewBuilder: wallpaperViewBuilder,
+            onlyStarred: onlyStarred,
         )
 
         return cvc
@@ -137,7 +140,8 @@ public final class ConversationViewController: OWSViewController {
         scrollToMessageId: String?,
         oldestUnreadMessage: TSInteraction?,
         chatColor: ColorOrGradientSetting,
-        wallpaperViewBuilder: WallpaperViewBuilder?
+        wallpaperViewBuilder: WallpaperViewBuilder?,
+        onlyStarred: Bool,
     ) {
         AssertIsOnMainThread()
 
@@ -154,12 +158,14 @@ public final class ConversationViewController: OWSViewController {
             viewState: viewState,
             threadViewModel: threadViewModel,
             conversationViewModel: conversationViewModel,
-            oldestUnreadMessageSortId: oldestUnreadMessage?.sortId
+            oldestUnreadMessageSortId: oldestUnreadMessage?.sortId,
+            onlyStarred: onlyStarred,
         )
         self.layout = ConversationViewLayout(conversationStyle: conversationStyle)
         self.collectionView = ConversationCollectionView(frame: .zero, collectionViewLayout: self.layout)
         self.searchController = ConversationSearchController(thread: threadViewModel.threadRecord)
-
+        self.onlyStarred = onlyStarred
+        
         super.init()
 
         self.viewState.delegate = self

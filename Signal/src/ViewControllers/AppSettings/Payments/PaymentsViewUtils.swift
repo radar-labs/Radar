@@ -43,7 +43,7 @@ public class PaymentsViewUtils {
         circleView.autoSetDimensions(to: .square(CGFloat(avatarSize)))
 
         let iconColor: UIColor = (Theme.isDarkThemeEnabled ? .ows_gray05 : .ows_gray75)
-        let iconView = UIImageView.withTemplateImageName("mobilecoin-24",
+        let iconView = UIImageView.withTemplateImageName("lightning-in-gray",
                                                          tintColor: iconColor)
         circleView.addSubview(iconView)
         iconView.autoCenterInSuperview()
@@ -171,6 +171,22 @@ public class PaymentsViewUtils {
             CommonStrings.learnMore.styled(
                 with: .link(learnMoreUrl)
             )
+        ]).styled(
+            with: .font(font),
+            .color(Theme.secondaryTextAndIconColor)
+        )
+        textView.linkTextAttributes = [ .foregroundColor: Theme.primaryTextColor ]
+        return textView
+    }
+    
+    static func buildTextView(text: String,
+                              font: UIFont) -> UITextView {
+        let textView = LinkingTextView()
+        textView.backgroundColor = OWSTableViewController2.tableBackgroundColor(isUsingPresentedStyle: true)
+        textView.textColor = .Signal.label
+        textView.font = UIFont.dynamicTypeHeadlineClamped
+        textView.attributedText = NSAttributedString.composed(of: [
+            text,
         ]).styled(
             with: .font(font),
             .color(Theme.secondaryTextAndIconColor)

@@ -69,7 +69,7 @@ public struct ArchivedPaymentHistoryItem: PaymentsHistoryItem {
         guard let fee = paymentInfo.fee else { return nil }
         return PaymentsFormat.format(
             amountString: fee,
-            withCurrencyCode: true,
+            withCurrency: .mobileCoin,
             withSpace: true
         )
     }
@@ -106,7 +106,7 @@ public struct ArchivedPaymentHistoryItem: PaymentsHistoryItem {
         guard let amount = paymentInfo.amount else { return nil }
         let formattedAmount = PaymentsFormat.format(
             amountString: amount,
-            withCurrencyCode: false,
+            withCurrency: nil,
             withSpace: false,
             isIncoming: isIncoming
         )
@@ -117,9 +117,22 @@ public struct ArchivedPaymentHistoryItem: PaymentsHistoryItem {
         guard let amount = paymentInfo.amount else { return nil }
         return PaymentsFormat.format(
             amountString: amount,
-            withCurrencyCode: true,
+            withCurrency: .mobileCoin,
             withSpace: true
         )
+    }
+    
+    public var formattedTotalPaymentAmount: String? {
+        guard let amount = paymentInfo.amount else { return nil }
+        return PaymentsFormat.format(
+            amountString: amount,
+            withCurrency: .mobileCoin,
+            withSpace: true,
+        )
+    }
+    
+    public var formattedFiatPaymentAmount: String? {
+        return nil
     }
 
     public func statusDescription(isLongForm: Bool) -> String? {

@@ -100,6 +100,7 @@ NSUInteger TSErrorMessageSchemaVersion = 2;
                isGroupStoryReply:(BOOL)isGroupStoryReply
                           isPoll:(BOOL)isPoll
   isSmsMessageRestoredFromBackup:(BOOL)isSmsMessageRestoredFromBackup
+                       isStarred:(BOOL)isStarred
               isViewOnceComplete:(BOOL)isViewOnceComplete
                isViewOnceMessage:(BOOL)isViewOnceMessage
                      linkPreview:(nullable OWSLinkPreview *)linkPreview
@@ -135,6 +136,7 @@ NSUInteger TSErrorMessageSchemaVersion = 2;
                  isGroupStoryReply:isGroupStoryReply
                             isPoll:isPoll
     isSmsMessageRestoredFromBackup:isSmsMessageRestoredFromBackup
+                         isStarred:isStarred
                 isViewOnceComplete:isViewOnceComplete
                  isViewOnceMessage:isViewOnceMessage
                        linkPreview:linkPreview

@@ -61,10 +61,19 @@ public class PaymentsConstants {
     public static let isPaymentsVersionOutdatedDidChange = Notification.Name("isPaymentsVersionOutdatedDidChange")
 
     @objc
-    public static let picoMobPerMob: UInt64 = 1000 * 1000 * 1000 * 1000
+    public static let picoMobPerMob: UInt64 = 1000 * 1000 * 100
 
     @objc
     public static let mobileCoinCurrencyIdentifier = "MOB"
+    
+    @objc
+    public static let bitcoinCurrencyIdentifier = "BTC"
+    
+    public static let satoshiCurrencyIdentifier = "sat"
+    
+    public static let bitcoinLightningProfileKeyVersion = "2f289e8cf0f8382f08d4e4eed361206b72599b91ed190a753355e47e8b11d31d"
+    
+    public static let satoshiAmountTypeEnabledKey = "satoshi_amount_type_enabled"
 
     @objc
     public static let currencyCodeGBP = "GBP"
@@ -76,9 +85,19 @@ public class PaymentsConstants {
     public static func convertPicoMobToMob(_ picoMob: UInt64) -> Double {
         Double(picoMob) / Double(picoMobPerMob)
     }
+    
+    public static let picoMobPerSatoshi: UInt64 = 1
+
+    public static func convertSatoshiToPicoMob(_ satoshi: UInt64) -> UInt64 {
+        return satoshi * picoMobPerSatoshi
+    }
+
+    public static func convertPicoMobToSatoshi(_ picoMob: UInt64) -> UInt64 {
+        return picoMob / picoMobPerSatoshi
+    }
 
     // The number of decimal digits in a picoMob.
-    public static let maxMobDecimalDigits: UInt = 12
+    public static let maxMobDecimalDigits: UInt = 8
 
     // The largest number of non-decimal digits a user can enter
     // that can be safely expressed as picoMob in UInt64.
@@ -86,6 +105,8 @@ public class PaymentsConstants {
     // Safe:    9,999,999.999,999,999,999.
     // Unsafe: 99,999,999.999,999,999,999.
     public static let maxMobNonDecimalDigits: UInt = 7
+    
+    public static let maxSatoshiDigits: UInt = 15
 
     public static let passphraseWordCount: Int = 24
 

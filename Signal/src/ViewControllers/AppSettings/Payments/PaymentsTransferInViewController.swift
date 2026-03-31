@@ -55,6 +55,27 @@ class PaymentsTransferInViewController: OWSTableViewController2 {
             return cell
         },
         actionBlock: nil))
+        
+        if let username = SUIEnvironment.shared.paymentsImplRef.walletLightningAddressUsername()  {
+            let editButton = UIButton(
+                configuration: .smallBorderless(title: CommonStrings.editButton),
+                primaryAction: UIAction { [weak self] _ in
+                    let viewController = WalletAddressEditViewController(oldAddress: username) { newUsername throws in
+                        let result = SUIEnvironment.shared.paymentsImplRef.registerUsername(newUsername)
+                        switch result {
+                        case .success(_):
+                            break
+                        case .failure(let error):
+                            throw error
+                        }
+                    }
+                    
+                    self?.navigationController?.pushViewController(viewController, animated: true)
+                })
+            
+            addressSection.customFooterView = editButton
+        }
+       
         contents.add(addressSection)
 
         let infoSection = OWSTableSection()
@@ -63,11 +84,10 @@ class PaymentsTransferInViewController: OWSTableViewController2 {
         infoSection.add(OWSTableItem(customCellBlock: {
             let cell = OWSTableItem.newCell()
 
-            let label = PaymentsViewUtils.buildTextWithLearnMoreLinkTextView(
+            let label = PaymentsViewUtils.buildTextView(
                 text: OWSLocalizedString("SETTINGS_PAYMENTS_ADD_MONEY_DESCRIPTION",
                                         comment: "Explanation of the process for adding money in the 'add money' settings view."),
-                font: .dynamicTypeSubheadlineClamped,
-                learnMoreUrl: URL.Support.Payments.transferFromExchange)
+                font: .dynamicTypeSubheadlineClamped)
             label.textAlignment = .center
             cell.contentView.addSubview(label)
             label.autoPinEdgesToSuperviewMargins()
@@ -116,14 +136,19 @@ class PaymentsTransferInViewController: OWSTableViewController2 {
             configureWithSubviews(subviews: [label])
         }
 
-        guard let walletAddressBase58 = SUIEnvironment.shared.paymentsRef.walletAddressBase58() else {
+        guard let lnurl = SUIEnvironment.shared.paymentsRef.walletAddressLNURL() else {
             configureForError()
             return
         }
-        let walletAddressBase58Data = Data(walletAddressBase58.utf8)
+        let walletAddressLnurlData = Data(lnurl.utf8)
+        
+        guard let walletLightningAddress = SUIEnvironment.shared.paymentsRef.walletLightningAddress() else {
+            configureForError()
+            return
+        }
 
         guard let qrImage = QRCodeGenerator().generateUnstyledQRCode(
-            data: walletAddressBase58Data
+            data: walletAddressLnurlData
         ) else {
             owsFailDebug("Failed to generate QR code image!")
             configureForError()
@@ -148,10 +173,10 @@ class PaymentsTransferInViewController: OWSTableViewController2 {
         titleLabel.textAlignment = .center
 
         let walletAddressLabel = UILabel()
-        walletAddressLabel.text = walletAddressBase58
+        walletAddressLabel.text = walletLightningAddress
         walletAddressLabel.textColor = Theme.secondaryTextAndIconColor
         walletAddressLabel.font = UIFont.monospacedDigitFont(ofSize: UIFont.dynamicTypeSubheadlineClamped.pointSize)
-        walletAddressLabel.lineBreakMode = .byTruncatingMiddle
+        walletAddressLabel.numberOfLines = 0
         walletAddressLabel.textAlignment = .center
 
         let copyLabel = UILabel()
@@ -181,11 +206,11 @@ class PaymentsTransferInViewController: OWSTableViewController2 {
     private func didTapCopyAddress() {
         AssertIsOnMainThread()
 
-        guard let walletAddressBase58 = SUIEnvironment.shared.paymentsRef.walletAddressBase58() else {
-            owsFailDebug("Missing walletAddressBase58.")
+        guard let walletLightningAddress = SUIEnvironment.shared.paymentsRef.walletLightningAddress() else {
+            owsFailDebug("Missing walletLightningAddress.")
             return
         }
-        UIPasteboard.general.string = walletAddressBase58
+        UIPasteboard.general.string = walletLightningAddress
 
         presentToast(text: OWSLocalizedString("SETTINGS_PAYMENTS_ADD_MONEY_WALLET_ADDRESS_COPIED",
                                              comment: "Indicator that the payments wallet address has been copied to the pasteboard."))
@@ -198,10 +223,10 @@ class PaymentsTransferInViewController: OWSTableViewController2 {
 
     @objc
     private func didTapShare() {
-        guard let walletAddressBase58 = SUIEnvironment.shared.paymentsRef.walletAddressBase58() else {
-            owsFailDebug("Missing walletAddressBase58.")
+        guard let walletLightningAddress = SUIEnvironment.shared.paymentsRef.walletLightningAddress() else {
+            owsFailDebug("Missing walletLightningAddress.")
             return
         }
-        AttachmentSharing.showShareUI(for: walletAddressBase58, sender: self)
+        AttachmentSharing.showShareUI(for: walletLightningAddress, sender: self)
     }
 }

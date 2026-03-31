@@ -62,7 +62,7 @@ NS_ASSUME_NONNULL_BEGIN
                         memoMessage:(nullable NSString *)memoMessage
                            isUnread:(BOOL)isUnread
                 interactionUniqueId:(nullable NSString *)interactionUniqueId
-                         mobileCoin:(MobileCoinPayment *)mobileCoin
+                         mobileCoin:(nullable MobileCoinPayment *)mobileCoin
 {
     NSString *uniqueId = [[self class] generateUniqueId];
     self = [super initWithUniqueId:uniqueId];
@@ -82,7 +82,11 @@ NS_ASSUME_NONNULL_BEGIN
     _interactionUniqueId = interactionUniqueId;
     _mobileCoin = mobileCoin;
 
-    _mcLedgerBlockIndex = mobileCoin.ledgerBlockIndex;
+    if (mobileCoin == nil) {
+        _mcLedgerBlockIndex = 0;
+    } else {
+        _mcLedgerBlockIndex = mobileCoin.ledgerBlockIndex;
+    }
     _mcTransactionData = mobileCoin.transactionData;
     _mcReceiptData = mobileCoin.receiptData;
 
@@ -96,6 +100,18 @@ NS_ASSUME_NONNULL_BEGIN
 - (nullable instancetype)initWithCoder:(NSCoder *)coder
 {
     return [super initWithCoder:coder];
+}
+
+- (void)updateWithTransactionData:(NSData *)transactionData transaction:(DBWriteTransaction *)transaction
+{
+    [self anyUpdateWithTransaction:transaction
+                             block:^(TSPaymentModel *paymentModel) { paymentModel.mcTransactionData = transactionData; }];
+}
+
+- (void)updateWithReceiptData:(NSData *)receiptData transaction:(DBWriteTransaction *)transaction
+{
+    [self anyUpdateWithTransaction:transaction
+                             block:^(TSPaymentModel *paymentModel) { paymentModel.mcReceiptData = receiptData; }];
 }
 
 // --- CODE GENERATION MARKER
@@ -169,6 +185,7 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self.createdDate;
 }
+
 
 - (void)updateWithPaymentState:(TSPaymentState)paymentState transaction:(DBWriteTransaction *)transaction
 {

@@ -15,6 +15,7 @@ class ConversationSplitViewController: UISplitViewController, ConversationSplit 
     private let detailPlaceholderVC = NoSelectedConversationViewController()
 
     private var chatListNavController: OWSNavigationController { homeVC.chatListNavController }
+    private var walletNavController: OWSNavigationController { homeVC.walletNavController }
     private var callsListNavController: OWSNavigationController { homeVC.callsListNavController }
     private var storiesNavController: OWSNavigationController { homeVC.storiesNavController }
 
@@ -52,6 +53,8 @@ class ConversationSplitViewController: UISplitViewController, ConversationSplit 
         let selectedNavController: OWSNavigationController = switch homeVC.selectedHomeTab {
         case .chatList:
             chatListNavController
+        case .payments:
+            walletNavController
         case .calls:
             callsListNavController
         case .stories:

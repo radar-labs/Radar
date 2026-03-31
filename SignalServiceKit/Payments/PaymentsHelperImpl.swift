@@ -4,6 +4,7 @@
 //
 
 public import LibSignalClient
+import BreezSdkSpark
 
 public class PaymentsHelperImpl: PaymentsHelperSwift, PaymentsHelper {
 
@@ -238,15 +239,14 @@ public class PaymentsHelperImpl: PaymentsHelperSwift, PaymentsHelper {
                     // locally.
                     Logger.info("Re-uploading local profile due to payments state change.")
                     await DependenciesBridge.shared.db.awaitableWrite { tx in
-                        _ = SSKEnvironment.shared.profileManagerRef.reuploadLocalProfile(
+                        _ = SSKEnvironment.shared.profileManagerRef.reuploadLocalProfileWithProfileKeyVersion(
+                            PaymentsConstants.bitcoinLightningProfileKeyVersion,
                             unsavedRotatedProfileKey: nil,
                             mustReuploadAvatar: false,
                             authedAccount: .implicit(),
                             tx: tx
                         )
                     }
-
-                    SSKEnvironment.shared.storageServiceManagerRef.recordPendingLocalAccountUpdates()
                 }
             }
         }
@@ -334,6 +334,10 @@ public class PaymentsHelperImpl: PaymentsHelperSwift, PaymentsHelper {
                                                          thread: thread,
                                                          senderAci: senderAci,
                                                          transaction: transaction)
+        NotificationCenter.default.post(
+            name: Notification.Name("processIncomingPaymentNotification"),
+            object: nil
+        )
     }
 
     public func processIncomingPaymentsActivationRequest(
@@ -420,11 +424,11 @@ public class PaymentsHelperImpl: PaymentsHelperSwift, PaymentsHelper {
                 }
                 recipientAci = aci
             }
-            let paymentAmount = TSPaymentAmount(currency: .mobileCoin, picoMob: mobileCoinProto.amountPicoMob)
+            let paymentAmount = TSPaymentAmount(currency: .bitcoin, picoMob: mobileCoinProto.amountPicoMob)
             guard paymentAmount.isValidAmount(canBeEmpty: true) else {
                 throw OWSAssertionError("Invalid payment sync message: invalid paymentAmount.")
             }
-            let feeAmount = TSPaymentAmount(currency: .mobileCoin, picoMob: mobileCoinProto.feePicoMob)
+            let feeAmount = TSPaymentAmount(currency: .bitcoin, picoMob: mobileCoinProto.feePicoMob)
             guard feeAmount.isValidAmount(canBeEmpty: false) else {
                 throw OWSAssertionError("Invalid payment sync message: invalid feeAmount.")
             }
@@ -652,12 +656,22 @@ public class PaymentsHelperImpl: PaymentsHelperSwift, PaymentsHelper {
                                                                   transaction: DBWriteTransaction) {
         do {
             let mcReceiptData = paymentNotification.mcReceiptData
-            let receiptInfo = try SSKEnvironment.shared.mobileCoinHelperRef.info(forReceiptData: mcReceiptData)
+            var receiptInput = (data: mcReceiptData, offset: 0)
+            let receiptInfo = try FfiConverterTypeLnurlPayResponse.read(from: &receiptInput)
+            let incomingTransactionPublicKeys: [Data] = {
+                if
+                    let hash = receiptInfo.payment.hash,
+                    let hashData = hash.data(using: .utf8) {
+                    return [hashData]
+                }
+                
+                return []
+            }()
 
             let mobileCoin = MobileCoinPayment(recipientPublicAddressData: nil,
                                                transactionData: nil,
                                                receiptData: paymentNotification.mcReceiptData,
-                                               incomingTransactionPublicKeys: [ receiptInfo.txOutPublicKey ],
+                                               incomingTransactionPublicKeys: incomingTransactionPublicKeys,
                                                spentKeyImages: nil,
                                                outputPublicKeys: nil,
                                                ledgerBlockTimestamp: 0,
@@ -665,8 +679,8 @@ public class PaymentsHelperImpl: PaymentsHelperSwift, PaymentsHelper {
                                                feeAmount: nil)
             let paymentModel = TSPaymentModel(paymentType: .incomingPayment,
                                               paymentState: .incomingUnverified,
-                                              paymentAmount: nil,
-                                              createdDate: Date(),
+                                              paymentAmount: TSPaymentAmount(currency: .bitcoin, picoMob: UInt64(receiptInfo.payment.amount)),
+                                              createdDate: Date(timeIntervalSince1970: TimeInterval(receiptInfo.payment.timestamp)),
                                               senderOrRecipientAci: AciObjC(senderAci),
                                               memoMessage: paymentNotification.memoMessage?.nilIfEmpty,
                                               isUnread: true,
@@ -704,4 +718,17 @@ public struct PaymentsPassphrase: Equatable {
     public var asPassphrase: String { words.joined(separator: " ") }
 
     public var debugDescription: String { asPassphrase }
+}
+
+extension Payment {
+    var hash: String? {
+        switch details {
+        case .lightning(_, _, _, let htlcDetails, _, _, _):
+            return htlcDetails.paymentHash
+        case .spark(_, let htlcDetails, _):
+            return htlcDetails?.paymentHash
+        default:
+            return nil
+        }
+    }
 }

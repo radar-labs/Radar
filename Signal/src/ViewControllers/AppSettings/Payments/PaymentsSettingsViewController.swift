@@ -26,7 +26,6 @@ public enum PaymentsSettingsMode: UInt, CustomStringConvertible {
 // MARK: -
 
 public class PaymentsSettingsViewController: OWSTableViewController2 {
-
     private let appReadiness: AppReadinessSetter
     private let mode: PaymentsSettingsMode
 
@@ -169,12 +168,7 @@ public class PaymentsSettingsViewController: OWSTableViewController2 {
     }
 
     private var helpCardsForNotEnabled: [HelpCard] {
-        let helpCards: [HelpCard] = [
-            .aboutMobileCoin,
-            .addMoney,
-            .cashOut
-        ]
-        return filterDismissedHelpCards(helpCards)
+        return []
     }
 
     private var helpCardsForEnabled: [HelpCard] {
@@ -203,15 +197,7 @@ public class PaymentsSettingsViewController: OWSTableViewController2 {
         } else {
             clearHelpCardEnabledFromDismissedList()
         }
-
-        let defaultCards: [HelpCard] = [
-            .aboutMobileCoin,
-            .addMoney,
-            .cashOut
-        ]
-        for card in defaultCards {
-            helpCards.append(card)
-        }
+    
         return filterDismissedHelpCards(helpCards.orderedMembers)
     }
 
@@ -506,7 +492,26 @@ public class PaymentsSettingsViewController: OWSTableViewController2 {
         let sendPaymentButton = buildHeaderButton(title: OWSLocalizedString("SETTINGS_PAYMENTS_SEND_PAYMENT",
                                                                            comment: "Label for 'send payment' button in the payment settings."),
                                                   iconName: "send-mob-24",
-                                                  selector: #selector(didTapSendPaymentButton))
+                                                  selector: nil)
+        
+        let sendPaymentButtonSubView = UIButton()
+        sendPaymentButtonSubView.frame = sendPaymentButton.bounds
+        sendPaymentButtonSubView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        sendPaymentButtonSubView.showsMenuAsPrimaryAction = true
+        sendPaymentButtonSubView.menu = UIMenu(
+            children: [
+                UIAction(title: "To Contacts") { [weak self] _ in
+                    self?.didTapSendPaymentButton()
+                },
+                UIAction(
+                    title: OWSLocalizedString("SETTINGS_PAYMENTS_TRANSFER_OUT_TITLE",
+                                              comment: "Label for 'send external' button in payment screen.")
+                ) { [weak self] _ in
+                    self?.didTapTransferToExchangeButton()
+                }
+        ])
+        sendPaymentButton.addSubview(sendPaymentButtonSubView)
+        
         let buttonStack = UIStackView(arrangedSubviews: [
             addMoneyButton,
             sendPaymentButton
@@ -537,7 +542,7 @@ public class PaymentsSettingsViewController: OWSTableViewController2 {
         }
     }
 
-    private func buildHeaderButton(title: String, iconName: String, selector: Selector) -> UIView {
+    private func buildHeaderButton(title: String, iconName: String, selector: Selector?) -> UIView {
 
         let iconView = UIImageView.withTemplateImageName(iconName,
                                                          tintColor: Theme.primaryIconColor)
@@ -557,8 +562,10 @@ public class PaymentsSettingsViewController: OWSTableViewController2 {
         stack.spacing = 5
         stack.layoutMargins = UIEdgeInsets(top: 12, leading: 20, bottom: 6, trailing: 20)
         stack.isLayoutMarginsRelativeArrangement = true
-        stack.isUserInteractionEnabled = true
-        stack.addGestureRecognizer(UITapGestureRecognizer(target: self, action: selector))
+        if let selector = selector {
+            stack.isUserInteractionEnabled = true
+            stack.addGestureRecognizer(UITapGestureRecognizer(target: self, action: selector))
+        }
 
         let backgroundView = UIView()
         backgroundView.backgroundColor = OWSTableViewController2.cellBackgroundColor(isUsingPresentedStyle: true)
@@ -576,7 +583,7 @@ public class PaymentsSettingsViewController: OWSTableViewController2 {
             return nil
         }
         guard let fiatAmountString = PaymentsFormat.formatAsFiatCurrency(paymentAmount: paymentBalance.amount,
-                                                                       currencyConversionInfo: currencyConversionInfo) else {
+                                                                         currencyConversionInfo: currencyConversionInfo) else {
             return nil
         }
 
@@ -920,16 +927,6 @@ public class PaymentsSettingsViewController: OWSTableViewController2 {
 
         actionSheet.addAction(ActionSheetAction(
             title: OWSLocalizedString(
-                "SETTINGS_PAYMENTS_TRANSFER_TO_EXCHANGE",
-                comment: "Label for the 'transfer to exchange' button in the payment settings."
-            ),
-            style: .default
-        ) { [weak self] _ in
-            self?.didTapTransferToExchangeButton()
-        })
-
-        actionSheet.addAction(ActionSheetAction(
-            title: OWSLocalizedString(
                 "SETTINGS_PAYMENTS_SET_CURRENCY",
                 comment: "Title for the 'set currency' view in the app settings."
             ),
@@ -963,6 +960,15 @@ public class PaymentsSettingsViewController: OWSTableViewController2 {
             style: .default
         ) { [weak self] _ in
             self?.didTapHelpButton()
+        })
+        
+        actionSheet.addAction(ActionSheetAction(
+            title: PaymentsImpl.isSatoshiAmountTypeEnabled()
+            ? "Disable satoshi amount display"
+            : "Enable satoshi amount display",
+            style: .default
+        ) { [weak self] _ in
+            self?.didTapToggleSatoshi()
         })
 
         actionSheet.addAction(OWSActionSheets.cancelAction)
@@ -1187,6 +1193,11 @@ public class PaymentsSettingsViewController: OWSTableViewController2 {
         let navigationVC = OWSNavigationController(rootViewController: view)
         present(navigationVC, animated: true)
      }
+    
+    private func didTapToggleSatoshi() {
+        _ = PaymentsImpl.toggleSatoshiAmountType()
+        updateTableContents()
+    }
 
     private func didTapTransferToExchangeButton() {
         if SSKEnvironment.shared.paymentsHelperRef.isPaymentsVersionOutdated {
@@ -1216,7 +1227,7 @@ public class PaymentsSettingsViewController: OWSTableViewController2 {
     }
 
     @objc
-    func didTapSendPaymentButton(sender: UIGestureRecognizer) {
+    func didTapSendPaymentButton() {
         guard !SUIEnvironment.shared.paymentsRef.isKillSwitchActive else {
             OWSActionSheets.showErrorAlert(message: OWSLocalizedString("SETTINGS_PAYMENTS_CANNOT_SEND_PAYMENTS_KILL_SWITCH",
                                                                       comment: "Error message indicating that payments cannot be sent because the feature is not currently available."))

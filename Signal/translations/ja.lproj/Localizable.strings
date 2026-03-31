@@ -6007,7 +6007,7 @@
 /* Payments in-chat message shown if a payment fails to send, bottom half. */
 "PAYMENTS_IN_CHAT_FAILURE_MESSAGE_BOTTOM" = "タップして詳細を見る";
 
-/* Payments in-chat message shown if a payment fails to send, top part. Embeds {{ number, amount of MOB coin not sent }} */
+/* Payments in-chat message shown if a payment fails to send, top part. Embeds {{ number, amount of BTC coin not sent }} */
 "PAYMENTS_IN_CHAT_FAILURE_MESSAGE_TOP" = "%1$@ MOBを送金できませんでした";
 
 /* Status indicator for invalid payments which could not be processed. */
@@ -8009,7 +8009,7 @@
 "SETTINGS_PAYMENTS_ADD_MONEY" = "入金";
 
 /* Explanation of the process for adding money in the 'add money' settings view. */
-"SETTINGS_PAYMENTS_ADD_MONEY_DESCRIPTION" = "入金するには、あなたのウォレットアドレスにMobileCoinを送信します。MobileCoinを扱っている取引所の、あなたの口座から取引を開始し、QRコードをスキャンするか、あなたのウォレットアドレスをコピーしてください。";
+"SETTINGS_PAYMENTS_ADD_MONEY_DESCRIPTION" = "入金するには、あなたのウォレットアドレスにBitcoin over Lightningを送信します。Bitcoin over Lightningを扱っている取引所の、あなたの口座から取引を開始し、QRコードをスキャンするか、あなたのウォレットアドレスをコピーしてください。";
 
 /* Indicator that the payments wallet address has been copied to the pasteboard. */
 "SETTINGS_PAYMENTS_ADD_MONEY_WALLET_ADDRESS_COPIED" = "ウォレットアドレスをコピーしました";
@@ -8417,7 +8417,7 @@
 "SETTINGS_PAYMENTS_TRANSFER_OUT_PLACEHOLDER" = "振替先: スキャンするかウォレットアドレスを入力してください";
 
 /* Label for 'transfer currency out' view in the payment settings. */
-"SETTINGS_PAYMENTS_TRANSFER_OUT_TITLE" = "取引所へ振替";
+"SETTINGS_PAYMENTS_TRANSFER_OUT_TITLE" = "外部への転送";
 
 /* Label for the 'transfer to exchange' button in the payment settings. */
 "SETTINGS_PAYMENTS_TRANSFER_TO_EXCHANGE" = "取引所へ振替";

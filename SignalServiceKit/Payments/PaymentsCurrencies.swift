@@ -56,22 +56,24 @@ public struct CurrencyConversionInfo {
     }
 
     public func convertToFiatCurrency(paymentAmount: TSPaymentAmount) -> Double? {
-        guard paymentAmount.currency == .mobileCoin else {
+        switch paymentAmount.currency {
+        case .bitcoin, .mobileCoin:
+            let value = PaymentsConstants.convertPicoMobToMob(paymentAmount.picoMob)
+            return conversionRate * value
+        default:
             owsFailDebug("Unknown currency: \(paymentAmount.currency).")
             return nil
         }
-        let mob = PaymentsConstants.convertPicoMobToMob(paymentAmount.picoMob)
-        return conversionRate * mob
     }
 
     public func convertFromFiatCurrencyToMOB(_ value: Double) -> TSPaymentAmount {
         guard value >= 0 else {
             owsFailDebug("Invalid amount: \(value).")
-            return TSPaymentAmount(currency: .mobileCoin, picoMob: 0)
+            return TSPaymentAmount(currency: .bitcoin, picoMob: 0)
         }
         let mob = value / conversionRate
         let picoMob = PaymentsConstants.convertMobToPicoMob(mob)
-        return TSPaymentAmount(currency: .mobileCoin, picoMob: picoMob)
+        return TSPaymentAmount(currency: .bitcoin, picoMob: picoMob)
     }
 
     public var asCurrencyInfo: Currency.Info {

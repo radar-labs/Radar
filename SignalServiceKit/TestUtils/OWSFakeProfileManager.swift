@@ -119,6 +119,7 @@ extension OWSFakeProfileManager: ProfileManager {
     }
 
     public func updateLocalProfile(
+        profileKeyVersion: String?,
         profileGivenName: OptionalChange<OWSUserProfile.NameComponent>,
         profileFamilyName: OptionalChange<OWSUserProfile.NameComponent?>,
         profileBio: OptionalChange<String?>,
@@ -134,6 +135,16 @@ extension OWSFakeProfileManager: ProfileManager {
     }
 
     public func reuploadLocalProfile(
+        unsavedRotatedProfileKey: Aes256Key?,
+        mustReuploadAvatar: Bool,
+        authedAccount: AuthedAccount,
+        tx: DBWriteTransaction
+    ) -> Promise<Void> {
+        return Promise(error: OWSGenericError("Not supported."))
+    }
+    
+    func reuploadLocalProfileWithProfileKeyVersion(
+        _ profileKeyVersion: String,
         unsavedRotatedProfileKey: Aes256Key?,
         mustReuploadAvatar: Bool,
         authedAccount: AuthedAccount,

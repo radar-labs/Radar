@@ -144,7 +144,8 @@ public class OutgoingMessageFactory: Factory {
             linkPreview: linkPreviewBuilder(),
             messageSticker: messageStickerBuilder(),
             giftBadge: giftBadgeBuilder(),
-            isPoll: isPollBuilder()
+            isPoll: isPollBuilder(),
+            isStarred: false
         ).build(transaction: transaction)
         return message
     }
@@ -319,7 +320,8 @@ public class IncomingMessageFactory: Factory {
             messageSticker: messageStickerBuilder(),
             giftBadge: giftBadgeBuilder(),
             paymentNotification: paymentNotificationBuilder(),
-            isPoll: isPollBuilder()
+            isPoll: isPollBuilder(),
+            isStarred: false
         )
         let item = builder.build()
         item.anyInsert(transaction: transaction)

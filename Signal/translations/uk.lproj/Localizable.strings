@@ -6007,8 +6007,8 @@
 /* Payments in-chat message shown if a payment fails to send, bottom half. */
 "PAYMENTS_IN_CHAT_FAILURE_MESSAGE_BOTTOM" = "Торкніться для інформації";
 
-/* Payments in-chat message shown if a payment fails to send, top part. Embeds {{ number, amount of MOB coin not sent }} */
-"PAYMENTS_IN_CHAT_FAILURE_MESSAGE_TOP" = "%1$@ MOB не надіслано";
+/* Payments in-chat message shown if a payment fails to send, top part. Embeds {{ number, amount of BTC coin not sent }} */
+"PAYMENTS_IN_CHAT_FAILURE_MESSAGE_TOP" = "%1$@ BTC не надіслано";
 
 /* Status indicator for invalid payments which could not be processed. */
 "PAYMENTS_INFO_UNAVAILABLE_MESSAGE" = "НЕДОСТУПНО";
@@ -6092,10 +6092,10 @@
 "PAYMENTS_NEW_PAYMENT_ERROR_CONNECTIVITY_FAILURE" = "Не вдалось з'єднатися з сервісом";
 
 /* Indicates that a payment failed due to insufficient funds. */
-"PAYMENTS_NEW_PAYMENT_ERROR_INSUFFICIENT_FUNDS" = "У вас не вистачає MOB на балансі для здійснення цього платежу.";
+"PAYMENTS_NEW_PAYMENT_ERROR_INSUFFICIENT_FUNDS" = "У вас не вистачає BTC на балансі для здійснення цього платежу.";
 
 /* Indicates that a payment failed due to insufficient funds. Embeds {{ current balance }}. */
-"PAYMENTS_NEW_PAYMENT_ERROR_INSUFFICIENT_FUNDS_FORMAT" = "У вас не вистачає MOB на балансі для здійснення цього платежу. Ваш поточний баланс — %1$@.";
+"PAYMENTS_NEW_PAYMENT_ERROR_INSUFFICIENT_FUNDS_FORMAT" = "У вас не вистачає BTC на балансі для здійснення цього платежу. Ваш поточний баланс — %1$@.";
 
 /* Indicates that a payment failed due to being invalid. */
 "PAYMENTS_NEW_PAYMENT_ERROR_INVALID_TRANSACTION" = "Неналежна трансакція";
@@ -8009,7 +8009,7 @@
 "SETTINGS_PAYMENTS_ADD_MONEY" = "Додати кошти";
 
 /* Explanation of the process for adding money in the 'add money' settings view. */
-"SETTINGS_PAYMENTS_ADD_MONEY_DESCRIPTION" = "Щоб додати кошти, надішліть MobileCoin на адресу свого гаманця. Почніть операцію у своєму обліковому записі на біржі, що підтримує MobileCoin, і зіскануйте QR-код або скопіюйте адресу свого гаманця.";
+"SETTINGS_PAYMENTS_ADD_MONEY_DESCRIPTION" = "Щоб додати кошти, надішліть Bitcoin over Lightning на адресу свого гаманця. Почніть операцію у своєму обліковому записі на біржі, що підтримує Bitcoin over Lightning, і зіскануйте QR-код або скопіюйте адресу свого гаманця.";
 
 /* Indicator that the payments wallet address has been copied to the pasteboard. */
 "SETTINGS_PAYMENTS_ADD_MONEY_WALLET_ADDRESS_COPIED" = "Адресу гаманця скопійовано";
@@ -8216,7 +8216,7 @@
 "SETTINGS_PAYMENTS_PAYMENT_DETAILS_STATUS_FOOTER_DEFRAGMENTATION" = "«Плата за округлення койнів» стягується, коли ваші койни неможливо згрупувати для здійснення трансакції. Округлення дасть вам змогу продовжити надсилати платежі.";
 
 /* Message for the 'insufficient balance for payment' alert. Embeds: {{ The current payments balance }}. */
-"SETTINGS_PAYMENTS_PAYMENT_INSUFFICIENT_BALANCE_ALERT_MESSAGE_FORMAT" = "У вас не вистачає MOB на балансі для здійснення цього платежу. Ваш поточний баланс — %1$@.";
+"SETTINGS_PAYMENTS_PAYMENT_INSUFFICIENT_BALANCE_ALERT_MESSAGE_FORMAT" = "У вас не вистачає BTC на балансі для здійснення цього платежу. Ваш поточний баланс — %1$@.";
 
 /* Title for the 'insufficient balance for payment' alert. */
 "SETTINGS_PAYMENTS_PAYMENT_INSUFFICIENT_BALANCE_ALERT_TITLE" = "Недостатньо коштів";
@@ -8417,7 +8417,7 @@
 "SETTINGS_PAYMENTS_TRANSFER_OUT_PLACEHOLDER" = "Кому: зіскануйте або введіть адресу гаманця";
 
 /* Label for 'transfer currency out' view in the payment settings. */
-"SETTINGS_PAYMENTS_TRANSFER_OUT_TITLE" = "Переказ для обміну";
+"SETTINGS_PAYMENTS_TRANSFER_OUT_TITLE" = "Передача до зовнішнього адресу";
 
 /* Label for the 'transfer to exchange' button in the payment settings. */
 "SETTINGS_PAYMENTS_TRANSFER_TO_EXCHANGE" = "Переказ на біржу";

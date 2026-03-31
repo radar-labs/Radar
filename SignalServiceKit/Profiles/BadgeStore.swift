@@ -46,7 +46,8 @@ public class ProfileBadge: Codable, Equatable {
         let spriteArray: [String] = try params.required(key: "sprites6")
         guard spriteArray.count == 6 else { throw OWSAssertionError("Invalid number of sprites") }
 
-        resourcePath = spriteArray[preferredVariant.sprite6Index]
+//        resourcePath = spriteArray[preferredVariant.sprite6Index]
+        resourcePath = ""
         badgeVariant = preferredVariant
 
         // TODO: Badges — Check with server to see if they'll return a Content-language

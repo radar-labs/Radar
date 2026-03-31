@@ -30,6 +30,7 @@ class ConversationSettingsViewController: OWSTableViewController2, BadgeCollecti
 
     private(set) var threadViewModel: ThreadViewModel
     private(set) var isSystemContact: Bool
+    private let appReadiness: AppReadinessSetter
     let spoilerState: SpoilerRenderState
     let callRecords: [CallRecord]
 
@@ -59,11 +60,13 @@ class ConversationSettingsViewController: OWSTableViewController2, BadgeCollecti
     var shouldRefreshAttachmentsOnReappear = false
 
     public init(
+        appReadiness: AppReadinessSetter,
         threadViewModel: ThreadViewModel,
         isSystemContact: Bool,
         spoilerState: SpoilerRenderState,
         callRecords: [CallRecord] = []
     ) {
+        self.appReadiness = appReadiness
         self.threadViewModel = threadViewModel
         self.isSystemContact = isSystemContact
         self.spoilerState = spoilerState
@@ -382,6 +385,21 @@ class ConversationSettingsViewController: OWSTableViewController2, BadgeCollecti
     func showSoundAndNotificationsSettingsView() {
         let vc = SoundAndNotificationsSettingsViewController(threadViewModel: threadViewModel)
         navigationController?.pushViewController(vc, animated: true)
+    }
+    
+    func showStarredMessagesView() {
+        let conversationViewController = SSKEnvironment.shared.databaseStorageRef.read { tx in
+            return ConversationViewController.load(
+                appReadiness: appReadiness,
+                threadViewModel: threadViewModel,
+                action: ConversationViewAction.none,
+                focusMessageId: nil,
+                onlyStarred: true,
+                tx: tx
+            )
+        }
+
+        navigationController?.pushViewController(conversationViewController, animated: true)
     }
 
     func showPermissionsSettingsView() {

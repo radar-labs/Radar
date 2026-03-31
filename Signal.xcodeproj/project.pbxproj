@@ -70,6 +70,8 @@
 		05A180362CD1840F00579FA4 /* UIViewPropertyAnimator+SignalUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05A180352CD1840F00579FA4 /* UIViewPropertyAnimator+SignalUI.swift */; };
 		05B411252C62845000A1EDBC /* ChatListInboxFilterSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05B411242C62845000A1EDBC /* ChatListInboxFilterSection.swift */; };
 		05FDBC292CD91B31000C87BC /* ChatListContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FDBC282CD91B31000C87BC /* ChatListContainerView.swift */; };
+		0C1A350E2F4DD6B40004353B /* WalletetAddressEditViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C1A350D2F4DD6880004353B /* WalletetAddressEditViewController.swift */; };
+		0CD2A2332F76ACFA008CC3D9 /* BreezSdkConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CD2A2322F76ACF3008CC3D9 /* BreezSdkConfig.swift */; };
 		0CE014267EDFBD2538E940A0 /* Pods_Signal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7FF88FB580BC19B240EEB86A /* Pods_Signal.framework */; };
 		1404D8B3276A353B0068E2F6 /* ChatListViewController+Multiselect.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1404D8B2276A353A0068E2F6 /* ChatListViewController+Multiselect.swift */; };
 		1466AB282817F7E7003B3D9F /* PluralAware.stringsdict in Resources */ = {isa = PBXBuildFile; fileRef = 1466AB262817F7E7003B3D9F /* PluralAware.stringsdict */; };
@@ -3933,6 +3935,8 @@
 		05EA61442CC943DD00B16D4E /* Project.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Project.xcconfig; sourceTree = "<group>"; };
 		05FDBC282CD91B31000C87BC /* ChatListContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatListContainerView.swift; sourceTree = "<group>"; };
 		0BADD293DAFC82BF3274F0F6 /* Pods_SignalTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_SignalTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		0C1A350D2F4DD6880004353B /* WalletetAddressEditViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletetAddressEditViewController.swift; sourceTree = "<group>"; };
+		0CD2A2322F76ACF3008CC3D9 /* BreezSdkConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreezSdkConfig.swift; sourceTree = "<group>"; };
 		1404D8B2276A353A0068E2F6 /* ChatListViewController+Multiselect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChatListViewController+Multiselect.swift"; sourceTree = "<group>"; };
 		1466AB272817F7E7003B3D9F /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = en; path = translations/en.lproj/PluralAware.stringsdict; sourceTree = "<group>"; };
 		1466AB292817F7F2003B3D9F /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = de; path = translations/de.lproj/PluralAware.stringsdict; sourceTree = "<group>"; };
@@ -8716,6 +8720,7 @@
 		34A955B7271B553D00B05242 /* Payments */ = {
 			isa = PBXGroup;
 			children = (
+				0CD2A2322F76ACF3008CC3D9 /* BreezSdkConfig.swift */,
 				34D21DA127297FBE00D891F4 /* DebugLogger+Payments.swift */,
 				3465F4D227287675001663AF /* MobileCoinAPI+Configuration.swift */,
 				3465F4D427287675001663AF /* MobileCoinAPI.swift */,
@@ -8778,6 +8783,7 @@
 				C1D9B1542B7FA28200D94595 /* SafetyTipsViewController.swift */,
 				346EAA1125013CDF00E8AB6F /* SendMessageFlow.swift */,
 				3434AE1B22AEDE7D002EE04E /* ViewOnceMessageViewController.swift */,
+				0C1A350D2F4DD6880004353B /* WalletetAddressEditViewController.swift */,
 			);
 			path = ViewControllers;
 			sourceTree = "<group>";
@@ -14905,6 +14911,7 @@
 				453518771FC635DD00210559 /* Embed Foundation Extensions */,
 				4535189F1FC63DBF00210559 /* Embed Frameworks */,
 				73B038A9B680719715E2A2B1 /* [CP] Embed Pods Frameworks */,
+				0CEE2B5C2EE1CEAF00263257 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -15004,7 +15011,6 @@
 					};
 					453518671FC635DD00210559 = {
 						CreatedOnToolsVersion = 9.2;
-						DevelopmentTeam = U68MSDN6DR;
 						LastSwiftMigration = 1020;
 						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
@@ -15056,7 +15062,6 @@
 						};
 					};
 					D221A0A9169C9E5F00537ABF = {
-						DevelopmentTeam = U68MSDN6DR;
 						LastSwiftMigration = 1020;
 						ProvisioningStyle = Automatic;
 						TestTargetID = D221A088169C9E5E00537ABF;
@@ -16217,6 +16222,23 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		0CEE2B5C2EE1CEAF00263257 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if [ -d \"${BUILT_PRODUCTS_DIR}/${FRAMEWORKS_FOLDER_PATH}/WebRTC.framework\" ]; then\n    echo \"Generating dSYM for WebRTC.framework\"\n    dsymutil \"${BUILT_PRODUCTS_DIR}/${FRAMEWORKS_FOLDER_PATH}/WebRTC.framework/WebRTC\" -o \"${BUILT_PRODUCTS_DIR}/WebRTC.framework.dSYM\"\nfi\n";
+		};
 		34C239432180B01B00B6108F /* Run Script: update_plist_info */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -16298,11 +16320,14 @@
 				"${BUILT_PRODUCTS_DIR}/BonMot/BonMot.framework",
 				"${BUILT_PRODUCTS_DIR}/LibMobileCoin/LibMobileCoin.framework",
 				"${BUILT_PRODUCTS_DIR}/Logging/Logging.framework",
+				"${BUILT_PRODUCTS_DIR}/MnemonicSwift/MnemonicSwift.framework",
 				"${BUILT_PRODUCTS_DIR}/MobileCoin/MobileCoin.framework",
 				"${BUILT_PRODUCTS_DIR}/PureLayout/PureLayout.framework",
+				"${BUILT_PRODUCTS_DIR}/Swift-BigInt/BigNumber.framework",
 				"${BUILT_PRODUCTS_DIR}/lottie-ios/Lottie.framework",
 				"${BUILT_PRODUCTS_DIR}/CocoaLumberjack/CocoaLumberjack.framework",
 				"${PODS_XCFRAMEWORKS_BUILD_DIR}/SignalRingRTC/WebRTC/WebRTC.framework/WebRTC",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/breez_sdk_sparkFFI/breez_sdk_sparkFFI.framework/breez_sdk_sparkFFI",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
@@ -16321,11 +16346,14 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/BonMot.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/LibMobileCoin.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Logging.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MnemonicSwift.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MobileCoin.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/PureLayout.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/BigNumber.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Lottie.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/CocoaLumberjack.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/WebRTC.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/breez_sdk_sparkFFI.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -16373,8 +16401,10 @@
 				"${BUILT_PRODUCTS_DIR}/blurhash/blurhash.framework",
 				"${BUILT_PRODUCTS_DIR}/libPhoneNumber-iOS/libPhoneNumber_iOS.framework",
 				"${BUILT_PRODUCTS_DIR}/libwebp/libwebp.framework",
+				"${BUILT_PRODUCTS_DIR}/Swift-BigInt/BigNumber.framework",
 				"${BUILT_PRODUCTS_DIR}/CocoaLumberjack/CocoaLumberjack.framework",
 				"${PODS_XCFRAMEWORKS_BUILD_DIR}/SignalRingRTC/WebRTC/WebRTC.framework/WebRTC",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/breez_sdk_sparkFFI/breez_sdk_sparkFFI.framework/breez_sdk_sparkFFI",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
@@ -16390,8 +16420,10 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/blurhash.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/libPhoneNumber_iOS.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/libwebp.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/BigNumber.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/CocoaLumberjack.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/WebRTC.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/breez_sdk_sparkFFI.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -16610,6 +16642,7 @@
 				05594CD02C98A00500CCBFF6 /* HostingController.swift in Sources */,
 				509085B82C498C3F00409B85 /* HTMLMetadata.swift in Sources */,
 				76896BFC2841A84D00F6C8D2 /* ImageAttachmentPrepViewController.swift in Sources */,
+				0CD2A2332F76ACFA008CC3D9 /* BreezSdkConfig.swift in Sources */,
 				3402AA94271D9E180084CBAE /* ImageEditorBlurRegionsItem.swift in Sources */,
 				3402AA8A271D9E180084CBAE /* ImageEditorCanvasView.swift in Sources */,
 				3402AA7D271D9E180084CBAE /* ImageEditorContents.swift in Sources */,
@@ -16873,6 +16906,7 @@
 				66485EB02CCC515A00B8613F /* BackupArchiveInternalErrorViewController.swift in Sources */,
 				66A1F4E62E03641D0095DE4B /* BackupBGProcessingTaskRunner.swift in Sources */,
 				D949C4052DF3A597007E095C /* BackupConfirmKeyViewController.swift in Sources */,
+				0C1A350E2F4DD6B40004353B /* WalletetAddressEditViewController.swift in Sources */,
 				041A5F072E05B3F900FAED05 /* BackupEnablementMegaphone.swift in Sources */,
 				D9DF21EC2E21BD6600A962B2 /* BackupEnablingManager.swift in Sources */,
 				D93BDD942E43064500779BD8 /* BackupKeepKeySafeSheet.swift in Sources */,
@@ -19395,6 +19429,7 @@
 				CODE_SIGN_ENTITLEMENTS = SignalNSE/SignalNSE.entitlements;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 32J6BB6VUS;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -19444,6 +19479,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_ENTITLEMENTS = "SignalNSE/SignalNSE-AppStore.entitlements";
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 32J6BB6VUS;
 				ENABLE_NS_ASSERTIONS = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -19500,6 +19536,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_ENTITLEMENTS = SignalNSE/SignalNSE.entitlements;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 32J6BB6VUS;
 				ENABLE_NS_ASSERTIONS = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -19556,6 +19593,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_ENTITLEMENTS = SignalNSE/SignalNSE.entitlements;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 32J6BB6VUS;
 				ENABLE_NS_ASSERTIONS = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -19600,6 +19638,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEFINES_MODULE = YES;
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 32J6BB6VUS;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -19659,6 +19698,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEFINES_MODULE = YES;
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 32J6BB6VUS;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -19725,6 +19765,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEFINES_MODULE = YES;
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 32J6BB6VUS;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -19791,6 +19832,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEFINES_MODULE = YES;
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 32J6BB6VUS;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -19840,6 +19882,7 @@
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 32J6BB6VUS;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -19891,6 +19934,7 @@
 				CODE_SIGN_IDENTITY = "";
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 32J6BB6VUS;
 				ENABLE_NS_ASSERTIONS = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -19949,6 +19993,7 @@
 				CODE_SIGN_IDENTITY = "";
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 32J6BB6VUS;
 				ENABLE_NS_ASSERTIONS = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -20007,6 +20052,7 @@
 				CODE_SIGN_IDENTITY = "";
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 32J6BB6VUS;
 				ENABLE_NS_ASSERTIONS = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -20050,6 +20096,7 @@
 				CODE_SIGN_ENTITLEMENTS = SignalShareExtension/SignalShareExtension.entitlements;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 32J6BB6VUS;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -20099,6 +20146,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_ENTITLEMENTS = "SignalShareExtension/SignalShareExtension-AppStore.entitlements";
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 32J6BB6VUS;
 				ENABLE_NS_ASSERTIONS = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -20204,7 +20252,7 @@
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -DTESTABLE_BUILD";
 				SDKROOT = iphoneos;
-				SIGNAL_BUNDLEID_PREFIX = org.whispersystems;
+				SIGNAL_BUNDLEID_PREFIX = com.cakelabs;
 				SIGNAL_MERCHANTID = org.signalfoundation;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_ENABLE_EXPLICIT_MODULES = NO;
@@ -20245,6 +20293,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Signal/Signal.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 32J6BB6VUS;
 				ENABLE_TESTABILITY = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_OPTIMIZATION_LEVEL = 3;
@@ -20278,6 +20327,7 @@
 				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/Signal.app/Signal";
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "";
+				DEVELOPMENT_TEAM = 32J6BB6VUS;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				EXCLUDED_ARCHS = "";
 				FRAMEWORK_SEARCH_PATHS = (
@@ -20357,6 +20407,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_ENTITLEMENTS = SignalShareExtension/SignalShareExtension.entitlements;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 32J6BB6VUS;
 				ENABLE_NS_ASSERTIONS = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -20458,7 +20509,7 @@
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
 				OTHER_SWIFT_FLAGS = "$(inherited) -DTESTABLE_BUILD";
 				SDKROOT = iphoneos;
-				SIGNAL_BUNDLEID_PREFIX = org.whispersystems;
+				SIGNAL_BUNDLEID_PREFIX = com.cakelabs;
 				SIGNAL_MERCHANTID = org.signalfoundation;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_ENABLE_EXPLICIT_MODULES = NO;
@@ -20499,6 +20550,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Signal/Signal.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 32J6BB6VUS;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_OPTIMIZATION_LEVEL = 3;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -20532,6 +20584,7 @@
 				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/Signal.app/Signal";
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "";
+				DEVELOPMENT_TEAM = 32J6BB6VUS;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				EXCLUDED_ARCHS = "";
 				FRAMEWORK_SEARCH_PATHS = (
@@ -20611,6 +20664,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_ENTITLEMENTS = SignalShareExtension/SignalShareExtension.entitlements;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 32J6BB6VUS;
 				ENABLE_NS_ASSERTIONS = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -20717,7 +20771,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_SWIFT_FLAGS = "$(inherited) -DTESTABLE_BUILD -DUSE_DEBUG_UI";
 				SDKROOT = iphoneos;
-				SIGNAL_BUNDLEID_PREFIX = org.whispersystems;
+				SIGNAL_BUNDLEID_PREFIX = com.cakelabs;
 				SIGNAL_MERCHANTID = org.signalfoundation;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_ENABLE_EXPLICIT_MODULES = NO;
@@ -20815,7 +20869,7 @@
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
 				SDKROOT = iphoneos;
-				SIGNAL_BUNDLEID_PREFIX = org.whispersystems;
+				SIGNAL_BUNDLEID_PREFIX = com.cakelabs;
 				SIGNAL_MERCHANTID = org.signalfoundation;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_ENABLE_EXPLICIT_MODULES = NO;
@@ -20859,6 +20913,7 @@
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 32J6BB6VUS;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -20897,6 +20952,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = "Signal/Signal-AppStore.entitlements";
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 32J6BB6VUS;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_OPTIMIZATION_LEVEL = 3;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -20930,6 +20986,7 @@
 				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/Signal.app/Signal";
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "";
+				DEVELOPMENT_TEAM = 32J6BB6VUS;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				EXCLUDED_ARCHS = "";
 				FRAMEWORK_SEARCH_PATHS = (
@@ -20989,6 +21046,7 @@
 				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/Signal.app/Signal";
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "";
+				DEVELOPMENT_TEAM = 32J6BB6VUS;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				EXCLUDED_ARCHS = "";
 				FRAMEWORK_SEARCH_PATHS = (
@@ -21053,6 +21111,8 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEFINES_MODULE = YES;
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 32J6BB6VUS;
+				"DEVELOPMENT_TEAM[sdk=macosx*]" = 32J6BB6VUS;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -21093,6 +21153,8 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEFINES_MODULE = YES;
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 32J6BB6VUS;
+				"DEVELOPMENT_TEAM[sdk=macosx*]" = 32J6BB6VUS;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -21133,6 +21195,8 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEFINES_MODULE = YES;
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 32J6BB6VUS;
+				"DEVELOPMENT_TEAM[sdk=macosx*]" = 32J6BB6VUS;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -21173,6 +21237,8 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEFINES_MODULE = YES;
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 32J6BB6VUS;
+				"DEVELOPMENT_TEAM[sdk=macosx*]" = 32J6BB6VUS;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -21218,6 +21284,8 @@
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 32J6BB6VUS;
+				"DEVELOPMENT_TEAM[sdk=macosx*]" = 32J6BB6VUS;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -21271,6 +21339,8 @@
 				CODE_SIGN_IDENTITY = "";
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 32J6BB6VUS;
+				"DEVELOPMENT_TEAM[sdk=macosx*]" = 32J6BB6VUS;
 				ENABLE_NS_ASSERTIONS = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -21331,6 +21401,8 @@
 				CODE_SIGN_IDENTITY = "";
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 32J6BB6VUS;
+				"DEVELOPMENT_TEAM[sdk=macosx*]" = 32J6BB6VUS;
 				ENABLE_NS_ASSERTIONS = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -21391,6 +21463,8 @@
 				CODE_SIGN_IDENTITY = "";
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 32J6BB6VUS;
+				"DEVELOPMENT_TEAM[sdk=macosx*]" = 32J6BB6VUS;
 				ENABLE_NS_ASSERTIONS = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;

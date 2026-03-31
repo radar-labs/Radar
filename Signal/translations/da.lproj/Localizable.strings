@@ -6007,8 +6007,8 @@
 /* Payments in-chat message shown if a payment fails to send, bottom half. */
 "PAYMENTS_IN_CHAT_FAILURE_MESSAGE_BOTTOM" = "Tryk for flere oplysninger";
 
-/* Payments in-chat message shown if a payment fails to send, top part. Embeds {{ number, amount of MOB coin not sent }} */
-"PAYMENTS_IN_CHAT_FAILURE_MESSAGE_TOP" = "%1$@ MOB blev ikke sendt";
+/* Payments in-chat message shown if a payment fails to send, top part. Embeds {{ number, amount of BTC coin not sent }} */
+"PAYMENTS_IN_CHAT_FAILURE_MESSAGE_TOP" = "%1$@ BTC blev ikke sendt";
 
 /* Status indicator for invalid payments which could not be processed. */
 "PAYMENTS_INFO_UNAVAILABLE_MESSAGE" = "IKKE TILGÆNGELIG";
@@ -8009,7 +8009,7 @@
 "SETTINGS_PAYMENTS_ADD_MONEY" = "Tilføj midler";
 
 /* Explanation of the process for adding money in the 'add money' settings view. */
-"SETTINGS_PAYMENTS_ADD_MONEY_DESCRIPTION" = "For at tilføje midler skal du sende MobileCoin til din wallet-adresse. Start en transaktion fra din konto på en børs, som understøtter MobileCoin, derefter scan QR-koden eller kopier wallet-adressen.";
+"SETTINGS_PAYMENTS_ADD_MONEY_DESCRIPTION" = "For at tilføje midler skal du sende Bitcoin over Lightning til din wallet-adresse. Start en transaktion fra din konto på en børs, som understøtter Bitcoin over Lightning, derefter scan QR-koden eller kopier wallet-adressen.";
 
 /* Indicator that the payments wallet address has been copied to the pasteboard. */
 "SETTINGS_PAYMENTS_ADD_MONEY_WALLET_ADDRESS_COPIED" = "Wallet-adresse kopieret";
@@ -8417,7 +8417,7 @@
 "SETTINGS_PAYMENTS_TRANSFER_OUT_PLACEHOLDER" = "Til: Scan eller indtast wallet-adresse";
 
 /* Label for 'transfer currency out' view in the payment settings. */
-"SETTINGS_PAYMENTS_TRANSFER_OUT_TITLE" = "Overfør til børs";
+"SETTINGS_PAYMENTS_TRANSFER_OUT_TITLE" = "Overfør til ekstern";
 
 /* Label for the 'transfer to exchange' button in the payment settings. */
 "SETTINGS_PAYMENTS_TRANSFER_TO_EXCHANGE" = "Overfør til børs";

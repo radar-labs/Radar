@@ -6007,7 +6007,7 @@
 /* Payments in-chat message shown if a payment fails to send, bottom half. */
 "PAYMENTS_IN_CHAT_FAILURE_MESSAGE_BOTTOM" = "탭하여 자세한 내용을 확인하세요.";
 
-/* Payments in-chat message shown if a payment fails to send, top part. Embeds {{ number, amount of MOB coin not sent }} */
+/* Payments in-chat message shown if a payment fails to send, top part. Embeds {{ number, amount of BTC coin not sent }} */
 "PAYMENTS_IN_CHAT_FAILURE_MESSAGE_TOP" = "%1$@MOB를 보내지 못함";
 
 /* Status indicator for invalid payments which could not be processed. */
@@ -8009,7 +8009,7 @@
 "SETTINGS_PAYMENTS_ADD_MONEY" = "자금 추가";
 
 /* Explanation of the process for adding money in the 'add money' settings view. */
-"SETTINGS_PAYMENTS_ADD_MONEY_DESCRIPTION" = "자금을 추가하려면 MobileCoin을 지갑 주소로 보내세요. MobileCoin을 지원하는 거래소의 계정에서 거래를 시작한 다음 QR 코드를 스캔하거나 지갑 주소를 복사하세요.";
+"SETTINGS_PAYMENTS_ADD_MONEY_DESCRIPTION" = "자금을 추가하려면 Bitcoin over Lightning을 지갑 주소로 보내세요. Bitcoin over Lightning을 지원하는 거래소의 계정에서 거래를 시작한 다음 QR 코드를 스캔하거나 지갑 주소를 복사하세요.";
 
 /* Indicator that the payments wallet address has been copied to the pasteboard. */
 "SETTINGS_PAYMENTS_ADD_MONEY_WALLET_ADDRESS_COPIED" = "지갑 주소 복사됨";
@@ -8417,7 +8417,7 @@
 "SETTINGS_PAYMENTS_TRANSFER_OUT_PLACEHOLDER" = "수신자: 지갑 주소 스캔 또는 입력";
 
 /* Label for 'transfer currency out' view in the payment settings. */
-"SETTINGS_PAYMENTS_TRANSFER_OUT_TITLE" = "거래소로 이체";
+"SETTINGS_PAYMENTS_TRANSFER_OUT_TITLE" = "외부 전송";
 
 /* Label for the 'transfer to exchange' button in the payment settings. */
 "SETTINGS_PAYMENTS_TRANSFER_TO_EXCHANGE" = "거래소로 이체";

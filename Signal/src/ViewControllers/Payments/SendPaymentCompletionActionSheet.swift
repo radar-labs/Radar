@@ -429,6 +429,8 @@ public class SendPaymentCompletionActionSheet: ActionSheetController {
                 owsFailDebug("Could not convert to fiat.")
             }
         }
+        print("paymentInfo.estimatedFeeAmount: \(paymentInfo.estimatedFeeAmount)")
+        print("paymentInfo.estimatedFeeAmount: \(paymentInfo.estimatedFeeAmount.formatted)")
 
         addRow(
             to: &topGroup,
@@ -472,8 +474,8 @@ public class SendPaymentCompletionActionSheet: ActionSheetController {
             otherUserName = SSKEnvironment.shared.databaseStorageRef.read { transaction in
                 SSKEnvironment.shared.contactManagerRef.displayName(for: recipientAddress, tx: transaction).resolvedValue()
             }
-        case .publicAddress(let recipientPublicAddress):
-            otherUserName = PaymentsImpl.formatAsBase58(publicAddress: recipientPublicAddress)
+        case .publicAddress(let inputType):
+            otherUserName = PaymentsImpl.format(inputType: inputType)
         }
         let userFormat = OWSLocalizedString("PAYMENTS_NEW_PAYMENT_RECIPIENT_AMOUNT_FORMAT",
                                            comment: "Format for the 'payment recipient amount' indicator. Embeds {{ the name of the recipient of the payment }}.")
@@ -583,7 +585,7 @@ public class SendPaymentCompletionActionSheet: ActionSheetController {
                 if case PaymentsError.defragmentationRequired = error {
                     Logger.warn("Error: \(error)")
                 } else {
-                    owsFailDebugUnlessMCNetworkFailure(error)
+                    Logger.warn("Could not prepare payment: \(error).")
                 }
             }
         }
@@ -594,19 +596,19 @@ public class SendPaymentCompletionActionSheet: ActionSheetController {
 
         ModalActivityIndicatorViewController.present(fromViewController: self, isInvisible: true, asyncBlock: { modalActivityIndicator in
             do {
-                let authOutcome = await SSKEnvironment.shared.owsPaymentsLockRef.tryToUnlock()
-                switch authOutcome {
-                case .failure(let error):
-                    throw PaymentsUIError.paymentsLockFailed(reason: "local authentication failed with error: \(error)")
-                case .unexpectedFailure(let error):
-                    throw PaymentsUIError.paymentsLockFailed(reason: "local authentication failed with unexpected error: \(error)")
-                case .success:
-                    break
-                case .cancel:
-                    throw PaymentsUIError.paymentsLockCancelled(reason: "local authentication cancelled")
-                case .disabled:
-                    break
-                }
+//                let authOutcome = await SSKEnvironment.shared.owsPaymentsLockRef.tryToUnlock()
+//                switch authOutcome {
+//                case .failure(let error):
+//                    throw PaymentsUIError.paymentsLockFailed(reason: "local authentication failed with error: \(error)")
+//                case .unexpectedFailure(let error):
+//                    throw PaymentsUIError.paymentsLockFailed(reason: "local authentication failed with unexpected error: \(error)")
+//                case .success:
+//                    break
+//                case .cancel:
+//                    throw PaymentsUIError.paymentsLockCancelled(reason: "local authentication cancelled")
+//                case .disabled:
+//                    break
+//                }
 
                 guard let task = self.preparedPaymentTask.get() else {
                     throw OWSAssertionError("Missing preparedPaymentTask.")
@@ -645,7 +647,6 @@ public class SendPaymentCompletionActionSheet: ActionSheetController {
                 self.didSucceedPayment(paymentInfo: paymentInfo)
                 modalActivityIndicator.dismiss()
             } catch {
-                owsFailDebugUnlessMCNetworkFailure(error)
                 modalActivityIndicator.dismiss()
                 self.didFailPayment(paymentInfo: paymentInfo, error: error)
             }

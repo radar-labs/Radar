@@ -12,6 +12,16 @@ extension ConversationViewController {
         AssertIsOnMainThread()
 
         self.title = nil
+        
+        guard !self.onlyStarred else {
+            headerView.attributedTitle = NSMutableAttributedString(
+                string: "Starred messages",
+                attributes: [
+                    .foregroundColor: UIColor.Signal.label,
+                ]
+            )
+            return
+        }
 
         if thread.isNoteToSelf {
             headerView.titleIcon = Theme.iconImage(.official)
@@ -43,6 +53,10 @@ extension ConversationViewController {
 
     public func createHeaderViews() {
         AssertIsOnMainThread()
+        
+        guard !self.onlyStarred else {
+            return
+        }
 
         headerView.configure(threadViewModel: threadViewModel)
         headerView.accessibilityLabel = OWSLocalizedString("CONVERSATION_SETTINGS",
@@ -79,6 +93,10 @@ extension ConversationViewController {
 
     public func updateBarButtonItems() {
         AssertIsOnMainThread()
+        
+        guard !self.onlyStarred else {
+            return
+        }
 
         if #available(iOS 26, *), BuildFlags.iOS26SDKIsAvailable {
             // iOS 26 already doesn't show back button text

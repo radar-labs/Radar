@@ -7,6 +7,7 @@ public class PaymentsCurrenciesImpl: PaymentsCurrenciesSwift, PaymentsCurrencies
 
     private let appReadiness: AppReadiness
     private var refreshEvent: RefreshEvent?
+    private var fetchRateHandler: (() async throws -> [(String, Double)])?
 
     @MainActor
     public init(appReadiness: AppReadiness) {
@@ -79,6 +80,10 @@ public class PaymentsCurrenciesImpl: PaymentsCurrenciesSwift, PaymentsCurrencies
         self.currentCurrencyCode = currencyCode
 
         Self.keyValueStore.setString(currencyCode, key: Self.currentCurrencyCodeKey, transaction: transaction)
+    }
+    
+    public func setFetchRateHandler(_ handler: @escaping () async throws -> [(String, Double)]) {
+        self.fetchRateHandler = handler
     }
 
     // Expressed as a ratio:
@@ -168,37 +173,31 @@ public class PaymentsCurrenciesImpl: PaymentsCurrenciesSwift, PaymentsCurrencies
     }
 
     private func _updateConversionRates() async throws {
-        let request = OWSRequestFactory.currencyConversionRequest()
-        let response = try await SSKEnvironment.shared.networkManagerRef.asyncRequest(request)
-
-        guard let parser = response.responseBodyParamParser else {
-            throw OWSAssertionError("Missing or invalid JSON")
+        guard let fetchRateHandler = self.fetchRateHandler else {
+            throw OWSAssertionError("Missing fetchRateHandler")
         }
-        let timestamp: UInt64 = try parser.required(key: "timestamp")
-        let serviceDate = Date(millisecondsSince1970: timestamp)
-        let currencyObjects: [[String: Any]] = try parser.required(key: "currencies")
+        
+        let rates = try await fetchRateHandler()
+        let date = Date.now
         var conversionRateMap = ConversionRateMap()
-        for currencyObject in currencyObjects {
-            let currencyParser = ParamParser(currencyObject)
-            let base: String = try currencyParser.required(key: "base")
-            guard base == PaymentsConstants.mobileCoinCurrencyIdentifier else {
+        for rateInfo in rates {
+            let currencyCode = rateInfo.0
+            let exchangeRate = rateInfo.1
+
+            guard currencyCode.count == 3 else {
+                Logger.warn("Ignoring invalid currencyCode: \(currencyCode)")
                 continue
             }
-            let conversionObjects: [String: NSNumber] = try currencyParser.required(key: "conversions")
-            for (currencyCode, nsExchangeRate) in conversionObjects {
-                guard currencyCode.count == 3 else {
-                    Logger.warn("Ignoring invalid currencyCode: \(currencyCode)")
-                    continue
-                }
-                let exchangeRate = nsExchangeRate.doubleValue
-                guard exchangeRate > 0 else {
-                    Logger.warn("Ignoring invalid exchangeRate: \(exchangeRate), currencyCode: \(currencyCode)")
-                    continue
-                }
-                conversionRateMap[currencyCode] = exchangeRate
+            
+            guard exchangeRate > 0 else {
+                Logger.warn("Ignoring invalid exchangeRate: \(exchangeRate), currencyCode: \(currencyCode)")
+                continue
             }
+            
+            conversionRateMap[currencyCode] = exchangeRate
         }
-        self.setConversionRates(ConversionRates(conversionRateMap: conversionRateMap, serviceDate: serviceDate))
+        
+        self.setConversionRates(ConversionRates(conversionRateMap: conversionRateMap, serviceDate: date))
         Logger.info("Success.")
     }
 
@@ -265,306 +264,7 @@ public class PaymentsCurrenciesImpl: PaymentsCurrenciesSwift, PaymentsCurrencies
         "CAD"
     ]
 
-    private static let supportedCurrencyCodesList: [Currency.Code] = [
-        "ADP",
-        "AED",
-        "AFA",
-        "AFN",
-        "ALK",
-        "ALL",
-        "AMD",
-        "ANG",
-        "AOA",
-        "AOK",
-        "AON",
-        "AOR",
-        "ARA",
-        "ARL",
-        "ARM",
-        "ARP",
-        "ARS",
-        "ATS",
-        "AUD",
-        "AWG",
-        "AZM",
-        "AZN",
-        "BAD",
-        "BAM",
-        "BAN",
-        "BBD",
-        "BDT",
-        "BEC",
-        "BEF",
-        "BEL",
-        "BGL",
-        "BGM",
-        "BGN",
-        "BGO",
-        "BHD",
-        "BIF",
-        "BMD",
-        "BND",
-        "BOB",
-        "BOL",
-        "BOP",
-        "BOV",
-        "BRB",
-        "BRC",
-        "BRE",
-        "BRL",
-        "BRN",
-        "BRR",
-        "BRZ",
-        "BSD",
-        "BTN",
-        "BUK",
-        "BWP",
-        "BYB",
-        "BYN",
-        "BYR",
-        "BZD",
-        "CAD",
-        "CDF",
-        "CHE",
-        "CHF",
-        "CHW",
-        "CLE",
-        "CLF",
-        "CLP",
-        "CNH",
-        "CNX",
-        "CNY",
-        "COP",
-        "COU",
-        "CRC",
-        "CSD",
-        "CSK",
-        "CVE",
-        "CYP",
-        "CZK",
-        "DDM",
-        "DEM",
-        "DJF",
-        "DKK",
-        "DOP",
-        "DZD",
-        "ECS",
-        "ECV",
-        "EEK",
-        "EGP",
-        "EQE",
-        "ERN",
-        "ESA",
-        "ESB",
-        "ESP",
-        "ETB",
-        "EUR",
-        "FIM",
-        "FJD",
-        "FKP",
-        "FRF",
-        "GBP",
-        "GEK",
-        "GEL",
-        "GHC",
-        "GHS",
-        "GIP",
-        "GMD",
-        "GNF",
-        "GNS",
-        "GQE",
-        "GRD",
-        "GTQ",
-        "GWE",
-        "GWP",
-        "GYD",
-        "HKD",
-        "HNL",
-        "HRD",
-        "HRK",
-        "HTG",
-        "HUF",
-        "IDR",
-        "IEP",
-        "ILP",
-        "ILR",
-        "ILS",
-        "INR",
-        "IQD",
-        "ISJ",
-        "ISK",
-        "ITL",
-        "JMD",
-        "JOD",
-        "JPY",
-        "KES",
-        "KGS",
-        "KHR",
-        "KMF",
-        "KRH",
-        "KRO",
-        "KRW",
-        "KWD",
-        "KYD",
-        "KZT",
-        "LAK",
-        "LBP",
-        "LKR",
-        "LRD",
-        "LSL",
-        "LSM",
-        "LTL",
-        "LTT",
-        "LUC",
-        "LUF",
-        "LUL",
-        "LVL",
-        "LVR",
-        "LYD",
-        "MAD",
-        "MAF",
-        "MCF",
-        "MDC",
-        "MDL",
-        "MGA",
-        "MGF",
-        "MKD",
-        "MKN",
-        "MLF",
-        "MMK",
-        "MNT",
-        "MOP",
-        "MRO",
-        "MRU",
-        "MTL",
-        "MTP",
-        "MUR",
-        "MVP",
-        "MVR",
-        "MWK",
-        "MXN",
-        "MXP",
-        "MXV",
-        "MYR",
-        "MZE",
-        "MZM",
-        "MZN",
-        "NAD",
-        "NGN",
-        "NIC",
-        "NIO",
-        "NLG",
-        "NOK",
-        "NPR",
-        "NZD",
-        "OMR",
-        "PAB",
-        "PEI",
-        "PEN",
-        "PES",
-        "PGK",
-        "PHP",
-        "PKR",
-        "PLN",
-        "PLZ",
-        "PTE",
-        "PYG",
-        "QAR",
-        "RHD",
-        "ROL",
-        "RON",
-        "RSD",
-        "RUB",
-        "RUR",
-        "RWF",
-        "SAR",
-        "SBD",
-        "SCR",
-        "SDD",
-        "SDG",
-        "SDP",
-        "SEK",
-        "SGD",
-        "SHP",
-        "SIT",
-        "SKK",
-        "SLL",
-        "SOS",
-        "SRD",
-        "SRG",
-        "SSP",
-        "STD",
-        "STN",
-        "SUR",
-        "SVC",
-        "SZL",
-        "THB",
-        "TJR",
-        "TJS",
-        "TMM",
-        "TMT",
-        "TND",
-        "TOP",
-        "TPE",
-        "TRL",
-        "TRY",
-        "TTD",
-        "TWD",
-        "TZS",
-        "UAH",
-        "UAK",
-        "UGS",
-        "UGX",
-        "USD",
-        "USN",
-        "USS",
-        "UYI",
-        "UYP",
-        "UYU",
-        "UZS",
-        "VEB",
-        "VEF",
-        "VND",
-        "VNN",
-        "VUV",
-        "WST",
-        "XAF",
-        "XAG",
-        "XAU",
-        "XBA",
-        "XBB",
-        "XBC",
-        "XBD",
-        "XCD",
-        "XDR",
-        "XEU",
-        "XFO",
-        "XFU",
-        "XOF",
-        "XPD",
-        "XPF",
-        "XPT",
-        "XRE",
-        "XSU",
-        "XTS",
-        "XUA",
-        "XXX",
-        "YDD",
-        "YER",
-        "YUD",
-        "YUM",
-        "YUN",
-        "YUR",
-        "ZAL",
-        "ZAR",
-        "ZMK",
-        "ZMW",
-        "ZRN",
-        "ZRZ",
-        "ZWD",
-        "ZWL",
-        "ZWR"
-    ]
+    private static var supportedCurrencyCodesList: [Currency.Code] = []
 
     static var supportedCurrencyCodes: Set<Currency.Code> {
         var result = Set<Currency.Code>()
@@ -588,5 +288,9 @@ public class PaymentsCurrenciesImpl: PaymentsCurrenciesSwift, PaymentsCurrencies
 
     public var supportedCurrencyInfosWithCurrencyConversions: [Currency.Info] {
         supportedConversionInfos.map { $0.asCurrencyInfo }
+    }
+    
+    public static func setSupportedCurrencyCodesList(_ list: [Currency.Code]) {
+        Self.supportedCurrencyCodesList = list
     }
 }

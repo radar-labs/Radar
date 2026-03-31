@@ -15,6 +15,8 @@ NSString *NSStringFromTSPaymentCurrency(TSPaymentCurrency value)
             return @"Unknown";
         case TSPaymentCurrencyMobileCoin:
             return @"MobileCoin";
+        case TSPaymentCurrencyBitcoin:
+            return @"Bitcoin";
     }
 }
 

@@ -6007,8 +6007,8 @@
 /* Payments in-chat message shown if a payment fails to send, bottom half. */
 "PAYMENTS_IN_CHAT_FAILURE_MESSAGE_BOTTOM" = "Pritisnite za više detalja";
 
-/* Payments in-chat message shown if a payment fails to send, top part. Embeds {{ number, amount of MOB coin not sent }} */
-"PAYMENTS_IN_CHAT_FAILURE_MESSAGE_TOP" = "Slanje %1$@ MOB nije uspjelo";
+/* Payments in-chat message shown if a payment fails to send, top part. Embeds {{ number, amount of BTC coin not sent }} */
+"PAYMENTS_IN_CHAT_FAILURE_MESSAGE_TOP" = "Slanje %1$@ BTC nije uspjelo";
 
 /* Status indicator for invalid payments which could not be processed. */
 "PAYMENTS_INFO_UNAVAILABLE_MESSAGE" = "NIJE DOSTUPNO";
@@ -6092,10 +6092,10 @@
 "PAYMENTS_NEW_PAYMENT_ERROR_CONNECTIVITY_FAILURE" = "Nije moguće kontaktirati uslugu";
 
 /* Indicates that a payment failed due to insufficient funds. */
-"PAYMENTS_NEW_PAYMENT_ERROR_INSUFFICIENT_FUNDS" = "Nemate dovoljno MOB za dovršetak ove uplate.";
+"PAYMENTS_NEW_PAYMENT_ERROR_INSUFFICIENT_FUNDS" = "Nemate dovoljno BTC za dovršetak ove uplate.";
 
 /* Indicates that a payment failed due to insufficient funds. Embeds {{ current balance }}. */
-"PAYMENTS_NEW_PAYMENT_ERROR_INSUFFICIENT_FUNDS_FORMAT" = "Nemate dovoljno MOB za dovršetak ove uplate. Vaše trenutno stanje je%1$@.";
+"PAYMENTS_NEW_PAYMENT_ERROR_INSUFFICIENT_FUNDS_FORMAT" = "Nemate dovoljno BTC za dovršetak ove uplate. Vaše trenutno stanje je%1$@.";
 
 /* Indicates that a payment failed due to being invalid. */
 "PAYMENTS_NEW_PAYMENT_ERROR_INVALID_TRANSACTION" = "Nevažeća transakcija";
@@ -8009,7 +8009,7 @@
 "SETTINGS_PAYMENTS_ADD_MONEY" = "Dodaj sredstva";
 
 /* Explanation of the process for adding money in the 'add money' settings view. */
-"SETTINGS_PAYMENTS_ADD_MONEY_DESCRIPTION" = "Da biste dodali sredstva, pošaljite MobileCoin na vašu adresu novčanika. Započnite prijenos sa svog računa na burzi koja podržava MobileCoin, a zatim skenirajte QR kôd ili kopirajte adresu novčanika.";
+"SETTINGS_PAYMENTS_ADD_MONEY_DESCRIPTION" = "Da biste dodali sredstva, pošaljite Bitcoin over Lightning na vašu adresu novčanika. Započnite prijenos sa svog računa na burzi koja podržava Bitcoin over Lightning, a zatim skenirajte QR kôd ili kopirajte adresu novčanika.";
 
 /* Indicator that the payments wallet address has been copied to the pasteboard. */
 "SETTINGS_PAYMENTS_ADD_MONEY_WALLET_ADDRESS_COPIED" = "Adresa novčanika je kopirana";
@@ -8216,7 +8216,7 @@
 "SETTINGS_PAYMENTS_PAYMENT_DETAILS_STATUS_FOOTER_DEFRAGMENTATION" = "\"Naknada za čišćenje novčića\" naplaćuje se kada se novčići u vašem posjedu ne mogu kombinirati za dovršetak transakcije. Čišćenje će vam omogućiti da i dalje šaljete uplate.";
 
 /* Message for the 'insufficient balance for payment' alert. Embeds: {{ The current payments balance }}. */
-"SETTINGS_PAYMENTS_PAYMENT_INSUFFICIENT_BALANCE_ALERT_MESSAGE_FORMAT" = "Nemate dovoljno MOB za dovršetak ove uplate. Vaše trenutno stanje je%1$@.";
+"SETTINGS_PAYMENTS_PAYMENT_INSUFFICIENT_BALANCE_ALERT_MESSAGE_FORMAT" = "Nemate dovoljno BTC za dovršetak ove uplate. Vaše trenutno stanje je%1$@.";
 
 /* Title for the 'insufficient balance for payment' alert. */
 "SETTINGS_PAYMENTS_PAYMENT_INSUFFICIENT_BALANCE_ALERT_TITLE" = "Nedovoljno na stanju";
@@ -8417,7 +8417,7 @@
 "SETTINGS_PAYMENTS_TRANSFER_OUT_PLACEHOLDER" = "Za: Skenirajte ili unesite adresu novčanika";
 
 /* Label for 'transfer currency out' view in the payment settings. */
-"SETTINGS_PAYMENTS_TRANSFER_OUT_TITLE" = "Prenesi na burzu";
+"SETTINGS_PAYMENTS_TRANSFER_OUT_TITLE" = "Prijenos na vanjski";
 
 /* Label for the 'transfer to exchange' button in the payment settings. */
 "SETTINGS_PAYMENTS_TRANSFER_TO_EXCHANGE" = "Prenesi na burzu";

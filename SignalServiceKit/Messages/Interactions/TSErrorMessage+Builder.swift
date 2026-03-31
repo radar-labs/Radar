@@ -37,7 +37,8 @@ public class TSErrorMessageBuilder: TSMessageBuilder {
             linkPreview: nil,
             messageSticker: nil,
             giftBadge: nil,
-            isPoll: false
+            isPoll: false,
+            isStarred: false,
         )
     }
 

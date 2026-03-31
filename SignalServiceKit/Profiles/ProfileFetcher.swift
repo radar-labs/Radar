@@ -15,11 +15,18 @@ public struct ProfileFetchContext {
 
     /// If true, the fetch must try to fetch a new credential.
     public var mustFetchNewCredential: Bool
+    
+    // If set, the fetch must tr y to fetch with special version
+    public var profileKeyVersion: String?
+    
+    public var cache: Bool
 
-    public init(groupId: GroupIdentifier? = nil, isOpportunistic: Bool = false, mustFetchNewCredential: Bool = false) {
+    public init(groupId: GroupIdentifier? = nil, isOpportunistic: Bool = false, mustFetchNewCredential: Bool = false, profileKeyVersion: String? = nil, cache: Bool = true) {
         self.groupId = groupId
         self.isOpportunistic = isOpportunistic
         self.mustFetchNewCredential = mustFetchNewCredential
+        self.profileKeyVersion = profileKeyVersion
+        self.cache = cache
     }
 }
 
@@ -33,6 +40,18 @@ extension ProfileFetcher {
     public func fetchProfile(
         for serviceId: ServiceId,
         context: ProfileFetchContext = ProfileFetchContext(),
+        authedAccount: AuthedAccount = .implicit()
+    ) async throws -> FetchedProfile {
+        return try await fetchProfileImpl(for: serviceId, context: context, authedAccount: authedAccount)
+    }
+    
+    public func fetchProfileWithLightningBitcoinAddress(
+        for serviceId: ServiceId,
+        // FIXME: Hardcoded value
+        context: ProfileFetchContext = ProfileFetchContext(
+            profileKeyVersion: PaymentsConstants.bitcoinLightningProfileKeyVersion,
+            cache: false
+        ),
         authedAccount: AuthedAccount = .implicit()
     ) async throws -> FetchedProfile {
         return try await fetchProfileImpl(for: serviceId, context: context, authedAccount: authedAccount)
@@ -60,7 +79,7 @@ public enum ProfileFetcherError: Error, IsRetryableProvider {
 }
 
 public actor ProfileFetcherImpl: ProfileFetcher {
-    private let jobCreator: (ServiceId, GroupIdentifier?, _ mustFetchNewCredential: Bool, AuthedAccount) -> ProfileFetcherJob
+    private let jobCreator: (ServiceId, GroupIdentifier?, _ mustFetchNewCredential: Bool, AuthedAccount, _ profileKeyVersion: String?, _ profileAutoUpdate: Bool) -> ProfileFetcherJob
     private let reachabilityManager: any SSKReachabilityManager
     private let tsAccountManager: any TSAccountManager
 
@@ -107,7 +126,7 @@ public actor ProfileFetcherImpl: ProfileFetcher {
     ) {
         self.reachabilityManager = reachabilityManager
         self.tsAccountManager = tsAccountManager
-        self.jobCreator = { serviceId, groupIdContext, mustFetchNewCredential, authedAccount in
+        self.jobCreator = { serviceId, groupIdContext, mustFetchNewCredential, authedAccount, profileKeyVersion, profileAutoUpdate in
             return ProfileFetcherJob(
                 serviceId: serviceId,
                 groupIdContext: groupIdContext,
@@ -123,7 +142,9 @@ public actor ProfileFetcherImpl: ProfileFetcher {
                 syncManager: syncManager,
                 tsAccountManager: tsAccountManager,
                 udManager: udManager,
-                versionedProfiles: versionedProfiles
+                versionedProfiles: versionedProfiles,
+                profileKeyVersion: profileKeyVersion,
+                profileAutoUpdate: profileAutoUpdate,
             )
         }
         SwiftSingletons.register(self)
@@ -254,7 +275,7 @@ public actor ProfileFetcherImpl: ProfileFetcher {
         context: ProfileFetchContext,
         authedAccount: AuthedAccount
     ) async throws -> FetchedProfile {
-        let result = await Result { try await jobCreator(serviceId, context.groupId, context.mustFetchNewCredential, authedAccount).run() }
+        let result = await Result { try await jobCreator(serviceId, context.groupId, context.mustFetchNewCredential, authedAccount, context.profileKeyVersion, context.cache).run() }
         let outcome: FetchResult.Outcome
         do {
             _ = try result.get()
@@ -270,7 +291,11 @@ public actor ProfileFetcherImpl: ProfileFetcher {
         if case .failure(ProfileRequestError.rateLimit) = result {
             self.rateLimitExpirationDate = now.adding(5 * .minute)
         }
-        self.recentFetchResults[serviceId] = FetchResult(outcome: outcome, completionDate: now)
+        
+        if context.cache {
+            self.recentFetchResults[serviceId] = FetchResult(outcome: outcome, completionDate: now)
+        }
+        
         return try result.get()
     }
 

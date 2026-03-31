@@ -15,6 +15,7 @@ public protocol RegistrationSplashPresenter: AnyObject {
 
     func switchToDeviceLinkingMode()
     func transferDevice()
+    func showRelinking()
 }
 
 // MARK: - RegistrationSplashViewController
@@ -38,7 +39,7 @@ public class RegistrationSplashViewController: OWSViewController, OWSNavigationC
         view.backgroundColor = .Signal.background
 
         // Buttons in the top right corner.
-        let canSwitchModes = UIDevice.current.isIPad || BuildFlags.linkedPhones
+        let canSwitchModes = UIDevice.current.isIPad
         var transferButtonTrailingAnchor: NSLayoutAnchor<NSLayoutXAxisAnchor> = contentLayoutGuide.trailingAnchor
         if canSwitchModes {
             let modeSwitchButton = UIButton(
@@ -200,6 +201,10 @@ public class RegistrationSplashViewController: OWSViewController, OWSNavigationC
                 self?.dismiss(animated: true) {
                     self?.presenter?.setHasOldDevice(hasOldDevice)
                 }
+            }, showRelinkingBlock: { [weak self] in
+                self?.dismiss(animated: true) {
+                    self?.presenter?.showRelinking()
+                }
             }
         )
         self.present(sheet, animated: true)
@@ -211,8 +216,10 @@ private class RestoreOrTransferPickerController: StackSheetViewController {
     override var placeOnGlassIfAvailable: Bool { false }
 
     private let setHasOldDeviceBlock: ((Bool) -> Void)
-    init(setHasOldDeviceBlock: @escaping (Bool) -> Void) {
+    private let showRelinkingBlock: (() -> Void)
+    init(setHasOldDeviceBlock: @escaping (Bool) -> Void, showRelinkingBlock: @escaping () -> Void) {
         self.setHasOldDeviceBlock = setHasOldDeviceBlock
+        self.showRelinkingBlock = showRelinkingBlock
         super.init()
     }
 
@@ -221,6 +228,18 @@ private class RestoreOrTransferPickerController: StackSheetViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         stackView.spacing = 16
+        
+        if BuildFlags.linkedPhones {
+            let linkIphoneButton = UIButton.registrationChoiceButton(
+                title: "Link your device",
+                subtitle: "Scan QR code for link this device to your account.",
+                iconName: "qr-code-48",
+                primaryAction: UIAction { [weak self] _ in
+                    self?.showRelinkingBlock()
+                }
+            )
+            stackView.addArrangedSubview(linkIphoneButton)
+        }
 
         let hasDeviceButton = UIButton.registrationChoiceButton(
             title: OWSLocalizedString(
@@ -274,6 +293,10 @@ private class PreviewRegistrationSplashPresenter: RegistrationSplashPresenter {
 
     func transferDevice() {
         print("transferDevice")
+    }
+    
+    func showRelinking() {
+        print("showRelinking")
     }
 }
 

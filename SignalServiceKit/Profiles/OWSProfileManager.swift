@@ -42,7 +42,7 @@ public class OWSProfileManager: ProfileManagerProtocol {
 
         appReadiness.runNowOrWhenAppDidBecomeReadyAsync {
             self.rotateLocalProfileKeyIfNecessary()
-            self.updateProfileOnServiceIfNecessary(authedAccount: .implicit())
+            self.updateProfileOnServiceIfNecessary(authedAccount: .implicit(), profileKeyVersion: nil)
             Self.updateStorageServiceIfNecessary()
         }
 
@@ -364,13 +364,13 @@ public class OWSProfileManager: ProfileManagerProtocol {
     @MainActor
     private func applicationDidBecomeActive(_ notification: NSNotification) {
         // TODO: Sync if necessary.
-        updateProfileOnServiceIfNecessary(authedAccount: .implicit())
+        updateProfileOnServiceIfNecessary(authedAccount: .implicit(), profileKeyVersion: nil)
     }
 
     @objc
     @MainActor
     private func reachabilityChanged(_ notification: NSNotification) {
-        updateProfileOnServiceIfNecessary(authedAccount: .implicit())
+        updateProfileOnServiceIfNecessary(authedAccount: .implicit(), profileKeyVersion: nil)
     }
 
     @objc
@@ -491,6 +491,7 @@ extension OWSProfileManager: ProfileManager {
     // (or in the unlikely fact that another error occurs) but this
     // manager will continue to retry until the update succeeds.
     public func updateLocalProfile(
+        profileKeyVersion: String?,
         profileGivenName: OptionalChange<OWSUserProfile.NameComponent>,
         profileFamilyName: OptionalChange<OWSUserProfile.NameComponent?>,
         profileBio: OptionalChange<String?>,
@@ -525,7 +526,7 @@ extension OWSProfileManager: ProfileManager {
         }
         tx.addSyncCompletion {
             Task { @MainActor in
-                self._updateProfileOnServiceIfNecessary()
+                self._updateProfileOnServiceIfNecessary(profileKeyVersion: profileKeyVersion)
             }
         }
         return promise
@@ -542,6 +543,32 @@ extension OWSProfileManager: ProfileManager {
 
         let profileChanges = currentPendingProfileChanges(tx: tx)
         return updateLocalProfile(
+            profileGivenName: .noChange,
+            profileFamilyName: .noChange,
+            profileBio: .noChange,
+            profileBioEmoji: .noChange,
+            profileAvatarData: mustReuploadAvatar ? .noChangeButMustReupload : .noChange,
+            visibleBadgeIds: .noChange,
+            unsavedRotatedProfileKey: unsavedRotatedProfileKey,
+            userProfileWriter: profileChanges?.userProfileWriter ?? .reupload,
+            authedAccount: authedAccount,
+            tx: tx
+        )
+    }
+    
+    // Reupload local profile with provided special profile key version
+    public func reuploadLocalProfileWithProfileKeyVersion(
+        _ profileKeyVersion: String,
+        unsavedRotatedProfileKey: Aes256Key?,
+        mustReuploadAvatar: Bool,
+        authedAccount: AuthedAccount,
+        tx: DBWriteTransaction
+    ) -> Promise<Void> {
+        Logger.info("")
+
+        let profileChanges = currentPendingProfileChanges(tx: tx)
+        return updateLocalProfile(
+            profileKeyVersion: profileKeyVersion,
             profileGivenName: .noChange,
             profileFamilyName: .noChange,
             profileBio: .noChange,
@@ -1070,8 +1097,8 @@ extension OWSProfileManager: ProfileManager {
     // MARK: -
 
     @MainActor
-    private func updateProfileOnServiceIfNecessary(authedAccount: AuthedAccount) {
-        switch _updateProfileOnServiceIfNecessary() {
+    private func updateProfileOnServiceIfNecessary(authedAccount: AuthedAccount, profileKeyVersion: String?) {
+        switch _updateProfileOnServiceIfNecessary(profileKeyVersion: profileKeyVersion) {
         case .notReady, .updating:
             return
         case .notNeeded:
@@ -1098,7 +1125,7 @@ extension OWSProfileManager: ProfileManager {
 
     @discardableResult
     @MainActor
-    private func _updateProfileOnServiceIfNecessary(retryDelay: TimeInterval = 1) -> UpdateProfileStatus {
+    private func _updateProfileOnServiceIfNecessary(retryDelay: TimeInterval = 1, profileKeyVersion: String?) -> UpdateProfileStatus {
         guard appReadiness.isAppReady else {
             return .notReady
         }
@@ -1130,13 +1157,14 @@ extension OWSProfileManager: ProfileManager {
                 try await updateProfileOnService(
                     profileChanges: profileChanges,
                     newProfileKey: parameters?.profileKey,
-                    authedAccount: authedAccount
+                    authedAccount: authedAccount,
+                    profileKeyVersion: profileKeyVersion
                 )
                 DispatchQueue.global().async {
                     parameters?.future.resolve()
                 }
                 DispatchQueue.main.async {
-                    self._updateProfileOnServiceIfNecessary()
+                    self._updateProfileOnServiceIfNecessary(profileKeyVersion: profileKeyVersion)
                 }
             } catch {
                 DispatchQueue.global().async {
@@ -1144,7 +1172,7 @@ extension OWSProfileManager: ProfileManager {
                 }
                 Logger.warn("Retrying profile update after \(retryDelay)s due to error: \(error)")
                 DispatchQueue.main.asyncAfter(deadline: .now() + retryDelay) {
-                    self._updateProfileOnServiceIfNecessary(retryDelay: retryDelay * 2)
+                    self._updateProfileOnServiceIfNecessary(retryDelay: retryDelay * 2, profileKeyVersion: profileKeyVersion)
                 }
             }
         }
@@ -1279,7 +1307,8 @@ extension OWSProfileManager: ProfileManager {
     private func updateProfileOnService(
         profileChanges: PendingProfileUpdate,
         newProfileKey: Aes256Key?,
-        authedAccount: AuthedAccount
+        authedAccount: AuthedAccount,
+        profileKeyVersion: String?,
     ) async throws {
         do {
             let userProfile = SSKEnvironment.shared.databaseStorageRef.read(
@@ -1321,16 +1350,30 @@ extension OWSProfileManager: ProfileManager {
             let newBioEmoji = profileChanges.profileBioEmoji.orExistingValue(userProfile.bioEmoji)
             let newVisibleBadgeIds = profileChanges.visibleBadgeIds.orExistingValue(userProfile.visibleBadges.map { $0.badgeId })
 
-            let versionedUpdate = try await SSKEnvironment.shared.versionedProfilesRef.updateProfile(
-                profileGivenName: newGivenName,
-                profileFamilyName: newFamilyName,
-                profileBio: newBio,
-                profileBioEmoji: newBioEmoji,
-                profileAvatarMutation: avatarUpdate.remoteMutation,
-                visibleBadgeIds: newVisibleBadgeIds,
-                profileKey: profileKey,
-                authedAccount: authedAccount
-            )
+            let versionedUpdate = if let profileKeyVersion = profileKeyVersion {
+                try await SSKEnvironment.shared.versionedProfilesRef.updateProfileWithProfileKeyVersion(
+                    profileKeyVersion,
+                    profileGivenName: newGivenName,
+                    profileFamilyName: newFamilyName,
+                    profileBio: newBio,
+                    profileBioEmoji: newBioEmoji,
+                    profileAvatarMutation: avatarUpdate.remoteMutation,
+                    visibleBadgeIds: newVisibleBadgeIds,
+                    profileKey: profileKey,
+                    authedAccount: authedAccount
+                )
+            } else {
+                try await SSKEnvironment.shared.versionedProfilesRef.updateProfile(
+                    profileGivenName: newGivenName,
+                    profileFamilyName: newFamilyName,
+                    profileBio: newBio,
+                    profileBioEmoji: newBioEmoji,
+                    profileAvatarMutation: avatarUpdate.remoteMutation,
+                    visibleBadgeIds: newVisibleBadgeIds,
+                    profileKey: profileKey,
+                    authedAccount: authedAccount
+                )
+            }
             await SSKEnvironment.shared.databaseStorageRef.awaitableWrite { tx in
                 self.tryToDequeueProfileChanges(profileChanges, tx: tx)
                 // Apply the changes to our local profile.

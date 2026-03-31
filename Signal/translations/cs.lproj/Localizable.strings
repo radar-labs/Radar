@@ -6007,8 +6007,8 @@
 /* Payments in-chat message shown if a payment fails to send, bottom half. */
 "PAYMENTS_IN_CHAT_FAILURE_MESSAGE_BOTTOM" = "Klepnutím zobrazíte víc informací";
 
-/* Payments in-chat message shown if a payment fails to send, top part. Embeds {{ number, amount of MOB coin not sent }} */
-"PAYMENTS_IN_CHAT_FAILURE_MESSAGE_TOP" = "%1$@ MOB nebylo odesláno";
+/* Payments in-chat message shown if a payment fails to send, top part. Embeds {{ number, amount of BTC coin not sent }} */
+"PAYMENTS_IN_CHAT_FAILURE_MESSAGE_TOP" = "%1$@ BTC nebylo odesláno";
 
 /* Status indicator for invalid payments which could not be processed. */
 "PAYMENTS_INFO_UNAVAILABLE_MESSAGE" = "NEDOSTUPNÉ";
@@ -8009,7 +8009,7 @@
 "SETTINGS_PAYMENTS_ADD_MONEY" = "Přidat prostředky";
 
 /* Explanation of the process for adding money in the 'add money' settings view. */
-"SETTINGS_PAYMENTS_ADD_MONEY_DESCRIPTION" = "Chcete-li přidat prostředky, zašlete MobileCoin na adresu vaší peněženky. Zahajte transakci ze svého účtu na burze, která podporuje MobileCoin, poté naskenujte QR kód nebo zkopírujte adresu peněženky.";
+"SETTINGS_PAYMENTS_ADD_MONEY_DESCRIPTION" = "Chcete-li přidat prostředky, zašlete Bitcoin over Lightning na adresu vaší peněženky. Zahajte transakci ze svého účtu na burze, která podporuje Bitcoin over Lightning, poté naskenujte QR kód nebo zkopírujte adresu peněženky.";
 
 /* Indicator that the payments wallet address has been copied to the pasteboard. */
 "SETTINGS_PAYMENTS_ADD_MONEY_WALLET_ADDRESS_COPIED" = "Adresa peněženky zkopírována";
@@ -8417,7 +8417,7 @@
 "SETTINGS_PAYMENTS_TRANSFER_OUT_PLACEHOLDER" = "Pro: Naskenujte nebo zadejte adresu peněženky";
 
 /* Label for 'transfer currency out' view in the payment settings. */
-"SETTINGS_PAYMENTS_TRANSFER_OUT_TITLE" = "Převést na burzu";
+"SETTINGS_PAYMENTS_TRANSFER_OUT_TITLE" = "Převod do externího";
 
 /* Label for the 'transfer to exchange' button in the payment settings. */
 "SETTINGS_PAYMENTS_TRANSFER_TO_EXCHANGE" = "Převést na burzu";

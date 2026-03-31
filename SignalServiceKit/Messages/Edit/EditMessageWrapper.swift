@@ -165,7 +165,8 @@ public struct IncomingEditMessageWrapper: EditMessageWrapper {
             messageSticker: nil,
             giftBadge: message.giftBadge,
             paymentNotification: nil,
-            isPoll: false
+            isPoll: false,
+            isStarred: false,
         )
     }
 
@@ -256,7 +257,8 @@ public struct OutgoingEditMessageWrapper: EditMessageWrapper {
             linkPreview: nil,
             messageSticker: nil,
             giftBadge: message.giftBadge,
-            isPoll: false
+            isPoll: false,
+            isStarred: false,
         )
     }
 

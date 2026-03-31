@@ -91,6 +91,14 @@ public protocol ProfileManager: ProfileManagerProtocol {
         authedAccount: AuthedAccount,
         tx: DBWriteTransaction
     ) -> Promise<Void>
+    
+    func reuploadLocalProfileWithProfileKeyVersion(
+        _ profileKeyVersion: String,
+        unsavedRotatedProfileKey: Aes256Key?,
+        mustReuploadAvatar: Bool,
+        authedAccount: AuthedAccount,
+        tx: DBWriteTransaction
+    ) -> Promise<Void>
 
     func downloadAndDecryptLocalUserAvatarIfNeeded(authedAccount: AuthedAccount) async throws
 
@@ -119,6 +127,7 @@ public protocol ProfileManager: ProfileManagerProtocol {
     )
 
     func updateLocalProfile(
+        profileKeyVersion: String?,
         profileGivenName: OptionalChange<OWSUserProfile.NameComponent>,
         profileFamilyName: OptionalChange<OWSUserProfile.NameComponent?>,
         profileBio: OptionalChange<String?>,
@@ -165,5 +174,32 @@ public protocol ProfileManager: ProfileManagerProtocol {
 extension ProfileManager {
     public func localProfileKey(tx: DBReadTransaction) -> ProfileKey? {
         return localUserProfile(tx: tx)?.profileKey.map(ProfileKey.init(_:))
+    }
+    
+    public func updateLocalProfile(
+        profileGivenName: OptionalChange<OWSUserProfile.NameComponent>,
+        profileFamilyName: OptionalChange<OWSUserProfile.NameComponent?>,
+        profileBio: OptionalChange<String?>,
+        profileBioEmoji: OptionalChange<String?>,
+        profileAvatarData: OptionalAvatarChange<Data?>,
+        visibleBadgeIds: OptionalChange<[String]>,
+        unsavedRotatedProfileKey: Aes256Key?,
+        userProfileWriter: UserProfileWriter,
+        authedAccount: AuthedAccount,
+        tx: DBWriteTransaction
+    ) -> Promise<Void> {
+        return updateLocalProfile(
+            profileKeyVersion: nil,
+            profileGivenName: profileGivenName,
+            profileFamilyName: profileFamilyName,
+            profileBio: profileBio,
+            profileBioEmoji: profileBioEmoji,
+            profileAvatarData: profileAvatarData,
+            visibleBadgeIds: visibleBadgeIds,
+            unsavedRotatedProfileKey: unsavedRotatedProfileKey,
+            userProfileWriter: userProfileWriter,
+            authedAccount: authedAccount,
+            tx: tx
+        )
     }
 }

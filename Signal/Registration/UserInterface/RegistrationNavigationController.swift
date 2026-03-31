@@ -517,6 +517,14 @@ extension RegistrationNavigationController: RegistrationSplashPresenter {
         let controller = RegistrationConfirmModeSwitchViewController(presenter: self)
         pushViewController(controller, animated: true)
     }
+    
+    public func showRelinking() {
+        guard coordinator.switchToSecondaryDeviceLinking() else {
+           owsFailBeta("Can't switch to secondary device linking")
+           return
+        }
+        SignalApp.shared.showRelinking(appReadiness: appReadiness)
+    }
 }
 
 extension RegistrationNavigationController: RegistrationConfimModeSwitchPresenter {

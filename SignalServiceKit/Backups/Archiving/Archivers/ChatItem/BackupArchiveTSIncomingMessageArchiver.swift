@@ -392,7 +392,8 @@ extension BackupArchiveTSIncomingMessageArchiver: BackupArchive.TSMessageEditHis
                 messageSticker: nil,
                 giftBadge: nil,
                 paymentNotification: nil,
-                isPoll: false // TODO(KC): fill in once polls are implemented in backups
+                isPoll: false, // TODO(KC): fill in once polls are implemented in backups
+                isStarred: false
             )
 
             switch contents {

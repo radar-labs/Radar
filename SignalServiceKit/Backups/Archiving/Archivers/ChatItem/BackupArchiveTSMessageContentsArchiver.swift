@@ -284,42 +284,46 @@ class BackupArchiveTSMessageContentsArchiver: BackupArchiveProtoStreamWriter {
         uniqueInteractionId: BackupArchive.InteractionUniqueId,
         context: BackupArchive.RecipientArchivingContext
     ) -> BackupArchive.ArchiveInteractionResult<ChatItemType> {
-        guard
-            let paymentNotification = message.paymentNotification,
-            let model = PaymentFinder.paymentModels(
-                forMcReceiptData: paymentNotification.mcReceiptData,
-                transaction: context.tx
-            ).first
-        else {
-            return .messageFailure([.archiveFrameError(.missingPaymentInformation, uniqueInteractionId)])
-        }
-
-        var paymentNotificationProto = BackupProto_PaymentNotification()
-
-        if
-            let amount = model.paymentAmount,
-            let amountString = PaymentsFormat.format(
-                picoMob: amount.picoMob,
-                isShortForm: true
-            )
-        {
-            paymentNotificationProto.amountMob = amountString
-        }
-        if
-            let fee = model.mobileCoin?.feeAmount,
-            let feeString = PaymentsFormat.format(
-                picoMob: fee.picoMob,
-                isShortForm: true
-            )
-        {
-            paymentNotificationProto.feeMob = feeString
-        }
-        if let memoMessage = paymentNotification.memoMessage {
-            paymentNotificationProto.note = memoMessage
-        }
-        paymentNotificationProto.transactionDetails = model.asArchivedPayment().toTransactionDetailsProto()
-
-        return .success(.paymentNotification(paymentNotificationProto))
+        // FIX-ME: Unimplemented
+        // exit(-1)
+        fatalError("Unimplemented")
+//        guard
+//            let paymentNotification = message.paymentNotification,
+//            let model = PaymentFinder.paymentModels(
+//                forMcReceiptData: paymentNotification.mcReceiptData,
+//                transaction: context.tx
+//            ).first
+//        else {
+//            return .messageFailure([.archiveFrameError(.missingPaymentInformation, uniqueInteractionId)])
+//        }
+//
+//        var paymentNotificationProto = BackupProto_PaymentNotification()
+//
+//        if
+//            let amount = model.paymentAmount,
+//            let amountString = PaymentsFormat.format(
+//                picoMob: amount.picoMob,
+//                isShortForm: true
+//            )
+//        {
+//            paymentNotificationProto.amountMob = amountString
+//        }
+//
+//        if
+//            let fee = model.mobileCoin?.feeAmount,
+//            let feeString = PaymentsFormat.format(
+//                picoMob: fee.picoMob,
+//                isShortForm: true
+//            )
+//        {
+//            paymentNotificationProto.feeMob = feeString
+//        }
+//        if let memoMessage = paymentNotification.memoMessage {
+//            paymentNotificationProto.note = memoMessage
+//        }
+//        paymentNotificationProto.transactionDetails = model.asArchivedPayment().toTransactionDetailsProto()
+//
+//        return .success(.paymentNotification(paymentNotificationProto))
     }
 
     // MARK: -

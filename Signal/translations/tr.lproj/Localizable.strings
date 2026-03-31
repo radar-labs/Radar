@@ -6007,8 +6007,8 @@
 /* Payments in-chat message shown if a payment fails to send, bottom half. */
 "PAYMENTS_IN_CHAT_FAILURE_MESSAGE_BOTTOM" = "Ayrıntılar için dokun";
 
-/* Payments in-chat message shown if a payment fails to send, top part. Embeds {{ number, amount of MOB coin not sent }} */
-"PAYMENTS_IN_CHAT_FAILURE_MESSAGE_TOP" = "%1$@ MOB gönderilemedi";
+/* Payments in-chat message shown if a payment fails to send, top part. Embeds {{ number, amount of BTC coin not sent }} */
+"PAYMENTS_IN_CHAT_FAILURE_MESSAGE_TOP" = "%1$@ BTC gönderilemedi";
 
 /* Status indicator for invalid payments which could not be processed. */
 "PAYMENTS_INFO_UNAVAILABLE_MESSAGE" = "KULLANILAMIYOR";
@@ -8009,7 +8009,7 @@
 "SETTINGS_PAYMENTS_ADD_MONEY" = "Para ekle";
 
 /* Explanation of the process for adding money in the 'add money' settings view. */
-"SETTINGS_PAYMENTS_ADD_MONEY_DESCRIPTION" = "Para eklemek için, cüzdan adresinize MobileCoin gönderin. MobileCoin destekleyen bir kambiyodaki hesabınızdan bir işlem başlatın, daha sonra Karekodu okutun veya cüzdan adresinizi girin.";
+"SETTINGS_PAYMENTS_ADD_MONEY_DESCRIPTION" = "Para eklemek için, cüzdan adresinize Bitcoin over Lightning gönderin. Bitcoin over Lightning destekleyen bir kambiyodaki hesabınızdan bir işlem başlatın, daha sonra Karekodu okutun veya cüzdan adresinizi girin.";
 
 /* Indicator that the payments wallet address has been copied to the pasteboard. */
 "SETTINGS_PAYMENTS_ADD_MONEY_WALLET_ADDRESS_COPIED" = "Cüzdan Adresi Kopyalandı";
@@ -8417,7 +8417,7 @@
 "SETTINGS_PAYMENTS_TRANSFER_OUT_PLACEHOLDER" = "Kime: Cüzdan adresini taratın veya girin";
 
 /* Label for 'transfer currency out' view in the payment settings. */
-"SETTINGS_PAYMENTS_TRANSFER_OUT_TITLE" = "Kambiyoya Aktar";
+"SETTINGS_PAYMENTS_TRANSFER_OUT_TITLE" = "Hariciye Aktar";
 
 /* Label for the 'transfer to exchange' button in the payment settings. */
 "SETTINGS_PAYMENTS_TRANSFER_TO_EXCHANGE" = "Kambiyoya Aktar";

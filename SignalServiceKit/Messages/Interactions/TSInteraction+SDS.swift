@@ -104,6 +104,7 @@ public struct InteractionRecord: SDSRecord {
     public let expireTimerVersion: UInt32?
     public let isSmsMessageRestoredFromBackup: Bool?
     public let isPoll: Bool?
+    public let isStarred: Bool?
 
     public enum CodingKeys: String, CodingKey, ColumnExpression, CaseIterable {
         case id
@@ -183,6 +184,7 @@ public struct InteractionRecord: SDSRecord {
         case expireTimerVersion
         case isSmsMessageRestoredFromBackup
         case isPoll
+        case isStarred
     }
 
     public static func columnName(_ column: InteractionRecord.CodingKeys, fullyQualified: Bool = false) -> String {
@@ -283,6 +285,7 @@ public extension InteractionRecord {
         expireTimerVersion = row[74]
         isSmsMessageRestoredFromBackup = row[75]
         isPoll = row[76]
+        isStarred = row[77]
     }
 }
 
@@ -335,6 +338,7 @@ extension TSInteraction {
             let isGroupStoryReply: Bool = try SDSDeserialization.required(record.isGroupStoryReply, name: "isGroupStoryReply")
             let isPoll: Bool = try SDSDeserialization.required(record.isPoll, name: "isPoll")
             let isSmsMessageRestoredFromBackup: Bool = try SDSDeserialization.required(record.isSmsMessageRestoredFromBackup, name: "isSmsMessageRestoredFromBackup")
+            let isStarred: Bool = try SDSDeserialization.required(record.isStarred, name: "isStarred")
             let isViewOnceComplete: Bool = try SDSDeserialization.required(record.isViewOnceComplete, name: "isViewOnceComplete")
             let isViewOnceMessage: Bool = try SDSDeserialization.required(record.isViewOnceMessage, name: "isViewOnceMessage")
             let linkPreviewSerialized: Data? = record.linkPreview
@@ -378,6 +382,7 @@ extension TSInteraction {
                                                 isGroupStoryReply: isGroupStoryReply,
                                                 isPoll: isPoll,
                                                 isSmsMessageRestoredFromBackup: isSmsMessageRestoredFromBackup,
+                                                isStarred: isStarred,
                                                 isViewOnceComplete: isViewOnceComplete,
                                                 isViewOnceMessage: isViewOnceMessage,
                                                 linkPreview: linkPreview,
@@ -421,6 +426,7 @@ extension TSInteraction {
             let isGroupStoryReply: Bool = try SDSDeserialization.required(record.isGroupStoryReply, name: "isGroupStoryReply")
             let isPoll: Bool = try SDSDeserialization.required(record.isPoll, name: "isPoll")
             let isSmsMessageRestoredFromBackup: Bool = try SDSDeserialization.required(record.isSmsMessageRestoredFromBackup, name: "isSmsMessageRestoredFromBackup")
+            let isStarred: Bool = try SDSDeserialization.required(record.isStarred, name: "isStarred")
             let isViewOnceComplete: Bool = try SDSDeserialization.required(record.isViewOnceComplete, name: "isViewOnceComplete")
             let isViewOnceMessage: Bool = try SDSDeserialization.required(record.isViewOnceMessage, name: "isViewOnceMessage")
             let linkPreviewSerialized: Data? = record.linkPreview
@@ -464,6 +470,7 @@ extension TSInteraction {
                                                         isGroupStoryReply: isGroupStoryReply,
                                                         isPoll: isPoll,
                                                         isSmsMessageRestoredFromBackup: isSmsMessageRestoredFromBackup,
+                                                        isStarred: isStarred,
                                                         isViewOnceComplete: isViewOnceComplete,
                                                         isViewOnceMessage: isViewOnceMessage,
                                                         linkPreview: linkPreview,
@@ -507,6 +514,7 @@ extension TSInteraction {
             let isGroupStoryReply: Bool = try SDSDeserialization.required(record.isGroupStoryReply, name: "isGroupStoryReply")
             let isPoll: Bool = try SDSDeserialization.required(record.isPoll, name: "isPoll")
             let isSmsMessageRestoredFromBackup: Bool = try SDSDeserialization.required(record.isSmsMessageRestoredFromBackup, name: "isSmsMessageRestoredFromBackup")
+            let isStarred: Bool = try SDSDeserialization.required(record.isStarred, name: "isStarred")
             let isViewOnceComplete: Bool = try SDSDeserialization.required(record.isViewOnceComplete, name: "isViewOnceComplete")
             let isViewOnceMessage: Bool = try SDSDeserialization.required(record.isViewOnceMessage, name: "isViewOnceMessage")
             let linkPreviewSerialized: Data? = record.linkPreview
@@ -554,6 +562,7 @@ extension TSInteraction {
                                                                  isGroupStoryReply: isGroupStoryReply,
                                                                  isPoll: isPoll,
                                                                  isSmsMessageRestoredFromBackup: isSmsMessageRestoredFromBackup,
+                                                                 isStarred: isStarred,
                                                                  isViewOnceComplete: isViewOnceComplete,
                                                                  isViewOnceMessage: isViewOnceMessage,
                                                                  linkPreview: linkPreview,
@@ -627,6 +636,7 @@ extension TSInteraction {
             let isGroupStoryReply: Bool = try SDSDeserialization.required(record.isGroupStoryReply, name: "isGroupStoryReply")
             let isPoll: Bool = try SDSDeserialization.required(record.isPoll, name: "isPoll")
             let isSmsMessageRestoredFromBackup: Bool = try SDSDeserialization.required(record.isSmsMessageRestoredFromBackup, name: "isSmsMessageRestoredFromBackup")
+            let isStarred: Bool = try SDSDeserialization.required(record.isStarred, name: "isStarred")
             let isViewOnceComplete: Bool = try SDSDeserialization.required(record.isViewOnceComplete, name: "isViewOnceComplete")
             let isViewOnceMessage: Bool = try SDSDeserialization.required(record.isViewOnceMessage, name: "isViewOnceMessage")
             let linkPreviewSerialized: Data? = record.linkPreview
@@ -671,6 +681,7 @@ extension TSInteraction {
                                                      isGroupStoryReply: isGroupStoryReply,
                                                      isPoll: isPoll,
                                                      isSmsMessageRestoredFromBackup: isSmsMessageRestoredFromBackup,
+                                                     isStarred: isStarred,
                                                      isViewOnceComplete: isViewOnceComplete,
                                                      isViewOnceMessage: isViewOnceMessage,
                                                      linkPreview: linkPreview,
@@ -718,6 +729,7 @@ extension TSInteraction {
             let isGroupStoryReply: Bool = try SDSDeserialization.required(record.isGroupStoryReply, name: "isGroupStoryReply")
             let isPoll: Bool = try SDSDeserialization.required(record.isPoll, name: "isPoll")
             let isSmsMessageRestoredFromBackup: Bool = try SDSDeserialization.required(record.isSmsMessageRestoredFromBackup, name: "isSmsMessageRestoredFromBackup")
+            let isStarred: Bool = try SDSDeserialization.required(record.isStarred, name: "isStarred")
             let isViewOnceComplete: Bool = try SDSDeserialization.required(record.isViewOnceComplete, name: "isViewOnceComplete")
             let isViewOnceMessage: Bool = try SDSDeserialization.required(record.isViewOnceMessage, name: "isViewOnceMessage")
             let linkPreviewSerialized: Data? = record.linkPreview
@@ -764,6 +776,7 @@ extension TSInteraction {
                                              isGroupStoryReply: isGroupStoryReply,
                                              isPoll: isPoll,
                                              isSmsMessageRestoredFromBackup: isSmsMessageRestoredFromBackup,
+                                             isStarred: isStarred,
                                              isViewOnceComplete: isViewOnceComplete,
                                              isViewOnceMessage: isViewOnceMessage,
                                              linkPreview: linkPreview,
@@ -813,6 +826,7 @@ extension TSInteraction {
             let isGroupStoryReply: Bool = try SDSDeserialization.required(record.isGroupStoryReply, name: "isGroupStoryReply")
             let isPoll: Bool = try SDSDeserialization.required(record.isPoll, name: "isPoll")
             let isSmsMessageRestoredFromBackup: Bool = try SDSDeserialization.required(record.isSmsMessageRestoredFromBackup, name: "isSmsMessageRestoredFromBackup")
+            let isStarred: Bool = try SDSDeserialization.required(record.isStarred, name: "isStarred")
             let isViewOnceComplete: Bool = try SDSDeserialization.required(record.isViewOnceComplete, name: "isViewOnceComplete")
             let isViewOnceMessage: Bool = try SDSDeserialization.required(record.isViewOnceMessage, name: "isViewOnceMessage")
             let linkPreviewSerialized: Data? = record.linkPreview
@@ -866,6 +880,7 @@ extension TSInteraction {
                                                      isGroupStoryReply: isGroupStoryReply,
                                                      isPoll: isPoll,
                                                      isSmsMessageRestoredFromBackup: isSmsMessageRestoredFromBackup,
+                                                     isStarred: isStarred,
                                                      isViewOnceComplete: isViewOnceComplete,
                                                      isViewOnceMessage: isViewOnceMessage,
                                                      linkPreview: linkPreview,
@@ -915,6 +930,7 @@ extension TSInteraction {
             let isGroupStoryReply: Bool = try SDSDeserialization.required(record.isGroupStoryReply, name: "isGroupStoryReply")
             let isPoll: Bool = try SDSDeserialization.required(record.isPoll, name: "isPoll")
             let isSmsMessageRestoredFromBackup: Bool = try SDSDeserialization.required(record.isSmsMessageRestoredFromBackup, name: "isSmsMessageRestoredFromBackup")
+            let isStarred: Bool = try SDSDeserialization.required(record.isStarred, name: "isStarred")
             let isViewOnceComplete: Bool = try SDSDeserialization.required(record.isViewOnceComplete, name: "isViewOnceComplete")
             let isViewOnceMessage: Bool = try SDSDeserialization.required(record.isViewOnceMessage, name: "isViewOnceMessage")
             let linkPreviewSerialized: Data? = record.linkPreview
@@ -970,6 +986,7 @@ extension TSInteraction {
                                              isGroupStoryReply: isGroupStoryReply,
                                              isPoll: isPoll,
                                              isSmsMessageRestoredFromBackup: isSmsMessageRestoredFromBackup,
+                                             isStarred: isStarred,
                                              isViewOnceComplete: isViewOnceComplete,
                                              isViewOnceMessage: isViewOnceMessage,
                                              linkPreview: linkPreview,
@@ -1021,6 +1038,7 @@ extension TSInteraction {
             let isGroupStoryReply: Bool = try SDSDeserialization.required(record.isGroupStoryReply, name: "isGroupStoryReply")
             let isPoll: Bool = try SDSDeserialization.required(record.isPoll, name: "isPoll")
             let isSmsMessageRestoredFromBackup: Bool = try SDSDeserialization.required(record.isSmsMessageRestoredFromBackup, name: "isSmsMessageRestoredFromBackup")
+            let isStarred: Bool = try SDSDeserialization.required(record.isStarred, name: "isStarred")
             let isViewOnceComplete: Bool = try SDSDeserialization.required(record.isViewOnceComplete, name: "isViewOnceComplete")
             let isViewOnceMessage: Bool = try SDSDeserialization.required(record.isViewOnceMessage, name: "isViewOnceMessage")
             let linkPreviewSerialized: Data? = record.linkPreview
@@ -1072,6 +1090,7 @@ extension TSInteraction {
                                                               isGroupStoryReply: isGroupStoryReply,
                                                               isPoll: isPoll,
                                                               isSmsMessageRestoredFromBackup: isSmsMessageRestoredFromBackup,
+                                                              isStarred: isStarred,
                                                               isViewOnceComplete: isViewOnceComplete,
                                                               isViewOnceMessage: isViewOnceMessage,
                                                               linkPreview: linkPreview,
@@ -1120,6 +1139,7 @@ extension TSInteraction {
             let isGroupStoryReply: Bool = try SDSDeserialization.required(record.isGroupStoryReply, name: "isGroupStoryReply")
             let isPoll: Bool = try SDSDeserialization.required(record.isPoll, name: "isPoll")
             let isSmsMessageRestoredFromBackup: Bool = try SDSDeserialization.required(record.isSmsMessageRestoredFromBackup, name: "isSmsMessageRestoredFromBackup")
+            let isStarred: Bool = try SDSDeserialization.required(record.isStarred, name: "isStarred")
             let isViewOnceComplete: Bool = try SDSDeserialization.required(record.isViewOnceComplete, name: "isViewOnceComplete")
             let isViewOnceMessage: Bool = try SDSDeserialization.required(record.isViewOnceMessage, name: "isViewOnceMessage")
             let linkPreviewSerialized: Data? = record.linkPreview
@@ -1171,6 +1191,7 @@ extension TSInteraction {
                                                       isGroupStoryReply: isGroupStoryReply,
                                                       isPoll: isPoll,
                                                       isSmsMessageRestoredFromBackup: isSmsMessageRestoredFromBackup,
+                                                      isStarred: isStarred,
                                                       isViewOnceComplete: isViewOnceComplete,
                                                       isViewOnceMessage: isViewOnceMessage,
                                                       linkPreview: linkPreview,
@@ -1219,6 +1240,7 @@ extension TSInteraction {
             let isGroupStoryReply: Bool = try SDSDeserialization.required(record.isGroupStoryReply, name: "isGroupStoryReply")
             let isPoll: Bool = try SDSDeserialization.required(record.isPoll, name: "isPoll")
             let isSmsMessageRestoredFromBackup: Bool = try SDSDeserialization.required(record.isSmsMessageRestoredFromBackup, name: "isSmsMessageRestoredFromBackup")
+            let isStarred: Bool = try SDSDeserialization.required(record.isStarred, name: "isStarred")
             let isViewOnceComplete: Bool = try SDSDeserialization.required(record.isViewOnceComplete, name: "isViewOnceComplete")
             let isViewOnceMessage: Bool = try SDSDeserialization.required(record.isViewOnceMessage, name: "isViewOnceMessage")
             let linkPreviewSerialized: Data? = record.linkPreview
@@ -1261,6 +1283,7 @@ extension TSInteraction {
                                                        isGroupStoryReply: isGroupStoryReply,
                                                        isPoll: isPoll,
                                                        isSmsMessageRestoredFromBackup: isSmsMessageRestoredFromBackup,
+                                                       isStarred: isStarred,
                                                        isViewOnceComplete: isViewOnceComplete,
                                                        isViewOnceMessage: isViewOnceMessage,
                                                        linkPreview: linkPreview,
@@ -1303,6 +1326,7 @@ extension TSInteraction {
             let isGroupStoryReply: Bool = try SDSDeserialization.required(record.isGroupStoryReply, name: "isGroupStoryReply")
             let isPoll: Bool = try SDSDeserialization.required(record.isPoll, name: "isPoll")
             let isSmsMessageRestoredFromBackup: Bool = try SDSDeserialization.required(record.isSmsMessageRestoredFromBackup, name: "isSmsMessageRestoredFromBackup")
+            let isStarred: Bool = try SDSDeserialization.required(record.isStarred, name: "isStarred")
             let isViewOnceComplete: Bool = try SDSDeserialization.required(record.isViewOnceComplete, name: "isViewOnceComplete")
             let isViewOnceMessage: Bool = try SDSDeserialization.required(record.isViewOnceMessage, name: "isViewOnceMessage")
             let linkPreviewSerialized: Data? = record.linkPreview
@@ -1345,6 +1369,7 @@ extension TSInteraction {
                                                       isGroupStoryReply: isGroupStoryReply,
                                                       isPoll: isPoll,
                                                       isSmsMessageRestoredFromBackup: isSmsMessageRestoredFromBackup,
+                                                      isStarred: isStarred,
                                                       isViewOnceComplete: isViewOnceComplete,
                                                       isViewOnceMessage: isViewOnceMessage,
                                                       linkPreview: linkPreview,
@@ -1387,6 +1412,7 @@ extension TSInteraction {
             let isGroupStoryReply: Bool = try SDSDeserialization.required(record.isGroupStoryReply, name: "isGroupStoryReply")
             let isPoll: Bool = try SDSDeserialization.required(record.isPoll, name: "isPoll")
             let isSmsMessageRestoredFromBackup: Bool = try SDSDeserialization.required(record.isSmsMessageRestoredFromBackup, name: "isSmsMessageRestoredFromBackup")
+            let isStarred: Bool = try SDSDeserialization.required(record.isStarred, name: "isStarred")
             let isViewOnceComplete: Bool = try SDSDeserialization.required(record.isViewOnceComplete, name: "isViewOnceComplete")
             let isViewOnceMessage: Bool = try SDSDeserialization.required(record.isViewOnceMessage, name: "isViewOnceMessage")
             let linkPreviewSerialized: Data? = record.linkPreview
@@ -1433,6 +1459,7 @@ extension TSInteraction {
                                                     isGroupStoryReply: isGroupStoryReply,
                                                     isPoll: isPoll,
                                                     isSmsMessageRestoredFromBackup: isSmsMessageRestoredFromBackup,
+                                                    isStarred: isStarred,
                                                     isViewOnceComplete: isViewOnceComplete,
                                                     isViewOnceMessage: isViewOnceMessage,
                                                     linkPreview: linkPreview,
@@ -1478,6 +1505,7 @@ extension TSInteraction {
             let isGroupStoryReply: Bool = try SDSDeserialization.required(record.isGroupStoryReply, name: "isGroupStoryReply")
             let isPoll: Bool = try SDSDeserialization.required(record.isPoll, name: "isPoll")
             let isSmsMessageRestoredFromBackup: Bool = try SDSDeserialization.required(record.isSmsMessageRestoredFromBackup, name: "isSmsMessageRestoredFromBackup")
+            let isStarred: Bool = try SDSDeserialization.required(record.isStarred, name: "isStarred")
             let isViewOnceComplete: Bool = try SDSDeserialization.required(record.isViewOnceComplete, name: "isViewOnceComplete")
             let isViewOnceMessage: Bool = try SDSDeserialization.required(record.isViewOnceMessage, name: "isViewOnceMessage")
             let linkPreviewSerialized: Data? = record.linkPreview
@@ -1527,6 +1555,7 @@ extension TSInteraction {
                                                      isGroupStoryReply: isGroupStoryReply,
                                                      isPoll: isPoll,
                                                      isSmsMessageRestoredFromBackup: isSmsMessageRestoredFromBackup,
+                                                     isStarred: isStarred,
                                                      isViewOnceComplete: isViewOnceComplete,
                                                      isViewOnceMessage: isViewOnceMessage,
                                                      linkPreview: linkPreview,
@@ -1598,6 +1627,7 @@ extension TSInteraction {
             let isGroupStoryReply: Bool = try SDSDeserialization.required(record.isGroupStoryReply, name: "isGroupStoryReply")
             let isPoll: Bool = try SDSDeserialization.required(record.isPoll, name: "isPoll")
             let isSmsMessageRestoredFromBackup: Bool = try SDSDeserialization.required(record.isSmsMessageRestoredFromBackup, name: "isSmsMessageRestoredFromBackup")
+            let isStarred: Bool = try SDSDeserialization.required(record.isStarred, name: "isStarred")
             let isViewOnceComplete: Bool = try SDSDeserialization.required(record.isViewOnceComplete, name: "isViewOnceComplete")
             let isViewOnceMessage: Bool = try SDSDeserialization.required(record.isViewOnceMessage, name: "isViewOnceMessage")
             let linkPreviewSerialized: Data? = record.linkPreview
@@ -1640,6 +1670,7 @@ extension TSInteraction {
                                   isGroupStoryReply: isGroupStoryReply,
                                   isPoll: isPoll,
                                   isSmsMessageRestoredFromBackup: isSmsMessageRestoredFromBackup,
+                                  isStarred: isStarred,
                                   isViewOnceComplete: isViewOnceComplete,
                                   isViewOnceMessage: isViewOnceMessage,
                                   linkPreview: linkPreview,
@@ -1682,6 +1713,7 @@ extension TSInteraction {
             let isGroupStoryReply: Bool = try SDSDeserialization.required(record.isGroupStoryReply, name: "isGroupStoryReply")
             let isPoll: Bool = try SDSDeserialization.required(record.isPoll, name: "isPoll")
             let isSmsMessageRestoredFromBackup: Bool = try SDSDeserialization.required(record.isSmsMessageRestoredFromBackup, name: "isSmsMessageRestoredFromBackup")
+            let isStarred: Bool = try SDSDeserialization.required(record.isStarred, name: "isStarred")
             let isViewOnceComplete: Bool = try SDSDeserialization.required(record.isViewOnceComplete, name: "isViewOnceComplete")
             let isViewOnceMessage: Bool = try SDSDeserialization.required(record.isViewOnceMessage, name: "isViewOnceMessage")
             let linkPreviewSerialized: Data? = record.linkPreview
@@ -1724,6 +1756,7 @@ extension TSInteraction {
                                      isGroupStoryReply: isGroupStoryReply,
                                      isPoll: isPoll,
                                      isSmsMessageRestoredFromBackup: isSmsMessageRestoredFromBackup,
+                                     isStarred: isStarred,
                                      isViewOnceComplete: isViewOnceComplete,
                                      isViewOnceMessage: isViewOnceMessage,
                                      linkPreview: linkPreview,
@@ -1770,6 +1803,7 @@ extension TSInteraction {
             let isGroupStoryReply: Bool = try SDSDeserialization.required(record.isGroupStoryReply, name: "isGroupStoryReply")
             let isPoll: Bool = try SDSDeserialization.required(record.isPoll, name: "isPoll")
             let isSmsMessageRestoredFromBackup: Bool = try SDSDeserialization.required(record.isSmsMessageRestoredFromBackup, name: "isSmsMessageRestoredFromBackup")
+            let isStarred: Bool = try SDSDeserialization.required(record.isStarred, name: "isStarred")
             let isViewOnceComplete: Bool = try SDSDeserialization.required(record.isViewOnceComplete, name: "isViewOnceComplete")
             let isViewOnceMessage: Bool = try SDSDeserialization.required(record.isViewOnceMessage, name: "isViewOnceMessage")
             let linkPreviewSerialized: Data? = record.linkPreview
@@ -1813,6 +1847,7 @@ extension TSInteraction {
                                  isGroupStoryReply: isGroupStoryReply,
                                  isPoll: isPoll,
                                  isSmsMessageRestoredFromBackup: isSmsMessageRestoredFromBackup,
+                                 isStarred: isStarred,
                                  isViewOnceComplete: isViewOnceComplete,
                                  isViewOnceMessage: isViewOnceMessage,
                                  linkPreview: linkPreview,
@@ -1871,6 +1906,7 @@ extension TSInteraction {
             let isGroupStoryReply: Bool = try SDSDeserialization.required(record.isGroupStoryReply, name: "isGroupStoryReply")
             let isPoll: Bool = try SDSDeserialization.required(record.isPoll, name: "isPoll")
             let isSmsMessageRestoredFromBackup: Bool = try SDSDeserialization.required(record.isSmsMessageRestoredFromBackup, name: "isSmsMessageRestoredFromBackup")
+            let isStarred: Bool = try SDSDeserialization.required(record.isStarred, name: "isStarred")
             let isViewOnceComplete: Bool = try SDSDeserialization.required(record.isViewOnceComplete, name: "isViewOnceComplete")
             let isViewOnceMessage: Bool = try SDSDeserialization.required(record.isViewOnceMessage, name: "isViewOnceMessage")
             let linkPreviewSerialized: Data? = record.linkPreview
@@ -1913,6 +1949,7 @@ extension TSInteraction {
                                                     isGroupStoryReply: isGroupStoryReply,
                                                     isPoll: isPoll,
                                                     isSmsMessageRestoredFromBackup: isSmsMessageRestoredFromBackup,
+                                                    isStarred: isStarred,
                                                     isViewOnceComplete: isViewOnceComplete,
                                                     isViewOnceMessage: isViewOnceMessage,
                                                     linkPreview: linkPreview,
@@ -1955,6 +1992,7 @@ extension TSInteraction {
             let isGroupStoryReply: Bool = try SDSDeserialization.required(record.isGroupStoryReply, name: "isGroupStoryReply")
             let isPoll: Bool = try SDSDeserialization.required(record.isPoll, name: "isPoll")
             let isSmsMessageRestoredFromBackup: Bool = try SDSDeserialization.required(record.isSmsMessageRestoredFromBackup, name: "isSmsMessageRestoredFromBackup")
+            let isStarred: Bool = try SDSDeserialization.required(record.isStarred, name: "isStarred")
             let isViewOnceComplete: Bool = try SDSDeserialization.required(record.isViewOnceComplete, name: "isViewOnceComplete")
             let isViewOnceMessage: Bool = try SDSDeserialization.required(record.isViewOnceMessage, name: "isViewOnceMessage")
             let linkPreviewSerialized: Data? = record.linkPreview
@@ -1999,6 +2037,7 @@ extension TSInteraction {
                                                              isGroupStoryReply: isGroupStoryReply,
                                                              isPoll: isPoll,
                                                              isSmsMessageRestoredFromBackup: isSmsMessageRestoredFromBackup,
+                                                             isStarred: isStarred,
                                                              isViewOnceComplete: isViewOnceComplete,
                                                              isViewOnceMessage: isViewOnceMessage,
                                                              linkPreview: linkPreview,
@@ -2043,6 +2082,7 @@ extension TSInteraction {
             let isGroupStoryReply: Bool = try SDSDeserialization.required(record.isGroupStoryReply, name: "isGroupStoryReply")
             let isPoll: Bool = try SDSDeserialization.required(record.isPoll, name: "isPoll")
             let isSmsMessageRestoredFromBackup: Bool = try SDSDeserialization.required(record.isSmsMessageRestoredFromBackup, name: "isSmsMessageRestoredFromBackup")
+            let isStarred: Bool = try SDSDeserialization.required(record.isStarred, name: "isStarred")
             let isViewOnceComplete: Bool = try SDSDeserialization.required(record.isViewOnceComplete, name: "isViewOnceComplete")
             let isViewOnceMessage: Bool = try SDSDeserialization.required(record.isViewOnceMessage, name: "isViewOnceMessage")
             let linkPreviewSerialized: Data? = record.linkPreview
@@ -2087,6 +2127,7 @@ extension TSInteraction {
                                                            isGroupStoryReply: isGroupStoryReply,
                                                            isPoll: isPoll,
                                                            isSmsMessageRestoredFromBackup: isSmsMessageRestoredFromBackup,
+                                                           isStarred: isStarred,
                                                            isViewOnceComplete: isViewOnceComplete,
                                                            isViewOnceMessage: isViewOnceMessage,
                                                            linkPreview: linkPreview,
@@ -2131,6 +2172,7 @@ extension TSInteraction {
             let isGroupStoryReply: Bool = try SDSDeserialization.required(record.isGroupStoryReply, name: "isGroupStoryReply")
             let isPoll: Bool = try SDSDeserialization.required(record.isPoll, name: "isPoll")
             let isSmsMessageRestoredFromBackup: Bool = try SDSDeserialization.required(record.isSmsMessageRestoredFromBackup, name: "isSmsMessageRestoredFromBackup")
+            let isStarred: Bool = try SDSDeserialization.required(record.isStarred, name: "isStarred")
             let isViewOnceComplete: Bool = try SDSDeserialization.required(record.isViewOnceComplete, name: "isViewOnceComplete")
             let isViewOnceMessage: Bool = try SDSDeserialization.required(record.isViewOnceMessage, name: "isViewOnceMessage")
             let linkPreviewSerialized: Data? = record.linkPreview
@@ -2164,6 +2206,7 @@ extension TSInteraction {
                              isGroupStoryReply: isGroupStoryReply,
                              isPoll: isPoll,
                              isSmsMessageRestoredFromBackup: isSmsMessageRestoredFromBackup,
+                             isStarred: isStarred,
                              isViewOnceComplete: isViewOnceComplete,
                              isViewOnceMessage: isViewOnceMessage,
                              linkPreview: linkPreview,
@@ -2201,6 +2244,7 @@ extension TSInteraction {
             let isGroupStoryReply: Bool = try SDSDeserialization.required(record.isGroupStoryReply, name: "isGroupStoryReply")
             let isPoll: Bool = try SDSDeserialization.required(record.isPoll, name: "isPoll")
             let isSmsMessageRestoredFromBackup: Bool = try SDSDeserialization.required(record.isSmsMessageRestoredFromBackup, name: "isSmsMessageRestoredFromBackup")
+            let isStarred: Bool = try SDSDeserialization.required(record.isStarred, name: "isStarred")
             let isViewOnceComplete: Bool = try SDSDeserialization.required(record.isViewOnceComplete, name: "isViewOnceComplete")
             let isViewOnceMessage: Bool = try SDSDeserialization.required(record.isViewOnceMessage, name: "isViewOnceMessage")
             let linkPreviewSerialized: Data? = record.linkPreview
@@ -2252,6 +2296,7 @@ extension TSInteraction {
                                      isGroupStoryReply: isGroupStoryReply,
                                      isPoll: isPoll,
                                      isSmsMessageRestoredFromBackup: isSmsMessageRestoredFromBackup,
+                                     isStarred: isStarred,
                                      isViewOnceComplete: isViewOnceComplete,
                                      isViewOnceMessage: isViewOnceMessage,
                                      linkPreview: linkPreview,
@@ -2462,6 +2507,7 @@ extension TSInteraction: DeepCopyable {
             let isGroupStoryReply: Bool = modelToCopy.isGroupStoryReply
             let isPoll: Bool = modelToCopy.isPoll
             let isSmsMessageRestoredFromBackup: Bool = modelToCopy.isSmsMessageRestoredFromBackup
+            let isStarred: Bool = modelToCopy.isStarred
             let isViewOnceComplete: Bool = modelToCopy.isViewOnceComplete
             let isViewOnceMessage: Bool = modelToCopy.isViewOnceMessage
             let linkPreview: OWSLinkPreview?
@@ -2523,6 +2569,7 @@ extension TSInteraction: DeepCopyable {
                                                       isGroupStoryReply: isGroupStoryReply,
                                                       isPoll: isPoll,
                                                       isSmsMessageRestoredFromBackup: isSmsMessageRestoredFromBackup,
+                                                      isStarred: isStarred,
                                                       isViewOnceComplete: isViewOnceComplete,
                                                       isViewOnceMessage: isViewOnceMessage,
                                                       linkPreview: linkPreview,
@@ -2586,6 +2633,7 @@ extension TSInteraction: DeepCopyable {
             let isGroupStoryReply: Bool = modelToCopy.isGroupStoryReply
             let isPoll: Bool = modelToCopy.isPoll
             let isSmsMessageRestoredFromBackup: Bool = modelToCopy.isSmsMessageRestoredFromBackup
+            let isStarred: Bool = modelToCopy.isStarred
             let isViewOnceComplete: Bool = modelToCopy.isViewOnceComplete
             let isViewOnceMessage: Bool = modelToCopy.isViewOnceMessage
             let linkPreview: OWSLinkPreview?
@@ -2647,6 +2695,7 @@ extension TSInteraction: DeepCopyable {
                                                               isGroupStoryReply: isGroupStoryReply,
                                                               isPoll: isPoll,
                                                               isSmsMessageRestoredFromBackup: isSmsMessageRestoredFromBackup,
+                                                              isStarred: isStarred,
                                                               isViewOnceComplete: isViewOnceComplete,
                                                               isViewOnceMessage: isViewOnceMessage,
                                                               linkPreview: linkPreview,
@@ -2710,6 +2759,7 @@ extension TSInteraction: DeepCopyable {
             let isGroupStoryReply: Bool = modelToCopy.isGroupStoryReply
             let isPoll: Bool = modelToCopy.isPoll
             let isSmsMessageRestoredFromBackup: Bool = modelToCopy.isSmsMessageRestoredFromBackup
+            let isStarred: Bool = modelToCopy.isStarred
             let isViewOnceComplete: Bool = modelToCopy.isViewOnceComplete
             let isViewOnceMessage: Bool = modelToCopy.isViewOnceMessage
             let linkPreview: OWSLinkPreview?
@@ -2779,6 +2829,7 @@ extension TSInteraction: DeepCopyable {
                                              isGroupStoryReply: isGroupStoryReply,
                                              isPoll: isPoll,
                                              isSmsMessageRestoredFromBackup: isSmsMessageRestoredFromBackup,
+                                             isStarred: isStarred,
                                              isViewOnceComplete: isViewOnceComplete,
                                              isViewOnceMessage: isViewOnceMessage,
                                              linkPreview: linkPreview,
@@ -2845,6 +2896,7 @@ extension TSInteraction: DeepCopyable {
             let isGroupStoryReply: Bool = modelToCopy.isGroupStoryReply
             let isPoll: Bool = modelToCopy.isPoll
             let isSmsMessageRestoredFromBackup: Bool = modelToCopy.isSmsMessageRestoredFromBackup
+            let isStarred: Bool = modelToCopy.isStarred
             let isViewOnceComplete: Bool = modelToCopy.isViewOnceComplete
             let isViewOnceMessage: Bool = modelToCopy.isViewOnceMessage
             let linkPreview: OWSLinkPreview?
@@ -2907,6 +2959,7 @@ extension TSInteraction: DeepCopyable {
                                                      isGroupStoryReply: isGroupStoryReply,
                                                      isPoll: isPoll,
                                                      isSmsMessageRestoredFromBackup: isSmsMessageRestoredFromBackup,
+                                                     isStarred: isStarred,
                                                      isViewOnceComplete: isViewOnceComplete,
                                                      isViewOnceMessage: isViewOnceMessage,
                                                      linkPreview: linkPreview,
@@ -2971,6 +3024,7 @@ extension TSInteraction: DeepCopyable {
             let isGroupStoryReply: Bool = modelToCopy.isGroupStoryReply
             let isPoll: Bool = modelToCopy.isPoll
             let isSmsMessageRestoredFromBackup: Bool = modelToCopy.isSmsMessageRestoredFromBackup
+            let isStarred: Bool = modelToCopy.isStarred
             let isViewOnceComplete: Bool = modelToCopy.isViewOnceComplete
             let isViewOnceMessage: Bool = modelToCopy.isViewOnceMessage
             let linkPreview: OWSLinkPreview?
@@ -3032,6 +3086,7 @@ extension TSInteraction: DeepCopyable {
                                      isGroupStoryReply: isGroupStoryReply,
                                      isPoll: isPoll,
                                      isSmsMessageRestoredFromBackup: isSmsMessageRestoredFromBackup,
+                                     isStarred: isStarred,
                                      isViewOnceComplete: isViewOnceComplete,
                                      isViewOnceMessage: isViewOnceMessage,
                                      linkPreview: linkPreview,
@@ -3095,6 +3150,7 @@ extension TSInteraction: DeepCopyable {
             let isGroupStoryReply: Bool = modelToCopy.isGroupStoryReply
             let isPoll: Bool = modelToCopy.isPoll
             let isSmsMessageRestoredFromBackup: Bool = modelToCopy.isSmsMessageRestoredFromBackup
+            let isStarred: Bool = modelToCopy.isStarred
             let isViewOnceComplete: Bool = modelToCopy.isViewOnceComplete
             let isViewOnceMessage: Bool = modelToCopy.isViewOnceMessage
             let linkPreview: OWSLinkPreview?
@@ -3159,6 +3215,7 @@ extension TSInteraction: DeepCopyable {
                                                      isGroupStoryReply: isGroupStoryReply,
                                                      isPoll: isPoll,
                                                      isSmsMessageRestoredFromBackup: isSmsMessageRestoredFromBackup,
+                                                     isStarred: isStarred,
                                                      isViewOnceComplete: isViewOnceComplete,
                                                      isViewOnceMessage: isViewOnceMessage,
                                                      linkPreview: linkPreview,
@@ -3220,6 +3277,7 @@ extension TSInteraction: DeepCopyable {
             let isGroupStoryReply: Bool = modelToCopy.isGroupStoryReply
             let isPoll: Bool = modelToCopy.isPoll
             let isSmsMessageRestoredFromBackup: Bool = modelToCopy.isSmsMessageRestoredFromBackup
+            let isStarred: Bool = modelToCopy.isStarred
             let isViewOnceComplete: Bool = modelToCopy.isViewOnceComplete
             let isViewOnceMessage: Bool = modelToCopy.isViewOnceMessage
             let linkPreview: OWSLinkPreview?
@@ -3288,6 +3346,7 @@ extension TSInteraction: DeepCopyable {
                                                     isGroupStoryReply: isGroupStoryReply,
                                                     isPoll: isPoll,
                                                     isSmsMessageRestoredFromBackup: isSmsMessageRestoredFromBackup,
+                                                    isStarred: isStarred,
                                                     isViewOnceComplete: isViewOnceComplete,
                                                     isViewOnceMessage: isViewOnceMessage,
                                                     linkPreview: linkPreview,
@@ -3348,6 +3407,7 @@ extension TSInteraction: DeepCopyable {
             let isGroupStoryReply: Bool = modelToCopy.isGroupStoryReply
             let isPoll: Bool = modelToCopy.isPoll
             let isSmsMessageRestoredFromBackup: Bool = modelToCopy.isSmsMessageRestoredFromBackup
+            let isStarred: Bool = modelToCopy.isStarred
             let isViewOnceComplete: Bool = modelToCopy.isViewOnceComplete
             let isViewOnceMessage: Bool = modelToCopy.isViewOnceMessage
             let linkPreview: OWSLinkPreview?
@@ -3413,6 +3473,7 @@ extension TSInteraction: DeepCopyable {
                                                                  isGroupStoryReply: isGroupStoryReply,
                                                                  isPoll: isPoll,
                                                                  isSmsMessageRestoredFromBackup: isSmsMessageRestoredFromBackup,
+                                                                 isStarred: isStarred,
                                                                  isViewOnceComplete: isViewOnceComplete,
                                                                  isViewOnceMessage: isViewOnceMessage,
                                                                  linkPreview: linkPreview,
@@ -3475,6 +3536,7 @@ extension TSInteraction: DeepCopyable {
             let isGroupStoryReply: Bool = modelToCopy.isGroupStoryReply
             let isPoll: Bool = modelToCopy.isPoll
             let isSmsMessageRestoredFromBackup: Bool = modelToCopy.isSmsMessageRestoredFromBackup
+            let isStarred: Bool = modelToCopy.isStarred
             let isViewOnceComplete: Bool = modelToCopy.isViewOnceComplete
             let isViewOnceMessage: Bool = modelToCopy.isViewOnceMessage
             let linkPreview: OWSLinkPreview?
@@ -3536,6 +3598,7 @@ extension TSInteraction: DeepCopyable {
                                                         isGroupStoryReply: isGroupStoryReply,
                                                         isPoll: isPoll,
                                                         isSmsMessageRestoredFromBackup: isSmsMessageRestoredFromBackup,
+                                                        isStarred: isStarred,
                                                         isViewOnceComplete: isViewOnceComplete,
                                                         isViewOnceMessage: isViewOnceMessage,
                                                         linkPreview: linkPreview,
@@ -3594,6 +3657,7 @@ extension TSInteraction: DeepCopyable {
             let isGroupStoryReply: Bool = modelToCopy.isGroupStoryReply
             let isPoll: Bool = modelToCopy.isPoll
             let isSmsMessageRestoredFromBackup: Bool = modelToCopy.isSmsMessageRestoredFromBackup
+            let isStarred: Bool = modelToCopy.isStarred
             let isViewOnceComplete: Bool = modelToCopy.isViewOnceComplete
             let isViewOnceMessage: Bool = modelToCopy.isViewOnceMessage
             let linkPreview: OWSLinkPreview?
@@ -3655,6 +3719,7 @@ extension TSInteraction: DeepCopyable {
                                                 isGroupStoryReply: isGroupStoryReply,
                                                 isPoll: isPoll,
                                                 isSmsMessageRestoredFromBackup: isSmsMessageRestoredFromBackup,
+                                                isStarred: isStarred,
                                                 isViewOnceComplete: isViewOnceComplete,
                                                 isViewOnceMessage: isViewOnceMessage,
                                                 linkPreview: linkPreview,
@@ -3713,6 +3778,7 @@ extension TSInteraction: DeepCopyable {
             let isGroupStoryReply: Bool = modelToCopy.isGroupStoryReply
             let isPoll: Bool = modelToCopy.isPoll
             let isSmsMessageRestoredFromBackup: Bool = modelToCopy.isSmsMessageRestoredFromBackup
+            let isStarred: Bool = modelToCopy.isStarred
             let isViewOnceComplete: Bool = modelToCopy.isViewOnceComplete
             let isViewOnceMessage: Bool = modelToCopy.isViewOnceMessage
             let linkPreview: OWSLinkPreview?
@@ -3774,6 +3840,7 @@ extension TSInteraction: DeepCopyable {
                                  isGroupStoryReply: isGroupStoryReply,
                                  isPoll: isPoll,
                                  isSmsMessageRestoredFromBackup: isSmsMessageRestoredFromBackup,
+                                 isStarred: isStarred,
                                  isViewOnceComplete: isViewOnceComplete,
                                  isViewOnceMessage: isViewOnceMessage,
                                  linkPreview: linkPreview,
@@ -3832,6 +3899,7 @@ extension TSInteraction: DeepCopyable {
             let isGroupStoryReply: Bool = modelToCopy.isGroupStoryReply
             let isPoll: Bool = modelToCopy.isPoll
             let isSmsMessageRestoredFromBackup: Bool = modelToCopy.isSmsMessageRestoredFromBackup
+            let isStarred: Bool = modelToCopy.isStarred
             let isViewOnceComplete: Bool = modelToCopy.isViewOnceComplete
             let isViewOnceMessage: Bool = modelToCopy.isViewOnceMessage
             let linkPreview: OWSLinkPreview?
@@ -3894,6 +3962,7 @@ extension TSInteraction: DeepCopyable {
                                              isGroupStoryReply: isGroupStoryReply,
                                              isPoll: isPoll,
                                              isSmsMessageRestoredFromBackup: isSmsMessageRestoredFromBackup,
+                                             isStarred: isStarred,
                                              isViewOnceComplete: isViewOnceComplete,
                                              isViewOnceMessage: isViewOnceMessage,
                                              linkPreview: linkPreview,
@@ -3958,6 +4027,7 @@ extension TSInteraction: DeepCopyable {
             let isGroupStoryReply: Bool = modelToCopy.isGroupStoryReply
             let isPoll: Bool = modelToCopy.isPoll
             let isSmsMessageRestoredFromBackup: Bool = modelToCopy.isSmsMessageRestoredFromBackup
+            let isStarred: Bool = modelToCopy.isStarred
             let isViewOnceComplete: Bool = modelToCopy.isViewOnceComplete
             let isViewOnceMessage: Bool = modelToCopy.isViewOnceMessage
             let linkPreview: OWSLinkPreview?
@@ -4013,6 +4083,7 @@ extension TSInteraction: DeepCopyable {
                                                      isGroupStoryReply: isGroupStoryReply,
                                                      isPoll: isPoll,
                                                      isSmsMessageRestoredFromBackup: isSmsMessageRestoredFromBackup,
+                                                     isStarred: isStarred,
                                                      isViewOnceComplete: isViewOnceComplete,
                                                      isViewOnceMessage: isViewOnceMessage,
                                                      linkPreview: linkPreview,
@@ -4075,6 +4146,7 @@ extension TSInteraction: DeepCopyable {
             let isGroupStoryReply: Bool = modelToCopy.isGroupStoryReply
             let isPoll: Bool = modelToCopy.isPoll
             let isSmsMessageRestoredFromBackup: Bool = modelToCopy.isSmsMessageRestoredFromBackup
+            let isStarred: Bool = modelToCopy.isStarred
             let isViewOnceComplete: Bool = modelToCopy.isViewOnceComplete
             let isViewOnceMessage: Bool = modelToCopy.isViewOnceMessage
             let linkPreview: OWSLinkPreview?
@@ -4129,6 +4201,7 @@ extension TSInteraction: DeepCopyable {
                                      isGroupStoryReply: isGroupStoryReply,
                                      isPoll: isPoll,
                                      isSmsMessageRestoredFromBackup: isSmsMessageRestoredFromBackup,
+                                     isStarred: isStarred,
                                      isViewOnceComplete: isViewOnceComplete,
                                      isViewOnceMessage: isViewOnceMessage,
                                      linkPreview: linkPreview,
@@ -4190,6 +4263,7 @@ extension TSInteraction: DeepCopyable {
             let isGroupStoryReply: Bool = modelToCopy.isGroupStoryReply
             let isPoll: Bool = modelToCopy.isPoll
             let isSmsMessageRestoredFromBackup: Bool = modelToCopy.isSmsMessageRestoredFromBackup
+            let isStarred: Bool = modelToCopy.isStarred
             let isViewOnceComplete: Bool = modelToCopy.isViewOnceComplete
             let isViewOnceMessage: Bool = modelToCopy.isViewOnceMessage
             let linkPreview: OWSLinkPreview?
@@ -4252,6 +4326,7 @@ extension TSInteraction: DeepCopyable {
                                                            isGroupStoryReply: isGroupStoryReply,
                                                            isPoll: isPoll,
                                                            isSmsMessageRestoredFromBackup: isSmsMessageRestoredFromBackup,
+                                                           isStarred: isStarred,
                                                            isViewOnceComplete: isViewOnceComplete,
                                                            isViewOnceMessage: isViewOnceMessage,
                                                            linkPreview: linkPreview,
@@ -4311,6 +4386,7 @@ extension TSInteraction: DeepCopyable {
             let isGroupStoryReply: Bool = modelToCopy.isGroupStoryReply
             let isPoll: Bool = modelToCopy.isPoll
             let isSmsMessageRestoredFromBackup: Bool = modelToCopy.isSmsMessageRestoredFromBackup
+            let isStarred: Bool = modelToCopy.isStarred
             let isViewOnceComplete: Bool = modelToCopy.isViewOnceComplete
             let isViewOnceMessage: Bool = modelToCopy.isViewOnceMessage
             let linkPreview: OWSLinkPreview?
@@ -4373,6 +4449,7 @@ extension TSInteraction: DeepCopyable {
                                                              isGroupStoryReply: isGroupStoryReply,
                                                              isPoll: isPoll,
                                                              isSmsMessageRestoredFromBackup: isSmsMessageRestoredFromBackup,
+                                                             isStarred: isStarred,
                                                              isViewOnceComplete: isViewOnceComplete,
                                                              isViewOnceMessage: isViewOnceMessage,
                                                              linkPreview: linkPreview,
@@ -4432,6 +4509,7 @@ extension TSInteraction: DeepCopyable {
             let isGroupStoryReply: Bool = modelToCopy.isGroupStoryReply
             let isPoll: Bool = modelToCopy.isPoll
             let isSmsMessageRestoredFromBackup: Bool = modelToCopy.isSmsMessageRestoredFromBackup
+            let isStarred: Bool = modelToCopy.isStarred
             let isViewOnceComplete: Bool = modelToCopy.isViewOnceComplete
             let isViewOnceMessage: Bool = modelToCopy.isViewOnceMessage
             let linkPreview: OWSLinkPreview?
@@ -4492,6 +4570,7 @@ extension TSInteraction: DeepCopyable {
                                                     isGroupStoryReply: isGroupStoryReply,
                                                     isPoll: isPoll,
                                                     isSmsMessageRestoredFromBackup: isSmsMessageRestoredFromBackup,
+                                                    isStarred: isStarred,
                                                     isViewOnceComplete: isViewOnceComplete,
                                                     isViewOnceMessage: isViewOnceMessage,
                                                     linkPreview: linkPreview,
@@ -4549,6 +4628,7 @@ extension TSInteraction: DeepCopyable {
             let isGroupStoryReply: Bool = modelToCopy.isGroupStoryReply
             let isPoll: Bool = modelToCopy.isPoll
             let isSmsMessageRestoredFromBackup: Bool = modelToCopy.isSmsMessageRestoredFromBackup
+            let isStarred: Bool = modelToCopy.isStarred
             let isViewOnceComplete: Bool = modelToCopy.isViewOnceComplete
             let isViewOnceMessage: Bool = modelToCopy.isViewOnceMessage
             let linkPreview: OWSLinkPreview?
@@ -4609,6 +4689,7 @@ extension TSInteraction: DeepCopyable {
                                                       isGroupStoryReply: isGroupStoryReply,
                                                       isPoll: isPoll,
                                                       isSmsMessageRestoredFromBackup: isSmsMessageRestoredFromBackup,
+                                                      isStarred: isStarred,
                                                       isViewOnceComplete: isViewOnceComplete,
                                                       isViewOnceMessage: isViewOnceMessage,
                                                       linkPreview: linkPreview,
@@ -4666,6 +4747,7 @@ extension TSInteraction: DeepCopyable {
             let isGroupStoryReply: Bool = modelToCopy.isGroupStoryReply
             let isPoll: Bool = modelToCopy.isPoll
             let isSmsMessageRestoredFromBackup: Bool = modelToCopy.isSmsMessageRestoredFromBackup
+            let isStarred: Bool = modelToCopy.isStarred
             let isViewOnceComplete: Bool = modelToCopy.isViewOnceComplete
             let isViewOnceMessage: Bool = modelToCopy.isViewOnceMessage
             let linkPreview: OWSLinkPreview?
@@ -4726,6 +4808,7 @@ extension TSInteraction: DeepCopyable {
                                                        isGroupStoryReply: isGroupStoryReply,
                                                        isPoll: isPoll,
                                                        isSmsMessageRestoredFromBackup: isSmsMessageRestoredFromBackup,
+                                                       isStarred: isStarred,
                                                        isViewOnceComplete: isViewOnceComplete,
                                                        isViewOnceMessage: isViewOnceMessage,
                                                        linkPreview: linkPreview,
@@ -4783,6 +4866,7 @@ extension TSInteraction: DeepCopyable {
             let isGroupStoryReply: Bool = modelToCopy.isGroupStoryReply
             let isPoll: Bool = modelToCopy.isPoll
             let isSmsMessageRestoredFromBackup: Bool = modelToCopy.isSmsMessageRestoredFromBackup
+            let isStarred: Bool = modelToCopy.isStarred
             let isViewOnceComplete: Bool = modelToCopy.isViewOnceComplete
             let isViewOnceMessage: Bool = modelToCopy.isViewOnceMessage
             let linkPreview: OWSLinkPreview?
@@ -4843,6 +4927,7 @@ extension TSInteraction: DeepCopyable {
                                   isGroupStoryReply: isGroupStoryReply,
                                   isPoll: isPoll,
                                   isSmsMessageRestoredFromBackup: isSmsMessageRestoredFromBackup,
+                                  isStarred: isStarred,
                                   isViewOnceComplete: isViewOnceComplete,
                                   isViewOnceMessage: isViewOnceMessage,
                                   linkPreview: linkPreview,
@@ -4900,6 +4985,7 @@ extension TSInteraction: DeepCopyable {
             let isGroupStoryReply: Bool = modelToCopy.isGroupStoryReply
             let isPoll: Bool = modelToCopy.isPoll
             let isSmsMessageRestoredFromBackup: Bool = modelToCopy.isSmsMessageRestoredFromBackup
+            let isStarred: Bool = modelToCopy.isStarred
             let isViewOnceComplete: Bool = modelToCopy.isViewOnceComplete
             let isViewOnceMessage: Bool = modelToCopy.isViewOnceMessage
             let linkPreview: OWSLinkPreview?
@@ -4945,6 +5031,7 @@ extension TSInteraction: DeepCopyable {
                              isGroupStoryReply: isGroupStoryReply,
                              isPoll: isPoll,
                              isSmsMessageRestoredFromBackup: isSmsMessageRestoredFromBackup,
+                             isStarred: isStarred,
                              isViewOnceComplete: isViewOnceComplete,
                              isViewOnceMessage: isViewOnceMessage,
                              linkPreview: linkPreview,
@@ -5114,6 +5201,7 @@ extension InteractionRecord {
                             expireTimerVersion,
                             isSmsMessageRestoredFromBackup,
                             isPoll,
+                            isStarred,
 
         ]
     }
@@ -5207,6 +5295,7 @@ extension TSInteractionSerializer {
     static var expireTimerVersionColumn: SDSColumnMetadata { SDSColumnMetadata(columnName: "expireTimerVersion", columnType: .int64, isOptional: true) }
     static var isSmsMessageRestoredFromBackupColumn: SDSColumnMetadata { SDSColumnMetadata(columnName: "isSmsMessageRestoredFromBackup", columnType: .int, isOptional: true) }
     static var isPollColumn: SDSColumnMetadata { SDSColumnMetadata(columnName: "isPoll", columnType: .int, isOptional: true) }
+    static var isStarredColumn: SDSColumnMetadata { SDSColumnMetadata(columnName: "isStarred", columnType: .int, isOptional: true) }
 
     public static var table: SDSTableMetadata {
         SDSTableMetadata(
@@ -5289,6 +5378,7 @@ extension TSInteractionSerializer {
                 expireTimerVersionColumn,
                 isSmsMessageRestoredFromBackupColumn,
                 isPollColumn,
+                isStarredColumn,
             ]
         )
     }
@@ -5654,7 +5744,8 @@ class TSInteractionSerializer: SDSSerializer {
         let expireTimerVersion: UInt32? = nil
         let isSmsMessageRestoredFromBackup: Bool? = nil
         let isPoll: Bool? = nil
+        let isStarred: Bool? = nil
 
-        return InteractionRecord(delegate: model, id: id, recordType: recordType, uniqueId: uniqueId, receivedAtTimestamp: receivedAtTimestamp, timestamp: timestamp, threadUniqueId: threadUniqueId, deprecated_attachmentIds: deprecated_attachmentIds, authorId: authorId, authorPhoneNumber: authorPhoneNumber, authorUUID: authorUUID, body: body, callType: callType, configurationDurationSeconds: configurationDurationSeconds, configurationIsEnabled: configurationIsEnabled, contactShare: contactShare, createdByRemoteName: createdByRemoteName, createdInExistingGroup: createdInExistingGroup, customMessage: customMessage, envelopeData: envelopeData, errorType: errorType, expireStartedAt: expireStartedAt, expiresAt: expiresAt, expiresInSeconds: expiresInSeconds, groupMetaMessage: groupMetaMessage, hasLegacyMessageState: hasLegacyMessageState, hasSyncedTranscript: hasSyncedTranscript, wasNotCreatedLocally: wasNotCreatedLocally, isLocalChange: isLocalChange, isViewOnceComplete: isViewOnceComplete, isViewOnceMessage: isViewOnceMessage, isVoiceMessage: isVoiceMessage, legacyMessageState: legacyMessageState, legacyWasDelivered: legacyWasDelivered, linkPreview: linkPreview, messageId: messageId, messageSticker: messageSticker, messageType: messageType, mostRecentFailureText: mostRecentFailureText, preKeyBundle: preKeyBundle, protocolVersion: protocolVersion, quotedMessage: quotedMessage, read: read, recipientAddress: recipientAddress, recipientAddressStates: recipientAddressStates, sender: sender, serverTimestamp: serverTimestamp, deprecated_sourceDeviceId: deprecated_sourceDeviceId, storedMessageState: storedMessageState, storedShouldStartExpireTimer: storedShouldStartExpireTimer, unregisteredAddress: unregisteredAddress, verificationState: verificationState, wasReceivedByUD: wasReceivedByUD, infoMessageUserInfo: infoMessageUserInfo, wasRemotelyDeleted: wasRemotelyDeleted, bodyRanges: bodyRanges, offerType: offerType, serverDeliveryTimestamp: serverDeliveryTimestamp, eraId: eraId, hasEnded: hasEnded, creatorUuid: creatorUuid, joinedMemberUuids: joinedMemberUuids, wasIdentityVerified: wasIdentityVerified, paymentCancellation: paymentCancellation, paymentNotification: paymentNotification, paymentRequest: paymentRequest, viewed: viewed, serverGuid: serverGuid, storyAuthorUuidString: storyAuthorUuidString, storyTimestamp: storyTimestamp, isGroupStoryReply: isGroupStoryReply, storyReactionEmoji: storyReactionEmoji, giftBadge: giftBadge, editState: editState, archivedPaymentInfo: archivedPaymentInfo, expireTimerVersion: expireTimerVersion, isSmsMessageRestoredFromBackup: isSmsMessageRestoredFromBackup, isPoll: isPoll)
+        return InteractionRecord(delegate: model, id: id, recordType: recordType, uniqueId: uniqueId, receivedAtTimestamp: receivedAtTimestamp, timestamp: timestamp, threadUniqueId: threadUniqueId, deprecated_attachmentIds: deprecated_attachmentIds, authorId: authorId, authorPhoneNumber: authorPhoneNumber, authorUUID: authorUUID, body: body, callType: callType, configurationDurationSeconds: configurationDurationSeconds, configurationIsEnabled: configurationIsEnabled, contactShare: contactShare, createdByRemoteName: createdByRemoteName, createdInExistingGroup: createdInExistingGroup, customMessage: customMessage, envelopeData: envelopeData, errorType: errorType, expireStartedAt: expireStartedAt, expiresAt: expiresAt, expiresInSeconds: expiresInSeconds, groupMetaMessage: groupMetaMessage, hasLegacyMessageState: hasLegacyMessageState, hasSyncedTranscript: hasSyncedTranscript, wasNotCreatedLocally: wasNotCreatedLocally, isLocalChange: isLocalChange, isViewOnceComplete: isViewOnceComplete, isViewOnceMessage: isViewOnceMessage, isVoiceMessage: isVoiceMessage, legacyMessageState: legacyMessageState, legacyWasDelivered: legacyWasDelivered, linkPreview: linkPreview, messageId: messageId, messageSticker: messageSticker, messageType: messageType, mostRecentFailureText: mostRecentFailureText, preKeyBundle: preKeyBundle, protocolVersion: protocolVersion, quotedMessage: quotedMessage, read: read, recipientAddress: recipientAddress, recipientAddressStates: recipientAddressStates, sender: sender, serverTimestamp: serverTimestamp, deprecated_sourceDeviceId: deprecated_sourceDeviceId, storedMessageState: storedMessageState, storedShouldStartExpireTimer: storedShouldStartExpireTimer, unregisteredAddress: unregisteredAddress, verificationState: verificationState, wasReceivedByUD: wasReceivedByUD, infoMessageUserInfo: infoMessageUserInfo, wasRemotelyDeleted: wasRemotelyDeleted, bodyRanges: bodyRanges, offerType: offerType, serverDeliveryTimestamp: serverDeliveryTimestamp, eraId: eraId, hasEnded: hasEnded, creatorUuid: creatorUuid, joinedMemberUuids: joinedMemberUuids, wasIdentityVerified: wasIdentityVerified, paymentCancellation: paymentCancellation, paymentNotification: paymentNotification, paymentRequest: paymentRequest, viewed: viewed, serverGuid: serverGuid, storyAuthorUuidString: storyAuthorUuidString, storyTimestamp: storyTimestamp, isGroupStoryReply: isGroupStoryReply, storyReactionEmoji: storyReactionEmoji, giftBadge: giftBadge, editState: editState, archivedPaymentInfo: archivedPaymentInfo, expireTimerVersion: expireTimerVersion, isSmsMessageRestoredFromBackup: isSmsMessageRestoredFromBackup, isPoll: isPoll, isStarred: isStarred)
     }
 }

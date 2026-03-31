@@ -22,7 +22,7 @@ public protocol VersionedProfiles: AnyObject {
     func clearProfileKeyCredential(for aci: Aci, transaction: DBWriteTransaction)
 
     func clearProfileKeyCredentials(transaction: DBWriteTransaction)
-
+    
     func updateProfile(
         profileGivenName: OWSUserProfile.NameComponent?,
         profileFamilyName: OWSUserProfile.NameComponent?,
@@ -34,9 +34,22 @@ public protocol VersionedProfiles: AnyObject {
         authedAccount: AuthedAccount
     ) async throws -> VersionedProfileUpdate
 
+    func updateProfileWithProfileKeyVersion(
+        _ profileKeyVersion: String,
+        profileGivenName: OWSUserProfile.NameComponent?,
+        profileFamilyName: OWSUserProfile.NameComponent?,
+        profileBio: String?,
+        profileBioEmoji: String?,
+        profileAvatarMutation: VersionedProfileAvatarMutation,
+        visibleBadgeIds: [String],
+        profileKey: Aes256Key,
+        authedAccount: AuthedAccount,
+    ) async throws -> VersionedProfileUpdate
+
     func versionedProfileRequest(
         for aci: Aci,
         profileKey: ProfileKey,
+        profileKeyVersion: String?,
         shouldRequestCredential: Bool,
         udAccessKey: SMKUDAccessKey?,
         auth: ChatServiceAuth
@@ -83,6 +96,7 @@ public class MockVersionedProfiles: VersionedProfiles {
     public func versionedProfileRequest(
         for aci: Aci,
         profileKey: ProfileKey,
+        profileKeyVersion: String?,
         shouldRequestCredential: Bool,
         udAccessKey: SMKUDAccessKey?,
         auth: ChatServiceAuth
@@ -101,6 +115,20 @@ public class MockVersionedProfiles: VersionedProfiles {
         visibleBadgeIds: [String],
         profileKey: Aes256Key,
         authedAccount: AuthedAccount
+    ) async throws -> VersionedProfileUpdate {
+        owsFail("Not implemented.")
+    }
+    
+    public func updateProfileWithProfileKeyVersion(
+        _ profileKeyVersion: String,
+        profileGivenName: OWSUserProfile.NameComponent?,
+        profileFamilyName: OWSUserProfile.NameComponent?,
+        profileBio: String?,
+        profileBioEmoji: String?,
+        profileAvatarMutation: VersionedProfileAvatarMutation,
+        visibleBadgeIds: [String],
+        profileKey: Aes256Key,
+        authedAccount: AuthedAccount,
     ) async throws -> VersionedProfileUpdate {
         owsFail("Not implemented.")
     }

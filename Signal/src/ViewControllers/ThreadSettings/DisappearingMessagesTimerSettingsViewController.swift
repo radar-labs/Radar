@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-import SignalServiceKit
+@preconcurrency import SignalServiceKit
 import SignalUI
 import SwiftUI
 

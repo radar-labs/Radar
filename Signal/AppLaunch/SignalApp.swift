@@ -360,6 +360,12 @@ extension SignalApp {
         ProvisioningController.presentProvisioningFlow(appReadiness: appReadiness)
         conversationSplitViewController = nil
     }
+    
+    @MainActor
+    func showRelinking(appReadiness: AppReadinessSetter) {
+        ProvisioningController.presentRelinkingFlow(appReadiness: appReadiness)
+        conversationSplitViewController = nil
+    }
 }
 
 extension SignalApp {

@@ -6007,8 +6007,8 @@
 /* Payments in-chat message shown if a payment fails to send, bottom half. */
 "PAYMENTS_IN_CHAT_FAILURE_MESSAGE_BOTTOM" = "Tocca per i dettagli";
 
-/* Payments in-chat message shown if a payment fails to send, top part. Embeds {{ number, amount of MOB coin not sent }} */
-"PAYMENTS_IN_CHAT_FAILURE_MESSAGE_TOP" = "%1$@ MOB non inviati";
+/* Payments in-chat message shown if a payment fails to send, top part. Embeds {{ number, amount of BTC coin not sent }} */
+"PAYMENTS_IN_CHAT_FAILURE_MESSAGE_TOP" = "%1$@ BTC non inviati";
 
 /* Status indicator for invalid payments which could not be processed. */
 "PAYMENTS_INFO_UNAVAILABLE_MESSAGE" = "NON DISPONIBILE";
@@ -6092,10 +6092,10 @@
 "PAYMENTS_NEW_PAYMENT_ERROR_CONNECTIVITY_FAILURE" = "Impossibile contattare il servizio";
 
 /* Indicates that a payment failed due to insufficient funds. */
-"PAYMENTS_NEW_PAYMENT_ERROR_INSUFFICIENT_FUNDS" = "Non hai abbastanza MOB per completare questo pagamento.";
+"PAYMENTS_NEW_PAYMENT_ERROR_INSUFFICIENT_FUNDS" = "Non hai abbastanza BTC per completare questo pagamento.";
 
 /* Indicates that a payment failed due to insufficient funds. Embeds {{ current balance }}. */
-"PAYMENTS_NEW_PAYMENT_ERROR_INSUFFICIENT_FUNDS_FORMAT" = "Non hai abbastanza MOB per completare questo pagamento. Il tuo saldo attuale è %1$@.";
+"PAYMENTS_NEW_PAYMENT_ERROR_INSUFFICIENT_FUNDS_FORMAT" = "Non hai abbastanza BTC per completare questo pagamento. Il tuo saldo attuale è %1$@.";
 
 /* Indicates that a payment failed due to being invalid. */
 "PAYMENTS_NEW_PAYMENT_ERROR_INVALID_TRANSACTION" = "Transazione non valida";
@@ -8009,7 +8009,7 @@
 "SETTINGS_PAYMENTS_ADD_MONEY" = "Aggiungi fondi";
 
 /* Explanation of the process for adding money in the 'add money' settings view. */
-"SETTINGS_PAYMENTS_ADD_MONEY_DESCRIPTION" = "Per aggiungere fondi, invia MobileCoin all'indirizzo del tuo portafoglio. Avvia una transazione dal tuo account su un exchange che supporta MobileCoin, quindi scansiona il codice QR o copia l'indirizzo del tuo portafoglio.";
+"SETTINGS_PAYMENTS_ADD_MONEY_DESCRIPTION" = "Per aggiungere fondi, invia Bitcoin over Lightning all'indirizzo del tuo portafoglio. Avvia una transazione dal tuo account su un exchange che supporta Bitcoin over Lightning, quindi scansiona il codice QR o copia l'indirizzo del tuo portafoglio.";
 
 /* Indicator that the payments wallet address has been copied to the pasteboard. */
 "SETTINGS_PAYMENTS_ADD_MONEY_WALLET_ADDRESS_COPIED" = "Indirizzo del portafoglio copiato";
@@ -8216,7 +8216,7 @@
 "SETTINGS_PAYMENTS_PAYMENT_DETAILS_STATUS_FOOTER_DEFRAGMENTATION" = "Una \"commissione per la pulizia delle monete\" viene addebitata quando le monete in tuo possesso non possono essere combinate per completare una transazione. La pulizia ti consentirà di continuare a inviare pagamenti.";
 
 /* Message for the 'insufficient balance for payment' alert. Embeds: {{ The current payments balance }}. */
-"SETTINGS_PAYMENTS_PAYMENT_INSUFFICIENT_BALANCE_ALERT_MESSAGE_FORMAT" = "Non hai abbastanza MOB per completare questo pagamento. Il tuo saldo attuale è %1$@.";
+"SETTINGS_PAYMENTS_PAYMENT_INSUFFICIENT_BALANCE_ALERT_MESSAGE_FORMAT" = "Non hai abbastanza BTC per completare questo pagamento. Il tuo saldo attuale è %1$@.";
 
 /* Title for the 'insufficient balance for payment' alert. */
 "SETTINGS_PAYMENTS_PAYMENT_INSUFFICIENT_BALANCE_ALERT_TITLE" = "Saldo insufficiente";
@@ -8417,7 +8417,7 @@
 "SETTINGS_PAYMENTS_TRANSFER_OUT_PLACEHOLDER" = "A: Scansiona o inserisci l'indirizzo del portafoglio";
 
 /* Label for 'transfer currency out' view in the payment settings. */
-"SETTINGS_PAYMENTS_TRANSFER_OUT_TITLE" = "Trasferisci all'exchange";
+"SETTINGS_PAYMENTS_TRANSFER_OUT_TITLE" = "Trasferimento a esterno";
 
 /* Label for the 'transfer to exchange' button in the payment settings. */
 "SETTINGS_PAYMENTS_TRANSFER_TO_EXCHANGE" = "Trasferisci all'exchange";

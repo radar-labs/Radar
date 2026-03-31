@@ -6007,8 +6007,8 @@
 /* Payments in-chat message shown if a payment fails to send, bottom half. */
 "PAYMENTS_IN_CHAT_FAILURE_MESSAGE_BOTTOM" = "A részletekért koppints";
 
-/* Payments in-chat message shown if a payment fails to send, top part. Embeds {{ number, amount of MOB coin not sent }} */
-"PAYMENTS_IN_CHAT_FAILURE_MESSAGE_TOP" = "%1$@ MOB nincs elküldve";
+/* Payments in-chat message shown if a payment fails to send, top part. Embeds {{ number, amount of BTC coin not sent }} */
+"PAYMENTS_IN_CHAT_FAILURE_MESSAGE_TOP" = "%1$@ BTC nincs elküldve";
 
 /* Status indicator for invalid payments which could not be processed. */
 "PAYMENTS_INFO_UNAVAILABLE_MESSAGE" = "NEM ÉRHETŐ EL";
@@ -6092,10 +6092,10 @@
 "PAYMENTS_NEW_PAYMENT_ERROR_CONNECTIVITY_FAILURE" = "Sikertelen kapcsolódás a szolgáltatáshoz";
 
 /* Indicates that a payment failed due to insufficient funds. */
-"PAYMENTS_NEW_PAYMENT_ERROR_INSUFFICIENT_FUNDS" = "Nincs elég MOB a birtokodban ehhez a kifizetéshez.";
+"PAYMENTS_NEW_PAYMENT_ERROR_INSUFFICIENT_FUNDS" = "Nincs elég BTC a birtokodban ehhez a kifizetéshez.";
 
 /* Indicates that a payment failed due to insufficient funds. Embeds {{ current balance }}. */
-"PAYMENTS_NEW_PAYMENT_ERROR_INSUFFICIENT_FUNDS_FORMAT" = "Nincs elég MOB a birtokodban ehhez a kifizetéshez. Az aktuális egyenleged: %1$@.";
+"PAYMENTS_NEW_PAYMENT_ERROR_INSUFFICIENT_FUNDS_FORMAT" = "Nincs elég BTC a birtokodban ehhez a kifizetéshez. Az aktuális egyenleged: %1$@.";
 
 /* Indicates that a payment failed due to being invalid. */
 "PAYMENTS_NEW_PAYMENT_ERROR_INVALID_TRANSACTION" = "Érvénytelen tranzakció";
@@ -8009,7 +8009,7 @@
 "SETTINGS_PAYMENTS_ADD_MONEY" = "Alaptőke hozzáadása";
 
 /* Explanation of the process for adding money in the 'add money' settings view. */
-"SETTINGS_PAYMENTS_ADD_MONEY_DESCRIPTION" = "Adj hozzá alaptőkét, küldj Mobilecoin valutát a tárcád címére. Indíts egy tranzakciót egy Mobilecoin valutát támogató tözsdefiók alól, majd olvasd be a QR kódot, vagy másold be tárcád címét.";
+"SETTINGS_PAYMENTS_ADD_MONEY_DESCRIPTION" = "Adj hozzá alaptőkét, küldj Bitcoin over Lightning valutát a tárcád címére. Indíts egy tranzakciót egy Bitcoin over Lightning valutát támogató tözsdefiók alól, majd olvasd be a QR kódot, vagy másold be tárcád címét.";
 
 /* Indicator that the payments wallet address has been copied to the pasteboard. */
 "SETTINGS_PAYMENTS_ADD_MONEY_WALLET_ADDRESS_COPIED" = "Tárca cím másolva";
@@ -8216,7 +8216,7 @@
 "SETTINGS_PAYMENTS_PAYMENT_DETAILS_STATUS_FOOTER_DEFRAGMENTATION" = "A “coin rendbetételi díj ” akkor kerül felszámolásra, ha a birtokodban lévő coinok nem kombinálhatók egy tranzakció teljesítéséhez. A rendbetétel lehetővé teszi, hogy folytasd a fizetések küldését.";
 
 /* Message for the 'insufficient balance for payment' alert. Embeds: {{ The current payments balance }}. */
-"SETTINGS_PAYMENTS_PAYMENT_INSUFFICIENT_BALANCE_ALERT_MESSAGE_FORMAT" = "Nincs elég MOB a birtokodban ehhez a kifizetéshez. Az aktuális egyenleged: %1$@.";
+"SETTINGS_PAYMENTS_PAYMENT_INSUFFICIENT_BALANCE_ALERT_MESSAGE_FORMAT" = "Nincs elég BTC a birtokodban ehhez a kifizetéshez. Az aktuális egyenleged: %1$@.";
 
 /* Title for the 'insufficient balance for payment' alert. */
 "SETTINGS_PAYMENTS_PAYMENT_INSUFFICIENT_BALANCE_ALERT_TITLE" = "Fedezethiány";
@@ -8417,7 +8417,7 @@
 "SETTINGS_PAYMENTS_TRANSFER_OUT_PLACEHOLDER" = "Ide: tárcacím beírása/beolvasása";
 
 /* Label for 'transfer currency out' view in the payment settings. */
-"SETTINGS_PAYMENTS_TRANSFER_OUT_TITLE" = "Átutalás a tőzsdére";
+"SETTINGS_PAYMENTS_TRANSFER_OUT_TITLE" = "Átvitel külsőre";
 
 /* Label for the 'transfer to exchange' button in the payment settings. */
 "SETTINGS_PAYMENTS_TRANSFER_TO_EXCHANGE" = "Átutalás a tőzsdére";

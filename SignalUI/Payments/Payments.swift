@@ -5,11 +5,14 @@
 
 public import MobileCoin
 public import SignalServiceKit
+public import BreezSdkSpark
 
 @objc
 public protocol Payments: AnyObject {
-
-    func walletAddressBase58() -> String?
+    
+    func walletAddressLNURL() -> String?
+    
+    func walletLightningAddress() -> String?
 
     var shouldShowPaymentsUI: Bool { get }
 
@@ -99,8 +102,7 @@ public protocol SendPaymentRecipient {
 // MARK: -
 
 public protocol PreparedPayment {
-    var transaction: MobileCoin.Transaction { get }
-    var receipt: MobileCoin.Receipt { get }
+    var preparedPayment: PrepareLnurlPayResponse { get }
     var feeAmount: TSPaymentAmount { get }
 }
 
@@ -132,8 +134,12 @@ extension MockPayments: PaymentsSwift {
     }
 
     public var paymentsEntropy: Data? { nil }
-
-    public func walletAddressBase58() -> String? {
+    
+    public func walletAddressLNURL() -> String? {
+        owsFail("Not implemented.")
+    }
+    
+    public func walletLightningAddress() -> String? {
         owsFail("Not implemented.")
     }
 
