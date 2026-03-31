@@ -88,7 +88,6 @@ SPEC REPOS:
     - libwebp
     - Logging
     - lottie-ios
-    - MnemonicSwift
     - PureLayout
     - Reachability
     - SDWebImage
