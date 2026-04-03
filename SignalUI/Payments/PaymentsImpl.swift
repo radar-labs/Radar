@@ -41,6 +41,7 @@ public class PaymentsImpl: NSObject, PaymentsSwift {
         self.appReadiness = appReadiness
         self.paymentsReconciliation = PaymentsReconciliation(appReadiness: appReadiness)
         self.paymentsProcessor = PaymentsProcessor(appReadiness: appReadiness)
+        self.currentSdk = SetOnce<BreezSdk>()
         super.init()
         
         self.onIncommingTransactionNotificationProcessing = NotificationCenter.default.addObserver(name: Notification.Name("processIncomingPaymentNotification")) { _ in
@@ -144,12 +145,12 @@ public class PaymentsImpl: NSObject, PaymentsSwift {
         }
     }
 
-    private var currentSdk: BreezSdk?
+    private var currentSdk: SetOnce<BreezSdk>
 
     public func didReceiveMCAuthError() {}
 
     private func getOrBuildBreezSdk(paymentsEntropy: Data) async throws -> BreezSdk {
-        if let sdk = self.currentSdk {
+        if let sdk = self.currentSdk.value {
             return sdk
         }
 
@@ -157,18 +158,27 @@ public class PaymentsImpl: NSObject, PaymentsSwift {
         let seed = Seed.entropy(paymentsEntropy)
         do {
             // FIXME: Move out into helper function
-            let documentsDirectory = try FileManager.default.url(
+            let fileManager = FileManager.default
+            let documentsDirectory = try fileManager.url(
                 for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
             let breezDirectory = documentsDirectory.appendingPathComponent(
                 "breez",
                 isDirectory: true
             )
 
+            if !fileManager.fileExists(atPath: breezDirectory.path) {
+                try fileManager.createDirectory(atPath: breezDirectory.path, withIntermediateDirectories: true)
+            }
+
             let builder = SdkBuilder(config: config, seed: seed)
             await builder.withDefaultStorage(storageDir: breezDirectory.path)
 
+            if let sdk = self.currentSdk.value {
+                return sdk
+            }
+
             let sdk = try await builder.build()
-            self.currentSdk = sdk
+            self.currentSdk.setOnce(sdk)
 
             let lightningAddress = try await sdk.getLightningAddress()
 

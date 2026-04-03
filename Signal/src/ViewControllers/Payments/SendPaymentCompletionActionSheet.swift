@@ -674,7 +674,11 @@ public class SendPaymentCompletionActionSheet: ActionSheetController {
         DispatchQueue.main.asyncAfter(deadline: .now() + Self.autoDismissDelay) { [weak self] in
             guard let self = self else { return }
             self.dismiss(animated: true) {
-                PaymentActionSheets.showBiometryAuthFailedActionSheet { _ in
+                OWSActionSheets.showActionSheet(
+                    title: "Failed to send payment",
+                    message: error.localizedDescription,
+                    buttonTitle: CommonStrings.okButton,
+                ) { _ in
                     delegate?.didSendPayment(success: false)
                 }
             }

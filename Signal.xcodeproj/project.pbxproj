@@ -71,6 +71,7 @@
 		05B411252C62845000A1EDBC /* ChatListInboxFilterSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05B411242C62845000A1EDBC /* ChatListInboxFilterSection.swift */; };
 		05FDBC292CD91B31000C87BC /* ChatListContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FDBC282CD91B31000C87BC /* ChatListContainerView.swift */; };
 		0C1A350E2F4DD6B40004353B /* WalletetAddressEditViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C1A350D2F4DD6880004353B /* WalletetAddressEditViewController.swift */; };
+		0CA604BC2F7FEC1B003AE0FD /* SetOnce.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CA604BB2F7FEC18003AE0FD /* SetOnce.swift */; };
 		0CD2A2332F76ACFA008CC3D9 /* BreezSdkConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CD2A2322F76ACF3008CC3D9 /* BreezSdkConfig.swift */; };
 		0CE014267EDFBD2538E940A0 /* Pods_Signal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7FF88FB580BC19B240EEB86A /* Pods_Signal.framework */; };
 		1404D8B3276A353B0068E2F6 /* ChatListViewController+Multiselect.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1404D8B2276A353A0068E2F6 /* ChatListViewController+Multiselect.swift */; };
@@ -3936,6 +3937,7 @@
 		05FDBC282CD91B31000C87BC /* ChatListContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatListContainerView.swift; sourceTree = "<group>"; };
 		0BADD293DAFC82BF3274F0F6 /* Pods_SignalTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_SignalTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		0C1A350D2F4DD6880004353B /* WalletetAddressEditViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletetAddressEditViewController.swift; sourceTree = "<group>"; };
+		0CA604BB2F7FEC18003AE0FD /* SetOnce.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetOnce.swift; sourceTree = "<group>"; };
 		0CD2A2322F76ACF3008CC3D9 /* BreezSdkConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreezSdkConfig.swift; sourceTree = "<group>"; };
 		1404D8B2276A353A0068E2F6 /* ChatListViewController+Multiselect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChatListViewController+Multiselect.swift"; sourceTree = "<group>"; };
 		1466AB272817F7E7003B3D9F /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = en; path = translations/en.lproj/PluralAware.stringsdict; sourceTree = "<group>"; };
@@ -8481,6 +8483,7 @@
 		34A95502271B510400B05242 /* Utils */ = {
 			isa = PBXGroup;
 			children = (
+				0CA604BB2F7FEC18003AE0FD /* SetOnce.swift */,
 				762EBBD12A2FE370002FD28F /* BlockListUIUtils.swift */,
 				F963F817292D7E53007DBBBD /* FormattedNumberField.swift */,
 				F963F819292DA8E2007DBBBD /* FormattedNumberFieldTest.swift */,
@@ -16660,6 +16663,7 @@
 				3402AA73271D9E180084CBAE /* ImageEditorTransform.swift in Sources */,
 				B9F215612A94071F002DCAE0 /* ImageEditorTransformable.swift in Sources */,
 				3402AA6C271D9E180084CBAE /* ImageEditorView.swift in Sources */,
+				0CA604BC2F7FEC1B003AE0FD /* SetOnce.swift in Sources */,
 				7666D54628331E4800A3BDB9 /* ImageEditorViewController+Blur.swift in Sources */,
 				7666D54428331E1100A3BDB9 /* ImageEditorViewController+Draw.swift in Sources */,
 				76995F15283868BD009DD4F4 /* ImageEditorViewController+StrokeWidthSlider.swift in Sources */,
