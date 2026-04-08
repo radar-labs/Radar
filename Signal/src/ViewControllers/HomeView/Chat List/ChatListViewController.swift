@@ -975,7 +975,8 @@ public class ChatListViewController: OWSViewController, HomeTabViewController {
         let formattedAmount = PaymentsFormat.format(paymentAmount: paymentAmount,
                                                     isShortForm: true,
                                                     withCurrencyCode: true,
-                                                    withSpace: true)
+                                                    withSpace: true,
+                                                    isSatoshi: PaymentsImpl.isSatoshiAmountTypeEnabled())
         let format = OWSLocalizedString("PAYMENTS_NOTIFICATION_BANNER_1_WITH_DETAILS_FORMAT",
                                        comment: "Format for the payments notification banner for a single payment notification with details. Embeds: {{ %1$@ the name of the user who sent you the payment, %2$@ the amount of the payment }}.")
         let title = String(format: format, shortName, formattedAmount)

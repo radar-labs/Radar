@@ -61,13 +61,7 @@ class PaymentsTransferInViewController: OWSTableViewController2 {
                 configuration: .smallBorderless(title: CommonStrings.editButton),
                 primaryAction: UIAction { [weak self] _ in
                     let viewController = WalletAddressEditViewController(oldAddress: username) { newUsername throws in
-                        let result = SUIEnvironment.shared.paymentsImplRef.registerUsername(newUsername)
-                        switch result {
-                        case .success(_):
-                            break
-                        case .failure(let error):
-                            throw error
-                        }
+                        try await SUIEnvironment.shared.paymentsImplRef.registerUsername(newUsername)
                     }
                     
                     self?.navigationController?.pushViewController(viewController, animated: true)

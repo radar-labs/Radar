@@ -44,7 +44,7 @@ public class SUIEnvironment: NSObject {
     public func setUp(
         appReadiness: AppReadiness,
         authCredentialManager: any AuthCredentialManager
-    ) {
+    ) async {
         registerCustomFonts()
 
         Theme.performInitialSetup(appReadiness: appReadiness)
@@ -56,7 +56,10 @@ public class SUIEnvironment: NSObject {
             linkPreviewSettingStore: DependenciesBridge.shared.linkPreviewSettingStore,
             tsAccountManager: DependenciesBridge.shared.tsAccountManager
         )
-        self.paymentsRef = PaymentsImpl(appReadiness: appReadiness)
+        let paymentsImpl = PaymentsImpl(appReadiness: appReadiness)
+        await paymentsImpl.initializeAsyncComponents()
+        
+        self.paymentsRef = paymentsImpl
 
         contactsViewHelperRef.performInitialSetup(appReadiness: appReadiness)
         audioSessionRef.performInitialSetup(appReadiness: appReadiness)

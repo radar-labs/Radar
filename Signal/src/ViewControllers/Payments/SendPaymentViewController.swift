@@ -199,45 +199,32 @@ public class SendPaymentViewController: OWSViewController {
 
             return
         }
-
-        let recipientHasPaymentsEnabled = SSKEnvironment.shared.databaseStorageRef.read { transaction in
-            SSKEnvironment.shared.paymentsHelperRef.arePaymentsEnabled(for: recipientAddress, transaction: transaction)
-        }
-        if recipientHasPaymentsEnabled {
-            presentAfterRecipientCheck(
-                presentationMode: presentationMode,
-                delegate: delegate,
-                recipientAddress: recipientAddress,
-                initialPaymentAmount: initialPaymentAmount,
-                isOutgoingTransfer: isOutgoingTransfer,
-                mode: mode
-            )
-        } else {
-            // Check whether recipient can receive payments.
-            ModalActivityIndicatorViewController.presentAsInvisible(fromViewController: fromViewController) { modalActivityIndicator in
-                Task { @MainActor in
-                    do {
-                        guard let serviceId = recipientAddress.serviceId else {
-                            throw ProfileRequestError.notFound
-                        }
-                        let profileFetcher = SSKEnvironment.shared.profileFetcherRef
-                        _ = try await profileFetcher.fetchProfileWithLightningBitcoinAddress(for: serviceId)
-
-                        modalActivityIndicator.dismiss {
-                            Self.presentAfterRecipientCheck(
-                                presentationMode: presentationMode,
-                                delegate: delegate,
-                                recipientAddress: recipientAddress,
-                                initialPaymentAmount: initialPaymentAmount,
-                                isOutgoingTransfer: isOutgoingTransfer,
-                                mode: mode
-                            )
-                        }
-                    } catch {
-                        owsFailDebug("Error: \(error)")
-                        modalActivityIndicator.dismiss {
-                            Self.showRecipientNotEnabledAlert(recipientAddress: recipientAddress)
-                        }
+        
+        // Check whether recipient can receive payments.
+        ModalActivityIndicatorViewController.presentAsInvisible(fromViewController: fromViewController) { modalActivityIndicator in
+            Task { @MainActor in
+                do {
+                    guard let serviceId = recipientAddress.serviceId else {
+                        throw ProfileRequestError.notFound
+                    }
+                    let profileFetcher = SSKEnvironment.shared.profileFetcherRef
+                    let fetchedProfile = try await profileFetcher.fetchProfileWithLightningBitcoinAddress(for: serviceId)
+                    
+                    modalActivityIndicator.dismiss {
+                        Self.presentAfterRecipientCheck(
+                            presentationMode: presentationMode,
+                            delegate: delegate,
+                            recipientAddress: recipientAddress,
+                            profile: fetchedProfile,
+                            initialPaymentAmount: initialPaymentAmount,
+                            isOutgoingTransfer: isOutgoingTransfer,
+                            mode: mode
+                        )
+                    }
+                } catch {
+                    owsFailDebug("Error: \(error)")
+                    modalActivityIndicator.dismiss {
+                        Self.showRecipientNotEnabledAlert(recipientAddress: recipientAddress)
                     }
                 }
             }
@@ -248,18 +235,22 @@ public class SendPaymentViewController: OWSViewController {
         presentationMode: PresentationMode,
         delegate: SendPaymentViewDelegate,
         recipientAddress: SignalServiceAddress,
+        profile: FetchedProfile,
         initialPaymentAmount: TSPaymentAmount? = nil,
         isOutgoingTransfer: Bool,
         mode: SendPaymentMode
     ) {
-        let recipientHasPaymentsEnabled = SSKEnvironment.shared.databaseStorageRef.read { transaction in
-            SSKEnvironment.shared.paymentsHelperRef.arePaymentsEnabled(for: recipientAddress, transaction: transaction)
-        }
-        guard recipientHasPaymentsEnabled else {
+        guard
+            let decryptedProfile = profile.decryptedProfile,
+            let paymentAddress = decryptedProfile.paymentAddress(identityKey: profile.identityKey),
+                paymentAddress.isValid,
+                paymentAddress.currency == .bitcoin,
+                (try? paymentAddress.asAddress())?.isEmpty == false
+        else {
             showRecipientNotEnabledAlert(recipientAddress: recipientAddress)
             return
         }
-
+    
         let recipient: SendPaymentRecipientImpl = .address(address: recipientAddress)
         let view = SendPaymentViewController(
             recipient: recipient,

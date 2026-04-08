@@ -456,7 +456,7 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
             notificationPresenter: NotificationPresenterImpl(),
             incrementalMessageTSAttachmentMigratorFactory: launchContext.incrementalMessageTSAttachmentMigratorFactory
         )
-        SUIEnvironment.shared.setUp(
+        await SUIEnvironment.shared.setUp(
             appReadiness: appReadiness,
             authCredentialManager: dataMigrationContinuation.authCredentialManager
         )

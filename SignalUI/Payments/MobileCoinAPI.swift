@@ -384,7 +384,7 @@ extension MobileCoin.PublicAddress {
 // MARK: -
 
 extension TSPaymentAddress {
-    func asAddress() throws -> String {
+    public func asAddress() throws -> String {
         guard currency == .bitcoin else {
             throw PaymentsError.invalidCurrency
         }

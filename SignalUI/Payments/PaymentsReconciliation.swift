@@ -368,6 +368,29 @@ public class PaymentsReconciliation {
                     throw ReconciliationError.unsavedChanges
                 }
             }
+            
+            if restoredPayments.isEmpty.negated {
+                // An archived payment at this point means there is something from a backup that is now
+                // being populated from the ledger. For each ArchivedPayment matched above, attempt
+                // to rebuild a TSPaymentModel from the matched public keys and spent key image information.
+                for restoredPayment in restoredPayments {
+                    let restoredSpentPayments = restoredSpentPayments[restoredPayment]
+                    let restoredReceivedPayments = restoredReceivedPayments[restoredPayment]
+                    if let paymentModel = buildArchivedPaymentModel(
+                        timestamp: createdTimestamp,
+                        blockActivity: blockActivity,
+                        restoredSpentItems: restoredSpentPayments,
+                        restoredReceivedItems: restoredReceivedPayments,
+                        archivedPayment: restoredPayment
+                    ) {
+                        try insert(model: paymentModel)
+                        databaseState.add(paymentModel: paymentModel)
+                    } else {
+                        unaccountedForSpentItems.append(contentsOf: restoredSpentPayments)
+                        unaccountedForReceivedItems.append(contentsOf: restoredReceivedPayments)
+                    }
+                }
+            }
 
             if !unaccountedForSpentItems.isEmpty || !unaccountedForReceivedItems.isEmpty {
                 let paymentModel = buildPaymentModel(
@@ -474,8 +497,8 @@ public class PaymentsReconciliation {
     private static func buildArchivedPaymentModel(
         timestamp: UInt64,
         blockActivity: BlockActivity,
-        restoredSpentItems: [MCTransactionHistoryItem],
-        restoredReceivedItems: [MCTransactionHistoryItem],
+        restoredSpentItems: [LightningTransactionHistoryItem],
+        restoredReceivedItems: [LightningTransactionHistoryItem],
         archivedPayment: ArchivedPayment
     ) -> TSPaymentModel? {
         let isOutgoing = archivedPayment.direction == .outgoing
@@ -1055,6 +1078,8 @@ public protocol LightningTransactionHistoryItem {
     
     var paymentAmount: TSPaymentAmount { get }
     
+    var amountPicoMob: UInt64 { get }
+    
     var createdDate: Date { get }
     
     var isOutgoing: Bool { get }
@@ -1093,6 +1118,10 @@ extension BreezSdkSpark.Payment: LightningTransactionHistoryItem {
     
     public var paymentAmount: TSPaymentAmount {
         return TSPaymentAmount(currency: .bitcoin, picoMob: UInt64(amount))
+    }
+    
+    public var amountPicoMob: UInt64 {
+        return UInt64(amount)
     }
     
     public var createdDate: Date {
