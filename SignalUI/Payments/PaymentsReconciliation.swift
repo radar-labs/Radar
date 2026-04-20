@@ -72,8 +72,8 @@ public class PaymentsReconciliation {
         guard shouldReconcile(appReadiness: appReadiness) else {
             return
         }
-        
-        let breezSdk = try await SUIEnvironment.shared.paymentsImplRef.getBreezSdk()
+
+        let breezSdk = try SUIEnvironment.shared.paymentsImplRef.getBreezSdk()
         _ = try await breezSdk.syncWallet(request: SyncWalletRequest())
         let listPayments = try await breezSdk.listPayments(request: ListPaymentsRequest())
         await Self.reconcileIfNecessary(transactionHistory: listPayments)

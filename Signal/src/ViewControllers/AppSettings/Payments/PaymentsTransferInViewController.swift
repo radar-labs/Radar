@@ -55,8 +55,8 @@ class PaymentsTransferInViewController: OWSTableViewController2 {
             return cell
         },
         actionBlock: nil))
-        
-        if let username = SUIEnvironment.shared.paymentsImplRef.walletLightningAddressUsername()  {
+
+        if let username = SUIEnvironment.shared.paymentsImplRef.walletLightningAddressUsername  {
             let editButton = UIButton(
                 configuration: .smallBorderless(title: CommonStrings.editButton),
                 primaryAction: UIAction { [weak self] _ in
@@ -130,13 +130,13 @@ class PaymentsTransferInViewController: OWSTableViewController2 {
             configureWithSubviews(subviews: [label])
         }
 
-        guard let lnurl = SUIEnvironment.shared.paymentsRef.walletAddressLNURL() else {
+        guard let lnurl = SUIEnvironment.shared.paymentsRef.walletAddressLNURL else {
             configureForError()
             return
         }
         let walletAddressLnurlData = Data(lnurl.utf8)
-        
-        guard let walletLightningAddress = SUIEnvironment.shared.paymentsRef.walletLightningAddress() else {
+
+        guard let walletLightningAddress = SUIEnvironment.shared.paymentsRef.walletLightningAddress else {
             configureForError()
             return
         }
@@ -200,7 +200,7 @@ class PaymentsTransferInViewController: OWSTableViewController2 {
     private func didTapCopyAddress() {
         AssertIsOnMainThread()
 
-        guard let walletLightningAddress = SUIEnvironment.shared.paymentsRef.walletLightningAddress() else {
+        guard let walletLightningAddress = SUIEnvironment.shared.paymentsRef.walletLightningAddress else {
             owsFailDebug("Missing walletLightningAddress.")
             return
         }
@@ -217,7 +217,7 @@ class PaymentsTransferInViewController: OWSTableViewController2 {
 
     @objc
     private func didTapShare() {
-        guard let walletLightningAddress = SUIEnvironment.shared.paymentsRef.walletLightningAddress() else {
+        guard let walletLightningAddress = SUIEnvironment.shared.paymentsRef.walletLightningAddress else {
             owsFailDebug("Missing walletLightningAddress.")
             return
         }

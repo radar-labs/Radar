@@ -327,7 +327,7 @@ class InternalSettingsViewController: OWSTableViewController2 {
                 if let passphrase = SUIEnvironment.shared.paymentsSwiftRef.passphrase {
                     paymentsSection.add(.copyableItem(label: "Mnemonic", value: passphrase.asPassphrase))
                 }
-                if let lnurl = SUIEnvironment.shared.paymentsSwiftRef.walletAddressLNURL() {
+                if let lnurl = SUIEnvironment.shared.paymentsSwiftRef.walletAddressLNURL {
                     paymentsSection.add(.copyableItem(label: "LNURL", value: lnurl))
                 }
             }

@@ -57,8 +57,8 @@ public class SUIEnvironment: NSObject {
             tsAccountManager: DependenciesBridge.shared.tsAccountManager
         )
         let paymentsImpl = PaymentsImpl(appReadiness: appReadiness)
-        await paymentsImpl.initializeAsyncComponents()
-        
+        await paymentsImpl.initializeComponents(warmCaches: true)
+
         self.paymentsRef = paymentsImpl
 
         contactsViewHelperRef.performInitialSetup(appReadiness: appReadiness)

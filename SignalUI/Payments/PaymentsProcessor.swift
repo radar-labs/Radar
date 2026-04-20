@@ -620,7 +620,7 @@ private class PaymentProcessingOperation {
         }
 
         do {
-            let sdk = try await SUIEnvironment.shared.paymentsImplRef.getBreezSdk()
+            let sdk = try SUIEnvironment.shared.paymentsImplRef.getBreezSdk()
             let paymentResponse = try await sdk.lnurlPay(request: LnurlPayRequest(prepareResponse: prepareLnurlPayResponse))
             try await Self.updatePaymentReceiptData(paymentModel: paymentModel, receiptData: paymentResponse.serializeData())
             try await Self.updatePaymentStatePromise(paymentModel: paymentModel, fromState: .outgoingUnsubmitted, toState: .outgoingUnverified)
@@ -633,22 +633,22 @@ private class PaymentProcessingOperation {
 
     private func verifyOutgoingPayment(paymentModel: TSPaymentModel) async throws {
         owsAssertDebug(paymentModel.paymentState == .outgoingUnverified)
-        
-        let sdk = try await SUIEnvironment.shared.paymentsImplRef.getBreezSdk()
-        
+
+        let sdk = try SUIEnvironment.shared.paymentsImplRef.getBreezSdk()
+
         guard
             let transaction = paymentModel.asLnurlPayResponse()
         else {
             await Self.handleIndeterminatePayment(paymentModel: paymentModel)
             throw PaymentsError.indeterminateState
         }
-        
+
         _ = try await sdk.syncWallet(request: SyncWalletRequest())
         guard let payment = try? await sdk.getPayment(request: GetPaymentRequest(paymentId: transaction.payment.id)).payment else {
             owsFailDebug("Payment with ID: \(transaction.payment.id) not found.")
             return
         }
-        
+
         try await SSKEnvironment.shared.databaseStorageRef.awaitableWrite { transaction in
             switch payment.status {
             case .completed:
@@ -740,24 +740,24 @@ private class PaymentProcessingOperation {
 
     private func verifyIncomingPayment(paymentModel: TSPaymentModel) async throws {
         owsAssertDebug(paymentModel.paymentState == .incomingUnverified)
-        let sdk = try await SUIEnvironment.shared.paymentsImplRef.getBreezSdk()
+        let sdk = try SUIEnvironment.shared.paymentsImplRef.getBreezSdk()
 
         guard let mcReceiptData = paymentModel.mcReceiptData, let receipt = try? LnurlPayResponse.deserialize(from: mcReceiptData) else {
             await Self.handleIndeterminatePayment(paymentModel: paymentModel)
             throw PaymentsError.indeterminateState
         }
-        
+
         _ = try await sdk.syncWallet(request: SyncWalletRequest())
         guard let paymentHash = receipt.payment.hash else {
             owsFailDebug("Payment hash for: \(receipt.payment.id) not found.")
             return
         }
-        
+
         guard let payment = try? await sdk.payment(by: paymentHash) else {
             owsFailDebug("Payment with ID: \(receipt.payment.id) not found.")
             return
         }
-        
+
         try await SSKEnvironment.shared.databaseStorageRef.awaitableWrite { transaction in
             switch payment.status {
             case .pending:
@@ -805,7 +805,7 @@ private class PaymentProcessingOperation {
             paymentModel.update(paymentState: toState, transaction: transaction)
         }
     }
-    
+
     private static func updatePaymentTransactionData(paymentModel: TSPaymentModel, transactionData: Data) async throws {
         try await SSKEnvironment.shared.databaseStorageRef.awaitableWrite { transaction in
             guard let paymentModel = TSPaymentModel.anyFetch(uniqueId: paymentModel.uniqueId, transaction: transaction) else {
@@ -815,7 +815,7 @@ private class PaymentProcessingOperation {
             paymentModel.update(withTransactionData: transactionData, transaction: transaction)
         }
     }
-    
+
     private static func updatePaymentReceiptData(paymentModel: TSPaymentModel, receiptData: Data) async throws {
         try await SSKEnvironment.shared.databaseStorageRef.awaitableWrite { transaction in
             guard let paymentModel = TSPaymentModel.anyFetch(uniqueId: paymentModel.uniqueId, transaction: transaction) else {
@@ -836,10 +836,10 @@ extension TSPaymentModel {
             let type = try? PrepareLnurlPayResponse.deserialize(from: transactionData) else {
                 return nil
             }
-        
+
         return type
     }
-    
+
     func asLnurlPayResponse() -> LnurlPayResponse? {
         guard
             let receiptData = mcReceiptData,
@@ -847,7 +847,7 @@ extension TSPaymentModel {
             let type = try? LnurlPayResponse.deserialize(from: receiptData) else {
                 return nil
             }
-        
+
         return type
     }
 }

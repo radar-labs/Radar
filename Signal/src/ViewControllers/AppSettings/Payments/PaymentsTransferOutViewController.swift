@@ -150,7 +150,7 @@ public class PaymentsTransferOutViewController: OWSTableViewController2 {
             return
         }
         let recipientAddress = PaymentsImpl.format(inputType: inputType)
-        guard let localWalletLightningAddress = SUIEnvironment.shared.paymentsRef.walletLightningAddress(),
+        guard let localWalletLightningAddress = SUIEnvironment.shared.paymentsRef.walletLightningAddress,
               localWalletLightningAddress != recipientAddress else {
             OWSActionSheets.showActionSheet(title: OWSLocalizedString("SETTINGS_PAYMENTS_TRANSFER_OUT_INVALID_PUBLIC_ADDRESS_TITLE",
                                                                      comment: "Title for error alert indicating that Bitcoin over Lightning public address is not valid."),

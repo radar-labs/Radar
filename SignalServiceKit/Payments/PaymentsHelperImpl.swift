@@ -195,8 +195,6 @@ public class PaymentsHelperImpl: PaymentsHelperSwift, PaymentsHelper {
 
         self.paymentStateCache.set(newPaymentsState)
 
-        SSKEnvironment.shared.paymentsEventsRef.updateLastKnownLocalPaymentAddressProtoData(transaction: transaction)
-
         let localAci = DependenciesBridge.shared.tsAccountManager.localIdentifiers(tx: transaction)?.aci
         TSPaymentsActivationRequestModel
             .allThreadsWithPaymentActivationRequests(transaction: transaction)

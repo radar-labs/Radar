@@ -9,10 +9,10 @@ public import BreezSdkSpark
 
 @objc
 public protocol Payments: AnyObject {
-    
-    func walletAddressLNURL() -> String?
-    
-    func walletLightningAddress() -> String?
+
+    var walletAddressLNURL: String? { get }
+
+    var walletLightningAddress: String? { get }
 
     var shouldShowPaymentsUI: Bool { get }
 
@@ -134,14 +134,10 @@ extension MockPayments: PaymentsSwift {
     }
 
     public var paymentsEntropy: Data? { nil }
-    
-    public func walletAddressLNURL() -> String? {
-        owsFail("Not implemented.")
-    }
-    
-    public func walletLightningAddress() -> String? {
-        owsFail("Not implemented.")
-    }
+
+    public var walletAddressLNURL: String? { nil  }
+
+    public var walletLightningAddress: String? { nil }
 
     public var isKillSwitchActive: Bool { false }
 
