@@ -114,8 +114,8 @@ extension ChatListViewController {
         // only perform a beginUpdates/endUpdates block if really necessary, otherwise
         // strange scroll animations may occur
         var tableUpdatesPerformed = false
-        let checkAndSetTableUpdates = { [weak self] in
-            if !tableUpdatesPerformed, let self = self {
+        let checkAndSetTableUpdates = {
+            if !tableUpdatesPerformed {
                 tableView.beginUpdates()
                 // animate all UI changes within the same transaction
                 if tableView.isEditing && !self.viewState.multiSelectState.isActive {
