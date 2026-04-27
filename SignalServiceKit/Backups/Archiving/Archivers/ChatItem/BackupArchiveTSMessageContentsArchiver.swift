@@ -301,7 +301,7 @@ class BackupArchiveTSMessageContentsArchiver: BackupArchiveProtoStreamWriter {
             let amountString = PaymentsFormat.format(
                 picoMob: amount.picoMob,
                 isShortForm: true
-            )
+            )?.replacingOccurrences(of: ",", with: ".")
         {
             paymentNotificationProto.amountMob = amountString
         }
@@ -311,7 +311,7 @@ class BackupArchiveTSMessageContentsArchiver: BackupArchiveProtoStreamWriter {
             let feeString = PaymentsFormat.format(
                 picoMob: fee.picoMob,
                 isShortForm: true
-            )
+            )?.replacingOccurrences(of: ",", with: ".")
         {
             paymentNotificationProto.feeMob = feeString
         }

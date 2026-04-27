@@ -109,11 +109,11 @@ public class PaymentsReconciliation {
     private static func shouldReconcile(transaction: DBReadTransaction,
                                         transactionHistory: LightningTransactionHistory) -> Bool {
 
-        
+
         let lastKnownPaymentsCount = transactionHistory.count
         let lastKnownPaymentId = transactionHistory.lastKnownPaymentId
         let lastKnownPaymentTimestamp = transactionHistory.lastKnownTimestamp
-        
+
         guard lastKnownPaymentsCount == Self.schedulingStore.getUInt64(Self.lastKnownPaymentsCountKey,
                                                                        defaultValue: 0,
                                                                        transaction: transaction) else {
@@ -259,7 +259,7 @@ public class PaymentsReconciliation {
         }
         for (index, item) in items.enumerated() {
             let index = UInt64(index)
-            
+
             if !item.isOutgoing {
                 // Incoming
                 blockActivity(forBlockIndex: index).addReceived(item: item)
@@ -368,7 +368,7 @@ public class PaymentsReconciliation {
                     throw ReconciliationError.unsavedChanges
                 }
             }
-            
+
             if restoredPayments.isEmpty.negated {
                 // An archived payment at this point means there is something from a backup that is now
                 // being populated from the ledger. For each ArchivedPayment matched above, attempt
@@ -965,7 +965,7 @@ internal class PaymentsDatabaseState {
                 spentImageKeyMap[spentImageKey] = .model(paymentModel)
             }
         } else if paymentModel.shouldHaveMCSpentKeyImages {
-//            owsFailDebug("Empty or missing mcSpentKeyImages: \(formattedState).")
+           owsFailDebug("Empty or missing mcSpentKeyImages: \(formattedState).")
         }
 
         if let mcOutputPublicKeys = paymentModel.mcOutputPublicKeys {
@@ -974,7 +974,7 @@ internal class PaymentsDatabaseState {
                 outputPublicKeyMap[outputPublicKeys] = .model(paymentModel)
             }
         } else if paymentModel.shouldHaveMCOutputPublicKeys {
-//            owsFailDebug("Empty or missing mcOutputPublicKeys: \(formattedState).")
+           owsFailDebug("Empty or missing mcOutputPublicKeys: \(formattedState).")
         }
 
         let ledgerBlockIndex = paymentModel.mobileCoin?.ledgerBlockIndex ?? 0
@@ -1071,19 +1071,19 @@ public class MultiMap<KeyType: Hashable, ValueType>: Sequence {
 
 public protocol LightningTransactionHistoryItem {
     var id: String { get }
-    
+
     var hashAsData: Data { get }
-    
+
     var paymentTimestamp: UInt64 { get }
-    
+
     var paymentAmount: TSPaymentAmount { get }
-    
+
     var amountPicoMob: UInt64 { get }
-    
+
     var createdDate: Date { get }
-    
+
     var isOutgoing: Bool { get }
-    
+
     var preimageAsData: Data? { get }
 }
 
@@ -1111,27 +1111,27 @@ extension BreezSdkSpark.Payment: LightningTransactionHistoryItem {
     public var paymentTimestamp: UInt64 {
         return timestamp * 1000
     }
-    
+
     public var hashAsData: Data {
         return hash?.data(using: .utf8) ?? Data()
     }
-    
+
     public var paymentAmount: TSPaymentAmount {
         return TSPaymentAmount(currency: .bitcoin, picoMob: UInt64(amount))
     }
-    
+
     public var amountPicoMob: UInt64 {
         return UInt64(amount)
     }
-    
+
     public var createdDate: Date {
         return Date(timeIntervalSince1970: TimeInterval(paymentTimestamp))
     }
-    
+
     public var isOutgoing: Bool {
         return paymentType == PaymentType.send
     }
-    
+
     public var preimageAsData: Data? {
         switch details {
         case .lightning(_, _, _, let details, _, _, _):
@@ -1148,11 +1148,11 @@ extension BreezSdkSpark.Payment: LightningTransactionHistoryItem {
 
 public protocol LightningTransactionHistory {
     var items: [LightningTransactionHistoryItem] { get }
-    
+
     var count: UInt64 { get }
-    
+
     var lastKnownTimestamp: UInt64 { get }
-    
+
     var lastKnownPaymentId: String { get }
 }
 
@@ -1160,23 +1160,23 @@ extension ListPaymentsResponse: LightningTransactionHistory {
     public var items: [any LightningTransactionHistoryItem] {
         return payments
     }
-    
+
     public var count: UInt64 {
         return UInt64(payments.count)
     }
-    
+
     public var lastKnownTimestamp: UInt64 {
         var timestamp: UInt64 = 0
-        
+
         for payment in self.payments {
             if payment.timestamp > timestamp {
                 timestamp = payment.timestamp
             }
         }
-        
+
         return timestamp
     }
-    
+
     public var lastKnownPaymentId: String {
         self.items.sortedByTimestamp(descending: false).first?.id ?? ""
     }

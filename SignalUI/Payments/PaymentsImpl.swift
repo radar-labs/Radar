@@ -485,7 +485,7 @@ extension PaymentsImpl {
             receiptData: nil,
             incomingTransactionPublicKeys: nil,
             spentKeyImages: [hash],
-            outputPublicKeys: nil,
+            outputPublicKeys: [hash],
             ledgerBlockTimestamp: 0,
             ledgerBlockIndex: 0,
             feeAmount: feeAmount,
