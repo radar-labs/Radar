@@ -137,16 +137,17 @@ public class CLVLoader {
         )
     }
 
-    private static func loadRenderStateAndDiffInternal(viewInfo: CLVViewInfo,
-                                                       updatedItemIds allUpdatedItemIds: Set<String>,
-                                                       lastRenderState: CLVRenderState,
-                                                       transaction: DBReadTransaction) throws -> CLVLoadResult {
+    private static func loadRenderStateAndDiffInternal(
+        viewInfo: CLVViewInfo,
+        updatedItemIds allUpdatedItemIds: Set<String>,
+        lastRenderState: CLVRenderState,
+        transaction: DBReadTransaction
+    ) throws -> CLVLoadResult {
 
         // Ignore updates to non-visible threads.
         var updatedItemIds = Set<String>()
         for threadId in allUpdatedItemIds {
             guard let thread = TSThread.anyFetch(uniqueId: threadId, transaction: transaction) else {
-                // Missing thread, it was deleted and should no longer be visible.
                 continue
             }
             if thread.shouldThreadBeVisible {
@@ -156,6 +157,18 @@ public class CLVLoader {
 
         let newRenderState = try Self.loadRenderStateInternal(viewInfo: viewInfo, transaction: transaction)
 
+        let countsChanged = lastRenderState.pinnedThreadUniqueIds.count != newRenderState.pinnedThreadUniqueIds.count
+            || lastRenderState.unpinnedThreadUniqueIds.count != newRenderState.unpinnedThreadUniqueIds.count
+
+        if countsChanged {
+            return .renderStateForReset(renderState: newRenderState)
+        }
+
+        if lastRenderState.sections.map(\.type) != newRenderState.sections.map(\.type) {
+            return .renderStateForReset(renderState: newRenderState)
+        }
+
+        // Incremental diff is only safe for in-place updates (read state, last message, etc.)
         let oldPinnedThreadIds: [String] = lastRenderState.pinnedThreadUniqueIds
         let oldUnpinnedThreadIds: [String] = lastRenderState.unpinnedThreadUniqueIds
         let newPinnedThreadIds: [String] = newRenderState.pinnedThreadUniqueIds
@@ -163,7 +176,6 @@ public class CLVLoader {
 
         struct CLVBatchUpdateValue: BatchUpdateValue {
             let threadUniqueId: String
-
             var batchUpdateId: String { threadUniqueId }
         }
 
@@ -175,21 +187,19 @@ public class CLVLoader {
         let pinnedChangedValues = newPinnedValues.filter { updatedItemIds.contains($0.threadUniqueId) }
         let unpinnedChangedValues = newUnpinnedValues.filter { updatedItemIds.contains($0.threadUniqueId) }
 
-        let pinnedBatchUpdateItems: [BatchUpdate.Item] = try BatchUpdate.build(viewType: .uiTableView,
-                                                                               oldValues: oldPinnedValues,
-                                                                               newValues: newPinnedValues,
-                                                                               changedValues: pinnedChangedValues)
-        let unpinnedBatchUpdateItems: [BatchUpdate.Item] = try BatchUpdate.build(viewType: .uiTableView,
-                                                                                 oldValues: oldUnpinnedValues,
-                                                                                 newValues: newUnpinnedValues,
-                                                                                 changedValues: unpinnedChangedValues)
+        let pinnedBatchUpdateItems: [BatchUpdate.Item] = try BatchUpdate.build(
+            viewType: .uiTableView,
+            oldValues: oldPinnedValues,
+            newValues: newPinnedValues,
+            changedValues: pinnedChangedValues
+        )
+        let unpinnedBatchUpdateItems: [BatchUpdate.Item] = try BatchUpdate.build(
+            viewType: .uiTableView,
+            oldValues: oldUnpinnedValues,
+            newValues: newUnpinnedValues,
+            changedValues: unpinnedChangedValues
+        )
 
-        /// For a given batch update, build a `CLVRowChangeType` with an
-        /// `IndexPath` in the appropriate section.
-        ///
-        /// The section index is looked up dynamically based on change type, from
-        /// either the new or old render state (e.g., deletes use old index paths
-        /// while insertions use new index paths).
         func rowChangeType(forBatchUpdateType batchUpdateType: BatchUpdateType, section: (CLVRenderState) -> Int) -> CLVRowChangeType {
             switch batchUpdateType {
             case .delete(let oldIndex):
@@ -218,45 +228,7 @@ public class CLVLoader {
         let pinnedRowChanges = rowChanges(forBatchUpdateItems: pinnedBatchUpdateItems, section: { $0.sectionIndex(for: .pinned)! })
         let unpinnedRowChanges = rowChanges(forBatchUpdateItems: unpinnedBatchUpdateItems, section: { $0.sectionIndex(for: .unpinned)! })
 
-        var allRowChanges = pinnedRowChanges + unpinnedRowChanges
-
-        // The "row change" logic above deals with the .pinned and
-        // .unpinned sections separately.
-        //
-        // We need to special-case one kind of update: pinning and
-        // unpinning, where a thread moves from one section to the
-        // other.
-        if pinnedRowChanges.count == 1,
-           let pinnedRowChange = pinnedRowChanges.first,
-           unpinnedRowChanges.count == 1,
-           let unpinnedRowChange = unpinnedRowChanges.first,
-           pinnedRowChange.threadUniqueId == unpinnedRowChange.threadUniqueId {
-
-            switch pinnedRowChange.type {
-            case .delete(let oldIndexPath):
-                switch unpinnedRowChange.type {
-                case .insert(let newIndexPath):
-                    // Unpin: Move from .pinned to .unpinned section.
-                    allRowChanges = [CLVRowChange(type: .move(oldIndexPath: oldIndexPath,
-                                                             newIndexPath: newIndexPath),
-                                                 threadUniqueId: pinnedRowChange.threadUniqueId)]
-                default:
-                    owsFailDebug("Unexpected changes. pinnedRowChange: \(pinnedRowChange)")
-                }
-            case .insert(let newIndexPath):
-                switch unpinnedRowChange.type {
-                case .delete(let oldIndexPath):
-                    // Pin: Move from .unpinned to .pinned section.
-                    allRowChanges = [CLVRowChange(type: .move(oldIndexPath: oldIndexPath,
-                                                             newIndexPath: newIndexPath),
-                                                 threadUniqueId: pinnedRowChange.threadUniqueId)]
-                default:
-                    owsFailDebug("Unexpected changes. pinnedRowChange: \(pinnedRowChange)")
-                }
-            default:
-                owsFailDebug("Unexpected changes. pinnedRowChange: \(pinnedRowChange)")
-            }
-        }
+        let allRowChanges = pinnedRowChanges + unpinnedRowChanges
 
         return .renderStateWithRowChanges(renderState: newRenderState, rowChanges: allRowChanges)
     }

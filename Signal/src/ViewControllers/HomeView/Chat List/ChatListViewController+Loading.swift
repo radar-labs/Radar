@@ -4,6 +4,7 @@
 //
 
 public import SignalServiceKit
+import UIKit
 
 extension ChatListViewController {
     public var isViewVisible: Bool {
@@ -40,8 +41,10 @@ extension ChatListViewController {
 
     // MARK: -
 
-    fileprivate func loadRenderStateForReset(viewInfo: CLVViewInfo,
-                                             transaction: DBReadTransaction) -> CLVLoadResult {
+    fileprivate func loadRenderStateForReset(
+        viewInfo: CLVViewInfo,
+        transaction: DBReadTransaction,
+    ) -> CLVLoadResult {
         AssertIsOnMainThread()
 
         return CLVLoader.loadRenderStateForReset(viewInfo: viewInfo, transaction: transaction)
@@ -52,15 +55,19 @@ extension ChatListViewController {
         return CLVLoader.newRenderStateWithViewInfo(viewInfo, lastRenderState: renderState)
     }
 
-    fileprivate func loadNewRenderStateWithDiff(viewInfo: CLVViewInfo,
-                                                updatedThreadIds: Set<String>,
-                                                transaction: DBReadTransaction) -> CLVLoadResult {
+    fileprivate func loadNewRenderStateWithDiff(
+        viewInfo: CLVViewInfo,
+        updatedThreadIds: Set<String>,
+        transaction: DBReadTransaction,
+    ) -> CLVLoadResult {
         AssertIsOnMainThread()
 
-        return CLVLoader.loadRenderStateAndDiff(viewInfo: viewInfo,
-                                               updatedItemIds: updatedThreadIds,
-                                               lastRenderState: renderState,
-                                               transaction: transaction)
+        return CLVLoader.loadRenderStateAndDiff(
+            viewInfo: viewInfo,
+            updatedItemIds: updatedThreadIds,
+            lastRenderState: renderState,
+            transaction: transaction,
+        )
     }
 
     fileprivate func applyLoadResult(_ loadResult: CLVLoadResult, animated: Bool) {
@@ -93,11 +100,23 @@ extension ChatListViewController {
         viewState.updateViewInfo(renderState.viewInfo)
     }
 
-    fileprivate func applyRowChanges(_ rowChanges: [CLVRowChange], renderState: CLVRenderState, animated: Bool) {
+    private func applyRowChanges(_ rowChanges: [CLVRowChange], renderState: CLVRenderState, animated: Bool) {
         AssertIsOnMainThread()
 
         let previousRenderState = tableDataSource.renderState
-        tableDataSource.renderState = renderState
+
+        guard validateDiffConsistency(
+            previousState: previousRenderState,
+            newState: renderState,
+            rowChanges: rowChanges
+        ) else {
+            tableDataSource.renderState = renderState
+            threadViewModelCache.clear()
+            cellContentCache.clear()
+            conversationCellHeightCache = nil
+            tableView.reloadData()
+            return
+        }
 
         let sectionChanges = renderState.sections
             .difference(from: previousRenderState.sections)
@@ -111,23 +130,17 @@ extension ChatListViewController {
         let filterChangeAnimation = animated ? UITableView.RowAnimation.fade : .none
         let defaultRowAnimation = animated ? UITableView.RowAnimation.automatic : .none
 
-        // only perform a beginUpdates/endUpdates block if really necessary, otherwise
-        // strange scroll animations may occur
         var tableUpdatesPerformed = false
         let checkAndSetTableUpdates = {
             if !tableUpdatesPerformed {
                 tableView.beginUpdates()
-                // animate all UI changes within the same transaction
-                if tableView.isEditing && !self.viewState.multiSelectState.isActive {
+                if tableView.isEditing, !self.viewState.multiSelectState.isActive {
                     tableView.setEditing(false, animated: true)
                 }
                 tableUpdatesPerformed = true
             }
         }
 
-        // As soon as structural changes are applied to the table we can not use our optimized update implementation
-        // anymore. All indexPaths are based on the old model (before any change was applied) and if we
-        // animate move, insert and delete changes the indexPaths of the to be updated rows will differ.
         var useFallBackUpdateMechanism = false
 
         if !sectionChanges.removals.isEmpty {
@@ -151,19 +164,13 @@ extension ChatListViewController {
                 checkAndSetTableUpdates()
                 tableView.deleteRows(at: [oldIndexPath], with: isChangingFilter ? filterChangeAnimation : defaultRowAnimation)
                 useFallBackUpdateMechanism = true
+
             case .insert(let newIndexPath):
                 checkAndSetTableUpdates()
                 tableView.insertRows(at: [newIndexPath], with: isChangingFilter ? filterChangeAnimation : defaultRowAnimation)
                 useFallBackUpdateMechanism = true
+
             case .move(let oldIndexPath, let newIndexPath):
-                // NOTE: if we're moving within the same section, we perform
-                //       moves using a "delete" and "insert" rather than a "move".
-                //       This ensures that moved items are also reloaded. This is
-                //       how UICollectionView performs reloads internally. We can't
-                //       do this when changing sections, because it results in a weird
-                //       animation. This should generally be safe, because you'll only
-                //       move between sections when pinning / unpinning which doesn't
-                //       require the moved item to be reloaded.
                 checkAndSetTableUpdates()
                 if oldIndexPath.section != newIndexPath.section {
                     tableView.moveRow(at: oldIndexPath, to: newIndexPath)
@@ -172,8 +179,9 @@ extension ChatListViewController {
                     tableView.insertRows(at: [newIndexPath], with: defaultRowAnimation)
                 }
                 useFallBackUpdateMechanism = true
+
             case .update(let oldIndexPath):
-                if tableView.isEditing && !viewState.multiSelectState.isActive {
+                if tableView.isEditing, !viewState.multiSelectState.isActive {
                     checkAndSetTableUpdates()
                 }
 
@@ -181,14 +189,6 @@ extension ChatListViewController {
                     checkAndSetTableUpdates()
                     tableView.reloadRows(at: [oldIndexPath], with: .none)
                 } else if let tableDataSource = tableView.dataSource as? CLVTableDataSource {
-                    // If we can, we'll do an in-place update to the cell rather
-                    // than call `reloadRows`, to avoid what can be a disruptive
-                    // re-layout of the chat list.
-                    //
-                    // This optimization is particularly important when there are
-                    // many rapid-fire chat-list-cell updates needed, such as when
-                    // fetching avatars after a Backup restore. (See:
-                    // `BackupArchiveAvatarFetcher`.)
                     tableDataSource.updateCellContent(at: oldIndexPath, for: tableView)
                 } else {
                     owsFailDebug("Failed to apply row update: unexpectedly missing table data source!")
@@ -200,9 +200,10 @@ extension ChatListViewController {
             checkAndSetTableUpdates()
 
             for (_, sectionUpdate) in sectionChanges.updates {
-                guard let rowChanges = renderState
-                    .sectionDifference(for: sectionUpdate.element, from: previousRenderState)?
-                    .batchedChanges()
+                guard
+                    let rowChanges = renderState
+                        .sectionDifference(for: sectionUpdate.element, from: previousRenderState)?
+                        .batchedChanges()
                 else { continue }
 
                 let sectionIndex = sectionUpdate.offset
@@ -210,21 +211,11 @@ extension ChatListViewController {
                 if !rowChanges.removals.isEmpty {
                     tableView.deleteRows(at: rowChanges.removals.indexPaths(in: sectionIndex), with: defaultRowAnimation)
                 }
-
                 if !rowChanges.insertions.isEmpty {
                     tableView.insertRows(at: rowChanges.insertions.indexPaths(in: sectionIndex), with: defaultRowAnimation)
                 }
-
                 if !rowChanges.updates.isEmpty {
                     if let previousSectionIndex = sectionUpdate.previousOffset, sectionIndex != previousSectionIndex {
-                        // If the section index has changed, there's a good
-                        // chance that the type of the cell has also changed
-                        // (i.e., the `reuseIdentifier` last associated with that
-                        // `indexPath`). This causes `reconfigureRows(at:)` to
-                        // raise an assertion.
-                        //
-                        // Whenever the type of cell may have changed, we have
-                        // to be conservative and reload instead of reconfiguring.
                         tableView.reloadRows(at: rowChanges.updates.indexPaths(in: previousSectionIndex), with: defaultRowAnimation)
                     } else {
                         tableView.reconfigureRows(at: rowChanges.updates.indexPaths(in: sectionIndex))
@@ -236,6 +227,61 @@ extension ChatListViewController {
         if tableUpdatesPerformed {
             tableView.endUpdates()
         }
+
+        tableDataSource.renderState = renderState
+    }
+
+    private func validateDiffConsistency(
+        previousState: CLVRenderState,
+        newState: CLVRenderState,
+        rowChanges: [CLVRowChange]
+    ) -> Bool {
+        let prevTypes = previousState.sections.map(\.type)
+        let newTypes = newState.sections.map(\.type)
+        guard prevTypes == newTypes else { return false }
+
+        guard previousState.sections.count == tableView.numberOfSections else {
+            return false
+        }
+
+        var simulatedCounts = [Int]()
+        for sectionIndex in 0..<previousState.sections.count {
+            let actualCount = tableView.numberOfRows(inSection: sectionIndex)
+            let expectedCount = previousState.numberOfRows(in: previousState.sections[sectionIndex])
+            guard actualCount == expectedCount else { return false }
+            simulatedCounts.append(actualCount)
+        }
+
+        let newExpectedCounts = newState.sections.map { newState.numberOfRows(in: $0) }
+
+        for change in rowChanges {
+            switch change.type {
+            case .delete(let indexPath):
+                guard indexPath.section < simulatedCounts.count,
+                      simulatedCounts[indexPath.section] > 0 else { return false }
+                simulatedCounts[indexPath.section] -= 1
+
+            case .insert(let indexPath):
+                guard indexPath.section < simulatedCounts.count,
+                      indexPath.section < newExpectedCounts.count,
+                      simulatedCounts[indexPath.section] < newExpectedCounts[indexPath.section] else {
+                    return false
+                }
+                simulatedCounts[indexPath.section] += 1
+
+            case .move(let from, let to):
+                guard from.section < simulatedCounts.count,
+                      to.section < simulatedCounts.count,
+                      simulatedCounts[from.section] > 0 else { return false }
+                simulatedCounts[from.section] -= 1
+                simulatedCounts[to.section] += 1
+
+            case .update:
+                break
+            }
+        }
+
+        return simulatedCounts == newExpectedCounts
     }
 }
 
