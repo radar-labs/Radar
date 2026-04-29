@@ -29,6 +29,8 @@ public class PaymentsSettingsViewController: OWSTableViewController2 {
     private let appReadiness: AppReadinessSetter
     private let mode: PaymentsSettingsMode
 
+    private var isBalanceHidden = false
+
     private let paymentsHistoryDataSource = PaymentsHistoryDataSource()
 
     fileprivate static let maxHistoryCount: Int = 4
@@ -417,14 +419,28 @@ public class PaymentsSettingsViewController: OWSTableViewController2 {
     }
 
     private func configureEnabledHeader(cell: UITableViewCell) {
+        let eyeButton = UIButton(type: .system)
+        let eyeImageName = isBalanceHidden ? "eye.slash" : "eye"
+        eyeButton.setImage(UIImage(systemName: eyeImageName), for: .normal)
+        eyeButton.tintColor = Theme.secondaryTextAndIconColor
+        eyeButton.addTarget(self, action: #selector(didTapEyeButton), for: .touchUpInside)
+        eyeButton.autoSetDimensions(to: .square(28))
+
         let balanceLabel = UILabel()
         balanceLabel.font = UIFont.regularFont(ofSize: 54)
         balanceLabel.textAlignment = .center
         balanceLabel.adjustsFontSizeToFitWidth = true
+        balanceLabel.isUserInteractionEnabled = true
+        balanceLabel.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(didTapToggleSatoshi)))
 
-        let balanceStack = UIStackView(arrangedSubviews: [ balanceLabel ])
+        let balanceRow = UIStackView(arrangedSubviews: [balanceLabel, eyeButton])
+        balanceRow.axis = .horizontal
+        balanceRow.alignment = .center
+        balanceRow.spacing = 8
+
+        let balanceStack = UIStackView(arrangedSubviews: [balanceRow])
         balanceStack.axis = .vertical
-        balanceStack.alignment = .fill
+        balanceStack.alignment = .center
 
         let conversionRefreshSize: CGFloat = 20
         let conversionRefreshIcon = UIImageView.withTemplateImageName("refresh-20",
@@ -463,7 +479,10 @@ public class PaymentsSettingsViewController: OWSTableViewController2 {
             conversionInfoView.tintColor = .clear
         }
 
-        if let paymentBalance = SUIEnvironment.shared.paymentsSwiftRef.currentPaymentBalance {
+        if isBalanceHidden {
+            balanceLabel.text = "••••••"
+            hideConversions()
+        } else if let paymentBalance = SUIEnvironment.shared.paymentsSwiftRef.currentPaymentBalance {
             balanceLabel.attributedText = PaymentsFormat.attributedFormat(paymentAmount: paymentBalance.amount,
                                                                           isShortForm: false)
 
@@ -478,7 +497,7 @@ public class PaymentsSettingsViewController: OWSTableViewController2 {
             balanceLabel.text = " "
 
             let activityIndicator = UIActivityIndicatorView(style: .medium)
-            balanceStack.addSubview(activityIndicator)
+            balanceLabel.addSubview(activityIndicator)
             activityIndicator.autoCenterInSuperview()
             activityIndicator.startAnimating()
 
@@ -962,15 +981,6 @@ public class PaymentsSettingsViewController: OWSTableViewController2 {
             self?.didTapHelpButton()
         })
         
-        actionSheet.addAction(ActionSheetAction(
-            title: PaymentsImpl.isSatoshiAmountTypeEnabled()
-            ? "Disable satoshi amount display"
-            : "Enable satoshi amount display",
-            style: .default
-        ) { [weak self] _ in
-            self?.didTapToggleSatoshi()
-        })
-
         actionSheet.addAction(OWSActionSheets.cancelAction)
 
         presentActionSheet(actionSheet)
@@ -1194,8 +1204,15 @@ public class PaymentsSettingsViewController: OWSTableViewController2 {
         present(navigationVC, animated: true)
      }
     
+    @objc
     private func didTapToggleSatoshi() {
         _ = PaymentsImpl.toggleSatoshiAmountType()
+        updateTableContents()
+    }
+
+    @objc
+    private func didTapEyeButton() {
+        isBalanceHidden.toggle()
         updateTableContents()
     }
 

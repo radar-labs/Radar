@@ -73,7 +73,6 @@
 		0C0656B22F912FE700CA36E7 /* BreezSdkExt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C0656B12F912FE700CA36E7 /* BreezSdkExt.swift */; };
 		0C1A350E2F4DD6B40004353B /* WalletetAddressEditViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C1A350D2F4DD6880004353B /* WalletetAddressEditViewController.swift */; };
 		0CA604BC2F7FEC1B003AE0FD /* SetOnce.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CA604BB2F7FEC18003AE0FD /* SetOnce.swift */; };
-		0CD2A2332F76ACFA008CC3D9 /* BreezSdkConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CD2A2322F76ACF3008CC3D9 /* BreezSdkConfig.swift */; };
 		0CE014267EDFBD2538E940A0 /* Pods_Signal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7FF88FB580BC19B240EEB86A /* Pods_Signal.framework */; };
 		1404D8B3276A353B0068E2F6 /* ChatListViewController+Multiselect.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1404D8B2276A353A0068E2F6 /* ChatListViewController+Multiselect.swift */; };
 		1466AB282817F7E7003B3D9F /* PluralAware.stringsdict in Resources */ = {isa = PBXBuildFile; fileRef = 1466AB262817F7E7003B3D9F /* PluralAware.stringsdict */; };
@@ -1482,6 +1481,7 @@
 		76F4B581293ACCD200A7CF2F /* UIKit+Animations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76F4B580293ACCD200A7CF2F /* UIKit+Animations.swift */; };
 		76F958632A09A5AE00B43E63 /* DebugUIDiskUsage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76F958622A09A5AE00B43E63 /* DebugUIDiskUsage.swift */; };
 		76FCCDBC27AB8FBE00BAA7F0 /* MediaControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76FCCDBB27AB8FBE00BAA7F0 /* MediaControls.swift */; };
+		7729BF792F9E4E3900B97F91 /* BreezSdkConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7729BF782F9E4E3900B97F91 /* BreezSdkConfig.swift */; };
 		83B9573927C9A1FA00A678FD /* CaptchaView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83B9573827C9A1FA00A678FD /* CaptchaView.swift */; };
 		8803FF6628EF89B50023574A /* StorySharingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88F5FA9528EF7E02007AA1BF /* StorySharingTests.swift */; };
 		8806EF19248DBD7200E764C7 /* NotificationPermissionReminderMegaphone.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8806EF18248DBD7200E764C7 /* NotificationPermissionReminderMegaphone.swift */; };
@@ -3940,7 +3940,6 @@
 		0C0656B12F912FE700CA36E7 /* BreezSdkExt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreezSdkExt.swift; sourceTree = "<group>"; };
 		0C1A350D2F4DD6880004353B /* WalletetAddressEditViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletetAddressEditViewController.swift; sourceTree = "<group>"; };
 		0CA604BB2F7FEC18003AE0FD /* SetOnce.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetOnce.swift; sourceTree = "<group>"; };
-		0CD2A2322F76ACF3008CC3D9 /* BreezSdkConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreezSdkConfig.swift; sourceTree = "<group>"; };
 		1404D8B2276A353A0068E2F6 /* ChatListViewController+Multiselect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChatListViewController+Multiselect.swift"; sourceTree = "<group>"; };
 		1466AB272817F7E7003B3D9F /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = en; path = translations/en.lproj/PluralAware.stringsdict; sourceTree = "<group>"; };
 		1466AB292817F7F2003B3D9F /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = de; path = translations/de.lproj/PluralAware.stringsdict; sourceTree = "<group>"; };
@@ -5391,6 +5390,7 @@
 		76F4B580293ACCD200A7CF2F /* UIKit+Animations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIKit+Animations.swift"; sourceTree = "<group>"; };
 		76F958622A09A5AE00B43E63 /* DebugUIDiskUsage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DebugUIDiskUsage.swift; sourceTree = "<group>"; };
 		76FCCDBB27AB8FBE00BAA7F0 /* MediaControls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaControls.swift; sourceTree = "<group>"; };
+		7729BF782F9E4E3900B97F91 /* BreezSdkConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreezSdkConfig.swift; sourceTree = "<group>"; };
 		7F965533D71CA51BE6704CC4 /* Pods_SignalNSE.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_SignalNSE.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		7FF88FB580BC19B240EEB86A /* Pods_Signal.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Signal.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		83B9573827C9A1FA00A678FD /* CaptchaView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptchaView.swift; sourceTree = "<group>"; };
@@ -8726,7 +8726,6 @@
 			isa = PBXGroup;
 			children = (
 				0C0656B12F912FE700CA36E7 /* BreezSdkExt.swift */,
-				0CD2A2322F76ACF3008CC3D9 /* BreezSdkConfig.swift */,
 				34D21DA127297FBE00D891F4 /* DebugLogger+Payments.swift */,
 				3465F4D227287675001663AF /* MobileCoinAPI+Configuration.swift */,
 				3465F4D427287675001663AF /* MobileCoinAPI.swift */,
@@ -8737,6 +8736,7 @@
 				3465F4D327287675001663AF /* PaymentsImpl.swift */,
 				3465F4D127287674001663AF /* PaymentsProcessor.swift */,
 				3465F4D027287674001663AF /* PaymentsReconciliation.swift */,
+				7729BF782F9E4E3900B97F91 /* BreezSdkConfig.swift */,
 			);
 			path = Payments;
 			sourceTree = "<group>";
@@ -15136,6 +15136,8 @@
 				zh_TW,
 			);
 			mainGroup = D221A07E169C9E5E00537ABF;
+			packageReferences = (
+			);
 			productRefGroup = D221A08A169C9E5E00537ABF /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -16648,7 +16650,6 @@
 				05594CD02C98A00500CCBFF6 /* HostingController.swift in Sources */,
 				509085B82C498C3F00409B85 /* HTMLMetadata.swift in Sources */,
 				76896BFC2841A84D00F6C8D2 /* ImageAttachmentPrepViewController.swift in Sources */,
-				0CD2A2332F76ACFA008CC3D9 /* BreezSdkConfig.swift in Sources */,
 				3402AA94271D9E180084CBAE /* ImageEditorBlurRegionsItem.swift in Sources */,
 				3402AA8A271D9E180084CBAE /* ImageEditorCanvasView.swift in Sources */,
 				3402AA7D271D9E180084CBAE /* ImageEditorContents.swift in Sources */,
@@ -16663,6 +16664,7 @@
 				3402AA76271D9E180084CBAE /* ImageEditorStrokeItem.swift in Sources */,
 				3402AAAE271D9E180084CBAE /* ImageEditorTextItem.swift in Sources */,
 				7628DDC32807609F009AA53D /* ImageEditorToolbar.swift in Sources */,
+				7729BF792F9E4E3900B97F91 /* BreezSdkConfig.swift in Sources */,
 				3402AA73271D9E180084CBAE /* ImageEditorTransform.swift in Sources */,
 				B9F215612A94071F002DCAE0 /* ImageEditorTransformable.swift in Sources */,
 				3402AA6C271D9E180084CBAE /* ImageEditorView.swift in Sources */,
