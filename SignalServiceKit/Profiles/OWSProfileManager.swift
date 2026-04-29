@@ -555,7 +555,6 @@ extension OWSProfileManager: ProfileManager {
             tx: tx
         )
     }
-    
     // Reupload local profile with provided special profile key version
     public func reuploadLocalProfileWithProfileKeyVersion(
         _ profileKeyVersion: String,
@@ -565,21 +564,54 @@ extension OWSProfileManager: ProfileManager {
         tx: DBWriteTransaction
     ) -> Promise<Void> {
         Logger.info("")
+        return Promise.wrapAsync { [weak self] in
+            guard let self = self else {
+                return
+            }
 
-        let profileChanges = currentPendingProfileChanges(tx: tx)
-        return updateLocalProfile(
-            profileKeyVersion: profileKeyVersion,
-            profileGivenName: .noChange,
-            profileFamilyName: .noChange,
-            profileBio: .noChange,
-            profileBioEmoji: .noChange,
-            profileAvatarData: mustReuploadAvatar ? .noChangeButMustReupload : .noChange,
-            visibleBadgeIds: .noChange,
-            unsavedRotatedProfileKey: unsavedRotatedProfileKey,
-            userProfileWriter: profileChanges?.userProfileWriter ?? .reupload,
-            authedAccount: authedAccount,
-            tx: tx
-        )
+            let userProfile = SSKEnvironment.shared.databaseStorageRef.read(
+                block: SSKEnvironment.shared.profileManagerImplRef.localUserProfile(tx:)
+            )
+            guard let userProfile else {
+                throw OWSAssertionError("Can't upload profile without profile.")
+            }
+
+            let avatarUpdate = try await buildAvatarUpdate(
+                avatarChange: .noChange,
+                localUserProfile: userProfile,
+                authedAccount: authedAccount
+            )
+
+            guard let profileKey = userProfile.profileKey else {
+                throw OWSAssertionError("Can't upload profile without profileKey.")
+            }
+
+            let givenName = userProfile.givenName.flatMap { OWSUserProfile.NameComponent(truncating: $0) }
+            let familyName = userProfile.familyName.flatMap { OWSUserProfile.NameComponent(truncating: $0) }
+            let bio = userProfile.bio
+            let bioEmoji = userProfile.bioEmoji
+            let visibleBadgeIds = userProfile.visibleBadges.map { $0.badgeId }
+
+            _ = try await SSKEnvironment.shared.versionedProfilesRef.updateProfileWithProfileKeyVersion(
+                profileKeyVersion,
+                profileGivenName: givenName,
+                profileFamilyName: familyName,
+                profileBio: bio,
+                profileBioEmoji: bioEmoji,
+                profileAvatarMutation: avatarUpdate.remoteMutation,
+                visibleBadgeIds: visibleBadgeIds,
+                profileKey: profileKey,
+                authedAccount: authedAccount
+            )
+
+            await SSKEnvironment.shared.databaseStorageRef.awaitableWrite { tx in
+                // Notify all our devices that the profile has changed.
+                let tsRegistrationState = DependenciesBridge.shared.tsAccountManager.registrationState(tx: tx)
+                if tsRegistrationState.isRegistered {
+                    SSKEnvironment.shared.syncManagerRef.sendFetchLatestProfileSyncMessage(tx: tx)
+                }
+            }
+        }
     }
 
     // MARK: -

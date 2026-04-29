@@ -15,10 +15,10 @@ public struct ProfileFetchContext {
 
     /// If true, the fetch must try to fetch a new credential.
     public var mustFetchNewCredential: Bool
-    
+
     // If set, the fetch must tr y to fetch with special version
     public var profileKeyVersion: String?
-    
+
     public var cache: Bool
 
     public init(groupId: GroupIdentifier? = nil, isOpportunistic: Bool = false, mustFetchNewCredential: Bool = false, profileKeyVersion: String? = nil, cache: Bool = true) {
@@ -44,10 +44,9 @@ extension ProfileFetcher {
     ) async throws -> FetchedProfile {
         return try await fetchProfileImpl(for: serviceId, context: context, authedAccount: authedAccount)
     }
-    
+
     public func fetchProfileWithLightningBitcoinAddress(
         for serviceId: ServiceId,
-        // FIXME: Hardcoded value
         context: ProfileFetchContext = ProfileFetchContext(
             profileKeyVersion: PaymentsConstants.bitcoinLightningProfileKeyVersion,
             cache: false
@@ -291,11 +290,11 @@ public actor ProfileFetcherImpl: ProfileFetcher {
         if case .failure(ProfileRequestError.rateLimit) = result {
             self.rateLimitExpirationDate = now.adding(5 * .minute)
         }
-        
+
         if context.cache {
             self.recentFetchResults[serviceId] = FetchResult(outcome: outcome, completionDate: now)
         }
-        
+
         return try result.get()
     }
 

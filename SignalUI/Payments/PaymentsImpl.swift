@@ -3,13 +3,13 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
+import BigNumber
 public import BreezSdkSpark
+import Foundation
 public import LibSignalClient
+import MnemonicSwift
 public import MobileCoin
 public import SignalServiceKit
-import BigNumber
-import Foundation
-import MnemonicSwift
 
 public class PaymentsImpl: NSObject, PaymentsSwift {
     public static let maxPaymentMemoMessageLength: Int = 32
@@ -44,6 +44,8 @@ public class PaymentsImpl: NSObject, PaymentsSwift {
 
     private var onIncommingTransactionNotificationProcessing: NotificationCenter.Observer?
 
+    private var onRegistrationStateChange: NotificationCenter.Observer?
+
     private var currentSdk: BreezSdk?
 
     private var currentWalletAddress: LightningAddressInfo?
@@ -77,6 +79,18 @@ public class PaymentsImpl: NSObject, PaymentsSwift {
             }
         }
 
+        onRegistrationStateChange = NotificationCenter.default.addObserver(
+            name: RegistrationStateChangeNotifications.registrationStateDidChange
+        ) { [weak self] _ in
+            self?.tryToReuploadPaymentProfile()
+
+            DispatchQueue.global().async { [weak self] in
+                SSKEnvironment.shared.databaseStorageRef.write { transaction in
+                    self?.paymentsReconciliation.scheduleReconciliationNow(transaction: transaction)
+                }
+            }
+        }
+
         // Note: this isn't how often we refresh the balance, it's how often we
         // check whether we should refresh the balance.
         //
@@ -98,12 +112,12 @@ public class PaymentsImpl: NSObject, PaymentsSwift {
             try await loadWalletAddress()
             try await setFetchRateHandler()
             try await updateFiatCurrencies()
+
+            tryToReuploadPaymentProfile()
         } catch {
             owsFailDebug("Failed initialize components with error: \(error)")
             return
         }
-
-        tryToReuploadProfile()
     }
 
     fileprivate func reloadComponents() async {
@@ -113,7 +127,7 @@ public class PaymentsImpl: NSObject, PaymentsSwift {
         default:
             currentSdk = nil
             currentWalletAddress = nil
-            tryToReuploadProfile()
+            tryToReuploadPaymentProfile()
         }
     }
 
@@ -163,13 +177,16 @@ public class PaymentsImpl: NSObject, PaymentsSwift {
         PaymentsCurrenciesImpl.setSupportedCurrencyCodesList(currencies)
     }
 
-    private func tryToReuploadProfile() {
+    private func tryToReuploadPaymentProfile() {
         Task {
             do {
-                try? await Task.sleep(nanoseconds: 1_000_000_000) // 1 second
-                try await self.updateLastKnownAddressAndReuploadProfile()
+                Logger.info("Trying to reupload payment profile")
+                try? await Task.sleep(nanoseconds: 1_000_000_000)  // 1 second
+                try await self.updateLastKnownAddressAndReuploadPaymentProfile()
             } catch {
-                owsFailDebug("Failed to update last known address and re-upload profile with error: \(error)")
+                owsFailDebug(
+                    "Failed to update last known address and re-upload profile with error: \(error)"
+                )
             }
         }
     }
@@ -565,7 +582,7 @@ extension PaymentsImpl {
 
         currentWalletAddress = try await self.getBreezSdk().registerLightningAddress(
             request: RegisterLightningAddressRequest(username: username))
-        try await updateLastKnownAddressAndReuploadProfile()
+        try await updateLastKnownAddressAndReuploadPaymentProfile()
     }
 
     public func localPaymentAddressProtoData(paymentsState: PaymentsState, tx: DBReadTransaction)
@@ -607,9 +624,9 @@ extension PaymentsImpl {
 }
 
 extension PaymentsImpl {
-    private func updateLastKnownAddressAndReuploadProfile() async throws {
-        try await DependenciesBridge.shared.db.awaitableWrite { transaction in
-            Logger.info("Re-uploading local profile as bitcoin lightning profile")
+    private func updateLastKnownAddressAndReuploadPaymentProfile() async throws {
+        Logger.info("Re-uploading local profile as bitcoin lightning profile")
+        _ = await DependenciesBridge.shared.db.awaitableWrite { transaction in
             updateLastKnownLocalPaymentAddressProtoData(transaction: transaction)
             return SSKEnvironment.shared.profileManagerRef
                 .reuploadLocalProfileWithProfileKeyVersion(
@@ -619,7 +636,7 @@ extension PaymentsImpl {
                     authedAccount: .implicit(),
                     tx: transaction
                 )
-        }.awaitable()
+        }
     }
 }
 
