@@ -19,7 +19,7 @@ ENV['RINGRTC_PREBUILD_CHECKSUM'] = 'b4a56a4d548cf2ea0215664f5a64c127c725ccf2ec36
 pod 'SignalRingRTC', git: 'https://github.com/signalapp/ringrtc', tag: 'v2.59.3', inhibit_warnings: true
 # pod 'SignalRingRTC', path: '../ringrtc', testspecs: ["Tests"]
 
-pod 'GRDB.swift/SQLCipher'
+pod 'GRDB.swift/SQLCipher', '~> 5.26'
 # pod 'GRDB.swift/SQLCipher', path: '../GRDB.swift'
 
 pod 'SQLCipher', git: 'https://github.com/signalapp/sqlcipher.git', tag: 'v4.6.1-f_barrierfsync'
@@ -37,8 +37,8 @@ pod 'Mantle', git: 'https://github.com/signalapp/Mantle', branch: 'signal-master
 pod 'libPhoneNumber-iOS', git: 'https://github.com/signalapp/libPhoneNumber-iOS', branch: 'signal-master'
 # pod 'libPhoneNumber-iOS', path: '../libPhoneNumber-iOS'
 
-pod 'SDWebImage'
-pod 'SDWebImageWebPCoder'
+pod 'SDWebImage', '5.21.2'
+pod 'SDWebImageWebPCoder', '0.14.6'
 pod 'libwebp' 
 
 ###
@@ -48,16 +48,16 @@ pod 'libwebp'
 pod 'Reachability', '~> 3.7.7', :inhibit_warnings => true
 
 def ui_pods
-  pod 'BonMot', inhibit_warnings: true
-  pod 'PureLayout', :inhibit_warnings => true
-  pod 'lottie-ios', :inhibit_warnings => true
+  pod 'BonMot', '6.0.0', inhibit_warnings: true
+  pod 'PureLayout', '3.1.4', :inhibit_warnings => true
+  pod 'lottie-ios', '4.4.3', :inhibit_warnings => true
 
   pod 'LibMobileCoin/CoreHTTP', git: 'https://github.com/signalapp/libmobilecoin-ios-artifacts', tag: 'signal/6.0.2', submodules: true
   pod 'MobileCoin/CoreHTTP', git: 'https://github.com/mobilecoinofficial/MobileCoin-Swift', tag: 'v6.0.3'
   
   pod 'Swift-BigInt', '2.4.0'
   pod 'BreezSdkSpark', git: 'https://github.com/breez/breez-sdk-spark-swift.git', tag: '0.9.1'
-  
+
   pod "MnemonicSwift", git: 'https://github.com/zcash/swift-bip39', tag: '2.2.5'
 end
 
@@ -87,11 +87,11 @@ target 'SignalUI' do
 end
 
 target 'SignalServiceKit' do
-  pod 'CocoaLumberjack'
+  pod 'CocoaLumberjack', '3.7.4'
   
   pod 'Swift-BigInt', '2.4.0'
   pod 'BreezSdkSpark', git: 'https://github.com/breez/breez-sdk-spark-swift.git', tag: '0.9.1'
-  
+
   target 'SignalServiceKitTests' do
     inherit! :search_paths
   end

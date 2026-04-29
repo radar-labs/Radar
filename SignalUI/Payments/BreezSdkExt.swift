@@ -25,6 +25,12 @@ extension BreezSdk {
 
         let builder = SdkBuilder(config: config, seed: seed)
         await builder.withDefaultStorage(storageDir: breezDirectory.path)
+        let keySetConfig = KeySetConfig(
+            keySetType: .nativeSegwit,
+            useAddressIndex: true,
+            accountNumber: nil
+        )
+        await builder.withKeySet(config: keySetConfig)
 
         return try await builder.build()
     }
