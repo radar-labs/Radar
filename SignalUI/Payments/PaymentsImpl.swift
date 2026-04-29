@@ -576,6 +576,11 @@ extension PaymentsImpl {
         return TSPaymentAddress(currency: .bitcoin, mobileCoinPublicAddressData: addressData)
     }
 
+    public func isUsernameAvailable(_ username: String) async throws -> Bool {
+        return try await getBreezSdk().checkLightningAddressAvailable(
+            req: CheckLightningAddressRequest(username: username))
+    }
+
     public func registerUsername(_ username: String) async throws {
         let paymentsState = self.paymentsState
         owsAssertDebug(paymentsState.isEnabled)

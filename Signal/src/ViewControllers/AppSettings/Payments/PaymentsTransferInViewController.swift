@@ -56,17 +56,16 @@ class PaymentsTransferInViewController: OWSTableViewController2 {
         },
         actionBlock: nil))
 
-        if let username = SUIEnvironment.shared.paymentsImplRef.walletLightningAddressUsername  {
+        if let username = SUIEnvironment.shared.paymentsImplRef.walletLightningAddressUsername {
             let editButton = UIButton(
                 configuration: .smallBorderless(title: CommonStrings.editButton),
                 primaryAction: UIAction { [weak self] _ in
-                    let viewController = WalletAddressEditViewController(oldAddress: username) { newUsername throws in
+                    let viewController = RadarUsernameViewController(oldUsername: username) { newUsername in
                         try await SUIEnvironment.shared.paymentsImplRef.registerUsername(newUsername)
                     }
-                    
                     self?.navigationController?.pushViewController(viewController, animated: true)
                 })
-            
+
             addressSection.customFooterView = editButton
         }
        
