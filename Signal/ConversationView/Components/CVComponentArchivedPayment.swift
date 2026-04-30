@@ -146,11 +146,12 @@ public class CVComponentArchivedPayment: CVComponentBase, CVComponent {
             return NSAttributedString(string: text)
         }
 
+        let displayAmount: String? = PaymentsDisplayPreferences.shared.isBalanceHidden ? nil : amount
         switch status {
         case .failed:
-            return PaymentsFormat.inChatFailureAmountBuilder(amount)
+            return PaymentsFormat.inChatFailureAmountBuilder(displayAmount)
         default:
-            return PaymentsFormat.inChatSuccessAmountBuilder(amount)
+            return PaymentsFormat.inChatSuccessAmountBuilder(displayAmount)
         }
     }
 

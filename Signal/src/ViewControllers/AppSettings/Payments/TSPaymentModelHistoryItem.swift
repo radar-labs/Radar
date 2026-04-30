@@ -51,12 +51,7 @@ public struct PaymentsHistoryModelItem: PaymentsHistoryItem {
 
     public var formattedFeeAmount: String? {
         guard let fee = paymentModel.mobileCoin?.feeAmount else { return nil }
-        return PaymentsFormat.format(
-            paymentAmount: fee,
-            isShortForm: false,
-            withCurrencyCode: true,
-            withSpace: true,
-            isSatoshi: PaymentsDisplayPreferences.shared.isSatoshiEnabled)
+        return PaymentsFormat.formattedBalance(fee).string
     }
     
 
@@ -98,11 +93,7 @@ public struct PaymentsHistoryModelItem: PaymentsHistoryItem {
             return nil
         }
 
-        return PaymentsFormat.attributedFormat(
-            paymentAmount: amount,
-            isShortForm: false,
-            paymentType: paymentType
-        )
+        return PaymentsFormat.formattedBalance(amount, paymentType: paymentType)
     }
 
     public var formattedPaymentAmount: String? {
@@ -116,15 +107,9 @@ public struct PaymentsHistoryModelItem: PaymentsHistoryItem {
         if let feeAmount = paymentModel.mobileCoin?.feeAmount {
             totalAmount = totalAmount.plus(feeAmount)
         }
-        return PaymentsFormat.format(
-            paymentAmount: totalAmount,
-            isShortForm: true,
-            withCurrencyCode: true,
-            withSpace: false,
-            withPaymentType: paymentModel.paymentType
-        )
+        return PaymentsFormat.formattedBalance(totalAmount, isShortForm: true, paymentType: paymentModel.paymentType).string
     }
-    
+
     public var formattedTotalPaymentAmount: String? {
         guard
             let paymentAmount = paymentModel.paymentAmount,
@@ -132,20 +117,11 @@ public struct PaymentsHistoryModelItem: PaymentsHistoryItem {
         else {
             return nil
         }
-        
         var totalAmount = paymentAmount
         if let feeAmount = paymentModel.mobileCoin?.feeAmount {
             totalAmount = totalAmount.plus(feeAmount)
         }
-        
-        return PaymentsFormat.format(
-            paymentAmount: totalAmount,
-            isShortForm: false,
-            withCurrencyCode: true,
-            withSpace: false,
-            withPaymentType: paymentModel.paymentType,
-            isSatoshi: PaymentsDisplayPreferences.shared.isSatoshiEnabled
-        )
+        return PaymentsFormat.formattedBalance(totalAmount, paymentType: paymentModel.paymentType).string
     }
     
     public var formattedFiatPaymentAmount: String? {

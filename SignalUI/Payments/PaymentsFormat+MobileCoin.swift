@@ -8,34 +8,28 @@ public import SignalServiceKit
 
 public extension PaymentsFormat {
 
-    static func formatInChatSuccess(
-        paymentAmount: TSPaymentAmount
-    ) -> NSAttributedString {
-        if PaymentsDisplayPreferences.shared.isSatoshiEnabled {
-            return inChatSuccessAmountBuilder("\(paymentAmount.picoMob)")
-        }
-        
-        return formatInChat(
-            paymentAmount: paymentAmount,
-            amountBuilder: inChatSuccessAmountBuilder(_:)
-        )
+    // Single source of truth for amount display: returns nil when hidden, formatted string otherwise.
+    private static func resolvedAmountString(_ amount: TSPaymentAmount, isShortForm: Bool = false) -> String? {
+        guard !PaymentsDisplayPreferences.shared.isBalanceHidden else { return nil }
+        return PaymentsDisplayPreferences.shared.isSatoshiEnabled
+            ? "\(amount.picoMob)"
+            : format(picoMob: amount.picoMob, isShortForm: isShortForm)
     }
 
-    static func formatInChatFailure(
-        paymentAmount: TSPaymentAmount
-    ) -> NSAttributedString {
-        if PaymentsDisplayPreferences.shared.isSatoshiEnabled {
-            return inChatFailureAmountBuilder("\(paymentAmount.picoMob)")
-        }
-        
-        return formatInChat(
-            paymentAmount: paymentAmount,
-            amountBuilder: inChatFailureAmountBuilder(_:)
-        )
+    static func formatInChatSuccess(paymentAmount: TSPaymentAmount) -> NSAttributedString {
+        inChatSuccessAmountBuilder(resolvedAmountString(paymentAmount))
     }
 
-    static func inChatSuccessAmountBuilder(_ amount: String) -> NSAttributedString {
+    static func formatInChatFailure(paymentAmount: TSPaymentAmount) -> NSAttributedString {
+        inChatFailureAmountBuilder(resolvedAmountString(paymentAmount))
+    }
+
+    static func inChatSuccessAmountBuilder(_ amount: String?) -> NSAttributedString {
         let firstAttributes: [NSAttributedString.Key: Any] = [.font: UIFont.dynamicTypeLargeTitle1Clamped.withSize(20)]
+
+        guard let amount else {
+            return NSAttributedString(string: "••••••", attributes: firstAttributes)
+        }
 
         let startingFont = UIFont.dynamicTypeLargeTitle1Clamped.withSize(20)
         let traits = [UIFontDescriptor.TraitKey.weight: UIFont.Weight.thin]
@@ -46,12 +40,8 @@ public extension PaymentsFormat {
         let newThinFont = UIFont(descriptor: thinFontDescriptor, size: startingFont.pointSize)
         let secondAttributes: [NSAttributedString.Key: Any] = [.font: newThinFont]
 
+        let currencyIdentifier = PaymentsDisplayPreferences.shared.isSatoshiEnabled ? "sats" : "BTC"
         let firstString = NSMutableAttributedString(string: amount, attributes: firstAttributes)
-        let currencyIdentifier = if PaymentsDisplayPreferences.shared.isSatoshiEnabled {
-            "sats"
-        } else {
-            "BTC"
-        }
         let secondString = NSMutableAttributedString(string: " \(currencyIdentifier)", attributes: secondAttributes)
 
         // NOTE: not RTL-friendly. Maybe fix this if it comes up.
@@ -59,7 +49,8 @@ public extension PaymentsFormat {
         return firstString
     }
 
-    static func inChatFailureAmountBuilder(_ amount: String) -> NSAttributedString {
+    static func inChatFailureAmountBuilder(_ amount: String?) -> NSAttributedString {
+        let displayAmount = amount ?? "••••••"
         let firstAttributes: [NSAttributedString.Key: Any] = [.font: UIFont.dynamicTypeLargeTitle1Clamped.withSize(17)]
 
         let startingFont = UIFont.dynamicTypeLargeTitle1Clamped.withSize(15)
@@ -73,7 +64,7 @@ public extension PaymentsFormat {
             "PAYMENTS_IN_CHAT_FAILURE_MESSAGE_TOP",
             comment: "Payments in-chat message shown if a payment fails to send, top part. Embeds {{ number, amount of MOB coin not sent }}"
         )
-        let topPart = String(format: template, amount)
+        let topPart = String(format: template, displayAmount)
 
         let bottomPart = OWSLocalizedString(
             "PAYMENTS_IN_CHAT_FAILURE_MESSAGE_BOTTOM",
@@ -157,13 +148,23 @@ public extension PaymentsFormat {
     /// - Pass `nil` when the balance is still loading — returns a space to
     ///   preserve layout height while a spinner overlays it.
     static func formattedBalance(_ balance: PaymentBalance?) -> NSAttributedString {
+        guard let balance else {
+            return PaymentsDisplayPreferences.shared.isBalanceHidden
+                ? NSAttributedString(string: "••••••")
+                : NSAttributedString(string: " ")
+        }
+        return formattedBalance(balance.amount)
+    }
+
+    static func formattedBalance(
+        _ amount: TSPaymentAmount,
+        isShortForm: Bool = false,
+        paymentType: TSPaymentType? = nil
+    ) -> NSAttributedString {
         guard !PaymentsDisplayPreferences.shared.isBalanceHidden else {
             return NSAttributedString(string: "••••••")
         }
-        guard let balance else {
-            return NSAttributedString(string: " ")
-        }
-        return attributedFormat(paymentAmount: balance.amount, isShortForm: false)
+        return attributedFormat(paymentAmount: amount, isShortForm: isShortForm, paymentType: paymentType)
     }
 
     static func attributedFormat(fiatCurrencyAmount: Double,

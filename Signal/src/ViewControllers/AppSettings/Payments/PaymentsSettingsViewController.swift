@@ -29,8 +29,6 @@ public class PaymentsSettingsViewController: OWSTableViewController2 {
     private let appReadiness: AppReadinessSetter
     private let mode: PaymentsSettingsMode
 
-    private var isBalanceHidden = false
-
     private let paymentsHistoryDataSource = PaymentsHistoryDataSource()
 
     fileprivate static let maxHistoryCount: Int = 4
@@ -1221,12 +1219,6 @@ public class PaymentsSettingsViewController: OWSTableViewController2 {
     @objc
     private func didTapEyeButton() {
         PaymentsDisplayPreferences.shared.toggleBalanceHidden()
-    }
-
-    @objc
-    private func didTapEyeButton() {
-        isBalanceHidden.toggle()
-        updateTableContents()
     }
 
     private func didTapTransferToExchangeButton() {
