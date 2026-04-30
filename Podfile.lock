@@ -57,23 +57,23 @@ PODS:
 
 DEPENDENCIES:
   - blurhash (from `./ThirdParty/blurhash.podspec`)
-  - BonMot (= 6.0.0)
+  - BonMot
   - BreezSdkSpark (from `https://github.com/breez/breez-sdk-spark-swift.git`, tag `0.9.1`)
-  - CocoaLumberjack (= 3.7.4)
-  - GRDB.swift/SQLCipher (~> 5.26)
+  - CocoaLumberjack
+  - GRDB.swift/SQLCipher
   - LibMobileCoin/CoreHTTP (from `https://github.com/signalapp/libmobilecoin-ios-artifacts`, tag `signal/6.0.2`)
   - libPhoneNumber-iOS (from `https://github.com/signalapp/libPhoneNumber-iOS`, branch `signal-master`)
   - LibSignalClient (from `https://github.com/signalapp/libsignal.git`, tag `v0.86.0`)
   - LibSignalClient/Tests (from `https://github.com/signalapp/libsignal.git`, tag `v0.86.0`)
   - libwebp
-  - lottie-ios (= 4.4.3)
+  - lottie-ios
   - Mantle (from `https://github.com/signalapp/Mantle`, branch `signal-master`)
   - MnemonicSwift (from `https://github.com/zcash/swift-bip39`, tag `2.2.5`)
   - MobileCoin/CoreHTTP (from `https://github.com/mobilecoinofficial/MobileCoin-Swift`, tag `v6.0.3`)
-  - PureLayout (= 3.1.4)
+  - PureLayout
   - Reachability (~> 3.7.7)
-  - SDWebImage (= 5.21.2)
-  - SDWebImageWebPCoder (= 0.14.6)
+  - SDWebImage
+  - SDWebImageWebPCoder
   - SignalRingRTC (from `https://github.com/signalapp/ringrtc`, tag `v2.59.3`)
   - SQLCipher (from `https://github.com/signalapp/sqlcipher.git`, tag `v4.6.1-f_barrierfsync`)
   - Swift-BigInt (= 2.4.0)
@@ -185,6 +185,6 @@ SPEC CHECKSUMS:
   Swift-BigInt: 39035927416daca0ff0ee7949f5fef18b3a1a7db
   SwiftProtobuf: e02f51c8c2df5845657aee2d4de9d61bf50ef788
 
-PODFILE CHECKSUM: dbe0441b05c36efe66968d70034fe9daeb65e460
+PODFILE CHECKSUM: 23563258cb3b49d55f7fda76c397bb59d7e21376
 
 COCOAPODS: 1.16.2
