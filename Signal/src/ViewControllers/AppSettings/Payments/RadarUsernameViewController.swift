@@ -184,23 +184,6 @@ class RadarUsernameViewController: OWSViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         usernameField.becomeFirstResponder()
-        fetchAndPrintBitcoinAddress()
-    }
-
-    private func fetchAndPrintBitcoinAddress() {
-        Task {
-            do {
-                print("[RadarUsername] Calling receivePayment with .bitcoinAddress...")
-                let response = try await SUIEnvironment.shared.paymentsImplRef.fetchBitcoinAddress()
-                print("[RadarUsername] ---- receivePayment response ----")
-                print("[RadarUsername] response: \(response)")
-                print("[RadarUsername] response.paymentRequest: \(response.paymentRequest)")
-                print("[RadarUsername] response.fee: \(response.fee)")
-                print("[RadarUsername] ----------------------------------")
-            } catch {
-                print("[RadarUsername] receivePayment failed with error: \(error)")
-            }
-        }
     }
 
     @objc
