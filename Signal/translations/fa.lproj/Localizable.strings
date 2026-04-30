@@ -8396,7 +8396,7 @@
 "SETTINGS_PAYMENTS_SEND_TO_RECIPIENT_TITLE" = "انتخاب گیرنده";
 
 /* Title for the 'set currency' view in the app settings. */
-"SETTINGS_PAYMENTS_SET_CURRENCY" = "تبدیل نرخ ارز";
+"SETTINGS_PAYMENTS_SET_CURRENCY" = "ارز نمایش";
 
 /* Label for the 'payments' section of the app settings. */
 "SETTINGS_PAYMENTS_TITLE" = "پرداخت‌ها";

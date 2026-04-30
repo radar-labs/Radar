@@ -256,6 +256,7 @@ public class PaymentsCurrenciesImpl: PaymentsCurrenciesSwift, PaymentsCurrencies
     }
 
     private static let preferredCurrencyCodes: [Currency.Code] = [
+        "USD",
         "EUR",
         "GBP",
         "JPY",
