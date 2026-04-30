@@ -355,6 +355,18 @@ public class PaymentsSettingsViewController: OWSTableViewController2 {
             name: PaymentsCurrenciesImpl.paymentConversionRatesDidChange,
             object: nil
         )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(updateTableContents),
+            name: PaymentsDisplayPreferences.balanceHiddenDidChange,
+            object: nil
+        )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(updateTableContents),
+            name: PaymentsDisplayPreferences.amountTypeDidChange,
+            object: nil
+        )
     }
 
     @objc
@@ -420,7 +432,7 @@ public class PaymentsSettingsViewController: OWSTableViewController2 {
 
     private func configureEnabledHeader(cell: UITableViewCell) {
         let eyeButton = UIButton(type: .system)
-        let eyeImageName = isBalanceHidden ? "eye.slash" : "eye"
+        let eyeImageName = PaymentsDisplayPreferences.shared.isBalanceHidden ? "eye.slash" : "eye"
         eyeButton.setImage(UIImage(systemName: eyeImageName), for: .normal)
         eyeButton.tintColor = Theme.secondaryTextAndIconColor
         eyeButton.addTarget(self, action: #selector(didTapEyeButton), for: .touchUpInside)
@@ -479,28 +491,24 @@ public class PaymentsSettingsViewController: OWSTableViewController2 {
             conversionInfoView.tintColor = .clear
         }
 
-        if isBalanceHidden {
-            balanceLabel.text = "••••••"
-            hideConversions()
-        } else if let paymentBalance = SUIEnvironment.shared.paymentsSwiftRef.currentPaymentBalance {
-            balanceLabel.attributedText = PaymentsFormat.attributedFormat(paymentAmount: paymentBalance.amount,
-                                                                          isShortForm: false)
+        let paymentBalance = SUIEnvironment.shared.paymentsSwiftRef.currentPaymentBalance
+        let prefs = PaymentsDisplayPreferences.shared
 
-            if let balanceConversionText = Self.buildBalanceConversionText(paymentBalance: paymentBalance) {
-                conversionLabel.text = balanceConversionText
-            } else {
-                hideConversions()
-            }
-        } else {
-            // Use an empty string to avoid jitter in layout between the
-            // "pending balance" and "has balance" states.
-            balanceLabel.text = " "
+        balanceLabel.attributedText = PaymentsFormat.formattedBalance(paymentBalance)
 
+        // Show spinner only while loading and not hidden.
+        if paymentBalance == nil && !prefs.isBalanceHidden {
             let activityIndicator = UIActivityIndicatorView(style: .medium)
             balanceLabel.addSubview(activityIndicator)
             activityIndicator.autoCenterInSuperview()
             activityIndicator.startAnimating()
+        }
 
+        if !prefs.isBalanceHidden,
+           let paymentBalance,
+           let balanceConversionText = Self.buildBalanceConversionText(paymentBalance: paymentBalance) {
+            conversionLabel.text = balanceConversionText
+        } else {
             hideConversions()
         }
 
@@ -980,7 +988,7 @@ public class PaymentsSettingsViewController: OWSTableViewController2 {
         ) { [weak self] _ in
             self?.didTapHelpButton()
         })
-        
+
         actionSheet.addAction(OWSActionSheets.cancelAction)
 
         presentActionSheet(actionSheet)
@@ -1206,8 +1214,12 @@ public class PaymentsSettingsViewController: OWSTableViewController2 {
     
     @objc
     private func didTapToggleSatoshi() {
-        _ = PaymentsImpl.toggleSatoshiAmountType()
-        updateTableContents()
+        PaymentsDisplayPreferences.shared.toggleAmountType()
+    }
+
+    @objc
+    private func didTapEyeButton() {
+        PaymentsDisplayPreferences.shared.toggleBalanceHidden()
     }
 
     @objc

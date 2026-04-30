@@ -11,7 +11,7 @@ public extension PaymentsFormat {
     static func formatInChatSuccess(
         paymentAmount: TSPaymentAmount
     ) -> NSAttributedString {
-        if PaymentsImpl.isSatoshiAmountTypeEnabled() {
+        if PaymentsDisplayPreferences.shared.isSatoshiEnabled {
             return inChatSuccessAmountBuilder("\(paymentAmount.picoMob)")
         }
         
@@ -24,7 +24,7 @@ public extension PaymentsFormat {
     static func formatInChatFailure(
         paymentAmount: TSPaymentAmount
     ) -> NSAttributedString {
-        if PaymentsImpl.isSatoshiAmountTypeEnabled() {
+        if PaymentsDisplayPreferences.shared.isSatoshiEnabled {
             return inChatFailureAmountBuilder("\(paymentAmount.picoMob)")
         }
         
@@ -47,7 +47,7 @@ public extension PaymentsFormat {
         let secondAttributes: [NSAttributedString.Key: Any] = [.font: newThinFont]
 
         let firstString = NSMutableAttributedString(string: amount, attributes: firstAttributes)
-        let currencyIdentifier = if PaymentsImpl.isSatoshiAmountTypeEnabled() {
+        let currencyIdentifier = if PaymentsDisplayPreferences.shared.isSatoshiEnabled {
             "sats"
         } else {
             "BTC"
@@ -95,7 +95,7 @@ public extension PaymentsFormat {
                                  withSpace: Bool = false) -> NSAttributedString {
         switch paymentAmount.currency {
         case .bitcoin:
-            let bitcoinString = if PaymentsImpl.isSatoshiAmountTypeEnabled() {
+            let bitcoinString = if PaymentsDisplayPreferences.shared.isSatoshiEnabled {
                 "\(paymentAmount.picoMob)"
             } else {
                 format(paymentAmount: paymentAmount,
@@ -134,7 +134,7 @@ public extension PaymentsFormat {
     
     static func attributedFormat(bitcoinString: String,
                                  withSpace: Bool = false) -> NSAttributedString {
-        let currencyCode = if PaymentsImpl.isSatoshiAmountTypeEnabled() {
+        let currencyCode = if PaymentsDisplayPreferences.shared.isSatoshiEnabled {
             PaymentsConstants.satoshiCurrencyIdentifier
         } else {
             PaymentsConstants.bitcoinCurrencyIdentifier
@@ -150,6 +150,20 @@ public extension PaymentsFormat {
         attributedFormat(currencyString: mobileCoinString,
                          currencyCode: PaymentsConstants.mobileCoinCurrencyIdentifier,
                          withSpace: withSpace)
+    }
+
+    /// Returns the wallet balance formatted for display, respecting both the
+    /// hide/show preference and the sats/btc preference.
+    /// - Pass `nil` when the balance is still loading — returns a space to
+    ///   preserve layout height while a spinner overlays it.
+    static func formattedBalance(_ balance: PaymentBalance?) -> NSAttributedString {
+        guard !PaymentsDisplayPreferences.shared.isBalanceHidden else {
+            return NSAttributedString(string: "••••••")
+        }
+        guard let balance else {
+            return NSAttributedString(string: " ")
+        }
+        return attributedFormat(paymentAmount: balance.amount, isShortForm: false)
     }
 
     static func attributedFormat(fiatCurrencyAmount: Double,

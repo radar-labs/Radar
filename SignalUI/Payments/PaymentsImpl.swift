@@ -51,15 +51,7 @@ public class PaymentsImpl: NSObject, PaymentsSwift {
     private var currentWalletAddress: LightningAddressInfo?
 
     public static func isSatoshiAmountTypeEnabled() -> Bool {
-        return UserDefaults.standard.bool(forKey: PaymentsConstants.satoshiAmountTypeEnabledKey)
-    }
-
-    public static func toggleSatoshiAmountType() -> Bool {
-        let value = !UserDefaults.standard.bool(
-            forKey: PaymentsConstants.satoshiAmountTypeEnabledKey)
-        UserDefaults.standard.set(value, forKey: PaymentsConstants.satoshiAmountTypeEnabledKey)
-
-        return value
+        PaymentsDisplayPreferences.shared.isSatoshiEnabled
     }
 
     @MainActor
@@ -576,6 +568,11 @@ extension PaymentsImpl {
         return TSPaymentAddress(currency: .bitcoin, mobileCoinPublicAddressData: addressData)
     }
 
+    public func isUsernameAvailable(_ username: String) async throws -> Bool {
+        return try await getBreezSdk().checkLightningAddressAvailable(
+            req: CheckLightningAddressRequest(username: username))
+    }
+
     public func fetchBitcoinAddress() async throws -> ReceivePaymentResponse {
         let sdk = try getBreezSdk()
         let response = try await sdk.receivePayment(
@@ -584,11 +581,6 @@ extension PaymentsImpl {
             )
         )
         return response
-    }
-
-    public func isUsernameAvailable(_ username: String) async throws -> Bool {
-        return try await getBreezSdk().checkLightningAddressAvailable(
-            req: CheckLightningAddressRequest(username: username))
     }
 
     public func registerUsername(_ username: String) async throws {
@@ -625,14 +617,18 @@ extension PaymentsImpl {
     }
 
     public func updateLastKnownLocalPaymentAddressProtoData(transaction: DBWriteTransaction) {
-        let data: Data?
+        // Never clear the cache from this opportunistic refresh path. Transient
+        // states (unwarmed paymentStateCache at startup, unregistered ripples,
+        // Breez SDK still loading) would otherwise wipe a perfectly good address
+        // and cause the next unrelated profile upload to drop it from the server.
+        // Explicit clearing on disable is handled in PaymentsHelperImpl.setPaymentsState.
         let paymentsState = self.paymentsState
-        if paymentsState.isEnabled {
-            data = localPaymentAddressProtoData(paymentsState: paymentsState, tx: transaction)
-        } else {
-            data = nil
+        guard paymentsState.isEnabled else {
+            return
         }
-
+        guard let data = localPaymentAddressProtoData(paymentsState: paymentsState, tx: transaction) else {
+            return
+        }
         SSKEnvironment.shared.paymentsHelperRef.setLastKnownLocalPaymentAddressProtoData(
             data, transaction: transaction)
     }
