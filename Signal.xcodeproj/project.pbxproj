@@ -275,6 +275,7 @@
 		3465F4D627287677001663AF /* PaymentsProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3465F4D127287674001663AF /* PaymentsProcessor.swift */; };
 		3465F4D727287677001663AF /* MobileCoinAPI+Configuration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3465F4D227287675001663AF /* MobileCoinAPI+Configuration.swift */; };
 		3465F4D827287677001663AF /* PaymentsImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3465F4D327287675001663AF /* PaymentsImpl.swift */; };
+		0430706099CA47739A6110E8 /* PaymentsDisplayPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26F93D12DE3541A78594229A /* PaymentsDisplayPreferences.swift */; };
 		3465F4D927287677001663AF /* MobileCoinAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3465F4D427287675001663AF /* MobileCoinAPI.swift */; };
 		3465F4DD2728812B001663AF /* Payments.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3465F4DC2728812A001663AF /* Payments.swift */; };
 		34661FB820C1C0D60056EDD6 /* message_sent.aiff in Resources */ = {isa = PBXBuildFile; fileRef = 34661FB720C1C0D60056EDD6 /* message_sent.aiff */; };
@@ -4081,6 +4082,7 @@
 		3465F4D127287674001663AF /* PaymentsProcessor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PaymentsProcessor.swift; sourceTree = "<group>"; };
 		3465F4D227287675001663AF /* MobileCoinAPI+Configuration.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "MobileCoinAPI+Configuration.swift"; sourceTree = "<group>"; };
 		3465F4D327287675001663AF /* PaymentsImpl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PaymentsImpl.swift; sourceTree = "<group>"; };
+		26F93D12DE3541A78594229A /* PaymentsDisplayPreferences.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PaymentsDisplayPreferences.swift; sourceTree = "<group>"; };
 		3465F4D427287675001663AF /* MobileCoinAPI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MobileCoinAPI.swift; sourceTree = "<group>"; };
 		3465F4DA27287858001663AF /* PaymentsHelperImpl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PaymentsHelperImpl.swift; sourceTree = "<group>"; };
 		3465F4DC2728812A001663AF /* Payments.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Payments.swift; sourceTree = "<group>"; };
@@ -8736,6 +8738,7 @@
 				34BB78B8272C51E800DA0D04 /* MobileCoinHelperSDKTest.swift */,
 				3465F4DC2728812A001663AF /* Payments.swift */,
 				34A955B8271B553D00B05242 /* PaymentsFormat+MobileCoin.swift */,
+				26F93D12DE3541A78594229A /* PaymentsDisplayPreferences.swift */,
 				3465F4D327287675001663AF /* PaymentsImpl.swift */,
 				3465F4D127287674001663AF /* PaymentsProcessor.swift */,
 				3465F4D027287674001663AF /* PaymentsReconciliation.swift */,
@@ -16733,6 +16736,7 @@
 				66CE755F28C332AF00D5FA79 /* PaymentOnboarding.swift in Sources */,
 				3465F4DD2728812B001663AF /* Payments.swift in Sources */,
 				34A955B9271B553D00B05242 /* PaymentsFormat+MobileCoin.swift in Sources */,
+				0430706099CA47739A6110E8 /* PaymentsDisplayPreferences.swift in Sources */,
 				3465F4D827287677001663AF /* PaymentsImpl.swift in Sources */,
 				3465F4D627287677001663AF /* PaymentsProcessor.swift in Sources */,
 				3465F4D527287677001663AF /* PaymentsReconciliation.swift in Sources */,
