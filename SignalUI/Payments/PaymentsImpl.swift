@@ -573,6 +573,16 @@ extension PaymentsImpl {
             req: CheckLightningAddressRequest(username: username))
     }
 
+    public func fetchBitcoinTaprootAddress() async throws -> ReceivePaymentResponse {
+        let sdk = try getBreezSdk()
+        let response = try await sdk.receivePayment(
+            request: ReceivePaymentRequest(
+                paymentMethod: .bitcoinAddress
+            )
+        )
+        return response
+    }
+
     public func registerUsername(_ username: String) async throws {
         let paymentsState = self.paymentsState
         owsAssertDebug(paymentsState.isEnabled)

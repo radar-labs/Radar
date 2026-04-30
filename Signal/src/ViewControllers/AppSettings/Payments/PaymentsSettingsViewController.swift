@@ -986,7 +986,7 @@ public class PaymentsSettingsViewController: OWSTableViewController2 {
         ) { [weak self] _ in
             self?.didTapHelpButton()
         })
-        
+
         actionSheet.addAction(OWSActionSheets.cancelAction)
 
         presentActionSheet(actionSheet)

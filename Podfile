@@ -39,7 +39,7 @@ pod 'libPhoneNumber-iOS', git: 'https://github.com/signalapp/libPhoneNumber-iOS'
 
 pod 'SDWebImage'
 pod 'SDWebImageWebPCoder'
-pod 'libwebp' 
+pod 'libwebp'
 
 ###
 # third party pods
@@ -54,10 +54,10 @@ def ui_pods
 
   pod 'LibMobileCoin/CoreHTTP', git: 'https://github.com/signalapp/libmobilecoin-ios-artifacts', tag: 'signal/6.0.2', submodules: true
   pod 'MobileCoin/CoreHTTP', git: 'https://github.com/mobilecoinofficial/MobileCoin-Swift', tag: 'v6.0.3'
-  
+
   pod 'Swift-BigInt', '2.4.0'
   pod 'BreezSdkSpark', git: 'https://github.com/breez/breez-sdk-spark-swift.git', tag: '0.9.1'
-  
+
   pod "MnemonicSwift", git: 'https://github.com/zcash/swift-bip39', tag: '2.2.5'
 end
 
@@ -88,10 +88,10 @@ end
 
 target 'SignalServiceKit' do
   pod 'CocoaLumberjack'
-  
+
   pod 'Swift-BigInt', '2.4.0'
   pod 'BreezSdkSpark', git: 'https://github.com/breez/breez-sdk-spark-swift.git', tag: '0.9.1'
-  
+
   target 'SignalServiceKitTests' do
     inherit! :search_paths
   end

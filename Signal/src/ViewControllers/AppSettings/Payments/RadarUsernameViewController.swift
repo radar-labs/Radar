@@ -110,7 +110,7 @@ class RadarUsernameViewController: OWSViewController {
         confirmButton.setEnabled(false)
 
         let skipButton = OWSFlatButton.button(
-            title: "Skip this step",
+            title: "Cancel",
             font: .dynamicTypeSubheadlineClamped.semibold(),
             titleColor: .ows_accentBlue,
             backgroundColor: .clear,

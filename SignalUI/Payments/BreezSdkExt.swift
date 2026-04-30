@@ -25,6 +25,13 @@ extension BreezSdk {
 
         let builder = SdkBuilder(config: config, seed: seed)
         await builder.withDefaultStorage(storageDir: breezDirectory.path)
+        // TODO: commented out as it changes the wallet, until we have clarity from breez
+//        let keySetConfig = KeySetConfig(
+//            keySetType: .nativeSegwit,
+//            useAddressIndex: true,
+//            accountNumber: nil
+//        )
+//        await builder.withKeySet(config: keySetConfig)
 
         return try await builder.build()
     }
