@@ -11,7 +11,7 @@ public extension PaymentsFormat {
     static func formatInChatSuccess(
         paymentAmount: TSPaymentAmount
     ) -> NSAttributedString {
-        if PaymentsImpl.isSatoshiAmountTypeEnabled() {
+        if PaymentsDisplayPreferences.shared.isSatoshiEnabled {
             return inChatSuccessAmountBuilder("\(paymentAmount.picoMob)")
         }
         
@@ -24,7 +24,7 @@ public extension PaymentsFormat {
     static func formatInChatFailure(
         paymentAmount: TSPaymentAmount
     ) -> NSAttributedString {
-        if PaymentsImpl.isSatoshiAmountTypeEnabled() {
+        if PaymentsDisplayPreferences.shared.isSatoshiEnabled {
             return inChatFailureAmountBuilder("\(paymentAmount.picoMob)")
         }
         
@@ -47,7 +47,7 @@ public extension PaymentsFormat {
         let secondAttributes: [NSAttributedString.Key: Any] = [.font: newThinFont]
 
         let firstString = NSMutableAttributedString(string: amount, attributes: firstAttributes)
-        let currencyIdentifier = if PaymentsImpl.isSatoshiAmountTypeEnabled() {
+        let currencyIdentifier = if PaymentsDisplayPreferences.shared.isSatoshiEnabled {
             "sats"
         } else {
             "BTC"
@@ -95,7 +95,7 @@ public extension PaymentsFormat {
                                  withSpace: Bool = false) -> NSAttributedString {
         switch paymentAmount.currency {
         case .bitcoin:
-            let bitcoinString = if PaymentsImpl.isSatoshiAmountTypeEnabled() {
+            let bitcoinString = if PaymentsDisplayPreferences.shared.isSatoshiEnabled {
                 "\(paymentAmount.picoMob)"
             } else {
                 format(paymentAmount: paymentAmount,
@@ -134,7 +134,7 @@ public extension PaymentsFormat {
     
     static func attributedFormat(bitcoinString: String,
                                  withSpace: Bool = false) -> NSAttributedString {
-        let currencyCode = if PaymentsImpl.isSatoshiAmountTypeEnabled() {
+        let currencyCode = if PaymentsDisplayPreferences.shared.isSatoshiEnabled {
             PaymentsConstants.satoshiCurrencyIdentifier
         } else {
             PaymentsConstants.bitcoinCurrencyIdentifier

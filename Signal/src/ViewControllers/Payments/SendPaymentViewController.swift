@@ -77,7 +77,7 @@ public class SendPaymentViewController: OWSViewController {
     }
     
     private var isSatoshiEnabled: Bool {
-        PaymentsImpl.isSatoshiAmountTypeEnabled()
+        PaymentsDisplayPreferences.shared.isSatoshiEnabled
     }
 
     public init(
@@ -90,7 +90,7 @@ public class SendPaymentViewController: OWSViewController {
         self.mode = mode
         self.isOutgoingTransfer = isOutgoingTransfer
 
-        if PaymentsImpl.isSatoshiAmountTypeEnabled() {
+        if PaymentsDisplayPreferences.shared.isSatoshiEnabled {
             amounts.set(currentAmount: Amounts.defaultSatoshiAmount, otherCurrencyAmount: nil)
         } else if Self.wasLastPaymentInFiat, let defaultFiatAmount = Amounts.defaultFiatAmount {
             amounts.set(currentAmount: defaultFiatAmount, otherCurrencyAmount: nil)
@@ -1438,7 +1438,7 @@ private class Amounts {
     }
 
     func reset() {
-        if PaymentsImpl.isSatoshiAmountTypeEnabled() {
+        if PaymentsDisplayPreferences.shared.isSatoshiEnabled {
             set(currentAmount: Self.defaultSatoshiAmount, otherCurrencyAmount: nil)
         } else {
             set(currentAmount: Self.defaultMCAmount, otherCurrencyAmount: nil)

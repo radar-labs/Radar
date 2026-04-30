@@ -29,8 +29,6 @@ public class PaymentsSettingsViewController: OWSTableViewController2 {
     private let appReadiness: AppReadinessSetter
     private let mode: PaymentsSettingsMode
 
-    private var isBalanceHidden = false
-
     private let paymentsHistoryDataSource = PaymentsHistoryDataSource()
 
     fileprivate static let maxHistoryCount: Int = 4
@@ -355,6 +353,18 @@ public class PaymentsSettingsViewController: OWSTableViewController2 {
             name: PaymentsCurrenciesImpl.paymentConversionRatesDidChange,
             object: nil
         )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(updateTableContents),
+            name: PaymentsDisplayPreferences.balanceHiddenDidChange,
+            object: nil
+        )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(updateTableContents),
+            name: PaymentsDisplayPreferences.amountTypeDidChange,
+            object: nil
+        )
     }
 
     @objc
@@ -420,7 +430,7 @@ public class PaymentsSettingsViewController: OWSTableViewController2 {
 
     private func configureEnabledHeader(cell: UITableViewCell) {
         let eyeButton = UIButton(type: .system)
-        let eyeImageName = isBalanceHidden ? "eye.slash" : "eye"
+        let eyeImageName = PaymentsDisplayPreferences.shared.isBalanceHidden ? "eye.slash" : "eye"
         eyeButton.setImage(UIImage(systemName: eyeImageName), for: .normal)
         eyeButton.tintColor = Theme.secondaryTextAndIconColor
         eyeButton.addTarget(self, action: #selector(didTapEyeButton), for: .touchUpInside)
@@ -479,7 +489,7 @@ public class PaymentsSettingsViewController: OWSTableViewController2 {
             conversionInfoView.tintColor = .clear
         }
 
-        if isBalanceHidden {
+        if PaymentsDisplayPreferences.shared.isBalanceHidden {
             balanceLabel.text = "••••••"
             hideConversions()
         } else if let paymentBalance = SUIEnvironment.shared.paymentsSwiftRef.currentPaymentBalance {
@@ -1206,14 +1216,12 @@ public class PaymentsSettingsViewController: OWSTableViewController2 {
     
     @objc
     private func didTapToggleSatoshi() {
-        _ = PaymentsImpl.toggleSatoshiAmountType()
-        updateTableContents()
+        PaymentsDisplayPreferences.shared.toggleAmountType()
     }
 
     @objc
     private func didTapEyeButton() {
-        isBalanceHidden.toggle()
-        updateTableContents()
+        PaymentsDisplayPreferences.shared.toggleBalanceHidden()
     }
 
     private func didTapTransferToExchangeButton() {
