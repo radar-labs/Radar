@@ -489,28 +489,24 @@ public class PaymentsSettingsViewController: OWSTableViewController2 {
             conversionInfoView.tintColor = .clear
         }
 
-        if PaymentsDisplayPreferences.shared.isBalanceHidden {
-            balanceLabel.text = "••••••"
-            hideConversions()
-        } else if let paymentBalance = SUIEnvironment.shared.paymentsSwiftRef.currentPaymentBalance {
-            balanceLabel.attributedText = PaymentsFormat.attributedFormat(paymentAmount: paymentBalance.amount,
-                                                                          isShortForm: false)
+        let paymentBalance = SUIEnvironment.shared.paymentsSwiftRef.currentPaymentBalance
+        let prefs = PaymentsDisplayPreferences.shared
 
-            if let balanceConversionText = Self.buildBalanceConversionText(paymentBalance: paymentBalance) {
-                conversionLabel.text = balanceConversionText
-            } else {
-                hideConversions()
-            }
-        } else {
-            // Use an empty string to avoid jitter in layout between the
-            // "pending balance" and "has balance" states.
-            balanceLabel.text = " "
+        balanceLabel.attributedText = PaymentsFormat.formattedBalance(paymentBalance)
 
+        // Show spinner only while loading and not hidden.
+        if paymentBalance == nil && !prefs.isBalanceHidden {
             let activityIndicator = UIActivityIndicatorView(style: .medium)
             balanceLabel.addSubview(activityIndicator)
             activityIndicator.autoCenterInSuperview()
             activityIndicator.startAnimating()
+        }
 
+        if !prefs.isBalanceHidden,
+           let paymentBalance,
+           let balanceConversionText = Self.buildBalanceConversionText(paymentBalance: paymentBalance) {
+            conversionLabel.text = balanceConversionText
+        } else {
             hideConversions()
         }
 

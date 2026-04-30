@@ -152,6 +152,20 @@ public extension PaymentsFormat {
                          withSpace: withSpace)
     }
 
+    /// Returns the wallet balance formatted for display, respecting both the
+    /// hide/show preference and the sats/btc preference.
+    /// - Pass `nil` when the balance is still loading — returns a space to
+    ///   preserve layout height while a spinner overlays it.
+    static func formattedBalance(_ balance: PaymentBalance?) -> NSAttributedString {
+        guard !PaymentsDisplayPreferences.shared.isBalanceHidden else {
+            return NSAttributedString(string: "••••••")
+        }
+        guard let balance else {
+            return NSAttributedString(string: " ")
+        }
+        return attributedFormat(paymentAmount: balance.amount, isShortForm: false)
+    }
+
     static func attributedFormat(fiatCurrencyAmount: Double,
                                  currencyCode: String,
                                  withSpace: Bool = false) -> NSAttributedString? {
