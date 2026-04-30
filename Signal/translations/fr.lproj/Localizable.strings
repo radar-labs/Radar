@@ -8159,19 +8159,19 @@
 "SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_BUTTON" = "Ignorer la phrase de récupération";
 
 /* Message of confirmation alert when discarding recovery phrase. */
-"SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_MESSAGE" = "Votre phrase de récupération vous permet de récupérer votre solde en cas de problème. Nous vous recommandons fortement de la conserver en lieu sûr.";
+"SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_MESSAGE" = "Sans votre phrase secrète, vous ne pourrez pas restaurer votre solde dans Cake Wallet ou d'autres portefeuilles compatibles Spark. Vous pouvez toujours la sauvegarder plus tard dans les paramètres.";
 
 /* Title of confirmation alert when discarding recovery phrase. */
 "SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_TITLE" = "Continuer sans enregistrer ?";
 
 /* Explanation of the 'payments passphrase' in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION" = "Votre solde est automatiquement restauré lorsque vous réinstallez Signal et confirmez votre code PIN Signal. Vous pouvez aussi le restaurer grâce à une phrase de récupération unique comportant 24 mots. Notez-la et conservez-la en lieu sûr.";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION" = "Votre phrase secrète n'est pas nécessaire pour sécuriser vos fonds — Radar gère la récupération automatiquement. La sauvegarder vous apporte une tranquillité d'esprit supplémentaire et vous permet de restaurer votre solde dans Cake Wallet ou tout autre portefeuille compatible Spark.";
 
 /* Explanation of the 'payments passphrase' when there is a balance. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_BALANCE" = "Un solde est disponible sur votre compte ! Il est temps d'enregistrer votre phrase de récupération, une clé de 24 mots que vous pouvez utiliser pour récupérer votre solde.";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_BALANCE" = "Vous avez un solde ! Sauvegarder votre phrase secrète n'est pas obligatoire, mais cela vous apporte une tranquillité d'esprit supplémentaire et vous permet de restaurer votre solde dans Cake Wallet ou d'autres portefeuilles compatibles Spark.";
 
 /* Explanation of the 'payments passphrase' when from the help card. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_HELP_CARD" = "Il est temps d'enregistrer votre phrase de récupération, une clé de 24 mots que vous pouvez utiliser pour récupérer votre solde.";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_HELP_CARD" = "Sauvegarder votre phrase secrète n'est pas obligatoire, mais cela vous apporte une tranquillité d'esprit supplémentaire et vous permet de restaurer votre solde dans Cake Wallet ou d'autres portefeuilles compatibles Spark.";
 
 /* Label for the 'add money' button in the 'send payment' UI. */
 "SETTINGS_PAYMENTS_PAYMENT_ADD_MONEY" = "Ajouter des fonds";
@@ -8465,10 +8465,10 @@
 "SETTINGS_PAYMENTS_VIEW_PASSPHRASE_TITLE" = "Phrase de récupération";
 
 /* Header text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "Notez les 24 mots suivants dans l'ordre où ils sont affichés. Conservez votre liste en lieu sûr.";
+"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "Notez ces 24 mots dans l'ordre et conservez-les en lieu sûr. Vous pouvez les utiliser pour restaurer votre solde dans Cake Wallet ou d'autres portefeuilles compatibles Spark.";
 
 /* Footer text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_FOOTER_2" = "Ne partagez pas cette liste";
+"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_FOOTER_2" = "Ne partagez cette phrase avec personne";
 
 /* Title for the content section of the  'payments lock prompt' view shown after payemts activation. */
 "SETTINGS_PAYMENTS_VIEW_PAYMENTS_LOCK_PROMPT_TITLE" = "Une protection renforcée";

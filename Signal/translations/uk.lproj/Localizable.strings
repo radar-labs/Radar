@@ -8159,19 +8159,19 @@
 "SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_BUTTON" = "Пропустити кодову фразу";
 
 /* Message of confirmation alert when discarding recovery phrase. */
-"SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_MESSAGE" = "Кодова фраза дає можливість відновити баланс, якщо станеться найгірше. Ми настійно радимо її зберегти.";
+"SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_MESSAGE" = "Без сід-фрази ви не зможете відновити баланс у Cake Wallet або інших Spark-сумісних гаманцях. Ви завжди можете зберегти її пізніше в налаштуваннях.";
 
 /* Title of confirmation alert when discarding recovery phrase. */
 "SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_TITLE" = "Продовжити без збереження?";
 
 /* Explanation of the 'payments passphrase' in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION" = "Після перевстановлення Signal ваш баланс буде автоматично відновлено, якщо ви підтвердите свій PIN-код Signal. Відновити баланс можна також за допомогою кодової фрази — вона унікальна й складається з 24 слів. Запишіть її та зберігайте в надійному місці.";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION" = "Ваша сід-фраза не є обов'язковою для збереження коштів — Radar автоматично виконує відновлення. Збереження дає вам додатковий спокій та дозволяє відновити баланс у Cake Wallet або іншому Spark-сумісному гаманці.";
 
 /* Explanation of the 'payments passphrase' when there is a balance. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_BALANCE" = "У вас є залишок! Збережіть кодову фразу — пароль з 24 слів, за допомогою якого ви зможете відновити свій залишок.";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_BALANCE" = "У вас є баланс! Зберігати сід-фразу необов'язково, але це дає додатковий спокій та дозволяє відновити баланс у Cake Wallet або інших Spark-сумісних гаманцях.";
 
 /* Explanation of the 'payments passphrase' when from the help card. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_HELP_CARD" = "Збережіть кодову фразу — пароль з 24 слів, за допомогою якого ви зможете відновити свій залишок.";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_HELP_CARD" = "Зберігати сід-фразу необов'язково, але це дає додатковий спокій та дозволяє відновити баланс у Cake Wallet або інших Spark-сумісних гаманцях.";
 
 /* Label for the 'add money' button in the 'send payment' UI. */
 "SETTINGS_PAYMENTS_PAYMENT_ADD_MONEY" = "Додати кошти";
@@ -8465,10 +8465,10 @@
 "SETTINGS_PAYMENTS_VIEW_PASSPHRASE_TITLE" = "Кодова фраза";
 
 /* Header text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "Запишіть ці 24 слова в такому ж порядку. Збережіть цей список слів у надійному місці.";
+"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "Запишіть ці 24 слова по порядку та зберігайте в надійному місці. Ви можете використовувати їх для відновлення балансу в Cake Wallet або інших Spark-сумісних гаманцях.";
 
 /* Footer text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_FOOTER_2" = "Ні з ким не діліться цим списком";
+"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_FOOTER_2" = "Не діліться цією фразою ні з ким";
 
 /* Title for the content section of the  'payments lock prompt' view shown after payemts activation. */
 "SETTINGS_PAYMENTS_VIEW_PAYMENTS_LOCK_PROMPT_TITLE" = "Додатковий рівень захисту";

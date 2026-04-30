@@ -8159,19 +8159,19 @@
 "SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_BUTTON" = "رد شدن از عبارت بازیابی";
 
 /* Message of confirmation alert when discarding recovery phrase. */
-"SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_MESSAGE" = "عبارت بازیابی به شما امکان می‌دهد که در بدترین حالت، موجودی خود را بازیابی کنید. اکیدا توصیه می‌کنیم که آن را ذخیره کنید.";
+"SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_MESSAGE" = "بدون عبارت بذر، نمی‌توانید موجودی خود را در Cake Wallet یا کیف پول‌های دیگر سازگار با Spark بازگردانید. همیشه می‌توانید بعداً از تنظیمات آن را ذخیره کنید.";
 
 /* Title of confirmation alert when discarding recovery phrase. */
 "SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_TITLE" = "ادامه بدون ذخیره‌سازی؟";
 
 /* Explanation of the 'payments passphrase' in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION" = "اگر پین سیگنال خود را تأیید کنید موجودی شما هنگام نصب دوبارهٔ سیگنال به صورت خودکار بازیابی خواهد شد. شما همچنین می‌توانید موجودی خود را با استفاده از یک عبارت بازیابی، که یک عبارت ۲۴-کلمه‌ای منحصر به شماست، بازیابی کنید. آن را یادداشت و در یک مکان امن نگهداری کنید.";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION" = "عبارت بذر شما برای ایمن نگه داشتن وجوهتان ضروری نیست — Radar به صورت خودکار بازیابی را مدیریت می‌کند. ذخیره آن آرامش ذهنی بیشتری به شما می‌دهد و به شما امکان می‌دهد موجودی خود را در Cake Wallet یا هر کیف پول سازگار با Spark دیگری بازگردانید.";
 
 /* Explanation of the 'payments passphrase' when there is a balance. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_BALANCE" = "شما موجودی‌ای دارید! زمان ذخیره‌سازی عبارت بازیابی است—یک رمز 24 کلمه‌ای که می‌توانید برای بازیابی موجودی خود از آن استفاده کنید.";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_BALANCE" = "موجودی دارید! ذخیره عبارت بذر اجباری نیست، اما آرامش ذهنی بیشتری می‌دهد و به شما امکان بازگردانی موجودی در Cake Wallet یا کیف پول‌های دیگر سازگار با Spark را می‌دهد.";
 
 /* Explanation of the 'payments passphrase' when from the help card. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_HELP_CARD" = "زمان ذخیره‌سازی عبارت بازیابی است—یک رمز 24 کلمه‌ای که می‌توانید برای بازیابی موجودی خود از آن استفاده کنید.";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_HELP_CARD" = "ذخیره عبارت بذر اجباری نیست، اما آرامش ذهنی بیشتری می‌دهد و به شما امکان بازگردانی موجودی در Cake Wallet یا کیف پول‌های دیگر سازگار با Spark را می‌دهد.";
 
 /* Label for the 'add money' button in the 'send payment' UI. */
 "SETTINGS_PAYMENTS_PAYMENT_ADD_MONEY" = "افزودن اعتبار";
@@ -8465,10 +8465,10 @@
 "SETTINGS_PAYMENTS_VIEW_PASSPHRASE_TITLE" = "عبارت بازیابی";
 
 /* Header text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "۲۴ کلمهٔ زیر را به ترتیب یادداشت کنید. فهرست خود را در یک جای امن نگهداری کنید.";
+"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "این ۲۴ کلمه را به ترتیب بنویسید و در جای امنی نگهداری کنید. می‌توانید از آنها برای بازگردانی موجودی در Cake Wallet یا کیف پول‌های دیگر سازگار با Spark استفاده کنید.";
 
 /* Footer text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_FOOTER_2" = "این فهرست اشتراک‌گذاری نشود";
+"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_FOOTER_2" = "این عبارت را با هیچکس به اشتراک نگذارید";
 
 /* Title for the content section of the  'payments lock prompt' view shown after payemts activation. */
 "SETTINGS_PAYMENTS_VIEW_PAYMENTS_LOCK_PROMPT_TITLE" = "لایه مضاعف محافظتی";

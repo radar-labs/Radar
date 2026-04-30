@@ -8159,19 +8159,19 @@
 "SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_BUTTON" = "Preskoči frazu za oporavak";
 
 /* Message of confirmation alert when discarding recovery phrase. */
-"SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_MESSAGE" = "Vaša fraza za oporavak omogućuje vam da vratite prethodno stanje svog računa u slučaju nepredviđenih okolnosti. Toplo vam preporučujemo da je spremite.";
+"SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_MESSAGE" = "Bez seed-fraze nećete moći obnoviti saldo u Cake Wallet ili drugim Spark-kompatibilnim novčanicama. Uvijek je možete pohraniti kasnije u postavkama.";
 
 /* Title of confirmation alert when discarding recovery phrase. */
 "SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_TITLE" = "Nastaviti bez spremanja?";
 
 /* Explanation of the 'payments passphrase' in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION" = "Račun će se automatski vratiti kada ponovo instalirate Signal ako potvrdite svoj Signal PIN. Stanje možete vratiti i pomoću fraze za oporavak koja je za vas jedinstvena fraza od 24 riječi. Zapišite je i spremite na sigurno mjesto.";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION" = "Vaša seed-fraza nije potrebna za čuvanje vaših sredstava — Radar automatski obrađuje oporavak. Njezino čuvanje pruža vam dodatni mir i omogućuje vam obnavljanje salda u Cake Wallet ili bilo kojoj drugoj Spark-kompatibilnoj novčanici.";
 
 /* Explanation of the 'payments passphrase' when there is a balance. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_BALANCE" = "Imate nešto na stanju! Vrijeme je da spremite svoju frazu za oporavak—lozinku od 24 riječi koju možete koristiti za vraćanje prethodnog stanja svog računa.";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_BALANCE" = "Imate saldo! Čuvanje seed-fraze nije obavezno, ali pruža dodatni mir i omogućuje obnavljanje salda u Cake Wallet ili drugim Spark-kompatibilnim novčanicama.";
 
 /* Explanation of the 'payments passphrase' when from the help card. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_HELP_CARD" = "Vrijeme je da spremite svoju frazu za oporavak—lozinku od 24 riječi koju možete koristiti za vraćanje prethodnog stanja svog računa.";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_HELP_CARD" = "Čuvanje seed-fraze nije obavezno, ali pruža dodatni mir i omogućuje obnavljanje salda u Cake Wallet ili drugim Spark-kompatibilnim novčanicama.";
 
 /* Label for the 'add money' button in the 'send payment' UI. */
 "SETTINGS_PAYMENTS_PAYMENT_ADD_MONEY" = "Dodaj sredstva";
@@ -8465,10 +8465,10 @@
 "SETTINGS_PAYMENTS_VIEW_PASSPHRASE_TITLE" = "Fraza za oporavak";
 
 /* Header text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "Redom zapišite slijedeće 24 riječi. Spremite vaš popis riječi na sigurno mjesto.";
+"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "Zapišite ovih 24 riječi redom i pohranite ih na sigurno mjesto. Možete ih koristiti za obnavljanje salda u Cake Wallet ili drugim Spark-kompatibilnim novčanicama.";
 
 /* Footer text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_FOOTER_2" = "Nemojte dijeliti ovaj popis";
+"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_FOOTER_2" = "Ne dijeli ovu frazu ni s kim";
 
 /* Title for the content section of the  'payments lock prompt' view shown after payemts activation. */
 "SETTINGS_PAYMENTS_VIEW_PAYMENTS_LOCK_PROMPT_TITLE" = "Dodatna razina zaštite";

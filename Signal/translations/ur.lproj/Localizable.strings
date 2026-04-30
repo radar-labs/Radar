@@ -8159,19 +8159,19 @@
 "SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_BUTTON" = "ریکوری کی عبارت موخر کریں";
 
 /* Message of confirmation alert when discarding recovery phrase. */
-"SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_MESSAGE" = "آپ کی بحالی کی عبارت آپ کو مشکل ترین صورتحال میں اپنا بیلنس بحال کرنے کی اجازت دیتی ہے۔ ہمارا مشورہ ہے کہ اسے محفوظ کر لیں۔";
+"SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_MESSAGE" = "سیڈ فریز کے بغیر آپ Cake Wallet یا دیگر Spark-مطابق والیٹس میں اپنا بیلنس بحال نہیں کر سکتے۔ آپ ہمیشہ اسے بعد میں سیٹنگز سے محفوظ کر سکتے ہیں۔";
 
 /* Title of confirmation alert when discarding recovery phrase. */
 "SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_TITLE" = "بغیر محفوظ کیے جاری رکھیں؟";
 
 /* Explanation of the 'payments passphrase' in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION" = "اگر آپ اپنے Signal پن کی تصدیق کرتے ہیں تو آپ Signal کو دوبارہ انسٹال کرتے وقت آپ کا بیلنس خود بخود بحال ہوجائے گا۔ آپ بازیافت والے فقرے کا استعمال کرتے ہوئے اپنے بیلنس کو بھی بحال کرسکتے ہیں ، جو آپ کے لئے 24 الفاظ کا جملہ ہے۔ اسے لکھ کر محفوظ جگہ پر محفوظ کریں۔";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION" = "آپ کی سیڈ فریز آپ کے فنڈز کو محفوظ رکھنے کے لیے ضروری نہیں — Radar خود بخود بازیابی کا انتظام کرتا ہے۔ اسے محفوظ کرنا آپ کو اضافی اطمینان دیتا ہے اور Cake Wallet یا کسی بھی دوسرے Spark-مطابق والیٹ میں اپنا بیلنس بحال کرنے دیتا ہے۔";
 
 /* Explanation of the 'payments passphrase' when there is a balance. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_BALANCE" = "آپ کے پاس بیلنس موجود ہے! اپنی ریکوری کی عبارت محفوظ کرنے کا وقت ہے—24 الفاظ پر مشتمل کیی جو آپ اپنا بیلنس ریکور کرنے کے لیے استعمال کر سکتے ہیں۔";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_BALANCE" = "آپ کا بیلنس ہے! سیڈ فریز محفوظ کرنا ضروری نہیں، لیکن اضافی اطمینان دیتا ہے اور Cake Wallet یا دیگر Spark-مطابق والیٹس میں بیلنس بحال کرنے دیتا ہے۔";
 
 /* Explanation of the 'payments passphrase' when from the help card. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_HELP_CARD" = "اپنی ریکوری کی عبارت محفوظ کرنے کا وقت ہے—24 الفاظ پر مشتمل کیی جو آپ اپنا بیلنس ریکور کرنے کے لیے استعمال کر سکتے ہیں۔";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_HELP_CARD" = "سیڈ فریز محفوظ کرنا ضروری نہیں، لیکن اضافی اطمینان دیتا ہے اور Cake Wallet یا دیگر Spark-مطابق والیٹس میں بیلنس بحال کرنے دیتا ہے۔";
 
 /* Label for the 'add money' button in the 'send payment' UI. */
 "SETTINGS_PAYMENTS_PAYMENT_ADD_MONEY" = "فنڈز شامل کریں";
@@ -8465,10 +8465,10 @@
 "SETTINGS_PAYMENTS_VIEW_PASSPHRASE_TITLE" = "بازیابی کی عبارت";
 
 /* Header text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "ترتیب میں مندرجہ ذیل 24 الفاظ لکھیں۔ اپنی فہرست کو محفوظ جگہ پر اسٹور کریں۔";
+"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "یہ 24 الفاظ ترتیب سے لکھیں اور محفوظ جگہ پر رکھیں۔ آپ انہیں Cake Wallet یا دیگر Spark-مطابق والیٹس میں اپنا بیلنس بحال کرنے کے لیے استعمال کر سکتے ہیں۔";
 
 /* Footer text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_FOOTER_2" = "اس فہرست کو شیئر نہ کریں";
+"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_FOOTER_2" = "یہ فریز کسی کے ساتھ شیئر نہ کریں";
 
 /* Title for the content section of the  'payments lock prompt' view shown after payemts activation. */
 "SETTINGS_PAYMENTS_VIEW_PAYMENTS_LOCK_PROMPT_TITLE" = "حفاظت کی ایک اور تہہ";

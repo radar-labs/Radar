@@ -8159,19 +8159,19 @@
 "SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_BUTTON" = "Bỏ qua Cụm từ Khôi phục";
 
 /* Message of confirmation alert when discarding recovery phrase. */
-"SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_MESSAGE" = "Cụm từ khôi phục giúp bạn khôi phục số dư tài khoản của mình trong trường hợp xấu nhất. Chúng tôi khuyến khích bạn lưu lại.";
+"SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_MESSAGE" = "Không có cụm từ khởi tạo, bạn sẽ không thể khôi phục số dư trong Cake Wallet hoặc các ví khác tương thích với Spark. Bạn luôn có thể lưu nó sau trong cài đặt.";
 
 /* Title of confirmation alert when discarding recovery phrase. */
 "SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_TITLE" = "Tiếp tục và không lưu?";
 
 /* Explanation of the 'payments passphrase' in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION" = "Số dư của bạn sẽ tự động khôi phục khi bạn cài lại Signal nếu bạn xác nhận mã PIN Signal của mình. Bạn cũng có thể khôi phục số dư của mình bằng cách sử dụng một cụm từ khôi phục, và đây là một cụm từ 24-từ chỉ riêng cho bạn. Ghi nó lại và lưu giữ nó ở một nơi an toàn.";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION" = "Cụm từ khởi tạo của bạn không bắt buộc để giữ an toàn cho tiền của bạn — Radar tự động xử lý khôi phục. Lưu lại giúp bạn an tâm hơn và cho phép bạn khôi phục số dư trong Cake Wallet hoặc bất kỳ ví nào khác tương thích với Spark.";
 
 /* Explanation of the 'payments passphrase' when there is a balance. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_BALANCE" = "Bạn đã nhận được số dư! Đã đến lúc lưu cụm từ khôi phục—cụm 24 từ này giống như chìa khóa giúp bạn khôi phục số dư của mình.";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_BALANCE" = "Bạn có số dư! Lưu cụm từ khởi tạo không bắt buộc, nhưng mang lại sự an tâm hơn và cho phép khôi phục số dư trong Cake Wallet hoặc các ví khác tương thích với Spark.";
 
 /* Explanation of the 'payments passphrase' when from the help card. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_HELP_CARD" = "Đã đến lúc lưu cụm từ khôi phục—cụm 24 từ này giống như chìa khóa giúp bạn khôi phục số dư của mình.";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_HELP_CARD" = "Lưu cụm từ khởi tạo không bắt buộc, nhưng mang lại sự an tâm hơn và cho phép khôi phục số dư trong Cake Wallet hoặc các ví khác tương thích với Spark.";
 
 /* Label for the 'add money' button in the 'send payment' UI. */
 "SETTINGS_PAYMENTS_PAYMENT_ADD_MONEY" = "Thêm quỹ";
@@ -8465,10 +8465,10 @@
 "SETTINGS_PAYMENTS_VIEW_PASSPHRASE_TITLE" = "Cụm từ khôi phục";
 
 /* Header text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "Ghi lại 24 từ sau theo thứ tự. Lưu trữ danh sách của bạn ở một nơi bảo mật.";
+"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "Viết 24 từ này theo thứ tự và lưu ở nơi an toàn. Bạn có thể dùng chúng để khôi phục số dư trong Cake Wallet hoặc các ví khác tương thích với Spark.";
 
 /* Footer text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_FOOTER_2" = "Không chia sẻ danh sách này";
+"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_FOOTER_2" = "Không chia sẻ cụm từ này với bất kỳ ai";
 
 /* Title for the content section of the  'payments lock prompt' view shown after payemts activation. */
 "SETTINGS_PAYMENTS_VIEW_PAYMENTS_LOCK_PROMPT_TITLE" = "Một Lớp Bảo vệ khác";

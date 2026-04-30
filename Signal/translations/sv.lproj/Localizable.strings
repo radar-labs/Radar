@@ -8159,19 +8159,19 @@
 "SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_BUTTON" = "Hoppa över återställningsfras";
 
 /* Message of confirmation alert when discarding recovery phrase. */
-"SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_MESSAGE" = "I ett värsta möjliga scenario kan du återställa ditt saldo med din återställningsfras. Vi rekommenderar starkt att du sparar den.";
+"SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_MESSAGE" = "Utan din seed-fras kan du inte återställa ditt saldo i Cake Wallet eller andra Spark-kompatibla plånböcker. Du kan alltid spara den senare i inställningarna.";
 
 /* Title of confirmation alert when discarding recovery phrase. */
 "SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_TITLE" = "Fortsätta utan att spara?";
 
 /* Explanation of the 'payments passphrase' in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION" = "Din saldo återställs automatiskt när du installerar om Signal om du bekräftar din Signal-PIN-kod. Du kan också återställa ditt saldo med en återställningsfras, som är en fras på 24 ord som är unik för dig. Skriv ner den och förvara den på ett säkert ställe.";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION" = "Din seed-fras behövs inte för att hålla dina medel säkra — Radar hanterar återställning automatiskt. Att spara den ger dig extra trygghet och låter dig återställa ditt saldo i Cake Wallet eller vilken annan Spark-kompatibel plånbok som helst.";
 
 /* Explanation of the 'payments passphrase' when there is a balance. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_BALANCE" = "Du har ett saldo. Det är dags att spara din återställningsfras – en nyckel på 24 ord som du kan använda för att återställa saldot.";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_BALANCE" = "Du har saldo! Att spara seed-frasen är inte obligatoriskt, men ger extra trygghet och låter dig återställa saldot i Cake Wallet eller andra Spark-kompatibla plånböcker.";
 
 /* Explanation of the 'payments passphrase' when from the help card. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_HELP_CARD" = "Det är dags att spara din återställningsfras – en nyckel på 24 ord som du kan använda för att återställa saldot.";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_HELP_CARD" = "Att spara seed-frasen är inte obligatoriskt, men ger extra trygghet och låter dig återställa saldot i Cake Wallet eller andra Spark-kompatibla plånböcker.";
 
 /* Label for the 'add money' button in the 'send payment' UI. */
 "SETTINGS_PAYMENTS_PAYMENT_ADD_MONEY" = "Lägga till pengar";
@@ -8465,10 +8465,10 @@
 "SETTINGS_PAYMENTS_VIEW_PASSPHRASE_TITLE" = "Återställningsfras";
 
 /* Header text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "Skriv ner följande 24 ord i ordning. Förvara din lista på ett säkert ställe.";
+"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "Skriv ner dessa 24 ord i ordning och förvara dem på en säker plats. Du kan använda dem för att återställa saldot i Cake Wallet eller andra Spark-kompatibla plånböcker.";
 
 /* Footer text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_FOOTER_2" = "Dela inte den här listan";
+"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_FOOTER_2" = "Dela inte den här frasen med någon";
 
 /* Title for the content section of the  'payments lock prompt' view shown after payemts activation. */
 "SETTINGS_PAYMENTS_VIEW_PAYMENTS_LOCK_PROMPT_TITLE" = "Ett skyddslager till";

@@ -8159,19 +8159,19 @@
 "SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_BUTTON" = "পুনরুদ্ধার করার বাক্য নির্ধারণের ধাপটি এড়িয়ে যান";
 
 /* Message of confirmation alert when discarding recovery phrase. */
-"SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_MESSAGE" = "আপনার পুনরুদ্ধার করার বাক্যটি আপনাকে সবচেয়ে প্রতিকূল পরিস্থিতিতে আপনার ব্যালেন্স পুনরুদ্ধার করতে সাহায্য করে। এটি সেভ করার জন্য আমরা আপনাকে জোরালো অনুরোধ জানাচ্ছি।";
+"SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_MESSAGE" = "সিড ফ্রেজ ছাড়া আপনি Cake Wallet বা অন্য Spark-সামঞ্জস্যপূর্ণ ওয়ালেটে ব্যালেন্স পুনরুদ্ধার করতে পারবেন না। সেটিংস থেকে পরে যেকোনো সময় সংরক্ষণ করতে পারবেন।";
 
 /* Title of confirmation alert when discarding recovery phrase. */
 "SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_TITLE" = "সেভ না করেই এগিয়ে যেতে চান?";
 
 /* Explanation of the 'payments passphrase' in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION" = "আপনি আপনার Signal পিন নিশ্চিত করলে Signal পুনরায় ইনস্টল করার সময় আপনার ব্যালেন্স স্বয়ংক্রিয়ভাবে পুনর্বহাল হয়ে যাবে। আপনি এছাড়াও রিকভারি ফ্রেজটি ব্যবহার করে আপনার ব্যালেন্স পুনর্বহাল করতে পারেন, যেটি 24-শব্দের একটি অনন্য বাক্যাংশ যা কেবলমাত্র আপনার কাছে থাকে। এটি লিখে রাখুন ও একটি নিরাপদ স্থানে সঞ্চয় করুন।";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION" = "আপনার সিড ফ্রেজ আপনার তহবিল সুরক্ষিত রাখতে প্রয়োজনীয় নয় — Radar স্বয়ংক্রিয়ভাবে পুনরুদ্ধার পরিচালনা করে। এটি সংরক্ষণ করা আপনাকে অতিরিক্ত মানসিক শান্তি দেয় এবং Cake Wallet বা অন্য যেকোনো Spark-সামঞ্জস্যপূর্ণ ওয়ালেটে ব্যালেন্স পুনরুদ্ধার করতে দেয়।";
 
 /* Explanation of the 'payments passphrase' when there is a balance. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_BALANCE" = "আপনি একটি ব্যালেন্স পেয়েছেন! আপনার পুনরুদ্ধার করার বাক্যটি সেভ করার সময় হয়েছে—একটি 24-শব্দের কী, যা আপনি আপনার ব্যালেন্স পুনরুদ্ধার করতে ব্যবহার করতে পারেন।";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_BALANCE" = "আপনার ব্যালেন্স আছে! সিড ফ্রেজ সংরক্ষণ বাধ্যতামূলক নয়, তবে অতিরিক্ত মানসিক শান্তি দেয় এবং Cake Wallet বা অন্য Spark-সামঞ্জস্যপূর্ণ ওয়ালেটে ব্যালেন্স পুনরুদ্ধার করতে দেয়।";
 
 /* Explanation of the 'payments passphrase' when from the help card. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_HELP_CARD" = "আপনার পুনরুদ্ধার করার বাক্যটি সেভ করার সময় হয়েছে—একটি 24-শব্দের কী, যা আপনি আপনার ব্যালেন্স পুনরুদ্ধার করতে ব্যবহার করতে পারেন।";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_HELP_CARD" = "সিড ফ্রেজ সংরক্ষণ বাধ্যতামূলক নয়, তবে অতিরিক্ত মানসিক শান্তি দেয় এবং Cake Wallet বা অন্য Spark-সামঞ্জস্যপূর্ণ ওয়ালেটে ব্যালেন্স পুনরুদ্ধার করতে দেয়।";
 
 /* Label for the 'add money' button in the 'send payment' UI. */
 "SETTINGS_PAYMENTS_PAYMENT_ADD_MONEY" = "ফান্ড যোগ করুন";
@@ -8465,10 +8465,10 @@
 "SETTINGS_PAYMENTS_VIEW_PASSPHRASE_TITLE" = "রিকভারি ফ্রেজ";
 
 /* Header text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "নিম্নোক্ত 24টি শব্দ সুবিন্যস্তভাবে লিখুন। আপনার তালিকাটি একটি নিরাপদ স্থানে সংরক্ষণ করুন।";
+"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "এই ২৪টি শব্দ ক্রমানুসারে লিখুন এবং নিরাপদ জায়গায় রাখুন। Cake Wallet বা অন্য Spark-সামঞ্জস্যপূর্ণ ওয়ালেটে ব্যালেন্স পুনরুদ্ধার করতে এগুলি ব্যবহার করতে পারবেন।";
 
 /* Footer text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_FOOTER_2" = "এই লিস্টটি শেয়ার করবেন না";
+"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_FOOTER_2" = "এই ফ্রেজটি কারো সাথে শেয়ার করবেন না";
 
 /* Title for the content section of the  'payments lock prompt' view shown after payemts activation. */
 "SETTINGS_PAYMENTS_VIEW_PAYMENTS_LOCK_PROMPT_TITLE" = "সুরক্ষার আরেকটি স্তর";

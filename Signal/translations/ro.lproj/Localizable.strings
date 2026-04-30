@@ -8159,19 +8159,19 @@
 "SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_BUTTON" = "Sari peste fraza de recuperare";
 
 /* Message of confirmation alert when discarding recovery phrase. */
-"SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_MESSAGE" = "Fraza ta de recuperare te ajută să restaurezi soldul în cazul în care se întâmplă o problemă. Îți recomandăm cu tărie să o salvezi.";
+"SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_MESSAGE" = "Fără fraza dvs. seed nu veți putea restabili soldul în Cake Wallet sau alte portofele compatibile Spark. O puteți salva oricând mai târziu din setări.";
 
 /* Title of confirmation alert when discarding recovery phrase. */
 "SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_TITLE" = "Continui Fără Să Salvezi?";
 
 /* Explanation of the 'payments passphrase' in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION" = "Soldul tău va fi restituit automat când reinstalezi Signal dacă confirmi PIN-ul Signal. De asemenea îți poți recupera soldul utilizând o frază de recuperare, ce este formată din 24 de cuvinte și este unică pentru tine. Ar trebui să o scrii pe hârtie si să o păstrezi într-un loc sigur.";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION" = "Fraza dvs. seed nu este necesară pentru a păstra fondurile în siguranță — Radar gestionează recuperarea automat. Salvarea ei vă oferă liniște suplimentară și vă permite să vă restabiliți soldul în Cake Wallet sau în orice alt portofel compatibil Spark.";
 
 /* Explanation of the 'payments passphrase' when there is a balance. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_BALANCE" = "Ai sold! E timpul să salvezi fraza de recuperare—o cheie de 24 de cuvinte pe care le poți folosi ca să restaurezi echilibrul.";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_BALANCE" = "Aveți un sold! Salvarea frazei seed nu este obligatorie, dar oferă liniște suplimentară și permite restabilirea soldului în Cake Wallet sau alte portofele compatibile Spark.";
 
 /* Explanation of the 'payments passphrase' when from the help card. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_HELP_CARD" = "E timpul să salvezi fraza de recuperare—o cheie de 24 de cuvinte pe care le poți folosi ca să restaurezi echilibrul.";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_HELP_CARD" = "Salvarea frazei seed nu este obligatorie, dar oferă liniște suplimentară și permite restabilirea soldului în Cake Wallet sau alte portofele compatibile Spark.";
 
 /* Label for the 'add money' button in the 'send payment' UI. */
 "SETTINGS_PAYMENTS_PAYMENT_ADD_MONEY" = "Adăugare fonduri";
@@ -8465,10 +8465,10 @@
 "SETTINGS_PAYMENTS_VIEW_PASSPHRASE_TITLE" = "Frază de recuperare";
 
 /* Header text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "Notați următoarele 24 de cuvinte în ordinea în care apar. Păstrați lista într-un loc sigur.";
+"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "Notați aceste 24 de cuvinte în ordine și păstrați-le într-un loc sigur. Le puteți folosi pentru a vă restabili soldul în Cake Wallet sau alte portofele compatibile Spark.";
 
 /* Footer text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_FOOTER_2" = "Nu distribui această listă";
+"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_FOOTER_2" = "Nu împărtășiți această frază cu nimeni";
 
 /* Title for the content section of the  'payments lock prompt' view shown after payemts activation. */
 "SETTINGS_PAYMENTS_VIEW_PAYMENTS_LOCK_PROMPT_TITLE" = "Alt strat de protecție";

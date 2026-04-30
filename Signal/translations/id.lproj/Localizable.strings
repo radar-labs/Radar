@@ -8159,19 +8159,19 @@
 "SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_BUTTON" = "Lewati Frasa Pemulihan";
 
 /* Message of confirmation alert when discarding recovery phrase. */
-"SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_MESSAGE" = "Frasa pemulihan memungkinkan Anda memulihkan saldo jika terjadi skenario terburuk. Sangat disarankan untuk menyimpannya.";
+"SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_MESSAGE" = "Tanpa seed phrase Anda, Anda tidak dapat memulihkan saldo di Cake Wallet atau dompet lain yang kompatibel dengan Spark. Anda selalu dapat menyimpannya nanti dari pengaturan.";
 
 /* Title of confirmation alert when discarding recovery phrase. */
 "SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_TITLE" = "Lanjutkan Tanpa Menyimpan?";
 
 /* Explanation of the 'payments passphrase' in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION" = "Saldo Anda akan dipulihkan secara otomatis saat Anda memasang ulang Signal jika Anda mengkonfirmasi PIN Signal. Anda juga dapat memulihkan saldo menggunakan frasa pemulihan, yang berupa 24 frasa kata unik untuk Anda. Tuliskan dan simpan di tempat yang aman.";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION" = "Seed phrase Anda tidak diperlukan untuk menjaga dana Anda tetap aman — Radar menangani pemulihan secara otomatis. Menyimpannya memberikan ketenangan pikiran ekstra dan memungkinkan Anda memulihkan saldo di Cake Wallet atau dompet lain yang kompatibel dengan Spark.";
 
 /* Explanation of the 'payments passphrase' when there is a balance. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_BALANCE" = "Anda memiliki saldo! Waktunya menyimpan frasa pemulihan—ini adalah kunci 24 kata yang bisa digunakan untuk memulihkan saldo.";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_BALANCE" = "Anda memiliki saldo! Menyimpan seed phrase tidak wajib, tetapi memberikan ketenangan pikiran ekstra dan memungkinkan pemulihan saldo di Cake Wallet atau dompet lain yang kompatibel dengan Spark.";
 
 /* Explanation of the 'payments passphrase' when from the help card. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_HELP_CARD" = "Waktunya menyimpan frasa pemulihan—ini adalah kunci 24 kata yang bisa digunakan untuk memulihkan saldo.";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_HELP_CARD" = "Menyimpan seed phrase tidak wajib, tetapi memberikan ketenangan pikiran ekstra dan memungkinkan pemulihan saldo di Cake Wallet atau dompet lain yang kompatibel dengan Spark.";
 
 /* Label for the 'add money' button in the 'send payment' UI. */
 "SETTINGS_PAYMENTS_PAYMENT_ADD_MONEY" = "Tambahkan Dana";
@@ -8465,10 +8465,10 @@
 "SETTINGS_PAYMENTS_VIEW_PASSPHRASE_TITLE" = "Frasa Pemulihan";
 
 /* Header text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "Tuliskan 24 kata berikut secara berurutan. Simpan di tempat yang aman.";
+"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "Tuliskan 24 kata ini secara berurutan dan simpan di tempat yang aman. Anda dapat menggunakannya untuk memulihkan saldo di Cake Wallet atau dompet lain yang kompatibel dengan Spark.";
 
 /* Footer text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_FOOTER_2" = "Jangan bagikan daftar ini";
+"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_FOOTER_2" = "Jangan bagikan frasa ini kepada siapa pun";
 
 /* Title for the content section of the  'payments lock prompt' view shown after payemts activation. */
 "SETTINGS_PAYMENTS_VIEW_PAYMENTS_LOCK_PROMPT_TITLE" = "Lapisan Perlindungan Lain";

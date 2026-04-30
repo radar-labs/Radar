@@ -8159,19 +8159,19 @@
 "SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_BUTTON" = "تَخَطَّ عبارة الاستعادة";
 
 /* Message of confirmation alert when discarding recovery phrase. */
-"SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_MESSAGE" = "تُتيح لك عبارة الاستعادة الخاصة بك اِسترجاع رصيدك في حالة حدوث أمر ما. نوصي بشدة بحفظها.";
+"SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_MESSAGE" = "بدون عبارة البذور لن تتمكن من استعادة رصيدك في Cake Wallet أو محافظ أخرى متوافقة مع Spark. يمكنك دائماً حفظها لاحقاً من الإعدادات.";
 
 /* Title of confirmation alert when discarding recovery phrase. */
 "SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_TITLE" = "هل ترغبُ بالمتابعة بدون حفظ؟";
 
 /* Explanation of the 'payments passphrase' in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION" = "سوف يُستعَاد رصيدك تلقائيًا فور الانتهاء من إعادة تثبيت سيجنال، وذلك إذا قُمتَ بتأكيد ‫رقم التعريف الشخصي‬ (PIN) على سيجنال الخاص بك. يمكنك أيضًا استعادة حسابك باستخدام عبارة الاستعادة، والتي تتكوَّن من 24 كلمة فريدة خاصك بك فقط. يُرجى كتابتها ثم حفظها في مكانٍ آمن.";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION" = "عبارة البذور الخاصة بك ليست ضرورية لحفظ أموالك — يتولى Radar الاسترداد تلقائياً. حفظها يمنحك راحة بال إضافية ويتيح لك استعادة رصيدك في Cake Wallet أو أي محفظة أخرى متوافقة مع Spark.";
 
 /* Explanation of the 'payments passphrase' when there is a balance. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_BALANCE" = "لديك رصيد! حان وقت حفظ عبارة الاستعادة الخاصة بك—مفتاح من 24 كلمة يُمكنك استخدامه لاستعادة رصيدك.";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_BALANCE" = "لديك رصيد! حفظ عبارة البذور ليس إلزامياً، لكنه يمنحك راحة بال إضافية ويتيح لك استعادة رصيدك في Cake Wallet أو محافظ أخرى متوافقة مع Spark.";
 
 /* Explanation of the 'payments passphrase' when from the help card. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_HELP_CARD" = "حان وقت حفظ عبارة الاستعادة الخاصة بك—مفتاح من 24 كلمة يُمكنك استخدامه لاستعادة رصيدك.";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_HELP_CARD" = "حفظ عبارة البذور ليس إلزامياً، لكنه يمنحك راحة بال إضافية ويتيح لك استعادة رصيدك في Cake Wallet أو محافظ أخرى متوافقة مع Spark.";
 
 /* Label for the 'add money' button in the 'send payment' UI. */
 "SETTINGS_PAYMENTS_PAYMENT_ADD_MONEY" = "إضافة مبالغ";
@@ -8465,10 +8465,10 @@
 "SETTINGS_PAYMENTS_VIEW_PASSPHRASE_TITLE" = "عبارة الاستعادة";
 
 /* Header text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "اكتب الكلمات الأربع والعشرين التالية بالترتيب. احتفِظ بقائمتك في مكانٍ آمن.";
+"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "اكتب هذه الكلمات الـ 24 بالترتيب واحتفظ بها في مكان آمن. يمكنك استخدامها لاستعادة رصيدك في Cake Wallet أو محافظ أخرى متوافقة مع Spark.";
 
 /* Footer text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_FOOTER_2" = "لا تُشارِك هذه القائمة";
+"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_FOOTER_2" = "لا تشارك هذه العبارة مع أحد";
 
 /* Title for the content section of the  'payments lock prompt' view shown after payemts activation. */
 "SETTINGS_PAYMENTS_VIEW_PAYMENTS_LOCK_PROMPT_TITLE" = "طبقة أخرى من الحماية";

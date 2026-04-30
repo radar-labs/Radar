@@ -8159,19 +8159,19 @@
 "SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_BUTTON" = "Παράλειψη φράσης ανάκτησης";
 
 /* Message of confirmation alert when discarding recovery phrase. */
-"SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_MESSAGE" = "Η φράση ανάκτησης σού επιτρέπει να επαναφέρεις το υπόλοιπό σου στο χειρότερο σενάριο. Συνιστούμε ανεπιφύλακτα να την αποθηκεύσεις.";
+"SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_MESSAGE" = "Χωρίς τη φράση seed σας δεν θα μπορείτε να επαναφέρετε το υπόλοιπό σας στο Cake Wallet ή σε άλλα πορτοφόλια συμβατά με Spark. Μπορείτε πάντα να την αποθηκεύσετε αργότερα από τις ρυθμίσεις.";
 
 /* Title of confirmation alert when discarding recovery phrase. */
 "SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_TITLE" = "Συνέχεια χωρίς αποθήκευση;";
 
 /* Explanation of the 'payments passphrase' in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION" = "Το υπόλοιπό σας θα αποκατασταθεί αυτόματα όταν εγκαταστήσετε ξανά το Signal, εάν επιβεβαιώσετε το Signal PIN. Μπορείτε επίσης να επαναφέρετε το υπόλοιπό σας χρησιμοποιώντας μια φράση ανάκτησης, η οποία είναι μια φράση 24 λέξεων, μοναδική για εσάς. Σημειώστε την και αποθηκεύστε την σε ασφαλές μέρος.";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION" = "Η φράση seed σας δεν είναι απαραίτητη για την ασφάλεια των κεφαλαίων σας — το Radar χειρίζεται αυτόματα την ανάκτηση. Η αποθήκευσή της σας δίνει επιπλέον ηρεμία και σας επιτρέπει να επαναφέρετε το υπόλοιπό σας στο Cake Wallet ή σε οποιοδήποτε άλλο πορτοφόλι συμβατό με Spark.";
 
 /* Explanation of the 'payments passphrase' when there is a balance. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_BALANCE" = "Έχεις υπόλοιπο! Ώρα να αποθηκεύσεις τη φράση ανάκτησης—μια φράση 24 λέξεων που μπορείς να χρησιμοποιήσεις για να επαναφέρεις το υπόλοιπό σου.";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_BALANCE" = "Έχετε υπόλοιπο! Η αποθήκευση της φράσης seed δεν είναι υποχρεωτική, αλλά σας δίνει επιπλέον ηρεμία και σας επιτρέπει να επαναφέρετε το υπόλοιπό σας στο Cake Wallet ή σε άλλα πορτοφόλια συμβατά με Spark.";
 
 /* Explanation of the 'payments passphrase' when from the help card. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_HELP_CARD" = "Ώρα να αποθηκεύσεις τη φράση ανάκτησης—μια φράση 24 λέξεων που μπορείς να χρησιμοποιήσεις για να επαναφέρεις το υπόλοιπό σου.";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_HELP_CARD" = "Η αποθήκευση της φράσης seed δεν είναι υποχρεωτική, αλλά σας δίνει επιπλέον ηρεμία και σας επιτρέπει να επαναφέρετε το υπόλοιπό σας στο Cake Wallet ή σε άλλα πορτοφόλια συμβατά με Spark.";
 
 /* Label for the 'add money' button in the 'send payment' UI. */
 "SETTINGS_PAYMENTS_PAYMENT_ADD_MONEY" = "Προσθήκη Χρημάτων";
@@ -8465,10 +8465,10 @@
 "SETTINGS_PAYMENTS_VIEW_PASSPHRASE_TITLE" = "Φράση ανάκτησης";
 
 /* Header text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "Σημειώστε τις ακόλουθες 24 λέξεις με τη σειρά. Φυλάξτε τον κατάλογό σας σε ασφαλές μέρος.";
+"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "Γράψτε αυτές τις 24 λέξεις με σειρά και φυλάξτε τις σε ασφαλές μέρος. Μπορείτε να τις χρησιμοποιήσετε για να επαναφέρετε το υπόλοιπό σας στο Cake Wallet ή σε άλλα πορτοφόλια συμβατά με Spark.";
 
 /* Footer text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_FOOTER_2" = "Μην κοινοποιείς αυτή τη λίστα";
+"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_FOOTER_2" = "Μην μοιραστείτε αυτή τη φράση με κανέναν";
 
 /* Title for the content section of the  'payments lock prompt' view shown after payemts activation. */
 "SETTINGS_PAYMENTS_VIEW_PAYMENTS_LOCK_PROMPT_TITLE" = "Ακόμα ένα επίπεδο προστασίας";

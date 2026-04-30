@@ -8159,19 +8159,19 @@
 "SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_BUTTON" = "跳過恢復片語";
 
 /* Message of confirmation alert when discarding recovery phrase. */
-"SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_MESSAGE" = "恢復片語可以幫你喺最壞情況下還原你嘅餘額。我哋強烈建議你收好佢。";
+"SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_MESSAGE" = "沒有助記詞，您將無法在Cake Wallet或其他Spark相容錢包中恢復餘額。您隨時可以在設定中稍後保存。";
 
 /* Title of confirmation alert when discarding recovery phrase. */
 "SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_TITLE" = "係咪唔使儲存就繼續操作？";
 
 /* Explanation of the 'payments passphrase' in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION" = "當您重新裝過 Signal 嘅時候，若果您確認您嘅 Signal PIN 碼，您嘅結餘將會自動還原。您亦可用恢復口訣嚟還原您嘅結餘。恢復口訣係您專屬、獨一無二嘅 24 組字詞，請寫低佢並保存喺安全嘅地方。";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION" = "您的助記詞不是保護資金安全的必要條件——Radar會自動處理復原。保存它可以給您額外的安心，並讓您在Cake Wallet或任何其他Spark相容錢包中恢復餘額。";
 
 /* Explanation of the 'payments passphrase' when there is a balance. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_BALANCE" = "你仲有餘額！係時候儲存你嘅恢復片語喇—佢係一組 24 個字嘅密鑰，可以用嚟恢復你嘅餘額。";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_BALANCE" = "您有餘額！保存助記詞不是必須的，但能給您額外的安心，並讓您在Cake Wallet或其他Spark相容錢包中恢復餘額。";
 
 /* Explanation of the 'payments passphrase' when from the help card. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_HELP_CARD" = "係時候儲存你嘅恢復片語喇—佢係一組 24 個字嘅密鑰，可以用嚟恢復你嘅餘額。";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_HELP_CARD" = "保存助記詞不是必須的，但能給您額外的安心，並讓您在Cake Wallet或其他Spark相容錢包中恢復餘額。";
 
 /* Label for the 'add money' button in the 'send payment' UI. */
 "SETTINGS_PAYMENTS_PAYMENT_ADD_MONEY" = "增加款項";
@@ -8465,10 +8465,10 @@
 "SETTINGS_PAYMENTS_VIEW_PASSPHRASE_TITLE" = "恢復口訣";
 
 /* Header text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "請依次序寫低下列 24 組字。將您嘅順序字條保存喺安全嘅地方。";
+"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "按順序寫下這24個詞並妥善保存。您可以用它們在Cake Wallet或其他Spark相容錢包中恢復餘額。";
 
 /* Footer text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_FOOTER_2" = "千祈唔好同人分享呢個清單";
+"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_FOOTER_2" = "請勿將此短語分享給任何人";
 
 /* Title for the content section of the  'payments lock prompt' view shown after payemts activation. */
 "SETTINGS_PAYMENTS_VIEW_PAYMENTS_LOCK_PROMPT_TITLE" = "另一重保護";
