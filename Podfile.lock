@@ -8,7 +8,7 @@ PODS:
   - CocoaLumberjack (3.7.4):
     - CocoaLumberjack/Core (= 3.7.4)
   - CocoaLumberjack/Core (3.7.4)
-  - GRDB.swift/SQLCipher (5.26.1):
+  - GRDB.swift/SQLCipher (5.26.0):
     - SQLCipher (>= 3.4.0)
   - LibMobileCoin/CoreHTTP (6.0.2):
     - SwiftProtobuf (~> 1.5)
@@ -166,7 +166,7 @@ SPEC CHECKSUMS:
   breez_sdk_sparkFFI: 2adb546ea38e7a4df697b89685ef38a8ca9f0128
   BreezSdkSpark: e21117a4e49a9882be5fb7aafa715ec373e04daf
   CocoaLumberjack: 543c79c114dadc3b1aba95641d8738b06b05b646
-  GRDB.swift: e98cd55ec99dea5da99355d588149063e4cfa0eb
+  GRDB.swift: 1395cb3556df6b16ed69dfc74c3886abc75d2825
   LibMobileCoin: 8503f567fa32184a5be7bc038fbd727747dd9991
   libPhoneNumber-iOS: 1a34106b49dc6e12a7f37eb9aee7c64011509547
   LibSignalClient: b1911173dd5a5e289308d65f939ba2116a7ddf62
@@ -185,6 +185,6 @@ SPEC CHECKSUMS:
   Swift-BigInt: 39035927416daca0ff0ee7949f5fef18b3a1a7db
   SwiftProtobuf: e02f51c8c2df5845657aee2d4de9d61bf50ef788
 
-PODFILE CHECKSUM: 23563258cb3b49d55f7fda76c397bb59d7e21376
+PODFILE CHECKSUM: 5b6ec0116ca2385ec88273da5d59184ffc4b79d7
 
 COCOAPODS: 1.16.2
