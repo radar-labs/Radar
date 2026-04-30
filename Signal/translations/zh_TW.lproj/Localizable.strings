@@ -7997,13 +7997,13 @@
 "SETTINGS_PAYMENTS_ACTIVATE_PAYMENTS_CONFIRM_AGREE" = "啟動";
 
 /* Description for the 'activate payments confirmation' UI in the payment settings. */
-"SETTINGS_PAYMENTS_ACTIVATE_PAYMENTS_CONFIRM_DESCRIPTION" = "你可使用 Signal 收發 MobileCoin。所有付款均受 MobileCoin 和 MobileCoin Wallet 的使用條款約束。你或許會遇到一些問題，以及你可能遺失付款或餘額而無法還原。";
+"SETTINGS_PAYMENTS_ACTIVATE_PAYMENTS_CONFIRM_DESCRIPTION" = "You can use Radar to send and receive Bitcoin over Lightning. All payments are subject to the Radar Terms of Use. You may encounter some issues and payments or balances you may lose can't be recovered.";
 
 /* Title for the 'activate payments confirmation' UI in the payment settings. */
 "SETTINGS_PAYMENTS_ACTIVATE_PAYMENTS_CONFIRM_TITLE" = "啟動";
 
 /* Label for the 'view payments terms' button in the 'activate payments confirmation' UI in the payment settings. */
-"SETTINGS_PAYMENTS_ACTIVATE_PAYMENTS_CONFIRM_VIEW_TERMS" = "查看MobileCoin條款";
+"SETTINGS_PAYMENTS_ACTIVATE_PAYMENTS_CONFIRM_VIEW_TERMS" = "View Terms";
 
 /* Label for 'add money' view in the payment settings. */
 "SETTINGS_PAYMENTS_ADD_MONEY" = "加值資金";
@@ -8084,19 +8084,19 @@
 "SETTINGS_PAYMENTS_ENABLE_PAYMENTS_LOCK_PROMPT" = "付款鎖定";
 
 /* Description for the 'About MobileCoin' help card in the payments settings. */
-"SETTINGS_PAYMENTS_HELP_CARD_ABOUT_MOBILECOIN_DESCRIPTION" = "MobileCoin是一種新的注重隱私的數位貨幣。";
+"SETTINGS_PAYMENTS_HELP_CARD_ABOUT_MOBILECOIN_DESCRIPTION" = "Radar lets you send and receive Bitcoin instantly over the Lightning Network, privately and without fees.";
 
 /* Title for the 'About MobileCoin' help card in the payments settings. */
-"SETTINGS_PAYMENTS_HELP_CARD_ABOUT_MOBILECOIN_TITLE" = "有關MobileCoin";
+"SETTINGS_PAYMENTS_HELP_CARD_ABOUT_MOBILECOIN_TITLE" = "About Radar Payments";
 
 /* Description for the 'Adding to your wallet' help card in the payments settings. */
-"SETTINGS_PAYMENTS_HELP_CARD_ADDING_TO_YOUR_WALLET_DESCRIPTION" = "你可以通過將MobileCoin傳送到你的錢包位址來增加在Signal中使用的資金。";
+"SETTINGS_PAYMENTS_HELP_CARD_ADDING_TO_YOUR_WALLET_DESCRIPTION" = "You can add funds by sending Bitcoin over Lightning to your Radar wallet address.";
 
 /* Title for the 'Adding to your wallet' help card in the payments settings. */
 "SETTINGS_PAYMENTS_HELP_CARD_ADDING_TO_YOUR_WALLET_TITLE" = "加值資金";
 
 /* Description for the 'Cashing Out' help card in the payments settings. */
-"SETTINGS_PAYMENTS_HELP_CARD_CASHING_OUT_DESCRIPTION" = "你可以隨時在支援MobileCoin的交易所兌現MobileCoin。 只需在該交易所轉帳到你的帳戶即可。";
+"SETTINGS_PAYMENTS_HELP_CARD_CASHING_OUT_DESCRIPTION" = "You can send your Bitcoin to any Lightning-compatible wallet or exchange at any time.";
 
 /* Title for the 'Cashing Out' help card in the payments settings. */
 "SETTINGS_PAYMENTS_HELP_CARD_CASHING_OUT_TITLE" = "兌現";
@@ -8147,13 +8147,13 @@
 "SETTINGS_PAYMENTS_OPT_IN_ACTIVATED_TOAST" = "付款功能已啟用。";
 
 /* Message for the 'payments opt-in' view in the app settings. */
-"SETTINGS_PAYMENTS_OPT_IN_MESSAGE" = "使用Signal傳送和接收MobileCoin，一種新的注重隱私的數位貨幣。 啟動後即可開始。";
+"SETTINGS_PAYMENTS_OPT_IN_MESSAGE" = "Send and receive Bitcoin instantly over the Lightning Network, right from your chats. Activate to get started.";
 
 /* Label for 'activate' button in the 'payments opt-in' view in the app settings. */
 "SETTINGS_PAYMENTS_OPT_IN_REACTIVATE_BUTTON" = "重新啟動付款功能";
 
 /* Title for the 'payments opt-in' view in the app settings. */
-"SETTINGS_PAYMENTS_OPT_IN_TITLE" = "付款功能登場";
+"SETTINGS_PAYMENTS_OPT_IN_TITLE" = "Introducing Radar Payments";
 
 /* Button when discarding recovery phrase. */
 "SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_BUTTON" = "略過恢復片語";
@@ -8210,7 +8210,7 @@
 "SETTINGS_PAYMENTS_PAYMENT_DETAILS_STATUS" = "狀態";
 
 /* Footer string for the status section of the payment details view in the app settings. */
-"SETTINGS_PAYMENTS_PAYMENT_DETAILS_STATUS_FOOTER" = "包括付款金額和交易時間在內的交易詳細資訊是MobileCoin Ledger的一部分。";
+"SETTINGS_PAYMENTS_PAYMENT_DETAILS_STATUS_FOOTER" = "Transaction details are recorded on the Bitcoin Lightning Network.";
 
 /* Footer string for the status section of the payment details view in the app settings for defragmentation transactions. */
 "SETTINGS_PAYMENTS_PAYMENT_DETAILS_STATUS_FOOTER_DEFRAGMENTATION" = "當你擁有的貨幣無法合併以完成交易時，將收取“貨幣清理費”。 結算將使你能夠繼續傳送付款。";
@@ -8405,7 +8405,7 @@
 "SETTINGS_PAYMENTS_TRANSFER_OUT_CANNOT_SEND_TO_SELF" = "你無法轉移到你的Signal錢包位址。 在支援的交易所中從你的帳戶輸入錢包位址。";
 
 /* Footer of the 'transfer currency out' view in the payment settings. */
-"SETTINGS_PAYMENTS_TRANSFER_OUT_FOOTER" = "你可以透過完成到交易所提供的錢包位址的轉移功能來轉帳到MobileCoin。 錢包位址是QR碼下方最常見的數字和字母字符串。";
+"SETTINGS_PAYMENTS_TRANSFER_OUT_FOOTER" = "Transfer Bitcoin by sending to the Lightning address or invoice provided by the recipient. The address is typically displayed below the QR code.";
 
 /* Error indicating that MobileCoin public address is not valid. */
 "SETTINGS_PAYMENTS_TRANSFER_OUT_INVALID_PUBLIC_ADDRESS" = "檢查你要轉帳的錢包位址，然後重試。";

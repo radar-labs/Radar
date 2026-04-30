@@ -7997,13 +7997,13 @@
 "SETTINGS_PAYMENTS_ACTIVATE_PAYMENTS_CONFIRM_AGREE" = "Aktifkan";
 
 /* Description for the 'activate payments confirmation' UI in the payment settings. */
-"SETTINGS_PAYMENTS_ACTIVATE_PAYMENTS_CONFIRM_DESCRIPTION" = "Anda boleh menggunakan Signal untuk menghantar dan menerima MobileCoin. Semua pembayaran tertakluk kepada Terma Penggunaan untuk MobileCoins dan MobileCoin Wallet. Anda mungkin menghadapi beberapa isu, dan pembayaran atau baki yang hilang tidak dapat dipulihkan.";
+"SETTINGS_PAYMENTS_ACTIVATE_PAYMENTS_CONFIRM_DESCRIPTION" = "You can use Radar to send and receive Bitcoin over Lightning. All payments are subject to the Radar Terms of Use. You may encounter some issues and payments or balances you may lose can't be recovered.";
 
 /* Title for the 'activate payments confirmation' UI in the payment settings. */
 "SETTINGS_PAYMENTS_ACTIVATE_PAYMENTS_CONFIRM_TITLE" = "Aktifkan";
 
 /* Label for the 'view payments terms' button in the 'activate payments confirmation' UI in the payment settings. */
-"SETTINGS_PAYMENTS_ACTIVATE_PAYMENTS_CONFIRM_VIEW_TERMS" = "Lihat Terma MobileCoin";
+"SETTINGS_PAYMENTS_ACTIVATE_PAYMENTS_CONFIRM_VIEW_TERMS" = "View Terms";
 
 /* Label for 'add money' view in the payment settings. */
 "SETTINGS_PAYMENTS_ADD_MONEY" = "Tambah Dana";
@@ -8084,19 +8084,19 @@
 "SETTINGS_PAYMENTS_ENABLE_PAYMENTS_LOCK_PROMPT" = "Kunci Pembayaran";
 
 /* Description for the 'About MobileCoin' help card in the payments settings. */
-"SETTINGS_PAYMENTS_HELP_CARD_ABOUT_MOBILECOIN_DESCRIPTION" = "MobileCoin merupakan mata wang digital yang tertumpu pada privasi.";
+"SETTINGS_PAYMENTS_HELP_CARD_ABOUT_MOBILECOIN_DESCRIPTION" = "Radar lets you send and receive Bitcoin instantly over the Lightning Network, privately and without fees.";
 
 /* Title for the 'About MobileCoin' help card in the payments settings. */
-"SETTINGS_PAYMENTS_HELP_CARD_ABOUT_MOBILECOIN_TITLE" = "Mengenai MobileCoin";
+"SETTINGS_PAYMENTS_HELP_CARD_ABOUT_MOBILECOIN_TITLE" = "About Radar Payments";
 
 /* Description for the 'Adding to your wallet' help card in the payments settings. */
-"SETTINGS_PAYMENTS_HELP_CARD_ADDING_TO_YOUR_WALLET_DESCRIPTION" = "Anda boleh menambah dana untuk digunakan dalam Signal dengan menghantar MobileCoin ke alamat dompet anda.";
+"SETTINGS_PAYMENTS_HELP_CARD_ADDING_TO_YOUR_WALLET_DESCRIPTION" = "You can add funds by sending Bitcoin over Lightning to your Radar wallet address.";
 
 /* Title for the 'Adding to your wallet' help card in the payments settings. */
 "SETTINGS_PAYMENTS_HELP_CARD_ADDING_TO_YOUR_WALLET_TITLE" = "Menambah Dana";
 
 /* Description for the 'Cashing Out' help card in the payments settings. */
-"SETTINGS_PAYMENTS_HELP_CARD_CASHING_OUT_DESCRIPTION" = "Anda boleh mengeluarkan MobileCoin pada bila-bila sahaja di pertukaran yang menyokong MobileCoin. Hanya buat pemindahan ke akaun anda di pertukaran tersebut.";
+"SETTINGS_PAYMENTS_HELP_CARD_CASHING_OUT_DESCRIPTION" = "You can send your Bitcoin to any Lightning-compatible wallet or exchange at any time.";
 
 /* Title for the 'Cashing Out' help card in the payments settings. */
 "SETTINGS_PAYMENTS_HELP_CARD_CASHING_OUT_TITLE" = "Mengeluarkan wang";
@@ -8147,13 +8147,13 @@
 "SETTINGS_PAYMENTS_OPT_IN_ACTIVATED_TOAST" = "Pembayaran diaktifkan.";
 
 /* Message for the 'payments opt-in' view in the app settings. */
-"SETTINGS_PAYMENTS_OPT_IN_MESSAGE" = "Gunakan Signal untuk menghantar dan menerima MobileCoin, mata wang digital baharu yang tertumpu pada privasi. Aktifkan untuk bermula.";
+"SETTINGS_PAYMENTS_OPT_IN_MESSAGE" = "Send and receive Bitcoin instantly over the Lightning Network, right from your chats. Activate to get started.";
 
 /* Label for 'activate' button in the 'payments opt-in' view in the app settings. */
 "SETTINGS_PAYMENTS_OPT_IN_REACTIVATE_BUTTON" = "Aktifkan semula Pembayaran";
 
 /* Title for the 'payments opt-in' view in the app settings. */
-"SETTINGS_PAYMENTS_OPT_IN_TITLE" = "Memperkenalkan Pembayaran";
+"SETTINGS_PAYMENTS_OPT_IN_TITLE" = "Introducing Radar Payments";
 
 /* Button when discarding recovery phrase. */
 "SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_BUTTON" = "Langkau Frasa Pemulihan";
@@ -8210,7 +8210,7 @@
 "SETTINGS_PAYMENTS_PAYMENT_DETAILS_STATUS" = "Status";
 
 /* Footer string for the status section of the payment details view in the app settings. */
-"SETTINGS_PAYMENTS_PAYMENT_DETAILS_STATUS_FOOTER" = "Butiran transaksi termasuk jumlah pembayaran dan masa transaksi ialah sebahagian daripada MobileCoin Ledger.";
+"SETTINGS_PAYMENTS_PAYMENT_DETAILS_STATUS_FOOTER" = "Transaction details are recorded on the Bitcoin Lightning Network.";
 
 /* Footer string for the status section of the payment details view in the app settings for defragmentation transactions. */
 "SETTINGS_PAYMENTS_PAYMENT_DETAILS_STATUS_FOOTER_DEFRAGMENTATION" = "\"Bayaran pembersihan syiling\" dikenakan apabila duit syiling yang anda miliki tidak dapat digabungkan untuk menyelesaikan transaksi. Pembersihan akan membenarkan anda terus menghantar pembayaran.";
@@ -8405,7 +8405,7 @@
 "SETTINGS_PAYMENTS_TRANSFER_OUT_CANNOT_SEND_TO_SELF" = "Anda tidak dapat memindahkan bayaran ke alamat dompet Signal anda. Masukkan alamat dompet daripada akaun anda di pertukaran yang disokong.";
 
 /* Footer of the 'transfer currency out' view in the payment settings. */
-"SETTINGS_PAYMENTS_TRANSFER_OUT_FOOTER" = "Anda boleh memindahkan MobileCoin dengan menyelesaikan pemindahan ke alamat dompet yang disediakan oleh pertukaran. Alamat dompet merupakan rentetan nombor dan huruf yang biasanya berada di bawah kod QR.";
+"SETTINGS_PAYMENTS_TRANSFER_OUT_FOOTER" = "Transfer Bitcoin by sending to the Lightning address or invoice provided by the recipient. The address is typically displayed below the QR code.";
 
 /* Error indicating that MobileCoin public address is not valid. */
 "SETTINGS_PAYMENTS_TRANSFER_OUT_INVALID_PUBLIC_ADDRESS" = "Periksa alamat dompet yang ingin anda pindahkan dan cuba lagi.";

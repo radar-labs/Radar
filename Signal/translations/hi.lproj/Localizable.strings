@@ -7997,13 +7997,13 @@
 "SETTINGS_PAYMENTS_ACTIVATE_PAYMENTS_CONFIRM_AGREE" = "चालू करें";
 
 /* Description for the 'activate payments confirmation' UI in the payment settings. */
-"SETTINGS_PAYMENTS_ACTIVATE_PAYMENTS_CONFIRM_DESCRIPTION" = "आप MobileCoin भेजने और पाने के लिए Signal इस्तेमाल कर सकते हैं। सभी भुगतानों पर MobileCoin और MobileCoin वॉलेट के इस्तेमाल की शर्तें लागू होती हैं। आपको कुछ समस्याएँ आ सकती हैं और जो भुगतान या बैलेंस आप खोते हैं उन्हें रिकवर नहीं किया जा सकता।";
+"SETTINGS_PAYMENTS_ACTIVATE_PAYMENTS_CONFIRM_DESCRIPTION" = "You can use Radar to send and receive Bitcoin over Lightning. All payments are subject to the Radar Terms of Use. You may encounter some issues and payments or balances you may lose can't be recovered.";
 
 /* Title for the 'activate payments confirmation' UI in the payment settings. */
 "SETTINGS_PAYMENTS_ACTIVATE_PAYMENTS_CONFIRM_TITLE" = "चालू करें";
 
 /* Label for the 'view payments terms' button in the 'activate payments confirmation' UI in the payment settings. */
-"SETTINGS_PAYMENTS_ACTIVATE_PAYMENTS_CONFIRM_VIEW_TERMS" = "MobileCoin की शर्तें देखें";
+"SETTINGS_PAYMENTS_ACTIVATE_PAYMENTS_CONFIRM_VIEW_TERMS" = "View Terms";
 
 /* Label for 'add money' view in the payment settings. */
 "SETTINGS_PAYMENTS_ADD_MONEY" = "फ़ंड जोड़ें";
@@ -8084,19 +8084,19 @@
 "SETTINGS_PAYMENTS_ENABLE_PAYMENTS_LOCK_PROMPT" = "भुगतान लॉक";
 
 /* Description for the 'About MobileCoin' help card in the payments settings. */
-"SETTINGS_PAYMENTS_HELP_CARD_ABOUT_MOBILECOIN_DESCRIPTION" = "MobileCoin एक डिजिटल करंसी है, जिसमें प्राइवेसी का खास ध्यान रखा जाता है।";
+"SETTINGS_PAYMENTS_HELP_CARD_ABOUT_MOBILECOIN_DESCRIPTION" = "Radar lets you send and receive Bitcoin instantly over the Lightning Network, privately and without fees.";
 
 /* Title for the 'About MobileCoin' help card in the payments settings. */
-"SETTINGS_PAYMENTS_HELP_CARD_ABOUT_MOBILECOIN_TITLE" = "MobileCoin के बारे में";
+"SETTINGS_PAYMENTS_HELP_CARD_ABOUT_MOBILECOIN_TITLE" = "About Radar Payments";
 
 /* Description for the 'Adding to your wallet' help card in the payments settings. */
-"SETTINGS_PAYMENTS_HELP_CARD_ADDING_TO_YOUR_WALLET_DESCRIPTION" = "Signal में इस्तेमाल करने के लिए, अपने वॉलेट पते पर MobileCoin भेजकर फ़ंड जोड़े जा सकते हैं।";
+"SETTINGS_PAYMENTS_HELP_CARD_ADDING_TO_YOUR_WALLET_DESCRIPTION" = "You can add funds by sending Bitcoin over Lightning to your Radar wallet address.";
 
 /* Title for the 'Adding to your wallet' help card in the payments settings. */
 "SETTINGS_PAYMENTS_HELP_CARD_ADDING_TO_YOUR_WALLET_TITLE" = "फ़ंड जोड़ना";
 
 /* Description for the 'Cashing Out' help card in the payments settings. */
-"SETTINGS_PAYMENTS_HELP_CARD_CASHING_OUT_DESCRIPTION" = "MobileCoin की सुविधा वाले किसी एक्सचेंज पर किसी भी समय MobileCoin को भुनाया जा सकता है। आपको बस एक्सचेंज में अपने अकाउंट में ट्रांसफ़र करना होगा।";
+"SETTINGS_PAYMENTS_HELP_CARD_CASHING_OUT_DESCRIPTION" = "You can send your Bitcoin to any Lightning-compatible wallet or exchange at any time.";
 
 /* Title for the 'Cashing Out' help card in the payments settings. */
 "SETTINGS_PAYMENTS_HELP_CARD_CASHING_OUT_TITLE" = "भुनाना";
@@ -8147,13 +8147,13 @@
 "SETTINGS_PAYMENTS_OPT_IN_ACTIVATED_TOAST" = "पेमेंट की सुविधा चालू की गई।";
 
 /* Message for the 'payments opt-in' view in the app settings. */
-"SETTINGS_PAYMENTS_OPT_IN_MESSAGE" = "MobileCoin भेजने और पाने के लिए Signal का इस्तेमाल करें। यह एक डिजिटल करंसी है, जिसमें प्राइवेसी का खास ध्यान रखा जाता है। शुरू करने के लिए ऐक्टिवेट करें।";
+"SETTINGS_PAYMENTS_OPT_IN_MESSAGE" = "Send and receive Bitcoin instantly over the Lightning Network, right from your chats. Activate to get started.";
 
 /* Label for 'activate' button in the 'payments opt-in' view in the app settings. */
 "SETTINGS_PAYMENTS_OPT_IN_REACTIVATE_BUTTON" = "भुगतान दोबारा सक्रिय करें";
 
 /* Title for the 'payments opt-in' view in the app settings. */
-"SETTINGS_PAYMENTS_OPT_IN_TITLE" = "भुगतान का परिचय";
+"SETTINGS_PAYMENTS_OPT_IN_TITLE" = "Introducing Radar Payments";
 
 /* Button when discarding recovery phrase. */
 "SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_BUTTON" = "रिकवरी वाक्य छोड़ें";
@@ -8210,7 +8210,7 @@
 "SETTINGS_PAYMENTS_PAYMENT_DETAILS_STATUS" = "स्टेटस";
 
 /* Footer string for the status section of the payment details view in the app settings. */
-"SETTINGS_PAYMENTS_PAYMENT_DETAILS_STATUS_FOOTER" = "पेमेंट की रकम और ट्रांज़ैक्शन का समय समेत इससे जुड़ी अन्य जानकारी, MobileCoin Ledger का हिस्सा होती है।";
+"SETTINGS_PAYMENTS_PAYMENT_DETAILS_STATUS_FOOTER" = "Transaction details are recorded on the Bitcoin Lightning Network.";
 
 /* Footer string for the status section of the payment details view in the app settings for defragmentation transactions. */
 "SETTINGS_PAYMENTS_PAYMENT_DETAILS_STATUS_FOOTER_DEFRAGMENTATION" = "जब आपके पास इतने कॉइन मौजूद न हो कि उन्हें मिलाकर कोई ट्रांज़ैक्शन पूरा किया जा सके, तो आपसे 'कॉइन क्लीनअप शुल्क' लिया जा सकता है। क्लीनअप करने से पेमेंट भेजा जा सकता है।";
@@ -8405,7 +8405,7 @@
 "SETTINGS_PAYMENTS_TRANSFER_OUT_CANNOT_SEND_TO_SELF" = "Signal वॉलेट पता ट्रांसफ़र नहीं किया जा सकता। सही एक्सचेंज पर अपने अकाउंट का वॉलेट पता डालें।";
 
 /* Footer of the 'transfer currency out' view in the payment settings. */
-"SETTINGS_PAYMENTS_TRANSFER_OUT_FOOTER" = "एक्सचेंज की ओर से दिए गए वॉलेट पते पर ट्रांसफ़र पूरा करके, MobileCoin भेजे जा सकते हैं। वॉलेट पता आम तौर पर अंकों और अक्षरों की एक स्ट्रिंग होती है, जो आम तौर पर QR कोड के नीचे मौजूद होता है।";
+"SETTINGS_PAYMENTS_TRANSFER_OUT_FOOTER" = "Transfer Bitcoin by sending to the Lightning address or invoice provided by the recipient. The address is typically displayed below the QR code.";
 
 /* Error indicating that MobileCoin public address is not valid. */
 "SETTINGS_PAYMENTS_TRANSFER_OUT_INVALID_PUBLIC_ADDRESS" = "आपको जिस वॉलेट पते पर ट्रांसफ़र करना है उसे सही से देखें और दोबारा कोशिश करें।";
