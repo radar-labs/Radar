@@ -610,14 +610,18 @@ extension PaymentsImpl {
     }
 
     public func updateLastKnownLocalPaymentAddressProtoData(transaction: DBWriteTransaction) {
-        let data: Data?
+        // Never clear the cache from this opportunistic refresh path. Transient
+        // states (unwarmed paymentStateCache at startup, unregistered ripples,
+        // Breez SDK still loading) would otherwise wipe a perfectly good address
+        // and cause the next unrelated profile upload to drop it from the server.
+        // Explicit clearing on disable is handled in PaymentsHelperImpl.setPaymentsState.
         let paymentsState = self.paymentsState
-        if paymentsState.isEnabled {
-            data = localPaymentAddressProtoData(paymentsState: paymentsState, tx: transaction)
-        } else {
-            data = nil
+        guard paymentsState.isEnabled else {
+            return
         }
-
+        guard let data = localPaymentAddressProtoData(paymentsState: paymentsState, tx: transaction) else {
+            return
+        }
         SSKEnvironment.shared.paymentsHelperRef.setLastKnownLocalPaymentAddressProtoData(
             data, transaction: transaction)
     }

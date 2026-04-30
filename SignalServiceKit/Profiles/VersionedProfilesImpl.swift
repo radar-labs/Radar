@@ -166,17 +166,19 @@ public class VersionedProfilesImpl: VersionedProfiles {
         }
 
         let profilePaymentAddressData: Data? = await {
-            guard
-                SSKEnvironment.shared.paymentsHelperRef.arePaymentsEnabled,
-                !SSKEnvironment.shared.paymentsHelperRef.isKillSwitchActive
-            else {
+            // The cached payment address is the source of truth for what's on the
+            // server. If it's populated, the user has previously uploaded a payment
+            // address; preserve it across any unrelated profile upload (name change,
+            // profile-key rotation, etc.). The cache is cleared explicitly when the
+            // user disables payments, so an empty cache here means "drop it" — and
+            // the kill switch overrides regardless.
+            if SSKEnvironment.shared.paymentsHelperRef.isKillSwitchActive {
                 return nil
             }
             guard
                 let addressProtoData = await fetchLocalPaymentAddressProtoData(),
                 addressProtoData.count > 0
             else {
-                owsFailDebug("Payments enabled, but paymentAddress is missing or empty.")
                 return nil
             }
             var result = Data()

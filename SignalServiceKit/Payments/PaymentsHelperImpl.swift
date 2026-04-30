@@ -195,6 +195,19 @@ public class PaymentsHelperImpl: PaymentsHelperSwift, PaymentsHelper {
 
         self.paymentStateCache.set(newPaymentsState)
 
+        // Explicitly clear the cached payment address proto data when transitioning
+        // out of an enabled state, so the subsequent profile re-upload removes the
+        // address from the server. Other code paths (opportunistic cache refresh in
+        // updateLastKnownLocalPaymentAddressProtoData) intentionally never clear the
+        // cache, which makes this the single point where a disable propagates.
+        if !newPaymentsState.isEnabled, oldPaymentsState.isEnabled {
+            Self.keyValueStore.setData(
+                nil,
+                key: Self.lastKnownLocalPaymentAddressProtoDataKey,
+                transaction: transaction
+            )
+        }
+
         let localAci = DependenciesBridge.shared.tsAccountManager.localIdentifiers(tx: transaction)?.aci
         TSPaymentsActivationRequestModel
             .allThreadsWithPaymentActivationRequests(transaction: transaction)
