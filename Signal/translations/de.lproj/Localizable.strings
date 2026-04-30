@@ -8159,19 +8159,19 @@
 "SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_BUTTON" = "Wiederherstellungsphrase überspringen";
 
 /* Message of confirmation alert when discarding recovery phrase. */
-"SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_MESSAGE" = "Mit deiner Wiederherstellungsphrase kannst du im schlimmsten Fall dein Guthaben wiederherstellen. Wir empfehlen dir dringend, sie zu speichern.";
+"SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_MESSAGE" = "Ohne Ihre Seed-Phrase können Sie Ihr Guthaben nicht in Cake Wallet oder anderen Spark-kompatiblen Wallets wiederherstellen. Sie können sie jederzeit später in den Einstellungen speichern.";
 
 /* Title of confirmation alert when discarding recovery phrase. */
 "SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_TITLE" = "Ohne Speichern fortfahren?";
 
 /* Explanation of the 'payments passphrase' in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION" = "Dein Kontostand wird beim erneuten Installieren von Signal automatisch wiederhergestellt, falls du deine Signal-PIN bestätigst. Weiterhin kannst du deinen Kontostand durch Verwenden einer Wiederherstellungsphrase wiederherstellen, einer aus 24 Wörtern bestehenden, einzigartigen Phrase. Notiere sie und bewahre sie an einem sicheren Ort auf.";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION" = "Ihre Seed-Phrase ist nicht erforderlich, um Ihr Guthaben zu schützen — Radar kümmert sich automatisch um die Wiederherstellung. Das Speichern gibt Ihnen zusätzliche Sicherheit und ermöglicht es Ihnen, Ihr Guthaben in Cake Wallet oder einer anderen Spark-kompatiblen Wallet wiederherzustellen.";
 
 /* Explanation of the 'payments passphrase' when there is a balance. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_BALANCE" = "Du hast ein Guthaben! Zeit, deine Wiederherstellungsphrase zu speichern – ein Schlüssel mit 24 Wörtern, mit dem du dein Guthaben wiederherstellen kannst.";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_BALANCE" = "Sie haben ein Guthaben! Das Speichern der Seed-Phrase ist nicht erforderlich, gibt Ihnen aber zusätzliche Sicherheit und ermöglicht die Wiederherstellung in Cake Wallet oder anderen Spark-kompatiblen Wallets.";
 
 /* Explanation of the 'payments passphrase' when from the help card. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_HELP_CARD" = "Zeit, deine Wiederherstellungsphrase zu speichern – ein Schlüssel mit 24 Wörtern, mit dem du dein Guthaben wiederherstellen kannst.";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_HELP_CARD" = "Das Speichern der Seed-Phrase ist nicht erforderlich, gibt Ihnen aber zusätzliche Sicherheit und ermöglicht die Wiederherstellung in Cake Wallet oder anderen Spark-kompatiblen Wallets.";
 
 /* Label for the 'add money' button in the 'send payment' UI. */
 "SETTINGS_PAYMENTS_PAYMENT_ADD_MONEY" = "Guthaben hinzufügen";
@@ -8465,10 +8465,10 @@
 "SETTINGS_PAYMENTS_VIEW_PASSPHRASE_TITLE" = "Wiederherstellungsphrase";
 
 /* Header text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "Notiere die folgenden 24 Wörter in der angegebenen Reihenfolge, und bewahre deine Liste an einem sicheren Ort auf.";
+"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "Schreiben Sie diese 24 Wörter in der richtigen Reihenfolge auf und bewahren Sie sie sicher auf. Sie können sie verwenden, um Ihr Guthaben in Cake Wallet oder anderen Spark-kompatiblen Wallets wiederherzustellen.";
 
 /* Footer text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_FOOTER_2" = "Gib diese Liste nicht weiter";
+"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_FOOTER_2" = "Teilen Sie diese Phrase mit niemandem";
 
 /* Title for the content section of the  'payments lock prompt' view shown after payemts activation. */
 "SETTINGS_PAYMENTS_VIEW_PAYMENTS_LOCK_PROMPT_TITLE" = "Eine weitere Schutzebene";

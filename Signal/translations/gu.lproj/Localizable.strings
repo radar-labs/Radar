@@ -8159,19 +8159,19 @@
 "SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_BUTTON" = "રિકવરી ફ્રેઝને અવગણો";
 
 /* Message of confirmation alert when discarding recovery phrase. */
-"SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_MESSAGE" = "તમારો રિકવરી ફ્રેઝ તમને સૌથી ખરાબ પરિસ્થિતિમાં તમારું બેલેન્સ રિસ્ટોર કરવા દે છે. અમે ભારપૂર્વક ભલામણ કરીએ છીએ કે તમે તેને સેવ કરો.";
+"SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_MESSAGE" = "સીડ ફ્રેઝ વિના તમે Cake Wallet અથવા અન્ય Spark-સુસંગત વૉલેટ્સમાં તમારી બૅલેન્સ પુનઃસ્થાપિત કરી શકશો નહીં. સેટિંગ્સમાંથી પછીથી હંમેશા સાચવી શકો છો.";
 
 /* Title of confirmation alert when discarding recovery phrase. */
 "SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_TITLE" = "સેવ કર્યા વિના ચાલુ રાખવું છે?";
 
 /* Explanation of the 'payments passphrase' in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION" = "જો તમે તમારા Signal પિનની પુષ્ટિ કરો છો તો તમે Signal ને ફરીથી ઇન્સ્ટોલ કરો ત્યારે તમારું બેલેન્સ આપોઆપ રિસ્ટોર થશે. તમે રિકવરી ફ્રેઝનો ઉપયોગ કરીને તમારું બેલેન્સ પણ રિસ્ટોર કરી શકો છો, જે તમારા માટે અનન્ય 24 શબ્દોનો ફ્રેઝ છે. તેને લખી ને સલામત સ્થળે સંગ્રહિત કરો.";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION" = "તમારી સીડ ફ્રેઝ તમારા ભંડોળને સુરક્ષિત રાખવા માટે જરૂરી નથી — Radar સ્વચાલિત રીતે પુનઃપ્રાપ્તિ સ્ંભાળે છે. તેને સાચવવાથી તમને વધારાની માનસિક શાંતિ મળે છે અને Cake Wallet અથવા અન્ય કોઈ Spark-સુસંગત વૉલેટમાં તમારી બૅલેન્સ પુનઃસ્થાપિત કરી શકો છો.";
 
 /* Explanation of the 'payments passphrase' when there is a balance. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_BALANCE" = "તમને બેલેન્સ મળ્યું છે! સમય છે તમારા રિકવરી ફ્રેઝને સેવ કરવાનો જે એક 24-શબ્દની કી છે અને તેનો ઉપયોગ તમે તમારું બેલેન્સ રિસ્ટોર કરવા માટે કરી શકો છો.";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_BALANCE" = "તમારી બૅલેન્સ છે! સીડ ફ્રેઝ સાચવવી જરૂરી નથી, પરંતુ વધારાની માનસિક શાંતિ આપે છે અને Cake Wallet અથવા અન્ય Spark-સુસંગત વૉલેટ્સમાં બૅલેન્સ પુનઃસ્થાપિત કરવાની મંજૂરી આપે છે.";
 
 /* Explanation of the 'payments passphrase' when from the help card. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_HELP_CARD" = "સમય છે તમારા રિકવરી ફ્રેઝને સેવ કરવાનો જે એક 24-શબ્દની કી છે અને તેનો ઉપયોગ તમે તમારું બેલેન્સ રિસ્ટોર કરવા માટે કરી શકો છો.";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_HELP_CARD" = "સીડ ફ્રેઝ સાચવવી જરૂરી નથી, પરંતુ વધારાની માનસિક શાંતિ આપે છે અને Cake Wallet અથવા અન્ય Spark-સુસંગત વૉલેટ્સમાં બૅલેન્સ પુનઃસ્થાપિત કરવાની મંજૂરી આપે છે.";
 
 /* Label for the 'add money' button in the 'send payment' UI. */
 "SETTINGS_PAYMENTS_PAYMENT_ADD_MONEY" = "ફંડ ઉમેરો";
@@ -8465,10 +8465,10 @@
 "SETTINGS_PAYMENTS_VIEW_PASSPHRASE_TITLE" = "રિકવરી ફ્રેઝ";
 
 /* Header text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "નીચેના 24 શબ્દો ક્રમમાં લખો. તમારા લિસ્ટને સુરક્ષિત જગ્યાએ સંગ્રહિત કરો.";
+"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "આ 24 શબ્દો ક્રમમાં લખો અને સુરક્ષિત સ્થળે રાખો. Cake Wallet અથવા અન્ય Spark-સુસંગત વૉલેટ્સમાં બૅલેન્સ પુનઃસ્થાપિત કરવા માટે તેનો ઉપયોગ કરી શકો છો.";
 
 /* Footer text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_FOOTER_2" = "આ લિસ્ટને શેર કરશો નહીં";
+"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_FOOTER_2" = "આ ફ્રેઝ કોઈની સાથે શેર કરશો નહીં";
 
 /* Title for the content section of the  'payments lock prompt' view shown after payemts activation. */
 "SETTINGS_PAYMENTS_VIEW_PAYMENTS_LOCK_PROMPT_TITLE" = "સંરક્ષણનું અલગ સ્તર";

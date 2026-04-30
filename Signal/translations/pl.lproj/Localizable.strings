@@ -8159,19 +8159,19 @@
 "SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_BUTTON" = "Pomiń frazę odzyskiwania";
 
 /* Message of confirmation alert when discarding recovery phrase. */
-"SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_MESSAGE" = "Fraza odzyskiwania pozwoli Ci na przywrócenie środków. Zdecydowanie zalecamy jej zapisanie na wszelki wypadek.";
+"SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_MESSAGE" = "Bez frazy ziarna nie będziesz mógł przywrócić salda w Cake Wallet lub innych portfelach zgodnych ze Spark. Zawsze możesz ją zapisać później w ustawieniach.";
 
 /* Title of confirmation alert when discarding recovery phrase. */
 "SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_TITLE" = "Kontynuować bez zapisywania?";
 
 /* Explanation of the 'payments passphrase' in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION" = "Jeśli ponownie zainstalujesz aplikację Signal, środki zostaną automatycznie przywrócone, gdy podasz swój PIN. Możesz też przywrócić środki za pomocą frazy odzyskiwania, która jest Twoim unikalnym hasłem złożonym z 24 wyrazów. Zapisz je i przechowuj w bezpiecznym miejscu.";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION" = "Twoja fraza ziarna nie jest wymagana do bezpiecznego przechowywania środków — Radar automatycznie obsługuje odzyskiwanie. Jej zapisanie daje ci dodatkowy spokój i umożliwia przywrócenie salda w Cake Wallet lub innym portfelu zgodnym ze Spark.";
 
 /* Explanation of the 'payments passphrase' when there is a balance. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_BALANCE" = "W Twoim portfelu są środki. Pora zapisać frazę odzyskiwania, czyli 24-wyrazowy klucz, którego możesz użyć do przywrócenia środków.";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_BALANCE" = "Masz saldo! Zapisanie frazy ziarna nie jest obowiązkowe, ale daje dodatkowy spokój i umożliwia przywrócenie salda w Cake Wallet lub innych portfelach zgodnych ze Spark.";
 
 /* Explanation of the 'payments passphrase' when from the help card. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_HELP_CARD" = "Pora zapisać frazę odzyskiwania, czyli 24-wyrazowy klucz, którego możesz użyć do przywrócenia środków.";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_HELP_CARD" = "Zapisanie frazy ziarna nie jest obowiązkowe, ale daje dodatkowy spokój i umożliwia przywrócenie salda w Cake Wallet lub innych portfelach zgodnych ze Spark.";
 
 /* Label for the 'add money' button in the 'send payment' UI. */
 "SETTINGS_PAYMENTS_PAYMENT_ADD_MONEY" = "Dodaj środki";
@@ -8465,10 +8465,10 @@
 "SETTINGS_PAYMENTS_VIEW_PASSPHRASE_TITLE" = "Fraza odzyskiwania";
 
 /* Header text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "Zapisz te 24 wyrazy w odpowiedniej kolejności. Przechowuj je w bezpiecznym miejscu.";
+"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "Zapisz te 24 słowa w kolejności i przechowuj je w bezpiecznym miejscu. Możesz ich użyć do przywrócenia salda w Cake Wallet lub innych portfelach zgodnych ze Spark.";
 
 /* Footer text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_FOOTER_2" = "Nie udostępniaj tej listy";
+"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_FOOTER_2" = "Nie udostępniaj tej frazy nikomu";
 
 /* Title for the content section of the  'payments lock prompt' view shown after payemts activation. */
 "SETTINGS_PAYMENTS_VIEW_PAYMENTS_LOCK_PROMPT_TITLE" = "Dodatkowe zabezpieczenie";

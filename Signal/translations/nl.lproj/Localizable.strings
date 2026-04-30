@@ -8159,19 +8159,19 @@
 "SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_BUTTON" = "Herstelzin overslaan";
 
 /* Message of confirmation alert when discarding recovery phrase. */
-"SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_MESSAGE" = "Met je herstelzin kun je je krediet herstellen als dat nodig is. We raden je sterk aan om het op te slaan.";
+"SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_MESSAGE" = "Zonder uw seed-phrase kunt u uw saldo niet herstellen in Cake Wallet of andere Spark-compatibele wallets. U kunt het altijd later opslaan via de instellingen.";
 
 /* Title of confirmation alert when discarding recovery phrase. */
 "SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_TITLE" = "Doorgaan zonder opslaan?";
 
 /* Explanation of the 'payments passphrase' in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION" = "Je krediet wordt automatisch hersteld als je bij het opnieuw installeren van Signal je Signal-pincode invoert. Je kunt je krediet ook herstellen middels een unieke herstelzin, die bestaat uit 24 woorden. Schrijf die zin op en bewaar hem op een veilige plaats.";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION" = "Uw seed-phrase is niet vereist om uw fondsen veilig te houden — Radar verwerkt herstel automatisch. Het opslaan ervan geeft u extra gemoedsrust en stelt u in staat uw saldo te herstellen in Cake Wallet of een andere Spark-compatibele wallet.";
 
 /* Explanation of the 'payments passphrase' when there is a balance. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_BALANCE" = "Je hebt krediet! Tijd om je herstelzin op te slaan. Dit is een wachtwoord van 24 woorden dat je kunt gebruiken om je tegoed te herstellen.";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_BALANCE" = "U heeft een saldo! Het opslaan van uw seed-phrase is niet verplicht, maar geeft extra gemoedsrust en stelt u in staat uw saldo te herstellen in Cake Wallet of andere Spark-compatibele wallets.";
 
 /* Explanation of the 'payments passphrase' when from the help card. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_HELP_CARD" = "Tijd om je herstelzin op te slaan. Dit is een wachtwoord van 24 woorden dat je kunt gebruiken om je krediet te herstellen.";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_HELP_CARD" = "Het opslaan van uw seed-phrase is niet verplicht, maar geeft extra gemoedsrust en stelt u in staat uw saldo te herstellen in Cake Wallet of andere Spark-compatibele wallets.";
 
 /* Label for the 'add money' button in the 'send payment' UI. */
 "SETTINGS_PAYMENTS_PAYMENT_ADD_MONEY" = "Krediet toevoegen";
@@ -8465,10 +8465,10 @@
 "SETTINGS_PAYMENTS_VIEW_PASSPHRASE_TITLE" = "Herstelzin";
 
 /* Header text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "Schrijf de volgende 24 woorden op in dezelfde volgorde en bewaar ze op een veilige plaats.";
+"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "Schrijf deze 24 woorden op in volgorde en bewaar ze op een veilige plek. U kunt ze gebruiken om uw saldo te herstellen in Cake Wallet of andere Spark-compatibele wallets.";
 
 /* Footer text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_FOOTER_2" = "Deel deze lijst niet";
+"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_FOOTER_2" = "Deel deze zin met niemand";
 
 /* Title for the content section of the  'payments lock prompt' view shown after payemts activation. */
 "SETTINGS_PAYMENTS_VIEW_PAYMENTS_LOCK_PROMPT_TITLE" = "Een extra beschermingslaag";

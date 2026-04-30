@@ -8159,19 +8159,19 @@
 "SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_BUTTON" = "Прескочи фразу за опоравак";
 
 /* Message of confirmation alert when discarding recovery phrase. */
-"SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_MESSAGE" = "Фраза за опоравак вам омогућава да вратите средства у најгорем сценарију. Препоручујемо вам да је сачувате.";
+"SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_MESSAGE" = "Без seed фразе нећете моћи да обновите салдо у Cake Wallet или другим новчаницама компатибилним са Spark-ом. Увек је можете сачувати касније у подешавањима.";
 
 /* Title of confirmation alert when discarding recovery phrase. */
 "SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_TITLE" = "Желите ли да наставите без чувања?";
 
 /* Explanation of the 'payments passphrase' in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION" = "Средства ће аутоматски бити враћена када поново инсталирате Signal и потврдите свој Signal PIN. Такође можете да вратите средства помоћу фразе за опоравак, јединствене фразе од 24 речи. Запишите је и чувајте је на сигурном месту.";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION" = "Ваша seed фраза није потребна за безбедност ваших средстава — Radar аутоматски управља опоравком. Чување је пружа додатни мир и омогућава вам обнављање салда у Cake Wallet или другим новчаницама компатибилним са Spark-ом.";
 
 /* Explanation of the 'payments passphrase' when there is a balance. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_BALANCE" = "Имате средства на налогу! Време је да сачувате фразу за опоравак – кључ од 24 речи који ћете користити да вратите средства.";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_BALANCE" = "Имате стање! Чување seed фразе није обавезно, али пружа додатни мир и омогућава обнављање салда у Cake Wallet или другим новчаницама компатибилним са Spark-ом.";
 
 /* Explanation of the 'payments passphrase' when from the help card. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_HELP_CARD" = "Време је да сачувате фразу за опоравак – кључ од 24 речи који ћете користити да вратите средства.";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_HELP_CARD" = "Чување seed фразе није обавезно, али пружа додатни мир и омогућава обнављање салда у Cake Wallet или другим новчаницама компатибилним са Spark-ом.";
 
 /* Label for the 'add money' button in the 'send payment' UI. */
 "SETTINGS_PAYMENTS_PAYMENT_ADD_MONEY" = "Додај средства";
@@ -8465,10 +8465,10 @@
 "SETTINGS_PAYMENTS_VIEW_PASSPHRASE_TITLE" = "Фраза за опоравак";
 
 /* Header text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "Запишите редом 24 речи из наставка. Чувајте листу на сигурном месту.";
+"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "Запишите ових 24 речи по реду и чувајте их на безбедном месту. Можете их користити за обнављање салда у Cake Wallet или другим новчаницама компатибилним са Spark-ом.";
 
 /* Footer text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_FOOTER_2" = "Не делите ову листу";
+"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_FOOTER_2" = "Не делите ову фразу ни са ким";
 
 /* Title for the content section of the  'payments lock prompt' view shown after payemts activation. */
 "SETTINGS_PAYMENTS_VIEW_PAYMENTS_LOCK_PROMPT_TITLE" = "Још један слој заштите";

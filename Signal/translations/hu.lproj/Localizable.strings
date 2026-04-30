@@ -8159,19 +8159,19 @@
 "SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_BUTTON" = "Helyreállítási kifejezés mentésének kihagyása";
 
 /* Message of confirmation alert when discarding recovery phrase. */
-"SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_MESSAGE" = "A helyreállítási kifejezés lehetővé teszi az egyenleged helyreállítását a legrosszabb forgatókönyv esetén. Azt javasoljuk, hogy mindenképpen mentsd el.";
+"SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_MESSAGE" = "Seed-mondat nélkül nem tudja visszaállítani az egyenlegét a Cake Walletben vagy más Spark-kompatibilis pénztárcákban. A beállításokban bármikor elmentheti.";
 
 /* Title of confirmation alert when discarding recovery phrase. */
 "SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_TITLE" = "Folytatás mentés nélkül?";
 
 /* Explanation of the 'payments passphrase' in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION" = "Az egyenleged automatikusan helyreáll, mikor újratelepíted a Signalt, mikor megadod a Signal PIN kódodat. Egyenleged egy helyreállítási kifejezéssel is helyreállíthatod, ami egy 24 szavas, egyedi mondat. Írd le és tárold biztonságos helyen.";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION" = "A seed-mondat nem szükséges ahhoz, hogy pénzeszközei biztonságban legyenek — a Radar automatikusan kezeli a helyreállítást. Elmentése extra nyugalmat ad, és lehetővé teszi az egyenleg visszaállítását a Cake Walletben vagy bármely más Spark-kompatibilis pénztárcában.";
 
 /* Explanation of the 'payments passphrase' when there is a balance. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_BALANCE" = "Van egyenleged! Itt az ideje, hogy elmentsd a helyreállítási kifejezésed—egy 24 szavas kulcsszót, amellyel helyreállíthatod az egyenleged.";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_BALANCE" = "Van egyenlege! A seed-mondat mentése nem kötelező, de extra nyugalmat ad, és lehetővé teszi az egyenleg visszaállítását a Cake Walletben vagy más Spark-kompatibilis pénztárcákban.";
 
 /* Explanation of the 'payments passphrase' when from the help card. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_HELP_CARD" = "Itt az ideje, hogy elmentsd a helyreállítási kifejezésed—egy 24 szavas kulcsszót, amellyel helyreállíthatod az egyenleged.";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_HELP_CARD" = "A seed-mondat mentése nem kötelező, de extra nyugalmat ad, és lehetővé teszi az egyenleg visszaállítását a Cake Walletben vagy más Spark-kompatibilis pénztárcákban.";
 
 /* Label for the 'add money' button in the 'send payment' UI. */
 "SETTINGS_PAYMENTS_PAYMENT_ADD_MONEY" = "Alaptőke hozzáadása";
@@ -8465,10 +8465,10 @@
 "SETTINGS_PAYMENTS_VIEW_PASSPHRASE_TITLE" = "Helyreállítási fázis";
 
 /* Header text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "Írd le a következő 24 szót sorrendben. Tárold ezt a listát egy biztonságos helyen.";
+"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "Írja le ezt a 24 szót sorban, és tárolja biztonságos helyen. Felhasználhatja az egyenleg visszaállítására a Cake Walletben vagy más Spark-kompatibilis pénztárcákban.";
 
 /* Footer text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_FOOTER_2" = "Ne oszd meg ezt a listát";
+"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_FOOTER_2" = "Ne ossza meg ezt a mondatot senkivel";
 
 /* Title for the content section of the  'payments lock prompt' view shown after payemts activation. */
 "SETTINGS_PAYMENTS_VIEW_PAYMENTS_LOCK_PROMPT_TITLE" = "Egy másik védelmi réteg";

@@ -8159,19 +8159,19 @@
 "SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_BUTTON" = "Ohita palautuslause";
 
 /* Message of confirmation alert when discarding recovery phrase. */
-"SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_MESSAGE" = "Palautuslauseen avulla voit pahimmassa tapauksessa palauttaa saldosi. Suosittelemme vahvasti, että tallennat sen.";
+"SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_MESSAGE" = "Ilman siemenlausekettasi et voi palauttaa saldoasi Cake Walletissa tai muissa Spark-yhteensopivissa lompakoissa. Voit aina tallentaa sen myöhemmin asetuksista.";
 
 /* Title of confirmation alert when discarding recovery phrase. */
 "SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_TITLE" = "Jatketaanko tallentamatta?";
 
 /* Explanation of the 'payments passphrase' in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION" = "Tilin saldo palautetaan automaattisesti Signalin uudelleenasennuksen yhteydessä syöttämällä Signalin tunnusluku. Saldon voi palauttaa myös henkilökohtaisella 24-sanaisella palautuslauseella. Kirjoita se ylös ja säilytä turvallisessa paikassa.";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION" = "Siemenlausekkeesi ei ole välttämätön varojesi turvaamiseksi — Radar hoitaa palautuksen automaattisesti. Sen tallentaminen antaa sinulle lisämielenrauhaa ja mahdollistaa saldosi palauttamisen Cake Walletissa tai muissa Spark-yhteensopivissa lompakoissa.";
 
 /* Explanation of the 'payments passphrase' when there is a balance. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_BALANCE" = "Sinulla on saldoa! On aika tallentaa palautuslause – 24 sanan mittainen avain, jonka avulla voit palauttaa saldosi.";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_BALANCE" = "Sinulla on saldo! Siemenlausekkeen tallentaminen ei ole pakollista, mutta se antaa lisämielenrauhaa ja mahdollistaa saldon palauttamisen Cake Walletissa tai muissa Spark-yhteensopivissa lompakoissa.";
 
 /* Explanation of the 'payments passphrase' when from the help card. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_HELP_CARD" = "On aika tallentaa palautuslause – 24 sanan mittainen avain, jonka avulla voit palauttaa saldosi.";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_HELP_CARD" = "Siemenlausekkeen tallentaminen ei ole pakollista, mutta se antaa lisämielenrauhaa ja mahdollistaa saldon palauttamisen Cake Walletissa tai muissa Spark-yhteensopivissa lompakoissa.";
 
 /* Label for the 'add money' button in the 'send payment' UI. */
 "SETTINGS_PAYMENTS_PAYMENT_ADD_MONEY" = "Lisää varoja";
@@ -8465,10 +8465,10 @@
 "SETTINGS_PAYMENTS_VIEW_PASSPHRASE_TITLE" = "Palautuslause";
 
 /* Header text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "Kirjoita muistiin seuraavat 24 sanaa järjestyksessä. Laita lista talteen turvalliseen paikkaan.";
+"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "Kirjoita nämä 24 sanaa järjestyksessä ja säilytä ne turvallisessa paikassa. Voit käyttää niitä saldon palauttamiseen Cake Walletissa tai muissa Spark-yhteensopivissa lompakoissa.";
 
 /* Footer text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_FOOTER_2" = "Älä jaa tätä luetteloa";
+"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_FOOTER_2" = "Älä jaa tätä lauseketta kenellekään";
 
 /* Title for the content section of the  'payments lock prompt' view shown after payemts activation. */
 "SETTINGS_PAYMENTS_VIEW_PAYMENTS_LOCK_PROMPT_TITLE" = "Lisäsuojaus";

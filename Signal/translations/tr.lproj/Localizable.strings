@@ -8159,19 +8159,19 @@
 "SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_BUTTON" = "Kurtarma İfadesini Atla";
 
 /* Message of confirmation alert when discarding recovery phrase. */
-"SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_MESSAGE" = "Kurtarma ifaden, en kötü durumda bakiyeni geri yüklemeni sağlar. Kurtarma ifadeni kaydetmeni şiddetle tavsiye ediyoruz.";
+"SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_MESSAGE" = "Tohum ifadeniz olmadan Cake Wallet'ta veya diğer Spark uyumlu cüzdanlarda bakiyenizi geri yükleyemezsiniz. Ayarlardan istediğiniz zaman kaydedebilirsiniz.";
 
 /* Title of confirmation alert when discarding recovery phrase. */
 "SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_TITLE" = "Kaydetmeden devam etmek istiyor musun?";
 
 /* Explanation of the 'payments passphrase' in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION" = "Signal'i yeniden kurduğunuzda Signal PIN'ini doğruladığınızda bakiyeniz otomatik olarak kurtarılacaktır. Bakiyenizi ayrıca bir kurtarma parolası ile de geri alabilirsiniz. Kurtarma parolası 24-kelimelik ve size özgü bir ifadedir. Bir yere yazın ve güvenli bir şekilde saklayın.";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION" = "Tohum ifadeniz fonlarınızı güvende tutmak için gerekli değildir — Radar kurtarmayı otomatik olarak yönetir. Kaydetmek size ekstra gönül rahatlığı sağlar ve Cake Wallet'ta veya diğer Spark uyumlu cüzdanlarda bakiyenizi geri yüklemenizi sağlar.";
 
 /* Explanation of the 'payments passphrase' when there is a balance. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_BALANCE" = "Bakiyen var! Kurtarma ifadeni kaydetme zamanı, bu bakiyeni geri yüklemek için kullanabileceğin 24 kelimelik bir anahtardır.";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_BALANCE" = "Bakiyeniz var! Tohum ifadesini kaydetmek zorunlu değil, ancak ekstra gönül rahatlığı sağlar ve Cake Wallet'ta veya diğer Spark uyumlu cüzdanlarda bakiyenizi geri yüklemenizi sağlar.";
 
 /* Explanation of the 'payments passphrase' when from the help card. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_HELP_CARD" = "Kurtarma ifadeni kaydetme zamanı, bu bakiyeni geri yüklemek için kullanabileceğin 24 kelimelik bir anahtardır.";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_HELP_CARD" = "Tohum ifadesini kaydetmek zorunlu değil, ancak ekstra gönül rahatlığı sağlar ve Cake Wallet'ta veya diğer Spark uyumlu cüzdanlarda bakiyenizi geri yüklemenizi sağlar.";
 
 /* Label for the 'add money' button in the 'send payment' UI. */
 "SETTINGS_PAYMENTS_PAYMENT_ADD_MONEY" = "Para ekle";
@@ -8465,10 +8465,10 @@
 "SETTINGS_PAYMENTS_VIEW_PASSPHRASE_TITLE" = "Kurtarma Parolası";
 
 /* Header text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "Aşağıdaki 24 kelimeyi oldukları sırada kaydedin. Bu listeyi güvenli bir yerde saklayın.";
+"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "Bu 24 kelimeyi sırasıyla yazın ve güvenli bir yerde saklayın. Cake Wallet'ta veya diğer Spark uyumlu cüzdanlarda bakiyenizi geri yüklemek için kullanabilirsiniz.";
 
 /* Footer text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_FOOTER_2" = "Bu listeyi paylaşma";
+"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_FOOTER_2" = "Bu ifadeyi kimseyle paylaşmayın";
 
 /* Title for the content section of the  'payments lock prompt' view shown after payemts activation. */
 "SETTINGS_PAYMENTS_VIEW_PAYMENTS_LOCK_PROMPT_TITLE" = "Başka Bir Koruma Katmanı";

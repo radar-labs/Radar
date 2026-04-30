@@ -8159,19 +8159,19 @@
 "SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_BUTTON" = "ข้ามขั้นตอนวลีกู้คืน";
 
 /* Message of confirmation alert when discarding recovery phrase. */
-"SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_MESSAGE" = "วลีกู้คืนจะช่วยให้คุณกู้คืนเงินได้ในกรณีที่เกิดเหตุไม่คาดฝัน เราจึงขอแนะนำให้คุณบันทึกไว้";
+"SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_MESSAGE" = "หากไม่มีวลีซีด คุณจะไม่สามารถกู้คืนยอดคงเหลือใน Cake Wallet หรือกระเป๋าเงินที่รองรับ Spark อื่นๆ ได้ คุณสามารถบันทึกได้ในภายหลังจากการตั้งค่า";
 
 /* Title of confirmation alert when discarding recovery phrase. */
 "SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_TITLE" = "ดำเนินการต่อโดยไม่บันทึกใช่ไหม";
 
 /* Explanation of the 'payments passphrase' in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION" = "ยอดคงเหลือของคุณจะกู้คืนมาโดยโดยอัตโนมัติเมื่อคุณติดตั้ง Signal อีกครั้ง หากคุณยืนยันรหัส Signal PIN ของคุณ คุณยังสามารถกู้คืนยอดคงเหลือได้โดยใช้วลีกู้คืน ซึ่งเป็นวลี 24 คำเฉพาะสำหรับคุณเท่านั้น จดบันทึกวลีนี้และเก็บไว้ในที่ปลอดภัย";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION" = "วลีซีดของคุณไม่จำเป็นสำหรับการรักษาเงินทุนให้ปลอดภัย — Radar จัดการการกู้คืนโดยอัตโนมัติ การบันทึกมันจะช่วยให้คุณสบายใจยิ่งขึ้นและช่วยให้คุณกู้คืนยอดคงเหลือใน Cake Wallet หรือกระเป๋าเงินที่รองรับ Spark อื่นๆ";
 
 /* Explanation of the 'payments passphrase' when there is a balance. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_BALANCE" = "คุณมียอดเงินคงเหลือ! ได้เวลาบันทึกวลีกู้คืนแล้ว ซึ่งคือรหัส 24 คำที่สามารถใช้เพื่อกู้คืนยอดเงินคงเหลือของคุณ";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_BALANCE" = "คุณมียอดคงเหลือ! การบันทึกวลีซีดไม่จำเป็น แต่ให้ความสบายใจเพิ่มเติมและช่วยให้กู้คืนยอดคงเหลือใน Cake Wallet หรือกระเป๋าเงินที่รองรับ Spark อื่นๆ";
 
 /* Explanation of the 'payments passphrase' when from the help card. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_HELP_CARD" = "ได้เวลาบันทึกวลีกู้คืนแล้ว ซึ่งคือรหัส 24 คำที่สามารถใช้เพื่อกู้คืนยอดเงินคงเหลือของคุณ";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_HELP_CARD" = "การบันทึกวลีซีดไม่จำเป็น แต่ให้ความสบายใจเพิ่มเติมและช่วยให้กู้คืนยอดคงเหลือใน Cake Wallet หรือกระเป๋าเงินที่รองรับ Spark อื่นๆ";
 
 /* Label for the 'add money' button in the 'send payment' UI. */
 "SETTINGS_PAYMENTS_PAYMENT_ADD_MONEY" = "เติมเงิน";
@@ -8465,10 +8465,10 @@
 "SETTINGS_PAYMENTS_VIEW_PASSPHRASE_TITLE" = "วลีกู้คืน";
 
 /* Header text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "จดทั้ง 24 คำต่อไปนี้ตามลำดับ เก็บรักษารายการของคุณนี้ไว้ในที่ปลอดภัย";
+"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "เขียน 24 คำเหล่านี้ตามลำดับและเก็บไว้ในที่ปลอดภัย คุณสามารถใช้เพื่อกู้คืนยอดคงเหลือใน Cake Wallet หรือกระเป๋าเงินที่รองรับ Spark อื่นๆ";
 
 /* Footer text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_FOOTER_2" = "อย่าเปิดเผยข้อมูลนี้กับใคร";
+"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_FOOTER_2" = "อย่าแชร์วลีนี้กับใคร";
 
 /* Title for the content section of the  'payments lock prompt' view shown after payemts activation. */
 "SETTINGS_PAYMENTS_VIEW_PAYMENTS_LOCK_PROMPT_TITLE" = "อีกชั้นของการปกป้อง";

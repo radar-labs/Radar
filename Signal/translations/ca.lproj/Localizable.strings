@@ -8159,19 +8159,19 @@
 "SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_BUTTON" = "Saltar frase de recuperació";
 
 /* Message of confirmation alert when discarding recovery phrase. */
-"SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_MESSAGE" = "La teva frase de recuperació et permetrà restaurar el saldo en el pitjor dels casos. Et recomanem que la guardis.";
+"SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_MESSAGE" = "Sense la vostra frase llavor no podreu restaurar el saldo a Cake Wallet o altres carteres compatibles amb Spark. Podeu desar-la sempre més tard des de la configuració.";
 
 /* Title of confirmation alert when discarding recovery phrase. */
 "SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_TITLE" = "Vols continuar sense desar?";
 
 /* Explanation of the 'payments passphrase' in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION" = "El saldo es restaurarà automàticament quan torneu a instal·lar el Signal si confirmeu el PIN del Signal. També podeu restaurar el saldo mitjançant una frase de recuperació, que és una frase de 24 paraules exclusiva. Anoteu-la i guardeu-la en un lloc segur.";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION" = "La vostra frase llavor no és necessària per mantenir els vostres fons segurs — Radar gestiona la recuperació automàticament. Desar-la us dóna una tranquil·litat addicional i us permet restaurar el saldo a Cake Wallet o qualsevol altra cartera compatible amb Spark.";
 
 /* Explanation of the 'payments passphrase' when there is a balance. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_BALANCE" = "Tens saldo! És hora de desar la teva frase de recuperació: una clau de 24 paraules que podràs utilitzar per restaurar el teu saldo.";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_BALANCE" = "Teniu saldo! Desar la frase llavor no és obligatori, però dóna una tranquil·litat addicional i permet restaurar el saldo a Cake Wallet o altres carteres compatibles amb Spark.";
 
 /* Explanation of the 'payments passphrase' when from the help card. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_HELP_CARD" = "És hora de desar la teva frase de recuperació: una clau de 24 paraules que podràs utilitzar per restaurar el teu saldo.";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_HELP_CARD" = "Desar la frase llavor no és obligatori, però dóna una tranquil·litat addicional i permet restaurar el saldo a Cake Wallet o altres carteres compatibles amb Spark.";
 
 /* Label for the 'add money' button in the 'send payment' UI. */
 "SETTINGS_PAYMENTS_PAYMENT_ADD_MONEY" = "Afegeix fons";
@@ -8465,10 +8465,10 @@
 "SETTINGS_PAYMENTS_VIEW_PASSPHRASE_TITLE" = "Frase de recuperació";
 
 /* Header text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "Escriviu les següents 24 paraules en ordre. Deseu la llista en un lloc segur.";
+"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "Escriviu aquestes 24 paraules en ordre i guardeu-les en un lloc segur. Podeu usar-les per restaurar el saldo a Cake Wallet o altres carteres compatibles amb Spark.";
 
 /* Footer text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_FOOTER_2" = "No comparteixis aquesta llista";
+"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_FOOTER_2" = "No compartiu aquesta frase amb ningú";
 
 /* Title for the content section of the  'payments lock prompt' view shown after payemts activation. */
 "SETTINGS_PAYMENTS_VIEW_PAYMENTS_LOCK_PROMPT_TITLE" = "Una altra capa de protecció";

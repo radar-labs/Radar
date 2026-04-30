@@ -8159,19 +8159,19 @@
 "SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_BUTTON" = "पुर्नप्राप्ती वाक्यांश वगळा";
 
 /* Message of confirmation alert when discarding recovery phrase. */
-"SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_MESSAGE" = "आपला पुर्नप्राप्ती वाक्यांश आपल्याला अत्यंत वाईट परिस्थितीमध्ये आपली शिल्लक पुनर्प्राप्त करू देतो. आपण त्याला जतन करावे अशी ठाम शिफारस आम्ही करतो.";
+"SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_MESSAGE" = "सीड फ्रेजशिवाय तुम्ही Cake Wallet किंवा इतर Spark-सुसंगत वॉलेटमध्ये तुमची शिल्लक पुनर्संचयित करू शकत नाही. तुम्ही ते नेहमी सेटिंग्जमधून नंतर जतन करू शकता.";
 
 /* Title of confirmation alert when discarding recovery phrase. */
 "SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_TITLE" = "जतन न करता पुढे सुरू ठेवायचे?";
 
 /* Explanation of the 'payments passphrase' in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION" = "आपण आपल्या Signal PIN ची पुष्टी केल्यास, आपण Signal पुन्हा स्थापित केल्यावर आपला बॅलंस स्वयंचलितपणे पुनर्स्थापित होईल. आपण आपला बॅलंस रिकव्हरी फ्रेझ वापरून देखील पुनर्स्थापित करू शकता, जी 24-शब्द फ्रेझ आपल्यासाठी ऐकमेव आहे. ती लिहून ठेवा आणि त्यास एका सुरक्षित जागेवर ठेवा.";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION" = "तुमची सीड फ्रेज तुमची निधी सुरक्षित ठेवण्यासाठी आवश्यक नाही — Radar आपोआप पुनर्प्राप्ती हाताळते. ती जतन केल्याने तुम्हाला अतिरिक्त मानसिक शांती मिळते आणि Cake Wallet किंवा इतर कोणत्याही Spark-सुसंगत वॉलेटमध्ये तुमची शिल्लक पुनर्संचयित करता येते.";
 
 /* Explanation of the 'payments passphrase' when there is a balance. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_BALANCE" = "आपण संतुलन साधले आहे! आपला पुर्नप्राप्ती वाक्यांश जतन करण्याची वेळ—संतुलन पुनर्संचयित करण्यासाठी 24-शब्दांची की वापरू शकता.";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_BALANCE" = "तुमची शिल्लक आहे! सीड फ्रेज जतन करणे आवश्यक नाही, परंतु अतिरिक्त मानसिक शांती देते आणि Cake Wallet किंवा इतर Spark-सुसंगत वॉलेटमध्ये शिल्लक पुनर्संचयित करण्याची परवानगी देते.";
 
 /* Explanation of the 'payments passphrase' when from the help card. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_HELP_CARD" = "आपला पुर्नप्राप्ती वाक्यांश जतन करण्याची वेळ—एक 24-शब्दांची की संतुलन पुनर्संचयित करण्यासाठी वापरू शकता.";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_HELP_CARD" = "सीड फ्रेज जतन करणे आवश्यक नाही, परंतु अतिरिक्त मानसिक शांती देते आणि Cake Wallet किंवा इतर Spark-सुसंगत वॉलेटमध्ये शिल्लक पुनर्संचयित करण्याची परवानगी देते.";
 
 /* Label for the 'add money' button in the 'send payment' UI. */
 "SETTINGS_PAYMENTS_PAYMENT_ADD_MONEY" = "फंड जोडा";
@@ -8465,10 +8465,10 @@
 "SETTINGS_PAYMENTS_VIEW_PASSPHRASE_TITLE" = "रिकव्हरी फ्रेझ";
 
 /* Header text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "पुढील 24 शब्द ओळीत लिहून ठेवा. आपली यादी सुरक्षित ठिकाणी ठेवा.";
+"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "हे 24 शब्द क्रमाने लिहा आणि सुरक्षित ठिकाणी ठेवा. Cake Wallet किंवा इतर Spark-सुसंगत वॉलेटमध्ये शिल्लक पुनर्संचयित करण्यासाठी त्यांचा वापर करू शकता.";
 
 /* Footer text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_FOOTER_2" = "ही सूची सामायिक करु नका";
+"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_FOOTER_2" = "ही फ्रेज कोणाशीही शेअर करू नका";
 
 /* Title for the content section of the  'payments lock prompt' view shown after payemts activation. */
 "SETTINGS_PAYMENTS_VIEW_PAYMENTS_LOCK_PROMPT_TITLE" = "सरंक्षणाचा आणखी एक स्तर";

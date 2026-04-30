@@ -8159,19 +8159,19 @@
 "SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_BUTTON" = "بىخەتەرلىك ئىبارىسىنى ئاتلاش";
 
 /* Message of confirmation alert when discarding recovery phrase. */
-"SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_MESSAGE" = "ئەڭ ئېغىر ئەھۋاللاردا ئەسلىگە كەلتۈرۈش ئىبارىسى ئارقىلىق قالدۇق سوممىڭىزنى ئەسلىگە كەلتۈرەلەيسىز. ئۇنى ساقلىۋېلىشىڭىزنى كۈچلۈك تەۋسىيە قىلىمىز.";
+"SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_MESSAGE" = "ئۇرۇق جۈملىسىسىز Cake Wallet ياكى باشقا Spark ماس كېلىدىغان خامتازالدا باھاڭىزنى ئەسلىگە كەلتۈرەلمەيسىز. ئۇنى ھەمىشە كېيىن تەڭشەكلەردىن ساقلىيالايسىز.";
 
 /* Title of confirmation alert when discarding recovery phrase. */
 "SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_TITLE" = "ساقلىمايلا داۋاملاشتۇرامسىز؟";
 
 /* Explanation of the 'payments passphrase' in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION" = "ئەگەرSignal نى قايتا قاچىلاپ Signal PIN نى جەزىملىسىڭىز قالدۇقىڭىز ئۆزلۈكىدىن ئەسلىگە كېلىدۇ. ئەسلىگە كەلتۈرۈش ئىبارىسى ئارقىلىقمۇ قالدۇقىڭىزنى ئەسلىگە كەلتۈرەلەيسىز ، بۇ 24-سۆزلۈك ئىبارە سىزگىلا خاس. ئۇنى يېزىۋېلىپ بىخەتەر جايدا ساقلاڭ.";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION" = "سىزنىڭ ئۇرۇق جۈملىڭىز مابلىغىڭىزنى بىخەتەر ساقلاش ئۈچۈن زۆرۈر ئەمەس — Radar ئەسلىگە كەلتۈرۈشنى ئاپتوماتىك بىر كۆزنى ئالىدۇ. ئۇنى ساقلاش سىزگە قوشۇمچە خاتىرجەملىك بېرىدۇ ۋە Cake Wallet ياكى باشقا Spark ماس كېلىدىغان خامتازالدا باھاڭىزنى ئەسلىگە كەلتۈرۈشكە يول قويىدۇ.";
 
 /* Explanation of the 'payments passphrase' when there is a balance. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_BALANCE" = "قالدۇق سوممىڭىز بار! قالدۇق سوممىڭىزنى ئەسلىگە كەلتۈرۈش ئۈچۈن ئەسلىگە كەلتۈرۈش ئىبارىسىنى (24 سۆزدىن تەركىب تاپقان بولىدۇ) ساقلىۋېلىڭ.";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_BALANCE" = "باھاڭىز بار! ئۇرۇق جۈملىسىنى ساقلاش مەجبۇرىي ئەمەس، ئەمما قوشۇمچە خاتىرجەملىك بېرىدۇ ۋە Cake Wallet ياكى باشقا Spark ماس كېلىدىغان خامتازالدا باھاڭىزنى ئەسلىگە كەلتۈرۈشكە يول قويىدۇ.";
 
 /* Explanation of the 'payments passphrase' when from the help card. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_HELP_CARD" = "قالدۇق سوممىڭىزنى ئەسلىگە كەلتۈرۈش ئۈچۈن ئەسلىگە كەلتۈرۈش ئىبارىسىنى (24 سۆزدىن تەركىب تاپقان بولىدۇ) ساقلىۋېلىڭ.";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_HELP_CARD" = "ئۇرۇق جۈملىسىنى ساقلاش مەجبۇرىي ئەمەس، ئەمما قوشۇمچە خاتىرجەملىك بېرىدۇ ۋە Cake Wallet ياكى باشقا Spark ماس كېلىدىغان خامتازالدا باھاڭىزنى ئەسلىگە كەلتۈرۈشكە يول قويىدۇ.";
 
 /* Label for the 'add money' button in the 'send payment' UI. */
 "SETTINGS_PAYMENTS_PAYMENT_ADD_MONEY" = "مەبلەغ قوش";
@@ -8465,10 +8465,10 @@
 "SETTINGS_PAYMENTS_VIEW_PASSPHRASE_TITLE" = "ئەسلىگە كەلتۈرۈش ئىبارىسى";
 
 /* Header text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "تۆۋەندىكى 24 سۆزنى تەرتىپى بويىچە يېزىۋېلىڭ. تىزىملىكىڭىزنى بىخەتەر جايدا ساقلاڭ.";
+"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "بۇ 24 سۆزنى تەرتىپلىك يېزىپ بىخەتەر جايغا قويۇڭ. Cake Wallet ياكى باشقا Spark ماس كېلىدىغان خامتازالدا باھاڭىزنى ئەسلىگە كەلتۈرۈش ئۈچۈن ئۇلارنى ئىشلىتەلەيسىز.";
 
 /* Footer text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_FOOTER_2" = "بۇ تىزىملىكنى ئورتاقلاشماڭ";
+"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_FOOTER_2" = "بۇ جۈملىنى ھېچكىمگە ئورتاقلاشمىڭ";
 
 /* Title for the content section of the  'payments lock prompt' view shown after payemts activation. */
 "SETTINGS_PAYMENTS_VIEW_PAYMENTS_LOCK_PROMPT_TITLE" = "يەنە بىر قەۋەت قوغداش تەدبىرى";

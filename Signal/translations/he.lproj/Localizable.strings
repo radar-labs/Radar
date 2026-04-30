@@ -8159,19 +8159,19 @@
 "SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_BUTTON" = "דילוג על משפט שחזור סיסמה";
 
 /* Message of confirmation alert when discarding recovery phrase. */
-"SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_MESSAGE" = "משפט השחזור שלך מאפשר לך לשחזר את היתרה שלך במקרה הגרוע ביותר. אנחנו ממליצים בחום לשמור אותו.";
+"SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_MESSAGE" = "ללא ביטוי הזרע שלך לא תוכל לשחזר את יתרתך ב-Cake Wallet או בארנקים אחרים התואמים ל-Spark. תוכל תמיד לשמור אותו מאוחר יותר מההגדרות.";
 
 /* Title of confirmation alert when discarding recovery phrase. */
 "SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_TITLE" = "להמשיך בלי לשמור?";
 
 /* Explanation of the 'payments passphrase' in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION" = "המאזן שלך ישוחזר באופן אוטומטי כשתתקין מחדש את Signal אם תאשר את PIN של Signal שלך. אתה יכול גם לשחזר את המאזן שלך ע״י שימוש במשפט השבה, שהוא משפט בן 24 מילים ייחודי לך. כתוב אותו ואחסן אותו במקום בטוח.";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION" = "ביטוי הזרע שלך אינו נדרש לשמירת הכספים שלך בטוחים — Radar מטפל בשחזור אוטומטית. שמירתו מעניקה לך שקט נפשי נוסף ומאפשרת לך לשחזר את יתרתך ב-Cake Wallet או בכל ארנק אחר התואם ל-Spark.";
 
 /* Explanation of the 'payments passphrase' when there is a balance. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_BALANCE" = "יש לך יתרה! הגיע הזמן לשמור את משפט שחזור הסיסמה שלך—סיסמה בעלת 24 מילים שאפשר להשתמש בה כדי לשחזר את היתרה הכספית שלך.";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_BALANCE" = "יש לך יתרה! שמירת ביטוי הזרע אינה חובה, אך מעניקה שקט נפשי נוסף ומאפשרת שחזור היתרה ב-Cake Wallet או בארנקים אחרים התואמים ל-Spark.";
 
 /* Explanation of the 'payments passphrase' when from the help card. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_HELP_CARD" = "הגיע הזמן לשמור את משפט שחזור הסיסמה שלך—סיסמה בעלת 24 מילים שאפשר להשתמש בה כדי לשחזר את היתרה הכספית שלך.";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_HELP_CARD" = "שמירת ביטוי הזרע אינה חובה, אך מעניקה שקט נפשי נוסף ומאפשרת שחזור היתרה ב-Cake Wallet או בארנקים אחרים התואמים ל-Spark.";
 
 /* Label for the 'add money' button in the 'send payment' UI. */
 "SETTINGS_PAYMENTS_PAYMENT_ADD_MONEY" = "הוסף כספים";
@@ -8465,10 +8465,10 @@
 "SETTINGS_PAYMENTS_VIEW_PASSPHRASE_TITLE" = "משפט השבה";
 
 /* Header text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "כתוב את 24 המילים הבאות לפי הסדר. אחסן את הרשימה שלך במקום מאובטח.";
+"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "כתוב את 24 המילים האלה בסדר ושמור אותן במקום בטוח. תוכל להשתמש בהן לשחזור יתרתך ב-Cake Wallet או בארנקים אחרים התואמים ל-Spark.";
 
 /* Footer text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_FOOTER_2" = "אין לשתף את הרשימה הזו";
+"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_FOOTER_2" = "אל תשתף ביטוי זה עם אף אחד";
 
 /* Title for the content section of the  'payments lock prompt' view shown after payemts activation. */
 "SETTINGS_PAYMENTS_VIEW_PAYMENTS_LOCK_PROMPT_TITLE" = "עוד שכבת הגנה";

@@ -8159,19 +8159,19 @@
 "SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_BUTTON" = "Spring gendannelsessætning over";
 
 /* Message of confirmation alert when discarding recovery phrase. */
-"SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_MESSAGE" = "Din gendannelsessætning giver dig mulighed for at gendanne din saldo hvis uheldet er ude. Vi anbefaler kraftigt at du gemmer den.";
+"SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_MESSAGE" = "Uden din seed-sætning kan du ikke gendanne din saldo i Cake Wallet eller andre Spark-kompatible punge. Du kan altid gemme den senere fra indstillingerne.";
 
 /* Title of confirmation alert when discarding recovery phrase. */
 "SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_TITLE" = "Fortsæt uden at gemme?";
 
 /* Explanation of the 'payments passphrase' in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION" = "Din saldo gendannes automatisk, når du geninstallerer Signal, hvis du bekræfter din Signal-pinkode. Du kan også gendanne din saldo ved hjælp af en gendannelsessætning, som er en 24-ords sætning, der er unik for dig. Skriv den ned, og opbevar den et sikkert sted.";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION" = "Din seed-sætning er ikke nødvendig for at holde dine midler sikre — Radar håndterer gendannelse automatisk. At gemme den giver dig ekstra ro og lader dig gendanne din saldo i Cake Wallet eller en hvilken som helst anden Spark-kompatibel pung.";
 
 /* Explanation of the 'payments passphrase' when there is a balance. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_BALANCE" = "Du har en saldo! Det er tid til at gemme din gendannelsessætning – en kode på 24 ord, som kan bruges til at genoprette din saldo.";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_BALANCE" = "Du har saldo! At gemme seed-sætningen er ikke obligatorisk, men giver ekstra ro og lader dig gendanne saldoen i Cake Wallet eller andre Spark-kompatible punge.";
 
 /* Explanation of the 'payments passphrase' when from the help card. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_HELP_CARD" = "Det er tid til at gemme din gendannelsessætning – en kode på 24 ord, som kan bruges til at genoprette din saldo.";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_HELP_CARD" = "At gemme seed-sætningen er ikke obligatorisk, men giver ekstra ro og lader dig gendanne saldoen i Cake Wallet eller andre Spark-kompatible punge.";
 
 /* Label for the 'add money' button in the 'send payment' UI. */
 "SETTINGS_PAYMENTS_PAYMENT_ADD_MONEY" = "Tilføj midler";
@@ -8465,10 +8465,10 @@
 "SETTINGS_PAYMENTS_VIEW_PASSPHRASE_TITLE" = "Gendannelsessætning";
 
 /* Header text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "Skriv følgende 24 ord i rækkefølge. Opbevar din liste på et sikkert sted.";
+"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "Skriv disse 24 ord i rækkefølge ned og opbevar dem et sikkert sted. Du kan bruge dem til at gendanne saldoen i Cake Wallet eller andre Spark-kompatible punge.";
 
 /* Footer text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_FOOTER_2" = "Del ikke denne liste";
+"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_FOOTER_2" = "Del ikke denne sætning med nogen";
 
 /* Title for the content section of the  'payments lock prompt' view shown after payemts activation. */
 "SETTINGS_PAYMENTS_VIEW_PAYMENTS_LOCK_PROMPT_TITLE" = "Endnu et beskyttelseslag";

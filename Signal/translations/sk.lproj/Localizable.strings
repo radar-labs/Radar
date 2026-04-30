@@ -8159,19 +8159,19 @@
 "SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_BUTTON" = "Preskočiť frázu na obnovenie";
 
 /* Message of confirmation alert when discarding recovery phrase. */
-"SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_MESSAGE" = "Fráza na obnovenie vám umožní obnoviť váš zostatok aj v tom najhoršom prípade. Dôrazne vám preto odporúčame, aby ste si ju uložili.";
+"SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_MESSAGE" = "Bez vašej seed frázy nebudete môcť obnoviť zostatok v Cake Wallet alebo iných peňaženkách kompatibilných so Spark. Vždy ju môžete uložiť neskôr v nastaveniach.";
 
 /* Title of confirmation alert when discarding recovery phrase. */
 "SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_TITLE" = "Pokračovať bez uloženia?";
 
 /* Explanation of the 'payments passphrase' in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION" = "Váš zostatok sa automaticky obnoví, keď si Signal preinštalujete, ak potvrdíte váš PIN pre Signal. Váš zostatok môžete taktiež obnoviť pomocou frázy na obnovenie, čo je fráza pozostávajúca z 24 slov, ktorú máte len vy. Zapíšte si ju a uložte na bezpečné miesto.";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION" = "Vaša seed fráza nie je potrebná na zabezpečenie vašich prostriedkov — Radar obnovenie spracúva automaticky. Uložením získate väčší pokoj a možnosť obnoviť zostatok v Cake Wallet alebo inej peňaženke kompatibilnej so Spark.";
 
 /* Explanation of the 'payments passphrase' when there is a balance. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_BALANCE" = "Máte zostatok! Je čas uložiť si frázu na obnovenie—24-slovný kľúč, ktorý môžete použiť na obnovenie vášho zostatku.";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_BALANCE" = "Máte zostatok! Uloženie seed frázy nie je povinné, ale dáva vám väčší pokoj a umožňuje obnoviť zostatok v Cake Wallet alebo iných peňaženkách kompatibilných so Spark.";
 
 /* Explanation of the 'payments passphrase' when from the help card. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_HELP_CARD" = "Je čas uložiť si frázu na obnovenie—24-slovný kľúč, ktorý môžete použiť na obnovenie zostatku.";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_HELP_CARD" = "Uloženie seed frázy nie je povinné, ale dáva vám väčší pokoj a umožňuje obnoviť zostatok v Cake Wallet alebo iných peňaženkách kompatibilných so Spark.";
 
 /* Label for the 'add money' button in the 'send payment' UI. */
 "SETTINGS_PAYMENTS_PAYMENT_ADD_MONEY" = "Pridať prostriedky";
@@ -8465,10 +8465,10 @@
 "SETTINGS_PAYMENTS_VIEW_PASSPHRASE_TITLE" = "Fráza na obnovenie";
 
 /* Header text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "Zapíšte si nasledovných 24 slov v poradí. Tento zoznam si uložte na bezpečnom mieste.";
+"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "Zapíšte týchto 24 slov v poradí a uložte ich na bezpečné miesto. Môžete ich použiť na obnovenie zostatku v Cake Wallet alebo iných peňaženkách kompatibilných so Spark.";
 
 /* Footer text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_FOOTER_2" = "Tento zoznam s nikým nezdieľajte";
+"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_FOOTER_2" = "Nezdieľajte túto frázu s nikým";
 
 /* Title for the content section of the  'payments lock prompt' view shown after payemts activation. */
 "SETTINGS_PAYMENTS_VIEW_PAYMENTS_LOCK_PROMPT_TITLE" = "Ďalšia vrstva ochrany";

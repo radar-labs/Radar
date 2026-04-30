@@ -8159,19 +8159,19 @@
 "SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_BUTTON" = "リカバリーフレーズをスキップする";
 
 /* Message of confirmation alert when discarding recovery phrase. */
-"SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_MESSAGE" = "リカバリーフレーズがあれば、万一の時に残高を復元できます。保存することを強くお勧めします。";
+"SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_MESSAGE" = "シードフレーズがなければ、Cake Walletやその他のSpark対応ウォレットで残高を復元できません。設定からいつでも後で保存できます。";
 
 /* Title of confirmation alert when discarding recovery phrase. */
 "SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_TITLE" = "保存せずに続けますか？";
 
 /* Explanation of the 'payments passphrase' in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION" = "Signalの再インストール時にSignal PINを確認すると、残高は自動で復元されます。また、あなた固有の24語のリカバリーフレーズを使って、残高を復元することもできます。リカバリーフレーズは、書きとめて安全な場所に保管してください。";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION" = "シードフレーズは資金を安全に保つために必須ではありません — Radarが自動的に復元を処理します。保存しておくことで安心感が増し、Cake Walletやその他のSpark対応ウォレットで残高を復元できます。";
 
 /* Explanation of the 'payments passphrase' when there is a balance. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_BALANCE" = "残高があります！残高を復元するためのキーとなる、24単語のリカバリーフレーズを保存しましょう。";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_BALANCE" = "残高があります！シードフレーズの保存は必須ではありませんが、安心感が増し、Cake Walletやその他のSpark対応ウォレットで残高を復元できます。";
 
 /* Explanation of the 'payments passphrase' when from the help card. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_HELP_CARD" = "残高を復元するためのキーとなる、24単語のリカバリーフレーズを保存しましょう。";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_HELP_CARD" = "シードフレーズの保存は必須ではありませんが、安心感が増し、Cake Walletやその他のSpark対応ウォレットで残高を復元できます。";
 
 /* Label for the 'add money' button in the 'send payment' UI. */
 "SETTINGS_PAYMENTS_PAYMENT_ADD_MONEY" = "入金";
@@ -8465,10 +8465,10 @@
 "SETTINGS_PAYMENTS_VIEW_PASSPHRASE_TITLE" = "リカバリーフレーズ";
 
 /* Header text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "次の24語を順番通り書きとめて、安全な場所に保管してください。";
+"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "この24語を順番に書き留め、安全な場所に保管してください。Cake Walletやその他のSpark対応ウォレットで残高を復元するために使用できます。";
 
 /* Footer text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_FOOTER_2" = "このリストは共有しないでください";
+"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_FOOTER_2" = "このフレーズを誰にも共有しないでください";
 
 /* Title for the content section of the  'payments lock prompt' view shown after payemts activation. */
 "SETTINGS_PAYMENTS_VIEW_PAYMENTS_LOCK_PROMPT_TITLE" = "保護レイヤーの追加";

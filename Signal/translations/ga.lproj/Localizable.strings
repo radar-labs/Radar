@@ -8159,19 +8159,19 @@
 "SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_BUTTON" = "Scipeáil Frása Athshlánaithe";
 
 /* Message of confirmation alert when discarding recovery phrase. */
-"SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_MESSAGE" = "Cuireann do fhrása athshlánaithe ar do chumas d'iarmhéid a aischur sa chás is measa. Molaimid go láidir duit é a shábháil.";
+"SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_MESSAGE" = "Gan do fhrása síl ní bheidh tú in ann d'iarmhéid a athchóiriú in Cake Wallet nó i sparáin eile atá comhoiriúnach le Spark. Is féidir leat é a shábháil níos déanaí ó na socruithe i gcónaí.";
 
 /* Title of confirmation alert when discarding recovery phrase. */
 "SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_TITLE" = "Lean ar Aghaidh gan Sábháil?";
 
 /* Explanation of the 'payments passphrase' in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION" = "Your balance will automatically restore when you reinstall Signal if you confirm your Signal PIN. You can also restore your balance using a recovery phrase, which is a 24-word phrase unique to you. Write it down and store it in a safe place.";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION" = "Ní gá do fhrása síl chun do chistí a choinneáil sábháilte — láimhseálann Radar téarnamh go huathoibríoch. Trí é a shábháil faigheann tú síocháin intinne bhreise agus ligeann sé duit do hiarmhéid a athchóiriú in Cake Wallet nó in aon sparán eile atá comhoiriúnach le Spark.";
 
 /* Explanation of the 'payments passphrase' when there is a balance. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_BALANCE" = "Tá iarmhéid agat! Tá sé in am duit do fhrása athshlánaithe a shábháil, sin eochair 24 focal is féidir leat a úsáid chun d'iarmhéid a aischur.";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_BALANCE" = "Tá iarmhéid agat! Ní gá an frása síl a shábháil, ach tugann sé síocháin intinne bhreise agus ligeann duit an iarmhéid a athchóiriú in Cake Wallet nó i sparáin eile atá comhoiriúnach le Spark.";
 
 /* Explanation of the 'payments passphrase' when from the help card. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_HELP_CARD" = "Tá sé in am duit do fhrása athshlánaithe a shábháil, sin eochair 24 focal is féidir leat a úsáid chun d'iarmhéid a aischur.";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_HELP_CARD" = "Ní gá an frása síl a shábháil, ach tugann sé síocháin intinne bhreise agus ligeann duit an iarmhéid a athchóiriú in Cake Wallet nó i sparáin eile atá comhoiriúnach le Spark.";
 
 /* Label for the 'add money' button in the 'send payment' UI. */
 "SETTINGS_PAYMENTS_PAYMENT_ADD_MONEY" = "Add Funds";
@@ -8465,10 +8465,10 @@
 "SETTINGS_PAYMENTS_VIEW_PASSPHRASE_TITLE" = "Recovery Phrase";
 
 /* Header text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "Write down the following 24 words in order. Store your list in a secure place.";
+"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "Scríobh na 24 focal seo in ord agus coinnigh in áit shábháilte iad. Is féidir leat iad a úsáid chun d'iarmhéid a athchóiriú in Cake Wallet nó i sparáin eile atá comhoiriúnach le Spark.";
 
 /* Footer text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_FOOTER_2" = "Ná comhroinn an liosta seo";
+"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_FOOTER_2" = "Ná roinn an frása seo le haon duine";
 
 /* Title for the content section of the  'payments lock prompt' view shown after payemts activation. */
 "SETTINGS_PAYMENTS_VIEW_PAYMENTS_LOCK_PROMPT_TITLE" = "Sraith Eile Cosanta";

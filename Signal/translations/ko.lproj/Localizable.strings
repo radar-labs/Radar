@@ -8159,19 +8159,19 @@
 "SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_BUTTON" = "복구 문구 건너뛰기";
 
 /* Message of confirmation alert when discarding recovery phrase. */
-"SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_MESSAGE" = "최악의 경우 복구 문구를 사용하면 잔액을 복원할 수 있습니다. 복구 문구를 저장하시는 게 좋습니다.";
+"SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_MESSAGE" = "시드 구문 없이는 Cake Wallet이나 다른 Spark 호환 지갑에서 잔액을 복원할 수 없습니다. 설정에서 나중에 언제든지 저장할 수 있습니다.";
 
 /* Title of confirmation alert when discarding recovery phrase. */
 "SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_TITLE" = "저장하지 않고 계속하시겠어요?";
 
 /* Explanation of the 'payments passphrase' in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION" = "Signal PIN을 확인하면 Signal을 다시 설치할 때 잔액이 자동으로 복원됩니다. 사용자는 또한 사용자에게 고유한 24단어로 구성된 문구인 복구 문구를 사용하여 잔액을 다시 찾을 수 있습니다. 적어 놓고 안전한 장소에 보관하세요.";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION" = "시드 구문은 자금을 안전하게 유지하는 데 필수적이지 않습니다 — Radar가 자동으로 복구를 처리합니다. 저장하면 추가적인 안심감을 주고 Cake Wallet이나 다른 Spark 호환 지갑에서 잔액을 복원할 수 있습니다.";
 
 /* Explanation of the 'payments passphrase' when there is a balance. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_BALANCE" = "잔액이 있습니다! 24개 단어 키인 복구 문구를 저장하세요. 해당 문구를 사용하여 잔액을 복구할 수 있습니다.";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_BALANCE" = "잔액이 있습니다! 시드 구문 저장은 필수가 아니지만 추가 안심감을 주고 Cake Wallet이나 다른 Spark 호환 지갑에서 잔액을 복원할 수 있습니다.";
 
 /* Explanation of the 'payments passphrase' when from the help card. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_HELP_CARD" = "24개 단어 키인 복구 문구를 저장하세요. 해당 문구를 사용하여 잔액을 복구할 수 있습니다.";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_HELP_CARD" = "시드 구문 저장은 필수가 아니지만 추가 안심감을 주고 Cake Wallet이나 다른 Spark 호환 지갑에서 잔액을 복원할 수 있습니다.";
 
 /* Label for the 'add money' button in the 'send payment' UI. */
 "SETTINGS_PAYMENTS_PAYMENT_ADD_MONEY" = "자금 추가";
@@ -8465,10 +8465,10 @@
 "SETTINGS_PAYMENTS_VIEW_PASSPHRASE_TITLE" = "복구 문구";
 
 /* Header text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "다음 24개 단어를 순서대로 써놓으세요. 안전한 장소에 목록을 저장하세요.";
+"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "이 24개 단어를 순서대로 적어 안전한 곳에 보관하세요. Cake Wallet이나 다른 Spark 호환 지갑에서 잔액을 복원하는 데 사용할 수 있습니다.";
 
 /* Footer text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_FOOTER_2" = "이 목록을 공유하지 마세요.";
+"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_FOOTER_2" = "이 구문을 누구와도 공유하지 마세요";
 
 /* Title for the content section of the  'payments lock prompt' view shown after payemts activation. */
 "SETTINGS_PAYMENTS_VIEW_PAYMENTS_LOCK_PROMPT_TITLE" = "추가 보안 조치";
