@@ -51,15 +51,7 @@ public class PaymentsImpl: NSObject, PaymentsSwift {
     private var currentWalletAddress: LightningAddressInfo?
 
     public static func isSatoshiAmountTypeEnabled() -> Bool {
-        return UserDefaults.standard.bool(forKey: PaymentsConstants.satoshiAmountTypeEnabledKey)
-    }
-
-    public static func toggleSatoshiAmountType() -> Bool {
-        let value = !UserDefaults.standard.bool(
-            forKey: PaymentsConstants.satoshiAmountTypeEnabledKey)
-        UserDefaults.standard.set(value, forKey: PaymentsConstants.satoshiAmountTypeEnabledKey)
-
-        return value
+        PaymentsDisplayPreferences.shared.isSatoshiEnabled
     }
 
     @MainActor
@@ -574,6 +566,11 @@ extension PaymentsImpl {
         }
 
         return TSPaymentAddress(currency: .bitcoin, mobileCoinPublicAddressData: addressData)
+    }
+
+    public func isUsernameAvailable(_ username: String) async throws -> Bool {
+        return try await getBreezSdk().checkLightningAddressAvailable(
+            req: CheckLightningAddressRequest(username: username))
     }
 
     public func registerUsername(_ username: String) async throws {

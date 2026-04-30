@@ -72,8 +72,8 @@
 		05FDBC292CD91B31000C87BC /* ChatListContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FDBC282CD91B31000C87BC /* ChatListContainerView.swift */; };
 		0C0656B22F912FE700CA36E7 /* BreezSdkExt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C0656B12F912FE700CA36E7 /* BreezSdkExt.swift */; };
 		0C1A350E2F4DD6B40004353B /* WalletetAddressEditViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C1A350D2F4DD6880004353B /* WalletetAddressEditViewController.swift */; };
+		8D7D4A065BD540F9964C22D2 /* RadarUsernameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE357466A03B42A7A4362BC9 /* RadarUsernameViewController.swift */; };
 		0CA604BC2F7FEC1B003AE0FD /* SetOnce.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CA604BB2F7FEC18003AE0FD /* SetOnce.swift */; };
-		0CD2A2332F76ACFA008CC3D9 /* BreezSdkConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CD2A2322F76ACF3008CC3D9 /* BreezSdkConfig.swift */; };
 		0CE014267EDFBD2538E940A0 /* Pods_Signal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7FF88FB580BC19B240EEB86A /* Pods_Signal.framework */; };
 		1404D8B3276A353B0068E2F6 /* ChatListViewController+Multiselect.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1404D8B2276A353A0068E2F6 /* ChatListViewController+Multiselect.swift */; };
 		1466AB282817F7E7003B3D9F /* PluralAware.stringsdict in Resources */ = {isa = PBXBuildFile; fileRef = 1466AB262817F7E7003B3D9F /* PluralAware.stringsdict */; };
@@ -275,6 +275,7 @@
 		3465F4D627287677001663AF /* PaymentsProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3465F4D127287674001663AF /* PaymentsProcessor.swift */; };
 		3465F4D727287677001663AF /* MobileCoinAPI+Configuration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3465F4D227287675001663AF /* MobileCoinAPI+Configuration.swift */; };
 		3465F4D827287677001663AF /* PaymentsImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3465F4D327287675001663AF /* PaymentsImpl.swift */; };
+		0430706099CA47739A6110E8 /* PaymentsDisplayPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26F93D12DE3541A78594229A /* PaymentsDisplayPreferences.swift */; };
 		3465F4D927287677001663AF /* MobileCoinAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3465F4D427287675001663AF /* MobileCoinAPI.swift */; };
 		3465F4DD2728812B001663AF /* Payments.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3465F4DC2728812A001663AF /* Payments.swift */; };
 		34661FB820C1C0D60056EDD6 /* message_sent.aiff in Resources */ = {isa = PBXBuildFile; fileRef = 34661FB720C1C0D60056EDD6 /* message_sent.aiff */; };
@@ -1482,6 +1483,7 @@
 		76F4B581293ACCD200A7CF2F /* UIKit+Animations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76F4B580293ACCD200A7CF2F /* UIKit+Animations.swift */; };
 		76F958632A09A5AE00B43E63 /* DebugUIDiskUsage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76F958622A09A5AE00B43E63 /* DebugUIDiskUsage.swift */; };
 		76FCCDBC27AB8FBE00BAA7F0 /* MediaControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76FCCDBB27AB8FBE00BAA7F0 /* MediaControls.swift */; };
+		7729BF792F9E4E3900B97F91 /* BreezSdkConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7729BF782F9E4E3900B97F91 /* BreezSdkConfig.swift */; };
 		83B9573927C9A1FA00A678FD /* CaptchaView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83B9573827C9A1FA00A678FD /* CaptchaView.swift */; };
 		8803FF6628EF89B50023574A /* StorySharingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88F5FA9528EF7E02007AA1BF /* StorySharingTests.swift */; };
 		8806EF19248DBD7200E764C7 /* NotificationPermissionReminderMegaphone.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8806EF18248DBD7200E764C7 /* NotificationPermissionReminderMegaphone.swift */; };
@@ -3939,8 +3941,8 @@
 		0BADD293DAFC82BF3274F0F6 /* Pods_SignalTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_SignalTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		0C0656B12F912FE700CA36E7 /* BreezSdkExt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreezSdkExt.swift; sourceTree = "<group>"; };
 		0C1A350D2F4DD6880004353B /* WalletetAddressEditViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletetAddressEditViewController.swift; sourceTree = "<group>"; };
+		DE357466A03B42A7A4362BC9 /* RadarUsernameViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadarUsernameViewController.swift; sourceTree = "<group>"; };
 		0CA604BB2F7FEC18003AE0FD /* SetOnce.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetOnce.swift; sourceTree = "<group>"; };
-		0CD2A2322F76ACF3008CC3D9 /* BreezSdkConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreezSdkConfig.swift; sourceTree = "<group>"; };
 		1404D8B2276A353A0068E2F6 /* ChatListViewController+Multiselect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChatListViewController+Multiselect.swift"; sourceTree = "<group>"; };
 		1466AB272817F7E7003B3D9F /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = en; path = translations/en.lproj/PluralAware.stringsdict; sourceTree = "<group>"; };
 		1466AB292817F7F2003B3D9F /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = de; path = translations/de.lproj/PluralAware.stringsdict; sourceTree = "<group>"; };
@@ -4080,6 +4082,7 @@
 		3465F4D127287674001663AF /* PaymentsProcessor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PaymentsProcessor.swift; sourceTree = "<group>"; };
 		3465F4D227287675001663AF /* MobileCoinAPI+Configuration.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "MobileCoinAPI+Configuration.swift"; sourceTree = "<group>"; };
 		3465F4D327287675001663AF /* PaymentsImpl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PaymentsImpl.swift; sourceTree = "<group>"; };
+		26F93D12DE3541A78594229A /* PaymentsDisplayPreferences.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PaymentsDisplayPreferences.swift; sourceTree = "<group>"; };
 		3465F4D427287675001663AF /* MobileCoinAPI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MobileCoinAPI.swift; sourceTree = "<group>"; };
 		3465F4DA27287858001663AF /* PaymentsHelperImpl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PaymentsHelperImpl.swift; sourceTree = "<group>"; };
 		3465F4DC2728812A001663AF /* Payments.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Payments.swift; sourceTree = "<group>"; };
@@ -5391,6 +5394,7 @@
 		76F4B580293ACCD200A7CF2F /* UIKit+Animations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIKit+Animations.swift"; sourceTree = "<group>"; };
 		76F958622A09A5AE00B43E63 /* DebugUIDiskUsage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DebugUIDiskUsage.swift; sourceTree = "<group>"; };
 		76FCCDBB27AB8FBE00BAA7F0 /* MediaControls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaControls.swift; sourceTree = "<group>"; };
+		7729BF782F9E4E3900B97F91 /* BreezSdkConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreezSdkConfig.swift; sourceTree = "<group>"; };
 		7F965533D71CA51BE6704CC4 /* Pods_SignalNSE.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_SignalNSE.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		7FF88FB580BC19B240EEB86A /* Pods_Signal.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Signal.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		83B9573827C9A1FA00A678FD /* CaptchaView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptchaView.swift; sourceTree = "<group>"; };
@@ -8368,6 +8372,7 @@
 				3497971425D6D55400E99FA4 /* PaymentsSendRecipientViewController.swift */,
 				3498AC8F2518E92B00B1F315 /* PaymentsSettingsViewController.swift */,
 				34848D6225D44EBD00E5034B /* PaymentsTransferInViewController.swift */,
+				DE357466A03B42A7A4362BC9 /* RadarUsernameViewController.swift */,
 				3406D32125DD40F000885B14 /* PaymentsTransferOutViewController.swift */,
 				3495FF0225F908FE00959D6E /* PaymentsViewPassphraseConfirmViewController.swift */,
 				3495FF0425F9091400959D6E /* PaymentsViewPassphraseGridViewController.swift */,
@@ -8726,7 +8731,6 @@
 			isa = PBXGroup;
 			children = (
 				0C0656B12F912FE700CA36E7 /* BreezSdkExt.swift */,
-				0CD2A2322F76ACF3008CC3D9 /* BreezSdkConfig.swift */,
 				34D21DA127297FBE00D891F4 /* DebugLogger+Payments.swift */,
 				3465F4D227287675001663AF /* MobileCoinAPI+Configuration.swift */,
 				3465F4D427287675001663AF /* MobileCoinAPI.swift */,
@@ -8734,9 +8738,11 @@
 				34BB78B8272C51E800DA0D04 /* MobileCoinHelperSDKTest.swift */,
 				3465F4DC2728812A001663AF /* Payments.swift */,
 				34A955B8271B553D00B05242 /* PaymentsFormat+MobileCoin.swift */,
+				26F93D12DE3541A78594229A /* PaymentsDisplayPreferences.swift */,
 				3465F4D327287675001663AF /* PaymentsImpl.swift */,
 				3465F4D127287674001663AF /* PaymentsProcessor.swift */,
 				3465F4D027287674001663AF /* PaymentsReconciliation.swift */,
+				7729BF782F9E4E3900B97F91 /* BreezSdkConfig.swift */,
 			);
 			path = Payments;
 			sourceTree = "<group>";
@@ -15136,6 +15142,8 @@
 				zh_TW,
 			);
 			mainGroup = D221A07E169C9E5E00537ABF;
+			packageReferences = (
+			);
 			productRefGroup = D221A08A169C9E5E00537ABF /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -16648,7 +16656,6 @@
 				05594CD02C98A00500CCBFF6 /* HostingController.swift in Sources */,
 				509085B82C498C3F00409B85 /* HTMLMetadata.swift in Sources */,
 				76896BFC2841A84D00F6C8D2 /* ImageAttachmentPrepViewController.swift in Sources */,
-				0CD2A2332F76ACFA008CC3D9 /* BreezSdkConfig.swift in Sources */,
 				3402AA94271D9E180084CBAE /* ImageEditorBlurRegionsItem.swift in Sources */,
 				3402AA8A271D9E180084CBAE /* ImageEditorCanvasView.swift in Sources */,
 				3402AA7D271D9E180084CBAE /* ImageEditorContents.swift in Sources */,
@@ -16663,6 +16670,7 @@
 				3402AA76271D9E180084CBAE /* ImageEditorStrokeItem.swift in Sources */,
 				3402AAAE271D9E180084CBAE /* ImageEditorTextItem.swift in Sources */,
 				7628DDC32807609F009AA53D /* ImageEditorToolbar.swift in Sources */,
+				7729BF792F9E4E3900B97F91 /* BreezSdkConfig.swift in Sources */,
 				3402AA73271D9E180084CBAE /* ImageEditorTransform.swift in Sources */,
 				B9F215612A94071F002DCAE0 /* ImageEditorTransformable.swift in Sources */,
 				3402AA6C271D9E180084CBAE /* ImageEditorView.swift in Sources */,
@@ -16728,6 +16736,7 @@
 				66CE755F28C332AF00D5FA79 /* PaymentOnboarding.swift in Sources */,
 				3465F4DD2728812B001663AF /* Payments.swift in Sources */,
 				34A955B9271B553D00B05242 /* PaymentsFormat+MobileCoin.swift in Sources */,
+				0430706099CA47739A6110E8 /* PaymentsDisplayPreferences.swift in Sources */,
 				3465F4D827287677001663AF /* PaymentsImpl.swift in Sources */,
 				3465F4D627287677001663AF /* PaymentsProcessor.swift in Sources */,
 				3465F4D527287677001663AF /* PaymentsReconciliation.swift in Sources */,
@@ -17401,6 +17410,7 @@
 				3497971525D6D55400E99FA4 /* PaymentsSendRecipientViewController.swift in Sources */,
 				3498AC922518E92B00B1F315 /* PaymentsSettingsViewController.swift in Sources */,
 				34848D6325D44EBD00E5034B /* PaymentsTransferInViewController.swift in Sources */,
+				8D7D4A065BD540F9964C22D2 /* RadarUsernameViewController.swift in Sources */,
 				3406D32225DD40F000885B14 /* PaymentsTransferOutViewController.swift in Sources */,
 				3495FF0325F908FE00959D6E /* PaymentsViewPassphraseConfirmViewController.swift in Sources */,
 				3495FF0525F9091400959D6E /* PaymentsViewPassphraseGridViewController.swift in Sources */,

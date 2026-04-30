@@ -56,7 +56,7 @@ public struct PaymentsHistoryModelItem: PaymentsHistoryItem {
             isShortForm: false,
             withCurrencyCode: true,
             withSpace: true,
-            isSatoshi: PaymentsImpl.isSatoshiAmountTypeEnabled())
+            isSatoshi: PaymentsDisplayPreferences.shared.isSatoshiEnabled)
     }
     
 
@@ -144,7 +144,7 @@ public struct PaymentsHistoryModelItem: PaymentsHistoryItem {
             withCurrencyCode: true,
             withSpace: false,
             withPaymentType: paymentModel.paymentType,
-            isSatoshi: PaymentsImpl.isSatoshiAmountTypeEnabled()
+            isSatoshi: PaymentsDisplayPreferences.shared.isSatoshiEnabled
         )
     }
     

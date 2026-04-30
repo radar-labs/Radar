@@ -198,12 +198,12 @@ class SendPaymentHelper {
 
         let formattedAmount = PaymentsFormat.format(paymentAmount: paymentAmount,
                                                     isShortForm: false)
-        let currencyIdentifier = if PaymentsImpl.isSatoshiAmountTypeEnabled() {
+        let currencyIdentifier = if PaymentsDisplayPreferences.shared.isSatoshiEnabled {
             PaymentsConstants.satoshiCurrencyIdentifier
         } else {
             paymentAmount.currency.identifier
         }
-        let balanceAmount = if PaymentsImpl.isSatoshiAmountTypeEnabled() {
+        let balanceAmount = if PaymentsDisplayPreferences.shared.isSatoshiEnabled {
             "\(paymentAmount.picoMob)"
         } else {
             formattedAmount
