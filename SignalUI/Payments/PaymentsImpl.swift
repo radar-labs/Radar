@@ -568,16 +568,6 @@ extension PaymentsImpl {
         return TSPaymentAddress(currency: .bitcoin, mobileCoinPublicAddressData: addressData)
     }
 
-    public func fetchBitcoinAddress() async throws -> ReceivePaymentResponse {
-        let sdk = try getBreezSdk()
-        let response = try await sdk.receivePayment(
-            request: ReceivePaymentRequest(
-                paymentMethod: .bitcoinAddress
-            )
-        )
-        return response
-    }
-
     public func isUsernameAvailable(_ username: String) async throws -> Bool {
         return try await getBreezSdk().checkLightningAddressAvailable(
             req: CheckLightningAddressRequest(username: username))
