@@ -8396,7 +8396,7 @@
 "SETTINGS_PAYMENTS_SEND_TO_RECIPIENT_TITLE" = "Odaberite primatelja";
 
 /* Title for the 'set currency' view in the app settings. */
-"SETTINGS_PAYMENTS_SET_CURRENCY" = "Pretvorba valute";
+"SETTINGS_PAYMENTS_SET_CURRENCY" = "Prikazna valuta";
 
 /* Label for the 'payments' section of the app settings. */
 "SETTINGS_PAYMENTS_TITLE" = "Plaćanja";

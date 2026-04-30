@@ -8396,7 +8396,7 @@
 "SETTINGS_PAYMENTS_SEND_TO_RECIPIENT_TITLE" = "揀選收款人";
 
 /* Title for the 'set currency' view in the app settings. */
-"SETTINGS_PAYMENTS_SET_CURRENCY" = "貨幣換算";
+"SETTINGS_PAYMENTS_SET_CURRENCY" = "顯示貨幣";
 
 /* Label for the 'payments' section of the app settings. */
 "SETTINGS_PAYMENTS_TITLE" = "付款";

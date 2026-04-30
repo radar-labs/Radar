@@ -8396,7 +8396,7 @@
 "SETTINGS_PAYMENTS_SEND_TO_RECIPIENT_TITLE" = "Zvoľte príjemcu";
 
 /* Title for the 'set currency' view in the app settings. */
-"SETTINGS_PAYMENTS_SET_CURRENCY" = "Prepočet meny";
+"SETTINGS_PAYMENTS_SET_CURRENCY" = "Zobrazovacia mena";
 
 /* Label for the 'payments' section of the app settings. */
 "SETTINGS_PAYMENTS_TITLE" = "Platby";

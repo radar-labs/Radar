@@ -8396,7 +8396,7 @@
 "SETTINGS_PAYMENTS_SEND_TO_RECIPIENT_TITLE" = "เลือกผู้รับ";
 
 /* Title for the 'set currency' view in the app settings. */
-"SETTINGS_PAYMENTS_SET_CURRENCY" = "การแปลงสกุลเงิน";
+"SETTINGS_PAYMENTS_SET_CURRENCY" = "สกุลเงินที่แสดง";
 
 /* Label for the 'payments' section of the app settings. */
 "SETTINGS_PAYMENTS_TITLE" = "การจ่ายเงิน";

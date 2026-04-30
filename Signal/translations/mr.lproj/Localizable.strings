@@ -8396,7 +8396,7 @@
 "SETTINGS_PAYMENTS_SEND_TO_RECIPIENT_TITLE" = "प्राप्तकर्ता निवडा";
 
 /* Title for the 'set currency' view in the app settings. */
-"SETTINGS_PAYMENTS_SET_CURRENCY" = "चलन रूपांतरण";
+"SETTINGS_PAYMENTS_SET_CURRENCY" = "प्रदर्शन चलन";
 
 /* Label for the 'payments' section of the app settings. */
 "SETTINGS_PAYMENTS_TITLE" = "पेमेंट";
