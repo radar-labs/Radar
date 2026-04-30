@@ -510,7 +510,7 @@ public class PaymentsSettingsViewController: OWSTableViewController2 {
                                                selector: #selector(didTapAddMoneyButton))
         let sendPaymentButton = buildHeaderButton(title: OWSLocalizedString("SETTINGS_PAYMENTS_SEND_PAYMENT",
                                                                            comment: "Label for 'send payment' button in the payment settings."),
-                                                  iconName: "send-mob-24",
+                                                  iconName: "payment-28",
                                                   selector: nil)
         
         let sendPaymentButtonSubView = UIButton()
@@ -829,7 +829,7 @@ public class PaymentsSettingsViewController: OWSTableViewController2 {
                                            body: OWSLocalizedString("SETTINGS_PAYMENTS_HELP_CARD_ABOUT_MOBILECOIN_DESCRIPTION",
                                                                     comment: "Description for the 'About MobileCoin' help card in the payments settings."),
                                            buttonText: CommonStrings.learnMore,
-                                           iconName: "about-mobilecoin",
+                                           iconName: "activate-payments",
                                            selector: #selector(didTapAboutMobileCoinCard)))
             case .addMoney:
                 contents.add(buildHelpCard(helpCard: helpCard,
