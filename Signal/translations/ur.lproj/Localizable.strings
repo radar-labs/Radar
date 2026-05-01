@@ -8217,6 +8217,7 @@
 
 /* Message for the 'insufficient balance for payment' alert. Embeds: {{ The current payments balance }}. */
 "SETTINGS_PAYMENTS_PAYMENT_INSUFFICIENT_BALANCE_ALERT_MESSAGE_FORMAT" = "آپ کے پاس اس ادائیگی کو مکمل کرنے کے لئے اتنی BTC نہیں ہے۔ آپ کا موجودہ بیلنس%1$@ ہے۔";
+"SETTINGS_PAYMENTS_PAYMENT_INSUFFICIENT_BALANCE_ALERT_MESSAGE_HIDDEN" = "اس ادائیگی کو مکمل کرنے کے لیے آپ کے پاس کافی BTC نہیں ہے۔";
 
 /* Title for the 'insufficient balance for payment' alert. */
 "SETTINGS_PAYMENTS_PAYMENT_INSUFFICIENT_BALANCE_ALERT_TITLE" = "ناکافی بیلنس";
