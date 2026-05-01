@@ -1608,9 +1608,7 @@ extension ChatListViewController: ChatListFilterControlDelegate {
         // Because this happens in response to an interactive gesture, it feels
         // better to go a little slower than the default animation duration (0.25 sec).
         UIView.animate(withDuration: 0.4) { [self] in
-            tableView.performBatchUpdates {
-                loadCoordinator.loadIfNecessary()
-            }
+            loadCoordinator.loadIfNecessary()
         }
     }
 }
