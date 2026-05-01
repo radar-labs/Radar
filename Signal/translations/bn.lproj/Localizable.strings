@@ -7997,13 +7997,13 @@
 "SETTINGS_PAYMENTS_ACTIVATE_PAYMENTS_CONFIRM_AGREE" = "সক্রিয় করুন";
 
 /* Description for the 'activate payments confirmation' UI in the payment settings. */
-"SETTINGS_PAYMENTS_ACTIVATE_PAYMENTS_CONFIRM_DESCRIPTION" = "আপনি MobileCoin পাঠাতে ও গ্রহণ করতে Signal ব্যবহার করতে পারবেন। সকল পেমেন্ট MobileCoin ও MobileCoin ওয়ালেট ব্যবহারের শর্তাবলী মেনে সম্পাদিত হয়। আপনি কিছু কিছু সমস্যার সম্মুখীন হতে পারেন এবং আপনার হারানো পেমেন্ট বা ব্যালেন্স পুনরুদ্ধার করা যাবে না।";
+"SETTINGS_PAYMENTS_ACTIVATE_PAYMENTS_CONFIRM_DESCRIPTION" = "You can use Radar to send and receive Bitcoin over Lightning. All payments are subject to the Radar Terms of Use. You may encounter some issues and payments or balances you may lose can't be recovered.";
 
 /* Title for the 'activate payments confirmation' UI in the payment settings. */
 "SETTINGS_PAYMENTS_ACTIVATE_PAYMENTS_CONFIRM_TITLE" = "সক্রিয় করুন";
 
 /* Label for the 'view payments terms' button in the 'activate payments confirmation' UI in the payment settings. */
-"SETTINGS_PAYMENTS_ACTIVATE_PAYMENTS_CONFIRM_VIEW_TERMS" = "MobileCoin-এর শর্তাবলী দেখুন";
+"SETTINGS_PAYMENTS_ACTIVATE_PAYMENTS_CONFIRM_VIEW_TERMS" = "View Terms";
 
 /* Label for 'add money' view in the payment settings. */
 "SETTINGS_PAYMENTS_ADD_MONEY" = "ফান্ড যোগ করুন";
@@ -8084,19 +8084,19 @@
 "SETTINGS_PAYMENTS_ENABLE_PAYMENTS_LOCK_PROMPT" = "পেমেন্ট লক";
 
 /* Description for the 'About MobileCoin' help card in the payments settings. */
-"SETTINGS_PAYMENTS_HELP_CARD_ABOUT_MOBILECOIN_DESCRIPTION" = "MobileCoin হল গোপনীয়তার উপর গুরুত্ব দেয় এমন একটি নতুন ডিজিটাল মুদ্রা।";
+"SETTINGS_PAYMENTS_HELP_CARD_ABOUT_MOBILECOIN_DESCRIPTION" = "Radar lets you send and receive Bitcoin instantly over the Lightning Network, privately and without fees.";
 
 /* Title for the 'About MobileCoin' help card in the payments settings. */
-"SETTINGS_PAYMENTS_HELP_CARD_ABOUT_MOBILECOIN_TITLE" = "MobileCoin সম্পর্কে";
+"SETTINGS_PAYMENTS_HELP_CARD_ABOUT_MOBILECOIN_TITLE" = "About Radar Payments";
 
 /* Description for the 'Adding to your wallet' help card in the payments settings. */
-"SETTINGS_PAYMENTS_HELP_CARD_ADDING_TO_YOUR_WALLET_DESCRIPTION" = "আপনার ওয়ালেটের ঠিকানায় MobileCoin পাঠানোর মাধ্যমে আপনি Signal-এ ব্যবহারের জন্য ফান্ড পাঠাতে পারেন।";
+"SETTINGS_PAYMENTS_HELP_CARD_ADDING_TO_YOUR_WALLET_DESCRIPTION" = "You can add funds by sending Bitcoin over Lightning to your Radar wallet address.";
 
 /* Title for the 'Adding to your wallet' help card in the payments settings. */
 "SETTINGS_PAYMENTS_HELP_CARD_ADDING_TO_YOUR_WALLET_TITLE" = "ফান্ড যোগ হচ্ছে";
 
 /* Description for the 'Cashing Out' help card in the payments settings. */
-"SETTINGS_PAYMENTS_HELP_CARD_CASHING_OUT_DESCRIPTION" = "MobileCoin-কে সাপোর্ট করে এমন যেকোনও কিছুর বিনিময়ে আপনি MobileCoin ক্যাশ আউট করতে পারবেন। কেবল সেটির বিনিময়ে আপনার অ্যাকাউন্টে টাকা ট্রান্সফার করুন।";
+"SETTINGS_PAYMENTS_HELP_CARD_CASHING_OUT_DESCRIPTION" = "You can send your Bitcoin to any Lightning-compatible wallet or exchange at any time.";
 
 /* Title for the 'Cashing Out' help card in the payments settings. */
 "SETTINGS_PAYMENTS_HELP_CARD_CASHING_OUT_TITLE" = "ক্যাশ আউট";
@@ -8147,31 +8147,31 @@
 "SETTINGS_PAYMENTS_OPT_IN_ACTIVATED_TOAST" = "পেমেন্ট চালু হয়েছে।";
 
 /* Message for the 'payments opt-in' view in the app settings. */
-"SETTINGS_PAYMENTS_OPT_IN_MESSAGE" = "গোপনীয়তাকে গুরুত্ব দেয় এমন একটি নতুন ডিজিটাল মুদ্রা MobileCoin পাঠাতে ও গ্রহণ করতে Signal ব্যবহার করুন। শুরু করতে সক্রিয় করুন।";
+"SETTINGS_PAYMENTS_OPT_IN_MESSAGE" = "Send and receive Bitcoin instantly over the Lightning Network, right from your chats. Activate to get started.";
 
 /* Label for 'activate' button in the 'payments opt-in' view in the app settings. */
 "SETTINGS_PAYMENTS_OPT_IN_REACTIVATE_BUTTON" = "পেমেন্ট আবারো চালু করুন";
 
 /* Title for the 'payments opt-in' view in the app settings. */
-"SETTINGS_PAYMENTS_OPT_IN_TITLE" = "পেমেন্ট পরিচিতি";
+"SETTINGS_PAYMENTS_OPT_IN_TITLE" = "Introducing Radar Payments";
 
 /* Button when discarding recovery phrase. */
 "SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_BUTTON" = "পুনরুদ্ধার করার বাক্য নির্ধারণের ধাপটি এড়িয়ে যান";
 
 /* Message of confirmation alert when discarding recovery phrase. */
-"SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_MESSAGE" = "আপনার পুনরুদ্ধার করার বাক্যটি আপনাকে সবচেয়ে প্রতিকূল পরিস্থিতিতে আপনার ব্যালেন্স পুনরুদ্ধার করতে সাহায্য করে। এটি সেভ করার জন্য আমরা আপনাকে জোরালো অনুরোধ জানাচ্ছি।";
+"SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_MESSAGE" = "সিড ফ্রেজ ছাড়া আপনি Cake Wallet বা অন্য Spark-সামঞ্জস্যপূর্ণ ওয়ালেটে ব্যালেন্স পুনরুদ্ধার করতে পারবেন না। সেটিংস থেকে পরে যেকোনো সময় সংরক্ষণ করতে পারবেন।";
 
 /* Title of confirmation alert when discarding recovery phrase. */
 "SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_TITLE" = "সেভ না করেই এগিয়ে যেতে চান?";
 
 /* Explanation of the 'payments passphrase' in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION" = "আপনি আপনার Signal পিন নিশ্চিত করলে Signal পুনরায় ইনস্টল করার সময় আপনার ব্যালেন্স স্বয়ংক্রিয়ভাবে পুনর্বহাল হয়ে যাবে। আপনি এছাড়াও রিকভারি ফ্রেজটি ব্যবহার করে আপনার ব্যালেন্স পুনর্বহাল করতে পারেন, যেটি 24-শব্দের একটি অনন্য বাক্যাংশ যা কেবলমাত্র আপনার কাছে থাকে। এটি লিখে রাখুন ও একটি নিরাপদ স্থানে সঞ্চয় করুন।";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION" = "আপনার সিড ফ্রেজ আপনার তহবিল সুরক্ষিত রাখতে প্রয়োজনীয় নয় — Radar স্বয়ংক্রিয়ভাবে পুনরুদ্ধার পরিচালনা করে। এটি সংরক্ষণ করা আপনাকে অতিরিক্ত মানসিক শান্তি দেয় এবং Cake Wallet বা অন্য যেকোনো Spark-সামঞ্জস্যপূর্ণ ওয়ালেটে ব্যালেন্স পুনরুদ্ধার করতে দেয়।";
 
 /* Explanation of the 'payments passphrase' when there is a balance. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_BALANCE" = "আপনি একটি ব্যালেন্স পেয়েছেন! আপনার পুনরুদ্ধার করার বাক্যটি সেভ করার সময় হয়েছে—একটি 24-শব্দের কী, যা আপনি আপনার ব্যালেন্স পুনরুদ্ধার করতে ব্যবহার করতে পারেন।";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_BALANCE" = "আপনার ব্যালেন্স আছে! সিড ফ্রেজ সংরক্ষণ বাধ্যতামূলক নয়, তবে অতিরিক্ত মানসিক শান্তি দেয় এবং Cake Wallet বা অন্য Spark-সামঞ্জস্যপূর্ণ ওয়ালেটে ব্যালেন্স পুনরুদ্ধার করতে দেয়।";
 
 /* Explanation of the 'payments passphrase' when from the help card. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_HELP_CARD" = "আপনার পুনরুদ্ধার করার বাক্যটি সেভ করার সময় হয়েছে—একটি 24-শব্দের কী, যা আপনি আপনার ব্যালেন্স পুনরুদ্ধার করতে ব্যবহার করতে পারেন।";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_HELP_CARD" = "সিড ফ্রেজ সংরক্ষণ বাধ্যতামূলক নয়, তবে অতিরিক্ত মানসিক শান্তি দেয় এবং Cake Wallet বা অন্য Spark-সামঞ্জস্যপূর্ণ ওয়ালেটে ব্যালেন্স পুনরুদ্ধার করতে দেয়।";
 
 /* Label for the 'add money' button in the 'send payment' UI. */
 "SETTINGS_PAYMENTS_PAYMENT_ADD_MONEY" = "ফান্ড যোগ করুন";
@@ -8210,7 +8210,7 @@
 "SETTINGS_PAYMENTS_PAYMENT_DETAILS_STATUS" = "অবস্থা";
 
 /* Footer string for the status section of the payment details view in the app settings. */
-"SETTINGS_PAYMENTS_PAYMENT_DETAILS_STATUS_FOOTER" = "লেনদেনের বিস্তারিত বিবরণের মধ্যে রয়েছে পেমেন্টের পরিমাণ এবং লেনদেনের সময় যা MobileCoin লেজার-এর একটি অংশ।";
+"SETTINGS_PAYMENTS_PAYMENT_DETAILS_STATUS_FOOTER" = "Transaction details are recorded on the Bitcoin Lightning Network.";
 
 /* Footer string for the status section of the payment details view in the app settings for defragmentation transactions. */
 "SETTINGS_PAYMENTS_PAYMENT_DETAILS_STATUS_FOOTER_DEFRAGMENTATION" = "যখন আপনার দখলে থাকা কয়েন কোনও লেনদেন সম্পন্ন করার কাজে সংযুক্ত করা যাবে না, তখন “কয়েন ক্লিনআপ ফি” ধার্য করা হয়। ক্লিনআপের ফলে আপনি পেমেন্ট পাঠানো অব্যাহত রাখতে পারবেন।";
@@ -8396,7 +8396,7 @@
 "SETTINGS_PAYMENTS_SEND_TO_RECIPIENT_TITLE" = "প্রাপক নির্বাচন করুন";
 
 /* Title for the 'set currency' view in the app settings. */
-"SETTINGS_PAYMENTS_SET_CURRENCY" = "মুদ্রা রূপান্তর";
+"SETTINGS_PAYMENTS_SET_CURRENCY" = "প্রদর্শন মুদ্রা";
 
 /* Label for the 'payments' section of the app settings. */
 "SETTINGS_PAYMENTS_TITLE" = "পেমেন্ট";
@@ -8405,7 +8405,7 @@
 "SETTINGS_PAYMENTS_TRANSFER_OUT_CANNOT_SEND_TO_SELF" = "আপনি আপনার Signal ওয়ালেট ঠিকানায় স্থানান্তর করতে পারবেন না। আপনার অ্যাকাউন্ট থেকে একটি সমর্থিত এক্সচেঞ্জে ওয়ালেট ঠিকানাটি লিখুন।";
 
 /* Footer of the 'transfer currency out' view in the payment settings. */
-"SETTINGS_PAYMENTS_TRANSFER_OUT_FOOTER" = "এক্সচেঞ্জের দেওয়া ওয়ালেটের ঠিকানায় ট্রান্সফার সম্পন্ন করে আপনি MobileCoin ট্রান্সফার করতে পারেন। ওয়ালেটের ঠিকানাটি হল সাধারণত QR কোডের নিচে থাকা সবচেয়ে বেশি সংখ্যা এবং বর্ণগুলির একটি লাইন।";
+"SETTINGS_PAYMENTS_TRANSFER_OUT_FOOTER" = "Transfer Bitcoin by sending to the Lightning address or invoice provided by the recipient. The address is typically displayed below the QR code.";
 
 /* Error indicating that MobileCoin public address is not valid. */
 "SETTINGS_PAYMENTS_TRANSFER_OUT_INVALID_PUBLIC_ADDRESS" = "আপনি যে ওয়ালেট ঠিকানাটিতে স্থানান্তর করতে চাচ্ছেন সেটি যাচাই করে আবার চেষ্টা করুন।";
@@ -8465,10 +8465,10 @@
 "SETTINGS_PAYMENTS_VIEW_PASSPHRASE_TITLE" = "রিকভারি ফ্রেজ";
 
 /* Header text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "নিম্নোক্ত 24টি শব্দ সুবিন্যস্তভাবে লিখুন। আপনার তালিকাটি একটি নিরাপদ স্থানে সংরক্ষণ করুন।";
+"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "এই ২৪টি শব্দ ক্রমানুসারে লিখুন এবং নিরাপদ জায়গায় রাখুন। Cake Wallet বা অন্য Spark-সামঞ্জস্যপূর্ণ ওয়ালেটে ব্যালেন্স পুনরুদ্ধার করতে এগুলি ব্যবহার করতে পারবেন।";
 
 /* Footer text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_FOOTER_2" = "এই লিস্টটি শেয়ার করবেন না";
+"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_FOOTER_2" = "এই ফ্রেজটি কারো সাথে শেয়ার করবেন না";
 
 /* Title for the content section of the  'payments lock prompt' view shown after payemts activation. */
 "SETTINGS_PAYMENTS_VIEW_PAYMENTS_LOCK_PROMPT_TITLE" = "সুরক্ষার আরেকটি স্তর";

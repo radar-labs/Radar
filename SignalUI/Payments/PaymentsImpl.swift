@@ -583,6 +583,7 @@ extension PaymentsImpl {
         return response
     }
 
+
     public func registerUsername(_ username: String) async throws {
         let paymentsState = self.paymentsState
         owsAssertDebug(paymentsState.isEnabled)

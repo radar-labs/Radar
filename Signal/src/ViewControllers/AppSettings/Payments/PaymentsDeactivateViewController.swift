@@ -98,8 +98,7 @@ public class PaymentsDeactivateViewController: OWSViewController {
         let titleLabel = UILabel()
         titleLabel.font = UIFont.regularFont(ofSize: 54)
         titleLabel.textColor = Theme.primaryTextColor
-        titleLabel.attributedText = PaymentsFormat.attributedFormat(paymentAmount: paymentBalance.amount,
-                                                                    isShortForm: false)
+        titleLabel.attributedText = PaymentsFormat.formattedBalance(paymentBalance.amount, isShortForm: false)
         titleLabel.adjustsFontSizeToFitWidth = true
         titleLabel.textAlignment = .center
 
