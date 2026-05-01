@@ -1030,12 +1030,20 @@ public class SendPaymentViewController: OWSViewController {
     }
 
     private func showInsufficientBalanceUI(paymentBalance: PaymentBalance) {
-        let messageFormat = OWSLocalizedString("SETTINGS_PAYMENTS_PAYMENT_INSUFFICIENT_BALANCE_ALERT_MESSAGE_FORMAT",
-                                              comment: "Message for the 'insufficient balance for payment' alert. Embeds: {{ The current payments balance }}.")
-        let message = String(format: messageFormat, PaymentsFormat.format(paymentAmount: paymentBalance.amount,
+        let message: String
+        if PaymentsDisplayPreferences.shared.isBalanceHidden {
+            message = OWSLocalizedString(
+                "SETTINGS_PAYMENTS_PAYMENT_INSUFFICIENT_BALANCE_ALERT_MESSAGE_HIDDEN",
+                comment: "Message for the 'insufficient balance for payment' alert when the balance is hidden."
+            )
+        } else {
+            let messageFormat = OWSLocalizedString("SETTINGS_PAYMENTS_PAYMENT_INSUFFICIENT_BALANCE_ALERT_MESSAGE_FORMAT",
+                                                  comment: "Message for the 'insufficient balance for payment' alert. Embeds: {{ The current payments balance }}.")
+            message = String(format: messageFormat, PaymentsFormat.format(paymentAmount: paymentBalance.amount,
                                                                           isShortForm: false,
                                                                           withCurrencyCode: true,
                                                                           withSpace: true))
+        }
 
         let actionSheet = ActionSheetController(title: OWSLocalizedString("SETTINGS_PAYMENTS_PAYMENT_INSUFFICIENT_BALANCE_ALERT_TITLE",
                                                                          comment: "Title for the 'insufficient balance for payment' alert."),

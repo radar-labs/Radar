@@ -8217,6 +8217,7 @@
 
 /* Message for the 'insufficient balance for payment' alert. Embeds: {{ The current payments balance }}. */
 "SETTINGS_PAYMENTS_PAYMENT_INSUFFICIENT_BALANCE_ALERT_MESSAGE_FORMAT" = "Non hai abbastanza BTC per completare questo pagamento. Il tuo saldo attuale è %1$@.";
+"SETTINGS_PAYMENTS_PAYMENT_INSUFFICIENT_BALANCE_ALERT_MESSAGE_HIDDEN" = "Non hai abbastanza BTC per completare questo pagamento.";
 
 /* Title for the 'insufficient balance for payment' alert. */
 "SETTINGS_PAYMENTS_PAYMENT_INSUFFICIENT_BALANCE_ALERT_TITLE" = "Saldo insufficiente";

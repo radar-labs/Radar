@@ -8,6 +8,8 @@ public import SignalServiceKit
 
 public extension PaymentsFormat {
 
+    static var hiddenBalanceString: String { "••••••" }
+
     // Single source of truth for amount display: returns nil when hidden, formatted string otherwise.
     private static func resolvedAmountString(_ amount: TSPaymentAmount, isShortForm: Bool = false) -> String? {
         guard !PaymentsDisplayPreferences.shared.isBalanceHidden else { return nil }
@@ -28,7 +30,7 @@ public extension PaymentsFormat {
         let firstAttributes: [NSAttributedString.Key: Any] = [.font: UIFont.dynamicTypeLargeTitle1Clamped.withSize(20)]
 
         guard let amount else {
-            return NSAttributedString(string: "••••••", attributes: firstAttributes)
+            return NSAttributedString(string: Self.hiddenBalanceString, attributes: firstAttributes)
         }
 
         let startingFont = UIFont.dynamicTypeLargeTitle1Clamped.withSize(20)
@@ -50,7 +52,7 @@ public extension PaymentsFormat {
     }
 
     static func inChatFailureAmountBuilder(_ amount: String?) -> NSAttributedString {
-        let displayAmount = amount ?? "••••••"
+        let displayAmount = amount ?? Self.hiddenBalanceString
         let firstAttributes: [NSAttributedString.Key: Any] = [.font: UIFont.dynamicTypeLargeTitle1Clamped.withSize(17)]
 
         let startingFont = UIFont.dynamicTypeLargeTitle1Clamped.withSize(15)
@@ -150,7 +152,7 @@ public extension PaymentsFormat {
     static func formattedBalance(_ balance: PaymentBalance?) -> NSAttributedString {
         guard let balance else {
             return PaymentsDisplayPreferences.shared.isBalanceHidden
-                ? NSAttributedString(string: "••••••")
+                ? NSAttributedString(string: Self.hiddenBalanceString)
                 : NSAttributedString(string: " ")
         }
         return formattedBalance(balance.amount)
@@ -162,9 +164,27 @@ public extension PaymentsFormat {
         paymentType: TSPaymentType? = nil
     ) -> NSAttributedString {
         guard !PaymentsDisplayPreferences.shared.isBalanceHidden else {
-            return NSAttributedString(string: "••••••")
+            return NSAttributedString(string: Self.hiddenBalanceString)
         }
         return attributedFormat(paymentAmount: amount, isShortForm: isShortForm, paymentType: paymentType)
+    }
+
+    static func formattedBalance(
+        _ amount: TSPaymentAmount,
+        isShortForm: Bool,
+        withCurrencyCode: Bool,
+        withSpace: Bool
+    ) -> String {
+        guard !PaymentsDisplayPreferences.shared.isBalanceHidden else {
+            return Self.hiddenBalanceString
+        }
+        return PaymentsFormat.format(
+            paymentAmount: amount,
+            isShortForm: isShortForm,
+            withCurrencyCode: withCurrencyCode,
+            withSpace: withSpace,
+            isSatoshi: PaymentsDisplayPreferences.shared.isSatoshiEnabled
+        )
     }
 
     static func attributedFormat(fiatCurrencyAmount: Double,

@@ -8217,6 +8217,7 @@
 
 /* Message for the 'insufficient balance for payment' alert. Embeds: {{ The current payments balance }}. */
 "SETTINGS_PAYMENTS_PAYMENT_INSUFFICIENT_BALANCE_ALERT_MESSAGE_FORMAT" = "決済を完了できる十分なMOBがありません。残高は%1$@です。";
+"SETTINGS_PAYMENTS_PAYMENT_INSUFFICIENT_BALANCE_ALERT_MESSAGE_HIDDEN" = "この支払いを完了するのに十分なBTCがありません。";
 
 /* Title for the 'insufficient balance for payment' alert. */
 "SETTINGS_PAYMENTS_PAYMENT_INSUFFICIENT_BALANCE_ALERT_TITLE" = "残高不足";

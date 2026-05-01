@@ -8217,6 +8217,7 @@
 
 /* Message for the 'insufficient balance for payment' alert. Embeds: {{ The current payments balance }}. */
 "SETTINGS_PAYMENTS_PAYMENT_INSUFFICIENT_BALANCE_ALERT_MESSAGE_FORMAT" = "지불을 완료하기에 충분한 MOB가 없습니다. 현재 잔액은 %1$@입니다.";
+"SETTINGS_PAYMENTS_PAYMENT_INSUFFICIENT_BALANCE_ALERT_MESSAGE_HIDDEN" = "이 결제를 완료하기에 BTC가 충분하지 않습니다.";
 
 /* Title for the 'insufficient balance for payment' alert. */
 "SETTINGS_PAYMENTS_PAYMENT_INSUFFICIENT_BALANCE_ALERT_TITLE" = "잔액 불충분";

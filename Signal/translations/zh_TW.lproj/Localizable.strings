@@ -8217,6 +8217,7 @@
 
 /* Message for the 'insufficient balance for payment' alert. Embeds: {{ The current payments balance }}. */
 "SETTINGS_PAYMENTS_PAYMENT_INSUFFICIENT_BALANCE_ALERT_MESSAGE_FORMAT" = "你沒有足夠的MOB來完成這筆付款。 你目前的餘額是 %1$@。";
+"SETTINGS_PAYMENTS_PAYMENT_INSUFFICIENT_BALANCE_ALERT_MESSAGE_HIDDEN" = "您沒有足夠的BTC來完成此付款。";
 
 /* Title for the 'insufficient balance for payment' alert. */
 "SETTINGS_PAYMENTS_PAYMENT_INSUFFICIENT_BALANCE_ALERT_TITLE" = "餘額不足";

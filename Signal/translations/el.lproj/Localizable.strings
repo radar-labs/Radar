@@ -8217,6 +8217,7 @@
 
 /* Message for the 'insufficient balance for payment' alert. Embeds: {{ The current payments balance }}. */
 "SETTINGS_PAYMENTS_PAYMENT_INSUFFICIENT_BALANCE_ALERT_MESSAGE_FORMAT" = "Δεν έχετε αρκετά BTC για να ολοκληρώσετε αυτήν την πληρωμή. Το τρέχον υπόλοιπό σας είναι %1$@.";
+"SETTINGS_PAYMENTS_PAYMENT_INSUFFICIENT_BALANCE_ALERT_MESSAGE_HIDDEN" = "Δεν έχετε αρκετά BTC για να ολοκληρώσετε αυτή την πληρωμή.";
 
 /* Title for the 'insufficient balance for payment' alert. */
 "SETTINGS_PAYMENTS_PAYMENT_INSUFFICIENT_BALANCE_ALERT_TITLE" = "Μη Επαρκές Υπόλοιπο";
