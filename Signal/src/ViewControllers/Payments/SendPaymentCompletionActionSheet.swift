@@ -429,8 +429,6 @@ public class SendPaymentCompletionActionSheet: ActionSheetController {
                 owsFailDebug("Could not convert to fiat.")
             }
         }
-        print("paymentInfo.estimatedFeeAmount: \(paymentInfo.estimatedFeeAmount)")
-        print("paymentInfo.estimatedFeeAmount: \(paymentInfo.estimatedFeeAmount.formatted)")
 
         addRow(
             to: &topGroup,

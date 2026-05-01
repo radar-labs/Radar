@@ -1265,26 +1265,18 @@ extension ChatListViewController {
         updateChatListFilter(.unread)
         updateBarButtonItems()
 
-        if filterControl?.isFiltering == true {
-            // No need to update the filter control if it's already in the
-            // filtering state.
-            loadCoordinator.loadIfNecessary()
-        } else {
-            tableView.performBatchUpdates {
-                filterControl?.startFiltering(animated: true)
-                loadCoordinator.loadIfNecessary()
-            }
+        if filterControl?.isFiltering != true {
+            filterControl?.startFiltering(animated: true)
         }
+        loadCoordinator.loadIfNecessary()
     }
 
     func disableChatListFilter(_ sender: AnyObject?) {
         updateChatListFilter(.none)
         updateBarButtonItems()
 
-        tableView.performBatchUpdates {
-            filterControl?.stopFiltering(animated: true)
-            loadCoordinator.loadIfNecessary()
-        }
+        filterControl?.stopFiltering(animated: true)
+        loadCoordinator.loadIfNecessary()
     }
 
     private func updateFilterControl(animated: Bool) {
