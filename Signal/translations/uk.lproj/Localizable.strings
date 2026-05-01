@@ -8019,6 +8019,7 @@
 
 /* Format string for the 'local balance converted into local currency' indicator. Embeds: {{ %1$@ the local balance in the local currency, %2$@ the local currency code, %3$@ the date the currency conversion rate was obtained. }}.. */
 "SETTINGS_PAYMENTS_BALANCE_CONVERSION_FORMAT" = "%1$@ %2$@ станом на %3$@";
+"SETTINGS_PAYMENTS_BITCOIN_UNIT" = "Одиниця біткоїна";
 
 /* Error message indicating that payments could not be activated because the feature is not currently available. */
 "SETTINGS_PAYMENTS_CANNOT_ACTIVATE_PAYMENTS_KILL_SWITCH" = "Платежі у Signal більше не доступні. Ви й досі можете переказувати кошти для обміну, але більше не можете надсилати та отримувати платежі та поповнювати рахунок.";

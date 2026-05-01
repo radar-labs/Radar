@@ -360,8 +360,8 @@ class AppSettingsViewController: OWSTableViewController2 {
 
                     return cell
                 },
-                actionBlock: { [weak self, appReadiness] in
-                    let vc = PaymentsSettingsViewController(mode: .inAppSettings, appReadiness: appReadiness)
+                actionBlock: { [weak self] in
+                    let vc = PaymentSettingsMenuViewController()
                     self?.navigationController?.pushViewController(vc, animated: true)
                 }
             ))

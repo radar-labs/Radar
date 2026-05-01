@@ -26,6 +26,7 @@ public enum PaymentsSettingsMode: UInt, CustomStringConvertible {
 // MARK: -
 
 public class PaymentsSettingsViewController: OWSTableViewController2 {
+
     private let appReadiness: AppReadinessSetter
     private let mode: PaymentsSettingsMode
 
@@ -256,6 +257,8 @@ public class PaymentsSettingsViewController: OWSTableViewController2 {
     public override func viewDidLoad() {
         super.viewDidLoad()
 
+        view.backgroundColor = tableBackgroundColor
+
         title = OWSLocalizedString("SETTINGS_PAYMENTS_VIEW_TITLE",
                                   comment: "Title for the 'payments settings' view in the app settings.")
 
@@ -277,6 +280,13 @@ public class PaymentsSettingsViewController: OWSTableViewController2 {
 
     private func updateNavbar() {
         if SSKEnvironment.shared.paymentsHelperRef.arePaymentsEnabled {
+            let eyeImageName = PaymentsDisplayPreferences.shared.isBalanceHidden ? "eye.slash" : "eye"
+            navigationItem.leftBarButtonItem = UIBarButtonItem(
+                image: UIImage(systemName: eyeImageName),
+                style: .plain,
+                target: self,
+                action: #selector(didTapEyeButton)
+            )
             navigationItem.rightBarButtonItem = UIBarButtonItem(
                 image: Theme.iconImage(.buttonMore),
                 landscapeImagePhone: nil,
@@ -285,6 +295,7 @@ public class PaymentsSettingsViewController: OWSTableViewController2 {
                 action: #selector(didTapSettings)
             )
         } else {
+            navigationItem.leftBarButtonItem = nil
             navigationItem.rightBarButtonItem = nil
         }
     }
@@ -429,12 +440,8 @@ public class PaymentsSettingsViewController: OWSTableViewController2 {
     }
 
     private func configureEnabledHeader(cell: UITableViewCell) {
-        let eyeButton = UIButton(type: .system)
-        let eyeImageName = PaymentsDisplayPreferences.shared.isBalanceHidden ? "eye.slash" : "eye"
-        eyeButton.setImage(UIImage(systemName: eyeImageName), for: .normal)
-        eyeButton.tintColor = Theme.secondaryTextAndIconColor
-        eyeButton.addTarget(self, action: #selector(didTapEyeButton), for: .touchUpInside)
-        eyeButton.autoSetDimensions(to: .square(28))
+        cell.backgroundColor = .clear
+        cell.contentView.backgroundColor = .clear
 
         let balanceLabel = UILabel()
         balanceLabel.font = UIFont.regularFont(ofSize: 54)
@@ -443,12 +450,7 @@ public class PaymentsSettingsViewController: OWSTableViewController2 {
         balanceLabel.isUserInteractionEnabled = true
         balanceLabel.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(didTapToggleSatoshi)))
 
-        let balanceRow = UIStackView(arrangedSubviews: [balanceLabel, eyeButton])
-        balanceRow.axis = .horizontal
-        balanceRow.alignment = .center
-        balanceRow.spacing = 8
-
-        let balanceStack = UIStackView(arrangedSubviews: [balanceRow])
+        let balanceStack = UIStackView(arrangedSubviews: [balanceLabel])
         balanceStack.axis = .vertical
         balanceStack.alignment = .center
 
@@ -947,70 +949,6 @@ public class PaymentsSettingsViewController: OWSTableViewController2 {
 
     // MARK: -
 
-    private func showSettingsActionSheet() {
-        let actionSheet = ActionSheetController(title: nil, message: nil)
-
-        actionSheet.addAction(ActionSheetAction(
-            title: OWSLocalizedString(
-                "SETTINGS_PAYMENTS_SET_CURRENCY",
-                comment: "Title for the 'set currency' view in the app settings."
-            ),
-            style: .default
-        ) { [weak self] _ in
-            self?.didTapSetCurrencyButton()
-        })
-
-        actionSheet.addAction(ActionSheetAction(
-            title: OWSLocalizedString(
-                "SETTINGS_PAYMENTS_DEACTIVATE_PAYMENTS",
-                comment: "Label for 'deactivate payments' button in the app settings."
-            ),
-            style: .default
-        ) { [weak self] _ in
-            self?.didTapDeactivatePaymentsButton()
-        })
-
-        actionSheet.addAction(ActionSheetAction(
-            title: OWSLocalizedString(
-                "SETTINGS_PAYMENTS_VIEW_RECOVERY_PASSPHRASE",
-                comment: "Label for 'view payments recovery passphrase' button in the app settings."
-            ),
-            style: .default
-        ) { [weak self] _ in
-            self?.didTapViewPaymentsPassphraseButton()
-        })
-
-        actionSheet.addAction(ActionSheetAction(
-            title: CommonStrings.help,
-            style: .default
-        ) { [weak self] _ in
-            self?.didTapHelpButton()
-        })
-
-
-        actionSheet.addAction(OWSActionSheets.cancelAction)
-
-        presentActionSheet(actionSheet)
-    }
-
-    private func showConfirmDeactivatePaymentsUI() {
-        let actionSheet = ActionSheetController(title: OWSLocalizedString("SETTINGS_PAYMENTS_DEACTIVATE_PAYMENTS_CONFIRM_TITLE",
-                                                                         comment: "Title for the 'deactivate payments confirmation' UI in the payment settings."),
-                                                message: OWSLocalizedString("SETTINGS_PAYMENTS_DEACTIVATE_PAYMENTS_CONFIRM_DESCRIPTION",
-                                                                           comment: "Description for the 'deactivate payments confirmation' UI in the payment settings."))
-
-        actionSheet.addAction(ActionSheetAction(
-            title: CommonStrings.continueButton,
-            style: .default
-        ) { [weak self] _ in
-            self?.didTapConfirmDeactivatePaymentsButton()
-        })
-
-        actionSheet.addAction(OWSActionSheets.cancelAction)
-
-        presentActionSheet(actionSheet)
-    }
-
     @objc
     private func didTapConversionRefresh() {
         SUIEnvironment.shared.paymentsSwiftRef.updateCurrentPaymentBalance()
@@ -1149,26 +1087,8 @@ public class PaymentsSettingsViewController: OWSTableViewController2 {
 
     @objc
     func didTapSettings() {
-        showSettingsActionSheet()
-    }
-
-    private func didTapSetCurrencyButton() {
-        let view = CurrencyPickerViewController(
-            dataSource: PaymentsCurrencyPickerDataSource()
-        ) { currencyCode in
-            SSKEnvironment.shared.databaseStorageRef.write { transaction in
-                SSKEnvironment.shared.paymentsCurrenciesRef.setCurrentCurrencyCode(currencyCode, transaction: transaction)
-            }
-        }
-        navigationController?.pushViewController(view, animated: true)
-    }
-
-    private func didTapViewPaymentsPassphraseButton() {
-        if Self.hasReviewedPassphraseWithSneakyTransaction() {
-            showPaymentsPassphraseUI(style: .reviewed)
-        } else {
-            showPaymentsPassphraseUI(style: .view)
-        }
+        let vc = PaymentSettingsMenuViewController()
+        navigationController?.pushViewController(vc, animated: true)
     }
 
     private func showPaymentsPassphraseUI(style: PaymentsViewPassphraseSplashViewController.Style) {
@@ -1183,34 +1103,6 @@ public class PaymentsSettingsViewController: OWSTableViewController2 {
         present(navigationVC, animated: true)
     }
 
-    private func didTapDeactivatePaymentsButton() {
-        showConfirmDeactivatePaymentsUI()
-    }
-
-    private func didTapConfirmDeactivatePaymentsButton() {
-        guard let paymentBalance = SUIEnvironment.shared.paymentsSwiftRef.currentPaymentBalance else {
-            OWSActionSheets.showErrorAlert(message: OWSLocalizedString("SETTINGS_PAYMENTS_CANNOT_DEACTIVATE_PAYMENTS_NO_BALANCE",
-                                                                      comment: "Error message indicating that payments could not be deactivated because the current balance is unavailable."))
-            return
-        }
-        guard paymentBalance.amount.picoMob > 0 else {
-            SSKEnvironment.shared.databaseStorageRef.write { transaction in
-                SSKEnvironment.shared.paymentsHelperRef.disablePayments(transaction: transaction)
-            }
-            return
-        }
-        let vc = PaymentsDeactivateViewController(paymentBalance: paymentBalance)
-        let navigationVC = OWSNavigationController(rootViewController: vc)
-        present(navigationVC, animated: true)
-    }
-
-    private func didTapHelpButton() {
-        let view = ContactSupportViewController()
-        view.selectedFilter = .payments
-        let navigationVC = OWSNavigationController(rootViewController: view)
-        present(navigationVC, animated: true)
-     }
-    
     @objc
     private func didTapToggleSatoshi() {
         PaymentsDisplayPreferences.shared.toggleAmountType()
@@ -1219,6 +1111,7 @@ public class PaymentsSettingsViewController: OWSTableViewController2 {
     @objc
     private func didTapEyeButton() {
         PaymentsDisplayPreferences.shared.toggleBalanceHidden()
+        updateNavbar()
     }
 
     private func didTapTransferToExchangeButton() {
