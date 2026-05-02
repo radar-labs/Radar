@@ -7687,6 +7687,15 @@
 /* If you send a message to a phone number, we might not know the owner of the account. When you later learn the owner of the account, we may show this message. The first parameter is a phone number; the second parameter is the contact's name. Put differently, this message indicates that a phone number belongs to a particular named recipient. */
 "SESSION_SWITCHOVER_EVENT" = "%1$@ tilhører %2$@";
 
+
+/* Header for the 'recent' section in the payment send-to view. */
+"SETTINGS_PAYMENTS_RECENT_RECIPIENTS" = "Recent";
+
+/* Placeholder text for the address/search field in the 'send to' payment view. */
+"SETTINGS_PAYMENTS_SEND_TO_PLACEHOLDER" = "Search or Enter";
+
+/* Title for the unified 'send to' payment view. */
+"SETTINGS_PAYMENTS_SEND_TO_TITLE" = "Send to";
 /* Title for the wallpaper choose from photos option */
 "SET_WALLPAPER_CHOOSE_PHOTO" = "Vælg fra billeder";
 

@@ -519,25 +519,7 @@ public class PaymentsSettingsViewController: OWSTableViewController2 {
         let sendPaymentButton = buildHeaderButton(title: OWSLocalizedString("SETTINGS_PAYMENTS_SEND_PAYMENT",
                                                                            comment: "Label for 'send payment' button in the payment settings."),
                                                   iconName: "payment-28",
-                                                  selector: nil)
-        
-        let sendPaymentButtonSubView = UIButton()
-        sendPaymentButtonSubView.frame = sendPaymentButton.bounds
-        sendPaymentButtonSubView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        sendPaymentButtonSubView.showsMenuAsPrimaryAction = true
-        sendPaymentButtonSubView.menu = UIMenu(
-            children: [
-                UIAction(title: "To Contacts") { [weak self] _ in
-                    self?.didTapSendPaymentButton()
-                },
-                UIAction(
-                    title: OWSLocalizedString("SETTINGS_PAYMENTS_TRANSFER_OUT_TITLE",
-                                              comment: "Label for 'send external' button in payment screen.")
-                ) { [weak self] _ in
-                    self?.didTapTransferToExchangeButton()
-                }
-        ])
-        sendPaymentButton.addSubview(sendPaymentButtonSubView)
+                                                  selector: #selector(didTapSendPaymentSheet))
         
         let buttonStack = UIStackView(arrangedSubviews: [
             addMoneyButton,
@@ -1114,7 +1096,8 @@ public class PaymentsSettingsViewController: OWSTableViewController2 {
         updateNavbar()
     }
 
-    private func didTapTransferToExchangeButton() {
+    @objc
+    private func didTapSendPaymentSheet() {
         if SSKEnvironment.shared.paymentsHelperRef.isPaymentsVersionOutdated {
             OWSActionSheets.showPaymentsOutdatedClientSheet(title: .updateRequired)
             return
@@ -1139,22 +1122,6 @@ public class PaymentsSettingsViewController: OWSTableViewController2 {
         let view = PaymentsTransferInViewController()
         let navigationController = OWSNavigationController(rootViewController: view)
         present(navigationController, animated: true, completion: nil)
-    }
-
-    @objc
-    func didTapSendPaymentButton() {
-        guard !SUIEnvironment.shared.paymentsRef.isKillSwitchActive else {
-            OWSActionSheets.showErrorAlert(message: OWSLocalizedString("SETTINGS_PAYMENTS_CANNOT_SEND_PAYMENTS_KILL_SWITCH",
-                                                                      comment: "Error message indicating that payments cannot be sent because the feature is not currently available."))
-            return
-        }
-
-        if SSKEnvironment.shared.paymentsHelperRef.isPaymentsVersionOutdated {
-            OWSActionSheets.showPaymentsOutdatedClientSheet(title: .updateRequired)
-            return
-        }
-
-        PaymentsSendRecipientViewController.presentAsFormSheet(fromViewController: self, isOutgoingTransfer: false)
     }
 
     private func didTapPaymentItem(paymentItem: PaymentsHistoryItem) {

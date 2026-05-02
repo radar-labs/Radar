@@ -147,7 +147,7 @@ class SendPaymentHelper {
         let format = OWSLocalizedString("PAYMENTS_NEW_PAYMENT_BALANCE_FORMAT",
                                        comment: "Format for the 'balance' indicator. Embeds {{ the current payments balance }}.")
         balanceLabel.text = String(format: format,
-                                   Self.formatCryptoCoinAmount(maximumPaymentAmount))
+                                   PaymentsFormat.formattedBalance(maximumPaymentAmount, isShortForm: false, withCurrencyCode: true, withSpace: true))
     }
 
     private func updateMaximumPaymentAmount() {
