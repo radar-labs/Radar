@@ -15,9 +15,7 @@ final class AppIconSettingsTableViewController: OWSTableViewController2 {
     // MARK: Static properties
 
     private static let customIcons: [[AppIcon]] = [
-        [.default, .white, .color, .night],
-        [.nightVariant, .chat, .bubbles, .yellow],
-        [.news, .notes, .weather, .waves],
+        [.default],
     ]
 
     /// This URL itself is not used. The action is overridden in the text view delegate function.
