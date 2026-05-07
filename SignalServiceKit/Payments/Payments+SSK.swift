@@ -65,14 +65,14 @@ public class PaymentsConstants {
 
     @objc
     public static let mobileCoinCurrencyIdentifier = "MOB"
-    
+
     @objc
     public static let bitcoinCurrencyIdentifier = "BTC"
-    
-    public static let satoshiCurrencyIdentifier = "sat"
-    
+
+    public static let satoshiCurrencyIdentifier = "sats"
+
     public static let bitcoinLightningProfileKeyVersion = "2f289e8cf0f8382f08d4e4eed361206b72599b91ed190a753355e47e8b11d31d"
-    
+
     public static let satoshiAmountTypeEnabledKey = "satoshi_amount_type_enabled"
 
     @objc
@@ -85,7 +85,7 @@ public class PaymentsConstants {
     public static func convertPicoMobToMob(_ picoMob: UInt64) -> Double {
         Double(picoMob) / Double(picoMobPerMob)
     }
-    
+
     public static let picoMobPerSatoshi: UInt64 = 1
 
     public static func convertSatoshiToPicoMob(_ satoshi: UInt64) -> UInt64 {
@@ -105,7 +105,7 @@ public class PaymentsConstants {
     // Safe:    9,999,999.999,999,999,999.
     // Unsafe: 99,999,999.999,999,999,999.
     public static let maxMobNonDecimalDigits: UInt = 7
-    
+
     public static let maxSatoshiDigits: UInt = 15
 
     public static let passphraseWordCount: Int = 24

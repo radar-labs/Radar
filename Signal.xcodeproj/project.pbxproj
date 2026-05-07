@@ -375,7 +375,6 @@
 		3498AC902518E92B00B1F315 /* PaymentsHistoryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3498AC8D2518E92B00B1F315 /* PaymentsHistoryViewController.swift */; };
 		3498AC912518E92B00B1F315 /* PaymentsHistory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3498AC8E2518E92B00B1F315 /* PaymentsHistory.swift */; };
 		3498AC922518E92B00B1F315 /* PaymentsSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3498AC8F2518E92B00B1F315 /* PaymentsSettingsViewController.swift */; };
-		AA5BC7D6399A49B39775CEE2 /* PaymentSettingsMenuViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F6D5347F4DB44F2AE1B3F53 /* PaymentSettingsMenuViewController.swift */; };
 		3498AC9F25190E8C00B1F315 /* ConversationViewLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3498AC9E25190E8B00B1F315 /* ConversationViewLayout.swift */; };
 		34995F1B2411838D00C70546 /* NewGroupMembersViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34995F172411838C00C70546 /* NewGroupMembersViewController.swift */; };
 		3499998222EF1E2100654932 /* GRDBFullTextSearcherTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3499997F22EF1E2100654932 /* GRDBFullTextSearcherTest.swift */; };
@@ -1687,6 +1686,7 @@
 		A1A018521805C5E800A052A6 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A11CD70C17FA230600A2D1B1 /* QuartzCore.framework */; };
 		A1A018531805C60D00A052A6 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D221A091169C9E5E00537ABF /* CoreGraphics.framework */; };
 		A5E7C675248C5443007C949A /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = A5E7C673248C5442007C949A /* InfoPlist.strings */; };
+		AA5BC7D6399A49B39775CEE2 /* PaymentSettingsMenuViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F6D5347F4DB44F2AE1B3F53 /* PaymentSettingsMenuViewController.swift */; };
 		B60EDE041A05A01700D73516 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B60EDE031A05A01700D73516 /* AudioToolbox.framework */; };
 		B66DBF4A19D5BBC8006EA940 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B66DBF4919D5BBC8006EA940 /* Images.xcassets */; };
 		B69CD25119773E79005CE69A /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B69CD25019773E79005CE69A /* XCTest.framework */; };
@@ -1694,17 +1694,6 @@
 		B6F509971AA53F760068F56A /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = B6F509951AA53F760068F56A /* Localizable.strings */; };
 		B6FE7EB71ADD62FA00A6D22F /* PushKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B6FE7EB61ADD62FA00A6D22F /* PushKit.framework */; };
 		B909C1592AAA5BAA00FED2AF /* AppIconSettingsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B909C1582AAA5BAA00FED2AF /* AppIconSettingsTableViewController.swift */; };
-		B91751C32EC5527B00FF7A9C /* AppIcon-news.icon in Resources */ = {isa = PBXBuildFile; fileRef = B91751C22EC5527B00FF7A9C /* AppIcon-news.icon */; };
-		B91751C72EC552DD00FF7A9C /* AppIcon-bubbles.icon in Resources */ = {isa = PBXBuildFile; fileRef = B91751C62EC552DD00FF7A9C /* AppIcon-bubbles.icon */; };
-		B91751C92EC5530500FF7A9C /* AppIcon-wave.icon in Resources */ = {isa = PBXBuildFile; fileRef = B91751C82EC5530500FF7A9C /* AppIcon-wave.icon */; };
-		B91751CB2EC553AB00FF7A9C /* AppIcon-chat.icon in Resources */ = {isa = PBXBuildFile; fileRef = B91751CA2EC553AB00FF7A9C /* AppIcon-chat.icon */; };
-		B91751CD2EC553F800FF7A9C /* AppIcon-notes.icon in Resources */ = {isa = PBXBuildFile; fileRef = B91751CC2EC553F800FF7A9C /* AppIcon-notes.icon */; };
-		B91751CF2EC5541700FF7A9C /* AppIcon-color.icon in Resources */ = {isa = PBXBuildFile; fileRef = B91751CE2EC5541700FF7A9C /* AppIcon-color.icon */; };
-		B91751D12EC5542B00FF7A9C /* AppIcon-dark.icon in Resources */ = {isa = PBXBuildFile; fileRef = B91751D02EC5542B00FF7A9C /* AppIcon-dark.icon */; };
-		B91751D32EC5544100FF7A9C /* AppIcon-dark-variant.icon in Resources */ = {isa = PBXBuildFile; fileRef = B91751D22EC5544100FF7A9C /* AppIcon-dark-variant.icon */; };
-		B91751D52EC5545200FF7A9C /* AppIcon-white.icon in Resources */ = {isa = PBXBuildFile; fileRef = B91751D42EC5545200FF7A9C /* AppIcon-white.icon */; };
-		B91751D72EC5546800FF7A9C /* AppIcon-weather.icon in Resources */ = {isa = PBXBuildFile; fileRef = B91751D62EC5546800FF7A9C /* AppIcon-weather.icon */; };
-		B91751D92EC5548500FF7A9C /* AppIcon-yellow.icon in Resources */ = {isa = PBXBuildFile; fileRef = B91751D82EC5548500FF7A9C /* AppIcon-yellow.icon */; };
 		B91751DB2EC5556B00FF7A9C /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = B91751DA2EC5556B00FF7A9C /* AppIcon.icon */; };
 		B91ACD9E2A797698000CFBC7 /* StickerPickerKeyboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = B91ACD9D2A797698000CFBC7 /* StickerPickerKeyboard.swift */; };
 		B9291BFC2B6058AE006BC25F /* ContactAboutSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9291BFB2B6058AE006BC25F /* ContactAboutSheet.swift */; };
@@ -4195,7 +4184,6 @@
 		3498AC8D2518E92B00B1F315 /* PaymentsHistoryViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PaymentsHistoryViewController.swift; sourceTree = "<group>"; };
 		3498AC8E2518E92B00B1F315 /* PaymentsHistory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PaymentsHistory.swift; sourceTree = "<group>"; };
 		3498AC8F2518E92B00B1F315 /* PaymentsSettingsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PaymentsSettingsViewController.swift; sourceTree = "<group>"; };
-		9F6D5347F4DB44F2AE1B3F53 /* PaymentSettingsMenuViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PaymentSettingsMenuViewController.swift; sourceTree = "<group>"; };
 		3498AC9E25190E8B00B1F315 /* ConversationViewLayout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConversationViewLayout.swift; sourceTree = "<group>"; };
 		34995F172411838C00C70546 /* NewGroupMembersViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NewGroupMembersViewController.swift; sourceTree = "<group>"; };
 		3499997F22EF1E2100654932 /* GRDBFullTextSearcherTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GRDBFullTextSearcherTest.swift; sourceTree = "<group>"; };
@@ -5647,6 +5635,7 @@
 		948B2FC201146EF3BA459226 /* Pods_SignalServiceKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_SignalServiceKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		94A685625E25E6F3EE3CC812 /* Pods-SignalUITests.testable release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SignalUITests.testable release.xcconfig"; path = "Target Support Files/Pods-SignalUITests/Pods-SignalUITests.testable release.xcconfig"; sourceTree = "<group>"; };
 		954AEE681DF33D32002E5410 /* ContactsPickerTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContactsPickerTest.swift; sourceTree = "<group>"; };
+		9F6D5347F4DB44F2AE1B3F53 /* PaymentSettingsMenuViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PaymentSettingsMenuViewController.swift; sourceTree = "<group>"; };
 		A11CD70C17FA230600A2D1B1 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		A163E8AA16F3F6A90094D68B /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		A1C32D4D17A0652C000A904E /* AddressBook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AddressBook.framework; path = System/Library/Frameworks/AddressBook.framework; sourceTree = SDKROOT; };
@@ -5682,17 +5671,6 @@
 		B6FE7EB61ADD62FA00A6D22F /* PushKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PushKit.framework; path = System/Library/Frameworks/PushKit.framework; sourceTree = SDKROOT; };
 		B7DF4FBE40A1DE0CD288E0EB /* Pods-SignalUITests.app store release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SignalUITests.app store release.xcconfig"; path = "Target Support Files/Pods-SignalUITests/Pods-SignalUITests.app store release.xcconfig"; sourceTree = "<group>"; };
 		B909C1582AAA5BAA00FED2AF /* AppIconSettingsTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppIconSettingsTableViewController.swift; sourceTree = "<group>"; };
-		B91751C22EC5527B00FF7A9C /* AppIcon-news.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = "AppIcon-news.icon"; sourceTree = "<group>"; };
-		B91751C62EC552DD00FF7A9C /* AppIcon-bubbles.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = "AppIcon-bubbles.icon"; sourceTree = "<group>"; };
-		B91751C82EC5530500FF7A9C /* AppIcon-wave.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = "AppIcon-wave.icon"; sourceTree = "<group>"; };
-		B91751CA2EC553AB00FF7A9C /* AppIcon-chat.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = "AppIcon-chat.icon"; sourceTree = "<group>"; };
-		B91751CC2EC553F800FF7A9C /* AppIcon-notes.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = "AppIcon-notes.icon"; sourceTree = "<group>"; };
-		B91751CE2EC5541700FF7A9C /* AppIcon-color.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = "AppIcon-color.icon"; sourceTree = "<group>"; };
-		B91751D02EC5542B00FF7A9C /* AppIcon-dark.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = "AppIcon-dark.icon"; sourceTree = "<group>"; };
-		B91751D22EC5544100FF7A9C /* AppIcon-dark-variant.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = "AppIcon-dark-variant.icon"; sourceTree = "<group>"; };
-		B91751D42EC5545200FF7A9C /* AppIcon-white.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = "AppIcon-white.icon"; sourceTree = "<group>"; };
-		B91751D62EC5546800FF7A9C /* AppIcon-weather.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = "AppIcon-weather.icon"; sourceTree = "<group>"; };
-		B91751D82EC5548500FF7A9C /* AppIcon-yellow.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = "AppIcon-yellow.icon"; sourceTree = "<group>"; };
 		B91751DA2EC5556B00FF7A9C /* AppIcon.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = AppIcon.icon; sourceTree = "<group>"; };
 		B91ACD9D2A797698000CFBC7 /* StickerPickerKeyboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StickerPickerKeyboard.swift; sourceTree = "<group>"; };
 		B9291BFB2B6058AE006BC25F /* ContactAboutSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactAboutSheet.swift; sourceTree = "<group>"; };
@@ -11216,17 +11194,6 @@
 		B91751C52EC552B100FF7A9C /* AppIcons */ = {
 			isa = PBXGroup;
 			children = (
-				B91751C62EC552DD00FF7A9C /* AppIcon-bubbles.icon */,
-				B91751CA2EC553AB00FF7A9C /* AppIcon-chat.icon */,
-				B91751CE2EC5541700FF7A9C /* AppIcon-color.icon */,
-				B91751D22EC5544100FF7A9C /* AppIcon-dark-variant.icon */,
-				B91751D02EC5542B00FF7A9C /* AppIcon-dark.icon */,
-				B91751C22EC5527B00FF7A9C /* AppIcon-news.icon */,
-				B91751CC2EC553F800FF7A9C /* AppIcon-notes.icon */,
-				B91751C82EC5530500FF7A9C /* AppIcon-wave.icon */,
-				B91751D62EC5546800FF7A9C /* AppIcon-weather.icon */,
-				B91751D42EC5545200FF7A9C /* AppIcon-white.icon */,
-				B91751D82EC5548500FF7A9C /* AppIcon-yellow.icon */,
 				B91751DA2EC5556B00FF7A9C /* AppIcon.icon */,
 			);
 			path = AppIcons;
@@ -15227,17 +15194,6 @@
 				34848D5F25D43ADD00E5034B /* about-mobilecoin.json in Resources */,
 				34848D6025D43ADD00E5034B /* activate-payments.json in Resources */,
 				34848D6125D43ADD00E5034B /* add-money.json in Resources */,
-				B91751C72EC552DD00FF7A9C /* AppIcon-bubbles.icon in Resources */,
-				B91751CB2EC553AB00FF7A9C /* AppIcon-chat.icon in Resources */,
-				B91751CF2EC5541700FF7A9C /* AppIcon-color.icon in Resources */,
-				B91751D32EC5544100FF7A9C /* AppIcon-dark-variant.icon in Resources */,
-				B91751D12EC5542B00FF7A9C /* AppIcon-dark.icon in Resources */,
-				B91751C32EC5527B00FF7A9C /* AppIcon-news.icon in Resources */,
-				B91751CD2EC553F800FF7A9C /* AppIcon-notes.icon in Resources */,
-				B91751C92EC5530500FF7A9C /* AppIcon-wave.icon in Resources */,
-				B91751D72EC5546800FF7A9C /* AppIcon-weather.icon in Resources */,
-				B91751D52EC5545200FF7A9C /* AppIcon-white.icon in Resources */,
-				B91751D92EC5548500FF7A9C /* AppIcon-yellow.icon in Resources */,
 				B91751DB2EC5556B00FF7A9C /* AppIcon.icon in Resources */,
 				052D17882C7E34D00023D56F /* AppIcon.xcassets in Resources */,
 				88DBDFBB2638FFBD00C2101C /* audio-played-dot.json in Resources */,

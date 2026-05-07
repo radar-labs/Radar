@@ -15,7 +15,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-	<string>${PRODUCT_NAME}</string>
+	<string>Radar</string>
 	<key>CFBundleExecutable</key>
 	<string>${EXECUTABLE_NAME}</string>
 	<key>CFBundleGetInfoString</key>
@@ -27,7 +27,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>${PRODUCT_NAME}</string>
+	<string>Radar</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -83,11 +83,11 @@
 		<string>_sgnl-new-device._tcp</string>
 	</array>
 	<key>NSCameraUsageDescription</key>
-	<string>Signal uses your camera to take photos, start or join a video call and to scan QR codes.</string>
+	<string>Radar uses your camera to take photos, start or join a video call and to scan QR codes.</string>
 	<key>NSContactsUsageDescription</key>
-	<string>Signal uses your contacts to find users you know. We do not store your contacts on the server.</string>
+	<string>Radar uses your contacts to find users you know. We do not store your contacts on the server.</string>
 	<key>NSFaceIDUsageDescription</key>
-	<string>Signal uses Face ID to confirm it's you.</string>
+	<string>Radar uses Face ID to confirm it's you.</string>
 	<key>NSLocalNetworkUsageDescription</key>
 	<string>Radar uses the local network to allow you to directly transfer your account to a new phone. It will not be used unless you explicitly choose to initiate a transfer to a new device.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
@@ -97,7 +97,7 @@
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>Radar will save photos to your library.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Signal will let you choose which photos from your library to send.</string>
+	<string>Radar will let you choose which photos from your library to send.</string>
 	<key>NSUserActivityTypes</key>
 	<array>
 		<string>INSendMessageIntent</string>
