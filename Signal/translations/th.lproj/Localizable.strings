@@ -2568,6 +2568,11 @@
 
 /* Label indicating a user who deleted their account. */
 "DELETED_USER" = "บัญชีที่ถูกลบ";
+"DEPOSIT_RECEIVED_TITLE" = "Deposit Received";
+"DEPOSIT_RECEIVED_SUBTITLE" = "You can now start sending payments on Radar";
+"DEPOSIT_RECEIVED_DEPOSIT_MORE" = "Deposit more Funds";
+"DEPOSIT_RECEIVED_SATS_LABEL" = "sats";
+
 
 /* Notification warning the user that they have been de-registered. */
 "DEREGISTRATION_NOTIFICATION" = "คุณออกจากระบบ Signal บนอุปกรณ์เครื่องนี้แล้ว";
@@ -5794,6 +5799,12 @@
 /* Explanation of the 'onboarding pin attempts exhausted' view when it is unknown if reglock is enabled. */
 "ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_WITH_UNKNOWN_REGLOCK_EXPLANATION" = "คุณลองใส่ PIN จนครบจำนวนครั้งที่อนุญาตแล้ว แต่คุณยังสามารถลองเข้าถึงบัญชี Signal ของคุณได้ด้วยการยืนยันหมายเลขโทรศัพท์ เพื่อความเป็นส่วนตัวและความปลอดภัยของคุณ บัญชีของคุณจะถูกกู้คืนโดยปราศจากข้อมูลโปรไฟล์หรือการตั้งค่าที่คุณบันทึกไว้";
 
+/* Title for the setup complete screen shown at the end of the onboarding flow. */
+"ONBOARDING_SETUP_COMPLETE_TITLE" = "ตั้งค่าเสร็จสมบูรณ์";
+
+/* Subtitle for the setup complete screen shown at the end of the onboarding flow. */
+"ONBOARDING_SETUP_COMPLETE_SUBTITLE" = "ตอนนี้คุณสามารถเริ่มใช้ Radar ได้แล้ว";
+
 /* Explanation of 'do not have old device' flow for the 'Restore or Transfer' prompt */
 "ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_BODY" = "หรือติดตั้ง Signal ใหม่บนอุปกรณ์เครื่องเดียวกันนั้น";
 
@@ -5813,7 +5824,8 @@
 "ONBOARDING_SPLASH_TERM_AND_PRIVACY_POLICY" = "เงื่อนไขและนโยบายความเป็นส่วนตัว";
 
 /* Title of the 'onboarding splash' view. */
-"ONBOARDING_SPLASH_TITLE" = "นำความเป็นส่วนตัวไปกับคุณทุกที่ \nเป็นตัวคุณในทุกข้อความ";
+"ONBOARDING_SPLASH_TITLE" = "Message privately,
+Send money securely.";
 
 /* Label for the link that lets users change their phone number in the onboarding views. */
 "ONBOARDING_VERIFICATION_BACK_LINK" = "หมายเลขไม่ถูกต้องหรือ?";
@@ -5974,6 +5986,9 @@
 /* Header title for card payment details screen */
 "PAYMENT_DETAILS_CARD_TITLE" = "บัตรเครดิตหรือบัตรเดบิต";
 
+
+
+
 /* Format for indicator of a payment amount converted to fiat currency with the freshness of the conversion rate. Embeds: {{ %1$@ the payment amount, %2$@ the freshness of the currency conversion rate }}. */
 "PAYMENTS_CURRENCY_CONVERSION_FRESHNESS_FORMAT" = "%1$@ เมื่อ %2$@";
 
@@ -6012,6 +6027,15 @@
 
 /* Status indicator for invalid payments which could not be processed. */
 "PAYMENTS_INFO_UNAVAILABLE_MESSAGE" = "ไม่สามารถดำเนินการได้";
+
+/* Body text for the Payments introduction screen explaining the Bitcoin Lightning Network. */
+"PAYMENTS_INTRO_BODY" = "Thanks to the Bitcoin Lightning Network, it's easy, fast and private.";
+
+/* Subtitle for the Payments introduction screen. */
+"PAYMENTS_INTRO_SUBTITLE" = "With Radar, you can send and receive money in your chats.";
+
+/* Title for the Payments introduction screen shown during onboarding. */
+"PAYMENTS_INTRO_TITLE" = "Introducing Payments";
 
 /* Indicates that an unknown error occurred while using Touch ID/Face ID/Phone Passcode. */
 "PAYMENTS_LOCK_AUTHENTICATION_ENABLE_UNKNOWN_ERROR" = "ไม่สามารถเข้าถึงการรับรองความถูกต้องได้";
@@ -6258,6 +6282,8 @@
 
 /* Indicator for unidentified outgoing payments. */
 "PAYMENTS_UNIDENTIFIED_PAYMENT_OUTGOING" = "การชำระเงินที่ส่งแล้ว";
+"PAYMENTS_WALLET_ADDRESS_LOADING" = "กำลังโหลด...";
+
 
 /* Label for unknown payments. */
 "PAYMENTS_UNKNOWN_PAYMENT" = "การจ่ายเงินที่ระบุไม่ได้";
@@ -9563,6 +9589,18 @@
 
 /* Title for an action sheet indicating that the given username is not associated with a registered Signal account. */
 "USERNAME_LOOKUP_NOT_FOUND_TITLE" = "ไม่พบผู้ใช้";
+
+/* Status label shown when the entered username is available to claim. */
+"USERNAME_ONBOARDING_AVAILABLE_STATUS" = "Username Available";
+
+/* Button label to confirm the chosen username on the username setup screen during onboarding. */
+"USERNAME_ONBOARDING_CONFIRM_BUTTON" = "Confirm";
+
+/* Subtitle for the username setup screen during onboarding, explaining what usernames are used for on Radar and Signal. */
+"USERNAME_ONBOARDING_SUBTITLE" = "Set your custom username for connecting with other users on Radar and Signal";
+
+/* Title for the username setup screen shown during onboarding. */
+"USERNAME_ONBOARDING_TITLE" = "Your Username";
 
 /* Instructions that appear below the username QR code on a sharable exported image. */
 "USERNAME_QR_CODE_EXPORT_INSTRUCTIONS" = "ใช้มือถือสแกนคิวอาร์โค้ดนี้เพื่อพูดคุยกับฉันบน Signal";

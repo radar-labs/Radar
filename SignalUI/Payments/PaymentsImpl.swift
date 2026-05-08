@@ -107,7 +107,7 @@ public class PaymentsImpl: NSObject, PaymentsSwift {
 
             tryToReuploadPaymentProfile()
         } catch {
-            owsFailDebug("Failed initialize components with error: \(error)")
+            Logger.warn("Failed initialize components with error: \(error)")
             return
         }
     }
@@ -142,6 +142,7 @@ public class PaymentsImpl: NSObject, PaymentsSwift {
         }
 
         currentWalletAddress = lightningAddress
+        NotificationCenter.default.postOnMainThread(name: Self.walletAddressDidLoad, object: nil)
     }
 
     private func setFetchRateHandler() async throws {
@@ -318,6 +319,8 @@ public class PaymentsImpl: NSObject, PaymentsSwift {
 
     public static let currentPaymentBalanceDidChange = Notification.Name(
         "currentPaymentBalanceDidChange")
+    public static let incomingPaymentReceived = Notification.Name("incomingPaymentReceived")
+    public static let walletAddressDidLoad = Notification.Name("walletAddressDidLoad")
 
     private let paymentBalanceCache = AtomicOptional<PaymentBalance>(nil, lock: .sharedGlobal)
 
@@ -1267,6 +1270,17 @@ public class PaymentsEventsMainApp: NSObject, PaymentsEvents {
 
         // If we're inserting a new payment of any kind, our balance may have changed.
         payments.updateCurrentPaymentBalance()
+
+        if paymentModel.isIncoming {
+            let picoMob = paymentModel.paymentAmount?.picoMob ?? 0
+            transaction.addSyncCompletion {
+                NotificationCenter.default.postOnMainThread(
+                    name: PaymentsImpl.incomingPaymentReceived,
+                    object: nil,
+                    userInfo: ["picoMob": picoMob]
+                )
+            }
+        }
     }
 
     public func willUpdatePayment(_ paymentModel: TSPaymentModel, transaction: DBWriteTransaction) {

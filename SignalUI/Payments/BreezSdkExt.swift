@@ -60,15 +60,42 @@ extension BreezSdk {
         return String(hashString.prefix(prefixLength))
     }
 
-    private static func generateUsername(length: Int = 16) -> String {
-        var bytes = [UInt8](repeating: 0, count: length)
-        let status = SecRandomCopyBytes(kSecRandomDefault, length, &bytes)
-        guard status == errSecSuccess else {
+    private static let usernameWords: [String] = [
+        "amber", "arctic", "azure", "beacon", "birch", "blast", "blaze", "bloom",
+        "bolt", "bravo", "breeze", "bright", "brisk", "bronze", "brook", "burst",
+        "calm", "cedar", "chain", "chase", "chief", "chill", "cipher", "citrus",
+        "clover", "coast", "cobalt", "comet", "coral", "craft", "crest", "crisp",
+        "crown", "crush", "crystal", "cyber", "delta", "dense", "depot", "depth",
+        "drift", "dusk", "echo", "ember", "falcon", "fern", "finch", "flame",
+        "flash", "fleet", "flint", "float", "flux", "forge", "forte", "frost",
+        "gale", "ghost", "glade", "gleam", "glide", "glow", "grand", "grant",
+        "gust", "haven", "hawk", "hazel", "haze", "helix", "helm", "hive",
+        "indie", "inlet", "iris", "ivory", "jade", "jasper", "jetty", "kindle",
+        "kite", "lance", "lark", "laser", "latch", "lava", "layer", "leap",
+        "ledge", "light", "lotus", "lunar", "lynx", "maple", "marble", "marsh",
+        "mist", "mosaic", "moss", "mural", "nova", "oaken", "ocean", "onyx",
+        "orbit", "otter", "oxide", "ozone", "pact", "peak", "pearl", "petal",
+        "pilot", "pine", "pivot", "pixel", "plaza", "plume", "polar", "pulse",
+        "quartz", "quest", "radar", "rapid", "raven", "realm", "relay", "ridge",
+        "ripple", "river", "roam", "rogue", "rover", "ruby", "rush", "sage",
+        "scout", "serene", "shade", "shift", "shore", "signal", "silver", "slate",
+        "solar", "sonic", "spark", "spire", "split", "sprint", "stark", "steel",
+        "storm", "strata", "streak", "stream", "stride", "swift", "talon", "teal",
+        "terra", "thunder", "tide", "timber", "titan", "torch", "trail", "trend",
+        "tropic", "turbo", "ultra", "unity", "vapor", "vault", "vector", "verde",
+        "vibe", "vista", "vital", "vivid", "volt", "wave", "wisp", "zenith"
+    ]
+
+    private static func generateUsername() -> String {
+        var bytes = [UInt8](repeating: 0, count: 6)
+        guard SecRandomCopyBytes(kSecRandomDefault, 6, &bytes) == errSecSuccess else {
             owsFailDebug("Failed to generate secure random bytes")
             return ""
         }
-
-        return bytes.map { String(format: "%02x", $0) }.joined()
+        let index1 = (Int(bytes[0]) << 8 | Int(bytes[1])) % usernameWords.count
+        let index2 = (Int(bytes[2]) << 8 | Int(bytes[3])) % usernameWords.count
+        let number = (Int(bytes[4]) << 8 | Int(bytes[5])) % 10000
+        return "\(usernameWords[index1])\(usernameWords[index2])\(String(format: "%04d", number))"
     }
 
     private func tryToRegisterLightningAddress(rateLimit: Int = 5) async {

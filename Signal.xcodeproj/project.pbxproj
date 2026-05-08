@@ -1765,6 +1765,7 @@
 		C13B9BB62A1819C7007F74C4 /* OutgoingEditMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = C13B9BB52A1819C7007F74C4 /* OutgoingEditMessage.swift */; };
 		C13EDC3F2D94636000670597 /* Registration.pb.swift in Sources */ = {isa = PBXBuildFile; fileRef = C15EE0922D5D5AC00070838C /* Registration.pb.swift */; };
 		C14366262DA55CF8008DE746 /* RegistrationRestoreFromBackupConfirmationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C14366252DA55CF8008DE746 /* RegistrationRestoreFromBackupConfirmationViewController.swift */; };
+		0B0A1E5BA1F54A79BD26277D /* RegistrationSetupCompleteViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2ACF11F249045BD8514B23D /* RegistrationSetupCompleteViewController.swift */; };
 		C14391132BD1C0DF00ED6FCB /* BackupRequestManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C14391122BD1C0DF00ED6FCB /* BackupRequestManager.swift */; };
 		C147C1722D9C58D60026952D /* RegistrationTransferStatusViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C147C1712D9C58D60026952D /* RegistrationTransferStatusViewController.swift */; };
 		C14AEBDF2C1A482900FAA31D /* CVComponentArchivedPayment.swift in Sources */ = {isa = PBXBuildFile; fileRef = C14AEBDE2C1A482900FAA31D /* CVComponentArchivedPayment.swift */; };
@@ -3731,6 +3732,10 @@
 		F9FA363629F335E500C13830 /* ProvisioningCipherTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9FA363529F335E500C13830 /* ProvisioningCipherTests.swift */; };
 		F9FAABD829DB55940004B383 /* Progress+Signal.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9FAABD729DB55940004B383 /* Progress+Signal.swift */; };
 		FCB11D8C1A129A76002F93FB /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FCB11D8B1A129A76002F93FB /* CoreMedia.framework */; };
+		50B791A8EDFA4671AFAD36BE /* PaymentsOnboardingCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F135D5191FF94FC0BD3F3299 /* PaymentsOnboardingCoordinator.swift */; };
+		032C396BAEA543FCA2F3BB20 /* DepositReceivedViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5407D257F32C412E9BAB122E /* DepositReceivedViewController.swift */; };
+		9C2CAFD9CEC74385B52C69F7 /* PaymentsIntroViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EADF791953F47E3A11ADDAD /* PaymentsIntroViewController.swift */; };
+		EE280878E9B84126A2323B7F /* UsernameOnboardingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 024E508025DF40279AC11A20 /* UsernameOnboardingViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -5742,6 +5747,7 @@
 		C13A484629B650BC00BA9005 /* UsernameValidationObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsernameValidationObserver.swift; sourceTree = "<group>"; };
 		C13B9BB52A1819C7007F74C4 /* OutgoingEditMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutgoingEditMessage.swift; sourceTree = "<group>"; };
 		C14366252DA55CF8008DE746 /* RegistrationRestoreFromBackupConfirmationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegistrationRestoreFromBackupConfirmationViewController.swift; sourceTree = "<group>"; };
+		B2ACF11F249045BD8514B23D /* RegistrationSetupCompleteViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegistrationSetupCompleteViewController.swift; sourceTree = "<group>"; };
 		C14391122BD1C0DF00ED6FCB /* BackupRequestManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupRequestManager.swift; sourceTree = "<group>"; };
 		C147C1712D9C58D60026952D /* RegistrationTransferStatusViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegistrationTransferStatusViewController.swift; sourceTree = "<group>"; };
 		C14AEBDE2C1A482900FAA31D /* CVComponentArchivedPayment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CVComponentArchivedPayment.swift; sourceTree = "<group>"; };
@@ -7758,6 +7764,10 @@
 		FEFD8A174F57F4C221747D51 /* Pods-SignalServiceKitTests.app store release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SignalServiceKitTests.app store release.xcconfig"; path = "Target Support Files/Pods-SignalServiceKitTests/Pods-SignalServiceKitTests.app store release.xcconfig"; sourceTree = "<group>"; };
 		FF348A86F3FA1E5B5A62F033 /* Pods-SignalNSE.profiling.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SignalNSE.profiling.xcconfig"; path = "Target Support Files/Pods-SignalNSE/Pods-SignalNSE.profiling.xcconfig"; sourceTree = "<group>"; };
 		FF39DCC8D1F7DFD3708276E2 /* Pods-SignalTests.app store release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SignalTests.app store release.xcconfig"; path = "Target Support Files/Pods-SignalTests/Pods-SignalTests.app store release.xcconfig"; sourceTree = "<group>"; };
+		F135D5191FF94FC0BD3F3299 /* PaymentsOnboardingCoordinator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PaymentsOnboardingCoordinator.swift; sourceTree = "<group>"; };
+		5407D257F32C412E9BAB122E /* DepositReceivedViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DepositReceivedViewController.swift; sourceTree = "<group>"; };
+		0EADF791953F47E3A11ADDAD /* PaymentsIntroViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PaymentsIntroViewController.swift; sourceTree = "<group>"; };
+		024E508025DF40279AC11A20 /* UsernameOnboardingViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UsernameOnboardingViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -8326,6 +8336,9 @@
 			isa = PBXGroup;
 			children = (
 				3497971E25DAA86100E99FA4 /* SendPaymentCompletionActionSheet.swift */,
+				F135D5191FF94FC0BD3F3299 /* PaymentsOnboardingCoordinator.swift */,
+				5407D257F32C412E9BAB122E /* DepositReceivedViewController.swift */,
+				0EADF791953F47E3A11ADDAD /* PaymentsIntroViewController.swift */,
 				3497972225DAAE3800E99FA4 /* SendPaymentHelper.swift */,
 				34EEECF125E846EC00574F0D /* SendPaymentMemoViewController.swift */,
 				3497971F25DAA86100E99FA4 /* SendPaymentViewController.swift */,
@@ -10061,6 +10074,7 @@
 				E15066C22CED498600F6F9AF /* RegistrationQuickRestoreQRCodeViewController.swift */,
 				F9440E7129C0FA490016FE95 /* RegistrationReglockTimeoutViewController.swift */,
 				C14366252DA55CF8008DE746 /* RegistrationRestoreFromBackupConfirmationViewController.swift */,
+				B2ACF11F249045BD8514B23D /* RegistrationSetupCompleteViewController.swift */,
 				F933FC3E2992E77300D78DB0 /* RegistrationSplashViewController.swift */,
 				F9426D17299FEC8900357352 /* RegistrationTransferChoiceViewController.swift */,
 				66C3887D29CA537400E6DC00 /* RegistrationTransferProgressViewController.swift */,
@@ -12844,9 +12858,18 @@
 			path = CustomContextMenus;
 			sourceTree = "<group>";
 		};
+				0A153A9BE8BA4912A6D085B6 /* Onboarding */ = {
+			isa = PBXGroup;
+			children = (
+				024E508025DF40279AC11A20 /* UsernameOnboardingViewController.swift */,
+			);
+			path = Onboarding;
+			sourceTree = "<group>";
+		};
 		D99840BB297A04A300F7ED6D /* Usernames */ = {
 			isa = PBXGroup;
 			children = (
+				0A153A9BE8BA4912A6D085B6 /* Onboarding */,
 				D9317FDA2A4CE47100075A92 /* Links */,
 				D9317FD92A4CE45500075A92 /* Selection */,
 				D93830822A708E95006CDCDE /* UsernameChangeDelegate.swift */,
@@ -17370,6 +17393,10 @@
 				AA5BC7D6399A49B39775CEE2 /* PaymentSettingsMenuViewController.swift in Sources */,
 				3498AC922518E92B00B1F315 /* PaymentsSettingsViewController.swift in Sources */,
 				34848D6325D44EBD00E5034B /* PaymentsTransferInViewController.swift in Sources */,
+				50B791A8EDFA4671AFAD36BE /* PaymentsOnboardingCoordinator.swift in Sources */,
+				032C396BAEA543FCA2F3BB20 /* DepositReceivedViewController.swift in Sources */,
+				9C2CAFD9CEC74385B52C69F7 /* PaymentsIntroViewController.swift in Sources */,
+				EE280878E9B84126A2323B7F /* UsernameOnboardingViewController.swift in Sources */,
 				8D7D4A065BD540F9964C22D2 /* RadarUsernameViewController.swift in Sources */,
 				3406D32225DD40F000885B14 /* PaymentsTransferOutViewController.swift in Sources */,
 				3495FF0325F908FE00959D6E /* PaymentsViewPassphraseConfirmViewController.swift in Sources */,
@@ -17459,6 +17486,7 @@
 				E15066C32CED49C800F6F9AF /* RegistrationQuickRestoreQRCodeViewController.swift in Sources */,
 				F9440E7229C0FA490016FE95 /* RegistrationReglockTimeoutViewController.swift in Sources */,
 				C14366262DA55CF8008DE746 /* RegistrationRestoreFromBackupConfirmationViewController.swift in Sources */,
+				0B0A1E5BA1F54A79BD26277D /* RegistrationSetupCompleteViewController.swift in Sources */,
 				F933FC3F2992E77300D78DB0 /* RegistrationSplashViewController.swift in Sources */,
 				6600F39029918CBF00B1EDB7 /* RegistrationStep.swift in Sources */,
 				F9426D18299FEC8900357352 /* RegistrationTransferChoiceViewController.swift in Sources */,

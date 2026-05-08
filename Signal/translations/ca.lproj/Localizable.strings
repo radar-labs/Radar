@@ -2568,6 +2568,11 @@
 
 /* Label indicating a user who deleted their account. */
 "DELETED_USER" = "Eliminar el compte";
+"DEPOSIT_RECEIVED_TITLE" = "Deposit Received";
+"DEPOSIT_RECEIVED_SUBTITLE" = "You can now start sending payments on Radar";
+"DEPOSIT_RECEIVED_DEPOSIT_MORE" = "Deposit more Funds";
+"DEPOSIT_RECEIVED_SATS_LABEL" = "sats";
+
 
 /* Notification warning the user that they have been de-registered. */
 "DEREGISTRATION_NOTIFICATION" = "S'ha tancat la teva sessió de Signal en aquest dispositiu.";
@@ -5794,6 +5799,12 @@
 /* Explanation of the 'onboarding pin attempts exhausted' view when it is unknown if reglock is enabled. */
 "ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_WITH_UNKNOWN_REGLOCK_EXPLANATION" = "Se t'han acabat els intents del PIN, però encara pots accedir al compte de Signal verificant el teu número de telèfon. Per a la teva privacitat i seguretat, el teu compte es restaurarà sense la teva informació de perfil o ajustos guardats.";
 
+/* Title for the setup complete screen shown at the end of the onboarding flow. */
+"ONBOARDING_SETUP_COMPLETE_TITLE" = "Configuració completa";
+
+/* Subtitle for the setup complete screen shown at the end of the onboarding flow. */
+"ONBOARDING_SETUP_COMPLETE_SUBTITLE" = "Ara pots començar a fer servir Radar";
+
 /* Explanation of 'do not have old device' flow for the 'Restore or Transfer' prompt */
 "ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_BODY" = "O estàs reinstal·lant Signal al mateix dispositiu";
 
@@ -5813,7 +5824,8 @@
 "ONBOARDING_SPLASH_TERM_AND_PRIVACY_POLICY" = "Condicions de servei i política de privadesa";
 
 /* Title of the 'onboarding splash' view. */
-"ONBOARDING_SPLASH_TITLE" = "Porteu a sobre la privadesa.\n\nSigueu vosaltres mateixos a cada missatge.";
+"ONBOARDING_SPLASH_TITLE" = "Message privately,
+Send money securely.";
 
 /* Label for the link that lets users change their phone number in the onboarding views. */
 "ONBOARDING_VERIFICATION_BACK_LINK" = "El número no és correcte?";
@@ -5974,6 +5986,9 @@
 /* Header title for card payment details screen */
 "PAYMENT_DETAILS_CARD_TITLE" = "Targeta de crèdit o dèbit";
 
+
+
+
 /* Format for indicator of a payment amount converted to fiat currency with the freshness of the conversion rate. Embeds: {{ %1$@ the payment amount, %2$@ the freshness of the currency conversion rate }}. */
 "PAYMENTS_CURRENCY_CONVERSION_FRESHNESS_FORMAT" = "%1$@ a %2$@";
 
@@ -6012,6 +6027,15 @@
 
 /* Status indicator for invalid payments which could not be processed. */
 "PAYMENTS_INFO_UNAVAILABLE_MESSAGE" = "NO DISPONIBLE";
+
+/* Body text for the Payments introduction screen explaining the Bitcoin Lightning Network. */
+"PAYMENTS_INTRO_BODY" = "Thanks to the Bitcoin Lightning Network, it's easy, fast and private.";
+
+/* Subtitle for the Payments introduction screen. */
+"PAYMENTS_INTRO_SUBTITLE" = "With Radar, you can send and receive money in your chats.";
+
+/* Title for the Payments introduction screen shown during onboarding. */
+"PAYMENTS_INTRO_TITLE" = "Introducing Payments";
 
 /* Indicates that an unknown error occurred while using Touch ID/Face ID/Phone Passcode. */
 "PAYMENTS_LOCK_AUTHENTICATION_ENABLE_UNKNOWN_ERROR" = "No s'ha pogut accedir a l'autenticació.";
@@ -6258,6 +6282,8 @@
 
 /* Indicator for unidentified outgoing payments. */
 "PAYMENTS_UNIDENTIFIED_PAYMENT_OUTGOING" = "Pagament enviat";
+"PAYMENTS_WALLET_ADDRESS_LOADING" = "Carregant...";
+
 
 /* Label for unknown payments. */
 "PAYMENTS_UNKNOWN_PAYMENT" = "Pagament no vàlid";
@@ -9563,6 +9589,18 @@
 
 /* Title for an action sheet indicating that the given username is not associated with a registered Signal account. */
 "USERNAME_LOOKUP_NOT_FOUND_TITLE" = "No s'ha trobat l'usuari";
+
+/* Status label shown when the entered username is available to claim. */
+"USERNAME_ONBOARDING_AVAILABLE_STATUS" = "Username Available";
+
+/* Button label to confirm the chosen username on the username setup screen during onboarding. */
+"USERNAME_ONBOARDING_CONFIRM_BUTTON" = "Confirm";
+
+/* Subtitle for the username setup screen during onboarding, explaining what usernames are used for on Radar and Signal. */
+"USERNAME_ONBOARDING_SUBTITLE" = "Set your custom username for connecting with other users on Radar and Signal";
+
+/* Title for the username setup screen shown during onboarding. */
+"USERNAME_ONBOARDING_TITLE" = "Your Username";
 
 /* Instructions that appear below the username QR code on a sharable exported image. */
 "USERNAME_QR_CODE_EXPORT_INSTRUCTIONS" = "Escaneja aquest codi QR amb el teu telèfon per xatejar amb mi a Signal.";

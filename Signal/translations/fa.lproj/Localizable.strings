@@ -2568,6 +2568,11 @@
 
 /* Label indicating a user who deleted their account. */
 "DELETED_USER" = "حساب پاک‌شده";
+"DEPOSIT_RECEIVED_TITLE" = "Deposit Received";
+"DEPOSIT_RECEIVED_SUBTITLE" = "You can now start sending payments on Radar";
+"DEPOSIT_RECEIVED_DEPOSIT_MORE" = "Deposit more Funds";
+"DEPOSIT_RECEIVED_SATS_LABEL" = "sats";
+
 
 /* Notification warning the user that they have been de-registered. */
 "DEREGISTRATION_NOTIFICATION" = "در این دستگاه از سیگنال خارج شده‌اید.";
@@ -5794,6 +5799,12 @@
 /* Explanation of the 'onboarding pin attempts exhausted' view when it is unknown if reglock is enabled. */
 "ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_WITH_UNKNOWN_REGLOCK_EXPLANATION" = "فرصت شما برای حدس پین تمام شد، ولی همچنان می‌توانید با تأیید شماره تلفن خود، سعی کنید و به حساب سیگنال خود دسترسی پیدا کنید. برای حفظ امنیت و حریم خصوصی، حسابتان بدون هیچ‌گونه اطلاعات یا تنظیمات ذخیره‌شده نمایه بازیابی خواهد شد.";
 
+/* Title for the setup complete screen shown at the end of the onboarding flow. */
+"ONBOARDING_SETUP_COMPLETE_TITLE" = "تنظیم کامل شد";
+
+/* Subtitle for the setup complete screen shown at the end of the onboarding flow. */
+"ONBOARDING_SETUP_COMPLETE_SUBTITLE" = "اکنون می‌توانید از Radar استفاده کنید";
+
 /* Explanation of 'do not have old device' flow for the 'Restore or Transfer' prompt */
 "ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_BODY" = "یا در حال نصب مجدد سیگنال روی همین دستگاه هستید";
 
@@ -5813,7 +5824,8 @@
 "ONBOARDING_SPLASH_TERM_AND_PRIVACY_POLICY" = "شرایط و سیاست های حفظ حریم خصوصی";
 
 /* Title of the 'onboarding splash' view. */
-"ONBOARDING_SPLASH_TITLE" = "حریم خصوصی را همراه خودتان داشته باشید.\nدر هر پیام خودتان باشید.";
+"ONBOARDING_SPLASH_TITLE" = "Message privately,
+Send money securely.";
 
 /* Label for the link that lets users change their phone number in the onboarding views. */
 "ONBOARDING_VERIFICATION_BACK_LINK" = "شماره اشتباه؟";
@@ -5974,6 +5986,9 @@
 /* Header title for card payment details screen */
 "PAYMENT_DETAILS_CARD_TITLE" = "کارت اعتباری یا دبیت کارت";
 
+
+
+
 /* Format for indicator of a payment amount converted to fiat currency with the freshness of the conversion rate. Embeds: {{ %1$@ the payment amount, %2$@ the freshness of the currency conversion rate }}. */
 "PAYMENTS_CURRENCY_CONVERSION_FRESHNESS_FORMAT" = "%1$@ در %2$@";
 
@@ -6012,6 +6027,15 @@
 
 /* Status indicator for invalid payments which could not be processed. */
 "PAYMENTS_INFO_UNAVAILABLE_MESSAGE" = "خارج از دسترس";
+
+/* Body text for the Payments introduction screen explaining the Bitcoin Lightning Network. */
+"PAYMENTS_INTRO_BODY" = "Thanks to the Bitcoin Lightning Network, it's easy, fast and private.";
+
+/* Subtitle for the Payments introduction screen. */
+"PAYMENTS_INTRO_SUBTITLE" = "With Radar, you can send and receive money in your chats.";
+
+/* Title for the Payments introduction screen shown during onboarding. */
+"PAYMENTS_INTRO_TITLE" = "Introducing Payments";
 
 /* Indicates that an unknown error occurred while using Touch ID/Face ID/Phone Passcode. */
 "PAYMENTS_LOCK_AUTHENTICATION_ENABLE_UNKNOWN_ERROR" = "دسترسی به احراز هویت ممکن نبود.";
@@ -6258,6 +6282,8 @@
 
 /* Indicator for unidentified outgoing payments. */
 "PAYMENTS_UNIDENTIFIED_PAYMENT_OUTGOING" = "پرداخت ارسالی";
+"PAYMENTS_WALLET_ADDRESS_LOADING" = "در حال بارگذاری...";
+
 
 /* Label for unknown payments. */
 "PAYMENTS_UNKNOWN_PAYMENT" = "پرداخت نامعتبر";
@@ -9563,6 +9589,18 @@
 
 /* Title for an action sheet indicating that the given username is not associated with a registered Signal account. */
 "USERNAME_LOOKUP_NOT_FOUND_TITLE" = "کاربر پیدا نشد";
+
+/* Status label shown when the entered username is available to claim. */
+"USERNAME_ONBOARDING_AVAILABLE_STATUS" = "Username Available";
+
+/* Button label to confirm the chosen username on the username setup screen during onboarding. */
+"USERNAME_ONBOARDING_CONFIRM_BUTTON" = "Confirm";
+
+/* Subtitle for the username setup screen during onboarding, explaining what usernames are used for on Radar and Signal. */
+"USERNAME_ONBOARDING_SUBTITLE" = "Set your custom username for connecting with other users on Radar and Signal";
+
+/* Title for the username setup screen shown during onboarding. */
+"USERNAME_ONBOARDING_TITLE" = "Your Username";
 
 /* Instructions that appear below the username QR code on a sharable exported image. */
 "USERNAME_QR_CODE_EXPORT_INSTRUCTIONS" = "برای گفتگو با من در سیگنال، این کد QR را با تلفن خود اسکن کنید.";

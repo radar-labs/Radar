@@ -2568,6 +2568,11 @@
 
 /* Label indicating a user who deleted their account. */
 "DELETED_USER" = "刪除咗嘅帳戶";
+"DEPOSIT_RECEIVED_TITLE" = "Deposit Received";
+"DEPOSIT_RECEIVED_SUBTITLE" = "You can now start sending payments on Radar";
+"DEPOSIT_RECEIVED_DEPOSIT_MORE" = "Deposit more Funds";
+"DEPOSIT_RECEIVED_SATS_LABEL" = "sats";
+
 
 /* Notification warning the user that they have been de-registered. */
 "DEREGISTRATION_NOTIFICATION" = "你已經喺呢部裝置度被登出咗 Signal。";
@@ -5794,6 +5799,12 @@
 /* Explanation of the 'onboarding pin attempts exhausted' view when it is unknown if reglock is enabled. */
 "ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_WITH_UNKNOWN_REGLOCK_EXPLANATION" = "你已經用晒所有嘗試輸入 PIN 碼嘅機會，但你仍然可以嘗試透過驗證電話冧把嚟進入 Signal 帳戶。為咗確保你嘅私隱同安全，你嘅帳戶會還原，但之前儲存嘅所有個人檔案資料同設定都會刪除。";
 
+/* Title for the setup complete screen shown at the end of the onboarding flow. */
+"ONBOARDING_SETUP_COMPLETE_TITLE" = "設定完成";
+
+/* Subtitle for the setup complete screen shown at the end of the onboarding flow. */
+"ONBOARDING_SETUP_COMPLETE_SUBTITLE" = "你而家可以開始使用 Radar";
+
 /* Explanation of 'do not have old device' flow for the 'Restore or Transfer' prompt */
 "ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_BODY" = "或者如果你喺同一部機度重新安裝緊 Signal";
 
@@ -5813,7 +5824,8 @@
 "ONBOARDING_SPLASH_TERM_AND_PRIVACY_POLICY" = "使用條款同私隱政策";
 
 /* Title of the 'onboarding splash' view. */
-"ONBOARDING_SPLASH_TITLE" = "讓私隱與您同在。\n每封訊息都做返自己、講人話。";
+"ONBOARDING_SPLASH_TITLE" = "Message privately,
+Send money securely.";
 
 /* Label for the link that lets users change their phone number in the onboarding views. */
 "ONBOARDING_VERIFICATION_BACK_LINK" = "個號碼唔啱？";
@@ -5974,6 +5986,9 @@
 /* Header title for card payment details screen */
 "PAYMENT_DETAILS_CARD_TITLE" = "信用卡或扣帳卡";
 
+
+
+
 /* Format for indicator of a payment amount converted to fiat currency with the freshness of the conversion rate. Embeds: {{ %1$@ the payment amount, %2$@ the freshness of the currency conversion rate }}. */
 "PAYMENTS_CURRENCY_CONVERSION_FRESHNESS_FORMAT" = "%1$@ (喺 %2$@ 換算)";
 
@@ -6012,6 +6027,15 @@
 
 /* Status indicator for invalid payments which could not be processed. */
 "PAYMENTS_INFO_UNAVAILABLE_MESSAGE" = "唔用得";
+
+/* Body text for the Payments introduction screen explaining the Bitcoin Lightning Network. */
+"PAYMENTS_INTRO_BODY" = "Thanks to the Bitcoin Lightning Network, it's easy, fast and private.";
+
+/* Subtitle for the Payments introduction screen. */
+"PAYMENTS_INTRO_SUBTITLE" = "With Radar, you can send and receive money in your chats.";
+
+/* Title for the Payments introduction screen shown during onboarding. */
+"PAYMENTS_INTRO_TITLE" = "Introducing Payments";
 
 /* Indicates that an unknown error occurred while using Touch ID/Face ID/Phone Passcode. */
 "PAYMENTS_LOCK_AUTHENTICATION_ENABLE_UNKNOWN_ERROR" = "存取唔到認證。";
@@ -6258,6 +6282,8 @@
 
 /* Indicator for unidentified outgoing payments. */
 "PAYMENTS_UNIDENTIFIED_PAYMENT_OUTGOING" = "傳送咗嘅付款";
+"PAYMENTS_WALLET_ADDRESS_LOADING" = "載入中...";
+
 
 /* Label for unknown payments. */
 "PAYMENTS_UNKNOWN_PAYMENT" = "付款無效";
@@ -9563,6 +9589,18 @@
 
 /* Title for an action sheet indicating that the given username is not associated with a registered Signal account. */
 "USERNAME_LOOKUP_NOT_FOUND_TITLE" = "搵唔到呢個用戶";
+
+/* Status label shown when the entered username is available to claim. */
+"USERNAME_ONBOARDING_AVAILABLE_STATUS" = "Username Available";
+
+/* Button label to confirm the chosen username on the username setup screen during onboarding. */
+"USERNAME_ONBOARDING_CONFIRM_BUTTON" = "Confirm";
+
+/* Subtitle for the username setup screen during onboarding, explaining what usernames are used for on Radar and Signal. */
+"USERNAME_ONBOARDING_SUBTITLE" = "Set your custom username for connecting with other users on Radar and Signal";
+
+/* Title for the username setup screen shown during onboarding. */
+"USERNAME_ONBOARDING_TITLE" = "Your Username";
 
 /* Instructions that appear below the username QR code on a sharable exported image. */
 "USERNAME_QR_CODE_EXPORT_INSTRUCTIONS" = "用電話掃描呢個二維碼，就開始喺 Signal 同我聊天喇。";
