@@ -33,19 +33,33 @@ class PaymentsOnboardingCoordinator {
         guard let navController else { return }
 
         navController.pushViewController(
-            PaymentsIntroViewController(onContinue: { [self] in showAddFunds() }),
+            PaymentsIntroViewController(onContinue: { [self] in showAddFundsIntro() }),
+            animated: true
+        )
+    }
+
+    private func showAddFundsIntro() {
+        guard let navController else { return }
+
+        if !SSKEnvironment.shared.paymentsHelperRef.arePaymentsEnabled {
+            Task.detached(priority: .userInitiated) {
+                SSKEnvironment.shared.databaseStorageRef.write { tx in
+                    SSKEnvironment.shared.paymentsHelperRef.enablePayments(transaction: tx)
+                }
+            }
+        }
+
+        navController.pushViewController(
+            AddFundsIntroViewController(
+                onContinue: { [self] in showAddFunds() },
+                onSkip: { [self] in showSetupComplete() }
+            ),
             animated: true
         )
     }
 
     private func showAddFunds() {
         guard let navController else { return }
-
-        if !SSKEnvironment.shared.paymentsHelperRef.arePaymentsEnabled {
-            SSKEnvironment.shared.databaseStorageRef.write { tx in
-                SSKEnvironment.shared.paymentsHelperRef.enablePayments(transaction: tx)
-            }
-        }
 
         startObservingDeposit()
         navController.pushViewController(
@@ -92,6 +106,7 @@ class PaymentsOnboardingCoordinator {
         let delays: [Double] = [2.5, 4.5, 6.5, 8.5, 10.5, 12.5, 14.5]
         let actions: [@MainActor () -> Void] = [
             { [self] in showIntro() },
+            { [self] in showAddFundsIntro() },
             { [self] in showAddFunds() },
             { [self] in showDepositReceived(amountSats: "1,250") },
             { [self] in showSetupComplete() },

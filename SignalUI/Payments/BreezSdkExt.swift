@@ -36,17 +36,18 @@ extension BreezSdk {
         return try await builder.build()
     }
 
-    public func validateInitialLightningAddress() async throws {
+    public func validateInitialLightningAddress() async throws -> LightningAddressInfo? {
         let lightningAddress = try await getLightningAddress()
 
         if let lightningAddress = lightningAddress {
             if let lnurlDomain = breezSdkConfig.lnurlDomain,
                 !lightningAddress.lightningAddress.contains("@\(lnurlDomain)")
             {
-                await self.tryToRegisterLightningAddress()
+                return await self.tryToRegisterLightningAddress()
             }
+            return nil
         } else {
-            await self.tryToRegisterLightningAddress()
+            return await self.tryToRegisterLightningAddress()
         }
     }
 
@@ -98,23 +99,21 @@ extension BreezSdk {
         return "\(usernameWords[index1])\(usernameWords[index2])\(String(format: "%04d", number))"
     }
 
-    private func tryToRegisterLightningAddress(rateLimit: Int = 5) async {
-         for _ in 0...rateLimit {
-             do {
-                 let username = Self.generateUsername()
-                 let isAvailable = try await checkLightningAddressAvailable(
-                         req: CheckLightningAddressRequest(username: username))
-
-                 if isAvailable {
-                     _ = try await registerLightningAddress(
-                             request: RegisterLightningAddressRequest(username: username))
-                     return
-                 }
-             } catch {
-                 owsFailDebug("Cannot to register lightning address. Error: \(error)")
-             }
-         }
-
-        owsFailDebug("Cannot to register lightning address. Out of rate limit: \(rateLimit)")
+    private func tryToRegisterLightningAddress(rateLimit: Int = 5) async -> LightningAddressInfo? {
+        for _ in 0...rateLimit {
+            do {
+                let username = Self.generateUsername()
+                let isAvailable = try await checkLightningAddressAvailable(
+                    req: CheckLightningAddressRequest(username: username))
+                if isAvailable {
+                    return try await registerLightningAddress(
+                        request: RegisterLightningAddressRequest(username: username))
+                }
+            } catch {
+                Logger.warn("Cannot register lightning address. Error: \(error)")
+            }
+        }
+        Logger.warn("Cannot register lightning address. Out of rate limit: \(rateLimit)")
+        return nil
     }
 }

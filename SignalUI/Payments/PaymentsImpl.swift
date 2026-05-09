@@ -106,6 +106,8 @@ public class PaymentsImpl: NSObject, PaymentsSwift {
             try await updateFiatCurrencies()
 
             tryToReuploadPaymentProfile()
+        } catch PaymentsError.notEnabled {
+            return
         } catch {
             Logger.warn("Failed initialize components with error: \(error)")
             return
@@ -133,14 +135,20 @@ public class PaymentsImpl: NSObject, PaymentsSwift {
         }
 
         currentSdk = try await BreezSdk.build(with: paymentEntropy)
-        try await currentSdk?.validateInitialLightningAddress()
+        if let newAddress = try await currentSdk?.validateInitialLightningAddress() {
+            currentWalletAddress = newAddress
+        }
     }
 
     private func loadWalletAddress() async throws {
-        guard let lightningAddress = try await self.getBreezSdk().getLightningAddress() else {
-            throw OWSAssertionError("Missing lightning address")
+        if currentWalletAddress != nil {
+            NotificationCenter.default.postOnMainThread(name: Self.walletAddressDidLoad, object: nil)
+            return
         }
-
+        guard let lightningAddress = try await self.getBreezSdk().getLightningAddress() else {
+            Logger.warn("No lightning address available yet — user may need to register a username.")
+            return
+        }
         currentWalletAddress = lightningAddress
         NotificationCenter.default.postOnMainThread(name: Self.walletAddressDidLoad, object: nil)
     }
@@ -171,6 +179,9 @@ public class PaymentsImpl: NSObject, PaymentsSwift {
     }
 
     private func tryToReuploadPaymentProfile() {
+        guard DependenciesBridge.shared.tsAccountManager.registrationStateWithMaybeSneakyTransaction.isRegistered else {
+            return
+        }
         Task {
             do {
                 Logger.info("Trying to reupload payment profile")
@@ -564,7 +575,7 @@ extension PaymentsImpl {
         owsAssertDebug(paymentsState.isEnabled)
 
         guard let addressData = walletAddressLNURL?.data(using: .utf8) else {
-            owsFailDebug("Missing wallet address.")
+            Logger.warn("Missing wallet address — Breez SDK not yet initialized.")
             return nil
         }
 
@@ -603,7 +614,6 @@ extension PaymentsImpl {
 
         guard let localPaymentAddress = buildLocalPaymentAddress(paymentsState: paymentsState)
         else {
-            owsFailDebug("Missing localPaymentAddress.")
             return nil
         }
         guard localPaymentAddress.isValid, localPaymentAddress.currency == .bitcoin else {

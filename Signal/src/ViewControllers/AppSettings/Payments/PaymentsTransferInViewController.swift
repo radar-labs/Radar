@@ -159,7 +159,6 @@ class PaymentsTransferInViewController: OWSViewController {
         container.layer.borderColor = Self.accentBlue.cgColor
         container.clipsToBounds = true
 
-        // White square with radar logo centred on the QR
         let iconBox = UIView()
         iconBox.backgroundColor = .white
         iconBox.layer.cornerRadius = 6
@@ -181,26 +180,41 @@ class PaymentsTransferInViewController: OWSViewController {
         qrSpinner = spinner
 
         qrContainerView = container
-
-        if SUIEnvironment.shared.paymentsRef.walletAddressLNURL != nil {
-            populateQRImage(in: container)
-        } else {
-            spinner.startAnimating()
-        }
+        spinner.startAnimating()
+        startQRGeneration()
 
         return container
     }
 
-    private func populateQRImage(in container: UIView) {
+    // Generates the QR on a background thread so it never blocks navigation animations.
+    // Safe to call multiple times — bails out early if QR is already rendered.
+    private func startQRGeneration() {
+        guard let container = qrContainerView else { return }
         guard !container.subviews.contains(where: { $0 is UIImageView }) else { return }
-        guard let lnurl = SUIEnvironment.shared.paymentsRef.walletAddressLNURL,
-              let qrImage = QRCodeGenerator().generateUnstyledQRCode(data: Data(lnurl.utf8)) else { return }
-        let qrImageView = UIImageView(image: qrImage)
-        qrImageView.layer.magnificationFilter = .nearest
-        qrImageView.layer.minificationFilter = .nearest
-        container.insertSubview(qrImageView, at: 0)
-        qrImageView.autoPinEdgesToSuperviewEdges(with: UIEdgeInsets(top: 12, left: 12, bottom: 12, right: 12))
-        qrSpinner?.stopAnimating()
+
+        let qrString: String
+        if let lnurl = SUIEnvironment.shared.paymentsRef.walletAddressLNURL {
+            qrString = lnurl
+        } else if let address = SUIEnvironment.shared.paymentsRef.walletLightningAddress {
+            qrString = address
+        } else {
+            return
+        }
+
+        Task.detached(priority: .userInitiated) { [weak self] in
+            let qrImage = QRCodeGenerator().generateUnstyledQRCode(data: Data(qrString.utf8))
+            await MainActor.run { [weak self] in
+                guard let self, let container = self.qrContainerView else { return }
+                guard !container.subviews.contains(where: { $0 is UIImageView }) else { return }
+                guard let qrImage else { return }
+                let qrImageView = UIImageView(image: qrImage)
+                qrImageView.layer.magnificationFilter = .nearest
+                qrImageView.layer.minificationFilter = .nearest
+                container.insertSubview(qrImageView, at: 0)
+                qrImageView.autoPinEdgesToSuperviewEdges(with: UIEdgeInsets(top: 12, left: 12, bottom: 12, right: 12))
+                self.qrSpinner?.stopAnimating()
+            }
+        }
     }
 
     // MARK: - Address label
@@ -259,12 +273,10 @@ class PaymentsTransferInViewController: OWSViewController {
     }
 
     private func refreshWalletAddressUI() {
-        if let container = qrContainerView {
-            populateQRImage(in: container)
-        }
         if let label = addressLabel {
             applyAddress(to: label)
         }
+        startQRGeneration()
     }
 
     // MARK: - Buttons

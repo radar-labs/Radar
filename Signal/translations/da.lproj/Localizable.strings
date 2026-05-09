@@ -5990,6 +5990,16 @@ Send money securely.";
 
 
 /* Format for indicator of a payment amount converted to fiat currency with the freshness of the conversion rate. Embeds: {{ %1$@ the payment amount, %2$@ the freshness of the currency conversion rate }}. */
+
+/* Title for the Add Funds onboarding screen. */
+"PAYMENTS_ADD_FUNDS_INTRO_TITLE" = "Add Funds";
+
+/* Subtitle for the Add Funds onboarding screen explaining where to deposit from. */
+"PAYMENTS_ADD_FUNDS_INTRO_SUBTITLE" = "To start sending payments, deposit funds from your existing account or exchange";
+
+/* Button label to skip the Add Funds step during payments onboarding. */
+"PAYMENTS_ADD_FUNDS_INTRO_SKIP" = "Skip this step";
+
 "PAYMENTS_CURRENCY_CONVERSION_FRESHNESS_FORMAT" = "%1$@ ved %2$@";
 
 /* Indicator for unknown currency. */
@@ -6175,6 +6185,9 @@ Send money securely.";
 /* Format for the payments notification banner for multiple payment notifications. Embeds: {{ the number of unread payment notifications }}. */
 "PAYMENTS_NOTIFICATION_BANNER_N_FORMAT" = "%1$@ nye betalingsnotifikationer";
 
+/* Badge label shown on failed payment bubbles in chat */
+"PAYMENTS_PAYMENT_STATUS_FAILED" = "Failed";
+
 /* Payment status context with contact name, failed. Embeds {{ Name of receiving contact }} */
 "PAYMENTS_PAYMENT_STATUS_IN_CHAT_PAYMENT_TO" = "Betaling til %1$@";
 
@@ -6216,6 +6229,13 @@ Send money securely.";
 
 /* Status indicator for payments which had an unknown failure. */
 "PAYMENTS_PAYMENT_STATUS_LONG_UNKNOWN" = "Ukendt fejl";
+
+/* Badge label shown on received payment bubbles in chat */
+"PAYMENTS_PAYMENT_STATUS_RECEIVED" = "Received";
+
+/* Badge label shown on sent payment bubbles in chat */
+"PAYMENTS_PAYMENT_STATUS_SENT" = "Sent";
+
 
 /* Status indicator for incoming payments which are complete. */
 "PAYMENTS_PAYMENT_STATUS_SHORT_INCOMING_COMPLETE" = "Udført";

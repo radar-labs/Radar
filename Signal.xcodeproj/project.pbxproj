@@ -372,6 +372,7 @@
 		3497972025DAA86100E99FA4 /* SendPaymentCompletionActionSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3497971E25DAA86100E99FA4 /* SendPaymentCompletionActionSheet.swift */; };
 		3497972125DAA86100E99FA4 /* SendPaymentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3497971F25DAA86100E99FA4 /* SendPaymentViewController.swift */; };
 		3497972325DAAE3800E99FA4 /* SendPaymentHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3497972225DAAE3800E99FA4 /* SendPaymentHelper.swift */; };
+		73D54F1EEDB6434C84EB3836 /* SendPaymentConfirmViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9975272EAA7F437F89CA9640 /* SendPaymentConfirmViewController.swift */; };
 		3498AC902518E92B00B1F315 /* PaymentsHistoryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3498AC8D2518E92B00B1F315 /* PaymentsHistoryViewController.swift */; };
 		3498AC912518E92B00B1F315 /* PaymentsHistory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3498AC8E2518E92B00B1F315 /* PaymentsHistory.swift */; };
 		3498AC922518E92B00B1F315 /* PaymentsSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3498AC8F2518E92B00B1F315 /* PaymentsSettingsViewController.swift */; };
@@ -3735,6 +3736,7 @@
 		50B791A8EDFA4671AFAD36BE /* PaymentsOnboardingCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F135D5191FF94FC0BD3F3299 /* PaymentsOnboardingCoordinator.swift */; };
 		032C396BAEA543FCA2F3BB20 /* DepositReceivedViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5407D257F32C412E9BAB122E /* DepositReceivedViewController.swift */; };
 		9C2CAFD9CEC74385B52C69F7 /* PaymentsIntroViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EADF791953F47E3A11ADDAD /* PaymentsIntroViewController.swift */; };
+		A1B2C3D4E5F64789AB0CD1E2 /* AddFundsIntroViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2C3D4E5F6074891AB1CD2E3 /* AddFundsIntroViewController.swift */; };
 		EE280878E9B84126A2323B7F /* UsernameOnboardingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 024E508025DF40279AC11A20 /* UsernameOnboardingViewController.swift */; };
 /* End PBXBuildFile section */
 
@@ -4185,6 +4187,7 @@
 		3497971E25DAA86100E99FA4 /* SendPaymentCompletionActionSheet.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SendPaymentCompletionActionSheet.swift; sourceTree = "<group>"; };
 		3497971F25DAA86100E99FA4 /* SendPaymentViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SendPaymentViewController.swift; sourceTree = "<group>"; };
 		3497972225DAAE3800E99FA4 /* SendPaymentHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SendPaymentHelper.swift; sourceTree = "<group>"; };
+		9975272EAA7F437F89CA9640 /* SendPaymentConfirmViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SendPaymentConfirmViewController.swift; sourceTree = "<group>"; };
 		3498A0A524DC81E100CA492C /* OWSContactsManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OWSContactsManager.swift; sourceTree = "<group>"; };
 		3498AC8D2518E92B00B1F315 /* PaymentsHistoryViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PaymentsHistoryViewController.swift; sourceTree = "<group>"; };
 		3498AC8E2518E92B00B1F315 /* PaymentsHistory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PaymentsHistory.swift; sourceTree = "<group>"; };
@@ -7767,6 +7770,7 @@
 		F135D5191FF94FC0BD3F3299 /* PaymentsOnboardingCoordinator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PaymentsOnboardingCoordinator.swift; sourceTree = "<group>"; };
 		5407D257F32C412E9BAB122E /* DepositReceivedViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DepositReceivedViewController.swift; sourceTree = "<group>"; };
 		0EADF791953F47E3A11ADDAD /* PaymentsIntroViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PaymentsIntroViewController.swift; sourceTree = "<group>"; };
+		B2C3D4E5F6074891AB1CD2E3 /* AddFundsIntroViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddFundsIntroViewController.swift; sourceTree = "<group>"; };
 		024E508025DF40279AC11A20 /* UsernameOnboardingViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UsernameOnboardingViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -8336,9 +8340,11 @@
 			isa = PBXGroup;
 			children = (
 				3497971E25DAA86100E99FA4 /* SendPaymentCompletionActionSheet.swift */,
+				9975272EAA7F437F89CA9640 /* SendPaymentConfirmViewController.swift */,
 				F135D5191FF94FC0BD3F3299 /* PaymentsOnboardingCoordinator.swift */,
 				5407D257F32C412E9BAB122E /* DepositReceivedViewController.swift */,
 				0EADF791953F47E3A11ADDAD /* PaymentsIntroViewController.swift */,
+				B2C3D4E5F6074891AB1CD2E3 /* AddFundsIntroViewController.swift */,
 				3497972225DAAE3800E99FA4 /* SendPaymentHelper.swift */,
 				34EEECF125E846EC00574F0D /* SendPaymentMemoViewController.swift */,
 				3497971F25DAA86100E99FA4 /* SendPaymentViewController.swift */,
@@ -17396,6 +17402,7 @@
 				50B791A8EDFA4671AFAD36BE /* PaymentsOnboardingCoordinator.swift in Sources */,
 				032C396BAEA543FCA2F3BB20 /* DepositReceivedViewController.swift in Sources */,
 				9C2CAFD9CEC74385B52C69F7 /* PaymentsIntroViewController.swift in Sources */,
+				A1B2C3D4E5F64789AB0CD1E2 /* AddFundsIntroViewController.swift in Sources */,
 				EE280878E9B84126A2323B7F /* UsernameOnboardingViewController.swift in Sources */,
 				8D7D4A065BD540F9964C22D2 /* RadarUsernameViewController.swift in Sources */,
 				3406D32225DD40F000885B14 /* PaymentsTransferOutViewController.swift in Sources */,
@@ -17518,6 +17525,7 @@
 				4C4AE6A1224AF35700D4AF6F /* SendMediaNavigationController.swift in Sources */,
 				346EAA1225013CDF00E8AB6F /* SendMessageFlow.swift in Sources */,
 				3497972025DAA86100E99FA4 /* SendPaymentCompletionActionSheet.swift in Sources */,
+				73D54F1EEDB6434C84EB3836 /* SendPaymentConfirmViewController.swift in Sources */,
 				3497972325DAAE3800E99FA4 /* SendPaymentHelper.swift in Sources */,
 				34EEECF225E846ED00574F0D /* SendPaymentMemoViewController.swift in Sources */,
 				3497972125DAA86100E99FA4 /* SendPaymentViewController.swift in Sources */,
