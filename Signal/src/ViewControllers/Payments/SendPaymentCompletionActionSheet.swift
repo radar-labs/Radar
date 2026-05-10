@@ -63,14 +63,26 @@ public class SendPaymentCompletionActionSheet: ActionSheetController {
 
     private var currentCurrencyConversion: CurrencyConversionInfo? { helper?.currentCurrencyConversion }
 
-    public init(mode: Mode, delegate: SendPaymentCompletionDelegate) {
+    private let initialPreparedTask: Task<PreparedPayment, any Error>?
+    private let startAtProgressStep: Bool
+
+    public init(
+        mode: Mode,
+        delegate: SendPaymentCompletionDelegate,
+        preparedTask: Task<PreparedPayment, any Error>? = nil,
+        startAtProgressStep: Bool = false
+    ) {
         self.mode = mode
         self.delegate = delegate
+        self.initialPreparedTask = preparedTask
+        self.startAtProgressStep = startAtProgressStep
 
         // TODO: Add support for requests.
         switch mode {
         case .payment(let paymentInfo):
-            currentStep = .confirmPay(paymentInfo: paymentInfo)
+            currentStep = startAtProgressStep
+                ? .progressPay(paymentInfo: paymentInfo)
+                : .confirmPay(paymentInfo: paymentInfo)
         }
 
         super.init()
@@ -89,13 +101,15 @@ public class SendPaymentCompletionActionSheet: ActionSheetController {
 
         createSubviews()
 
-        // Try to optimistically prepare a payment before
-        // user approves it to reduce perceived latency
-        // when sending outgoing payments.
-        if let paymentInfo = mode.paymentInfo {
-            tryToPreparePayment(paymentInfo: paymentInfo)
-        } else {
+        guard let paymentInfo = mode.paymentInfo else {
             owsFailDebug("Missing paymentInfo.")
+            return
+        }
+
+        if let existingTask = initialPreparedTask {
+            preparedPaymentTask.set(existingTask)
+        } else {
+            tryToPreparePayment(paymentInfo: paymentInfo)
         }
     }
 
@@ -111,6 +125,10 @@ public class SendPaymentCompletionActionSheet: ActionSheetController {
         // For now, the design only allows for portrait layout on non-iPads
         if !UIDevice.current.isIPad && view.window?.windowScene?.interfaceOrientation != .portrait {
             UIDevice.current.ows_setOrientation(.portrait)
+        }
+
+        if startAtProgressStep, case .progressPay(let paymentInfo) = currentStep {
+            tryToSendPayment(paymentInfo: paymentInfo)
         }
     }
 

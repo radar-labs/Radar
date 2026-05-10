@@ -963,7 +963,6 @@ public class SendPaymentViewController: OWSViewController {
     }
 
     // MARK: -
-    private var actionSheet: SendPaymentCompletionActionSheet?
 
     @objc
     private func didTapPayButton(_ sender: UIButton) {
@@ -1113,10 +1112,8 @@ public class SendPaymentViewController: OWSViewController {
             memoMessage: memoMessage,
             isOutgoingTransfer: isOutgoingTransfer
         )
-        let actionSheet = SendPaymentCompletionActionSheet(mode: .payment(paymentInfo: paymentInfo),
-                                                           delegate: self)
-        self.actionSheet = actionSheet
-        actionSheet.present(fromViewController: self)
+        let confirmVC = SendPaymentConfirmViewController(paymentInfo: paymentInfo, completionDelegate: self)
+        navigationController?.pushViewController(confirmVC, animated: true)
     }
 
     private static func showEnablePaymentsActionSheet() {
