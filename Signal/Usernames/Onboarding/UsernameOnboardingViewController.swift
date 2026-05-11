@@ -30,6 +30,7 @@ class UsernameOnboardingViewController: HostingController<UsernameOnboardingView
 class UsernameOnboardingViewModel: ObservableObject {
     struct Context {
         let localUsernameManager: LocalUsernameManager
+        let existingUsername: Usernames.ParsedUsername?
     }
 
     enum State: Equatable {
@@ -49,6 +50,7 @@ class UsernameOnboardingViewModel: ObservableObject {
     @Published private(set) var nickname: String = ""
     @Published private(set) var discriminatorInput: String = String(format: "%02d", Int.random(in: 0...99))
     @Published private(set) var state: State = .empty
+    @Published private(set) var isDisplayingExistingUsername: Bool
 
     private let context: Context
     private let onConfirm: () -> Void
@@ -59,11 +61,27 @@ class UsernameOnboardingViewModel: ObservableObject {
     init(context: Context, onConfirm: @escaping () -> Void) {
         self.context = context
         self.onConfirm = onConfirm
+        self.isDisplayingExistingUsername = context.existingUsername != nil
     }
+
+    var existingUsername: Usernames.ParsedUsername? { context.existingUsername }
 
     var confirmedUsername: Usernames.HashedUsername? {
         if case .available(_, let hashed) = state { return hashed }
         return nil
+    }
+
+    func proceedWithExistingUsername() {
+        onConfirm()
+    }
+
+    func editUsername() {
+        isDisplayingExistingUsername = false
+        guard let existing = context.existingUsername else { return }
+        nickname = existing.nickname
+        discriminatorInput = existing.discriminator
+        state = .checking
+        triggerReservation(nickname: existing.nickname, discriminator: existing.discriminator)
     }
 
     func confirmUsername() async {
@@ -197,46 +215,85 @@ struct UsernameOnboardingView: View {
 
                 Spacer().frame(height: 12)
 
-                Text(OWSLocalizedString(
-                    "USERNAME_ONBOARDING_SUBTITLE",
-                    comment: "Subtitle for the username setup screen during onboarding, explaining what usernames are used for on Radar and Signal."
-                ))
-                .font(.body)
-                .foregroundStyle(Color.Signal.secondaryLabel)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, 32)
+                if viewModel.isDisplayingExistingUsername, let existing = viewModel.existingUsername {
+                    Text(OWSLocalizedString(
+                        "USERNAME_ONBOARDING_EXISTING_SUBTITLE",
+                        comment: "Subtitle shown on the username screen during onboarding when the user already has a username."
+                    ))
+                    .font(.body)
+                    .foregroundStyle(Color.Signal.secondaryLabel)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 32)
 
-                Spacer().frame(height: 32)
-                textFieldsRow
-                Spacer().frame(height: 10)
-                statusView
+                    Spacer().frame(height: 32)
+                    existingUsernameRow(username: existing)
+                } else {
+                    Text(OWSLocalizedString(
+                        "USERNAME_ONBOARDING_SUBTITLE",
+                        comment: "Subtitle for the username setup screen during onboarding, explaining what usernames are used for on Radar and Signal."
+                    ))
+                    .font(.body)
+                    .foregroundStyle(Color.Signal.secondaryLabel)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 32)
+
+                    Spacer().frame(height: 32)
+                    textFieldsRow
+                    Spacer().frame(height: 10)
+                    statusView
+                }
+
                 Spacer().frame(height: 16)
             }
         } pinnedFooter: {
-            Button {
-                Task { await viewModel.confirmUsername() }
-            } label: {
-                Text(OWSLocalizedString(
-                    "USERNAME_ONBOARDING_CONFIRM_BUTTON",
-                    comment: "Button label to confirm the chosen username on the username setup screen during onboarding."
-                ))
-            }
-            .buttonStyle(Registration.UI.LargePrimaryButtonStyle())
-            .disabled(viewModel.confirmedUsername == nil)
-            .padding(.horizontal, 40)
+            if viewModel.isDisplayingExistingUsername {
+                Button(action: viewModel.proceedWithExistingUsername) {
+                    Text(CommonStrings.continueButton)
+                }
+                .buttonStyle(Registration.UI.LargePrimaryButtonStyle())
+                .padding(.horizontal, 40)
 
-            Spacer().frame(height: 16)
+                Spacer().frame(height: 16)
 
-            Button(action: onSkip) {
-                Text(CommonStrings.skipButton)
+                Button(action: viewModel.editUsername) {
+                    Text(OWSLocalizedString(
+                        "USERNAME_ONBOARDING_EDIT_BUTTON",
+                        comment: "Button label to edit the username on the existing username screen during onboarding."
+                    ))
                     .font(.headline)
                     .foregroundStyle(Color.Signal.accent)
+                }
+                .padding(.horizontal, 40)
+            } else {
+                Button {
+                    Task { await viewModel.confirmUsername() }
+                } label: {
+                    Text(OWSLocalizedString(
+                        "USERNAME_ONBOARDING_CONFIRM_BUTTON",
+                        comment: "Button label to confirm the chosen username on the username setup screen during onboarding."
+                    ))
+                }
+                .buttonStyle(Registration.UI.LargePrimaryButtonStyle())
+                .disabled(viewModel.confirmedUsername == nil)
+                .padding(.horizontal, 40)
+
+                Spacer().frame(height: 16)
+
+                Button(action: onSkip) {
+                    Text(CommonStrings.skipButton)
+                        .font(.headline)
+                        .foregroundStyle(Color.Signal.accent)
+                }
+                .padding(.horizontal, 40)
             }
-            .padding(.horizontal, 40)
 
             Spacer().frame(height: 8)
         }
-        .onAppear { nicknameFocused = true }
+        .onAppear {
+            if !viewModel.isDisplayingExistingUsername {
+                nicknameFocused = true
+            }
+        }
     }
 
     // MARK: Illustration
@@ -246,6 +303,31 @@ struct UsernameOnboardingView: View {
             .resizable()
             .scaledToFit()
             .frame(width: 120, height: 120)
+    }
+
+    // MARK: Existing Username Display
+
+    private func existingUsernameRow(username: Usernames.ParsedUsername) -> some View {
+        HStack(spacing: 0) {
+            Text(username.nickname)
+                .font(.system(size: 17, weight: .medium))
+                .foregroundStyle(Color.Signal.label)
+                .frame(maxWidth: .infinity, minHeight: 52)
+                .padding(.horizontal, 16)
+
+            Rectangle()
+                .frame(width: 1, height: 52)
+                .foregroundStyle(Color.black.opacity(0.1))
+
+            Text(username.discriminator)
+                .font(.system(size: 17, weight: .medium))
+                .foregroundStyle(Color.Signal.label)
+                .frame(width: 64, height: 52)
+                .multilineTextAlignment(.center)
+        }
+        .background(Color.Signal.secondaryFill)
+        .clipShape(Capsule())
+        .padding(.horizontal, 20)
     }
 
     // MARK: Text Fields
@@ -396,10 +478,21 @@ struct UsernameOnboardingView: View {
 #if DEBUG
 
 @available(iOS 17, *)
-#Preview {
+#Preview("New user") {
     UsernameOnboardingView(
         viewModel: UsernameOnboardingViewModel(context: .init(
-            localUsernameManager: DependenciesBridge.shared.localUsernameManager
+            localUsernameManager: DependenciesBridge.shared.localUsernameManager,
+            existingUsername: nil
+        ), onConfirm: {}),
+        onSkip: {}
+    )
+}
+
+#Preview("Existing username") {
+    UsernameOnboardingView(
+        viewModel: UsernameOnboardingViewModel(context: .init(
+            localUsernameManager: DependenciesBridge.shared.localUsernameManager,
+            existingUsername: Usernames.ParsedUsername(rawUsername: "myname.67")
         ), onConfirm: {}),
         onSkip: {}
     )
