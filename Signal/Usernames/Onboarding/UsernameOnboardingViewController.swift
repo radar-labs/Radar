@@ -12,13 +12,12 @@ import SwiftUI
 class UsernameOnboardingViewController: HostingController<UsernameOnboardingView> {
     init(
         context: UsernameOnboardingViewModel.Context,
-        onConfirm: @escaping (Usernames.HashedUsername) -> Void,
+        onConfirm: @escaping () -> Void,
         onSkip: @escaping () -> Void
     ) {
-        let viewModel = UsernameOnboardingViewModel(context: context)
+        let viewModel = UsernameOnboardingViewModel(context: context, onConfirm: onConfirm)
         super.init(wrappedView: UsernameOnboardingView(
             viewModel: viewModel,
-            onConfirm: onConfirm,
             onSkip: onSkip
         ))
         OWSTableViewController2.removeBackButtonText(viewController: self)
@@ -44,6 +43,7 @@ class UsernameOnboardingViewModel: ObservableObject {
         case rateLimited
         case networkError
         case unknownError
+        case confirming
     }
 
     @Published private(set) var nickname: String = ""
@@ -51,17 +51,40 @@ class UsernameOnboardingViewModel: ObservableObject {
     @Published private(set) var state: State = .empty
 
     private let context: Context
+    private let onConfirm: () -> Void
     private var reservationTask: Task<Void, Never>?
     private let minNicknameLength: UInt32 = RemoteConfig.current.minNicknameLength
     private let maxNicknameLength: UInt32 = RemoteConfig.current.maxNicknameLength
 
-    init(context: Context) {
+    init(context: Context, onConfirm: @escaping () -> Void) {
         self.context = context
+        self.onConfirm = onConfirm
     }
 
     var confirmedUsername: Usernames.HashedUsername? {
         if case .available(_, let hashed) = state { return hashed }
         return nil
+    }
+
+    func confirmUsername() async {
+        guard case .available(_, let hashedUsername) = state else { return }
+        reservationTask?.cancel()
+        state = .confirming
+
+        let result = await context.localUsernameManager.confirmUsername(reservedUsername: hashedUsername)
+
+        switch result {
+        case .success(.success):
+            onConfirm()
+        case .success(.rejected):
+            state = .unavailable
+        case .success(.rateLimited):
+            state = .rateLimited
+        case .failure(.networkError):
+            state = .networkError
+        case .failure(.otherError):
+            state = .unknownError
+        }
     }
 
     func nicknameDidChange(_ newNickname: String) {
@@ -84,13 +107,19 @@ class UsernameOnboardingViewModel: ObservableObject {
 
         guard !nickname.isEmpty else { return }
         reservationTask?.cancel()
+
+        guard !filtered.isEmpty else {
+            state = .empty
+            return
+        }
+
         state = .checking
         triggerReservation(nickname: nickname, discriminator: filtered)
     }
 
     private func triggerReservation(nickname: String, discriminator: String) {
         let task = Task { [weak self] in
-            try? await Task.sleep(nanoseconds: 500_000_000)
+            try? await Task.sleep(nanoseconds: 1_000_000_000)
             guard !Task.isCancelled, let self else { return }
             await self.attemptReservation(forNickname: nickname, desiredDiscriminator: discriminator)
         }
@@ -122,16 +151,6 @@ class UsernameOnboardingViewModel: ObservableObject {
             return
         }
 
-#if DEBUG
-        if let hash = candidates.candidateHashes.first,
-           let hashedUsername = candidates.candidate(matchingHash: hash),
-           let parsedUsername = Usernames.ParsedUsername(rawUsername: hashedUsername.usernameString) {
-            discriminatorInput = parsedUsername.discriminator
-            state = .available(username: parsedUsername, hashedUsername: hashedUsername)
-            return
-        }
-#endif
-
         let result = await context.localUsernameManager.reserveUsername(usernameCandidates: candidates)
         guard !Task.isCancelled else { return }
 
@@ -155,7 +174,6 @@ class UsernameOnboardingViewModel: ObservableObject {
 
 struct UsernameOnboardingView: View {
     @ObservedObject var viewModel: UsernameOnboardingViewModel
-    let onConfirm: (Usernames.HashedUsername) -> Void
     let onSkip: () -> Void
 
     @FocusState private var nicknameFocused: Bool
@@ -196,8 +214,7 @@ struct UsernameOnboardingView: View {
             }
         } pinnedFooter: {
             Button {
-                guard let hashedUsername = viewModel.confirmedUsername else { return }
-                onConfirm(hashedUsername)
+                Task { await viewModel.confirmUsername() }
             } label: {
                 Text(OWSLocalizedString(
                     "USERNAME_ONBOARDING_CONFIRM_BUTTON",
@@ -265,23 +282,18 @@ struct UsernameOnboardingView: View {
         ZStack {
             Color.Signal.secondaryFill
 
-            if case .checking = viewModel.state {
-                ProgressView()
-                    .progressViewStyle(.circular)
-            } else {
-                TextField("00", text: Binding(
-                    get: { viewModel.discriminatorInput },
-                    set: { newValue in
-                        let filtered = String(newValue.filter { $0.isNumber }.prefix(2))
-                        viewModel.discriminatorDidChange(filtered)
-                    }
-                ))
-                .focused($discriminatorFocused)
-                .keyboardType(.numberPad)
-                .multilineTextAlignment(.center)
-                .font(.system(size: 17, weight: .medium))
-                .foregroundStyle(Color.Signal.label)
-            }
+            TextField("00", text: Binding(
+                get: { viewModel.discriminatorInput },
+                set: { newValue in
+                    let filtered = String(newValue.filter { $0.isNumber }.prefix(2))
+                    viewModel.discriminatorDidChange(filtered)
+                }
+            ))
+            .focused($discriminatorFocused)
+            .keyboardType(.numberPad)
+            .multilineTextAlignment(.center)
+            .font(.system(size: 17, weight: .medium))
+            .foregroundStyle(Color.Signal.label)
         }
         .frame(width: 64, height: 52)
         .clipShape(Capsule())
@@ -366,7 +378,11 @@ struct UsernameOnboardingView: View {
                     .foregroundStyle(Color.Signal.red)
                     .font(.subheadline)
 
-            case .empty, .checking:
+            case .checking, .confirming:
+                ProgressView()
+                    .progressViewStyle(.circular)
+
+            case .empty:
                 EmptyView()
             }
         }
@@ -384,8 +400,7 @@ struct UsernameOnboardingView: View {
     UsernameOnboardingView(
         viewModel: UsernameOnboardingViewModel(context: .init(
             localUsernameManager: DependenciesBridge.shared.localUsernameManager
-        )),
-        onConfirm: { _ in },
+        ), onConfirm: {}),
         onSkip: {}
     )
 }

@@ -22,7 +22,7 @@ class PaymentsOnboardingCoordinator {
         )
         return UsernameOnboardingViewController(
             context: context,
-            onConfirm: { [self] _ in showIntro() },
+            onConfirm: { [self] in showIntro() },
             onSkip: { [self] in showIntro() }
         )
     }
