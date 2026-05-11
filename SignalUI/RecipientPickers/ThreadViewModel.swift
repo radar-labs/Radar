@@ -238,6 +238,11 @@ public class ChatListInfo {
             return .draft(draftText: draftText)
         } else if hasVoiceMemoDraft() {
             return .voiceMemoDraft
+        } else if let lastMsg = lastMessageForInbox,
+                  (lastMsg is OWSPaymentMessage || lastMsg is OWSArchivedPaymentMessage) {
+            let isIncoming = lastMsg is TSIncomingMessage
+            let amountText = buildPaymentAmountText(for: lastMsg, transaction: transaction)
+            return .paymentSnippet(amountText: amountText, isIncoming: isIncoming)
         } else if let lastMessageText = loadLastMessageText()?.nilIfEmpty {
             if let senderName = loadLastMessageSenderName()?.nilIfEmpty {
                 return .groupSnippet(lastMessageText: lastMessageText, senderName: senderName)
@@ -248,6 +253,26 @@ public class ChatListInfo {
             return .none
         }
     }
+
+    private static func buildPaymentAmountText(for message: TSInteraction, transaction: DBReadTransaction) -> String {
+        let unit = PaymentsDisplayPreferences.shared.isSatoshiEnabled ? "sats" : "BTC"
+        if PaymentsDisplayPreferences.shared.isBalanceHidden {
+            return PaymentsFormat.hiddenBalanceString
+        }
+        if let paymentMsg = message as? OWSPaymentMessage,
+           let receiptData = paymentMsg.paymentNotification?.mcReceiptData,
+           let paymentModel = PaymentFinder.paymentModels(forMcReceiptData: receiptData, transaction: transaction).first,
+           let amount = paymentModel.paymentAmount {
+            let number: String = PaymentsDisplayPreferences.shared.isSatoshiEnabled
+                ? "\(amount.picoMob)"
+                : (PaymentsFormat.format(picoMob: amount.picoMob, isShortForm: true) ?? "\(amount.picoMob)")
+            return "\(number) \(unit)"
+        } else if let archivedMsg = message as? OWSArchivedPaymentMessage,
+                  let rawAmount = archivedMsg.archivedPaymentInfo.amount {
+            return "\(rawAmount) \(unit)"
+        }
+        return ""
+    }
 }
 
 // MARK: -
@@ -257,6 +282,7 @@ public enum CLVSnippet {
     case pendingMessageRequest(addedToGroupByName: String?)
     case draft(draftText: HydratedMessageBody)
     case voiceMemoDraft
+    case paymentSnippet(amountText: String, isIncoming: Bool)
     case contactSnippet(lastMessageText: HydratedMessageBody)
     case groupSnippet(lastMessageText: HydratedMessageBody, senderName: String)
     case none

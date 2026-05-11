@@ -21,6 +21,11 @@ class ChatListCell: UITableViewCell, ReusableTableViewCell {
     private let unreadBadge = NeverClearView(name: "unreadBadge")
     private let unreadLabel = CVLabel()
 
+    private let paymentPillView = UIView()
+    private let paymentPillStack = UIStackView()
+    private let paymentPillIconView = UIImageView()
+    private let paymentPillLabel = UILabel()
+
     private let outerHStack = ManualStackViewWithLayer(name: "outerHStack")
     private let avatarStack = ManualStackView(name: "avatarStack")
     private let vStack = ManualStackView(name: "vStack")
@@ -187,8 +192,43 @@ class ChatListCell: UITableViewCell, ReusableTableViewCell {
             outerHStack.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
         ])
 
+        setupPaymentPillView()
+
         selectionStyle = .default
         automaticallyUpdatesBackgroundConfiguration = false
+    }
+
+    private func setupPaymentPillView() {
+        paymentPillView.layer.cornerRadius = 12
+        paymentPillView.clipsToBounds = true
+        paymentPillView.isHidden = true
+
+        paymentPillLabel.font = .systemFont(ofSize: 12)
+        paymentPillLabel.numberOfLines = 1
+
+        paymentPillIconView.contentMode = .scaleAspectFit
+        paymentPillIconView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            paymentPillIconView.widthAnchor.constraint(equalToConstant: 16),
+            paymentPillIconView.heightAnchor.constraint(equalToConstant: 16),
+        ])
+
+        paymentPillStack.axis = .horizontal
+        paymentPillStack.spacing = 4
+        paymentPillStack.alignment = .center
+        paymentPillStack.isLayoutMarginsRelativeArrangement = true
+        paymentPillStack.layoutMargins = UIEdgeInsets(top: 4, left: 8, bottom: 4, right: 8)
+        paymentPillStack.addArrangedSubview(paymentPillIconView)
+        paymentPillStack.addArrangedSubview(paymentPillLabel)
+
+        paymentPillView.addSubview(paymentPillStack)
+        paymentPillStack.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            paymentPillStack.topAnchor.constraint(equalTo: paymentPillView.topAnchor),
+            paymentPillStack.leadingAnchor.constraint(equalTo: paymentPillView.leadingAnchor),
+            paymentPillStack.trailingAnchor.constraint(equalTo: paymentPillView.trailingAnchor),
+            paymentPillStack.bottomAnchor.constraint(equalTo: paymentPillView.bottomAnchor),
+        ])
     }
 
     override func updateConfiguration(using state: UICellConfigurationState) {
@@ -226,6 +266,7 @@ class ChatListCell: UITableViewCell, ReusableTableViewCell {
             shouldShowMuteIndicator: Self.shouldShowMuteIndicator(configuration: configuration),
             hasOverrideSnippet: configuration.hasOverrideSnippet,
             messageStatusToken: Self.buildMessageStatusToken(configuration: configuration),
+            paymentPillConfig: Self.buildPaymentPillConfig(configuration: configuration),
             unreadIndicatorLabelConfig: Self.buildUnreadIndicatorLabelConfig(configuration: configuration),
             topRowStackConfig: Self.topRowStackConfig,
             bottomRowStackConfig: Self.bottomRowStackConfig,
@@ -236,6 +277,14 @@ class ChatListCell: UITableViewCell, ReusableTableViewCell {
             nameLabelConfig: Self.nameLabelConfig(configuration: configuration),
             dateTimeLabelConfig: Self.dateTimeLabelConfig(configuration: configuration)
         )
+    }
+
+    private static func buildPaymentPillConfig(configuration: Configuration) -> CLVPaymentPillConfig? {
+        guard !configuration.hasOverrideSnippet else { return nil }
+        guard case .paymentSnippet(let amountText, let isIncoming) = configuration.threadViewModel.chatListInfo?.snippet else {
+            return nil
+        }
+        return CLVPaymentPillConfig(amountText: amountText, isIncoming: isIncoming)
     }
 
     private static func buildContentMeasurements(for configuration: CLVCellContentConfiguration) -> CLVCellContentMeasurements {
@@ -467,6 +516,32 @@ class ChatListCell: UITableViewCell, ReusableTableViewCell {
                 height: typingIndicatorSize.height
             )
         }
+
+        if let pillConfig = configuration.paymentPillConfig {
+            let arrowSymbol = pillConfig.isIncoming ? "arrow.down.left" : "arrow.up.right"
+            paymentPillIconView.image = UIImage(systemName: arrowSymbol)?
+                .withConfiguration(UIImage.SymbolConfiguration(pointSize: 10, weight: .medium))
+            paymentPillIconView.tintColor = ChatListCell.snippetColor
+            paymentPillLabel.text = pillConfig.amountText
+            paymentPillLabel.textColor = ChatListCell.snippetColor
+            paymentPillView.backgroundColor = UIColor { traits in
+                traits.userInterfaceStyle == .dark
+                    ? UIColor.white.withAlphaComponent(0.1)
+                    : UIColor.black.withAlphaComponent(0.1)
+            }
+        }
+
+        bottomRowWrapper.addSubview(paymentPillView) { [weak self] _ in
+            guard let self = self else { return }
+            let pillSize = self.paymentPillView.systemLayoutSizeFitting(
+                UIView.layoutFittingCompressedSize,
+                withHorizontalFittingPriority: .fittingSizeLevel,
+                verticalFittingPriority: .fittingSizeLevel
+            )
+            let yOffset = max(0, (snippetLineHeight - pillSize.height) * 0.5)
+            self.paymentPillView.frame = CGRect(origin: CGPoint(x: 0, y: yOffset), size: pillSize)
+        }
+
         updateTypingIndicatorState()
 
         var bottomRowStackSubviews: [UIView] = [ bottomRowWrapper ]
@@ -833,6 +908,8 @@ class ChatListCell: UITableViewCell, ReusableTableViewCell {
                 ]
             )
             return .attributedText(snippetText)
+        case .paymentSnippet:
+            return .text("")
         case .contactSnippet(let lastMessageText):
             return .messageBody(lastMessageText)
         case .groupSnippet(let lastMessageText, let senderName):
@@ -938,6 +1015,10 @@ class ChatListCell: UITableViewCell, ReusableTableViewCell {
         typingIndicatorView.resetForReuse()
         spoilerConfigBuilder.text = nil
 
+        paymentPillLabel.text = nil
+        paymentPillIconView.image = nil
+        paymentPillView.isHidden = true
+
         NotificationCenter.default.removeObserver(self)
     }
 
@@ -984,6 +1065,10 @@ class ChatListCell: UITableViewCell, ReusableTableViewCell {
         return true
     }
 
+    private var isPaymentSnippet: Bool {
+        cellContentToken?.configuration.paymentPillConfig != nil
+    }
+
     private func updateTypingIndicatorState() {
         AssertIsOnMainThread()
 
@@ -993,10 +1078,17 @@ class ChatListCell: UITableViewCell, ReusableTableViewCell {
         // We don't want to show typing indicators in that case.
         if shouldShowTypingIndicators {
             snippetLabel.isHidden = true
+            paymentPillView.isHidden = true
             typingIndicatorView.isHidden = false
             typingIndicatorView.startAnimation()
+        } else if isPaymentSnippet {
+            snippetLabel.isHidden = true
+            paymentPillView.isHidden = false
+            typingIndicatorView.isHidden = true
+            typingIndicatorView.stopAnimation()
         } else {
             snippetLabel.isHidden = false
+            paymentPillView.isHidden = true
             typingIndicatorView.isHidden = true
             typingIndicatorView.stopAnimation()
         }
@@ -1019,6 +1111,11 @@ private struct CLVMessageStatusToken {
 
 // MARK: -
 
+private struct CLVPaymentPillConfig {
+    let amountText: String
+    let isIncoming: Bool
+}
+
 private struct CLVCellContentConfiguration {
     let thread: TSThread
     let lastReloadDate: Date?
@@ -1028,6 +1125,7 @@ private struct CLVCellContentConfiguration {
     let shouldShowMuteIndicator: Bool
     let hasOverrideSnippet: Bool
     let messageStatusToken: CLVMessageStatusToken?
+    let paymentPillConfig: CLVPaymentPillConfig?
 
     let unreadIndicatorLabelConfig: CVLabelConfig?
     let topRowStackConfig: ManualStackView.Config

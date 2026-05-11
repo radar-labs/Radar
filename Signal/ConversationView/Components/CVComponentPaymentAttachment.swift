@@ -21,6 +21,7 @@ public class CVComponentPaymentAttachment: CVComponentBase, CVComponent {
     private let paymentAmount: UInt64?
     private let contactName: String
     private let messageStatus: MessageReceiptStatus
+    private let footerState: CVComponentFooter.State?
 
     init(
         itemModel: CVItemModel,
@@ -28,27 +29,83 @@ public class CVComponentPaymentAttachment: CVComponentBase, CVComponent {
         paymentModel: TSPaymentModel?,
         contactName: String,
         paymentAmount: UInt64?,
-        messageStatus: MessageReceiptStatus?
+        messageStatus: MessageReceiptStatus?,
+        footerState: CVComponentFooter.State?
     ) {
         self.paymentAttachment = paymentAttachment
         self.paymentModel = paymentModel
         self.contactName = contactName
         self.paymentAmount = paymentAmount
+        self.footerState = footerState
 
-        // If no messageStatus have different defaults for incoming vs outgoing
         switch (messageStatus, itemModel.interaction.interactionType) {
         case (nil, .incomingMessage):
-            // Use .sent as default for "incoming" so debug UI shows up correct
             self.messageStatus = .sent
         case (.some(let messageStatus), _):
             self.messageStatus = messageStatus
         default:
-            // Default to .failed for all other cases where `messageStatus == nil`
             self.messageStatus = .failed
         }
 
         super.init(itemModel: itemModel)
     }
+
+    // MARK: - Content helpers
+
+    private var noteText: String? {
+        paymentAttachment.notification.memoMessage?.nilIfEmpty
+    }
+
+    private var amountNumberText: String {
+        guard !PaymentsDisplayPreferences.shared.isBalanceHidden else {
+            return PaymentsFormat.hiddenBalanceString
+        }
+        guard let mob = paymentAmount else {
+            return OWSLocalizedString(
+                "PAYMENTS_INFO_UNAVAILABLE_MESSAGE",
+                comment: "Status indicator for invalid payments which could not be processed."
+            )
+        }
+        if PaymentsDisplayPreferences.shared.isSatoshiEnabled {
+            return "\(mob)"
+        }
+        return PaymentsFormat.format(picoMob: mob, isShortForm: false) ?? "\(mob)"
+    }
+
+    private var amountUnitText: String {
+        " " + (PaymentsDisplayPreferences.shared.isSatoshiEnabled ? "sats" : "BTC")
+    }
+
+    private var badgeText: String {
+        let paymentType = paymentModel?.paymentType
+        let interactionType = itemModel.interaction.interactionType
+        switch (paymentType, interactionType, messageStatus) {
+        case (_, _, .sending):
+            return OWSLocalizedString(
+                "PAYMENTS_PAYMENT_STATUS_IN_CHAT_PROCESSING",
+                comment: "Payment status context while sending"
+            )
+        case (_, .incomingMessage, _),
+            (.incomingPayment, _, _),
+            (.incomingUnidentified, _, _):
+            return OWSLocalizedString(
+                "PAYMENTS_PAYMENT_STATUS_RECEIVED",
+                comment: "Badge label shown on received payment bubbles in chat"
+            )
+        case (_, .outgoingMessage, .failed):
+            return OWSLocalizedString(
+                "PAYMENTS_PAYMENT_STATUS_FAILED",
+                comment: "Badge label shown on failed payment bubbles in chat"
+            )
+        default:
+            return OWSLocalizedString(
+                "PAYMENTS_PAYMENT_STATUS_SENT",
+                comment: "Badge label shown on sent payment bubbles in chat"
+            )
+        }
+    }
+
+    // MARK: - Build component view
 
     public func buildComponentView(componentDelegate: CVComponentDelegate) -> CVComponentView {
         CVComponentViewPaymentAttachment()
@@ -65,308 +122,348 @@ public class CVComponentPaymentAttachment: CVComponentBase, CVComponent {
             return
         }
 
-        let bigAmountLabel = componentView.bigAmountLabel
-        bigAmountLabelConfig.applyForRendering(label: bigAmountLabel)
-        bigAmountLabel.alpha = messageStatus.bigAmountLabelAlpha
-        bigAmountLabel.numberOfLines = messageStatus.bigAmountLabelNumberOfLines
+        let textColor = conversationStyle.bubbleTextColor(isIncoming: isIncoming)
+        let dimTextColor = textColor.withAlphaComponent(isIncoming ? 0.5 : 0.75)
+        let statusTextColor = conversationStyle.bubbleSecondaryTextColor(isIncoming: isIncoming)
+        let accentBgColor: UIColor = isIncoming
+            ? UIColor.black.withAlphaComponent(0.05)
+            : UIColor.white.withAlphaComponent(0.15)
 
-        let topLabel = componentView.topLabel
-        topLabelConfig.applyForRendering(label: topLabel)
+        // Badge pill
+        componentView.badgePillView.backgroundColor = accentBgColor
+        componentView.badgeLabel.text = badgeText
+        componentView.badgeLabel.textColor = textColor
+        let arrowSymbol = isIncoming ? "arrow.down.left" : "arrow.up.right"
+        componentView.badgeIconView.image = UIImage(systemName: arrowSymbol)?
+            .withConfiguration(UIImage.SymbolConfiguration(pointSize: 10, weight: .medium))
+        componentView.badgeIconView.tintColor = textColor
 
-        let hStackView = componentView.hStackView
-        hStackView.addBlurBackgroundExactlyOnce(isIncoming: isIncoming)
-
-        // Reset left space for status
-        componentView.leftSpace.removeAllSubviews()
-
-        let hInnerSubviews: [UIView]
-        switch messageStatus {
-        case .sending:
-            componentView.leftSpace.addSubview(self.createLoadingSpinner())
-            hInnerSubviews = [
-                componentView.leftSpace,
-                componentView.bigAmountLabel,
-                componentView.rightSpace
-            ]
-        case .failed:
-            componentView.leftSpace.addSubview(self.createFailureIcon())
-            hInnerSubviews = [
-                componentView.leftSpace,
-                componentView.bigAmountLabel
-            ]
-        default:
-            hInnerSubviews = [
-                componentView.leftSpace,
-                componentView.bigAmountLabel,
-                componentView.rightSpace
-            ]
+        // Badge order: received = [icon, label], sent = [label, icon]
+        componentView.badgePillStack.arrangedSubviews.forEach {
+            componentView.badgePillStack.removeArrangedSubview($0)
+            $0.removeFromSuperview()
         }
-
-        hStackView.configure(
-            config: hStackConfig,
-            cellMeasurement: cellMeasurement,
-            measurementKey: .measurementKey_hStack,
-            subviews: hInnerSubviews
-        )
-
-        let vStackView = componentView.vStackView
-
-        let vInnerSubviews: [UIView]
-        if paymentAttachment.notification.memoMessage != nil {
-            noteLabelConfig.applyForRendering(label: componentView.noteLabel)
-            vInnerSubviews = [topLabel, hStackView, componentView.noteLabel]
+        if isIncoming {
+            componentView.badgePillStack.addArrangedSubview(componentView.badgeIconView)
+            componentView.badgePillStack.addArrangedSubview(componentView.badgeLabel)
         } else {
-            vInnerSubviews = [topLabel, hStackView]
+            componentView.badgePillStack.addArrangedSubview(componentView.badgeLabel)
+            componentView.badgePillStack.addArrangedSubview(componentView.badgeIconView)
         }
 
-        vStackView.configure(
-            config: vStackConfig,
-            cellMeasurement: cellMeasurement,
-            measurementKey: .measurementKey_vStack,
-            subviews: vInnerSubviews
-        )
-    }
+        // Amount
+        let amountAlpha: CGFloat = messageStatus == .sending ? 0.5 : 1
+        componentView.amountNumberLabel.text = amountNumberText
+        componentView.amountNumberLabel.textColor = textColor
+        componentView.amountNumberLabel.alpha = amountAlpha
+        componentView.amountUnitLabel.text = amountUnitText
+        componentView.amountUnitLabel.textColor = dimTextColor
+        componentView.amountUnitLabel.alpha = amountAlpha
 
-    private func createLoadingSpinner() -> CustomView {
-        // Recreate each time in-case theme changes
-        let animationName = (isIncoming && !isDarkThemeEnabled
-                             ? "indeterminate_spinner_blue"
-                             : "indeterminate_spinner_white")
+        // Fiat label (hidden — no fiat data available for payment attachments yet)
+        componentView.fiatLabel.isHidden = true
 
-        let animationView = mediaCache.buildLottieAnimationView(name: animationName)
-        owsAssertDebug(animationView.animation != nil)
-        animationView.backgroundBehavior = .pauseAndRestore
-        animationView.loopMode = .loop
-        animationView.contentMode = .scaleAspectFit
-        animationView.play()
+        // Footer timestamp and status indicator
+        let timestampText = footerState?.timestampText ?? ""
 
-        return CustomView.wrapperFor(view: animationView, dimension: .spinnerSquareDimension)
-    }
+        // Note section
+        if let note = noteText {
+            // Footer lives inside the note section
+            componentView.topFooterStack.isHidden = true
 
-    private func createFailureIcon() -> CustomView {
-        let tintColor = conversationStyle.bubbleTextColor(isIncoming: isIncoming)
-        return CustomView.wrapperFor(
-            view: UIImageView.createFailureIcon(tintColor: tintColor),
-            dimension: .failureIconDimension)
-    }
+            componentView.noteLabel.text = note
+            componentView.noteLabel.textColor = textColor
+            componentView.noteSectionView.backgroundColor = accentBgColor
+            componentView.noteSectionView.isHidden = false
 
-    private func formatPaymentAmount(status: MessageReceiptStatus) -> NSAttributedString {
-        guard let mob = paymentAmount else {
-            let text = OWSLocalizedString(
-                "PAYMENTS_INFO_UNAVAILABLE_MESSAGE",
-                comment: "Status indicator for invalid payments which could not be processed."
+            componentView.noteTimestampLabel.text = timestampText
+            componentView.noteTimestampLabel.textColor = statusTextColor
+            configureStatusView(
+                componentView.noteStatusView,
+                widthConstraint: componentView.noteStatusWidthConstraint,
+                heightConstraint: componentView.noteStatusHeightConstraint,
+                tintColor: statusTextColor
             )
-            return NSAttributedString(string: text)
+            componentView.noteFooterStack.isHidden = false
+        } else {
+            // Footer lives in the top section, bottom-right
+            componentView.noteSectionView.isHidden = true
+
+            componentView.topTimestampLabel.text = timestampText
+            componentView.topTimestampLabel.textColor = statusTextColor
+            configureStatusView(
+                componentView.topStatusView,
+                widthConstraint: componentView.topStatusWidthConstraint,
+                heightConstraint: componentView.topStatusHeightConstraint,
+                tintColor: statusTextColor
+            )
+            componentView.topFooterStack.isHidden = false
         }
+    }
 
-        let amount = TSPaymentAmount(currency: .bitcoin, picoMob: mob)
-        switch status {
-        case .failed:
-            return PaymentsFormat.formatInChatFailure(paymentAmount: amount)
-        default:
-            return PaymentsFormat.formatInChatSuccess(paymentAmount: amount)
+    private func configureStatusView(
+        _ statusView: UIImageView,
+        widthConstraint: NSLayoutConstraint?,
+        heightConstraint: NSLayoutConstraint?,
+        tintColor: UIColor
+    ) {
+        if let si = footerState?.statusIndicator, let icon = UIImage(named: si.imageName) {
+            statusView.image = icon.withRenderingMode(.alwaysTemplate)
+            statusView.tintColor = tintColor
+            widthConstraint?.constant = si.imageSize.width
+            heightConstraint?.constant = si.imageSize.height
+            statusView.isHidden = false
+        } else {
+            statusView.isHidden = true
         }
     }
 
-    private var hStackConfig: CVStackViewConfig {
-        CVStackViewConfig(
-            axis: .horizontal,
-            alignment: .center,
-            spacing: .innerHStackSpacing,
-            layoutMargins: UIEdgeInsets(top: 25, leading: 8, bottom: 25, trailing: 16)
-        )
-    }
-
-    private var vStackConfig: CVStackViewConfig {
-        CVStackViewConfig(
-            axis: .vertical,
-            alignment: .leading,
-            spacing: 8,
-            layoutMargins: UIEdgeInsets(top: 5, leading: 0, bottom: 0, trailing: 0)
-        )
-    }
-
-    private var bigAmountLabelConfig: CVLabelConfig {
-        let font = UIFont.dynamicTypeLargeTitle1Clamped.withSize(28)
-        return CVLabelConfig(
-            text: .attributedText(formatPaymentAmount(status: messageStatus)),
-            displayConfig: .forUnstyledText(
-                font: font,
-                textColor: conversationStyle.bubbleTextColor(isIncoming: isIncoming)
-            ),
-            font: font,
-            textColor: conversationStyle.bubbleTextColor(isIncoming: isIncoming),
-            numberOfLines: messageStatus.bigAmountLabelNumberOfLines,
-            lineBreakMode: .byWordWrapping,
-            textAlignment: messageStatus.bigAmountLabelTextAlignment
-        )
-    }
-
-    private var topLabelConfig: CVLabelConfig {
-        let text: String
-        let paymentType = paymentModel?.paymentType
-        let interactionType = itemModel.interaction.interactionType
-        switch (paymentType, interactionType, messageStatus) {
-        case (_, _, .sending):
-            text = OWSLocalizedString(
-                "PAYMENTS_PAYMENT_STATUS_IN_CHAT_PROCESSING",
-                comment: "Payment status context while sending"
-            )
-        case (_, .incomingMessage, _),
-            (.incomingPayment, _, _),
-            (.incomingUnidentified, _, _):
-            let format = OWSLocalizedString(
-                "PAYMENTS_PAYMENT_STATUS_IN_CHAT_SENT_YOU",
-                comment: "Payment status context with contact name, incoming. Embeds {{ Name of sending contact }}"
-            )
-            text = String(format: format, contactName)
-        case (_, .outgoingMessage, .failed):
-            let format = OWSLocalizedString(
-                "PAYMENTS_PAYMENT_STATUS_IN_CHAT_PAYMENT_TO",
-                comment: "Payment status context with contact name, failed. Embeds {{ Name of receiving contact }}"
-            )
-            text = String(format: format, contactName)
-        case (_, .outgoingMessage, _):
-            let format = OWSLocalizedString(
-                "PAYMENTS_PAYMENT_STATUS_IN_CHAT_YOU_SENT",
-                comment: "Payment status context with contact name, sent. Embeds {{ Name of receiving contact }}"
-            )
-            text = String(format: format, contactName)
-        default:
-            // default to failed text because it doesn't imply success
-            let format = OWSLocalizedString(
-                "PAYMENTS_PAYMENT_STATUS_IN_CHAT_PAYMENT_TO",
-                comment: "Payment status context with contact name, failed. Embeds {{ Name of receiving contact }}"
-            )
-            text = String(format: format, contactName)
-        }
-
-        return CVLabelConfig(
-            text: .text(text),
-            displayConfig: .forUnstyledText(
-                font: .dynamicTypeBody,
-                textColor: conversationStyle.bubbleTextColor(isIncoming: isIncoming)
-            ),
-            font: UIFont.dynamicTypeBody,
-            textColor: conversationStyle.bubbleTextColor(isIncoming: isIncoming),
-            lineBreakMode: .byTruncatingMiddle
-        )
-    }
-
-    private var noteLabelConfig: CVLabelConfig {
-        CVLabelConfig(
-            text: .text(paymentAttachment.notification.memoMessage ?? ""),
-            displayConfig: .forUnstyledText(
-                font: .dynamicTypeBody,
-                textColor: conversationStyle.bubbleTextColor(isIncoming: isIncoming)
-            ),
-            font: UIFont.dynamicTypeBody,
-            textColor: conversationStyle.bubbleTextColor(isIncoming: isIncoming),
-            numberOfLines: 0,
-            lineBreakMode: .byTruncatingMiddle
-        )
-    }
+    // MARK: - Measurement
 
     public func measure(
         maxWidth: CGFloat,
         measurementBuilder: CVCellMeasurement.Builder
     ) -> CGSize {
         owsAssertDebug(maxWidth > 0)
-
-        let maxLabelWidth = max(0, maxWidth - vStackConfig.layoutMargins.totalWidth)
-
-        let maxBigLabelWidth: CGFloat = {
-            let nonLabelWidth =
-            (hStackConfig.layoutMargins.totalWidth
-             + messageStatus.hStackCumulativeSpacing
-             + vStackConfig.layoutMargins.totalWidth
-             + messageStatus.spacersTotalWidth)
-
-            return max(0, maxWidth - nonLabelWidth)
-        }()
-
-        let bigAmountLabelSize = CVText.measureLabel(
-            config: bigAmountLabelConfig,
-            maxWidth: maxBigLabelWidth
-        )
-        let statusIconSize = CGSize(square: messageStatus.statusIconDimension)
-
-        var hSubviewInfos = [ManualStackSubviewInfo]()
-        hSubviewInfos.append(statusIconSize.asManualSubviewInfo())
-        hSubviewInfos.append(bigAmountLabelSize.asManualSubviewInfo())
-        if messageStatus != .failed {
-            hSubviewInfos.append(statusIconSize.asManualSubviewInfo())
-        }
-        let hStackMeasurement = ManualStackView.measure(
-            config: hStackConfig,
-            measurementBuilder: measurementBuilder,
-            measurementKey: .measurementKey_hStack,
-            subviewInfos: hSubviewInfos,
+        return CVComponentArchivedPayment.measurePaymentBubble(
+            noteText: noteText,
+            badgeText: badgeText,
+            amountNumberText: amountNumberText,
+            amountUnitText: amountUnitText,
             maxWidth: maxWidth
         )
-
-        let maxTopLabelWidth = min(maxLabelWidth, hStackMeasurement.measuredSize.width)
-        let maxNoteLabelWidth = maxTopLabelWidth // Same for now
-        let topLabelSize = CVText.measureLabel(config: topLabelConfig, maxWidth: maxTopLabelWidth)
-        let noteLabelSize = CVText.measureLabel(
-            config: noteLabelConfig,
-            maxWidth: maxNoteLabelWidth
-        )
-
-        var vSubviewInfos = [ManualStackSubviewInfo]()
-        vSubviewInfos.append(topLabelSize.asManualSubviewInfo())
-        vSubviewInfos.append(hStackMeasurement.measuredSize.asManualSubviewInfo)
-
-        if paymentAttachment.notification.memoMessage != nil {
-            vSubviewInfos.append(noteLabelSize.asManualSubviewInfo())
-        }
-
-        let vStackMeasurement = ManualStackView.measure(
-            config: vStackConfig,
-            measurementBuilder: measurementBuilder,
-            measurementKey: .measurementKey_vStack,
-            subviewInfos: vSubviewInfos
-        )
-
-        return vStackMeasurement.measuredSize
     }
 
     // MARK: - CVComponentView
 
-    // Used for rendering some portion of an Conversation View item.
-    // It could be the entire item or some part thereof.
     public class CVComponentViewPaymentAttachment: NSObject, CVComponentView {
 
-        fileprivate let hStackView = ManualStackView(name: "PaymentAttachment.hStackView")
-        fileprivate let vStackView = ManualStackView(name: "PaymentAttachment.vStackView")
+        private let containerView = UIView()
 
-        fileprivate var leftSpace = UIView()
-        fileprivate var rightSpace = UIView()
+        // Badge pill
+        let badgePillView = UIView()
+        let badgePillStack = UIStackView()
+        let badgeIconView = UIImageView()
+        let badgeLabel = UILabel()
 
-        fileprivate let bigAmountLabel = CVLabel()
-        fileprivate let topLabel = CVLabel()
-        fileprivate let noteLabel = CVLabel()
+        // Amount row
+        let amountNumberLabel = UILabel()
+        let amountUnitLabel = UILabel()
+
+        // Fiat amount
+        let fiatLabel = UILabel()
+
+        // Top section footer row (shown when no note)
+        let topFooterStack = UIStackView()
+        let topTimestampLabel = UILabel()
+        let topStatusView = UIImageView()
+        var topStatusWidthConstraint: NSLayoutConstraint?
+        var topStatusHeightConstraint: NSLayoutConstraint?
+
+        // Note section
+        let noteSectionView = UIView()
+        let noteLabel = UILabel()
+
+        // Note section footer row (shown when note is present)
+        let noteFooterStack = UIStackView()
+        let noteTimestampLabel = UILabel()
+        let noteStatusView = UIImageView()
+        var noteStatusWidthConstraint: NSLayoutConstraint?
+        var noteStatusHeightConstraint: NSLayoutConstraint?
 
         public var isDedicatedCellView = true
 
-        public var rootView: UIView {
-            vStackView
+        public var rootView: UIView { containerView }
+
+        override init() {
+            super.init()
+            setupViews()
+        }
+
+        private func setupViews() {
+            // Badge pill
+            badgePillView.layer.cornerRadius = 11
+            badgePillView.clipsToBounds = true
+
+            badgeLabel.font = UIFont.systemFont(ofSize: 12)
+            badgeLabel.numberOfLines = 1
+            badgeLabel.setContentHuggingPriority(.required, for: .horizontal)
+
+            badgeIconView.contentMode = .scaleAspectFit
+            badgeIconView.translatesAutoresizingMaskIntoConstraints = false
+            NSLayoutConstraint.activate([
+                badgeIconView.widthAnchor.constraint(equalToConstant: 16),
+                badgeIconView.heightAnchor.constraint(equalToConstant: 16)
+            ])
+
+            badgePillStack.axis = .horizontal
+            badgePillStack.spacing = 2
+            badgePillStack.alignment = .center
+            badgePillStack.addArrangedSubview(badgeIconView)
+            badgePillStack.addArrangedSubview(badgeLabel)
+
+            badgePillView.addSubview(badgePillStack)
+            badgePillStack.translatesAutoresizingMaskIntoConstraints = false
+            NSLayoutConstraint.activate([
+                badgePillStack.topAnchor.constraint(equalTo: badgePillView.topAnchor, constant: 3),
+                badgePillStack.bottomAnchor.constraint(equalTo: badgePillView.bottomAnchor, constant: -3),
+                badgePillStack.leadingAnchor.constraint(equalTo: badgePillView.leadingAnchor, constant: 8),
+                badgePillStack.trailingAnchor.constraint(equalTo: badgePillView.trailingAnchor, constant: -8)
+            ])
+
+            badgePillView.heightAnchor.constraint(greaterThanOrEqualToConstant: 22).isActive = true
+
+            // Badge wrapper — keeps pill left-aligned within the fill-aligned stack
+            let badgeWrapperView = UIView()
+            badgeWrapperView.addSubview(badgePillView)
+            badgePillView.translatesAutoresizingMaskIntoConstraints = false
+            NSLayoutConstraint.activate([
+                badgePillView.topAnchor.constraint(equalTo: badgeWrapperView.topAnchor),
+                badgePillView.leadingAnchor.constraint(equalTo: badgeWrapperView.leadingAnchor),
+                badgePillView.bottomAnchor.constraint(equalTo: badgeWrapperView.bottomAnchor)
+                // No trailing — pill hugs its content width
+            ])
+
+            // Amount row
+            amountNumberLabel.font = UIFont.systemFont(ofSize: 28, weight: .medium)
+            amountNumberLabel.numberOfLines = 1
+            amountNumberLabel.setContentHuggingPriority(.required, for: .horizontal)
+
+            amountUnitLabel.font = UIFont.systemFont(ofSize: 28, weight: .medium)
+            amountUnitLabel.numberOfLines = 1
+            amountUnitLabel.setContentHuggingPriority(.defaultLow, for: .horizontal)
+
+            let amountRow = UIStackView(arrangedSubviews: [amountNumberLabel, amountUnitLabel])
+            amountRow.axis = .horizontal
+            amountRow.spacing = 2
+            amountRow.alignment = .lastBaseline
+
+            // Fiat label
+            fiatLabel.font = UIFont.systemFont(ofSize: 16)
+            fiatLabel.numberOfLines = 1
+            fiatLabel.isHidden = true
+
+            // Top footer row (timestamp + status, right-aligned)
+            topTimestampLabel.font = UIFont.systemFont(ofSize: 13)
+            topTimestampLabel.numberOfLines = 1
+            topTimestampLabel.setContentHuggingPriority(.required, for: .horizontal)
+
+            topFooterStack.addArrangedSubview(topStatusView)
+            let topStatusWC = topStatusView.widthAnchor.constraint(equalToConstant: 12)
+            let topStatusHC = topStatusView.heightAnchor.constraint(equalToConstant: 12)
+            topStatusWC.isActive = true
+            topStatusHC.isActive = true
+            topStatusWidthConstraint = topStatusWC
+            topStatusHeightConstraint = topStatusHC
+            topStatusView.contentMode = .scaleAspectFit
+
+            let topFooterSpacer = UIView()
+            topFooterSpacer.setContentHuggingPriority(.defaultLow, for: .horizontal)
+            topFooterSpacer.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+
+            topFooterStack.axis = .horizontal
+            topFooterStack.spacing = 3
+            topFooterStack.alignment = .center
+            topFooterStack.removeArrangedSubview(topStatusView)
+            topStatusView.removeFromSuperview()
+            topFooterStack.addArrangedSubview(topFooterSpacer)
+            topFooterStack.addArrangedSubview(topTimestampLabel)
+            topFooterStack.addArrangedSubview(topStatusView)
+
+            // Top content stack — .fill so topFooterStack can stretch to full width
+            let topContentStack = UIStackView(arrangedSubviews: [badgeWrapperView, amountRow, fiatLabel, topFooterStack])
+            topContentStack.axis = .vertical
+            topContentStack.spacing = 4
+            topContentStack.alignment = .fill
+            topContentStack.isLayoutMarginsRelativeArrangement = true
+            topContentStack.layoutMargins = UIEdgeInsets(top: 12, left: 12, bottom: 12, right: 12)
+
+            // Note section
+            noteLabel.font = UIFont.systemFont(ofSize: 16)
+            noteLabel.numberOfLines = 0
+
+            // Note footer row (timestamp + status, right-aligned within note section)
+            noteTimestampLabel.font = UIFont.systemFont(ofSize: 13)
+            noteTimestampLabel.numberOfLines = 1
+            noteTimestampLabel.setContentHuggingPriority(.required, for: .horizontal)
+
+            noteFooterStack.addArrangedSubview(noteStatusView)
+            let noteStatusWC = noteStatusView.widthAnchor.constraint(equalToConstant: 12)
+            let noteStatusHC = noteStatusView.heightAnchor.constraint(equalToConstant: 12)
+            noteStatusWC.isActive = true
+            noteStatusHC.isActive = true
+            noteStatusWidthConstraint = noteStatusWC
+            noteStatusHeightConstraint = noteStatusHC
+            noteStatusView.contentMode = .scaleAspectFit
+
+            let noteFooterSpacer = UIView()
+            noteFooterSpacer.setContentHuggingPriority(.defaultLow, for: .horizontal)
+            noteFooterSpacer.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+
+            noteFooterStack.axis = .horizontal
+            noteFooterStack.spacing = 3
+            noteFooterStack.alignment = .center
+            noteFooterStack.removeArrangedSubview(noteStatusView)
+            noteStatusView.removeFromSuperview()
+            noteFooterStack.addArrangedSubview(noteFooterSpacer)
+            noteFooterStack.addArrangedSubview(noteTimestampLabel)
+            noteFooterStack.addArrangedSubview(noteStatusView)
+
+            noteSectionView.addSubview(noteLabel)
+            noteSectionView.addSubview(noteFooterStack)
+            noteLabel.translatesAutoresizingMaskIntoConstraints = false
+            noteFooterStack.translatesAutoresizingMaskIntoConstraints = false
+            NSLayoutConstraint.activate([
+                noteLabel.topAnchor.constraint(equalTo: noteSectionView.topAnchor, constant: 12),
+                noteLabel.leadingAnchor.constraint(equalTo: noteSectionView.leadingAnchor, constant: 12),
+                noteLabel.trailingAnchor.constraint(equalTo: noteSectionView.trailingAnchor, constant: -12),
+                noteLabel.bottomAnchor.constraint(equalTo: noteFooterStack.topAnchor, constant: -4),
+                noteFooterStack.leadingAnchor.constraint(equalTo: noteSectionView.leadingAnchor, constant: 12),
+                noteFooterStack.trailingAnchor.constraint(equalTo: noteSectionView.trailingAnchor, constant: -12),
+                noteFooterStack.bottomAnchor.constraint(equalTo: noteSectionView.bottomAnchor, constant: -12)
+            ])
+
+            // Main layout
+            let mainStack = UIStackView(arrangedSubviews: [topContentStack, noteSectionView])
+            mainStack.axis = .vertical
+            mainStack.spacing = 0
+            mainStack.alignment = .fill
+
+            containerView.addSubview(mainStack)
+            mainStack.translatesAutoresizingMaskIntoConstraints = false
+            NSLayoutConstraint.activate([
+                mainStack.topAnchor.constraint(equalTo: containerView.topAnchor),
+                mainStack.leadingAnchor.constraint(equalTo: containerView.leadingAnchor),
+                mainStack.trailingAnchor.constraint(equalTo: containerView.trailingAnchor),
+                mainStack.bottomAnchor.constraint(equalTo: containerView.bottomAnchor)
+            ])
         }
 
         public func setIsCellVisible(_ isCellVisible: Bool) {}
 
         public func reset() {
-            hStackView.reset()
-            vStackView.reset()
-
-            bigAmountLabel.text = nil
-            topLabel.text = nil
+            badgeLabel.text = nil
+            badgeIconView.image = nil
+            amountNumberLabel.text = nil
+            amountUnitLabel.text = nil
+            amountNumberLabel.alpha = 1
+            amountUnitLabel.alpha = 1
+            fiatLabel.text = nil
+            fiatLabel.isHidden = true
+            topTimestampLabel.text = nil
+            topStatusView.image = nil
+            topStatusView.isHidden = true
+            topFooterStack.isHidden = false
             noteLabel.text = nil
-
-            leftSpace.removeAllSubviews()
-            rightSpace.removeAllSubviews()
+            noteSectionView.isHidden = true
+            noteTimestampLabel.text = nil
+            noteStatusView.image = nil
+            noteStatusView.isHidden = true
+            noteFooterStack.isHidden = true
         }
     }
+
+    // MARK: - Tap handler
 
     public override func handleTap(
         sender: UIGestureRecognizer,
@@ -384,135 +481,14 @@ public class CVComponentPaymentAttachment: CVComponentBase, CVComponent {
     }
 }
 
-// MARK: - Constants & Utils
-
-fileprivate extension String {
-    static let measurementKey_hStack = "CVComponentPaymentAttachment.measurementKey_hStack"
-    static let measurementKey_vStack = "CVComponentPaymentAttachment.measurementKey_vStack"
-}
+// MARK: - Accessibility
 
 extension CVComponentPaymentAttachment: CVAccessibilityComponent {
     public var accessibilityDescription: String {
-        return formatPaymentAmount(status: messageStatus).string
-    }
-}
-
-fileprivate extension UIView {
-    @discardableResult
-    func addBlur(style: UIBlurEffect.Style = .extraLight) -> UIVisualEffectView {
-        let blurEffect = UIBlurEffect(style: style)
-        let blurBackground = UIVisualEffectView(effect: blurEffect)
-        blurBackground.alpha = 0.3
-        blurBackground.layer.cornerRadius = 18
-        blurBackground.clipsToBounds = true
-        blurBackground.frame = self.frame // your view that have any objects
-        blurBackground.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        addSubview(blurBackground)
-        return blurBackground
-    }
-}
-
-private class CustomView: UIView {
-    var dimension: CGFloat = .spinnerSquareDimension
-
-    override var intrinsicContentSize: CGSize {
-        CGSize(square: dimension)
-    }
-
-    static func wrapperFor(view: UIView, dimension: CGFloat) -> CustomView {
-        let wrapper = CustomView()
-
-        wrapper.contentMode = .center
-        wrapper.dimension = dimension
-        wrapper.addSubview(view)
-        view.translatesAutoresizingMaskIntoConstraints = false
-        view.contentMode = .scaleAspectFit
-
-        view.centerXAnchor.constraint(equalTo: wrapper.centerXAnchor).isActive = true
-        view.centerYAnchor.constraint(equalTo: wrapper.centerYAnchor).isActive = true
-        view.heightAnchor.constraint(equalToConstant: dimension).isActive = true
-        view.widthAnchor.constraint(equalToConstant: dimension).isActive = true
-
-        wrapper.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            wrapper.heightAnchor.constraint(equalToConstant: dimension),
-            wrapper.widthAnchor.constraint(equalTo: wrapper.heightAnchor, multiplier: 1)
-        ])
-
-        return wrapper
-    }
-}
-
-extension CGFloat {
-    fileprivate static let spinnerSquareDimension: CGFloat = 20
-    fileprivate static let failureIconDimension: CGFloat = 22
-    fileprivate static let innerHStackSpacing: CGFloat = 9
-}
-
-fileprivate extension MessageReceiptStatus {
-    var bigAmountLabelAlpha: CGFloat {
-        self == .sending ? 0.5 : 1
-    }
-
-    var bigAmountLabelNumberOfLines: Int {
-        self == .failed ? 2 : 1
-    }
-
-    var bigAmountLabelTextAlignment: NSTextAlignment {
-        self == .failed ? .left : .center
-    }
-
-    var statusIconDimension: CGFloat {
-        self == .failed ? .failureIconDimension : .spinnerSquareDimension
-    }
-
-    var spacersTotalWidth: CGFloat {
-        self == .failed ? .failureIconDimension : .spinnerSquareDimension * 2
-    }
-
-    var hStackCumulativeSpacing: CGFloat {
-        self == .failed ? .innerHStackSpacing : .innerHStackSpacing * 2
-    }
-}
-
-fileprivate extension ManualStackView {
-    func addBlurBackgroundExactlyOnce(isIncoming: Bool) {
-        var subviewsToCheck = self.subviews
-        while let subviewToCheck = subviewsToCheck.popLast() {
-            if subviewToCheck is UIVisualEffectView {
-                // already exists
-                return
-            }
-            subviewsToCheck = subviewToCheck.subviews + subviewsToCheck
+        let amount = amountNumberText + amountUnitText
+        if let note = noteText {
+            return amount + ". " + note
         }
-
-        let effect: UIBlurEffect.Style = {
-            (Theme.isDarkThemeEnabled && isIncoming) ? .regular : .extraLight
-        }()
-
-        let blurBackground = self.addBlur(style: effect)
-        blurBackground.alpha = {
-            switch (Theme.isDarkThemeEnabled, isIncoming) {
-            case (_, false):
-                return 0.4
-            case (true, true):
-                return 1
-            case (false, true):
-                return 1
-            }
-        }()
-    }
-}
-
-fileprivate extension UIImageView {
-    static func createFailureIcon(tintColor: UIColor) -> UIImageView {
-        let sendFailureBadge = UIImageView(frame: .zero)
-        sendFailureBadge.contentMode = .center
-        sendFailureBadge.setTemplateImageName("error-outline-24", tintColor: tintColor)
-        sendFailureBadge.backgroundColor = UIColor.clear
-        sendFailureBadge.layer.cornerRadius = .failureIconDimension / 2
-        sendFailureBadge.clipsToBounds = true
-
-        return sendFailureBadge
+        return amount
     }
 }

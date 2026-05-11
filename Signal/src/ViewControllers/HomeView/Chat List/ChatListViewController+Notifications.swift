@@ -61,6 +61,18 @@ extension ChatListViewController {
                                                selector: #selector(preferContactAvatarsPreferenceDidChange),
                                                name: SSKPreferences.preferContactAvatarsPreferenceDidChange,
                                                object: nil)
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(paymentsDisplayPreferenceDidChange),
+            name: PaymentsDisplayPreferences.balanceHiddenDidChange,
+            object: nil
+        )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(paymentsDisplayPreferenceDidChange),
+            name: PaymentsDisplayPreferences.amountTypeDidChange,
+            object: nil
+        )
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(blockListDidChange),
                                                name: BlockingManager.blockListDidChange,
@@ -185,6 +197,13 @@ extension ChatListViewController {
         AssertIsOnMainThread()
 
         reloadTableDataAndResetCellContentCache()
+    }
+
+    @objc
+    private func paymentsDisplayPreferenceDidChange(_ notification: NSNotification) {
+        AssertIsOnMainThread()
+
+        reloadTableDataAndResetThreadViewModelCache()
     }
 
     @objc
