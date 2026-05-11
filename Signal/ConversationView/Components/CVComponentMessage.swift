@@ -305,22 +305,14 @@ public class CVComponentMessage: CVComponentBase, CVRootComponent {
                 )
             }()
 
-            if let footerState = itemViewState.footerState {
-                self.standaloneFooter = CVComponentFooter(
-                    itemModel: itemModel,
-                    footerState: footerState,
-                    isOverlayingMedia: false,
-                    isOutsideBubble: false
-                )
-            }
-
             self.paymentAttachment = CVComponentPaymentAttachment(
                 itemModel: itemModel,
                 paymentAttachment: paymentAttachment,
                 paymentModel: paymentAttachment.model,
                 contactName: paymentAttachment.otherUserShortName,
                 paymentAmount: paymentAmount,
-                messageStatus: messageStatus
+                messageStatus: messageStatus,
+                footerState: itemViewState.footerState
             )
 
         }
@@ -336,19 +328,11 @@ public class CVComponentMessage: CVComponentBase, CVRootComponent {
                 )
             }()
 
-            if let footerState = itemViewState.footerState {
-                self.standaloneFooter = CVComponentFooter(
-                    itemModel: itemModel,
-                    footerState: footerState,
-                    isOverlayingMedia: false,
-                    isOutsideBubble: false
-                )
-            }
-
             self.archivedPaymentAttachment = CVComponentArchivedPayment(
                 itemModel: itemModel,
                 archivedPaymentAttachment: archivedPaymentAttachment,
-                messageStatus: messageStatus
+                messageStatus: messageStatus,
+                footerState: itemViewState.footerState
             )
         }
 
@@ -379,7 +363,8 @@ public class CVComponentMessage: CVComponentBase, CVRootComponent {
             bodyMedia = CVComponentBodyMedia(itemModel: itemModel, bodyMedia: bodyMediaState, footerOverlay: footerOverlay)
         }
 
-        let hasStandaloneFooter = (footerOverlay == nil && !itemViewState.shouldHideFooter)
+        let hasStandaloneFooter = (footerOverlay == nil && !itemViewState.shouldHideFooter
+            && self.paymentAttachment == nil && self.archivedPaymentAttachment == nil)
         if hasStandaloneFooter {
             if let footerState = itemViewState.footerState {
                 self.standaloneFooter = CVComponentFooter(itemModel: itemModel,
@@ -956,8 +941,8 @@ public class CVComponentMessage: CVComponentBase, CVRootComponent {
     // section determines the ordering of the subcomponents.
     private static var topFullWidthCVComponentKeys: [CVComponentKey] { [.linkPreview] }
     private static var topNestedCVComponentKeys: [CVComponentKey] { [.senderName] }
-    private static var bottomFullWidthCVComponentKeys: [CVComponentKey] { [.quotedReply, .bodyMedia] }
-    private static var bottomNestedShareCVComponentKeys: [CVComponentKey] { [.viewOnce, .audioAttachment, .genericAttachment, .paymentAttachment, .archivedPaymentAttachment, .contactShare, .giftBadge, .poll] }
+    private static var bottomFullWidthCVComponentKeys: [CVComponentKey] { [.quotedReply, .bodyMedia, .paymentAttachment, .archivedPaymentAttachment] }
+    private static var bottomNestedShareCVComponentKeys: [CVComponentKey] { [.viewOnce, .audioAttachment, .genericAttachment, .contactShare, .giftBadge, .poll] }
     private static var bottomNestedTextCVComponentKeys: [CVComponentKey] { [.bodyText, .footer, .undownloadableAttachment] }
 
     // The "message" contents of this component for most messages are vertically
