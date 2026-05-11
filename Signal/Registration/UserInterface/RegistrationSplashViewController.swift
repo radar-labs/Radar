@@ -84,24 +84,43 @@ public class RegistrationSplashViewController: OWSViewController, OWSNavigationC
             ])
         }
 
-        // Image at the top.
-        let imageView = UIImageView(image: UIImage(named: "onboarding_splash_hero"))
-        imageView.contentMode = .scaleAspectFit
-        imageView.layer.minificationFilter = .trilinear
-        imageView.layer.magnificationFilter = .trilinear
-        imageView.setCompressionResistanceLow()
-        imageView.setContentHuggingVerticalLow()
-        imageView.accessibilityIdentifier = "registration.splash.heroImageView"
-        let heroImageContainer = UIView.container()
-        heroImageContainer.addSubview(imageView)
-        imageView.translatesAutoresizingMaskIntoConstraints = false
-        // Center image vertically in the available space above title text.
+        // App icon at the top.
+        let iconSize: CGFloat = 160
+        let appIconView = UIImageView(image: UIImage(named: "AppIconPreview/default"))
+        appIconView.contentMode = .scaleAspectFit
+        appIconView.layer.cornerRadius = iconSize * 53.125 / 200
+        appIconView.layer.masksToBounds = true
+        appIconView.accessibilityIdentifier = "registration.splash.heroImageView"
+        appIconView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            imageView.centerXAnchor.constraint(equalTo: heroImageContainer.centerXAnchor),
-            imageView.widthAnchor.constraint(equalTo: heroImageContainer.widthAnchor),
-            imageView.centerYAnchor.constraint(equalTo: heroImageContainer.centerYAnchor),
-            imageView.heightAnchor.constraint(equalTo: heroImageContainer.heightAnchor, constant: 0.8),
+            appIconView.widthAnchor.constraint(equalToConstant: iconSize),
+            appIconView.heightAnchor.constraint(equalToConstant: iconSize),
         ])
+
+        // "Radar." wordmark below icon.
+        let wordmarkView = UILabel()
+        wordmarkView.text = "Radar."
+        wordmarkView.textColor = .Signal.label
+        wordmarkView.font = UIFont.systemFont(ofSize: 48, weight: .bold)
+        wordmarkView.textAlignment = .center
+        wordmarkView.accessibilityIdentifier = "registration.splash.wordmark"
+
+        let iconStack = UIStackView(arrangedSubviews: [appIconView, wordmarkView])
+        iconStack.axis = .vertical
+        iconStack.alignment = .center
+        iconStack.spacing = 18
+
+        // Fixed top spacer gives the icon breathing room below the status bar.
+        let topSpacer = UIView()
+        topSpacer.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            topSpacer.heightAnchor.constraint(equalToConstant: 40),
+        ])
+
+        // Flexible spacer absorbs all remaining vertical space between the ToS link
+        // and the bottom buttons, keeping the buttons anchored at the bottom.
+        let bottomSpacer = UIView()
+        bottomSpacer.setContentHuggingPriority(UILayoutPriority(1), for: .vertical)
 
         // Welcome text.
         let titleText = {
@@ -161,13 +180,17 @@ public class RegistrationSplashViewController: OWSViewController, OWSNavigationC
 
         // Main content view.
         let stackView = addStaticContentStackView(arrangedSubviews: [
-            heroImageContainer,
+            topSpacer,
+            iconStack,
             titleLabel,
             tosPPButton,
+            bottomSpacer,
             largeButtonsContainer,
         ])
-        stackView.setCustomSpacing(44, after: imageView)
-        stackView.setCustomSpacing(82, after: tosPPButton)
+        stackView.setCustomSpacing(32, after: topSpacer)
+        stackView.setCustomSpacing(32, after: iconStack)
+        stackView.setCustomSpacing(12, after: titleLabel)
+        stackView.setCustomSpacing(0, after: tosPPButton)
 
         view.sendSubviewToBack(stackView)
     }

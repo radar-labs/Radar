@@ -453,6 +453,13 @@ public class RegistrationNavigationController: OWSNavigationController {
         case .done:
             Logger.info("Finished with registration!")
             SignalApp.shared.showConversationSplitView(appReadiness: appReadiness)
+            DispatchQueue.main.async {
+                guard let rootVC = UIApplication.shared.delegate?.window??.rootViewController else { return }
+                let nav = OWSNavigationController()
+                let coordinator = PaymentsOnboardingCoordinator()
+                nav.viewControllers = [coordinator.prepareForPresentation(inNavController: nav)]
+                rootVC.presentFormSheet(nav, animated: true)
+            }
             return nil
         }
     }

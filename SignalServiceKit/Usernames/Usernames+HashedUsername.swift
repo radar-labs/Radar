@@ -56,11 +56,11 @@ public extension Usernames.HashedUsername {
             self.candidates = candidates
         }
 
-        var candidateHashes: [String] {
+        public var candidateHashes: [String] {
             candidates.map { $0.hashString }
         }
 
-        func candidate(matchingHash hashString: String) -> Usernames.HashedUsername? {
+        public func candidate(matchingHash hashString: String) -> Usernames.HashedUsername? {
             candidates.first(where: { candidate in
                 candidate.hashString == hashString
             })

@@ -2568,6 +2568,11 @@
 
 /* Label indicating a user who deleted their account. */
 "DELETED_USER" = "삭제된 계정";
+"DEPOSIT_RECEIVED_TITLE" = "Deposit Received";
+"DEPOSIT_RECEIVED_SUBTITLE" = "You can now start sending payments on Radar";
+"DEPOSIT_RECEIVED_DEPOSIT_MORE" = "Deposit more Funds";
+"DEPOSIT_RECEIVED_SATS_LABEL" = "sats";
+
 
 /* Notification warning the user that they have been de-registered. */
 "DEREGISTRATION_NOTIFICATION" = "이 기기의 Signal에서 로그아웃했습니다.";
@@ -5794,6 +5799,12 @@
 /* Explanation of the 'onboarding pin attempts exhausted' view when it is unknown if reglock is enabled. */
 "ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_WITH_UNKNOWN_REGLOCK_EXPLANATION" = "PIN 시도 횟수 제한에 도달했으나 전화번호를 확인하여 Signal 계정에 액세스할 수 있습니다. 개인 정보를 보호하고 보안을 지키기 위해 저장한 프로필 정보와 설정 없이 계정을 복원합니다.";
 
+/* Title for the setup complete screen shown at the end of the onboarding flow. */
+"ONBOARDING_SETUP_COMPLETE_TITLE" = "설정 완료";
+
+/* Subtitle for the setup complete screen shown at the end of the onboarding flow. */
+"ONBOARDING_SETUP_COMPLETE_SUBTITLE" = "이제 Radar를 사용할 수 있습니다";
+
 /* Explanation of 'do not have old device' flow for the 'Restore or Transfer' prompt */
 "ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_BODY" = "또는 동일한 기기에 Signal을 다시 설치하는 중입니다";
 
@@ -5813,7 +5824,8 @@
 "ONBOARDING_SPLASH_TERM_AND_PRIVACY_POLICY" = "이용약관 및 개인정보 처리방침";
 
 /* Title of the 'onboarding splash' view. */
-"ONBOARDING_SPLASH_TITLE" = "어떤 대화를 나누든 안전하게.\n모든 메시지를 당당하게 보내세요.";
+"ONBOARDING_SPLASH_TITLE" = "Message privately,
+Send money securely.";
 
 /* Label for the link that lets users change their phone number in the onboarding views. */
 "ONBOARDING_VERIFICATION_BACK_LINK" = "번호가 잘못되었나요?";
@@ -5974,7 +5986,20 @@
 /* Header title for card payment details screen */
 "PAYMENT_DETAILS_CARD_TITLE" = "신용 또는 직불 카드";
 
+
+
+
 /* Format for indicator of a payment amount converted to fiat currency with the freshness of the conversion rate. Embeds: {{ %1$@ the payment amount, %2$@ the freshness of the currency conversion rate }}. */
+
+/* Title for the Add Funds onboarding screen. */
+"PAYMENTS_ADD_FUNDS_INTRO_TITLE" = "Add Funds";
+
+/* Subtitle for the Add Funds onboarding screen explaining where to deposit from. */
+"PAYMENTS_ADD_FUNDS_INTRO_SUBTITLE" = "To start sending payments, deposit funds from your existing account or exchange";
+
+/* Button label to skip the Add Funds step during payments onboarding. */
+"PAYMENTS_ADD_FUNDS_INTRO_SKIP" = "Skip this step";
+
 "PAYMENTS_CURRENCY_CONVERSION_FRESHNESS_FORMAT" = "%2$@의 %1$@";
 
 /* Indicator for unknown currency. */
@@ -6012,6 +6037,15 @@
 
 /* Status indicator for invalid payments which could not be processed. */
 "PAYMENTS_INFO_UNAVAILABLE_MESSAGE" = "사용할 수 없음";
+
+/* Body text for the Payments introduction screen explaining the Bitcoin Lightning Network. */
+"PAYMENTS_INTRO_BODY" = "Thanks to the Bitcoin Lightning Network, it's easy, fast and private.";
+
+/* Subtitle for the Payments introduction screen. */
+"PAYMENTS_INTRO_SUBTITLE" = "With Radar, you can send and receive money in your chats.";
+
+/* Title for the Payments introduction screen shown during onboarding. */
+"PAYMENTS_INTRO_TITLE" = "Introducing Payments";
 
 /* Indicates that an unknown error occurred while using Touch ID/Face ID/Phone Passcode. */
 "PAYMENTS_LOCK_AUTHENTICATION_ENABLE_UNKNOWN_ERROR" = "인증 기능에 접근할 수 없습니다.";
@@ -6151,6 +6185,9 @@
 /* Format for the payments notification banner for multiple payment notifications. Embeds: {{ the number of unread payment notifications }}. */
 "PAYMENTS_NOTIFICATION_BANNER_N_FORMAT" = "%1$@ 새로운 결제 알림";
 
+/* Badge label shown on failed payment bubbles in chat */
+"PAYMENTS_PAYMENT_STATUS_FAILED" = "Failed";
+
 /* Payment status context with contact name, failed. Embeds {{ Name of receiving contact }} */
 "PAYMENTS_PAYMENT_STATUS_IN_CHAT_PAYMENT_TO" = "결제를 받을 사람: %1$@";
 
@@ -6192,6 +6229,13 @@
 
 /* Status indicator for payments which had an unknown failure. */
 "PAYMENTS_PAYMENT_STATUS_LONG_UNKNOWN" = "알 수 없는 오류";
+
+/* Badge label shown on received payment bubbles in chat */
+"PAYMENTS_PAYMENT_STATUS_RECEIVED" = "Received";
+
+/* Badge label shown on sent payment bubbles in chat */
+"PAYMENTS_PAYMENT_STATUS_SENT" = "Sent";
+
 
 /* Status indicator for incoming payments which are complete. */
 "PAYMENTS_PAYMENT_STATUS_SHORT_INCOMING_COMPLETE" = "완료";
@@ -6258,6 +6302,8 @@
 
 /* Indicator for unidentified outgoing payments. */
 "PAYMENTS_UNIDENTIFIED_PAYMENT_OUTGOING" = "지불 발신됨";
+"PAYMENTS_WALLET_ADDRESS_LOADING" = "불러오는 중...";
+
 
 /* Label for unknown payments. */
 "PAYMENTS_UNKNOWN_PAYMENT" = "잘못된 결제";
@@ -9563,6 +9609,18 @@
 
 /* Title for an action sheet indicating that the given username is not associated with a registered Signal account. */
 "USERNAME_LOOKUP_NOT_FOUND_TITLE" = "사용자 찾을 수 없음";
+
+/* Status label shown when the entered username is available to claim. */
+"USERNAME_ONBOARDING_AVAILABLE_STATUS" = "Username Available";
+
+/* Button label to confirm the chosen username on the username setup screen during onboarding. */
+"USERNAME_ONBOARDING_CONFIRM_BUTTON" = "Confirm";
+
+/* Subtitle for the username setup screen during onboarding, explaining what usernames are used for on Radar and Signal. */
+"USERNAME_ONBOARDING_SUBTITLE" = "Set your custom username for connecting with other users on Radar and Signal";
+
+/* Title for the username setup screen shown during onboarding. */
+"USERNAME_ONBOARDING_TITLE" = "Your Username";
 
 /* Instructions that appear below the username QR code on a sharable exported image. */
 "USERNAME_QR_CODE_EXPORT_INSTRUCTIONS" = "Signal에서 나와 대화하려면 휴대전화로 이 QR 코드를 스캔하세요.";

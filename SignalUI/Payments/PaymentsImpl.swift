@@ -106,8 +106,10 @@ public class PaymentsImpl: NSObject, PaymentsSwift {
             try await updateFiatCurrencies()
 
             tryToReuploadPaymentProfile()
+        } catch PaymentsError.notEnabled {
+            return
         } catch {
-            owsFailDebug("Failed initialize components with error: \(error)")
+            Logger.warn("Failed initialize components with error: \(error)")
             return
         }
     }
@@ -133,15 +135,22 @@ public class PaymentsImpl: NSObject, PaymentsSwift {
         }
 
         currentSdk = try await BreezSdk.build(with: paymentEntropy)
-        try await currentSdk?.validateInitialLightningAddress()
+        if let newAddress = try await currentSdk?.validateInitialLightningAddress() {
+            currentWalletAddress = newAddress
+        }
     }
 
     private func loadWalletAddress() async throws {
-        guard let lightningAddress = try await self.getBreezSdk().getLightningAddress() else {
-            throw OWSAssertionError("Missing lightning address")
+        if currentWalletAddress != nil {
+            NotificationCenter.default.postOnMainThread(name: Self.walletAddressDidLoad, object: nil)
+            return
         }
-
+        guard let lightningAddress = try await self.getBreezSdk().getLightningAddress() else {
+            Logger.warn("No lightning address available yet — user may need to register a username.")
+            return
+        }
         currentWalletAddress = lightningAddress
+        NotificationCenter.default.postOnMainThread(name: Self.walletAddressDidLoad, object: nil)
     }
 
     private func setFetchRateHandler() async throws {
@@ -170,6 +179,9 @@ public class PaymentsImpl: NSObject, PaymentsSwift {
     }
 
     private func tryToReuploadPaymentProfile() {
+        guard DependenciesBridge.shared.tsAccountManager.registrationStateWithMaybeSneakyTransaction.isRegistered else {
+            return
+        }
         Task {
             do {
                 Logger.info("Trying to reupload payment profile")
@@ -318,6 +330,8 @@ public class PaymentsImpl: NSObject, PaymentsSwift {
 
     public static let currentPaymentBalanceDidChange = Notification.Name(
         "currentPaymentBalanceDidChange")
+    public static let incomingPaymentReceived = Notification.Name("incomingPaymentReceived")
+    public static let walletAddressDidLoad = Notification.Name("walletAddressDidLoad")
 
     private let paymentBalanceCache = AtomicOptional<PaymentBalance>(nil, lock: .sharedGlobal)
 
@@ -561,7 +575,7 @@ extension PaymentsImpl {
         owsAssertDebug(paymentsState.isEnabled)
 
         guard let addressData = walletAddressLNURL?.data(using: .utf8) else {
-            owsFailDebug("Missing wallet address.")
+            Logger.warn("Missing wallet address — Breez SDK not yet initialized.")
             return nil
         }
 
@@ -600,7 +614,6 @@ extension PaymentsImpl {
 
         guard let localPaymentAddress = buildLocalPaymentAddress(paymentsState: paymentsState)
         else {
-            owsFailDebug("Missing localPaymentAddress.")
             return nil
         }
         guard localPaymentAddress.isValid, localPaymentAddress.currency == .bitcoin else {
@@ -1267,6 +1280,17 @@ public class PaymentsEventsMainApp: NSObject, PaymentsEvents {
 
         // If we're inserting a new payment of any kind, our balance may have changed.
         payments.updateCurrentPaymentBalance()
+
+        if paymentModel.isIncoming {
+            let picoMob = paymentModel.paymentAmount?.picoMob ?? 0
+            transaction.addSyncCompletion {
+                NotificationCenter.default.postOnMainThread(
+                    name: PaymentsImpl.incomingPaymentReceived,
+                    object: nil,
+                    userInfo: ["picoMob": picoMob]
+                )
+            }
+        }
     }
 
     public func willUpdatePayment(_ paymentModel: TSPaymentModel, transaction: DBWriteTransaction) {

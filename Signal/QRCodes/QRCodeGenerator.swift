@@ -32,6 +32,10 @@ struct QRCodeGenerator {
         )
     }
 
+    // CIContext is thread-safe and expensive to create (triggers Metal pipeline init).
+    // Sharing one instance avoids re-initializing the GPU on every call.
+    private static let sharedCIContext = CIContext(options: nil)
+
     /// Generate an un-styled QR code image encoding the given data.
     func generateUnstyledQRCode(data: Data) -> UIImage? {
         guard let filter = CIFilter(name: "CIQRCodeGenerator") else {
@@ -58,8 +62,7 @@ struct QRCodeGenerator {
 
         // UIImages backed by a CIImage won't render without antialiasing, so we convert the backing
         // image to a CGImage, which can be scaled crisply.
-        let context = CIContext(options: nil)
-        guard let cgImage = context.createCGImage(recoloredCIImage, from: recoloredCIImage.extent) else {
+        guard let cgImage = Self.sharedCIContext.createCGImage(recoloredCIImage, from: recoloredCIImage.extent) else {
             owsFailDebug("Failed to create CG image!")
             return nil
         }

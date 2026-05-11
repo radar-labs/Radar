@@ -174,7 +174,7 @@ public class PaymentsCurrenciesImpl: PaymentsCurrenciesSwift, PaymentsCurrencies
 
     private func _updateConversionRates() async throws {
         guard let fetchRateHandler = self.fetchRateHandler else {
-            throw OWSAssertionError("Missing fetchRateHandler")
+            return
         }
         
         let rates = try await fetchRateHandler()
