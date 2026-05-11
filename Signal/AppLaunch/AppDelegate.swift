@@ -677,14 +677,15 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
             }
         }
 
-        appReadiness.runNowOrWhenAppDidBecomeReadyAsync {
-            Task {
-                try? await RemoteMegaphoneFetcher(
-                    databaseStorage: SSKEnvironment.shared.databaseStorageRef,
-                    signalService: SSKEnvironment.shared.signalServiceRef
-                ).syncRemoteMegaphonesIfNecessary()
-            }
-        }
+        // Disabled: prevents Signal's "Donate Today" and other promotional megaphones from appearing.
+//        appReadiness.runNowOrWhenAppDidBecomeReadyAsync {
+//            Task {
+//                try? await RemoteMegaphoneFetcher(
+//                    databaseStorage: SSKEnvironment.shared.databaseStorageRef,
+//                    signalService: SSKEnvironment.shared.signalServiceRef
+//                ).syncRemoteMegaphonesIfNecessary()
+//            }
+//        }
 
         appReadiness.runNowOrWhenAppDidBecomeReadyAsync {
             DependenciesBridge.shared.orphanedAttachmentCleaner.beginObserving()
