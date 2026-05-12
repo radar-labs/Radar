@@ -1,7 +1,7 @@
 {
   "images" : [
     {
-      "filename" : "signal-logo-ultramarine.pdf",
+      "filename" : "radar-splash.pdf",
       "idiom" : "universal"
     },
     {
@@ -11,7 +11,7 @@
           "value" : "dark"
         }
       ],
-      "filename" : "signal-logo-white.pdf",
+      "filename" : "radar-splash-dark.pdf",
       "idiom" : "universal"
     }
   ],
