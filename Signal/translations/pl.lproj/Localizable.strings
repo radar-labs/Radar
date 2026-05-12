@@ -9616,6 +9616,12 @@ Send money securely.";
 /* Button label to confirm the chosen username on the username setup screen during onboarding. */
 "USERNAME_ONBOARDING_CONFIRM_BUTTON" = "Confirm";
 
+/* Button label to edit the username on the existing username screen during onboarding. */
+"USERNAME_ONBOARDING_EDIT_BUTTON" = "Edit my Username";
+
+/* Subtitle shown on the username screen during onboarding when the user already has a username. */
+"USERNAME_ONBOARDING_EXISTING_SUBTITLE" = "This is your username for connecting with other users on Radar and Signal";
+
 /* Subtitle for the username setup screen during onboarding, explaining what usernames are used for on Radar and Signal. */
 "USERNAME_ONBOARDING_SUBTITLE" = "Set your custom username for connecting with other users on Radar and Signal";
 

@@ -17,12 +17,24 @@ class PaymentsOnboardingCoordinator {
     func prepareForPresentation(inNavController navController: UINavigationController) -> UIViewController {
         self.navController = navController
 
+        let existingUsername: Usernames.ParsedUsername? = SSKEnvironment.shared.databaseStorageRef.read { tx in
+            switch DependenciesBridge.shared.localUsernameManager.usernameState(tx: tx) {
+            case .available(let username, _):
+                return Usernames.ParsedUsername(rawUsername: username)
+            case .linkCorrupted(let username):
+                return Usernames.ParsedUsername(rawUsername: username)
+            case .unset, .usernameAndLinkCorrupted:
+                return nil
+            }
+        }
+
         let context = UsernameOnboardingViewModel.Context(
-            localUsernameManager: DependenciesBridge.shared.localUsernameManager
+            localUsernameManager: DependenciesBridge.shared.localUsernameManager,
+            existingUsername: existingUsername
         )
         return UsernameOnboardingViewController(
             context: context,
-            onConfirm: { [self] _ in showIntro() },
+            onConfirm: { [self] in showIntro() },
             onSkip: { [self] in showIntro() }
         )
     }
