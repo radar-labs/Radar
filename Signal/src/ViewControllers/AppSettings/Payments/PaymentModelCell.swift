@@ -14,8 +14,10 @@ public class PaymentModelCell: UITableViewCell {
     let nameLabel = UILabel()
     let statusLabel = UILabel()
     let amountLabel = UILabel()
+    let fiatAmountLabel = UILabel()
     let hStack = UIStackView()
     let vStack = UIStackView()
+    let amountStack = UIStackView()
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -26,6 +28,20 @@ public class PaymentModelCell: UITableViewCell {
 
         amountLabel.setCompressionResistanceHigh()
         amountLabel.setContentHuggingHigh()
+        amountLabel.textAlignment = .right
+
+        fiatAmountLabel.setCompressionResistanceHigh()
+        fiatAmountLabel.setContentHuggingHigh()
+        fiatAmountLabel.textAlignment = .right
+        fiatAmountLabel.font = UIFont.systemFont(ofSize: 14)
+        fiatAmountLabel.textColor = Theme.ternaryTextColor
+
+        amountStack.addArrangedSubview(amountLabel)
+        amountStack.addArrangedSubview(fiatAmountLabel)
+        amountStack.axis = .vertical
+        amountStack.alignment = .trailing
+        amountStack.setCompressionResistanceHigh()
+        amountStack.setContentHuggingHigh()
 
         vStack.addArrangedSubview(nameLabel)
         vStack.addArrangedSubview(statusLabel)
@@ -65,7 +81,7 @@ public class PaymentModelCell: UITableViewCell {
         statusLabel.font = .dynamicTypeSubheadlineClamped
         statusLabel.textColor = Theme.ternaryTextColor
 
-        amountLabel.font = .dynamicTypeBodyClamped
+        amountLabel.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         amountLabel.textColor = (paymentItem.isIncoming
                                     ? UIColor.ows_accentGreen
                                     : Theme.primaryTextColor)
@@ -93,11 +109,12 @@ public class PaymentModelCell: UITableViewCell {
 
         // We don't want to render the amount for incoming
         // transactions until they are verified.
-        amountLabel.text = paymentItem.formattedTotalPaymentAmount
-        amountLabel.font = amountLabel.font.withSize(10)
-        
+        let prefix = paymentItem.isIncoming ? "+ " : "- "
+        amountLabel.text = paymentItem.formattedTotalPaymentAmount.map { prefix + $0 }
+        fiatAmountLabel.text = paymentItem.formattedFiatPaymentAmount
+
         arrangedSubviews.append(vStack)
-        arrangedSubviews.append(amountLabel)
+        arrangedSubviews.append(amountStack)
         hStack.removeAllSubviews()
         for subview in arrangedSubviews {
             hStack.addArrangedSubview(subview)
@@ -115,5 +132,6 @@ public class PaymentModelCell: UITableViewCell {
         nameLabel.text = nil
         statusLabel.text = nil
         amountLabel.text = nil
+        fiatAmountLabel.text = nil
     }
 }

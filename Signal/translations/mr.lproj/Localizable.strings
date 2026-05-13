@@ -6108,10 +6108,10 @@ Send money securely.";
 "PAYMENTS_LOCK_REASON_UNLOCK_PAYMENTS_LOCK" = "पेमेंटची पुष्टी करण्यास प्रमाणीकरण करा.";
 
 /* Label for the 'add memo' ui in the 'send payment' UI. */
-"PAYMENTS_NEW_PAYMENT_ADD_MEMO" = "टीप जोडा";
+"PAYMENTS_NEW_PAYMENT_ADD_MEMO" = "नोंद (पर्यायी)";
 
 /* Format for the 'balance' indicator. Embeds {{ the current payments balance }}. */
-"PAYMENTS_NEW_PAYMENT_BALANCE_FORMAT" = "उपलब्ध बॅलंस: %1$@";
+"PAYMENTS_NEW_PAYMENT_BALANCE_FORMAT" = "उपलब्ध: %@";
 
 /* Label for the 'confirm payment' button. */
 "PAYMENTS_NEW_PAYMENT_CONFIRM_PAYMENT_BUTTON" = "पेमेंटची पुष्टी करा";
@@ -6175,6 +6175,9 @@ Send money securely.";
 
 /* Format for the 'payment recipient amount' indicator. Embeds {{ the name of the recipient of the payment }}. */
 "PAYMENTS_NEW_PAYMENT_RECIPIENT_AMOUNT_FORMAT" = "%1$@ ला";
+
+/* Label for the 'send payment' button. */
+"PAYMENTS_NEW_PAYMENT_SEND_BUTTON" = "पाठवा";
 
 /* Label for the payments notification banner for a single payment notification. */
 "PAYMENTS_NOTIFICATION_BANNER_1" = "1 नवीन पेमेंट सूचना";
@@ -6290,6 +6293,9 @@ Send money securely.";
 
 /* Title for error alert indicating that a given user cannot receive payments because they have not enabled payments. Embeds {{ the contact's name }} */
 "PAYMENTS_RECIPIENT_PAYMENTS_NOT_ENABLED_TITLE" = "%1$@ ने पेमेंट्स सक्रिय केलेले नाहीत";
+
+/* Label for 'send' button on the payments screen. */
+"PAYMENTS_SCREEN_SEND_BUTTON" = "Send";
 
 /* Payments Preview Text shown in chat list for payments. */
 "PAYMENTS_THREAD_PREVIEW_TEXT" = "💳 पेमेंट";

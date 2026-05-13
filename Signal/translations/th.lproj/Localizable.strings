@@ -6108,10 +6108,10 @@ Send money securely.";
 "PAYMENTS_LOCK_REASON_UNLOCK_PAYMENTS_LOCK" = "รับรองความถูกต้องเพื่อยืนยันการชำระเงิน";
 
 /* Label for the 'add memo' ui in the 'send payment' UI. */
-"PAYMENTS_NEW_PAYMENT_ADD_MEMO" = "เพิ่มบันทึก";
+"PAYMENTS_NEW_PAYMENT_ADD_MEMO" = "หมายเหตุ (ไม่บังคับ)";
 
 /* Format for the 'balance' indicator. Embeds {{ the current payments balance }}. */
-"PAYMENTS_NEW_PAYMENT_BALANCE_FORMAT" = "ยอดคงเหลือ: %1$@";
+"PAYMENTS_NEW_PAYMENT_BALANCE_FORMAT" = "ที่มีอยู่: %@";
 
 /* Label for the 'confirm payment' button. */
 "PAYMENTS_NEW_PAYMENT_CONFIRM_PAYMENT_BUTTON" = "ยืนยันการจ่ายเงิน";
@@ -6175,6 +6175,9 @@ Send money securely.";
 
 /* Format for the 'payment recipient amount' indicator. Embeds {{ the name of the recipient of the payment }}. */
 "PAYMENTS_NEW_PAYMENT_RECIPIENT_AMOUNT_FORMAT" = "ถึง %1$@";
+
+/* Label for the 'send payment' button. */
+"PAYMENTS_NEW_PAYMENT_SEND_BUTTON" = "ส่ง";
 
 /* Label for the payments notification banner for a single payment notification. */
 "PAYMENTS_NOTIFICATION_BANNER_1" = "1 การแจ้งเตือนการชำระเงิน";
@@ -6290,6 +6293,9 @@ Send money securely.";
 
 /* Title for error alert indicating that a given user cannot receive payments because they have not enabled payments. Embeds {{ the contact's name }} */
 "PAYMENTS_RECIPIENT_PAYMENTS_NOT_ENABLED_TITLE" = "%1$@ ยังไม่ได้เปิดใช้การชำระเงิน";
+
+/* Label for 'send' button on the payments screen. */
+"PAYMENTS_SCREEN_SEND_BUTTON" = "Send";
 
 /* Payments Preview Text shown in chat list for payments. */
 "PAYMENTS_THREAD_PREVIEW_TEXT" = "💳 การชำระเงิน";

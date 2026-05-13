@@ -197,19 +197,21 @@ class BitcoinUnitPickerViewController: OWSTableViewController2 {
         let isSatoshi = PaymentsDisplayPreferences.shared.isSatoshiEnabled
 
         section.add(.item(
-            name: "sats",
-            accessoryType: isSatoshi ? .checkmark : .none,
+            name: "Bitcoin",
+            subtitle: "BTC",
+            accessoryType: !isSatoshi ? .checkmark : .none,
             actionBlock: { [weak self] in
-                PaymentsDisplayPreferences.shared.isSatoshiEnabled = true
+                PaymentsDisplayPreferences.shared.isSatoshiEnabled = false
                 self?.navigationController?.popViewController(animated: true)
             }
         ))
 
         section.add(.item(
-            name: "BTC",
-            accessoryType: !isSatoshi ? .checkmark : .none,
+            name: "Satoshi",
+            subtitle: "1 sat = 0.00 000 001 BTC",
+            accessoryType: isSatoshi ? .checkmark : .none,
             actionBlock: { [weak self] in
-                PaymentsDisplayPreferences.shared.isSatoshiEnabled = false
+                PaymentsDisplayPreferences.shared.isSatoshiEnabled = true
                 self?.navigationController?.popViewController(animated: true)
             }
         ))

@@ -133,7 +133,7 @@ public class CVComponentPaymentAttachment: CVComponentBase, CVComponent {
         componentView.badgePillView.backgroundColor = accentBgColor
         componentView.badgeLabel.text = badgeText
         componentView.badgeLabel.textColor = textColor
-        let arrowSymbol = isIncoming ? "arrow.down.left" : "arrow.up.right"
+        let arrowSymbol = isIncoming ? "arrow.down.right" : "arrow.up.right"
         componentView.badgeIconView.image = UIImage(systemName: arrowSymbol)?
             .withConfiguration(UIImage.SymbolConfiguration(pointSize: 10, weight: .medium))
         componentView.badgeIconView.tintColor = textColor

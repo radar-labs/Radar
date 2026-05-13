@@ -6108,10 +6108,10 @@ Send money securely.";
 "PAYMENTS_LOCK_REASON_UNLOCK_PAYMENTS_LOCK" = "Uwierzytelnij, aby potwierdzić płatność.";
 
 /* Label for the 'add memo' ui in the 'send payment' UI. */
-"PAYMENTS_NEW_PAYMENT_ADD_MEMO" = "Dodaj notatkę";
+"PAYMENTS_NEW_PAYMENT_ADD_MEMO" = "Notatka (opcjonalnie)";
 
 /* Format for the 'balance' indicator. Embeds {{ the current payments balance }}. */
-"PAYMENTS_NEW_PAYMENT_BALANCE_FORMAT" = "Dostępne środki: %1$@";
+"PAYMENTS_NEW_PAYMENT_BALANCE_FORMAT" = "Dostępne: %@";
 
 /* Label for the 'confirm payment' button. */
 "PAYMENTS_NEW_PAYMENT_CONFIRM_PAYMENT_BUTTON" = "Potwierdź płatność";
@@ -6175,6 +6175,9 @@ Send money securely.";
 
 /* Format for the 'payment recipient amount' indicator. Embeds {{ the name of the recipient of the payment }}. */
 "PAYMENTS_NEW_PAYMENT_RECIPIENT_AMOUNT_FORMAT" = "Odbiorca: %1$@";
+
+/* Label for the 'send payment' button. */
+"PAYMENTS_NEW_PAYMENT_SEND_BUTTON" = "Wyślij";
 
 /* Label for the payments notification banner for a single payment notification. */
 "PAYMENTS_NOTIFICATION_BANNER_1" = "Nowe powiadomienie o płatności";
@@ -6290,6 +6293,9 @@ Send money securely.";
 
 /* Title for error alert indicating that a given user cannot receive payments because they have not enabled payments. Embeds {{ the contact's name }} */
 "PAYMENTS_RECIPIENT_PAYMENTS_NOT_ENABLED_TITLE" = "%1$@ nie ma aktywowanych płatności";
+
+/* Label for 'send' button on the payments screen. */
+"PAYMENTS_SCREEN_SEND_BUTTON" = "Send";
 
 /* Payments Preview Text shown in chat list for payments. */
 "PAYMENTS_THREAD_PREVIEW_TEXT" = "💳 Płatność";

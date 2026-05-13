@@ -49,6 +49,9 @@ public class SendPaymentViewController: OWSViewController {
     private let currencyConversionInfoView = UIImageView()
 
     private let balanceLabel = SendPaymentHelper.buildBottomLabel()
+    private let noteTextField = UITextField()
+    private let noteContainer = UIView()
+    private let balancePillView = UIView()
 
     // MARK: - Amount
 
@@ -441,7 +444,6 @@ public class SendPaymentViewController: OWSViewController {
         updateBalanceLabel()
 
         let swapCurrencyIconSize: CGFloat = 24
-        let bigAmountLeft = UIView.container()
         let bigAmountRight: UIView
         if nil != currentCurrencyConversion {
             bigAmountRight = UIImageView.withTemplateImageName("transfer", tintColor: .ows_gray45)
@@ -452,31 +454,28 @@ public class SendPaymentViewController: OWSViewController {
         } else {
             bigAmountRight = UIView.container()
         }
-        bigAmountLeft.autoSetDimension(.width, toSize: swapCurrencyIconSize)
         bigAmountRight.autoSetDimension(.width, toSize: swapCurrencyIconSize)
-        let bigAmountRow = UIStackView(arrangedSubviews: [bigAmountLeft, bigAmountLabel, bigAmountRight])
+
+        let amountWithIcon = UIStackView(arrangedSubviews: [bigAmountLabel, bigAmountRight])
+        amountWithIcon.axis = .horizontal
+        amountWithIcon.alignment = .center
+        amountWithIcon.spacing = 6
+
+        let amountLeftSpacer = UIView.container()
+        let amountRightSpacer = UIView.container()
+        amountLeftSpacer.setContentHuggingHorizontalLow()
+        amountRightSpacer.setContentHuggingHorizontalLow()
+        UIView.matchWidthsOfViews([amountLeftSpacer, amountRightSpacer])
+        let bigAmountRow = UIStackView(arrangedSubviews: [amountLeftSpacer, amountWithIcon, amountRightSpacer])
         bigAmountRow.axis = .horizontal
         bigAmountRow.alignment = .center
-        bigAmountRow.spacing = 8
 
-        let memoView: UIView
-        if let hasMemoView = PaymentsViewUtils.buildMemoLabel(memoMessage: memoMessage) {
-            memoView = hasMemoView
-        } else {
-            let addMemoLabel = UILabel()
-            addMemoLabel.text = OWSLocalizedString("PAYMENTS_NEW_PAYMENT_ADD_MEMO",
-                                                  comment: "Label for the 'add memo' ui in the 'send payment' UI.")
-            addMemoLabel.font = .dynamicTypeBodyClamped
-            addMemoLabel.textColor = Theme.accentBlueColor
-            memoView = addMemoLabel
-        }
-        let memoStack = UIStackView(arrangedSubviews: [memoView])
-        memoStack.axis = .vertical
-        memoStack.alignment = .center
-        memoStack.isLayoutMarginsRelativeArrangement = true
-        memoStack.layoutMargins = UIEdgeInsets(hMargin: 0, vMargin: 12)
-        memoStack.isUserInteractionEnabled = true
-        memoStack.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(didTapAddMemo)))
+        noteContainer.backgroundColor = OWSTableViewController2.cellBackgroundColor(isUsingPresentedStyle: isUsingPresentedStyle)
+        noteTextField.text = memoMessage
+
+        balancePillView.backgroundColor = Theme.isDarkThemeEnabled
+            ? UIColor.white.withAlphaComponent(0.1)
+            : UIColor.black.withAlphaComponent(0.05)
 
         let spacerFactory = SpacerFactory()
 
@@ -504,11 +503,10 @@ public class SendPaymentViewController: OWSViewController {
             smallAmountRow
         ]
         if isIdentifiedPayment {
-            requiredViews.append(memoStack)
+            requiredViews.append(noteContainer)
         }
         requiredViews += [
-            amountButtons,
-            balanceLabel
+            amountButtons
         ]
         requiredViews += keyboardViews.keyboardRows
 
@@ -517,16 +515,25 @@ public class SendPaymentViewController: OWSViewController {
             requiredView.setContentHuggingHigh()
         }
 
+        let balanceLeftSpacer = UIView.container()
+        let balanceRightSpacer = UIView.container()
+        balanceLeftSpacer.setContentHuggingHorizontalLow()
+        balanceRightSpacer.setContentHuggingHorizontalLow()
+        UIView.matchWidthsOfViews([balanceLeftSpacer, balanceRightSpacer])
+        let balancePillRow = UIStackView(arrangedSubviews: [balanceLeftSpacer, balancePillView, balanceRightSpacer])
+        balancePillRow.axis = .horizontal
+        balancePillRow.alignment = .center
+
         rootStack.removeAllSubviews()
         rootStack.addArrangedSubviews([
-            spacerFactory.buildVSpacer(),
+            balancePillRow,
             spacerFactory.buildVSpacer(),
             spacerFactory.buildVSpacer(),
             bigAmountRow,
             smallAmountRow,
             spacerFactory.buildVSpacer(),
             spacerFactory.buildVSpacer(),
-            memoStack,
+            noteContainer,
             spacerFactory.buildVSpacer(),
             spacerFactory.buildVSpacer(),
             spacerFactory.buildVSpacer()
@@ -536,9 +543,7 @@ public class SendPaymentViewController: OWSViewController {
             spacerFactory.buildVSpacer(),
             spacerFactory.buildVSpacer(),
             spacerFactory.buildVSpacer(),
-            amountButtons,
-            spacerFactory.buildVSpacer(),
-            balanceLabel
+            amountButtons
         ])
 
         spacerFactory.finalizeSpacers()
@@ -687,7 +692,7 @@ public class SendPaymentViewController: OWSViewController {
 
     private func buildAmountButtons() -> UIView {
         return buildBottomButtonStack([buildBottomButton(
-            title: OWSLocalizedString("PAYMENTS_NEW_PAYMENT_PAY_BUTTON", comment: "Label for the 'new payment' button."),
+            title: OWSLocalizedString("PAYMENTS_NEW_PAYMENT_SEND_BUTTON", comment: "Label for the 'send payment' button."),
             target: self,
             selector: #selector(didTapPayButton)
         )])
@@ -723,6 +728,31 @@ public class SendPaymentViewController: OWSViewController {
         currencyConversionInfoView.setTemplateImageName("info-compact", tintColor: Theme.secondaryTextAndIconColor)
         currencyConversionInfoView.autoSetDimensions(to: .square(16))
         currencyConversionInfoView.setCompressionResistanceHigh()
+
+        noteTextField.placeholder = OWSLocalizedString(
+            "PAYMENTS_NEW_PAYMENT_ADD_MEMO",
+            comment: "Placeholder for the note text field in the 'send payment' UI."
+        )
+        noteTextField.font = .dynamicTypeBodyClamped
+        noteTextField.borderStyle = .none
+        noteTextField.addTarget(self, action: #selector(noteTextFieldDidChange), for: .editingChanged)
+
+        noteContainer.layer.cornerRadius = 26
+        noteContainer.layer.masksToBounds = true
+        noteContainer.addSubview(noteTextField)
+        noteTextField.autoPinEdge(toSuperviewEdge: .leading, withInset: 16)
+        noteTextField.autoPinEdge(toSuperviewEdge: .trailing, withInset: 16)
+        noteTextField.autoPinEdge(toSuperviewEdge: .top)
+        noteTextField.autoPinEdge(toSuperviewEdge: .bottom)
+        noteContainer.autoSetDimension(.height, toSize: 52)
+
+        balancePillView.layer.cornerRadius = 16
+        balancePillView.layer.masksToBounds = true
+        balancePillView.addSubview(balanceLabel)
+        balanceLabel.autoPinEdge(toSuperviewEdge: .leading, withInset: 12)
+        balanceLabel.autoPinEdge(toSuperviewEdge: .trailing, withInset: 12)
+        balanceLabel.autoPinEdge(toSuperviewEdge: .top, withInset: 6)
+        balanceLabel.autoPinEdge(toSuperviewEdge: .bottom, withInset: 6)
     }
 
     private func updateAmountLabels() {
@@ -836,10 +866,8 @@ public class SendPaymentViewController: OWSViewController {
     // MARK: - Events
 
     @objc
-    private func didTapAddMemo() {
-        let view = SendPaymentMemoViewController(memoMessage: self.memoMessage)
-        view.delegate = self
-        navigationController?.pushViewController(view, animated: true)
+    private func noteTextFieldDidChange() {
+        memoMessage = noteTextField.text?.nilIfEmpty
     }
 
     private func updateAmount(_ amount: Amount) -> Amount {
@@ -1171,16 +1199,6 @@ public class SendPaymentViewController: OWSViewController {
     @objc
     private func didTapCurrencyConversionInfo() {
         PaymentsSettingsViewController.showCurrencyConversionInfoAlert(fromViewController: self)
-    }
-}
-
-// MARK: -
-
-extension SendPaymentViewController: SendPaymentMemoViewDelegate {
-    public func didChangeMemo(memoMessage: String?) {
-        self.memoMessage = memoMessage?.nilIfEmpty
-
-        updateContents()
     }
 }
 
