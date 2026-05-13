@@ -494,7 +494,7 @@ public class PaymentsSettingsViewController: OWSTableViewController2 {
         let paymentBalance = SUIEnvironment.shared.paymentsSwiftRef.currentPaymentBalance
         let prefs = PaymentsDisplayPreferences.shared
 
-        balanceLabel.attributedText = PaymentsFormat.formattedBalance(paymentBalance)
+        balanceLabel.attributedText = PaymentsFormat.formattedBalance(paymentBalance, withSpace: true)
 
         // Show spinner only while loading and not hidden.
         if paymentBalance == nil && !prefs.isBalanceHidden {

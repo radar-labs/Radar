@@ -149,24 +149,25 @@ public extension PaymentsFormat {
     /// hide/show preference and the sats/btc preference.
     /// - Pass `nil` when the balance is still loading — returns a space to
     ///   preserve layout height while a spinner overlays it.
-    static func formattedBalance(_ balance: PaymentBalance?) -> NSAttributedString {
+    static func formattedBalance(_ balance: PaymentBalance?, withSpace: Bool = false) -> NSAttributedString {
         guard let balance else {
             return PaymentsDisplayPreferences.shared.isBalanceHidden
                 ? NSAttributedString(string: Self.hiddenBalanceString)
                 : NSAttributedString(string: " ")
         }
-        return formattedBalance(balance.amount)
+        return formattedBalance(balance.amount, withSpace: withSpace)
     }
 
     static func formattedBalance(
         _ amount: TSPaymentAmount,
         isShortForm: Bool = false,
-        paymentType: TSPaymentType? = nil
+        paymentType: TSPaymentType? = nil,
+        withSpace: Bool = false
     ) -> NSAttributedString {
         guard !PaymentsDisplayPreferences.shared.isBalanceHidden else {
             return NSAttributedString(string: Self.hiddenBalanceString)
         }
-        return attributedFormat(paymentAmount: amount, isShortForm: isShortForm, paymentType: paymentType)
+        return attributedFormat(paymentAmount: amount, isShortForm: isShortForm, paymentType: paymentType, withSpace: withSpace)
     }
 
     static func formattedBalance(
