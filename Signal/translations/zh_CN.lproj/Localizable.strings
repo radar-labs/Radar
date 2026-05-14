@@ -5662,10 +5662,10 @@
 "ONBOARDING_2FA_SKIP_PIN_ENTRY_TITLE" = "跳过 PIN 码设置？";
 
 /* The body for the device transfer 'choice' view 'restore backup' option */
-"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_BODY" = "从您的 Signal 备份中恢复账户和消息";
+"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_BODY" = "从您的 Radar/Signal 备份中恢复账户和消息";
 
 /* The title for the device transfer 'choice' view 'restore backup' option */
-"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_TITLE" = "恢复 Signal 安全备份";
+"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_TITLE" = "恢复 Radar/Signal 安全备份";
 
 /* Body for a sheet warning users about skipping restore. */
 "ONBOARDING_CHOOSE_RESTORE_METHOD_CONFIRM_SKIP_RESTORE_BODY" = "如果您现在跳过恢复，以后将无法进行恢复。如果您在此设备上重启备份，您当前的备份将会被您的新消息记录取代。";
@@ -5806,13 +5806,13 @@
 "ONBOARDING_SETUP_COMPLETE_SUBTITLE" = "您现在可以开始使用 Radar";
 
 /* Explanation of 'do not have old device' flow for the 'Restore or Transfer' prompt */
-"ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_BODY" = "您可以在同一个设备上重新安装 Signal";
+"ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_BODY" = "您可以在同一个设备上重新安装 Radar/Signal";
 
 /* Title for the 'do not have my old device' choice of the 'Restore or Transfer' prompt */
 "ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_TITLE" = "我无法用旧手机";
 
 /* Explanation of 'have old device' flow for the 'Restore or Transfer' prompt */
-"ONBOARDING_SPLASH_HAVE_OLD_DEVICE_BODY" = "从您当前的 Signal 账户扫描二维码以快速开始操作";
+"ONBOARDING_SPLASH_HAVE_OLD_DEVICE_BODY" = "从您当前的 Radar/Signal 账户扫描二维码以快速开始操作";
 
 /* Title for the 'have my old device' choice of the 'Restore or Transfer' prompt */
 "ONBOARDING_SPLASH_HAVE_OLD_DEVICE_TITLE" = "我可以用旧手机";
@@ -5990,6 +5990,9 @@ Send money securely.";
 
 
 /* Format for indicator of a payment amount converted to fiat currency with the freshness of the conversion rate. Embeds: {{ %1$@ the payment amount, %2$@ the freshness of the currency conversion rate }}. */
+
+/* Instruction shown on the Add Funds screen telling the user which address and network to use. */
+"PAYMENTS_ADD_FUNDS_INSTRUCTION" = "将比特币发送到以下地址和网络：";
 
 /* Title for the Add Funds onboarding screen. */
 "PAYMENTS_ADD_FUNDS_INTRO_TITLE" = "Add Funds";
@@ -6308,6 +6311,9 @@ Send money securely.";
 
 /* Indicator for unidentified outgoing payments. */
 "PAYMENTS_UNIDENTIFIED_PAYMENT_OUTGOING" = "已发送付款";
+/* Label for the Payments Username row in payment settings. */
+"PAYMENTS_USERNAME_SETTINGS_TITLE" = "付款用户名";
+
 "PAYMENTS_WALLET_ADDRESS_LOADING" = "加载中...";
 
 
@@ -7212,13 +7218,13 @@ Send money securely.";
 "REGISTRATION_PIN_CONFIRM_TITLE" = "确认 PIN 码";
 
 /* During registration, users are asked to create a PIN code. This is the subtitle on the screen where this happens. A \"learn more\" link will be added to the end of this string. */
-"REGISTRATION_PIN_CREATE_SUBTITLE" = "PIN 码可以帮您恢复账户，并为您储存在 Signal 上的信息提供加密保护。";
+"REGISTRATION_PIN_CREATE_SUBTITLE" = "PIN 码可以帮您恢复账户，并为您储存在 Radar 上的信息提供加密保护。";
 
 /* During registration, users are asked to create a PIN code. This is the title on the screen where this happens. */
 "REGISTRATION_PIN_CREATE_TITLE" = "创建您的 PIN 码";
 
 /* During re-registration, users may be asked to re-enter their PIN code. This is the subtitle on the screen where this happens. A \"learn more\" link will be added to the end of this string. */
-"REGISTRATION_PIN_ENTER_EXISTING_SUBTITLE" = "PIN 码可以帮您恢复账户，并为您储存在 Signal 上的信息提供加密保护。";
+"REGISTRATION_PIN_ENTER_EXISTING_SUBTITLE" = "PIN 码可以帮您恢复账户，并为您储存在 Radar 上的信息提供加密保护。";
 
 /* During re-registration, users may be asked to re-enter their PIN code. This is the title on the screen where this happens. */
 "REGISTRATION_PIN_ENTER_EXISTING_TITLE" = "请输入 PIN 码";

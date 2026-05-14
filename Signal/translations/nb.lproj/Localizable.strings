@@ -5806,13 +5806,13 @@
 "ONBOARDING_SETUP_COMPLETE_SUBTITLE" = "Du kan nå begynne å bruke Radar";
 
 /* Explanation of 'do not have old device' flow for the 'Restore or Transfer' prompt */
-"ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_BODY" = "Eller du skal installere Signal på nytt på samme enhet";
+"ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_BODY" = "Eller du skal installere Radar/Signal på nytt på samme enhet";
 
 /* Title for the 'do not have my old device' choice of the 'Restore or Transfer' prompt */
 "ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_TITLE" = "Jeg har ikke den gamle enheten";
 
 /* Explanation of 'have old device' flow for the 'Restore or Transfer' prompt */
-"ONBOARDING_SPLASH_HAVE_OLD_DEVICE_BODY" = "Du kan skanne en QR-kode fra Signal-kontoen din for å komme kjapt i gang";
+"ONBOARDING_SPLASH_HAVE_OLD_DEVICE_BODY" = "Du kan skanne en QR-kode fra Radar/Signal-kontoen din for å komme kjapt i gang";
 
 /* Title for the 'have my old device' choice of the 'Restore or Transfer' prompt */
 "ONBOARDING_SPLASH_HAVE_OLD_DEVICE_TITLE" = "Jeg har den gamle enheten";
@@ -5990,6 +5990,9 @@ Send money securely.";
 
 
 /* Format for indicator of a payment amount converted to fiat currency with the freshness of the conversion rate. Embeds: {{ %1$@ the payment amount, %2$@ the freshness of the currency conversion rate }}. */
+
+/* Instruction shown on the Add Funds screen telling the user which address and network to use. */
+"PAYMENTS_ADD_FUNDS_INSTRUCTION" = "Send Bitcoin til følgende adresse og nettverk:";
 
 /* Title for the Add Funds onboarding screen. */
 "PAYMENTS_ADD_FUNDS_INTRO_TITLE" = "Add Funds";
@@ -6308,6 +6311,9 @@ Send money securely.";
 
 /* Indicator for unidentified outgoing payments. */
 "PAYMENTS_UNIDENTIFIED_PAYMENT_OUTGOING" = "Sendt betaling";
+/* Label for the Payments Username row in payment settings. */
+"PAYMENTS_USERNAME_SETTINGS_TITLE" = "Betalingsbrukernavn";
+
 "PAYMENTS_WALLET_ADDRESS_LOADING" = "Laster...";
 
 
@@ -7212,13 +7218,13 @@ Send money securely.";
 "REGISTRATION_PIN_CONFIRM_TITLE" = "Bekreft PIN-koden";
 
 /* During registration, users are asked to create a PIN code. This is the subtitle on the screen where this happens. A \"learn more\" link will be added to the end of this string. */
-"REGISTRATION_PIN_CREATE_SUBTITLE" = "PIN-koden hjelper deg med å gjenopprette kontoen og holde informasjonen din kryptert på Signal.";
+"REGISTRATION_PIN_CREATE_SUBTITLE" = "PIN-koden hjelper deg med å gjenopprette kontoen og holde informasjonen din kryptert på Radar.";
 
 /* During registration, users are asked to create a PIN code. This is the title on the screen where this happens. */
 "REGISTRATION_PIN_CREATE_TITLE" = "Opprett en PIN-kode";
 
 /* During re-registration, users may be asked to re-enter their PIN code. This is the subtitle on the screen where this happens. A \"learn more\" link will be added to the end of this string. */
-"REGISTRATION_PIN_ENTER_EXISTING_SUBTITLE" = "PIN-koden hjelper deg med å gjenopprette kontoen og holde informasjonen din kryptert på Signal.";
+"REGISTRATION_PIN_ENTER_EXISTING_SUBTITLE" = "PIN-koden hjelper deg med å gjenopprette kontoen og holde informasjonen din kryptert på Radar.";
 
 /* During re-registration, users may be asked to re-enter their PIN code. This is the title on the screen where this happens. */
 "REGISTRATION_PIN_ENTER_EXISTING_TITLE" = "Skriv inn PIN-koden din";

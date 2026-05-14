@@ -5662,10 +5662,10 @@
 "ONBOARDING_2FA_SKIP_PIN_ENTRY_TITLE" = "Lewati Entri PIN?";
 
 /* The body for the device transfer 'choice' view 'restore backup' option */
-"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_BODY" = "Pulihkan akun dan pesan dari Signal Backup";
+"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_BODY" = "Pulihkan akun dan pesan dari Radar/Signal Backup";
 
 /* The title for the device transfer 'choice' view 'restore backup' option */
-"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_TITLE" = "Pulihkan Signal Secure Backups";
+"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_TITLE" = "Pulihkan Radar/Signal Secure Backups";
 
 /* Body for a sheet warning users about skipping restore. */
 "ONBOARDING_CHOOSE_RESTORE_METHOD_CONFIRM_SKIP_RESTORE_BODY" = "Jika pemulihan dilewati, nanti data cadangan tidak bisa dipulihkan sama sekali. Jika pencadangan data diaktifkan kembali di perangkat ini, data cadangan Anda saat ini akan digantikan dengan riwayat pesan baru.";
@@ -5806,13 +5806,13 @@
 "ONBOARDING_SETUP_COMPLETE_SUBTITLE" = "Anda sekarang dapat mulai menggunakan Radar";
 
 /* Explanation of 'do not have old device' flow for the 'Restore or Transfer' prompt */
-"ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_BODY" = "Atau Anda menginstal ulang Signal di perangkat yang sama";
+"ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_BODY" = "Atau Anda menginstal ulang Radar/Signal di perangkat yang sama";
 
 /* Title for the 'do not have my old device' choice of the 'Restore or Transfer' prompt */
 "ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_TITLE" = "Ponsel lama saya sudah tidak ada";
 
 /* Explanation of 'have old device' flow for the 'Restore or Transfer' prompt */
-"ONBOARDING_SPLASH_HAVE_OLD_DEVICE_BODY" = "Pindai kode QR dari akun Signal Anda saat ini untuk memulai dengan cepat";
+"ONBOARDING_SPLASH_HAVE_OLD_DEVICE_BODY" = "Pindai kode QR dari akun Radar/Signal Anda saat ini untuk memulai dengan cepat";
 
 /* Title for the 'have my old device' choice of the 'Restore or Transfer' prompt */
 "ONBOARDING_SPLASH_HAVE_OLD_DEVICE_TITLE" = "Ponsel lama saya masih ada";
@@ -5990,6 +5990,9 @@ Send money securely.";
 
 
 /* Format for indicator of a payment amount converted to fiat currency with the freshness of the conversion rate. Embeds: {{ %1$@ the payment amount, %2$@ the freshness of the currency conversion rate }}. */
+
+/* Instruction shown on the Add Funds screen telling the user which address and network to use. */
+"PAYMENTS_ADD_FUNDS_INSTRUCTION" = "Kirim Bitcoin ke Alamat dan Jaringan berikut:";
 
 /* Title for the Add Funds onboarding screen. */
 "PAYMENTS_ADD_FUNDS_INTRO_TITLE" = "Add Funds";
@@ -6308,6 +6311,9 @@ Send money securely.";
 
 /* Indicator for unidentified outgoing payments. */
 "PAYMENTS_UNIDENTIFIED_PAYMENT_OUTGOING" = "Pembayaran Terkirim";
+/* Label for the Payments Username row in payment settings. */
+"PAYMENTS_USERNAME_SETTINGS_TITLE" = "Nama pengguna pembayaran";
+
 "PAYMENTS_WALLET_ADDRESS_LOADING" = "Memuat...";
 
 
@@ -7212,13 +7218,13 @@ Send money securely.";
 "REGISTRATION_PIN_CONFIRM_TITLE" = "Konfirmasi PIN Anda";
 
 /* During registration, users are asked to create a PIN code. This is the subtitle on the screen where this happens. A \"learn more\" link will be added to the end of this string. */
-"REGISTRATION_PIN_CREATE_SUBTITLE" = "PIN dapat membantu Anda memulihkan akun dan memastikan info Anda terenkripsi di Signal.";
+"REGISTRATION_PIN_CREATE_SUBTITLE" = "PIN dapat membantu Anda memulihkan akun dan memastikan info Anda terenkripsi di Radar.";
 
 /* During registration, users are asked to create a PIN code. This is the title on the screen where this happens. */
 "REGISTRATION_PIN_CREATE_TITLE" = "Buat PIN Anda";
 
 /* During re-registration, users may be asked to re-enter their PIN code. This is the subtitle on the screen where this happens. A \"learn more\" link will be added to the end of this string. */
-"REGISTRATION_PIN_ENTER_EXISTING_SUBTITLE" = "PIN dapat membantu Anda memulihkan akun dan memastikan info Anda terenkripsi di Signal.";
+"REGISTRATION_PIN_ENTER_EXISTING_SUBTITLE" = "PIN dapat membantu Anda memulihkan akun dan memastikan info Anda terenkripsi di Radar.";
 
 /* During re-registration, users may be asked to re-enter their PIN code. This is the title on the screen where this happens. */
 "REGISTRATION_PIN_ENTER_EXISTING_TITLE" = "Masukkan PIN Anda";

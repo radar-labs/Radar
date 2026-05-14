@@ -5662,7 +5662,7 @@
 "ONBOARDING_2FA_SKIP_PIN_ENTRY_TITLE" = "Ne pas saisir de code PIN ?";
 
 /* The body for the device transfer 'choice' view 'restore backup' option */
-"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_BODY" = "Restaurez votre compte et vos messages depuis votre sauvegarde sécurisée Signal.";
+"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_BODY" = "Restaurez votre compte et vos messages depuis votre sauvegarde sécurisée Radar/Signal.";
 
 /* The title for the device transfer 'choice' view 'restore backup' option */
 "ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_TITLE" = "Restaurer une sauvegarde sécurisée";
@@ -5806,13 +5806,13 @@
 "ONBOARDING_SETUP_COMPLETE_SUBTITLE" = "Vous pouvez maintenant commencer à utiliser Radar";
 
 /* Explanation of 'do not have old device' flow for the 'Restore or Transfer' prompt */
-"ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_BODY" = "ou vous réinstallez Signal sur le même appareil";
+"ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_BODY" = "ou vous réinstallez Radar/Signal sur le même appareil";
 
 /* Title for the 'do not have my old device' choice of the 'Restore or Transfer' prompt */
 "ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_TITLE" = "Vous n'avez pas accès à votre ancien téléphone";
 
 /* Explanation of 'have old device' flow for the 'Restore or Transfer' prompt */
-"ONBOARDING_SPLASH_HAVE_OLD_DEVICE_BODY" = "Scannez un code QR depuis votre compte Signal existant pour démarrer rapidement";
+"ONBOARDING_SPLASH_HAVE_OLD_DEVICE_BODY" = "Scannez un code QR depuis votre compte Radar/Signal existant pour démarrer rapidement";
 
 /* Title for the 'have my old device' choice of the 'Restore or Transfer' prompt */
 "ONBOARDING_SPLASH_HAVE_OLD_DEVICE_TITLE" = "Vous avez accès à votre ancien téléphone";
@@ -5990,6 +5990,9 @@ Send money securely.";
 
 
 /* Format for indicator of a payment amount converted to fiat currency with the freshness of the conversion rate. Embeds: {{ %1$@ the payment amount, %2$@ the freshness of the currency conversion rate }}. */
+
+/* Instruction shown on the Add Funds screen telling the user which address and network to use. */
+"PAYMENTS_ADD_FUNDS_INSTRUCTION" = "Envoyez des Bitcoin à l'adresse et au réseau suivants :";
 
 /* Title for the Add Funds onboarding screen. */
 "PAYMENTS_ADD_FUNDS_INTRO_TITLE" = "Add Funds";
@@ -6308,6 +6311,9 @@ Send money securely.";
 
 /* Indicator for unidentified outgoing payments. */
 "PAYMENTS_UNIDENTIFIED_PAYMENT_OUTGOING" = "Paiement émis";
+/* Label for the Payments Username row in payment settings. */
+"PAYMENTS_USERNAME_SETTINGS_TITLE" = "Nom d'utilisateur des paiements";
+
 "PAYMENTS_WALLET_ADDRESS_LOADING" = "Chargement...";
 
 
@@ -7212,13 +7218,13 @@ Send money securely.";
 "REGISTRATION_PIN_CONFIRM_TITLE" = "Confirmer votre PIN";
 
 /* During registration, users are asked to create a PIN code. This is the subtitle on the screen where this happens. A \"learn more\" link will be added to the end of this string. */
-"REGISTRATION_PIN_CREATE_SUBTITLE" = "Utilisez un code PIN pour protéger les informations que vous stockez dans Signal et faciliter la restauration de votre compte.";
+"REGISTRATION_PIN_CREATE_SUBTITLE" = "Utilisez un code PIN pour protéger les informations que vous stockez dans Radar et faciliter la restauration de votre compte.";
 
 /* During registration, users are asked to create a PIN code. This is the title on the screen where this happens. */
 "REGISTRATION_PIN_CREATE_TITLE" = "Créer un code PIN";
 
 /* During re-registration, users may be asked to re-enter their PIN code. This is the subtitle on the screen where this happens. A \"learn more\" link will be added to the end of this string. */
-"REGISTRATION_PIN_ENTER_EXISTING_SUBTITLE" = "Utilisez un code PIN pour protéger les informations que vous stockez dans Signal et faciliter la restauration de votre compte.";
+"REGISTRATION_PIN_ENTER_EXISTING_SUBTITLE" = "Utilisez un code PIN pour protéger les informations que vous stockez dans Radar et faciliter la restauration de votre compte.";
 
 /* During re-registration, users may be asked to re-enter their PIN code. This is the title on the screen where this happens. */
 "REGISTRATION_PIN_ENTER_EXISTING_TITLE" = "Saisissez votre PIN";

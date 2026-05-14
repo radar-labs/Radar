@@ -22,6 +22,15 @@ class PaymentsDetailViewController: OWSTableViewController2 {
         title = OWSLocalizedString("SETTINGS_PAYMENTS_DETAIL_VIEW_TITLE",
                                   comment: "Label for the 'payments details' view of the app settings.")
 
+        if paymentItem.address != nil {
+            navigationItem.rightBarButtonItem = UIBarButtonItem(
+                image: UIImage(systemName: "bubble.left"),
+                style: .plain,
+                target: self,
+                action: #selector(didTapOpenChat)
+            )
+        }
+
         updateTableContents()
 
         DependenciesBridge.shared.databaseChangeObserver.appendDatabaseChangeDelegate(self)
@@ -437,6 +446,12 @@ class PaymentsDetailViewController: OWSTableViewController2 {
     }
 
     // MARK: -
+
+    @objc
+    private func didTapOpenChat() {
+        guard let address = paymentItem.address else { return }
+        SignalApp.shared.presentConversationForAddress(address, animated: true)
+    }
 
     private func updateItem() {
         guard let _ = SSKEnvironment.shared.databaseStorageRef.read(block: { [weak self] tx in

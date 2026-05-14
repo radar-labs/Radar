@@ -5662,10 +5662,10 @@
 "ONBOARDING_2FA_SKIP_PIN_ENTRY_TITLE" = "Bỏ qua Nhập mã PIN? ";
 
 /* The body for the device transfer 'choice' view 'restore backup' option */
-"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_BODY" = "Khôi phục tài khoản và tin nhắn của bạn từ Sao lưu Signal";
+"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_BODY" = "Khôi phục tài khoản và tin nhắn của bạn từ Sao lưu Radar/Signal";
 
 /* The title for the device transfer 'choice' view 'restore backup' option */
-"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_TITLE" = "Khôi phục bản Sao lưu bảo mật Signal";
+"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_TITLE" = "Khôi phục bản Sao lưu bảo mật Radar/Signal";
 
 /* Body for a sheet warning users about skipping restore. */
 "ONBOARDING_CHOOSE_RESTORE_METHOD_CONFIRM_SKIP_RESTORE_BODY" = "Nếu bạn bỏ qua việc khôi phục bây giờ, bạn sẽ không thể khôi phục sau này. Nếu bạn bật lại tính năng sao lưu trên thiết bị này, bản sao lưu hiện tại sẽ được thay thế bởi lịch sử tin nhắn mới.";
@@ -5806,13 +5806,13 @@
 "ONBOARDING_SETUP_COMPLETE_SUBTITLE" = "Bây giờ bạn có thể bắt đầu sử dụng Radar";
 
 /* Explanation of 'do not have old device' flow for the 'Restore or Transfer' prompt */
-"ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_BODY" = "Hoặc bạn đang cài lại Signal trên cùng thiết bị";
+"ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_BODY" = "Hoặc bạn đang cài lại Radar/Signal trên cùng thiết bị";
 
 /* Title for the 'do not have my old device' choice of the 'Restore or Transfer' prompt */
 "ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_TITLE" = "Tôi không có điện thoại cũ";
 
 /* Explanation of 'have old device' flow for the 'Restore or Transfer' prompt */
-"ONBOARDING_SPLASH_HAVE_OLD_DEVICE_BODY" = "Quét mã QR từ tài khoản Signal điện thoại của bạn để nhanh chóng bắt đầu";
+"ONBOARDING_SPLASH_HAVE_OLD_DEVICE_BODY" = "Quét mã QR từ tài khoản Radar/Signal điện thoại của bạn để nhanh chóng bắt đầu";
 
 /* Title for the 'have my old device' choice of the 'Restore or Transfer' prompt */
 "ONBOARDING_SPLASH_HAVE_OLD_DEVICE_TITLE" = "Tôi có điện thoại cũ";
@@ -5990,6 +5990,9 @@ Send money securely.";
 
 
 /* Format for indicator of a payment amount converted to fiat currency with the freshness of the conversion rate. Embeds: {{ %1$@ the payment amount, %2$@ the freshness of the currency conversion rate }}. */
+
+/* Instruction shown on the Add Funds screen telling the user which address and network to use. */
+"PAYMENTS_ADD_FUNDS_INSTRUCTION" = "Gửi Bitcoin đến Địa chỉ và Mạng lưới sau:";
 
 /* Title for the Add Funds onboarding screen. */
 "PAYMENTS_ADD_FUNDS_INTRO_TITLE" = "Add Funds";
@@ -6308,6 +6311,9 @@ Send money securely.";
 
 /* Indicator for unidentified outgoing payments. */
 "PAYMENTS_UNIDENTIFIED_PAYMENT_OUTGOING" = "Thanh toán đã gửi";
+/* Label for the Payments Username row in payment settings. */
+"PAYMENTS_USERNAME_SETTINGS_TITLE" = "Tên người dùng thanh toán";
+
 "PAYMENTS_WALLET_ADDRESS_LOADING" = "Đang tải...";
 
 
@@ -7212,13 +7218,13 @@ Send money securely.";
 "REGISTRATION_PIN_CONFIRM_TITLE" = "Xác nhận mã PIN của bạn";
 
 /* During registration, users are asked to create a PIN code. This is the subtitle on the screen where this happens. A \"learn more\" link will be added to the end of this string. */
-"REGISTRATION_PIN_CREATE_SUBTITLE" = "Mã PIN có thể giúp bạn khôi phục tài khoản và giúp mã hóa thông tin của bạn với Signal.";
+"REGISTRATION_PIN_CREATE_SUBTITLE" = "Mã PIN có thể giúp bạn khôi phục tài khoản và giúp mã hóa thông tin của bạn với Radar.";
 
 /* During registration, users are asked to create a PIN code. This is the title on the screen where this happens. */
 "REGISTRATION_PIN_CREATE_TITLE" = "Tạo mã PIN của bạn";
 
 /* During re-registration, users may be asked to re-enter their PIN code. This is the subtitle on the screen where this happens. A \"learn more\" link will be added to the end of this string. */
-"REGISTRATION_PIN_ENTER_EXISTING_SUBTITLE" = "Mã PIN có thể giúp bạn khôi phục tài khoản và giúp mã hóa thông tin của bạn với Signal.";
+"REGISTRATION_PIN_ENTER_EXISTING_SUBTITLE" = "Mã PIN có thể giúp bạn khôi phục tài khoản và giúp mã hóa thông tin của bạn với Radar.";
 
 /* During re-registration, users may be asked to re-enter their PIN code. This is the title on the screen where this happens. */
 "REGISTRATION_PIN_ENTER_EXISTING_TITLE" = "Nhập mã PIN của bạn";

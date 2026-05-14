@@ -99,7 +99,7 @@ public class CVComponentArchivedPayment: CVComponentBase, CVComponent {
         let dimTextColor = textColor.withAlphaComponent(isIncoming ? 0.5 : 0.75)
         let statusTextColor = conversationStyle.bubbleSecondaryTextColor(isIncoming: isIncoming)
         let accentBgColor: UIColor = isIncoming
-            ? UIColor.black.withAlphaComponent(0.05)
+            ? UIColor.black.withAlphaComponent(0.12)
             : UIColor.white.withAlphaComponent(0.15)
 
         // Badge pill

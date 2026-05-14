@@ -14,7 +14,7 @@ public extension PaymentsFormat {
     private static func resolvedAmountString(_ amount: TSPaymentAmount, isShortForm: Bool = false) -> String? {
         guard !PaymentsDisplayPreferences.shared.isBalanceHidden else { return nil }
         return PaymentsDisplayPreferences.shared.isSatoshiEnabled
-            ? "\(amount.picoMob)"
+            ? formatSatoshi(amount.picoMob)
             : format(picoMob: amount.picoMob, isShortForm: isShortForm)
     }
 
@@ -89,7 +89,7 @@ public extension PaymentsFormat {
         switch paymentAmount.currency {
         case .bitcoin:
             let bitcoinString = if PaymentsDisplayPreferences.shared.isSatoshiEnabled {
-                "\(paymentAmount.picoMob)"
+                (paymentType.map { $0.isIncoming ? "" : "-" } ?? "") + formatSatoshi(paymentAmount.picoMob)
             } else {
                 format(paymentAmount: paymentAmount,
                        isShortForm: isShortForm,

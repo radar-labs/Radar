@@ -5662,7 +5662,7 @@
 "ONBOARDING_2FA_SKIP_PIN_ENTRY_TITLE" = "Желите ли да прескочите унос PIN-а?";
 
 /* The body for the device transfer 'choice' view 'restore backup' option */
-"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_BODY" = "Вратите налог и поруке из резервне копије Signal-а";
+"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_BODY" = "Вратите налог и поруке из резервне копије Radar/Signal-а";
 
 /* The title for the device transfer 'choice' view 'restore backup' option */
 "ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_TITLE" = "Врати безбедну резервну копију";
@@ -5806,13 +5806,13 @@
 "ONBOARDING_SETUP_COMPLETE_SUBTITLE" = "Сада можете почети да користите Radar";
 
 /* Explanation of 'do not have old device' flow for the 'Restore or Transfer' prompt */
-"ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_BODY" = "Или поново инсталирате Signal на истом уређају";
+"ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_BODY" = "Или поново инсталирате Radar/Signal на истом уређају";
 
 /* Title for the 'do not have my old device' choice of the 'Restore or Transfer' prompt */
 "ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_TITLE" = "Немам свој стари телефон";
 
 /* Explanation of 'have old device' flow for the 'Restore or Transfer' prompt */
-"ONBOARDING_SPLASH_HAVE_OLD_DEVICE_BODY" = "Скенирајте QR код на вашем тренутном налогу на Signal-у да бисте брзо започели";
+"ONBOARDING_SPLASH_HAVE_OLD_DEVICE_BODY" = "Скенирајте QR код на вашем тренутном налогу на Radar/Signal-у да бисте брзо започели";
 
 /* Title for the 'have my old device' choice of the 'Restore or Transfer' prompt */
 "ONBOARDING_SPLASH_HAVE_OLD_DEVICE_TITLE" = "Имам свој стари телефон";
@@ -5990,6 +5990,9 @@ Send money securely.";
 
 
 /* Format for indicator of a payment amount converted to fiat currency with the freshness of the conversion rate. Embeds: {{ %1$@ the payment amount, %2$@ the freshness of the currency conversion rate }}. */
+
+/* Instruction shown on the Add Funds screen telling the user which address and network to use. */
+"PAYMENTS_ADD_FUNDS_INSTRUCTION" = "Пошаљите Bitcoin на следећу адресу и мрежу:";
 
 /* Title for the Add Funds onboarding screen. */
 "PAYMENTS_ADD_FUNDS_INTRO_TITLE" = "Add Funds";
@@ -6308,6 +6311,9 @@ Send money securely.";
 
 /* Indicator for unidentified outgoing payments. */
 "PAYMENTS_UNIDENTIFIED_PAYMENT_OUTGOING" = "Послата уплата";
+/* Label for the Payments Username row in payment settings. */
+"PAYMENTS_USERNAME_SETTINGS_TITLE" = "Корисничко име за плаћање";
+
 "PAYMENTS_WALLET_ADDRESS_LOADING" = "Učitavanje...";
 
 
@@ -7212,13 +7218,13 @@ Send money securely.";
 "REGISTRATION_PIN_CONFIRM_TITLE" = "Потврдите PIN";
 
 /* During registration, users are asked to create a PIN code. This is the subtitle on the screen where this happens. A \"learn more\" link will be added to the end of this string. */
-"REGISTRATION_PIN_CREATE_SUBTITLE" = "PIN-ови вам омогућавају да вратите налог и чувају ваше информације шифрованим у Signal-у.";
+"REGISTRATION_PIN_CREATE_SUBTITLE" = "PIN-ови вам омогућавају да вратите налог и чувају ваше информације шифрованим у Radar-у.";
 
 /* During registration, users are asked to create a PIN code. This is the title on the screen where this happens. */
 "REGISTRATION_PIN_CREATE_TITLE" = "Креирајте PIN";
 
 /* During re-registration, users may be asked to re-enter their PIN code. This is the subtitle on the screen where this happens. A \"learn more\" link will be added to the end of this string. */
-"REGISTRATION_PIN_ENTER_EXISTING_SUBTITLE" = "PIN-ови вам омогућавају да вратите налог и чувају ваше информације шифрованим у Signal-у.";
+"REGISTRATION_PIN_ENTER_EXISTING_SUBTITLE" = "PIN-ови вам омогућавају да вратите налог и чувају ваше информације шифрованим у Radar-у.";
 
 /* During re-registration, users may be asked to re-enter their PIN code. This is the title on the screen where this happens. */
 "REGISTRATION_PIN_ENTER_EXISTING_TITLE" = "Унесите PIN";

@@ -14,6 +14,12 @@ class PaymentSettingsMenuViewController: OWSTableViewController2 {
             "SETTINGS_PAYMENTS_VIEW_TITLE",
             comment: "Title for the 'payments settings' view in the app settings."
         )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(updateTableContents),
+            name: PaymentsImpl.walletAddressDidLoad,
+            object: nil
+        )
         updateTableContents()
     }
 
@@ -55,6 +61,16 @@ class PaymentSettingsMenuViewController: OWSTableViewController2 {
 
         mainSection.add(.disclosureItem(
             withText: OWSLocalizedString(
+                "PAYMENTS_USERNAME_SETTINGS_TITLE",
+                comment: "Label for the Payments Username row in payment settings."
+            ),
+            actionBlock: { [weak self] in
+                self?.didTapPaymentsUsername()
+            }
+        ))
+
+        mainSection.add(.disclosureItem(
+            withText: OWSLocalizedString(
                 "SETTINGS_PAYMENTS_VIEW_RECOVERY_PASSPHRASE",
                 comment: "Label for 'view payments recovery passphrase' button in the app settings."
             ),
@@ -86,6 +102,14 @@ class PaymentSettingsMenuViewController: OWSTableViewController2 {
         contents.add(deactivateSection)
 
         self.contents = contents
+    }
+
+    private func didTapPaymentsUsername() {
+        guard let username = SUIEnvironment.shared.paymentsImplRef.walletLightningAddressUsername else { return }
+        let vc = RadarUsernameViewController(oldUsername: username) { newUsername in
+            try await SUIEnvironment.shared.paymentsImplRef.registerUsername(newUsername)
+        }
+        navigationController?.pushViewController(vc, animated: true)
     }
 
     private func showCurrencyPicker() {

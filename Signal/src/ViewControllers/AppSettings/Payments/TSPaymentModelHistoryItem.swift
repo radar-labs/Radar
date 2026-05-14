@@ -93,7 +93,7 @@ public struct PaymentsHistoryModelItem: PaymentsHistoryItem {
             return nil
         }
 
-        return PaymentsFormat.formattedBalance(amount, paymentType: paymentType)
+        return PaymentsFormat.formattedBalance(amount, paymentType: paymentType, withSpace: true)
     }
 
     public var formattedPaymentAmount: String? {
@@ -121,7 +121,7 @@ public struct PaymentsHistoryModelItem: PaymentsHistoryItem {
         if let feeAmount = paymentModel.mobileCoin?.feeAmount {
             totalAmount = totalAmount.plus(feeAmount)
         }
-        return PaymentsFormat.formattedBalance(totalAmount, paymentType: paymentModel.paymentType).string
+        return PaymentsFormat.formattedBalance(totalAmount, withSpace: true).string
     }
     
     public var formattedFiatPaymentAmount: String? {

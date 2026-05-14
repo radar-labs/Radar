@@ -5662,10 +5662,10 @@
 "ONBOARDING_2FA_SKIP_PIN_ENTRY_TITLE" = "پن انٹری چھوڑ دیں؟";
 
 /* The body for the device transfer 'choice' view 'restore backup' option */
-"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_BODY" = "اپنے Signal کے بیک اپ سے اپنا اکاؤنٹ اور میسجز ری اسٹور کریں";
+"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_BODY" = "اپنے Radar/Signal کے بیک اپ سے اپنا اکاؤنٹ اور میسجز ری اسٹور کریں";
 
 /* The title for the device transfer 'choice' view 'restore backup' option */
-"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_TITLE" = "Signal محفوظ بیک اپس کو ری اسٹور کریں";
+"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_TITLE" = "Radar/Signal محفوظ بیک اپس کو ری اسٹور کریں";
 
 /* Body for a sheet warning users about skipping restore. */
 "ONBOARDING_CHOOSE_RESTORE_METHOD_CONFIRM_SKIP_RESTORE_BODY" = "اگر آپ ری اسٹور کرنے کو ابھی چھوڑ دیتے ہیں تو آپ بعد میں بھی ری اسٹور نہیں کر سکیں گے۔ اگر آپ اس ڈیوائس پر بیک اپس کو دوبارہ فعال کرتے ہیں، تو اپ کا موجودہ بیک اپ آپ کی نئی میسج ہسٹری سے تبدیل کر دیا جائے گا۔";
@@ -5806,13 +5806,13 @@
 "ONBOARDING_SETUP_COMPLETE_SUBTITLE" = "آپ اب Radar استعمال شروع کر سکتے ہیں";
 
 /* Explanation of 'do not have old device' flow for the 'Restore or Transfer' prompt */
-"ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_BODY" = "یا آپ اسی ڈیوائس پر Signal کو دوبارہ انسٹال کر رہے ہیں";
+"ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_BODY" = "یا آپ اسی ڈیوائس پر Radar/Signal کو دوبارہ انسٹال کر رہے ہیں";
 
 /* Title for the 'do not have my old device' choice of the 'Restore or Transfer' prompt */
 "ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_TITLE" = "میرے پاس اپنا پرانا فون موجود نہیں ہے";
 
 /* Explanation of 'have old device' flow for the 'Restore or Transfer' prompt */
-"ONBOARDING_SPLASH_HAVE_OLD_DEVICE_BODY" = "فوری آغاز کرنے کے لیے اپنے موجودہ Signal اکاؤنٹ سے QR کوڈ کو اسکین کریں";
+"ONBOARDING_SPLASH_HAVE_OLD_DEVICE_BODY" = "فوری آغاز کرنے کے لیے اپنے موجودہ Radar/Signal اکاؤنٹ سے QR کوڈ کو اسکین کریں";
 
 /* Title for the 'have my old device' choice of the 'Restore or Transfer' prompt */
 "ONBOARDING_SPLASH_HAVE_OLD_DEVICE_TITLE" = "میرے پاس اپنا پرانا فون موجود ہے";
@@ -5990,6 +5990,9 @@ Send money securely.";
 
 
 /* Format for indicator of a payment amount converted to fiat currency with the freshness of the conversion rate. Embeds: {{ %1$@ the payment amount, %2$@ the freshness of the currency conversion rate }}. */
+
+/* Instruction shown on the Add Funds screen telling the user which address and network to use. */
+"PAYMENTS_ADD_FUNDS_INSTRUCTION" = "درج ذیل پتے اور نیٹ ورک پر Bitcoin بھیجیں:";
 
 /* Title for the Add Funds onboarding screen. */
 "PAYMENTS_ADD_FUNDS_INTRO_TITLE" = "Add Funds";
@@ -6308,6 +6311,9 @@ Send money securely.";
 
 /* Indicator for unidentified outgoing payments. */
 "PAYMENTS_UNIDENTIFIED_PAYMENT_OUTGOING" = "ادائیگی بھیجی گئی";
+/* Label for the Payments Username row in payment settings. */
+"PAYMENTS_USERNAME_SETTINGS_TITLE" = "ادائیگی صارف نام";
+
 "PAYMENTS_WALLET_ADDRESS_LOADING" = "لوڈ ہو رہا ہے...";
 
 
@@ -7212,13 +7218,13 @@ Send money securely.";
 "REGISTRATION_PIN_CONFIRM_TITLE" = "اپنے پِن کی تصدیق کریں";
 
 /* During registration, users are asked to create a PIN code. This is the subtitle on the screen where this happens. A \"learn more\" link will be added to the end of this string. */
-"REGISTRATION_PIN_CREATE_SUBTITLE" = "پِنز آپ کو اپنا اکاؤنٹ بحال کرنے اور Signal کے ساتھ آپ کی معلومات کو انکرپٹ کردہ رکھنے میں مدد کرتے ہیں۔";
+"REGISTRATION_PIN_CREATE_SUBTITLE" = "پِنز آپ کو اپنا اکاؤنٹ بحال کرنے اور Radar کے ساتھ آپ کی معلومات کو انکرپٹ کردہ رکھنے میں مدد کرتے ہیں۔";
 
 /* During registration, users are asked to create a PIN code. This is the title on the screen where this happens. */
 "REGISTRATION_PIN_CREATE_TITLE" = "اپنا پن تخلیق کریں";
 
 /* During re-registration, users may be asked to re-enter their PIN code. This is the subtitle on the screen where this happens. A \"learn more\" link will be added to the end of this string. */
-"REGISTRATION_PIN_ENTER_EXISTING_SUBTITLE" = "پِنز آپ کو اپنا اکاؤنٹ بحال کرنے اور Signal کے ساتھ آپ کی معلومات کو انکرپٹ کردہ رکھنے میں مدد کرتے ہیں۔";
+"REGISTRATION_PIN_ENTER_EXISTING_SUBTITLE" = "پِنز آپ کو اپنا اکاؤنٹ بحال کرنے اور Radar کے ساتھ آپ کی معلومات کو انکرپٹ کردہ رکھنے میں مدد کرتے ہیں۔";
 
 /* During re-registration, users may be asked to re-enter their PIN code. This is the title on the screen where this happens. */
 "REGISTRATION_PIN_ENTER_EXISTING_TITLE" = "اپنا پِن درج کریں";

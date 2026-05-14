@@ -1011,21 +1011,15 @@ public class ChatListViewController: OWSViewController, HomeTabViewController {
             title = String(format: format, OWSFormat.formatUInt(unreadCount))
         }
 
-        let iconView = UIImageView.withTemplateImageName(
-            "payment",
-            tintColor: Theme.isDarkThemeEnabled ? .ows_gray15 : .ows_white
-        )
-        iconView.autoSetDimensions(to: .square(24))
-        let iconCircleView = OWSLayerView.circleView(size: CGFloat(Self.paymentsBannerAvatarSize))
-        iconCircleView.backgroundColor = (Theme.isDarkThemeEnabled
-                                            ? .ows_gray80
-                                            : .ows_gray95)
-        iconCircleView.addSubview(iconView)
-        iconView.autoCenterInSuperview()
+        let iconView = UIImageView()
+        iconView.image = UIImage(systemName: "bitcoinsign.circle.fill")
+        iconView.tintColor = Theme.isDarkThemeEnabled ? .ows_gray15 : Theme.primaryTextColor
+        iconView.contentMode = .scaleAspectFit
+        iconView.autoSetDimensions(to: .square(CGFloat(Self.paymentsBannerAvatarSize)))
 
         configureUnreadPaymentsBanner(paymentsReminderView,
                                       title: title,
-                                      avatarView: iconCircleView) { [weak self] in
+                                      avatarView: iconView) { [weak self] in
             self?.showAppSettings(mode: .payments)
         }
     }
@@ -1034,6 +1028,8 @@ public class ChatListViewController: OWSViewController, HomeTabViewController {
 
     private class PaymentsBannerView: UIView {
         let block: () -> Void
+        var dismissBlock: (() -> Void)?
+        weak var dismissButton: UIView?
 
         init(block: @escaping () -> Void) {
             self.block = block
@@ -1051,6 +1047,19 @@ public class ChatListViewController: OWSViewController, HomeTabViewController {
         @objc
         func didTap() {
             block()
+        }
+
+        @objc
+        func didTapDismiss() {
+            dismissBlock?()
+        }
+
+        override func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+            if let dismissButton {
+                let point = gestureRecognizer.location(in: self)
+                if dismissButton.frame.contains(point) { return false }
+            }
+            return true
         }
     }
 
@@ -1097,6 +1106,7 @@ public class ChatListViewController: OWSViewController, HomeTabViewController {
                                             : .ows_gray05)
         dismissButton.setCompressionResistanceHigh()
         dismissButton.setContentHuggingHigh()
+        dismissButton.isUserInteractionEnabled = true
 
         let dismissIcon = UIImageView.withTemplateImageName("x-compact",
                                                             tintColor: (Theme.isDarkThemeEnabled
@@ -1105,6 +1115,14 @@ public class ChatListViewController: OWSViewController, HomeTabViewController {
         dismissIcon.autoSetDimensions(to: .square(16))
         dismissButton.addSubview(dismissIcon)
         dismissIcon.autoCenterInSuperview()
+
+        paymentsBannerView.dismissButton = dismissButton
+        paymentsBannerView.dismissBlock = { [weak paymentsReminderView] in
+            PaymentsViewUtils.markAllUnreadPaymentsAsReadWithSneakyTransaction()
+            paymentsReminderView?.isHidden = true
+        }
+        let dismissTap = UITapGestureRecognizer(target: paymentsBannerView, action: #selector(PaymentsBannerView.didTapDismiss))
+        dismissButton.addGestureRecognizer(dismissTap)
 
         let stack = UIStackView(arrangedSubviews: [ avatarView,
                                                     textStack,

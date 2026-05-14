@@ -5662,10 +5662,10 @@
 "ONBOARDING_2FA_SKIP_PIN_ENTRY_TITLE" = "رد شدن از وارد کردن رمز؟";
 
 /* The body for the device transfer 'choice' view 'restore backup' option */
-"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_BODY" = "حساب و پیام‌هایتان را از نسخه پشتیبان سیگنال خود بازیابی کنید";
+"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_BODY" = "حساب و پیام‌هایتان را از نسخه پشتیبان Radar/سیگنال خود بازیابی کنید";
 
 /* The title for the device transfer 'choice' view 'restore backup' option */
-"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_TITLE" = "پشتیبان‌گیری امن سیگنال را بازیابی کنید";
+"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_TITLE" = "پشتیبان‌گیری امن Radar/سیگنال را بازیابی کنید";
 
 /* Body for a sheet warning users about skipping restore. */
 "ONBOARDING_CHOOSE_RESTORE_METHOD_CONFIRM_SKIP_RESTORE_BODY" = "اگر اکنون رد شوید، بعداً نمی‌توانید بازیابی کنید. اگر پشتیبان‌گیری را در این دستگاه دوباره فعال کنید، نسخه پشتیبان فعلی شما با تاریخچه پیام جدیدتان جایگزین خواهد شد.";
@@ -5806,13 +5806,13 @@
 "ONBOARDING_SETUP_COMPLETE_SUBTITLE" = "اکنون می‌توانید از Radar استفاده کنید";
 
 /* Explanation of 'do not have old device' flow for the 'Restore or Transfer' prompt */
-"ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_BODY" = "یا در حال نصب مجدد سیگنال روی همین دستگاه هستید";
+"ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_BODY" = "یا در حال نصب مجدد Radar/سیگنال روی همین دستگاه هستید";
 
 /* Title for the 'do not have my old device' choice of the 'Restore or Transfer' prompt */
 "ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_TITLE" = "تلفن قدیمی‌ام را ندارم";
 
 /* Explanation of 'have old device' flow for the 'Restore or Transfer' prompt */
-"ONBOARDING_SPLASH_HAVE_OLD_DEVICE_BODY" = "برای شروع سریع، کد QR را از حساب فعلی سیگنال خود اسکن کنید";
+"ONBOARDING_SPLASH_HAVE_OLD_DEVICE_BODY" = "برای شروع سریع، کد QR را از حساب فعلی Radar/سیگنال خود اسکن کنید";
 
 /* Title for the 'have my old device' choice of the 'Restore or Transfer' prompt */
 "ONBOARDING_SPLASH_HAVE_OLD_DEVICE_TITLE" = "تلفن قدیمی‌ام را دارم";
@@ -5990,6 +5990,9 @@ Send money securely.";
 
 
 /* Format for indicator of a payment amount converted to fiat currency with the freshness of the conversion rate. Embeds: {{ %1$@ the payment amount, %2$@ the freshness of the currency conversion rate }}. */
+
+/* Instruction shown on the Add Funds screen telling the user which address and network to use. */
+"PAYMENTS_ADD_FUNDS_INSTRUCTION" = "بیتکوین را به آدرس و شبکه زیر ارسال کنید:";
 
 /* Title for the Add Funds onboarding screen. */
 "PAYMENTS_ADD_FUNDS_INTRO_TITLE" = "Add Funds";
@@ -6308,6 +6311,9 @@ Send money securely.";
 
 /* Indicator for unidentified outgoing payments. */
 "PAYMENTS_UNIDENTIFIED_PAYMENT_OUTGOING" = "پرداخت ارسالی";
+/* Label for the Payments Username row in payment settings. */
+"PAYMENTS_USERNAME_SETTINGS_TITLE" = "نام کاربری پرداخت";
+
 "PAYMENTS_WALLET_ADDRESS_LOADING" = "در حال بارگذاری...";
 
 
@@ -7212,13 +7218,13 @@ Send money securely.";
 "REGISTRATION_PIN_CONFIRM_TITLE" = "پین خود را تأیید کنید";
 
 /* During registration, users are asked to create a PIN code. This is the subtitle on the screen where this happens. A \"learn more\" link will be added to the end of this string. */
-"REGISTRATION_PIN_CREATE_SUBTITLE" = "با کمک پین می‌توانید حسابتان را بازیابی کنید و اطلاعات حساب سیگنال‌تان را رمزگذاری‌شده نگه دارید.";
+"REGISTRATION_PIN_CREATE_SUBTITLE" = "با کمک پین می‌توانید حسابتان را بازیابی کنید و اطلاعات حساب Radar‌تان را رمزگذاری‌شده نگه دارید.";
 
 /* During registration, users are asked to create a PIN code. This is the title on the screen where this happens. */
 "REGISTRATION_PIN_CREATE_TITLE" = "پین خود را ایجاد کنید";
 
 /* During re-registration, users may be asked to re-enter their PIN code. This is the subtitle on the screen where this happens. A \"learn more\" link will be added to the end of this string. */
-"REGISTRATION_PIN_ENTER_EXISTING_SUBTITLE" = "با کمک پین می‌توانید حسابتان را بازیابی کنید و اطلاعات حساب سیگنال‌تان را رمزگذاری‌شده نگه دارید.";
+"REGISTRATION_PIN_ENTER_EXISTING_SUBTITLE" = "با کمک پین می‌توانید حسابتان را بازیابی کنید و اطلاعات حساب Radar‌تان را رمزگذاری‌شده نگه دارید.";
 
 /* During re-registration, users may be asked to re-enter their PIN code. This is the title on the screen where this happens. */
 "REGISTRATION_PIN_ENTER_EXISTING_TITLE" = "پین خود را وارد کنید";

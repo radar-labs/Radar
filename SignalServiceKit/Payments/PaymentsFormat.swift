@@ -21,6 +21,7 @@ public enum PaymentsFormat {
                                                  ? 4
                                                  : Int(PaymentsConstants.maxMobDecimalDigits))
         numberFormatter.usesSignificantDigits = false
+        numberFormatter.usesGroupingSeparator = true
         if isShortForm {
             numberFormatter.roundingMode = .halfEven
         }
@@ -38,6 +39,19 @@ public enum PaymentsFormat {
     // Used for formatting MOB (not picoMob) values for display.
     private static func mobFormat(isShortForm: Bool) -> NumberFormatter {
         isShortForm ? mobFormatShort : mobFormatLong
+    }
+
+    private static let satoshiFormatter: NumberFormatter = {
+        let f = NumberFormatter()
+        f.locale = Locale.current
+        f.numberStyle = .decimal
+        f.usesGroupingSeparator = true
+        f.maximumFractionDigits = 0
+        return f
+    }()
+
+    public static func formatSatoshi(_ picoMob: UInt64) -> String {
+        satoshiFormatter.string(from: NSNumber(value: picoMob)) ?? "\(picoMob)"
     }
 
     // Used for formatting decimal numbers in the
@@ -94,7 +108,7 @@ public enum PaymentsFormat {
                                           comment: "Indicator for unknown currency.")
             }
             
-            let amount = isSatoshi ? "\(paymentAmount.picoMob)" : amountString
+            let amount = isSatoshi ? formatSatoshi(paymentAmount.picoMob) : amountString
             
             return format(
                 amountString: amount,

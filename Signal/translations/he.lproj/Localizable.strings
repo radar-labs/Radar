@@ -5662,10 +5662,10 @@
 "ONBOARDING_2FA_SKIP_PIN_ENTRY_TITLE" = "לדלג על הכנסת PIN?";
 
 /* The body for the device transfer 'choice' view 'restore backup' option */
-"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_BODY" = "שחזור החשבון וההודעות שלך מתוך גיבוי Signal שלך";
+"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_BODY" = "שחזור החשבון וההודעות שלך מתוך גיבוי Radar/Signal שלך";
 
 /* The title for the device transfer 'choice' view 'restore backup' option */
-"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_TITLE" = "שחזור גיבוי Signal מאובטח";
+"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_TITLE" = "שחזור גיבוי Radar/Signal מאובטח";
 
 /* Body for a sheet warning users about skipping restore. */
 "ONBOARDING_CHOOSE_RESTORE_METHOD_CONFIRM_SKIP_RESTORE_BODY" = "אם תדלג/י על השחזור כעת, לא תהיה לך אפשרות לשחזר מאוחר יותר. אם תפעיל/י מחדש גיבויים במכשיר זה, הגיבוי הנוכחי שלך יוחלף עם היסטוריית ההודעות החדשה שלך.";
@@ -5806,13 +5806,13 @@
 "ONBOARDING_SETUP_COMPLETE_SUBTITLE" = "כעת תוכל להתחיל להשתמש ב-Radar";
 
 /* Explanation of 'do not have old device' flow for the 'Restore or Transfer' prompt */
-"ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_BODY" = "או שמדובר בהתקנה חוזרת של Signal על אותו מכשיר";
+"ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_BODY" = "או שמדובר בהתקנה חוזרת של Radar/Signal על אותו מכשיר";
 
 /* Title for the 'do not have my old device' choice of the 'Restore or Transfer' prompt */
 "ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_TITLE" = "אין לי את הטלפון הישן שלי";
 
 /* Explanation of 'have old device' flow for the 'Restore or Transfer' prompt */
-"ONBOARDING_SPLASH_HAVE_OLD_DEVICE_BODY" = "אפשר לסרוק קוד QR מחשבון Signal הנוכחי שלך כדי להתחיל במהירות";
+"ONBOARDING_SPLASH_HAVE_OLD_DEVICE_BODY" = "אפשר לסרוק קוד QR מחשבון Radar/Signal הנוכחי שלך כדי להתחיל במהירות";
 
 /* Title for the 'have my old device' choice of the 'Restore or Transfer' prompt */
 "ONBOARDING_SPLASH_HAVE_OLD_DEVICE_TITLE" = "יש לי את הטלפון הישן שלי";
@@ -5990,6 +5990,9 @@ Send money securely.";
 
 
 /* Format for indicator of a payment amount converted to fiat currency with the freshness of the conversion rate. Embeds: {{ %1$@ the payment amount, %2$@ the freshness of the currency conversion rate }}. */
+
+/* Instruction shown on the Add Funds screen telling the user which address and network to use. */
+"PAYMENTS_ADD_FUNDS_INSTRUCTION" = "שלח Bitcoin לכתובת ולרשת הבאות:";
 
 /* Title for the Add Funds onboarding screen. */
 "PAYMENTS_ADD_FUNDS_INTRO_TITLE" = "Add Funds";
@@ -6308,6 +6311,9 @@ Send money securely.";
 
 /* Indicator for unidentified outgoing payments. */
 "PAYMENTS_UNIDENTIFIED_PAYMENT_OUTGOING" = "שלח תשלום";
+/* Label for the Payments Username row in payment settings. */
+"PAYMENTS_USERNAME_SETTINGS_TITLE" = "שם משתמש לתשלומים";
+
 "PAYMENTS_WALLET_ADDRESS_LOADING" = "טוען...";
 
 
@@ -7212,13 +7218,13 @@ Send money securely.";
 "REGISTRATION_PIN_CONFIRM_TITLE" = "אישור ה–PIN שלך";
 
 /* During registration, users are asked to create a PIN code. This is the subtitle on the screen where this happens. A \"learn more\" link will be added to the end of this string. */
-"REGISTRATION_PIN_CREATE_SUBTITLE" = "קודי PIN יכולים לעזור לך לשחזר את החשבון שלך ולשמור על המידע שלך מוצפן עם Signal.";
+"REGISTRATION_PIN_CREATE_SUBTITLE" = "קודי PIN יכולים לעזור לך לשחזר את החשבון שלך ולשמור על המידע שלך מוצפן עם Radar.";
 
 /* During registration, users are asked to create a PIN code. This is the title on the screen where this happens. */
 "REGISTRATION_PIN_CREATE_TITLE" = "יצירת ה–PIN שלך";
 
 /* During re-registration, users may be asked to re-enter their PIN code. This is the subtitle on the screen where this happens. A \"learn more\" link will be added to the end of this string. */
-"REGISTRATION_PIN_ENTER_EXISTING_SUBTITLE" = "קודי PIN יכולים לעזור לך לשחזר את החשבון שלך ולשמור על המידע שלך מוצפן עם Signal.";
+"REGISTRATION_PIN_ENTER_EXISTING_SUBTITLE" = "קודי PIN יכולים לעזור לך לשחזר את החשבון שלך ולשמור על המידע שלך מוצפן עם Radar.";
 
 /* During re-registration, users may be asked to re-enter their PIN code. This is the title on the screen where this happens. */
 "REGISTRATION_PIN_ENTER_EXISTING_TITLE" = "הזנת ה–PIN שלך";

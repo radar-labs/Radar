@@ -161,6 +161,8 @@ class CurrencyPickerViewController<DataSourceType: CurrencyPickerDataSource>: OW
             let flagLabel = UILabel()
             flagLabel.text = flag
             flagLabel.font = .systemFont(ofSize: 28)
+            flagLabel.setContentHuggingPriority(.required, for: .horizontal)
+            flagLabel.setContentCompressionResistancePriority(.required, for: .horizontal)
 
             let nameLabel = UILabel()
             nameLabel.text = currencyInfo.name
@@ -175,6 +177,7 @@ class CurrencyPickerViewController<DataSourceType: CurrencyPickerDataSource>: OW
             let textStack = UIStackView(arrangedSubviews: [nameLabel, currencyCodeLabel])
             textStack.axis = .vertical
             textStack.alignment = .fill
+            textStack.setContentHuggingPriority(.defaultLow, for: .horizontal)
 
             let rowStack = UIStackView(arrangedSubviews: [flagLabel, textStack])
             rowStack.axis = .horizontal

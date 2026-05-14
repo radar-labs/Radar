@@ -288,7 +288,7 @@ public class PaymentsSettingsViewController: OWSTableViewController2 {
                 action: #selector(didTapEyeButton)
             )
             navigationItem.rightBarButtonItem = UIBarButtonItem(
-                image: UIImage(systemName: "gearshape"),
+                image: UIImage(systemName: "gear"),
                 landscapeImagePhone: nil,
                 style: .plain,
                 target: self,
@@ -541,29 +541,29 @@ public class PaymentsSettingsViewController: OWSTableViewController2 {
         label.textColor = isPrimary ? .white : Theme.primaryTextColor
         label.font = .dynamicTypeBodyClamped
 
-        let stack = UIStackView(arrangedSubviews: [iconView, label])
-        stack.axis = .horizontal
-        stack.alignment = .center
-        stack.spacing = 12
-        stack.layoutMargins = UIEdgeInsets(top: 12, leading: 20, bottom: 12, trailing: 20)
-        stack.isLayoutMarginsRelativeArrangement = true
-        stack.autoSetDimension(.height, toSize: 72)
-        if let selector = selector {
-            stack.isUserInteractionEnabled = true
-            stack.addGestureRecognizer(UITapGestureRecognizer(target: self, action: selector))
-        }
+        let contentStack = UIStackView(arrangedSubviews: [iconView, label])
+        contentStack.axis = .horizontal
+        contentStack.alignment = .center
+        contentStack.spacing = 12
 
-        let backgroundView = UIView()
-        backgroundView.backgroundColor = isPrimary
+        let container = UIView()
+        container.backgroundColor = isPrimary
             ? Theme.accentBlueColor
             : OWSTableViewController2.cellBackgroundColor(isUsingPresentedStyle: true)
-        backgroundView.layer.cornerRadius = 36
-        backgroundView.clipsToBounds = true
-        stack.addSubview(backgroundView)
-        stack.sendSubviewToBack(backgroundView)
-        backgroundView.autoPinEdgesToSuperviewEdges()
+        container.layer.cornerRadius = 36
+        container.clipsToBounds = true
+        container.autoSetDimension(.height, toSize: 72)
+        container.addSubview(contentStack)
+        contentStack.autoCenterInSuperview()
+        contentStack.autoPinEdge(toSuperviewEdge: .leading, withInset: 20, relation: .greaterThanOrEqual)
+        contentStack.autoPinEdge(toSuperviewEdge: .trailing, withInset: 20, relation: .greaterThanOrEqual)
 
-        return stack
+        if let selector = selector {
+            container.isUserInteractionEnabled = true
+            container.addGestureRecognizer(UITapGestureRecognizer(target: self, action: selector))
+        }
+
+        return container
     }
 
     private static func buildBalanceConversionText(paymentBalance: PaymentBalance) -> String? {
