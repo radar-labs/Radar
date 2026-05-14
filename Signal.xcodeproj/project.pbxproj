@@ -1236,6 +1236,7 @@
 		66D89A332CFE8E260074E510 /* AttachmentReference+SDSFetch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66D89A322CFE8E190074E510 /* AttachmentReference+SDSFetch.swift */; };
 		66DA59C62BBB090C00D0EC58 /* AttachmentUpload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66DA59C52BBB090C00D0EC58 /* AttachmentUpload.swift */; };
 		66DA8DF82C910D3B00799E70 /* BGProcessingTaskRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66DA8DF72C910D3B00799E70 /* BGProcessingTaskRunner.swift */; };
+
 		66DA8DFA2C91125200799E70 /* AttachmentValidationBackfillRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66DA8DF92C91125200799E70 /* AttachmentValidationBackfillRunner.swift */; };
 		66E1AD762B8FD0B700C56B7B /* Attachment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E1AD752B8FD0B700C56B7B /* Attachment.swift */; };
 		66E1AD812B8FDA6900C56B7B /* AttachmentReference.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E1AD802B8FDA6900C56B7B /* AttachmentReference.swift */; };
@@ -5224,6 +5225,7 @@
 		66D89A322CFE8E190074E510 /* AttachmentReference+SDSFetch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AttachmentReference+SDSFetch.swift"; sourceTree = "<group>"; };
 		66DA59C52BBB090C00D0EC58 /* AttachmentUpload.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttachmentUpload.swift; sourceTree = "<group>"; };
 		66DA8DF72C910D3B00799E70 /* BGProcessingTaskRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BGProcessingTaskRunner.swift; sourceTree = "<group>"; };
+
 		66DA8DF92C91125200799E70 /* AttachmentValidationBackfillRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttachmentValidationBackfillRunner.swift; sourceTree = "<group>"; };
 		66E1AD752B8FD0B700C56B7B /* Attachment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Attachment.swift; sourceTree = "<group>"; };
 		66E1AD802B8FDA6900C56B7B /* AttachmentReference.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttachmentReference.swift; sourceTree = "<group>"; };
@@ -10595,6 +10597,7 @@
 				66DA8DF92C91125200799E70 /* AttachmentValidationBackfillRunner.swift */,
 				66A1F4E52E0364140095DE4B /* BackupBGProcessingTaskRunner.swift */,
 				66DA8DF72C910D3B00799E70 /* BGProcessingTaskRunner.swift */,
+
 				66C1BF542D0CC881002296F7 /* IncrementalMessageTSAttachmentMigrationRunner.swift */,
 				66CDB7512AF9D117009A36EC /* MessageFetchBGRefreshTask.swift */,
 			);
@@ -16944,6 +16947,7 @@
 				349439D824360D63001045F7 /* BaseGroupMemberViewController.swift in Sources */,
 				34F1072026D005340053EF4D /* BatchUpdate.swift in Sources */,
 				66DA8DF82C910D3B00799E70 /* BGProcessingTaskRunner.swift in Sources */,
+
 				D9EB22202A4B636C00C73E1D /* Bitmaps+Image.swift in Sources */,
 				D9EB221E2A4B636C00C73E1D /* Bitmaps+LineDrawing.swift in Sources */,
 				D9EB221F2A4B636C00C73E1D /* Bitmaps+Shapes.swift in Sources */,
