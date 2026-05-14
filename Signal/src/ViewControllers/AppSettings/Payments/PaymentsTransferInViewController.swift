@@ -168,7 +168,7 @@ class PaymentsTransferInViewController: OWSViewController {
         mainStack.setCustomSpacing(48, after: instructionLabel)
         mainStack.setCustomSpacing(32, after: networkToggle)
         mainStack.setCustomSpacing(32, after: qrWrapper)
-        mainStack.setCustomSpacing(32, after: addressLbl)
+        mainStack.setCustomSpacing(56, after: addressLbl)
         mainStack.setCustomSpacing(16, after: buttons)
         mainStack.isLayoutMarginsRelativeArrangement = true
         mainStack.layoutMargins = UIEdgeInsets(top: 18, left: 24, bottom: 32, right: 24)
