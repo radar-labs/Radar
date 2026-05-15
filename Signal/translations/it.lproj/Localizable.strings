@@ -6947,6 +6947,15 @@ Send money securely.";
 /* Indicates this message is a quoted reply to a video file. */
 "QUOTED_REPLY_TYPE_VIDEO" = "Video";
 
+/* Footer explaining what the Radar push relay does and the implications of disabling it. */
+"RADAR_PUSH_RELAY_FOOTER" = "When enabled, Radar uses an external service to deliver push notifications even when the app has been force-quit. Disabling it removes the linked device used for relaying.";
+
+/* Header for the Radar push notification relay setting section. */
+"RADAR_PUSH_RELAY_SECTION_HEADER" = "Push relay";
+
+/* Label for the switch that enables/disables the Radar push notification relay. */
+"RADAR_PUSH_RELAY_TOGGLE_LABEL" = "Use Radar push relay";
+
 /* Label for a button to lower your raised hand in a call. */
 "RAISED_HANDS_LOWER_HAND_BUTTON" = "Abbassa la mano";
 

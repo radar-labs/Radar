@@ -117,6 +117,26 @@ class NotificationSettingsViewController: OWSTableViewController2 {
         ))
         contents.add(reregisterPushSection)
 
+        let pushRelaySection = OWSTableSection()
+        pushRelaySection.headerTitle = OWSLocalizedString(
+            "RADAR_PUSH_RELAY_SECTION_HEADER",
+            comment: "Header for the Radar push notification relay setting section."
+        )
+        pushRelaySection.footerTitle = OWSLocalizedString(
+            "RADAR_PUSH_RELAY_FOOTER",
+            comment: "Footer explaining what the Radar push relay does and the implications of disabling it."
+        )
+        pushRelaySection.add(.switch(
+            withText: OWSLocalizedString(
+                "RADAR_PUSH_RELAY_TOGGLE_LABEL",
+                comment: "Label for the switch that enables/disables the Radar push notification relay."
+            ),
+            isOn: { RadarPushRelay.isEnabled() },
+            target: self,
+            selector: #selector(didTogglePushRelaySwitch)
+        ))
+        contents.add(pushRelaySection)
+
         self.contents = contents
     }
 
@@ -136,6 +156,12 @@ class NotificationSettingsViewController: OWSTableViewController2 {
         let currentValue = SSKEnvironment.shared.databaseStorageRef.read { SSKEnvironment.shared.preferencesRef.shouldNotifyOfNewAccounts(transaction: $0) }
         guard currentValue != sender.isOn else { return }
         SSKEnvironment.shared.databaseStorageRef.write { SSKEnvironment.shared.preferencesRef.setShouldNotifyOfNewAccounts(sender.isOn, transaction: $0) }
+    }
+
+    @objc
+    private func didTogglePushRelaySwitch(_ sender: UISwitch) {
+        let newValue = sender.isOn
+        Task { await RadarPushRelay.setEnabled(newValue) }
     }
 
     private func syncPushTokens() {

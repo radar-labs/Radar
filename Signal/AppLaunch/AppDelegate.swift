@@ -747,6 +747,7 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
         if tsRegistrationState.isRegistered {
             // This should happen at any launch, background or foreground.
             SyncPushTokensJob.run()
+            Task { await RadarPushRelay.ensure(apnsHexToken: nil) }
         }
 
         if tsRegistrationState.isRegistered {
@@ -1717,6 +1718,8 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
             Task {
                 try await StickerManager.downloadPendingSickerPacks()
             }
+        } else {
+            Task { await RadarPushRelay.unregister() }
         }
 
         Self.updateApplicationShortcutItems(isRegistered: isRegistered)
