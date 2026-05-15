@@ -49,7 +49,12 @@ class PaymentsTransferInViewController: OWSViewController {
         )
 
         view.backgroundColor = OWSTableViewController2.tableBackgroundColor(isUsingPresentedStyle: true)
-        buildLayout()
+
+        if isOnboarding {
+            buildOnboardingLayout()
+        } else {
+            buildLayout()
+        }
 
         walletObserver = NotificationCenter.default.addObserver(
             forName: PaymentsImpl.walletAddressDidLoad,
@@ -65,9 +70,9 @@ class PaymentsTransferInViewController: OWSViewController {
         SUIEnvironment.shared.paymentsSwiftRef.updateCurrentPaymentBalance()
     }
 
-    // MARK: - Layout
+    // MARK: - Onboarding layout (main-branch UI)
 
-    private func buildLayout() {
+    private func buildOnboardingLayout() {
         let instructionLabel = UILabel()
         instructionLabel.text = "Send Bitcoin over the Lightning Network to the following address:"
         instructionLabel.font = UIFont.systemFont(ofSize: 17, weight: .medium)
@@ -75,7 +80,6 @@ class PaymentsTransferInViewController: OWSViewController {
         instructionLabel.textAlignment = .center
         instructionLabel.numberOfLines = 0
 
-        // QR code centred in a full-width wrapper (16pt top/bottom gives it breathing room)
         let qrView = buildQRView()
         let qrWrapper = UIView()
         qrWrapper.addSubview(qrView)
@@ -85,7 +89,6 @@ class PaymentsTransferInViewController: OWSViewController {
 
         let addressLbl = buildAddressRow()
 
-        // Buttons centred in a full-width wrapper
         let buttons = buildButtonsRow()
         let buttonsWrapper = UIView()
         buttonsWrapper.addSubview(buttons)
@@ -109,6 +112,73 @@ class PaymentsTransferInViewController: OWSViewController {
         mainStack.isLayoutMarginsRelativeArrangement = true
         mainStack.layoutMargins = UIEdgeInsets(top: 18, left: 24, bottom: 32, right: 24)
 
+        embedInScrollView(mainStack)
+
+        if let onContinue {
+            let continueContainer = makeContinueButton(action: onContinue)
+            view.addSubview(continueContainer)
+            continueContainer.translatesAutoresizingMaskIntoConstraints = false
+            NSLayoutConstraint.activate([
+                continueContainer.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+                continueContainer.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+                continueContainer.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+            ])
+            // Reserve space so scroll content is never hidden under the pinned button.
+            // Button height (≥52) + top inset (16) + bottom inset (16) = 84pt minimum.
+            if let scrollView = view.subviews.first(where: { $0 is UIScrollView }) as? UIScrollView {
+                scrollView.contentInset.bottom = 84
+            }
+        }
+    }
+
+    // MARK: - Non-onboarding layout (Figma-aligned spacing)
+
+    private func buildLayout() {
+        let instructionLabel = UILabel()
+        instructionLabel.text = OWSLocalizedString(
+            "PAYMENTS_ADD_FUNDS_INSTRUCTION",
+            comment: "Instruction shown on the Add Funds screen telling the user which address and network to use."
+        )
+        instructionLabel.font = UIFont.systemFont(ofSize: 17, weight: .medium)
+        instructionLabel.textColor = Theme.primaryTextColor
+        instructionLabel.textAlignment = .center
+        instructionLabel.numberOfLines = 0
+
+        let qrView = buildQRView()
+        let qrWrapper = UIView()
+        qrWrapper.addSubview(qrView)
+        qrView.autoHCenterInSuperview()
+        qrView.autoPinEdge(toSuperviewEdge: .top, withInset: 16)
+        qrView.autoPinEdge(toSuperviewEdge: .bottom, withInset: 16)
+
+        let addressLbl = buildAddressRow()
+        let networkToggle = buildNetworkToggle()
+        let buttons = buildButtonsRow()
+
+        let mainStack = UIStackView(arrangedSubviews: [
+            instructionLabel,
+            networkToggle,
+            qrWrapper,
+            addressLbl,
+            buttons,
+            UIView.vStretchingSpacer(),
+        ])
+        mainStack.axis = .vertical
+        mainStack.alignment = .fill
+        mainStack.setCustomSpacing(48, after: instructionLabel)
+        mainStack.setCustomSpacing(32, after: networkToggle)
+        mainStack.setCustomSpacing(32, after: qrWrapper)
+        mainStack.setCustomSpacing(56, after: addressLbl)
+        mainStack.setCustomSpacing(16, after: buttons)
+        mainStack.isLayoutMarginsRelativeArrangement = true
+        mainStack.layoutMargins = UIEdgeInsets(top: 18, left: 24, bottom: 32, right: 24)
+
+        embedInScrollView(mainStack)
+    }
+
+    // MARK: - Scroll view helper
+
+    private func embedInScrollView(_ mainStack: UIStackView) {
         let scrollView = UIScrollView()
         scrollView.alwaysBounceVertical = false
         scrollView.showsVerticalScrollIndicator = false
@@ -130,20 +200,6 @@ class PaymentsTransferInViewController: OWSViewController {
 
         contentView.addSubview(mainStack)
         mainStack.autoPinEdgesToSuperviewEdges()
-
-        if isOnboarding, let onContinue {
-            let continueContainer = makeContinueButton(action: onContinue)
-            view.addSubview(continueContainer)
-            continueContainer.translatesAutoresizingMaskIntoConstraints = false
-            NSLayoutConstraint.activate([
-                continueContainer.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-                continueContainer.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-                continueContainer.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
-            ])
-            // Reserve space so scroll content is never hidden under the pinned button.
-            // Button height (≥52) + top inset (16) + bottom inset (16) = 84pt minimum.
-            scrollView.contentInset.bottom = 84
-        }
     }
 
     // MARK: - QR view
@@ -217,7 +273,7 @@ class PaymentsTransferInViewController: OWSViewController {
         }
     }
 
-    // MARK: - Address label
+    // MARK: - Address row
 
     private func buildAddressRow() -> UIView {
         let label = UILabel()
@@ -297,26 +353,55 @@ class PaymentsTransferInViewController: OWSViewController {
         return row
     }
 
-    private func makeContinueButton(action: @escaping () -> Void) -> UIView {
-        var cfg = UIButton.Configuration.filled()
-        cfg.attributedTitle = AttributedString(
-            CommonStrings.continueButton,
-            attributes: AttributeContainer([.font: UIFont.systemFont(ofSize: 17, weight: .bold)])
+    private func buildNetworkToggle() -> UIView {
+        var lightCfg = UIButton.Configuration.filled()
+        lightCfg.attributedTitle = AttributedString(
+            "Lightning",
+            attributes: AttributeContainer([.font: UIFont.systemFont(ofSize: 13, weight: .medium)])
         )
-        cfg.baseBackgroundColor = Self.accentBlue
-        cfg.baseForegroundColor = .white
-        cfg.cornerStyle = .large
-        cfg.contentInsets = NSDirectionalEdgeInsets(top: 14, leading: 16, bottom: 14, trailing: 16)
+        lightCfg.image = UIImage(systemName: "bolt.fill")
+        lightCfg.imagePlacement = .leading
+        lightCfg.imagePadding = 6
+        lightCfg.baseBackgroundColor = .white
+        lightCfg.baseForegroundColor = Self.accentBlue
+        lightCfg.background.cornerRadius = 20
+        lightCfg.contentInsets = NSDirectionalEdgeInsets(top: 6, leading: 10, bottom: 6, trailing: 14)
 
-        let btn = UIButton(configuration: cfg, primaryAction: UIAction { _ in action() })
-        btn.autoSetDimension(.height, toSize: 52, relation: .greaterThanOrEqual)
+        let lightningBtn = UIButton(configuration: lightCfg)
+        lightningBtn.isUserInteractionEnabled = false
+
+        var onchainCfg = UIButton.Configuration.plain()
+        onchainCfg.attributedTitle = AttributedString(
+            "Onchain",
+            attributes: AttributeContainer([.font: UIFont.systemFont(ofSize: 13, weight: .medium)])
+        )
+        onchainCfg.image = UIImage(systemName: "bitcoinsign.circle")
+        onchainCfg.imagePlacement = .leading
+        onchainCfg.imagePadding = 6
+        onchainCfg.baseForegroundColor = UIColor.black.withAlphaComponent(0.5)
+        onchainCfg.contentInsets = NSDirectionalEdgeInsets(top: 6, leading: 10, bottom: 6, trailing: 14)
+
+        let onchainBtn = UIButton(configuration: onchainCfg)
+        onchainBtn.isUserInteractionEnabled = false
+
+        let tabStack = UIStackView(arrangedSubviews: [lightningBtn, onchainBtn])
+        tabStack.axis = .horizontal
+        tabStack.spacing = 0
+        tabStack.alignment = .center
+
+        let container = UIView()
+        container.backgroundColor = UIColor(red: 233/255, green: 233/255, blue: 234/255, alpha: 1)
+        container.layer.cornerRadius = 24
+        container.layer.masksToBounds = true
+        container.addSubview(tabStack)
+        tabStack.autoPinEdgesToSuperviewEdges(with: UIEdgeInsets(top: 4, left: 4, bottom: 4, right: 4))
+        container.autoSetDimension(.height, toSize: 48)
 
         let wrapper = UIView()
-        wrapper.addSubview(btn)
-        btn.autoPinEdge(toSuperviewEdge: .top, withInset: 16)
-        btn.autoPinEdge(toSuperviewEdge: .bottom, withInset: 16)
-        btn.autoPinEdge(toSuperviewEdge: .leading, withInset: 24)
-        btn.autoPinEdge(toSuperviewEdge: .trailing, withInset: 24)
+        wrapper.addSubview(container)
+        container.autoHCenterInSuperview()
+        container.autoPinEdge(toSuperviewEdge: .top)
+        container.autoPinEdge(toSuperviewEdge: .bottom)
         return wrapper
     }
 
@@ -342,6 +427,29 @@ class PaymentsTransferInViewController: OWSViewController {
         let btn = UIButton(configuration: cfg)
         btn.autoSetDimension(.height, toSize: 48)
         return btn
+    }
+
+    private func makeContinueButton(action: @escaping () -> Void) -> UIView {
+        var cfg = UIButton.Configuration.filled()
+        cfg.attributedTitle = AttributedString(
+            CommonStrings.continueButton,
+            attributes: AttributeContainer([.font: UIFont.systemFont(ofSize: 17, weight: .bold)])
+        )
+        cfg.baseBackgroundColor = Self.accentBlue
+        cfg.baseForegroundColor = .white
+        cfg.cornerStyle = .large
+        cfg.contentInsets = NSDirectionalEdgeInsets(top: 14, leading: 16, bottom: 14, trailing: 16)
+
+        let btn = UIButton(configuration: cfg, primaryAction: UIAction { _ in action() })
+        btn.autoSetDimension(.height, toSize: 52, relation: .greaterThanOrEqual)
+
+        let wrapper = UIView()
+        wrapper.addSubview(btn)
+        btn.autoPinEdge(toSuperviewEdge: .top, withInset: 16)
+        btn.autoPinEdge(toSuperviewEdge: .bottom, withInset: 16)
+        btn.autoPinEdge(toSuperviewEdge: .leading, withInset: 24)
+        btn.autoPinEdge(toSuperviewEdge: .trailing, withInset: 24)
+        return wrapper
     }
 
     // MARK: - Actions

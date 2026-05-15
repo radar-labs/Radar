@@ -5662,10 +5662,10 @@
 "ONBOARDING_2FA_SKIP_PIN_ENTRY_TITLE" = "PINの入力を省略しますか？";
 
 /* The body for the device transfer 'choice' view 'restore backup' option */
-"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_BODY" = "Signalバックアップからアカウントとメッセージを復元します";
+"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_BODY" = "Radar/Signalバックアップからアカウントとメッセージを復元します";
 
 /* The title for the device transfer 'choice' view 'restore backup' option */
-"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_TITLE" = "Signalセキュアバックアップを復元する";
+"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_TITLE" = "Radar/Signalセキュアバックアップを復元する";
 
 /* Body for a sheet warning users about skipping restore. */
 "ONBOARDING_CHOOSE_RESTORE_METHOD_CONFIRM_SKIP_RESTORE_BODY" = "復元を今スキップすると、後で復元することはできません。この端末でバックアップを再度有効にすると、現在のバックアップが新しいメッセージ履歴に置き換えられます。";
@@ -5806,13 +5806,13 @@
 "ONBOARDING_SETUP_COMPLETE_SUBTITLE" = "Radarのご利用を開始できます";
 
 /* Explanation of 'do not have old device' flow for the 'Restore or Transfer' prompt */
-"ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_BODY" = "または、Signalを同じ端末に再インストールする場合";
+"ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_BODY" = "または、Radar/Signalを同じ端末に再インストールする場合";
 
 /* Title for the 'do not have my old device' choice of the 'Restore or Transfer' prompt */
 "ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_TITLE" = "以前利用していた端末がない場合";
 
 /* Explanation of 'have old device' flow for the 'Restore or Transfer' prompt */
-"ONBOARDING_SPLASH_HAVE_OLD_DEVICE_BODY" = "新しいSignalアカウントからQRコードをスキャンすれば、すぐに再開できます";
+"ONBOARDING_SPLASH_HAVE_OLD_DEVICE_BODY" = "新しいRadar/SignalアカウントからQRコードをスキャンすれば、すぐに再開できます";
 
 /* Title for the 'have my old device' choice of the 'Restore or Transfer' prompt */
 "ONBOARDING_SPLASH_HAVE_OLD_DEVICE_TITLE" = "以前利用していた端末がある場合";
@@ -5991,6 +5991,9 @@ Send money securely.";
 
 /* Format for indicator of a payment amount converted to fiat currency with the freshness of the conversion rate. Embeds: {{ %1$@ the payment amount, %2$@ the freshness of the currency conversion rate }}. */
 
+/* Instruction shown on the Add Funds screen telling the user which address and network to use. */
+"PAYMENTS_ADD_FUNDS_INSTRUCTION" = "以下のアドレスとネットワークにBitcoinを送ってください：";
+
 /* Title for the Add Funds onboarding screen. */
 "PAYMENTS_ADD_FUNDS_INTRO_TITLE" = "Add Funds";
 
@@ -6108,10 +6111,10 @@ Send money securely.";
 "PAYMENTS_LOCK_REASON_UNLOCK_PAYMENTS_LOCK" = "支払いを確定するための認証です。";
 
 /* Label for the 'add memo' ui in the 'send payment' UI. */
-"PAYMENTS_NEW_PAYMENT_ADD_MEMO" = "メモを追加";
+"PAYMENTS_NEW_PAYMENT_ADD_MEMO" = "メモ（任意）";
 
 /* Format for the 'balance' indicator. Embeds {{ the current payments balance }}. */
-"PAYMENTS_NEW_PAYMENT_BALANCE_FORMAT" = "利用可能残高: %1$@";
+"PAYMENTS_NEW_PAYMENT_BALANCE_FORMAT" = "利用可能: %@";
 
 /* Label for the 'confirm payment' button. */
 "PAYMENTS_NEW_PAYMENT_CONFIRM_PAYMENT_BUTTON" = "決済を確認";
@@ -6175,6 +6178,9 @@ Send money securely.";
 
 /* Format for the 'payment recipient amount' indicator. Embeds {{ the name of the recipient of the payment }}. */
 "PAYMENTS_NEW_PAYMENT_RECIPIENT_AMOUNT_FORMAT" = "送金先 %1$@";
+
+/* Label for the 'send payment' button. */
+"PAYMENTS_NEW_PAYMENT_SEND_BUTTON" = "送信";
 
 /* Label for the payments notification banner for a single payment notification. */
 "PAYMENTS_NOTIFICATION_BANNER_1" = "1件の決済通知";
@@ -6291,6 +6297,9 @@ Send money securely.";
 /* Title for error alert indicating that a given user cannot receive payments because they have not enabled payments. Embeds {{ the contact's name }} */
 "PAYMENTS_RECIPIENT_PAYMENTS_NOT_ENABLED_TITLE" = "%1$@ さんは決済機能を有効にしていません";
 
+/* Label for 'send' button on the payments screen. */
+"PAYMENTS_SCREEN_SEND_BUTTON" = "Send";
+
 /* Payments Preview Text shown in chat list for payments. */
 "PAYMENTS_THREAD_PREVIEW_TEXT" = "💳 決済";
 
@@ -6302,6 +6311,9 @@ Send money securely.";
 
 /* Indicator for unidentified outgoing payments. */
 "PAYMENTS_UNIDENTIFIED_PAYMENT_OUTGOING" = "送金した決済";
+/* Label for the Payments Username row in payment settings. */
+"PAYMENTS_USERNAME_SETTINGS_TITLE" = "支払いユーザー名";
+
 "PAYMENTS_WALLET_ADDRESS_LOADING" = "読み込み中...";
 
 
@@ -7215,13 +7227,13 @@ Send money securely.";
 "REGISTRATION_PIN_CONFIRM_TITLE" = "PINの確認";
 
 /* During registration, users are asked to create a PIN code. This is the subtitle on the screen where this happens. A \"learn more\" link will be added to the end of this string. */
-"REGISTRATION_PIN_CREATE_SUBTITLE" = "PINは、アカウントの復元に使用され、お客様の情報をSignalで暗号化してお預かりすることを可能にします。";
+"REGISTRATION_PIN_CREATE_SUBTITLE" = "PINは、アカウントの復元に使用され、お客様の情報をRadarで暗号化してお預かりすることを可能にします。";
 
 /* During registration, users are asked to create a PIN code. This is the title on the screen where this happens. */
 "REGISTRATION_PIN_CREATE_TITLE" = "PINの作成";
 
 /* During re-registration, users may be asked to re-enter their PIN code. This is the subtitle on the screen where this happens. A \"learn more\" link will be added to the end of this string. */
-"REGISTRATION_PIN_ENTER_EXISTING_SUBTITLE" = "PINは、アカウントの復元に使用され、お客様の情報をSignalで暗号化してお預かりすることを可能にします。";
+"REGISTRATION_PIN_ENTER_EXISTING_SUBTITLE" = "PINは、アカウントの復元に使用され、お客様の情報をRadarで暗号化してお預かりすることを可能にします。";
 
 /* During re-registration, users may be asked to re-enter their PIN code. This is the title on the screen where this happens. */
 "REGISTRATION_PIN_ENTER_EXISTING_TITLE" = "PINを入力してください";

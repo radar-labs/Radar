@@ -5662,10 +5662,10 @@
 "ONBOARDING_2FA_SKIP_PIN_ENTRY_TITLE" = "Пропустить ввод PIN-кода?";
 
 /* The body for the device transfer 'choice' view 'restore backup' option */
-"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_BODY" = "Восстановите свою учётную запись и сообщения из резервного копирования Signal";
+"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_BODY" = "Восстановите свою учётную запись и сообщения из резервного копирования Radar/Signal";
 
 /* The title for the device transfer 'choice' view 'restore backup' option */
-"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_TITLE" = "Восстановить безопасное резервное копирование Signal";
+"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_TITLE" = "Восстановить безопасное резервное копирование Radar/Signal";
 
 /* Body for a sheet warning users about skipping restore. */
 "ONBOARDING_CHOOSE_RESTORE_METHOD_CONFIRM_SKIP_RESTORE_BODY" = "Если вы пропустите восстановление сейчас, вы не сможете выполнить его позже. Если вы повторно включите резервное копирование на этом устройстве, текущая резервная копия будет заменена новой историей сообщений.";
@@ -5806,13 +5806,13 @@
 "ONBOARDING_SETUP_COMPLETE_SUBTITLE" = "Теперь вы можете начать использовать Radar";
 
 /* Explanation of 'do not have old device' flow for the 'Restore or Transfer' prompt */
-"ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_BODY" = "Либо вы повторно устанавливаете Signal на том же устройстве";
+"ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_BODY" = "Либо вы повторно устанавливаете Radar/Signal на том же устройстве";
 
 /* Title for the 'do not have my old device' choice of the 'Restore or Transfer' prompt */
 "ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_TITLE" = "У меня нет старого телефона";
 
 /* Explanation of 'have old device' flow for the 'Restore or Transfer' prompt */
-"ONBOARDING_SPLASH_HAVE_OLD_DEVICE_BODY" = "Отсканируйте QR-код из текущей учётной записи Signal, чтобы быстро начать использование";
+"ONBOARDING_SPLASH_HAVE_OLD_DEVICE_BODY" = "Отсканируйте QR-код из текущей учётной записи Radar/Signal, чтобы быстро начать использование";
 
 /* Title for the 'have my old device' choice of the 'Restore or Transfer' prompt */
 "ONBOARDING_SPLASH_HAVE_OLD_DEVICE_TITLE" = "У меня есть мой старый телефон";
@@ -5991,6 +5991,9 @@ Send money securely.";
 
 /* Format for indicator of a payment amount converted to fiat currency with the freshness of the conversion rate. Embeds: {{ %1$@ the payment amount, %2$@ the freshness of the currency conversion rate }}. */
 
+/* Instruction shown on the Add Funds screen telling the user which address and network to use. */
+"PAYMENTS_ADD_FUNDS_INSTRUCTION" = "Отправьте Bitcoin на следующий адрес и сеть:";
+
 /* Title for the Add Funds onboarding screen. */
 "PAYMENTS_ADD_FUNDS_INTRO_TITLE" = "Add Funds";
 
@@ -6108,10 +6111,10 @@ Send money securely.";
 "PAYMENTS_LOCK_REASON_UNLOCK_PAYMENTS_LOCK" = "Аутентификация при подтверждении платежа.";
 
 /* Label for the 'add memo' ui in the 'send payment' UI. */
-"PAYMENTS_NEW_PAYMENT_ADD_MEMO" = "Добавить заметку";
+"PAYMENTS_NEW_PAYMENT_ADD_MEMO" = "Заметка (необязательно)";
 
 /* Format for the 'balance' indicator. Embeds {{ the current payments balance }}. */
-"PAYMENTS_NEW_PAYMENT_BALANCE_FORMAT" = "Доступный баланс: %1$@";
+"PAYMENTS_NEW_PAYMENT_BALANCE_FORMAT" = "Доступно: %@";
 
 /* Label for the 'confirm payment' button. */
 "PAYMENTS_NEW_PAYMENT_CONFIRM_PAYMENT_BUTTON" = "Подтвердить платёж";
@@ -6175,6 +6178,9 @@ Send money securely.";
 
 /* Format for the 'payment recipient amount' indicator. Embeds {{ the name of the recipient of the payment }}. */
 "PAYMENTS_NEW_PAYMENT_RECIPIENT_AMOUNT_FORMAT" = "Кому: %1$@";
+
+/* Label for the 'send payment' button. */
+"PAYMENTS_NEW_PAYMENT_SEND_BUTTON" = "Отправить";
 
 /* Label for the payments notification banner for a single payment notification. */
 "PAYMENTS_NOTIFICATION_BANNER_1" = "1 новое уведомление о платеже";
@@ -6291,6 +6297,9 @@ Send money securely.";
 /* Title for error alert indicating that a given user cannot receive payments because they have not enabled payments. Embeds {{ the contact's name }} */
 "PAYMENTS_RECIPIENT_PAYMENTS_NOT_ENABLED_TITLE" = "Пользователь %1$@ не активировал платежи";
 
+/* Label for 'send' button on the payments screen. */
+"PAYMENTS_SCREEN_SEND_BUTTON" = "Send";
+
 /* Payments Preview Text shown in chat list for payments. */
 "PAYMENTS_THREAD_PREVIEW_TEXT" = "💳 Платёж";
 
@@ -6302,6 +6311,9 @@ Send money securely.";
 
 /* Indicator for unidentified outgoing payments. */
 "PAYMENTS_UNIDENTIFIED_PAYMENT_OUTGOING" = "Отправленный платёж";
+/* Label for the Payments Username row in payment settings. */
+"PAYMENTS_USERNAME_SETTINGS_TITLE" = "Имя пользователя для платежей";
+
 "PAYMENTS_WALLET_ADDRESS_LOADING" = "Загрузка...";
 
 
@@ -7215,13 +7227,13 @@ Send money securely.";
 "REGISTRATION_PIN_CONFIRM_TITLE" = "Подтвердите свой Пин-код";
 
 /* During registration, users are asked to create a PIN code. This is the subtitle on the screen where this happens. A \"learn more\" link will be added to the end of this string. */
-"REGISTRATION_PIN_CREATE_SUBTITLE" = "Пин-коды могут помочь вам восстановить вашу учётную запись и сохранить вашу информацию в зашифрованном виде в Signal.";
+"REGISTRATION_PIN_CREATE_SUBTITLE" = "Пин-коды могут помочь вам восстановить вашу учётную запись и сохранить вашу информацию в зашифрованном виде в Radar.";
 
 /* During registration, users are asked to create a PIN code. This is the title on the screen where this happens. */
 "REGISTRATION_PIN_CREATE_TITLE" = "Создать Пин-код";
 
 /* During re-registration, users may be asked to re-enter their PIN code. This is the subtitle on the screen where this happens. A \"learn more\" link will be added to the end of this string. */
-"REGISTRATION_PIN_ENTER_EXISTING_SUBTITLE" = "Пин-коды могут помочь вам восстановить вашу учётную запись и сохранить вашу информацию в зашифрованном виде в Signal.";
+"REGISTRATION_PIN_ENTER_EXISTING_SUBTITLE" = "Пин-коды могут помочь вам восстановить вашу учётную запись и сохранить вашу информацию в зашифрованном виде в Radar.";
 
 /* During re-registration, users may be asked to re-enter their PIN code. This is the title on the screen where this happens. */
 "REGISTRATION_PIN_ENTER_EXISTING_TITLE" = "Введите свой Пин-код";

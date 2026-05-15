@@ -5662,10 +5662,10 @@
 "ONBOARDING_2FA_SKIP_PIN_ENTRY_TITLE" = "Saltare l'inserimento del PIN?";
 
 /* The body for the device transfer 'choice' view 'restore backup' option */
-"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_BODY" = "Ripristina account e messaggi dal tuo Backup di Signal";
+"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_BODY" = "Ripristina account e messaggi dal tuo Backup di Radar/Signal";
 
 /* The title for the device transfer 'choice' view 'restore backup' option */
-"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_TITLE" = "Ripristina i Backup sicuri di Signal";
+"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_TITLE" = "Ripristina i Backup sicuri di Radar/Signal";
 
 /* Body for a sheet warning users about skipping restore. */
 "ONBOARDING_CHOOSE_RESTORE_METHOD_CONFIRM_SKIP_RESTORE_BODY" = "Se non fai ora il ripristino, non sarà possibile eseguirlo in un secondo momento. Se attivi di nuovo i backup su questo dispositivo, il tuo backup attuale verrà sostituito con la tua nuova cronologia messaggi.";
@@ -5806,13 +5806,13 @@
 "ONBOARDING_SETUP_COMPLETE_SUBTITLE" = "Ora puoi iniziare a usare Radar";
 
 /* Explanation of 'do not have old device' flow for the 'Restore or Transfer' prompt */
-"ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_BODY" = "Oppure stai reinstallando Signal sullo stesso dispositivo";
+"ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_BODY" = "Oppure stai reinstallando Radar/Signal sullo stesso dispositivo";
 
 /* Title for the 'do not have my old device' choice of the 'Restore or Transfer' prompt */
 "ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_TITLE" = "Non ho il mio vecchio telefono";
 
 /* Explanation of 'have old device' flow for the 'Restore or Transfer' prompt */
-"ONBOARDING_SPLASH_HAVE_OLD_DEVICE_BODY" = "Scansiona un codice QR dal tuo attuale account Signal per iniziare subito";
+"ONBOARDING_SPLASH_HAVE_OLD_DEVICE_BODY" = "Scansiona un codice QR dal tuo attuale account Radar/Signal per iniziare subito";
 
 /* Title for the 'have my old device' choice of the 'Restore or Transfer' prompt */
 "ONBOARDING_SPLASH_HAVE_OLD_DEVICE_TITLE" = "Ho il mio vecchio telefono";
@@ -5991,6 +5991,9 @@ Send money securely.";
 
 /* Format for indicator of a payment amount converted to fiat currency with the freshness of the conversion rate. Embeds: {{ %1$@ the payment amount, %2$@ the freshness of the currency conversion rate }}. */
 
+/* Instruction shown on the Add Funds screen telling the user which address and network to use. */
+"PAYMENTS_ADD_FUNDS_INSTRUCTION" = "Invia Bitcoin al seguente Indirizzo e Rete:";
+
 /* Title for the Add Funds onboarding screen. */
 "PAYMENTS_ADD_FUNDS_INTRO_TITLE" = "Add Funds";
 
@@ -6108,10 +6111,10 @@ Send money securely.";
 "PAYMENTS_LOCK_REASON_UNLOCK_PAYMENTS_LOCK" = "Autenticati per confermare il pagamento.";
 
 /* Label for the 'add memo' ui in the 'send payment' UI. */
-"PAYMENTS_NEW_PAYMENT_ADD_MEMO" = "Aggiungi nota";
+"PAYMENTS_NEW_PAYMENT_ADD_MEMO" = "Nota (opzionale)";
 
 /* Format for the 'balance' indicator. Embeds {{ the current payments balance }}. */
-"PAYMENTS_NEW_PAYMENT_BALANCE_FORMAT" = "Saldo disponibile: %1$@";
+"PAYMENTS_NEW_PAYMENT_BALANCE_FORMAT" = "Disponibile: %@";
 
 /* Label for the 'confirm payment' button. */
 "PAYMENTS_NEW_PAYMENT_CONFIRM_PAYMENT_BUTTON" = "Conferma pagamento";
@@ -6175,6 +6178,9 @@ Send money securely.";
 
 /* Format for the 'payment recipient amount' indicator. Embeds {{ the name of the recipient of the payment }}. */
 "PAYMENTS_NEW_PAYMENT_RECIPIENT_AMOUNT_FORMAT" = "A %1$@";
+
+/* Label for the 'send payment' button. */
+"PAYMENTS_NEW_PAYMENT_SEND_BUTTON" = "Invia";
 
 /* Label for the payments notification banner for a single payment notification. */
 "PAYMENTS_NOTIFICATION_BANNER_1" = "1 nuova notifica di pagamento";
@@ -6291,6 +6297,9 @@ Send money securely.";
 /* Title for error alert indicating that a given user cannot receive payments because they have not enabled payments. Embeds {{ the contact's name }} */
 "PAYMENTS_RECIPIENT_PAYMENTS_NOT_ENABLED_TITLE" = "%1$@ non ha attivato la funzione per i pagamenti";
 
+/* Label for 'send' button on the payments screen. */
+"PAYMENTS_SCREEN_SEND_BUTTON" = "Send";
+
 /* Payments Preview Text shown in chat list for payments. */
 "PAYMENTS_THREAD_PREVIEW_TEXT" = "💳 Pagamenti";
 
@@ -6302,6 +6311,9 @@ Send money securely.";
 
 /* Indicator for unidentified outgoing payments. */
 "PAYMENTS_UNIDENTIFIED_PAYMENT_OUTGOING" = "Pagamento inviato";
+/* Label for the Payments Username row in payment settings. */
+"PAYMENTS_USERNAME_SETTINGS_TITLE" = "Nome utente pagamenti";
+
 "PAYMENTS_WALLET_ADDRESS_LOADING" = "Caricamento...";
 
 
@@ -7215,13 +7227,13 @@ Send money securely.";
 "REGISTRATION_PIN_CONFIRM_TITLE" = "Conferma il tuo PIN";
 
 /* During registration, users are asked to create a PIN code. This is the subtitle on the screen where this happens. A \"learn more\" link will be added to the end of this string. */
-"REGISTRATION_PIN_CREATE_SUBTITLE" = "I PIN ti aiutano a ripristinare il tuo account e a mantenere le tue informazioni crittografate su Signal.";
+"REGISTRATION_PIN_CREATE_SUBTITLE" = "I PIN ti aiutano a ripristinare il tuo account e a mantenere le tue informazioni crittografate su Radar.";
 
 /* During registration, users are asked to create a PIN code. This is the title on the screen where this happens. */
 "REGISTRATION_PIN_CREATE_TITLE" = "Crea il tuo PIN";
 
 /* During re-registration, users may be asked to re-enter their PIN code. This is the subtitle on the screen where this happens. A \"learn more\" link will be added to the end of this string. */
-"REGISTRATION_PIN_ENTER_EXISTING_SUBTITLE" = "I PIN ti aiutano a ripristinare il tuo account e a mantenere le tue informazioni crittografate su Signal.";
+"REGISTRATION_PIN_ENTER_EXISTING_SUBTITLE" = "I PIN ti aiutano a ripristinare il tuo account e a mantenere le tue informazioni crittografate su Radar.";
 
 /* During re-registration, users may be asked to re-enter their PIN code. This is the title on the screen where this happens. */
 "REGISTRATION_PIN_ENTER_EXISTING_TITLE" = "Inserisci il tuo PIN";

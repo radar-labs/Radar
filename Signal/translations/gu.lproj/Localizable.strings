@@ -5662,10 +5662,10 @@
 "ONBOARDING_2FA_SKIP_PIN_ENTRY_TITLE" = "PIN એન્ટ્રી સ્કિપ કરો?";
 
 /* The body for the device transfer 'choice' view 'restore backup' option */
-"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_BODY" = "તમારા Signal બેકઅપમાંથી તમારા એકાઉન્ટ અને મેસેજ રિસ્ટોર કરો";
+"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_BODY" = "તમારા Radar/Signal બેકઅપમાંથી તમારા એકાઉન્ટ અને મેસેજ રિસ્ટોર કરો";
 
 /* The title for the device transfer 'choice' view 'restore backup' option */
-"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_TITLE" = "Signal સુરક્ષિત બેકઅપ રિસ્ટોર કરો";
+"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_TITLE" = "Radar/Signal સુરક્ષિત બેકઅપ રિસ્ટોર કરો";
 
 /* Body for a sheet warning users about skipping restore. */
 "ONBOARDING_CHOOSE_RESTORE_METHOD_CONFIRM_SKIP_RESTORE_BODY" = "જો તમે હમણાં રિસ્ટોર કરવાનું સ્કિપ કરો છો, તો તમે પછીથી રિસ્ટોર કરી શકશો નહીં. જો તમે આ ડિવાઇસ પર બેકઅપ ફરીથી સક્ષમ કરશો, તો તમારા વર્તમાન બેકઅપને તમારા નવા મેસેજિંગ હિસ્ટ્રીથી બદલવામાં આવશે.";
@@ -5806,13 +5806,13 @@
 "ONBOARDING_SETUP_COMPLETE_SUBTITLE" = "તમે હવે Radar નો ઉપયોગ શરૂ કરી શકો છો";
 
 /* Explanation of 'do not have old device' flow for the 'Restore or Transfer' prompt */
-"ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_BODY" = "અથવા તમે તે જ ડિવાઇસ પર Signal ફરીથી ઇન્સ્ટોલ કરી રહ્યાં છો";
+"ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_BODY" = "અથવા તમે તે જ ડિવાઇસ પર Radar/Signal ફરીથી ઇન્સ્ટોલ કરી રહ્યાં છો";
 
 /* Title for the 'do not have my old device' choice of the 'Restore or Transfer' prompt */
 "ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_TITLE" = "મારી પાસે મારો જૂનો ફોન નથી";
 
 /* Explanation of 'have old device' flow for the 'Restore or Transfer' prompt */
-"ONBOARDING_SPLASH_HAVE_OLD_DEVICE_BODY" = "ઝડપથી શરૂ કરવા માટે તમારા વર્તમાન Signal અકાઉન્ટમાંથી QR કોડ સ્કેન કરો";
+"ONBOARDING_SPLASH_HAVE_OLD_DEVICE_BODY" = "ઝડપથી શરૂ કરવા માટે તમારા વર્તમાન Radar/Signal અકાઉન્ટમાંથી QR કોડ સ્કેન કરો";
 
 /* Title for the 'have my old device' choice of the 'Restore or Transfer' prompt */
 "ONBOARDING_SPLASH_HAVE_OLD_DEVICE_TITLE" = "મારી પાસે મારો જૂનો ફોન છે";
@@ -5991,6 +5991,9 @@ Send money securely.";
 
 /* Format for indicator of a payment amount converted to fiat currency with the freshness of the conversion rate. Embeds: {{ %1$@ the payment amount, %2$@ the freshness of the currency conversion rate }}. */
 
+/* Instruction shown on the Add Funds screen telling the user which address and network to use. */
+"PAYMENTS_ADD_FUNDS_INSTRUCTION" = "નીચેના સરનામા અને નેટવર્ક પર Bitcoin મોકલો:";
+
 /* Title for the Add Funds onboarding screen. */
 "PAYMENTS_ADD_FUNDS_INTRO_TITLE" = "Add Funds";
 
@@ -6108,10 +6111,10 @@ Send money securely.";
 "PAYMENTS_LOCK_REASON_UNLOCK_PAYMENTS_LOCK" = "ચુકવણી કન્ફર્મ કરવા પ્રમાણીકરણ કરો.";
 
 /* Label for the 'add memo' ui in the 'send payment' UI. */
-"PAYMENTS_NEW_PAYMENT_ADD_MEMO" = "નોટ ઉમેરો";
+"PAYMENTS_NEW_PAYMENT_ADD_MEMO" = "નોંધ (વૈકલ્પિક)";
 
 /* Format for the 'balance' indicator. Embeds {{ the current payments balance }}. */
-"PAYMENTS_NEW_PAYMENT_BALANCE_FORMAT" = "ઉપલબ્ધ બેલેન્સ: %1$@";
+"PAYMENTS_NEW_PAYMENT_BALANCE_FORMAT" = "ઉપલબ્ધ: %@";
 
 /* Label for the 'confirm payment' button. */
 "PAYMENTS_NEW_PAYMENT_CONFIRM_PAYMENT_BUTTON" = "પેમેન્ટની પુષ્ટિ કરો";
@@ -6175,6 +6178,9 @@ Send money securely.";
 
 /* Format for the 'payment recipient amount' indicator. Embeds {{ the name of the recipient of the payment }}. */
 "PAYMENTS_NEW_PAYMENT_RECIPIENT_AMOUNT_FORMAT" = "%1$@માં";
+
+/* Label for the 'send payment' button. */
+"PAYMENTS_NEW_PAYMENT_SEND_BUTTON" = "મોકલો";
 
 /* Label for the payments notification banner for a single payment notification. */
 "PAYMENTS_NOTIFICATION_BANNER_1" = "1 નવી પેમેન્ટ સંબંધી સૂચના";
@@ -6291,6 +6297,9 @@ Send money securely.";
 /* Title for error alert indicating that a given user cannot receive payments because they have not enabled payments. Embeds {{ the contact's name }} */
 "PAYMENTS_RECIPIENT_PAYMENTS_NOT_ENABLED_TITLE" = "%1$@એ પેમેન્ટ સક્રિય કરેલ નથી";
 
+/* Label for 'send' button on the payments screen. */
+"PAYMENTS_SCREEN_SEND_BUTTON" = "Send";
+
 /* Payments Preview Text shown in chat list for payments. */
 "PAYMENTS_THREAD_PREVIEW_TEXT" = "💳 ચુકવણી";
 
@@ -6302,6 +6311,9 @@ Send money securely.";
 
 /* Indicator for unidentified outgoing payments. */
 "PAYMENTS_UNIDENTIFIED_PAYMENT_OUTGOING" = "પેમેન્ટ મોકલ્યું";
+/* Label for the Payments Username row in payment settings. */
+"PAYMENTS_USERNAME_SETTINGS_TITLE" = "ચુકવણી વપરાશકર્તા નામ";
+
 "PAYMENTS_WALLET_ADDRESS_LOADING" = "લોડ થઈ રહ્યું છે...";
 
 
@@ -7215,13 +7227,13 @@ Send money securely.";
 "REGISTRATION_PIN_CONFIRM_TITLE" = "તમારો પિન કન્ફર્મ કરો";
 
 /* During registration, users are asked to create a PIN code. This is the subtitle on the screen where this happens. A \"learn more\" link will be added to the end of this string. */
-"REGISTRATION_PIN_CREATE_SUBTITLE" = "પિન તમને તમારું એકાઉન્ટ રિસ્ટોર કરવામાં અને તમારી માહિતીને Signal સાથે એન્ક્રિપ્ટેડ રાખવામાં મદદ કરી શકે છે.";
+"REGISTRATION_PIN_CREATE_SUBTITLE" = "પિન તમને તમારું એકાઉન્ટ રિસ્ટોર કરવામાં અને તમારી માહિતીને Radar સાથે એન્ક્રિપ્ટેડ રાખવામાં મદદ કરી શકે છે.";
 
 /* During registration, users are asked to create a PIN code. This is the title on the screen where this happens. */
 "REGISTRATION_PIN_CREATE_TITLE" = "તમારો પિન બનાવો";
 
 /* During re-registration, users may be asked to re-enter their PIN code. This is the subtitle on the screen where this happens. A \"learn more\" link will be added to the end of this string. */
-"REGISTRATION_PIN_ENTER_EXISTING_SUBTITLE" = "પિન તમને તમારું એકાઉન્ટ રિસ્ટોર કરવામાં અને તમારી માહિતીને Signal સાથે એન્ક્રિપ્ટેડ રાખવામાં મદદ કરી શકે છે.";
+"REGISTRATION_PIN_ENTER_EXISTING_SUBTITLE" = "પિન તમને તમારું એકાઉન્ટ રિસ્ટોર કરવામાં અને તમારી માહિતીને Radar સાથે એન્ક્રિપ્ટેડ રાખવામાં મદદ કરી શકે છે.";
 
 /* During re-registration, users may be asked to re-enter their PIN code. This is the title on the screen where this happens. */
 "REGISTRATION_PIN_ENTER_EXISTING_TITLE" = "તમારો પિન દાખલ કરો";

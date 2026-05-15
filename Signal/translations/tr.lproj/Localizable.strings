@@ -5662,10 +5662,10 @@
 "ONBOARDING_2FA_SKIP_PIN_ENTRY_TITLE" = "PIN Girişini Atla?";
 
 /* The body for the device transfer 'choice' view 'restore backup' option */
-"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_BODY" = "Hesabını ve mesajlarını Signal Yedeklemenden geri yükle";
+"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_BODY" = "Hesabını ve mesajlarını Radar/Signal Yedeklemenden geri yükle";
 
 /* The title for the device transfer 'choice' view 'restore backup' option */
-"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_TITLE" = "Signal Güvenli Yedeklemeleri Geri Yükle";
+"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_TITLE" = "Radar/Signal Güvenli Yedeklemeleri Geri Yükle";
 
 /* Body for a sheet warning users about skipping restore. */
 "ONBOARDING_CHOOSE_RESTORE_METHOD_CONFIRM_SKIP_RESTORE_BODY" = "Şimdi geri yüklemeyi atlarsan, sonradan geri yükleme yapamazsın. Bu cihazda yedeklemeleri yeniden etkinleştirirsen, mevcut yedeklemen yeni mesajlaşma geçmişinle değiştirilir.";
@@ -5806,13 +5806,13 @@
 "ONBOARDING_SETUP_COMPLETE_SUBTITLE" = "Artık Radar'ı kullanmaya başlayabilirsiniz";
 
 /* Explanation of 'do not have old device' flow for the 'Restore or Transfer' prompt */
-"ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_BODY" = "Ya da Signal'i aynı cihaza yeniden yüklüyorsun";
+"ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_BODY" = "Ya da Radar/Signal'i aynı cihaza yeniden yüklüyorsun";
 
 /* Title for the 'do not have my old device' choice of the 'Restore or Transfer' prompt */
 "ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_TITLE" = "Eski telefonum yanımda değil";
 
 /* Explanation of 'have old device' flow for the 'Restore or Transfer' prompt */
-"ONBOARDING_SPLASH_HAVE_OLD_DEVICE_BODY" = "Hızla başlamak için mevcut Signal hesabından bir kare kod tara";
+"ONBOARDING_SPLASH_HAVE_OLD_DEVICE_BODY" = "Hızla başlamak için mevcut Radar/Signal hesabından bir kare kod tara";
 
 /* Title for the 'have my old device' choice of the 'Restore or Transfer' prompt */
 "ONBOARDING_SPLASH_HAVE_OLD_DEVICE_TITLE" = "Eski telefonum var";
@@ -5991,6 +5991,9 @@ Send money securely.";
 
 /* Format for indicator of a payment amount converted to fiat currency with the freshness of the conversion rate. Embeds: {{ %1$@ the payment amount, %2$@ the freshness of the currency conversion rate }}. */
 
+/* Instruction shown on the Add Funds screen telling the user which address and network to use. */
+"PAYMENTS_ADD_FUNDS_INSTRUCTION" = "Aşağıdaki Adrese ve Ağa Bitcoin gönderin:";
+
 /* Title for the Add Funds onboarding screen. */
 "PAYMENTS_ADD_FUNDS_INTRO_TITLE" = "Add Funds";
 
@@ -6108,10 +6111,10 @@ Send money securely.";
 "PAYMENTS_LOCK_REASON_UNLOCK_PAYMENTS_LOCK" = "Ödemeyi onaylamak için kimlik doğrulaması yap.";
 
 /* Label for the 'add memo' ui in the 'send payment' UI. */
-"PAYMENTS_NEW_PAYMENT_ADD_MEMO" = "Not Ekle";
+"PAYMENTS_NEW_PAYMENT_ADD_MEMO" = "Not (isteğe bağlı)";
 
 /* Format for the 'balance' indicator. Embeds {{ the current payments balance }}. */
-"PAYMENTS_NEW_PAYMENT_BALANCE_FORMAT" = "Mevcut bakiye: %1$@";
+"PAYMENTS_NEW_PAYMENT_BALANCE_FORMAT" = "Mevcut: %@";
 
 /* Label for the 'confirm payment' button. */
 "PAYMENTS_NEW_PAYMENT_CONFIRM_PAYMENT_BUTTON" = "Ödemeyi Onayla";
@@ -6175,6 +6178,9 @@ Send money securely.";
 
 /* Format for the 'payment recipient amount' indicator. Embeds {{ the name of the recipient of the payment }}. */
 "PAYMENTS_NEW_PAYMENT_RECIPIENT_AMOUNT_FORMAT" = "Alıcı %1$@";
+
+/* Label for the 'send payment' button. */
+"PAYMENTS_NEW_PAYMENT_SEND_BUTTON" = "Gönder";
 
 /* Label for the payments notification banner for a single payment notification. */
 "PAYMENTS_NOTIFICATION_BANNER_1" = "1 yeni ödeme bildirimi";
@@ -6291,6 +6297,9 @@ Send money securely.";
 /* Title for error alert indicating that a given user cannot receive payments because they have not enabled payments. Embeds {{ the contact's name }} */
 "PAYMENTS_RECIPIENT_PAYMENTS_NOT_ENABLED_TITLE" = "%1$@, Ödemeleri etkinleştirmedi";
 
+/* Label for 'send' button on the payments screen. */
+"PAYMENTS_SCREEN_SEND_BUTTON" = "Send";
+
 /* Payments Preview Text shown in chat list for payments. */
 "PAYMENTS_THREAD_PREVIEW_TEXT" = "💳 Ödeme";
 
@@ -6302,6 +6311,9 @@ Send money securely.";
 
 /* Indicator for unidentified outgoing payments. */
 "PAYMENTS_UNIDENTIFIED_PAYMENT_OUTGOING" = "Gönderilen Ödeme";
+/* Label for the Payments Username row in payment settings. */
+"PAYMENTS_USERNAME_SETTINGS_TITLE" = "Ödeme kullanıcı adı";
+
 "PAYMENTS_WALLET_ADDRESS_LOADING" = "Yükleniyor...";
 
 
@@ -7215,13 +7227,13 @@ Send money securely.";
 "REGISTRATION_PIN_CONFIRM_TITLE" = "PIN'ini onayla";
 
 /* During registration, users are asked to create a PIN code. This is the subtitle on the screen where this happens. A \"learn more\" link will be added to the end of this string. */
-"REGISTRATION_PIN_CREATE_SUBTITLE" = "PIN'ler, hesabını geri yüklemene ve bilgilerini Signal ile şifrelenmiş hâlde tutmana yardımcı olabilir.";
+"REGISTRATION_PIN_CREATE_SUBTITLE" = "PIN'ler, hesabını geri yüklemene ve bilgilerini Radar ile şifrelenmiş hâlde tutmana yardımcı olabilir.";
 
 /* During registration, users are asked to create a PIN code. This is the title on the screen where this happens. */
 "REGISTRATION_PIN_CREATE_TITLE" = "PIN'ini oluştur";
 
 /* During re-registration, users may be asked to re-enter their PIN code. This is the subtitle on the screen where this happens. A \"learn more\" link will be added to the end of this string. */
-"REGISTRATION_PIN_ENTER_EXISTING_SUBTITLE" = "PIN'ler, hesabını geri yüklemene ve bilgilerini Signal ile şifrelenmiş hâlde tutmana yardımcı olabilir.";
+"REGISTRATION_PIN_ENTER_EXISTING_SUBTITLE" = "PIN'ler, hesabını geri yüklemene ve bilgilerini Radar ile şifrelenmiş hâlde tutmana yardımcı olabilir.";
 
 /* During re-registration, users may be asked to re-enter their PIN code. This is the title on the screen where this happens. */
 "REGISTRATION_PIN_ENTER_EXISTING_TITLE" = "PIN'ini gir";

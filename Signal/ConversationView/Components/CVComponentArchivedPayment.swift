@@ -99,14 +99,14 @@ public class CVComponentArchivedPayment: CVComponentBase, CVComponent {
         let dimTextColor = textColor.withAlphaComponent(isIncoming ? 0.5 : 0.75)
         let statusTextColor = conversationStyle.bubbleSecondaryTextColor(isIncoming: isIncoming)
         let accentBgColor: UIColor = isIncoming
-            ? UIColor.black.withAlphaComponent(0.05)
+            ? UIColor.black.withAlphaComponent(0.12)
             : UIColor.white.withAlphaComponent(0.15)
 
         // Badge pill
         componentView.badgePillView.backgroundColor = accentBgColor
         componentView.badgeLabel.text = badgeText
         componentView.badgeLabel.textColor = textColor
-        let arrowSymbol = isIncoming ? "arrow.down.left" : "arrow.up.right"
+        let arrowSymbol = isIncoming ? "arrow.down.right" : "arrow.up.right"
         componentView.badgeIconView.image = UIImage(systemName: arrowSymbol)?
             .withConfiguration(UIImage.SymbolConfiguration(pointSize: 10, weight: .medium))
         componentView.badgeIconView.tintColor = textColor

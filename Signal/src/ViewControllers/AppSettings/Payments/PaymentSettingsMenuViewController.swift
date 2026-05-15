@@ -14,6 +14,12 @@ class PaymentSettingsMenuViewController: OWSTableViewController2 {
             "SETTINGS_PAYMENTS_VIEW_TITLE",
             comment: "Title for the 'payments settings' view in the app settings."
         )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(updateTableContents),
+            name: PaymentsImpl.walletAddressDidLoad,
+            object: nil
+        )
         updateTableContents()
     }
 
@@ -55,6 +61,16 @@ class PaymentSettingsMenuViewController: OWSTableViewController2 {
 
         mainSection.add(.disclosureItem(
             withText: OWSLocalizedString(
+                "PAYMENTS_USERNAME_SETTINGS_TITLE",
+                comment: "Label for the Payments Username row in payment settings."
+            ),
+            actionBlock: { [weak self] in
+                self?.didTapPaymentsUsername()
+            }
+        ))
+
+        mainSection.add(.disclosureItem(
+            withText: OWSLocalizedString(
                 "SETTINGS_PAYMENTS_VIEW_RECOVERY_PASSPHRASE",
                 comment: "Label for 'view payments recovery passphrase' button in the app settings."
             ),
@@ -86,6 +102,14 @@ class PaymentSettingsMenuViewController: OWSTableViewController2 {
         contents.add(deactivateSection)
 
         self.contents = contents
+    }
+
+    private func didTapPaymentsUsername() {
+        guard let username = SUIEnvironment.shared.paymentsImplRef.walletLightningAddressUsername else { return }
+        let vc = RadarUsernameViewController(oldUsername: username) { newUsername in
+            try await SUIEnvironment.shared.paymentsImplRef.registerUsername(newUsername)
+        }
+        navigationController?.pushViewController(vc, animated: true)
     }
 
     private func showCurrencyPicker() {
@@ -197,19 +221,21 @@ class BitcoinUnitPickerViewController: OWSTableViewController2 {
         let isSatoshi = PaymentsDisplayPreferences.shared.isSatoshiEnabled
 
         section.add(.item(
-            name: "sats",
-            accessoryType: isSatoshi ? .checkmark : .none,
+            name: "Bitcoin",
+            subtitle: "BTC",
+            accessoryType: !isSatoshi ? .checkmark : .none,
             actionBlock: { [weak self] in
-                PaymentsDisplayPreferences.shared.isSatoshiEnabled = true
+                PaymentsDisplayPreferences.shared.isSatoshiEnabled = false
                 self?.navigationController?.popViewController(animated: true)
             }
         ))
 
         section.add(.item(
-            name: "BTC",
-            accessoryType: !isSatoshi ? .checkmark : .none,
+            name: "Satoshi",
+            subtitle: "1 sat = 0.00 000 001 BTC",
+            accessoryType: isSatoshi ? .checkmark : .none,
             actionBlock: { [weak self] in
-                PaymentsDisplayPreferences.shared.isSatoshiEnabled = false
+                PaymentsDisplayPreferences.shared.isSatoshiEnabled = true
                 self?.navigationController?.popViewController(animated: true)
             }
         ))

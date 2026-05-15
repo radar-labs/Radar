@@ -136,13 +136,33 @@ class CurrencyPickerViewController<DataSourceType: CurrencyPickerDataSource>: OW
         self.contents = contents
     }
 
+    private static func flagEmoji(forCurrencyCode currencyCode: Currency.Code) -> String {
+        // Most currency codes start with the ISO 3166-1 alpha-2 country code.
+        // Convert the first two letters to regional indicator symbols to get the flag emoji.
+        let countryCode = String(currencyCode.prefix(2))
+        let base: UInt32 = 127397 // offset to regional indicator A from "A"
+        var flag = ""
+        for scalar in countryCode.uppercased().unicodeScalars {
+            guard let indicator = Unicode.Scalar(base + scalar.value) else { continue }
+            flag.unicodeScalars.append(indicator)
+        }
+        return flag
+    }
+
     private func buildTableItem(forCurrencyInfo currencyInfo: Currency.Info,
                                 currentCurrencyCode: Currency.Code) -> OWSTableItem {
 
         let currencyCode = currencyInfo.code
+        let flag = Self.flagEmoji(forCurrencyCode: currencyCode)
 
         return OWSTableItem(customCellBlock: {
             let cell = OWSTableItem.newCell()
+
+            let flagLabel = UILabel()
+            flagLabel.text = flag
+            flagLabel.font = .systemFont(ofSize: 28)
+            flagLabel.setContentHuggingPriority(.required, for: .horizontal)
+            flagLabel.setContentCompressionResistancePriority(.required, for: .horizontal)
 
             let nameLabel = UILabel()
             nameLabel.text = currencyInfo.name
@@ -154,11 +174,17 @@ class CurrencyPickerViewController<DataSourceType: CurrencyPickerDataSource>: OW
             currencyCodeLabel.font = .dynamicTypeFootnoteClamped
             currencyCodeLabel.textColor = .Signal.secondaryLabel
 
-            let stackView = UIStackView(arrangedSubviews: [ nameLabel, currencyCodeLabel ])
-            stackView.axis = .vertical
-            stackView.alignment = .fill
-            cell.contentView.addSubview(stackView)
-            stackView.autoPinEdgesToSuperviewMargins()
+            let textStack = UIStackView(arrangedSubviews: [nameLabel, currencyCodeLabel])
+            textStack.axis = .vertical
+            textStack.alignment = .fill
+            textStack.setContentHuggingPriority(.defaultLow, for: .horizontal)
+
+            let rowStack = UIStackView(arrangedSubviews: [flagLabel, textStack])
+            rowStack.axis = .horizontal
+            rowStack.alignment = .center
+            rowStack.spacing = 12
+            cell.contentView.addSubview(rowStack)
+            rowStack.autoPinEdgesToSuperviewMargins()
 
             cell.accessibilityIdentifier = "currency.\(currencyCode)"
             cell.accessibilityLabel = currencyInfo.name

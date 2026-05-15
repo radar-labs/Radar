@@ -518,17 +518,23 @@ class ChatListCell: UITableViewCell, ReusableTableViewCell {
         }
 
         if let pillConfig = configuration.paymentPillConfig {
-            let arrowSymbol = pillConfig.isIncoming ? "arrow.down.left" : "arrow.up.right"
+            let arrowSymbol = pillConfig.isIncoming ? "arrow.down.right" : "arrow.up.right"
             paymentPillIconView.image = UIImage(systemName: arrowSymbol)?
                 .withConfiguration(UIImage.SymbolConfiguration(pointSize: 10, weight: .medium))
-            paymentPillIconView.tintColor = ChatListCell.snippetColor
-            paymentPillLabel.text = pillConfig.amountText
-            paymentPillLabel.textColor = ChatListCell.snippetColor
-            paymentPillView.backgroundColor = UIColor { traits in
-                traits.userInterfaceStyle == .dark
-                    ? UIColor.white.withAlphaComponent(0.1)
-                    : UIColor.black.withAlphaComponent(0.1)
+            if pillConfig.isIncoming {
+                paymentPillIconView.tintColor = .white
+                paymentPillLabel.textColor = .white
+                paymentPillView.backgroundColor = UIColor.ows_accentGreen
+            } else {
+                paymentPillIconView.tintColor = ChatListCell.snippetColor
+                paymentPillLabel.textColor = ChatListCell.snippetColor
+                paymentPillView.backgroundColor = UIColor { traits in
+                    traits.userInterfaceStyle == .dark
+                        ? UIColor.white.withAlphaComponent(0.1)
+                        : UIColor.black.withAlphaComponent(0.1)
+                }
             }
+            paymentPillLabel.text = pillConfig.amountText
         }
 
         bottomRowWrapper.addSubview(paymentPillView) { [weak self] _ in

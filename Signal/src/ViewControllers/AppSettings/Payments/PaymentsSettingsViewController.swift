@@ -288,7 +288,7 @@ public class PaymentsSettingsViewController: OWSTableViewController2 {
                 action: #selector(didTapEyeButton)
             )
             navigationItem.rightBarButtonItem = UIBarButtonItem(
-                image: Theme.iconImage(.buttonMore),
+                image: UIImage(systemName: "gear"),
                 landscapeImagePhone: nil,
                 style: .plain,
                 target: self,
@@ -429,12 +429,12 @@ public class PaymentsSettingsViewController: OWSTableViewController2 {
         ))
         contents.add(headerSection)
 
+        addHelpCards(contents: contents,
+                     helpCards: helpCardsForEnabled)
+
         let historySection = OWSTableSection()
         configureHistorySection(historySection, paymentsHistoryDataSource: paymentsHistoryDataSource)
         contents.add(historySection)
-
-        addHelpCards(contents: contents,
-                     helpCards: helpCardsForEnabled)
 
         self.contents = contents
     }
@@ -454,47 +454,22 @@ public class PaymentsSettingsViewController: OWSTableViewController2 {
         balanceStack.axis = .vertical
         balanceStack.alignment = .center
 
-        let conversionRefreshSize: CGFloat = 20
-        let conversionRefreshIcon = UIImageView.withTemplateImageName("refresh-20",
-                                                                      tintColor: Theme.primaryIconColor)
-        conversionRefreshIcon.autoSetDimensions(to: .square(conversionRefreshSize))
-        conversionRefreshIcon.isUserInteractionEnabled = true
-        conversionRefreshIcon.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(didTapConversionRefresh)))
-
         let conversionLabel = UILabel()
-        conversionLabel.font = UIFont.dynamicTypeSubheadlineClamped
+        conversionLabel.font = UIFont.dynamicTypeTitle2Clamped
         conversionLabel.textColor = Theme.secondaryTextAndIconColor
 
-        let conversionInfoView = UIImageView()
-        conversionInfoView.setTemplateImageName("info-compact", tintColor: Theme.secondaryTextAndIconColor)
-        conversionInfoView.autoSetDimensions(to: .square(16))
-        conversionInfoView.setCompressionResistanceHigh()
-
-        let conversionStack1 = UIStackView(arrangedSubviews: [
-            conversionRefreshIcon,
-            conversionLabel,
-            conversionInfoView
-        ])
-        conversionStack1.axis = .horizontal
-        conversionStack1.alignment = .center
-        conversionStack1.spacing = 12
-        conversionStack1.isUserInteractionEnabled = true
-        conversionStack1.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(didTapCurrencyConversionInfo)))
-
-        let conversionStack2 = UIStackView(arrangedSubviews: [ conversionStack1 ])
+        let conversionStack2 = UIStackView(arrangedSubviews: [conversionLabel])
         conversionStack2.axis = .vertical
         conversionStack2.alignment = .center
 
         func hideConversions() {
-            conversionRefreshIcon.tintColor = .clear
             conversionLabel.text = " "
-            conversionInfoView.tintColor = .clear
         }
 
         let paymentBalance = SUIEnvironment.shared.paymentsSwiftRef.currentPaymentBalance
         let prefs = PaymentsDisplayPreferences.shared
 
-        balanceLabel.attributedText = PaymentsFormat.formattedBalance(paymentBalance)
+        balanceLabel.attributedText = PaymentsFormat.formattedBalance(paymentBalance, withSpace: true)
 
         // Show spinner only while loading and not hidden.
         if paymentBalance == nil && !prefs.isBalanceHidden {
@@ -515,11 +490,13 @@ public class PaymentsSettingsViewController: OWSTableViewController2 {
         let addMoneyButton = buildHeaderButton(title: OWSLocalizedString("SETTINGS_PAYMENTS_ADD_MONEY",
                                                                         comment: "Label for 'add money' view in the payment settings."),
                                                iconName: "plus",
-                                               selector: #selector(didTapAddMoneyButton))
-        let sendPaymentButton = buildHeaderButton(title: OWSLocalizedString("SETTINGS_PAYMENTS_SEND_PAYMENT",
-                                                                           comment: "Label for 'send payment' button in the payment settings."),
-                                                  iconName: "payment-28",
-                                                  selector: #selector(didTapSendPaymentSheet))
+                                               selector: #selector(didTapAddMoneyButton),
+                                               isPrimary: false)
+        let sendPaymentButton = buildHeaderButton(title: OWSLocalizedString("PAYMENTS_SCREEN_SEND_BUTTON",
+                                                                           comment: "Label for 'send' button on the payments screen."),
+                                                  iconName: "paperplane.fill",
+                                                  selector: #selector(didTapSendPaymentSheet),
+                                                  isPrimary: true)
         
         let buttonStack = UIStackView(arrangedSubviews: [
             addMoneyButton,
@@ -551,61 +528,54 @@ public class PaymentsSettingsViewController: OWSTableViewController2 {
         }
     }
 
-    private func buildHeaderButton(title: String, iconName: String, selector: Selector?) -> UIView {
-
-        let iconView = UIImageView.withTemplateImageName(iconName,
-                                                         tintColor: Theme.primaryIconColor)
+    private func buildHeaderButton(title: String, iconName: String, selector: Selector?, isPrimary: Bool) -> UIView {
+        let iconTint: UIColor = isPrimary ? .white : Theme.primaryIconColor
+        let iconImage = (UIImage(systemName: iconName) ?? UIImage(named: iconName))?.withRenderingMode(.alwaysTemplate)
+        let iconView = UIImageView(image: iconImage)
+        iconView.tintColor = iconTint
+        iconView.contentMode = .scaleAspectFit
         iconView.autoSetDimensions(to: .square(24))
 
         let label = UILabel()
         label.text = title
-        label.textColor = Theme.primaryTextColor
-        label.font = .dynamicTypeCaption2Clamped
+        label.textColor = isPrimary ? .white : Theme.primaryTextColor
+        label.font = .dynamicTypeBodyClamped
 
-        let stack = UIStackView(arrangedSubviews: [
-            iconView,
-            label
-        ])
-        stack.axis = .vertical
-        stack.alignment = .center
-        stack.spacing = 5
-        stack.layoutMargins = UIEdgeInsets(top: 12, leading: 20, bottom: 6, trailing: 20)
-        stack.isLayoutMarginsRelativeArrangement = true
+        let contentStack = UIStackView(arrangedSubviews: [iconView, label])
+        contentStack.axis = .horizontal
+        contentStack.alignment = .center
+        contentStack.spacing = 12
+
+        let container = UIView()
+        container.backgroundColor = isPrimary
+            ? Theme.accentBlueColor
+            : OWSTableViewController2.cellBackgroundColor(isUsingPresentedStyle: true)
+        container.layer.cornerRadius = 36
+        container.clipsToBounds = true
+        container.autoSetDimension(.height, toSize: 72)
+        container.addSubview(contentStack)
+        contentStack.autoCenterInSuperview()
+        contentStack.autoPinEdge(toSuperviewEdge: .leading, withInset: 20, relation: .greaterThanOrEqual)
+        contentStack.autoPinEdge(toSuperviewEdge: .trailing, withInset: 20, relation: .greaterThanOrEqual)
+
         if let selector = selector {
-            stack.isUserInteractionEnabled = true
-            stack.addGestureRecognizer(UITapGestureRecognizer(target: self, action: selector))
+            container.isUserInteractionEnabled = true
+            container.addGestureRecognizer(UITapGestureRecognizer(target: self, action: selector))
         }
 
-        let backgroundView = UIView()
-        backgroundView.backgroundColor = OWSTableViewController2.cellBackgroundColor(isUsingPresentedStyle: true)
-        backgroundView.layer.cornerRadius = 10
-        stack.addSubview(backgroundView)
-        stack.sendSubviewToBack(backgroundView)
-        backgroundView.autoPinEdgesToSuperviewEdges()
-
-        return stack
+        return container
     }
 
     private static func buildBalanceConversionText(paymentBalance: PaymentBalance) -> String? {
         let localCurrencyCode = SSKEnvironment.shared.paymentsCurrenciesRef.currentCurrencyCode
-        guard let currencyConversionInfo = SSKEnvironment.shared.paymentsCurrenciesRef.conversionInfo(forCurrencyCode: localCurrencyCode)  else {
+        guard let currencyConversionInfo = SSKEnvironment.shared.paymentsCurrenciesRef.conversionInfo(forCurrencyCode: localCurrencyCode) else {
             return nil
         }
         guard let fiatAmountString = PaymentsFormat.formatAsFiatCurrency(paymentAmount: paymentBalance.amount,
                                                                          currencyConversionInfo: currencyConversionInfo) else {
             return nil
         }
-
-        // NOTE: conversion freshness is different than the balance freshness.
-        //
-        // We format the conversion freshness date using the local locale.
-        // We format the currency using the EN/US locale.
-        //
-        // It is sufficient to format as a time, currency conversions go stale in less than a day.
-        let conversionFreshnessString = DateUtil.formatDateAsTime(currencyConversionInfo.conversionDate)
-        let formatString = OWSLocalizedString("SETTINGS_PAYMENTS_BALANCE_CONVERSION_FORMAT",
-                                             comment: "Format string for the 'local balance converted into local currency' indicator. Embeds: {{ %1$@ the local balance in the local currency, %2$@ the local currency code, %3$@ the date the currency conversion rate was obtained. }}..")
-        return String(format: formatString, fiatAmountString, localCurrencyCode, conversionFreshnessString)
+        return "\(fiatAmountString) \(localCurrencyCode)"
     }
 
     private func configureHistorySection(_ section: OWSTableSection,

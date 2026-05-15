@@ -58,7 +58,7 @@ class HomeTabBarController: UITabBarController {
             case .chatList:
                 return UIImage(imageLiteralResourceName: "tab-chats")
             case .payments:
-                return UIImage(imageLiteralResourceName: "wallet-icon-black").resizedImage(to: CGSize(width: 40, height: 40))
+                return UIImage(systemName: "bitcoinsign.circle.fill")
             case .calls:
                 return UIImage(named: "tab-calls")
             case .stories:
@@ -71,7 +71,7 @@ class HomeTabBarController: UITabBarController {
             case .chatList:
                 return UIImage(named: "tab-chats")
             case .payments:
-                return UIImage(named: "wallet-icon-black")?.resizedImage(to: CGSize(width: 40, height: 40))
+                return UIImage(systemName: "bitcoinsign.circle.fill")
             case .calls:
                 return UIImage(named: "tab-calls")
             case .stories:

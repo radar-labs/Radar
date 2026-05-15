@@ -260,9 +260,7 @@ public class PaymentsCurrenciesImpl: PaymentsCurrenciesSwift, PaymentsCurrencies
         "EUR",
         "GBP",
         "JPY",
-        "CNY",
-        "AUD",
-        "CAD"
+        "CNY"
     ]
 
     private static var supportedCurrencyCodesList: [Currency.Code] = []
