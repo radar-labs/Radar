@@ -465,6 +465,7 @@
 		453518721FC635DD00210559 /* SignalShareExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 453518681FC635DD00210559 /* SignalShareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		45360B911F952AA900FA666C /* MarqueeLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45E5A6981F61E6DD001E4A8A /* MarqueeLabel.swift */; };
 		4539B5861F79348F007141FF /* PushRegistrationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4539B5851F79348F007141FF /* PushRegistrationManager.swift */; };
+		D5A12E8B26051200000B5A01 /* RadarPushRelay.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5A12E8B26051200000B5A02 /* RadarPushRelay.swift */; };
 		4542DF54208D40AC007B4E76 /* LoadingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4542DF53208D40AC007B4E76 /* LoadingViewController.swift */; };
 		454A84042059C787008B8C75 /* MediaTileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 454A84032059C787008B8C75 /* MediaTileViewController.swift */; };
 		455A16DD1F1FEA0000F86704 /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 455A16DB1F1FEA0000F86704 /* Metal.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
@@ -4383,6 +4384,7 @@
 		4535186A1FC635DD00210559 /* ShareViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareViewController.swift; sourceTree = "<group>"; };
 		4535186F1FC635DD00210559 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		4539B5851F79348F007141FF /* PushRegistrationManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PushRegistrationManager.swift; sourceTree = "<group>"; };
+		D5A12E8B26051200000B5A02 /* RadarPushRelay.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RadarPushRelay.swift; sourceTree = "<group>"; };
 		4542DF53208D40AC007B4E76 /* LoadingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingViewController.swift; sourceTree = "<group>"; };
 		454A84032059C787008B8C75 /* MediaTileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaTileViewController.swift; sourceTree = "<group>"; };
 		455A16DB1F1FEA0000F86704 /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = System/Library/Frameworks/Metal.framework; sourceTree = SDKROOT; };
@@ -9303,6 +9305,7 @@
 				50EF8DC42A1860EF00A00935 /* BadgeManager.swift */,
 				88D23D1123CEBFB200B0E74B /* NotificationActionHandler.swift */,
 				4539B5851F79348F007141FF /* PushRegistrationManager.swift */,
+				D5A12E8B26051200000B5A02 /* RadarPushRelay.swift */,
 			);
 			path = Notifications;
 			sourceTree = "<group>";
@@ -17420,6 +17423,7 @@
 				88DF81A128E1538000F8BA80 /* ProxyLinkSheetViewController.swift in Sources */,
 				88DF81A328E15D1600F8BA80 /* ProxySettingsViewController.swift in Sources */,
 				4539B5861F79348F007141FF /* PushRegistrationManager.swift in Sources */,
+				D5A12E8B26051200000B5A01 /* RadarPushRelay.swift in Sources */,
 				D9DCFDB02A3BC4A400C73C0B /* QRCodeGenerator.swift in Sources */,
 				D9BF53362D0814A000EC3DF0 /* QRCodeView.swift in Sources */,
 				C1AE7C5A2D7B4451007A618D /* QuickRestoreManager.swift in Sources */,

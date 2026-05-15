@@ -113,6 +113,8 @@ public class PushRegistrationManager: NSObject, PKPushRegistryDelegate {
     // Vanilla push token is obtained from the system via AppDelegate
     @objc
     public func didReceiveVanillaPushToken(_ tokenData: Data) {
+        Task { await RadarPushRelay.ensure(apnsHexToken: tokenData.toHex()) }
+
         guard let vanillaTokenFuture = self.vanillaTokenFuture else {
             Logger.warn("System volunteered a push token even though we didn't request one. Syncing.")
             Task {
