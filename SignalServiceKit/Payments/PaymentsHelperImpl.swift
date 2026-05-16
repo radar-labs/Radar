@@ -258,6 +258,10 @@ public class PaymentsHelperImpl: PaymentsHelperSwift, PaymentsHelper {
                             tx: tx
                         )
                     }
+
+                    // Sync paymentsEntropy to StorageService; without this the
+                    // wallet seed lives only on this device and is unrecoverable.
+                    SSKEnvironment.shared.storageServiceManagerRef.recordPendingLocalAccountUpdates()
                 }
             }
         }
