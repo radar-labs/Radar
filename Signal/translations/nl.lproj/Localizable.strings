@@ -6003,6 +6003,9 @@ Send money securely.";
 /* Button label to skip the Add Funds step during payments onboarding. */
 "PAYMENTS_ADD_FUNDS_INTRO_SKIP" = "Skip this step";
 
+/* Toast shown when fetching the on-chain Bitcoin receive address fails on the Add Funds screen. */
+"PAYMENTS_ADD_FUNDS_ONCHAIN_FETCH_FAILED" = "Couldn't load Bitcoin address";
+
 "PAYMENTS_CURRENCY_CONVERSION_FRESHNESS_FORMAT" = "%1$@ om %2$@";
 
 /* Indicator for unknown currency. */

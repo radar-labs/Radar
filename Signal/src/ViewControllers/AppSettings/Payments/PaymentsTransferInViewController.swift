@@ -14,9 +14,21 @@ class PaymentsTransferInViewController: OWSViewController {
     private let isOnboarding: Bool
     private let onContinue: (() -> Void)?
 
+    private enum Network {
+        case lightning
+        case onchain
+    }
+
+    private var selectedNetwork: Network = .lightning
+    private var onchainAddress: String?
+
     private var qrContainerView: UIView?
     private var qrSpinner: UIActivityIndicatorView?
+    private var qrImageView: UIImageView?
     private var addressLabel: UILabel?
+    private var pencilButton: UIButton?
+    private var lightningTabButton: UIButton?
+    private var onchainTabButton: UIButton?
     private var walletObserver: NSObjectProtocol?
 
     init(isOnboarding: Bool = false, onContinue: (() -> Void)? = nil) {
@@ -174,6 +186,29 @@ class PaymentsTransferInViewController: OWSViewController {
         mainStack.layoutMargins = UIEdgeInsets(top: 18, left: 24, bottom: 32, right: 24)
 
         embedInScrollView(mainStack)
+
+        prefetchOnchainAddress()
+    }
+
+    // MARK: - Onchain prefetch
+
+    private func prefetchOnchainAddress() {
+        guard onchainAddress == nil else { return }
+        Task { [weak self] in
+            do {
+                let response = try await SUIEnvironment.shared.paymentsImplRef.fetchBitcoinTaprootAddress()
+                await MainActor.run { [weak self] in
+                    guard let self else { return }
+                    self.onchainAddress = response.paymentRequest
+                    if self.selectedNetwork == .onchain {
+                        if let label = self.addressLabel { self.applyAddress(to: label) }
+                        self.generateQR(force: true)
+                    }
+                }
+            } catch {
+                Logger.warn("Failed to prefetch onchain address: \(error)")
+            }
+        }
     }
 
     // MARK: - Scroll view helper
@@ -204,8 +239,12 @@ class PaymentsTransferInViewController: OWSViewController {
 
     // MARK: - QR view
 
+    private static func qrSize() -> CGFloat {
+        return min(UIScreen.main.bounds.width - 80, 300)
+    }
+
     private func buildQRView() -> UIView {
-        let size: CGFloat = min(UIScreen.main.bounds.width - 80, 300)
+        let size = Self.qrSize()
 
         let container = UIView()
         container.backgroundColor = .white
@@ -237,37 +276,46 @@ class PaymentsTransferInViewController: OWSViewController {
 
         qrContainerView = container
         spinner.startAnimating()
-        startQRGeneration()
+        generateQR(force: false)
 
         return container
     }
 
-    // Generates the QR on a background thread so it never blocks navigation animations.
-    // Safe to call multiple times — bails out early if QR is already rendered.
-    private func startQRGeneration() {
-        guard let container = qrContainerView else { return }
-        guard !container.subviews.contains(where: { $0 is UIImageView }) else { return }
-
-        let qrString: String
-        if let lnurl = SUIEnvironment.shared.paymentsRef.walletAddressLNURL {
-            qrString = lnurl
-        } else if let address = SUIEnvironment.shared.paymentsRef.walletLightningAddress {
-            qrString = address
-        } else {
-            return
+    private func currentQRString() -> String? {
+        switch selectedNetwork {
+        case .lightning:
+            return SUIEnvironment.shared.paymentsRef.walletAddressLNURL
+                ?? SUIEnvironment.shared.paymentsRef.walletLightningAddress
+        case .onchain:
+            return onchainAddress
         }
+    }
+
+    // Generates the QR on a background thread so it never blocks navigation animations.
+    // With force=false, bails out if a QR is already rendered (used by passive refresh paths).
+    // With force=true, clears the existing image and regenerates (used when toggling networks).
+    private func generateQR(force: Bool) {
+        guard qrContainerView != nil else { return }
+        if !force, qrImageView != nil { return }
+
+        qrImageView?.removeFromSuperview()
+        qrImageView = nil
+        qrSpinner?.startAnimating()
+
+        guard let target = currentQRString() else { return }
 
         Task.detached(priority: .userInitiated) { [weak self] in
-            let qrImage = QRCodeGenerator().generateUnstyledQRCode(data: Data(qrString.utf8))
+            let qrImage = QRCodeGenerator().generateUnstyledQRCode(data: Data(target.utf8))
             await MainActor.run { [weak self] in
-                guard let self, let container = self.qrContainerView else { return }
-                guard !container.subviews.contains(where: { $0 is UIImageView }) else { return }
-                guard let qrImage else { return }
-                let qrImageView = UIImageView(image: qrImage)
-                qrImageView.layer.magnificationFilter = .nearest
-                qrImageView.layer.minificationFilter = .nearest
-                container.insertSubview(qrImageView, at: 0)
-                qrImageView.autoPinEdgesToSuperviewEdges(with: UIEdgeInsets(top: 12, left: 12, bottom: 12, right: 12))
+                guard let self, let container = self.qrContainerView, let qrImage else { return }
+                // Drop result if the user toggled networks while we were generating.
+                guard self.currentQRString() == target else { return }
+                let iv = UIImageView(image: qrImage)
+                iv.layer.magnificationFilter = .nearest
+                iv.layer.minificationFilter = .nearest
+                container.insertSubview(iv, at: 0)
+                iv.autoPinEdgesToSuperviewEdges(with: UIEdgeInsets(top: 12, left: 12, bottom: 12, right: 12))
+                self.qrImageView = iv
                 self.qrSpinner?.stopAnimating()
             }
         }
@@ -278,6 +326,7 @@ class PaymentsTransferInViewController: OWSViewController {
     private func buildAddressRow() -> UIView {
         let label = UILabel()
         label.numberOfLines = 1
+        label.autoSetDimension(.width, toSize: Self.qrSize(), relation: .lessThanOrEqual)
         addressLabel = label
         applyAddress(to: label)
 
@@ -286,6 +335,7 @@ class PaymentsTransferInViewController: OWSViewController {
         pencilBtn.setImage(UIImage(systemName: "pencil", withConfiguration: config), for: .normal)
         pencilBtn.tintColor = Theme.primaryTextColor.withAlphaComponent(0.4)
         pencilBtn.addTarget(self, action: #selector(didTapEdit), for: .touchUpInside)
+        pencilButton = pencilBtn
 
         let hStack = UIStackView(arrangedSubviews: [label, pencilBtn])
         hStack.axis = .horizontal
@@ -302,6 +352,19 @@ class PaymentsTransferInViewController: OWSViewController {
     }
 
     private func applyAddress(to label: UILabel) {
+        switch selectedNetwork {
+        case .lightning:
+            applyLightningAddress(to: label)
+        case .onchain:
+            applyOnchainAddress(to: label)
+        }
+    }
+
+    private func applyLightningAddress(to label: UILabel) {
+        label.attributedText = nil
+        label.numberOfLines = 1
+        label.lineBreakMode = .byTruncatingTail
+        label.textAlignment = .natural
         guard let address = SUIEnvironment.shared.paymentsRef.walletLightningAddress else {
             label.text = OWSLocalizedString(
                 "PAYMENTS_WALLET_ADDRESS_LOADING",
@@ -328,11 +391,33 @@ class PaymentsTransferInViewController: OWSViewController {
         }
     }
 
+    private func applyOnchainAddress(to label: UILabel) {
+        label.attributedText = nil
+        guard let address = onchainAddress else {
+            label.text = OWSLocalizedString(
+                "PAYMENTS_WALLET_ADDRESS_LOADING",
+                comment: "Placeholder shown in the wallet address field while the Lightning address is being loaded."
+            )
+            label.font = UIFont.systemFont(ofSize: 17)
+            label.textColor = Theme.primaryTextColor.withAlphaComponent(0.4)
+            label.numberOfLines = 1
+            label.lineBreakMode = .byTruncatingTail
+            label.textAlignment = .center
+            return
+        }
+        label.text = address
+        label.font = UIFont.monospacedSystemFont(ofSize: 14, weight: .medium)
+        label.textColor = Theme.primaryTextColor
+        label.numberOfLines = 3
+        label.lineBreakMode = .byCharWrapping
+        label.textAlignment = .center
+    }
+
     private func refreshWalletAddressUI() {
         if let label = addressLabel {
             applyAddress(to: label)
         }
-        startQRGeneration()
+        generateQR(force: false)
     }
 
     // MARK: - Buttons
@@ -354,40 +439,20 @@ class PaymentsTransferInViewController: OWSViewController {
     }
 
     private func buildNetworkToggle() -> UIView {
-        var lightCfg = UIButton.Configuration.filled()
-        lightCfg.attributedTitle = AttributedString(
-            "Lightning",
-            attributes: AttributeContainer([.font: UIFont.systemFont(ofSize: 13, weight: .medium)])
-        )
-        lightCfg.image = UIImage(systemName: "bolt.fill")
-        lightCfg.imagePlacement = .leading
-        lightCfg.imagePadding = 6
-        lightCfg.baseBackgroundColor = .white
-        lightCfg.baseForegroundColor = Self.accentBlue
-        lightCfg.background.cornerRadius = 20
-        lightCfg.contentInsets = NSDirectionalEdgeInsets(top: 6, leading: 10, bottom: 6, trailing: 14)
+        let lightningBtn = makeNetworkTabButton(title: "Lightning", systemIcon: "bolt.fill")
+        lightningBtn.addTarget(self, action: #selector(didTapLightningTab), for: .touchUpInside)
+        let onchainBtn = makeNetworkTabButton(title: "Onchain", systemIcon: "bitcoinsign.circle")
+        onchainBtn.addTarget(self, action: #selector(didTapOnchainTab), for: .touchUpInside)
 
-        let lightningBtn = UIButton(configuration: lightCfg)
-        lightningBtn.isUserInteractionEnabled = false
-
-        var onchainCfg = UIButton.Configuration.plain()
-        onchainCfg.attributedTitle = AttributedString(
-            "Onchain",
-            attributes: AttributeContainer([.font: UIFont.systemFont(ofSize: 13, weight: .medium)])
-        )
-        onchainCfg.image = UIImage(systemName: "bitcoinsign.circle")
-        onchainCfg.imagePlacement = .leading
-        onchainCfg.imagePadding = 6
-        onchainCfg.baseForegroundColor = UIColor.black.withAlphaComponent(0.5)
-        onchainCfg.contentInsets = NSDirectionalEdgeInsets(top: 6, leading: 10, bottom: 6, trailing: 14)
-
-        let onchainBtn = UIButton(configuration: onchainCfg)
-        onchainBtn.isUserInteractionEnabled = false
+        lightningTabButton = lightningBtn
+        onchainTabButton = onchainBtn
+        applyTabStyling()
 
         let tabStack = UIStackView(arrangedSubviews: [lightningBtn, onchainBtn])
         tabStack.axis = .horizontal
         tabStack.spacing = 0
         tabStack.alignment = .center
+        tabStack.distribution = .fillEqually
 
         let container = UIView()
         container.backgroundColor = UIColor(red: 233/255, green: 233/255, blue: 234/255, alpha: 1)
@@ -403,6 +468,35 @@ class PaymentsTransferInViewController: OWSViewController {
         container.autoPinEdge(toSuperviewEdge: .top)
         container.autoPinEdge(toSuperviewEdge: .bottom)
         return wrapper
+    }
+
+    private func makeNetworkTabButton(title: String, systemIcon: String) -> UIButton {
+        var cfg = UIButton.Configuration.plain()
+        cfg.attributedTitle = AttributedString(
+            title,
+            attributes: AttributeContainer([.font: UIFont.systemFont(ofSize: 13, weight: .medium)])
+        )
+        cfg.image = UIImage(systemName: systemIcon)
+        cfg.imagePlacement = .leading
+        cfg.imagePadding = 6
+        cfg.contentInsets = NSDirectionalEdgeInsets(top: 6, leading: 10, bottom: 6, trailing: 14)
+        cfg.background.cornerRadius = 20
+        cfg.background.backgroundColor = .clear
+        return UIButton(configuration: cfg)
+    }
+
+    private func applyTabStyling() {
+        let isLightning = (selectedNetwork == .lightning)
+        if let lBtn = lightningTabButton, var lCfg = lBtn.configuration {
+            lCfg.background.backgroundColor = isLightning ? .white : .clear
+            lCfg.baseForegroundColor = isLightning ? Self.accentBlue : UIColor.black.withAlphaComponent(0.5)
+            lBtn.configuration = lCfg
+        }
+        if let oBtn = onchainTabButton, var oCfg = oBtn.configuration {
+            oCfg.background.backgroundColor = isLightning ? .clear : .white
+            oCfg.baseForegroundColor = isLightning ? UIColor.black.withAlphaComponent(0.5) : Self.accentBlue
+            oBtn.configuration = oCfg
+        }
     }
 
     private func makePillButton(
@@ -454,8 +548,71 @@ class PaymentsTransferInViewController: OWSViewController {
 
     // MARK: - Actions
 
+    private func currentDisplayedAddress() -> String? {
+        switch selectedNetwork {
+        case .lightning:
+            return SUIEnvironment.shared.paymentsRef.walletLightningAddress
+        case .onchain:
+            return onchainAddress
+        }
+    }
+
+    @objc private func didTapLightningTab() {
+        guard selectedNetwork != .lightning else { return }
+        selectedNetwork = .lightning
+        applyTabStyling()
+        pencilButton?.isHidden = false
+        if let label = addressLabel { applyAddress(to: label) }
+        generateQR(force: true)
+    }
+
+    @objc private func didTapOnchainTab() {
+        guard selectedNetwork != .onchain else { return }
+        selectedNetwork = .onchain
+        applyTabStyling()
+        pencilButton?.isHidden = true
+        if let label = addressLabel { applyAddress(to: label) }
+
+        if onchainAddress != nil {
+            generateQR(force: true)
+            return
+        }
+
+        // No cached address yet — show spinner while fetching.
+        qrImageView?.removeFromSuperview()
+        qrImageView = nil
+        qrSpinner?.startAnimating()
+        Task { [weak self] in
+            do {
+                let response = try await SUIEnvironment.shared.paymentsImplRef.fetchBitcoinTaprootAddress()
+                await MainActor.run { [weak self] in
+                    guard let self else { return }
+                    self.onchainAddress = response.paymentRequest
+                    guard self.selectedNetwork == .onchain else { return }
+                    if let label = self.addressLabel { self.applyAddress(to: label) }
+                    self.generateQR(force: true)
+                }
+            } catch {
+                Logger.warn("Failed to fetch onchain address: \(error)")
+                await MainActor.run { [weak self] in
+                    guard let self else { return }
+                    guard self.selectedNetwork == .onchain else { return }
+                    self.presentToast(text: OWSLocalizedString(
+                        "PAYMENTS_ADD_FUNDS_ONCHAIN_FETCH_FAILED",
+                        comment: "Toast shown when fetching the on-chain Bitcoin receive address fails on the Add Funds screen."
+                    ))
+                    self.selectedNetwork = .lightning
+                    self.applyTabStyling()
+                    self.pencilButton?.isHidden = false
+                    if let label = self.addressLabel { self.applyAddress(to: label) }
+                    self.generateQR(force: true)
+                }
+            }
+        }
+    }
+
     @objc private func didTapCopy() {
-        guard let address = SUIEnvironment.shared.paymentsRef.walletLightningAddress else { return }
+        guard let address = currentDisplayedAddress() else { return }
         UIPasteboard.general.string = address
         presentToast(text: OWSLocalizedString(
             "SETTINGS_PAYMENTS_ADD_MONEY_WALLET_ADDRESS_COPIED",
@@ -476,7 +633,7 @@ class PaymentsTransferInViewController: OWSViewController {
     }
 
     @objc private func didTapShare() {
-        guard let address = SUIEnvironment.shared.paymentsRef.walletLightningAddress else { return }
+        guard let address = currentDisplayedAddress() else { return }
         AttachmentSharing.showShareUI(for: address, sender: self)
     }
 }
