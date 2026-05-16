@@ -72,6 +72,8 @@
 		05B411252C62845000A1EDBC /* ChatListInboxFilterSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05B411242C62845000A1EDBC /* ChatListInboxFilterSection.swift */; };
 		05FDBC292CD91B31000C87BC /* ChatListContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FDBC282CD91B31000C87BC /* ChatListContainerView.swift */; };
 		0C0656B22F912FE700CA36E7 /* BreezSdkExt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C0656B12F912FE700CA36E7 /* BreezSdkExt.swift */; };
+		AA000001302600000000A001 /* LightningLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000002302600000000A002 /* LightningLogger.swift */; };
+		AA000003302600000000A003 /* LightningLogsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000004302600000000A004 /* LightningLogsViewController.swift */; };
 		0C1A350E2F4DD6B40004353B /* WalletetAddressEditViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C1A350D2F4DD6880004353B /* WalletetAddressEditViewController.swift */; };
 		0CA604BC2F7FEC1B003AE0FD /* SetOnce.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CA604BB2F7FEC18003AE0FD /* SetOnce.swift */; };
 		0CE014267EDFBD2538E940A0 /* Pods_Signal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7FF88FB580BC19B240EEB86A /* Pods_Signal.framework */; };
@@ -3939,6 +3941,8 @@
 		05FDBC282CD91B31000C87BC /* ChatListContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatListContainerView.swift; sourceTree = "<group>"; };
 		0BADD293DAFC82BF3274F0F6 /* Pods_SignalTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_SignalTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		0C0656B12F912FE700CA36E7 /* BreezSdkExt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreezSdkExt.swift; sourceTree = "<group>"; };
+		AA000002302600000000A002 /* LightningLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LightningLogger.swift; sourceTree = "<group>"; };
+		AA000004302600000000A004 /* LightningLogsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LightningLogsViewController.swift; sourceTree = "<group>"; };
 		0C1A350D2F4DD6880004353B /* WalletetAddressEditViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletetAddressEditViewController.swift; sourceTree = "<group>"; };
 		0CA604BB2F7FEC18003AE0FD /* SetOnce.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetOnce.swift; sourceTree = "<group>"; };
 		1404D8B2276A353A0068E2F6 /* ChatListViewController+Multiselect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChatListViewController+Multiselect.swift"; sourceTree = "<group>"; };
@@ -8374,6 +8378,7 @@
 				3495FF0925F9276E00959D6E /* PaymentsRestoreWalletWordViewController.swift */,
 				3497971425D6D55400E99FA4 /* PaymentsSendRecipientViewController.swift */,
 				9F6D5347F4DB44F2AE1B3F53 /* PaymentSettingsMenuViewController.swift */,
+				AA000004302600000000A004 /* LightningLogsViewController.swift */,
 				3498AC8F2518E92B00B1F315 /* PaymentsSettingsViewController.swift */,
 				34848D6225D44EBD00E5034B /* PaymentsTransferInViewController.swift */,
 				DE357466A03B42A7A4362BC9 /* RadarUsernameViewController.swift */,
@@ -8735,6 +8740,7 @@
 			isa = PBXGroup;
 			children = (
 				0C0656B12F912FE700CA36E7 /* BreezSdkExt.swift */,
+				AA000002302600000000A002 /* LightningLogger.swift */,
 				34D21DA127297FBE00D891F4 /* DebugLogger+Payments.swift */,
 				3465F4D227287675001663AF /* MobileCoinAPI+Configuration.swift */,
 				3465F4D427287675001663AF /* MobileCoinAPI.swift */,
@@ -16719,6 +16725,7 @@
 				765283AE2A00D8B4004583A9 /* OWSTableContents.swift in Sources */,
 				765283B22A00D8EC004583A9 /* OWSTableItem.swift in Sources */,
 				0C0656B22F912FE700CA36E7 /* BreezSdkExt.swift in Sources */,
+				AA000001302600000000A001 /* LightningLogger.swift in Sources */,
 				765283B02A00D8CE004583A9 /* OWSTableSection.swift in Sources */,
 				8868A08C287F4F81000E74A5 /* OWSTableSheetViewController.swift in Sources */,
 				3402AA5A271D9DCD0084CBAE /* OWSTableViewController2.swift in Sources */,
@@ -17404,6 +17411,7 @@
 				3495FF0B25F9276E00959D6E /* PaymentsRestoreWalletWordViewController.swift in Sources */,
 				3497971525D6D55400E99FA4 /* PaymentsSendRecipientViewController.swift in Sources */,
 				AA5BC7D6399A49B39775CEE2 /* PaymentSettingsMenuViewController.swift in Sources */,
+				AA000003302600000000A003 /* LightningLogsViewController.swift in Sources */,
 				3498AC922518E92B00B1F315 /* PaymentsSettingsViewController.swift in Sources */,
 				34848D6325D44EBD00E5034B /* PaymentsTransferInViewController.swift in Sources */,
 				50B791A8EDFA4671AFAD36BE /* PaymentsOnboardingCoordinator.swift in Sources */,

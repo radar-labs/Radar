@@ -86,6 +86,16 @@ class PaymentSettingsMenuViewController: OWSTableViewController2 {
             }
         ))
 
+        mainSection.add(.disclosureItem(
+            withText: OWSLocalizedString(
+                "SETTINGS_PAYMENTS_LIGHTNING_LOGS",
+                comment: "Label for the 'lightning logs' row in payment settings."
+            ),
+            actionBlock: { [weak self] in
+                self?.showLightningLogs()
+            }
+        ))
+
         contents.add(mainSection)
 
         let deactivateSection = OWSTableSection()
@@ -142,6 +152,11 @@ class PaymentSettingsMenuViewController: OWSTableViewController2 {
         let vc = ContactSupportViewController()
         vc.selectedFilter = .payments
         present(OWSNavigationController(rootViewController: vc), animated: true)
+    }
+
+    private func showLightningLogs() {
+        let vc = LightningLogsViewController()
+        navigationController?.pushViewController(vc, animated: true)
     }
 
     private func confirmDeactivatePayments() {

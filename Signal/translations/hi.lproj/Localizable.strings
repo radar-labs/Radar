@@ -8202,6 +8202,18 @@ Send money securely.";
 /* Indicator that the payments wallet address is invalid. */
 "SETTINGS_PAYMENTS_INVALID_WALLET_ADDRESS" = "वॉलेट पता सही नहीं है";
 
+/* Label for the 'lightning logs' row in payment settings. */
+"SETTINGS_PAYMENTS_LIGHTNING_LOGS" = "Lightning लॉग";
+
+/* Placeholder text shown when no lightning logs have been captured yet. */
+"SETTINGS_PAYMENTS_LIGHTNING_LOGS_EMPTY" = "अभी तक कोई Lightning लॉग कैप्चर नहीं हुआ है।";
+
+/* Title for the 'export lightning logs' button in the lightning logs view. */
+"SETTINGS_PAYMENTS_LIGHTNING_LOGS_EXPORT_BUTTON" = "लॉग निर्यात करें";
+
+/* Error message shown when exporting lightning logs fails. */
+"SETTINGS_PAYMENTS_LIGHTNING_LOGS_EXPORT_FAILED" = "Lightning लॉग निर्यात करने में विफल।";
+
 /* Label for UISwitch based payments-lock setting that when enabled requires biometric-authentication (or passcode) to transfer funds or view the recovery phrase. */
 "SETTINGS_PAYMENTS_LOCK_SWITCH_LABEL" = "भुगतान लॉक";
 

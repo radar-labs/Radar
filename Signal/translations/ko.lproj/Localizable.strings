@@ -8202,6 +8202,18 @@ Send money securely.";
 /* Indicator that the payments wallet address is invalid. */
 "SETTINGS_PAYMENTS_INVALID_WALLET_ADDRESS" = "잘못된 지갑 주소";
 
+/* Label for the 'lightning logs' row in payment settings. */
+"SETTINGS_PAYMENTS_LIGHTNING_LOGS" = "Lightning 로그";
+
+/* Placeholder text shown when no lightning logs have been captured yet. */
+"SETTINGS_PAYMENTS_LIGHTNING_LOGS_EMPTY" = "아직 Lightning 로그가 기록되지 않았습니다.";
+
+/* Title for the 'export lightning logs' button in the lightning logs view. */
+"SETTINGS_PAYMENTS_LIGHTNING_LOGS_EXPORT_BUTTON" = "로그 내보내기";
+
+/* Error message shown when exporting lightning logs fails. */
+"SETTINGS_PAYMENTS_LIGHTNING_LOGS_EXPORT_FAILED" = "Lightning 로그를 내보내지 못했습니다.";
+
 /* Label for UISwitch based payments-lock setting that when enabled requires biometric-authentication (or passcode) to transfer funds or view the recovery phrase. */
 "SETTINGS_PAYMENTS_LOCK_SWITCH_LABEL" = "결제 잠금";
 
