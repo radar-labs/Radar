@@ -405,9 +405,27 @@ class PaymentsTransferInViewController: OWSViewController {
             label.textAlignment = .center
             return
         }
-        label.text = address
-        label.font = UIFont.monospacedSystemFont(ofSize: 14, weight: .medium)
-        label.textColor = Theme.primaryTextColor
+        let font = UIFont.monospacedSystemFont(ofSize: 14, weight: .medium)
+        let groupSize = 4
+        var groups: [String] = []
+        var cursor = address.startIndex
+        while cursor < address.endIndex {
+            let end = address.index(cursor, offsetBy: groupSize, limitedBy: address.endIndex) ?? address.endIndex
+            groups.append(String(address[cursor..<end]))
+            cursor = end
+        }
+        let attributed = NSMutableAttributedString()
+        for (index, group) in groups.enumerated() {
+            let color = index.isMultiple(of: 2) ? Theme.primaryTextColor : Theme.ternaryTextColor
+            if index > 0 {
+                attributed.append(NSAttributedString(string: " ", attributes: [.font: font]))
+            }
+            attributed.append(NSAttributedString(string: group, attributes: [
+                .font: font,
+                .foregroundColor: color,
+            ]))
+        }
+        label.attributedText = attributed
         label.numberOfLines = 3
         label.lineBreakMode = .byCharWrapping
         label.textAlignment = .center
