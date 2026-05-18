@@ -76,8 +76,8 @@ extension PaymentsPassphrase {
     public static func parse(passphrase: String,
                              validateWords: Bool) throws -> PaymentsPassphrase {
         let words = Array(passphrase.lowercased().stripped.components(separatedBy: " ").compactMap { $0.nilIfEmpty })
-        guard words.count == PaymentsConstants.passphraseWordCount else {
-            Logger.warn("words.count \(words.count) != \(PaymentsConstants.passphraseWordCount)")
+        guard PaymentsConstants.supportedPassphraseWordCounts.contains(words.count) else {
+            Logger.warn("words.count \(words.count) not in supported counts \(PaymentsConstants.supportedPassphraseWordCounts)")
             throw PaymentsError.invalidPassphrase
         }
         if validateWords {

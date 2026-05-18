@@ -114,6 +114,7 @@ post_install do |installer|
   update_frameworks_script(installer)
   disable_non_development_pod_warnings(installer)
   fix_ringrtc_project_symlink(installer)
+  patch_reachability_private_header(installer)
   fetch_ringrtc
   copy_acknowledgements
 end
@@ -185,6 +186,26 @@ def promote_minimum_supported_version(installer)
   end
 end
 
+
+# The Reachability 3.7.x pod imports <netinet6/in6.h>, which newer Apple SDKs
+# treat as a private system header. The file uses only IPv4 types, so the
+# import is dead code — stripping it after each `pod install` eliminates the
+# resulting "Use of private header from outside its module" error. Pod source
+# files install read-only, so we temporarily make the file writable.
+def patch_reachability_private_header(installer)
+  reachability_m = 'Pods/Reachability/Reachability.m'
+  return unless File.exist?(reachability_m)
+  contents = File.read(reachability_m)
+  fixed = contents.gsub(/^#import <netinet6\/in6\.h>\s*\n/, '')
+  return if fixed == contents
+  original_mode = File.stat(reachability_m).mode
+  File.chmod(0644, reachability_m)
+  begin
+    File.write(reachability_m, fixed)
+  ensure
+    File.chmod(original_mode, reachability_m)
+  end
+end
 
 def disable_bitcode(installer)
   installer.pods_project.targets.each do |target|

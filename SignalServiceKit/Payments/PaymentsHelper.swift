@@ -100,8 +100,8 @@ public enum PaymentsState: Equatable {
         guard let paymentsEntropy = paymentsEntropy else {
             return .disabled
         }
-        guard paymentsEntropy.count == PaymentsConstants.paymentsEntropyLength else {
-            owsFailDebug("paymentsEntropy has invalid length: \(paymentsEntropy.count) != \(PaymentsConstants.paymentsEntropyLength).")
+        guard PaymentsConstants.supportedPaymentsEntropyLengths.contains(paymentsEntropy.count) else {
+            owsFailDebug("paymentsEntropy has invalid length: \(paymentsEntropy.count); supported: \(PaymentsConstants.supportedPaymentsEntropyLengths).")
             return .disabled
         }
         if arePaymentsEnabled {
