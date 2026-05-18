@@ -593,7 +593,7 @@ extension PaymentsImpl {
         let sdk = try getBreezSdk()
         let response = try await sdk.receivePayment(
             request: ReceivePaymentRequest(
-                paymentMethod: .bitcoinAddress
+                paymentMethod: .bitcoinAddress(newAddress: nil)
             )
         )
         return response
@@ -771,10 +771,11 @@ extension PaymentsImpl {
             let optionalValidateSuccessActionUrl = true
 
             let request = PrepareLnurlPayRequest(
-                amountSats: amountSats,
+                amount: BInt(amountSats),
                 payRequest: payRequest,
                 comment: optionalComment,
-                validateSuccessActionUrl: optionalValidateSuccessActionUrl
+                validateSuccessActionUrl: optionalValidateSuccessActionUrl,
+                tokenIdentifier: nil
             )
 
             let preparedPayment = try await sdk.prepareLnurlPay(request: request)
@@ -794,10 +795,11 @@ extension PaymentsImpl {
             let optionalValidateSuccessActionUrl = true
 
             let request = PrepareLnurlPayRequest(
-                amountSats: amountSats,
+                amount: BInt(amountSats),
                 payRequest: payRequest,
                 comment: optionalComment,
-                validateSuccessActionUrl: optionalValidateSuccessActionUrl
+                validateSuccessActionUrl: optionalValidateSuccessActionUrl,
+                tokenIdentifier: nil
             )
 
             let preparedPayment = try await sdk.prepareLnurlPay(request: request)
