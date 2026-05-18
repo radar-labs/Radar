@@ -6,36 +6,18 @@
     {
       "layers" : [
         {
-          "blend-mode" : "normal",
-          "fill" : "automatic",
-          "glass-specializations" : [
-            {
-              "value" : false
-            },
-            {
-              "appearance" : "dark",
-              "value" : false
-            },
-            {
-              "appearance" : "tinted",
-              "value" : false
-            }
-          ],
+          "glass" : false,
           "hidden" : false,
           "image-name-specializations" : [
             {
-              "value" : "radar-icon-full.png"
-            },
-            {
-              "appearance" : "dark",
-              "value" : "radar-dark.png"
+              "value" : "radar-icon-2.png"
             },
             {
               "appearance" : "tinted",
-              "value" : "mono-version.png"
+              "value" : "radar-2-mono.png"
             }
           ],
-          "name" : "radar-no-bg"
+          "name" : "radar-2-mono"
         }
       ],
       "shadow" : {
