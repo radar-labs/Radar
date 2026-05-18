@@ -8131,7 +8131,7 @@ Send money securely.";
 "SETTINGS_PAYMENTS_DEACTIVATE_PAYMENTS" = "Deaktiver betalinger";
 
 /* Description for the 'deactivate payments confirmation' UI in the payment settings. */
-"SETTINGS_PAYMENTS_DEACTIVATE_PAYMENTS_CONFIRM_DESCRIPTION" = "Du vil ikke kunne sende eller motta MobileCoin i Signal hvis du deaktiverer betalinger.";
+"SETTINGS_PAYMENTS_DEACTIVATE_PAYMENTS_CONFIRM_DESCRIPTION" = "You will not be able to send or receive Lightning in Radar if you deactivate payments.";
 
 /* Title for the 'deactivate payments confirmation' UI in the payment settings. */
 "SETTINGS_PAYMENTS_DEACTIVATE_PAYMENTS_CONFIRM_TITLE" = "Deaktivere betalinger?";
