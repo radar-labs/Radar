@@ -465,8 +465,8 @@ public class SendPaymentViewController: OWSViewController {
         let amountRightSpacer = UIView.container()
         amountLeftSpacer.setContentHuggingHorizontalLow()
         amountRightSpacer.setContentHuggingHorizontalLow()
-        UIView.matchWidthsOfViews([amountLeftSpacer, amountRightSpacer])
         let bigAmountRow = UIStackView(arrangedSubviews: [amountLeftSpacer, amountWithIcon, amountRightSpacer])
+        UIView.matchWidthsOfViews([amountLeftSpacer, amountRightSpacer])
         bigAmountRow.axis = .horizontal
         bigAmountRow.alignment = .center
 
@@ -519,8 +519,8 @@ public class SendPaymentViewController: OWSViewController {
         let balanceRightSpacer = UIView.container()
         balanceLeftSpacer.setContentHuggingHorizontalLow()
         balanceRightSpacer.setContentHuggingHorizontalLow()
-        UIView.matchWidthsOfViews([balanceLeftSpacer, balanceRightSpacer])
         let balancePillRow = UIStackView(arrangedSubviews: [balanceLeftSpacer, balancePillView, balanceRightSpacer])
+        UIView.matchWidthsOfViews([balanceLeftSpacer, balanceRightSpacer])
         balancePillRow.axis = .horizontal
         balancePillRow.alignment = .center
 
@@ -735,13 +735,28 @@ public class SendPaymentViewController: OWSViewController {
         )
         noteTextField.font = .dynamicTypeBodyClamped
         noteTextField.borderStyle = .none
+        noteTextField.returnKeyType = .done
+        noteTextField.delegate = self
         noteTextField.addTarget(self, action: #selector(noteTextFieldDidChange), for: .editingChanged)
 
         noteContainer.layer.cornerRadius = 26
         noteContainer.layer.masksToBounds = true
         noteContainer.addSubview(noteTextField)
+
+        let notePasteIconView = UIImageView(image: UIImage(systemName: "doc.on.clipboard"))
+        notePasteIconView.tintColor = Theme.primaryIconColor
+        notePasteIconView.contentMode = .scaleAspectFit
+        notePasteIconView.autoSetDimensions(to: .square(24))
+        notePasteIconView.setCompressionResistanceHigh()
+        notePasteIconView.setContentHuggingHigh()
+        notePasteIconView.isUserInteractionEnabled = true
+        notePasteIconView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(didTapNotePaste)))
+        noteContainer.addSubview(notePasteIconView)
+        notePasteIconView.autoPinEdge(toSuperviewEdge: .trailing, withInset: 16)
+        notePasteIconView.autoAlignAxis(toSuperviewAxis: .horizontal)
+
         noteTextField.autoPinEdge(toSuperviewEdge: .leading, withInset: 16)
-        noteTextField.autoPinEdge(toSuperviewEdge: .trailing, withInset: 16)
+        noteTextField.autoPinEdge(.trailing, to: .leading, of: notePasteIconView, withOffset: -8)
         noteTextField.autoPinEdge(toSuperviewEdge: .top)
         noteTextField.autoPinEdge(toSuperviewEdge: .bottom)
         noteContainer.autoSetDimension(.height, toSize: 52)
@@ -775,51 +790,35 @@ public class SendPaymentViewController: OWSViewController {
             currencyConversionInfoView.tintColor = Theme.secondaryTextAndIconColor
         }
 
-        bigAmountLabel.attributedText = amount.formatAsKeyboardInputAttributed(withSpace: false)
+        bigAmountLabel.attributedText = amount.formatAsKeyboardInputAttributed(withSpace: true)
 
         switch amount {
         case .cryptoCurrency:
             if let otherCurrencyAmount = self.otherCurrencyAmount,
-               let currencyConversion = otherCurrencyAmount.currencyConversion {
-                let formattedAmount = otherCurrencyAmount.formatForDisplay(withSpace: true).string
-                enableSmallLabel(Self.formatWithConversionFreshness(formattedAmount: formattedAmount,
-                                                                    currencyConversion: currencyConversion,
-                                                                    isZero: isZero))
+               otherCurrencyAmount.currencyConversion != nil {
+                enableSmallLabel(otherCurrencyAmount.formatForDisplay(withSpace: true).string)
             } else if let currencyConversion = currentCurrencyConversion,
                       let fiatCurrencyAmount = currencyConversion.convertToFiatCurrency(paymentAmount: parsedPaymentAmount),
                       let fiatString = PaymentsFormat.attributedFormat(fiatCurrencyAmount: fiatCurrencyAmount,
                                                                        currencyCode: currencyConversion.currencyCode,
                                                                        withSpace: true) {
-                enableSmallLabel(Self.formatWithConversionFreshness(formattedAmount: fiatString.string,
-                                                                    currencyConversion: currencyConversion,
-                                                                    isZero: isZero))
+                enableSmallLabel(fiatString.string)
             } else {
                 hideConversionLabelOrShowWarning()
             }
         case .fiatCurrency(_, let currencyConversion):
             if let otherCurrencyAmount = self.otherCurrencyAmount {
-                let formattedAmount = otherCurrencyAmount.formatForDisplay(withSpace: true).string
-                enableSmallLabel(Self.formatWithConversionFreshness(formattedAmount: formattedAmount,
-                                                                    currencyConversion: currencyConversion,
-                                                                    isZero: isZero))
+                enableSmallLabel(otherCurrencyAmount.formatForDisplay(withSpace: true).string)
             } else {
                 let paymentAmount = currencyConversion.convertFromFiatCurrencyToMOB(amount.asDouble)
-                let formattedAmount = PaymentsFormat.attributedFormat(paymentAmount: paymentAmount,
-                                                                      isShortForm: false,
-                                                                      withSpace: true).string
-                enableSmallLabel(Self.formatWithConversionFreshness(formattedAmount: formattedAmount,
-                                                                    currencyConversion: currencyConversion,
-                                                                    isZero: isZero))
+                enableSmallLabel(PaymentsFormat.attributedFormat(paymentAmount: paymentAmount,
+                                                                  isShortForm: false,
+                                                                  withSpace: true).string)
             }
         case .satoshi:
             if let otherCurrencyAmount = self.otherCurrencyAmount,
-               let currencyConversion = otherCurrencyAmount.currencyConversion {
-                let formattedAmount = otherCurrencyAmount.formatForDisplay(withSpace: true).string
-                enableSmallLabel(Self.formatWithConversionFreshness(
-                    formattedAmount: formattedAmount,
-                    currencyConversion: currencyConversion,
-                    isZero: isZero
-                ))
+               otherCurrencyAmount.currencyConversion != nil {
+                enableSmallLabel(otherCurrencyAmount.formatForDisplay(withSpace: true).string)
             } else if let currencyConversion = currentCurrencyConversion,
                       let fiatAmount = currencyConversion.convertToFiatCurrency(paymentAmount: parsedPaymentAmount),
                       let fiatString = PaymentsFormat.attributedFormat(
@@ -827,27 +826,11 @@ public class SendPaymentViewController: OWSViewController {
                           currencyCode: currencyConversion.currencyCode,
                           withSpace: true
                       ) {
-                enableSmallLabel(Self.formatWithConversionFreshness(
-                    formattedAmount: fiatString.string,
-                    currencyConversion: currencyConversion,
-                    isZero: isZero
-                ))
+                enableSmallLabel(fiatString.string)
             } else {
                 hideConversionLabelOrShowWarning()
             }
         }
-    }
-
-    static func formatWithConversionFreshness(formattedAmount: String,
-                                              currencyConversion: CurrencyConversionInfo,
-                                              isZero: Bool) -> String {
-        guard !isZero else {
-            return formattedAmount
-        }
-        let formattedFreshness = DateUtil.formatDateAsTime(currencyConversion.conversionDate)
-        let conversionFormat = OWSLocalizedString("PAYMENTS_CURRENCY_CONVERSION_FRESHNESS_FORMAT",
-                                                 comment: "Format for indicator of a payment amount converted to fiat currency with the freshness of the conversion rate. Embeds: {{ %1$@ the payment amount, %2$@ the freshness of the currency conversion rate }}.")
-        return String(format: conversionFormat, formattedAmount, formattedFreshness)
     }
 
     private func updateBalanceLabel() {
@@ -868,6 +851,13 @@ public class SendPaymentViewController: OWSViewController {
     @objc
     private func noteTextFieldDidChange() {
         memoMessage = noteTextField.text?.nilIfEmpty
+    }
+
+    @objc
+    private func didTapNotePaste() {
+        guard let text = UIPasteboard.general.string, !text.isEmpty else { return }
+        noteTextField.text = text
+        noteTextFieldDidChange()
     }
 
     private func updateAmount(_ amount: Amount) -> Amount {
@@ -1483,6 +1473,15 @@ extension SendPaymentViewController: AmountsDelegate {
         } else {
             updateAmountLabels()
         }
+    }
+}
+
+// MARK: -
+
+extension SendPaymentViewController: UITextFieldDelegate {
+    public func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        return true
     }
 }
 
