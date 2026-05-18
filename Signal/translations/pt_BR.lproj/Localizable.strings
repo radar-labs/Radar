@@ -8202,6 +8202,18 @@ Send money securely.";
 /* Indicator that the payments wallet address is invalid. */
 "SETTINGS_PAYMENTS_INVALID_WALLET_ADDRESS" = "Endereço inválido da carteira";
 
+/* Label for the 'lightning logs' row in payment settings. */
+"SETTINGS_PAYMENTS_LIGHTNING_LOGS" = "Registros do Lightning";
+
+/* Placeholder text shown when no lightning logs have been captured yet. */
+"SETTINGS_PAYMENTS_LIGHTNING_LOGS_EMPTY" = "Nenhum registro do Lightning foi capturado ainda.";
+
+/* Title for the 'export lightning logs' button in the lightning logs view. */
+"SETTINGS_PAYMENTS_LIGHTNING_LOGS_EXPORT_BUTTON" = "Exportar registros";
+
+/* Error message shown when exporting lightning logs fails. */
+"SETTINGS_PAYMENTS_LIGHTNING_LOGS_EXPORT_FAILED" = "Falha ao exportar os registros do Lightning.";
+
 /* Label for UISwitch based payments-lock setting that when enabled requires biometric-authentication (or passcode) to transfer funds or view the recovery phrase. */
 "SETTINGS_PAYMENTS_LOCK_SWITCH_LABEL" = "Bloqueio de pagamentos";
 

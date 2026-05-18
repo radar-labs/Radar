@@ -134,6 +134,8 @@ public class PaymentsImpl: NSObject, PaymentsSwift {
             throw PaymentsError.notEnabled
         }
 
+        LightningLogger.installIfNeeded()
+
         currentSdk = try await BreezSdk.build(with: paymentEntropy)
         if let newAddress = try await currentSdk?.validateInitialLightningAddress() {
             currentWalletAddress = newAddress
