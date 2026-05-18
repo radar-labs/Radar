@@ -1463,6 +1463,16 @@ public class RegistrationCoordinatorImpl: RegistrationCoordinator {
         // Start syncing system contacts now that we have set up tsAccountManager.
         deps.contactsManager.fetchSystemContactsOnceIfAlreadyAuthorized()
 
+        // Merge the server manifest into local state before rotating; otherwise
+        // the rotation below has no local manifestRecordIkm and wipes the
+        // server's records (including paymentsEntropy) on conflict-retry.
+        if persistedState.restoreMethod?.isBackup == true {
+            try? await deps.storageServiceManager.restoreOrCreateManifestIfNecessary(
+                authedDevice: accountIdentity.authedDevice,
+                masterKeySource: .explicit(accountEntropyPool.getMasterKey())
+            ).awaitable()
+        }
+
         try? await deps.storageServiceManager.rotateManifest(
             mode: .preservingRecordsIfPossible,
             authedDevice: accountIdentity.authedDevice
