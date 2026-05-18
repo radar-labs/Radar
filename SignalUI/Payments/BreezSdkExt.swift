@@ -1,5 +1,6 @@
 public import BreezSdkSpark
 import CryptoKit
+import MnemonicSwift
 import SignalServiceKit
 
 extension BreezSdk {
@@ -9,7 +10,11 @@ extension BreezSdk {
 
     public static func build(with entropy: Data) async throws -> BreezSdk {
         let config = breezSdkConfig
-        let seed = Seed.entropy(entropy)
+        // Treat the stored 32 bytes as BIP-39 entropy: encode to a 24-word mnemonic and let
+        // Spark run standard BIP-39 PBKDF2-SHA512 internally. This makes the displayed
+        // backup phrase interoperable with every other BIP-39 wallet.
+        let mnemonic = try Mnemonic.mnemonicString(from: entropy.toHex())
+        let seed = Seed.mnemonic(mnemonic: mnemonic, passphrase: nil)
         let fileManager = FileManager.default
         let documentsDirectory = try fileManager.url(
             for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
