@@ -142,6 +142,51 @@ public class PaymentsImpl: NSObject, PaymentsSwift {
         }
     }
 
+    public func deletePaymentWallet() async throws {
+        // Best-effort: deregister the lightning username and disconnect the SDK
+        // before wiping local state. We don't fail the whole operation if these
+        // calls error, because the user has already accepted that the wallet is
+        // being destroyed locally.
+        if let sdk = currentSdk {
+            do {
+                try await sdk.deleteLightningAddress()
+            } catch {
+                Logger.warn("deleteLightningAddress failed during wallet deletion: \(error)")
+            }
+            do {
+                try await sdk.disconnect()
+            } catch {
+                Logger.warn("Breez disconnect failed during wallet deletion: \(error)")
+            }
+        }
+
+        currentSdk = nil
+        currentWalletAddress = nil
+
+        let fileManager = FileManager.default
+        if let documentsDirectory = try? fileManager.url(
+            for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false
+        ) {
+            let breezDirectory = documentsDirectory.appendingPathComponent(
+                BreezSdk.Constants.defaultBreezDirectoryName,
+                isDirectory: true
+            )
+            if fileManager.fileExists(atPath: breezDirectory.path) {
+                do {
+                    try fileManager.removeItem(at: breezDirectory)
+                } catch {
+                    Logger.warn("Failed to remove Breez storage directory: \(error)")
+                }
+            }
+        }
+
+        await SSKEnvironment.shared.databaseStorageRef.awaitableWrite { transaction in
+            SSKEnvironment.shared.paymentsHelperRef.resetPaymentsState(transaction: transaction)
+        }
+
+        paymentBalanceCache.set(nil)
+    }
+
     private func loadWalletAddress() async throws {
         if currentWalletAddress != nil {
             NotificationCenter.default.postOnMainThread(name: Self.walletAddressDidLoad, object: nil)

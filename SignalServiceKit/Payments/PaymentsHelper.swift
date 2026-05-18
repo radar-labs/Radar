@@ -28,6 +28,7 @@ public protocol PaymentsHelper: AnyObject {
     func enablePayments(transaction: DBWriteTransaction)
     func enablePayments(withPaymentsEntropy: Data, transaction: DBWriteTransaction) -> Bool
     func disablePayments(transaction: DBWriteTransaction)
+    func resetPaymentsState(transaction: DBWriteTransaction)
 
     func setLastKnownLocalPaymentAddressProtoData(_ data: Data?, transaction: DBWriteTransaction)
     func lastKnownLocalPaymentAddressProtoData(transaction: DBWriteTransaction) -> Data?
@@ -188,6 +189,10 @@ extension MockPaymentsHelper: PaymentsHelperSwift, PaymentsHelper {
     }
 
     public func disablePayments(transaction: DBWriteTransaction) {
+        owsFail("Not implemented.")
+    }
+
+    public func resetPaymentsState(transaction: DBWriteTransaction) {
         owsFail("Not implemented.")
     }
 

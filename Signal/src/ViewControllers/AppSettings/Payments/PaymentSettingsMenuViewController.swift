@@ -109,6 +109,16 @@ class PaymentSettingsMenuViewController: OWSTableViewController2 {
                 self?.confirmDeactivatePayments()
             }
         ))
+        deactivateSection.add(.item(
+            name: OWSLocalizedString(
+                "SETTINGS_PAYMENTS_DELETE_WALLET",
+                comment: "Label for 'delete payment wallet' button in the app settings."
+            ),
+            textColor: .ows_accentRed,
+            actionBlock: { [weak self] in
+                self?.confirmDeletePaymentWallet()
+            }
+        ))
         contents.add(deactivateSection)
 
         self.contents = contents
@@ -197,6 +207,75 @@ class PaymentSettingsMenuViewController: OWSTableViewController2 {
             return
         }
         present(OWSNavigationController(rootViewController: PaymentsDeactivateViewController(paymentBalance: paymentBalance)), animated: true)
+    }
+
+    private func confirmDeletePaymentWallet() {
+        guard let paymentBalance = SUIEnvironment.shared.paymentsSwiftRef.currentPaymentBalance else {
+            OWSActionSheets.showErrorAlert(
+                message: OWSLocalizedString(
+                    "SETTINGS_PAYMENTS_DELETE_WALLET_BALANCE_UNAVAILABLE",
+                    comment: "Error message indicating that the payment wallet could not be deleted because the current balance is unavailable."
+                )
+            )
+            return
+        }
+        guard paymentBalance.amount.picoMob == 0 else {
+            OWSActionSheets.showErrorAlert(
+                message: OWSLocalizedString(
+                    "SETTINGS_PAYMENTS_DELETE_WALLET_REQUIRES_ZERO_BALANCE",
+                    comment: "Error message indicating that the payment wallet cannot be deleted until the balance is zero."
+                )
+            )
+            return
+        }
+
+        let actionSheet = ActionSheetController(
+            title: OWSLocalizedString(
+                "SETTINGS_PAYMENTS_DELETE_WALLET_CONFIRM_TITLE",
+                comment: "Title for the 'delete payment wallet confirmation' UI in the payment settings."
+            ),
+            message: OWSLocalizedString(
+                "SETTINGS_PAYMENTS_DELETE_WALLET_CONFIRM_DESCRIPTION",
+                comment: "Description for the 'delete payment wallet confirmation' UI in the payment settings."
+            )
+        )
+        actionSheet.addAction(ActionSheetAction(
+            title: OWSLocalizedString(
+                "SETTINGS_PAYMENTS_DELETE_WALLET",
+                comment: "Label for 'delete payment wallet' button in the app settings."
+            ),
+            style: .destructive
+        ) { [weak self] _ in
+            self?.deletePaymentWallet()
+        })
+        actionSheet.addAction(OWSActionSheets.cancelAction)
+        presentActionSheet(actionSheet)
+    }
+
+    private func deletePaymentWallet() {
+        ModalActivityIndicatorViewController.present(
+            fromViewController: self,
+            presentationDelay: 0.25,
+            asyncBlock: { modal in
+                let result = await Result {
+                    try await SUIEnvironment.shared.paymentsImplRef.deletePaymentWallet()
+                }
+                modal.dismissIfNotCanceled { [weak self] in
+                    guard let self else { return }
+                    do {
+                        _ = try result.get()
+                        self.navigationController?.popViewController(animated: true)
+                    } catch {
+                        OWSActionSheets.showErrorAlert(
+                            message: OWSLocalizedString(
+                                "SETTINGS_PAYMENTS_DELETE_WALLET_FAILED",
+                                comment: "Error message shown when deleting the payment wallet fails."
+                            )
+                        )
+                    }
+                }
+            }
+        )
     }
 }
 

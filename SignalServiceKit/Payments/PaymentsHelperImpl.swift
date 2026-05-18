@@ -154,6 +154,29 @@ public class PaymentsHelperImpl: PaymentsHelperSwift, PaymentsHelper {
         owsAssertDebug(!arePaymentsEnabled)
     }
 
+    public func resetPaymentsState(transaction: DBWriteTransaction) {
+        // Wipe local payment history rows; they belong to the wallet we're deleting.
+        var paymentModelsToRemove: [TSPaymentModel] = []
+        TSPaymentModel.anyEnumerate(transaction: transaction) { paymentModel, _ in
+            paymentModelsToRemove.append(paymentModel)
+        }
+        for paymentModel in paymentModelsToRemove {
+            paymentModel.anyRemove(transaction: transaction)
+        }
+
+        // Clear all KV state (paymentsEntropy, arePaymentsEnabled, lastKnownLocalPaymentAddress, ...).
+        Self.keyValueStore.removeAll(transaction: transaction)
+
+        paymentStateCache.set(.disabled)
+
+        // Push the cleared state to StorageService so linked devices and reinstalls
+        // don't restore the old wallet seed.
+        transaction.addSyncCompletion {
+            SSKEnvironment.shared.storageServiceManagerRef.recordPendingLocalAccountUpdates()
+            NotificationCenter.default.postOnMainThread(name: PaymentsConstants.arePaymentsEnabledDidChange, object: nil)
+        }
+    }
+
     public func setPaymentsState(_ newPaymentsState: PaymentsState,
                                  originatedLocally: Bool,
                                  transaction: DBWriteTransaction) {

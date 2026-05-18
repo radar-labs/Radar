@@ -67,6 +67,8 @@ public protocol PaymentsSwift: Payments {
     func isValidPassphraseWord(_ word: String?) -> Bool
 
     func blockOnOutgoingVerification(paymentModel: TSPaymentModel) async throws -> Bool
+
+    func deletePaymentWallet() async throws
 }
 
 // MARK: -
@@ -221,6 +223,10 @@ extension MockPayments: PaymentsSwift {
     }
 
     public func blockOnOutgoingVerification(paymentModel: TSPaymentModel) async throws -> Bool {
+        owsFail("Not implemented.")
+    }
+
+    public func deletePaymentWallet() async throws {
         owsFail("Not implemented.")
     }
 }
