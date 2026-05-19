@@ -651,6 +651,7 @@ extension PaymentsImpl {
 
         currentWalletAddress = try await self.getBreezSdk().registerLightningAddress(
             request: RegisterLightningAddressRequest(username: username))
+        NotificationCenter.default.postOnMainThread(name: Self.walletAddressDidLoad, object: nil)
         try await updateLastKnownAddressAndReuploadPaymentProfile()
     }
 

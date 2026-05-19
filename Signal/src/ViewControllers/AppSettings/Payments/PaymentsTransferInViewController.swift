@@ -435,7 +435,7 @@ class PaymentsTransferInViewController: OWSViewController {
         if let label = addressLabel {
             applyAddress(to: label)
         }
-        generateQR(force: false)
+        generateQR(force: selectedNetwork == .lightning)
     }
 
     // MARK: - Buttons
