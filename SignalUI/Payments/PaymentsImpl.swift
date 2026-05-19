@@ -184,6 +184,19 @@ public class PaymentsImpl: NSObject, PaymentsSwift {
             SSKEnvironment.shared.paymentsHelperRef.resetPaymentsState(transaction: transaction)
         }
 
+        // Strip the encrypted paymentAddress from the server profile now, instead
+        // of waiting for the next unrelated profile upload. The KV cache was just
+        // wiped, so VersionedProfilesImpl will upload no paymentAddress field.
+        await DependenciesBridge.shared.db.awaitableWrite { transaction in
+            _ = SSKEnvironment.shared.profileManagerRef.reuploadLocalProfileWithProfileKeyVersion(
+                PaymentsConstants.bitcoinLightningProfileKeyVersion,
+                unsavedRotatedProfileKey: nil,
+                mustReuploadAvatar: false,
+                authedAccount: .implicit(),
+                tx: transaction
+            )
+        }
+
         paymentBalanceCache.set(nil)
     }
 
