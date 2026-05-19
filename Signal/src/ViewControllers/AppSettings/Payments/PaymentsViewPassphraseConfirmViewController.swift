@@ -76,7 +76,7 @@ public class PaymentsViewPassphraseConfirmViewController: OWSTableViewController
     }
 
     private static func buildWordIndices(forPassphrase passphrase: PaymentsPassphrase) -> [Int] {
-        let allIndices = 0..<PaymentsConstants.passphraseWordCount
+        let allIndices = 0..<passphrase.wordCount
         let availableIndices = allIndices.shuffled()
         let wordIndices = Array(availableIndices.prefix(2)).sorted()
         return wordIndices

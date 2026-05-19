@@ -8440,6 +8440,12 @@ Send money securely.";
 /* Title for the 'restore payments wallet' view of the app settings. */
 "SETTINGS_PAYMENTS_RESTORE_WALLET_TITLE" = "วลีกู้คืน";
 
+/* Switcher option for restoring a 12-word recovery phrase. */
+"SETTINGS_PAYMENTS_RESTORE_WALLET_WORD_COUNT_12" = "12 คำ";
+
+/* Switcher option for restoring a 24-word recovery phrase. */
+"SETTINGS_PAYMENTS_RESTORE_WALLET_WORD_COUNT_24" = "24 คำ";
+
 /* Format for the instructions for the 'enter word' step of the 'restore payments wallet' views. Embeds {{ the index of the current word }}. */
 "SETTINGS_PAYMENTS_RESTORE_WALLET_WORD_INSTRUCTIONS_FORMAT" = "ใส่คำ %1$@";
 

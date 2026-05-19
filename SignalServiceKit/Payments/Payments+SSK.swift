@@ -108,7 +108,11 @@ public class PaymentsConstants {
 
     public static let maxSatoshiDigits: UInt = 15
 
-    public static let passphraseWordCount: Int = 24
+    public static let passphraseWordCount: Int = 12
+
+    // Newly-generated wallets use 12 words; older wallets that were created
+    // before the switch may still have 24-word phrases stored on device.
+    public static let supportedPassphraseWordCounts: [Int] = [12, 24]
 
     private struct DecimalFormattingInfo {
         let decimalSeparator: String
@@ -232,5 +236,9 @@ public class PaymentsConstants {
         decimalFormattingInfo.shouldUseGroupingSeparatorsAfterDecimal
     }
 
-    public static let paymentsEntropyLength: UInt = 32
+    public static let paymentsEntropyLength: UInt = 16
+
+    // Newly-generated wallets use 16 bytes (12-word BIP-39); older wallets that
+    // were created before the switch may still have 32-byte entropy on device.
+    public static let supportedPaymentsEntropyLengths: [Int] = [16, 32]
 }

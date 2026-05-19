@@ -32,6 +32,12 @@ public class PaymentsRestoreWalletWordViewController: OWSViewController {
 
     private let warningLabel = UILabel()
 
+    private static let switcherAccentBlue = UIColor(red: 0, green: 105/255, blue: 254/255, alpha: 1)
+    private static let switcherContainerFill = UIColor(red: 233/255, green: 233/255, blue: 234/255, alpha: 1)
+
+    private var twelveWordTabButton: UIButton?
+    private var twentyFourWordTabButton: UIButton?
+
     public init(restoreWalletDelegate: PaymentsRestoreWalletDelegate,
                 partialPassphrase: PartialPaymentsPassphrase,
                 wordIndex: Int) {
@@ -174,8 +180,14 @@ public class PaymentsRestoreWalletWordViewController: OWSViewController {
         nextButton.autoSetHeightUsingFont()
 
         rootView.removeAllSubviews()
-        rootView.addArrangedSubviews([
+        var arrangedSubviews: [UIView] = [
             UIView.spacer(withHeight: 20),
+        ]
+        if wordIndex == 0 {
+            arrangedSubviews.append(buildWordCountSwitcher())
+            arrangedSubviews.append(UIView.spacer(withHeight: 20))
+        }
+        arrangedSubviews.append(contentsOf: [
             topStack,
             UIView.spacer(withHeight: 60),
             textfieldStack,
@@ -185,7 +197,91 @@ public class PaymentsRestoreWalletWordViewController: OWSViewController {
             nextButton,
             UIView.spacer(withHeight: 8)
         ])
+        rootView.addArrangedSubviews(arrangedSubviews)
    }
+
+    private func buildWordCountSwitcher() -> UIView {
+        let twelveTitle = OWSLocalizedString(
+            "SETTINGS_PAYMENTS_RESTORE_WALLET_WORD_COUNT_12",
+            comment: "Switcher option for restoring a 12-word recovery phrase.")
+        let twentyFourTitle = OWSLocalizedString(
+            "SETTINGS_PAYMENTS_RESTORE_WALLET_WORD_COUNT_24",
+            comment: "Switcher option for restoring a 24-word recovery phrase.")
+
+        let twelveBtn = makeWordCountTabButton(title: twelveTitle)
+        twelveBtn.addTarget(self, action: #selector(didTapTwelveWordTab), for: .touchUpInside)
+        let twentyFourBtn = makeWordCountTabButton(title: twentyFourTitle)
+        twentyFourBtn.addTarget(self, action: #selector(didTapTwentyFourWordTab), for: .touchUpInside)
+
+        twelveWordTabButton = twelveBtn
+        twentyFourWordTabButton = twentyFourBtn
+        applyWordCountTabStyling()
+
+        let tabStack = UIStackView(arrangedSubviews: [twelveBtn, twentyFourBtn])
+        tabStack.axis = .horizontal
+        tabStack.spacing = 0
+        tabStack.alignment = .center
+        tabStack.distribution = .fillEqually
+
+        let container = UIView()
+        container.backgroundColor = Self.switcherContainerFill
+        container.layer.cornerRadius = 24
+        container.layer.masksToBounds = true
+        container.addSubview(tabStack)
+        tabStack.autoPinEdgesToSuperviewEdges(with: UIEdgeInsets(top: 4, left: 4, bottom: 4, right: 4))
+        container.autoSetDimension(.height, toSize: 48)
+
+        let wrapper = UIView()
+        wrapper.addSubview(container)
+        container.autoHCenterInSuperview()
+        container.autoPinEdge(toSuperviewEdge: .top)
+        container.autoPinEdge(toSuperviewEdge: .bottom)
+        return wrapper
+    }
+
+    private func makeWordCountTabButton(title: String) -> UIButton {
+        var cfg = UIButton.Configuration.plain()
+        cfg.attributedTitle = AttributedString(
+            title,
+            attributes: AttributeContainer([.font: UIFont.systemFont(ofSize: 13, weight: .medium)])
+        )
+        cfg.contentInsets = NSDirectionalEdgeInsets(top: 6, leading: 18, bottom: 6, trailing: 18)
+        cfg.background.cornerRadius = 20
+        cfg.background.backgroundColor = .clear
+        return UIButton(configuration: cfg)
+    }
+
+    private func applyWordCountTabStyling() {
+        let isTwelve = (partialPassphrase.wordCount == 12)
+        if let tBtn = twelveWordTabButton, var tCfg = tBtn.configuration {
+            tCfg.background.backgroundColor = isTwelve ? .white : .clear
+            tCfg.baseForegroundColor = isTwelve ? Self.switcherAccentBlue : UIColor.black.withAlphaComponent(0.5)
+            tBtn.configuration = tCfg
+        }
+        if let fBtn = twentyFourWordTabButton, var fCfg = fBtn.configuration {
+            fCfg.background.backgroundColor = isTwelve ? .clear : .white
+            fCfg.baseForegroundColor = isTwelve ? UIColor.black.withAlphaComponent(0.5) : Self.switcherAccentBlue
+            fBtn.configuration = fCfg
+        }
+    }
+
+    @objc
+    private func didTapTwelveWordTab() {
+        guard partialPassphrase.wordCount != 12 else { return }
+        partialPassphrase.reset(wordCount: 12)
+        textfield.text = nil
+        warningLabel.text = " "
+        applyWordCountTabStyling()
+    }
+
+    @objc
+    private func didTapTwentyFourWordTab() {
+        guard partialPassphrase.wordCount != 24 else { return }
+        partialPassphrase.reset(wordCount: 24)
+        textfield.text = nil
+        warningLabel.text = " "
+        applyWordCountTabStyling()
+    }
 
     // MARK: - Events
 
@@ -233,11 +329,15 @@ public class PartialPaymentsPassphrase {
 
     private var wordMap = [Int: String]()
 
+    public private(set) var wordCount: Int
+
     public var isComplete: Bool {
-        wordMap.count == PaymentsConstants.passphraseWordCount
+        wordMap.count == wordCount
     }
 
-    public init() {}
+    public init(wordCount: Int = PaymentsConstants.passphraseWordCount) {
+        self.wordCount = wordCount
+    }
 
     public static var empty: PartialPaymentsPassphrase { PartialPaymentsPassphrase() }
 
@@ -257,7 +357,7 @@ public class PartialPaymentsPassphrase {
     public func asPaymentsPassphrase() -> PaymentsPassphrase? {
         var words = [String]()
 
-        for index in 0..<PaymentsConstants.passphraseWordCount {
+        for index in 0..<wordCount {
             guard let word = wordMap[index] else {
                 owsFailDebug("Missing word: \(index)")
                 return nil
@@ -274,6 +374,11 @@ public class PartialPaymentsPassphrase {
     }
 
     public func reset() {
+        wordMap.removeAll()
+    }
+
+    public func reset(wordCount: Int) {
+        self.wordCount = wordCount
         wordMap.removeAll()
     }
 }

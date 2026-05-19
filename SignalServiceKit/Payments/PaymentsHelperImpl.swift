@@ -720,8 +720,8 @@ public struct PaymentsPassphrase: Equatable {
     public let words: [String]
 
     public init(words: [String]) throws {
-        guard words.count == PaymentsConstants.passphraseWordCount else {
-            owsFailDebug("words.count \(words.count) != \(PaymentsConstants.passphraseWordCount)")
+        guard PaymentsConstants.supportedPassphraseWordCounts.contains(words.count) else {
+            owsFailDebug("words.count \(words.count) not in supported counts \(PaymentsConstants.supportedPassphraseWordCounts)")
             throw PaymentsError.invalidPassphrase
         }
 
