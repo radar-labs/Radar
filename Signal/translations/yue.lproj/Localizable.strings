@@ -8131,7 +8131,7 @@ Send money securely.";
 "SETTINGS_PAYMENTS_DEACTIVATE_PAYMENTS" = "停用付款";
 
 /* Description for the 'deactivate payments confirmation' UI in the payment settings. */
-"SETTINGS_PAYMENTS_DEACTIVATE_PAYMENTS_CONFIRM_DESCRIPTION" = "停用付款嘅話，您將唔能夠喺 Signal 度收發 Mobilecoin 㗎喇。";
+"SETTINGS_PAYMENTS_DEACTIVATE_PAYMENTS_CONFIRM_DESCRIPTION" = "You will not be able to send or receive Lightning in Radar if you deactivate payments.";
 
 /* Title for the 'deactivate payments confirmation' UI in the payment settings. */
 "SETTINGS_PAYMENTS_DEACTIVATE_PAYMENTS_CONFIRM_TITLE" = "係咪要停用付款？";
