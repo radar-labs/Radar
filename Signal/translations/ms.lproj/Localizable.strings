@@ -8154,6 +8154,24 @@ Send money securely.";
 /* Error indicating that payments could not be deactivated in the payments settings. */
 "SETTINGS_PAYMENTS_DEACTIVATION_FAILED" = "Pembayaran tidak dapat dinyahaktifkan";
 
+/* Label for 'delete payment wallet' button in the app settings. */
+"SETTINGS_PAYMENTS_DELETE_WALLET" = "Delete Payment Wallet";
+
+/* Error message indicating that the payment wallet could not be deleted because the current balance is unavailable. */
+"SETTINGS_PAYMENTS_DELETE_WALLET_BALANCE_UNAVAILABLE" = "Your wallet balance is not yet available. Please try again.";
+
+/* Description for the 'delete payment wallet confirmation' UI in the payment settings. */
+"SETTINGS_PAYMENTS_DELETE_WALLET_CONFIRM_DESCRIPTION" = "This will permanently delete your current payment wallet from this device and unregister its lightning username. You will lose access to your old wallet unless you have saved your recovery phrase.";
+
+/* Title for the 'delete payment wallet confirmation' UI in the payment settings. */
+"SETTINGS_PAYMENTS_DELETE_WALLET_CONFIRM_TITLE" = "Delete Payment Wallet?";
+
+/* Error message shown when deleting the payment wallet fails. */
+"SETTINGS_PAYMENTS_DELETE_WALLET_FAILED" = "Payment wallet could not be deleted";
+
+/* Error message indicating that the payment wallet cannot be deleted until the balance is zero. */
+"SETTINGS_PAYMENTS_DELETE_WALLET_REQUIRES_ZERO_BALANCE" = "You must transfer out your entire wallet balance before deleting the wallet.";
+
 /* Label for the 'payments details' view of the app settings. */
 "SETTINGS_PAYMENTS_DETAIL_VIEW_TITLE" = "Butiran";
 
