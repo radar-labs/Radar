@@ -218,7 +218,9 @@ public class RegistrationSplashViewController: OWSViewController, OWSNavigationC
 
     private func continuePressed() {
         Logger.info("")
-        presenter?.continueFromSplash()
+        guard let presenter else { return }
+        let signUpVC = RegistrationSignUpViewController(presenter: presenter)
+        navigationController?.pushViewController(signUpVC, animated: true)
     }
 
     private func didTapRestoreOrTransfer() {
@@ -238,7 +240,7 @@ public class RegistrationSplashViewController: OWSViewController, OWSNavigationC
     }
 }
 
-private class RestoreOrTransferPickerController: StackSheetViewController {
+class RestoreOrTransferPickerController: StackSheetViewController {
 
     override var placeOnGlassIfAvailable: Bool { false }
 

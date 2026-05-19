@@ -3154,6 +3154,7 @@
 		F927478B28CFEA680056EAFE /* test-apng.png in Resources */ = {isa = PBXBuildFile; fileRef = F908AA7C28CE629700472E68 /* test-apng.png */; };
 		F92E4C74299E9A0100C6E6C7 /* RegistrationLoadingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F92E4C73299E9A0100C6E6C7 /* RegistrationLoadingViewController.swift */; };
 		F933FC3F2992E77300D78DB0 /* RegistrationSplashViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F933FC3E2992E77300D78DB0 /* RegistrationSplashViewController.swift */; };
+		F933FC412993E77300D78DB0 /* RegistrationSignUpViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F933FC402993E77300D78DB0 /* RegistrationSignUpViewController.swift */; };
 		F93461B0291EB5E300366682 /* DonationPaymentDetailsViewController+FormState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F93461AF291EB5E300366682 /* DonationPaymentDetailsViewController+FormState.swift */; };
 		F93461B3291EB8C700366682 /* DonationPaymentDetailsViewController+OneTimeDonation.swift in Sources */ = {isa = PBXBuildFile; fileRef = F93461B2291EB8C700366682 /* DonationPaymentDetailsViewController+OneTimeDonation.swift */; };
 		F93461B9291ED28A00366682 /* PaymentDetailsValidity.swift in Sources */ = {isa = PBXBuildFile; fileRef = F93461B8291ED28900366682 /* PaymentDetailsValidity.swift */; };
@@ -7171,6 +7172,7 @@
 		F9292633297743EF0097F8FF /* PreparedGiftPayment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreparedGiftPayment.swift; sourceTree = "<group>"; };
 		F92E4C73299E9A0100C6E6C7 /* RegistrationLoadingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegistrationLoadingViewController.swift; sourceTree = "<group>"; };
 		F933FC3E2992E77300D78DB0 /* RegistrationSplashViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegistrationSplashViewController.swift; sourceTree = "<group>"; };
+		F933FC402993E77300D78DB0 /* RegistrationSignUpViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegistrationSignUpViewController.swift; sourceTree = "<group>"; };
 		F93461AF291EB5E300366682 /* DonationPaymentDetailsViewController+FormState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DonationPaymentDetailsViewController+FormState.swift"; sourceTree = "<group>"; };
 		F93461B2291EB8C700366682 /* DonationPaymentDetailsViewController+OneTimeDonation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DonationPaymentDetailsViewController+OneTimeDonation.swift"; sourceTree = "<group>"; };
 		F93461B8291ED28900366682 /* PaymentDetailsValidity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PaymentDetailsValidity.swift; sourceTree = "<group>"; };
@@ -10098,6 +10100,7 @@
 				F9440E7129C0FA490016FE95 /* RegistrationReglockTimeoutViewController.swift */,
 				C14366252DA55CF8008DE746 /* RegistrationRestoreFromBackupConfirmationViewController.swift */,
 				B2ACF11F249045BD8514B23D /* RegistrationSetupCompleteViewController.swift */,
+				F933FC402993E77300D78DB0 /* RegistrationSignUpViewController.swift */,
 				F933FC3E2992E77300D78DB0 /* RegistrationSplashViewController.swift */,
 				F9426D17299FEC8900357352 /* RegistrationTransferChoiceViewController.swift */,
 				66C3887D29CA537400E6DC00 /* RegistrationTransferProgressViewController.swift */,
@@ -17506,6 +17509,7 @@
 				F9440E7229C0FA490016FE95 /* RegistrationReglockTimeoutViewController.swift in Sources */,
 				C14366262DA55CF8008DE746 /* RegistrationRestoreFromBackupConfirmationViewController.swift in Sources */,
 				0B0A1E5BA1F54A79BD26277D /* RegistrationSetupCompleteViewController.swift in Sources */,
+				F933FC412993E77300D78DB0 /* RegistrationSignUpViewController.swift in Sources */,
 				F933FC3F2992E77300D78DB0 /* RegistrationSplashViewController.swift in Sources */,
 				6600F39029918CBF00B1EDB7 /* RegistrationStep.swift in Sources */,
 				F9426D18299FEC8900357352 /* RegistrationTransferChoiceViewController.swift in Sources */,

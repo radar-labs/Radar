@@ -5805,6 +5805,24 @@
 /* Subtitle for the setup complete screen shown at the end of the onboarding flow. */
 "ONBOARDING_SETUP_COMPLETE_SUBTITLE" = "आता तुम्ही Radar वापरणे सुरू करू शकता";
 
+/* Primary button on the 'sign up' screen that begins the new account flow. */
+"ONBOARDING_SIGN_UP_CREATE_ACCOUNT_BUTTON_TITLE" = "Create New Account";
+
+/* Continuation of the body text on the 'sign up' onboarding screen. Begins with a leading space and follows the highlighted phrase. */
+"ONBOARDING_SIGN_UP_SIGNAL_INFO_BODY" = " and compatible with it, letting you keep all your existing conversations";
+
+/* Highlighted leading phrase of the body text on the 'sign up' onboarding screen. Rendered in the app's accent color. */
+"ONBOARDING_SIGN_UP_SIGNAL_INFO_HIGHLIGHT" = "Radar is based on Signal";
+
+/* Subtitle on the 'sign up' screen shown after the user taps 'I'm new to Radar' on the onboarding splash. */
+"ONBOARDING_SIGN_UP_SUBTITLE" = "Create a new account or restore an existing Signal account";
+
+/* Title of the 'sign up' screen shown after the user taps 'I'm new to Radar' on the onboarding splash. */
+"ONBOARDING_SIGN_UP_TITLE" = "Sign up";
+
+/* Secondary text button on the 'sign up' screen that begins the restore / use existing Signal account flow. */
+"ONBOARDING_SIGN_UP_USE_SIGNAL_ACCOUNT_BUTTON_TITLE" = "Use my Signal account";
+
 /* Explanation of 'do not have old device' flow for the 'Restore or Transfer' prompt */
 "ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_BODY" = "किंवा आपण त्याच डिव्हाईसवर Radar/Signal पुन्हा इन्स्टॉल करत आहात";
 
@@ -5818,10 +5836,10 @@
 "ONBOARDING_SPLASH_HAVE_OLD_DEVICE_TITLE" = "माझ्याकडे माझा जुना फोन आहे";
 
 /* Primary button on the 'onboarding splash' view for users who are new to the app. */
-"ONBOARDING_SPLASH_NEW_TO_SIGNAL_BUTTON_TITLE" = "I'm new to Signal/Radar";
+"ONBOARDING_SPLASH_NEW_TO_SIGNAL_BUTTON_TITLE" = "I'm new to Radar";
 
 /* Button for restoring or transferring account in the 'onboarding splash' view. */
-"ONBOARDING_SPLASH_RESTORE_OR_TRANSFER_BUTTON_TITLE" = "Restore my Signal/Radar";
+"ONBOARDING_SPLASH_RESTORE_OR_TRANSFER_BUTTON_TITLE" = "I already have an account";
 
 /* Link to the 'terms and privacy policy' in the 'onboarding splash' view. */
 "ONBOARDING_SPLASH_TERM_AND_PRIVACY_POLICY" = "अटी आणि गोपनीयता धोरण";
