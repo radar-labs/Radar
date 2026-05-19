@@ -144,6 +144,14 @@ class GetStartedBannerViewController: UIViewController, UICollectionViewDelegate
         SSKEnvironment.shared.databaseStorageRef.read { readTx -> [GetStartedBannerEntry] in
             var activeCards = Self.getActiveCards(readTx: readTx)
 
+            // Hide the post-onboarding "Get Started" cards entirely.
+            activeCards.removeAll { entry in
+                switch entry {
+                case .newGroup, .inviteFriends, .appearance, .avatarBuilder:
+                    return true
+                }
+            }
+
             if activeCards.isEmpty {
                 return []
             }

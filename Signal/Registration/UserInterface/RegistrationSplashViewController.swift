@@ -152,11 +152,15 @@ public class RegistrationSplashViewController: OWSViewController, OWSNavigationC
 
         // Large buttons enclosed in a container with some extra horizontal padding.
         let continueButton = UIButton(
-            configuration: .largePrimary(title: CommonStrings.continueButton),
+            configuration: .largePrimary(title: OWSLocalizedString(
+                "ONBOARDING_SPLASH_NEW_TO_SIGNAL_BUTTON_TITLE",
+                comment: "Primary button on the 'onboarding splash' view for users who are new to the app."
+            )),
             primaryAction: UIAction { [weak self] _ in
                 self?.continuePressed()
             }
         )
+        continueButton.enableMultilineLabel()
         continueButton.accessibilityIdentifier = "registration.splash.continueButton"
 
         let largeButtonsContainer: UIView
