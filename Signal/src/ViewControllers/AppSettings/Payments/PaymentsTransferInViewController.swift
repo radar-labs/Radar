@@ -281,16 +281,6 @@ class PaymentsTransferInViewController: OWSViewController {
         return container
     }
 
-    private func currentQRString() -> String? {
-        switch selectedNetwork {
-        case .lightning:
-            return SUIEnvironment.shared.paymentsRef.walletAddressLNURL
-                ?? SUIEnvironment.shared.paymentsRef.walletLightningAddress
-        case .onchain:
-            return onchainAddress
-        }
-    }
-
     // Generates the QR on a background thread so it never blocks navigation animations.
     // With force=false, bails out if a QR is already rendered (used by passive refresh paths).
     // With force=true, clears the existing image and regenerates (used when toggling networks).
@@ -302,14 +292,40 @@ class PaymentsTransferInViewController: OWSViewController {
         qrImageView = nil
         qrSpinner?.startAnimating()
 
-        guard let target = currentQRString() else { return }
+        let networkAtStart = selectedNetwork
+        let lightningAddress = SUIEnvironment.shared.paymentsRef.walletLightningAddress
+        let lightningUsername = SUIEnvironment.shared.paymentsImplRef.walletLightningAddressUsername
+        let onchainAddressAtStart = onchainAddress
 
         Task.detached(priority: .userInitiated) { [weak self] in
+            let target: String?
+            switch networkAtStart {
+            case .lightning:
+                let fallback: String? = {
+                    if let lightningAddress { return "lightning:\(lightningAddress)" }
+                    if let lightningUsername { return "lightning:\(lightningUsername)@radar.cash" }
+                    return nil
+                }()
+                if let lightningAddress,
+                   let bolt11 = try? await getBolt11FromLightningAddress(lightningAddress) {
+                    target = "lightning:\(bolt11)"
+                } else {
+                    target = fallback
+                }
+            case .onchain:
+                target = onchainAddressAtStart
+            }
+
+            guard let target else {
+                await MainActor.run { [weak self] in self?.qrSpinner?.stopAnimating() }
+                return
+            }
+
             let qrImage = QRCodeGenerator().generateUnstyledQRCode(data: Data(target.utf8))
             await MainActor.run { [weak self] in
                 guard let self, let container = self.qrContainerView, let qrImage else { return }
                 // Drop result if the user toggled networks while we were generating.
-                guard self.currentQRString() == target else { return }
+                guard self.selectedNetwork == networkAtStart else { return }
                 let iv = UIImageView(image: qrImage)
                 iv.layer.magnificationFilter = .nearest
                 iv.layer.minificationFilter = .nearest
@@ -654,4 +670,42 @@ class PaymentsTransferInViewController: OWSViewController {
         guard let address = currentDisplayedAddress() else { return }
         AttachmentSharing.showShareUI(for: address, sender: self)
     }
+}
+
+// MARK: - Lightning address → bolt11 (LNURL-pay)
+
+private struct LNURLPayResponse: Decodable {
+    let callback: String
+    let maxSendable: Int
+    let minSendable: Int
+    let tag: String
+    let metadata: String
+}
+
+private struct LNURLPayCallbackResponse: Decodable {
+    let pr: String
+}
+
+private enum LightningAddressError: Error {
+    case invalidAddress
+    case invalidCallbackURL
+}
+
+fileprivate func getBolt11FromLightningAddress(_ lightningAddress: String, amount: Int = 0) async throws -> String {
+    let parts = lightningAddress.split(separator: "@")
+    guard parts.count == 2 else { throw LightningAddressError.invalidAddress }
+    let name = parts[0]
+    let domain = parts[1]
+    guard let url = URL(string: "https://\(domain)/.well-known/lnurlp/\(name)") else {
+        throw LightningAddressError.invalidAddress
+    }
+
+    let (data, _) = try await URLSession.shared.data(from: url)
+    let response = try JSONDecoder().decode(LNURLPayResponse.self, from: data)
+    guard let callbackURL = URL(string: "\(response.callback)?amount=\(amount)") else {
+        throw LightningAddressError.invalidCallbackURL
+    }
+    let (callbackData, _) = try await URLSession.shared.data(from: callbackURL)
+    let callbackResponse = try JSONDecoder().decode(LNURLPayCallbackResponse.self, from: callbackData)
+    return callbackResponse.pr
 }
