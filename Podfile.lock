@@ -1,9 +1,9 @@
 PODS:
   - blurhash (0.0.1)
   - BonMot (6.0.0)
-  - breez_sdk_sparkFFI (0.9.1)
-  - BreezSdkSpark (0.9.1):
-    - breez_sdk_sparkFFI (= 0.9.1)
+  - breez_sdk_sparkFFI (0.14.0)
+  - BreezSdkSpark (0.14.0):
+    - breez_sdk_sparkFFI (= 0.14.0)
     - Swift-BigInt (~> 2.0)
   - CocoaLumberjack (3.7.4):
     - CocoaLumberjack/Core (= 3.7.4)
@@ -58,7 +58,8 @@ PODS:
 DEPENDENCIES:
   - blurhash (from `./ThirdParty/blurhash.podspec`)
   - BonMot
-  - BreezSdkSpark (from `https://github.com/breez/breez-sdk-spark-swift.git`, tag `0.9.1`)
+  - breez_sdk_sparkFFI (from `./ThirdParty/breez_sdk_sparkFFI.podspec.json`)
+  - BreezSdkSpark (from `./ThirdParty/BreezSdkSpark.podspec.json`)
   - CocoaLumberjack
   - GRDB.swift/SQLCipher
   - LibMobileCoin/CoreHTTP (from `https://github.com/signalapp/libmobilecoin-ios-artifacts`, tag `signal/6.0.2`)
@@ -82,7 +83,6 @@ DEPENDENCIES:
 SPEC REPOS:
   trunk:
     - BonMot
-    - breez_sdk_sparkFFI
     - CocoaLumberjack
     - GRDB.swift
     - libwebp
@@ -98,9 +98,10 @@ SPEC REPOS:
 EXTERNAL SOURCES:
   blurhash:
     :podspec: "./ThirdParty/blurhash.podspec"
+  breez_sdk_sparkFFI:
+    :podspec: "./ThirdParty/breez_sdk_sparkFFI.podspec.json"
   BreezSdkSpark:
-    :git: https://github.com/breez/breez-sdk-spark-swift.git
-    :tag: 0.9.1
+    :podspec: "./ThirdParty/BreezSdkSpark.podspec.json"
   LibMobileCoin:
     :git: https://github.com/signalapp/libmobilecoin-ios-artifacts
     :submodules: true
@@ -133,7 +134,7 @@ CHECKOUT OPTIONS:
     :git: https://github.com/signalapp/blurhash
   BreezSdkSpark:
     :git: https://github.com/breez/breez-sdk-spark-swift.git
-    :tag: 0.9.1
+    :tag: 0.14.0
   LibMobileCoin:
     :git: https://github.com/signalapp/libmobilecoin-ios-artifacts
     :submodules: true
@@ -163,8 +164,8 @@ CHECKOUT OPTIONS:
 SPEC CHECKSUMS:
   blurhash: f588a9d659f4c742a325bbbbd438d1ef3c34af19
   BonMot: fb2b6a2209cb3149aca37b7131d49c051c04ae86
-  breez_sdk_sparkFFI: 2adb546ea38e7a4df697b89685ef38a8ca9f0128
-  BreezSdkSpark: e21117a4e49a9882be5fb7aafa715ec373e04daf
+  breez_sdk_sparkFFI: 9e2443a7a7d2463603519335d335155b15295553
+  BreezSdkSpark: 3cd0525be3190706860f94b978bc026a58b574ef
   CocoaLumberjack: 543c79c114dadc3b1aba95641d8738b06b05b646
   GRDB.swift: 1395cb3556df6b16ed69dfc74c3886abc75d2825
   LibMobileCoin: 8503f567fa32184a5be7bc038fbd727747dd9991
@@ -185,6 +186,6 @@ SPEC CHECKSUMS:
   Swift-BigInt: 39035927416daca0ff0ee7949f5fef18b3a1a7db
   SwiftProtobuf: e02f51c8c2df5845657aee2d4de9d61bf50ef788
 
-PODFILE CHECKSUM: 23563258cb3b49d55f7fda76c397bb59d7e21376
+PODFILE CHECKSUM: 65f49ad33ceebf931bd89f2ee8bfc6d04edf7303
 
 COCOAPODS: 1.16.2

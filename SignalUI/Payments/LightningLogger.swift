@@ -7,7 +7,7 @@ public import BreezSdkSpark
 import Foundation
 import SignalServiceKit
 
-public final class LightningLogger: BreezSdkSpark.Logger {
+public final class LightningLogger: BreezSdkSpark.Logger, @unchecked Sendable {
 
     public static let shared = LightningLogger()
 
