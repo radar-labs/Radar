@@ -47,6 +47,12 @@ public class CVComponentArchivedPayment: CVComponentBase, CVComponent {
         guard !PaymentsDisplayPreferences.shared.isBalanceHidden else {
             return PaymentsFormat.hiddenBalanceString
         }
+        if let mob = archivedPaymentAttachment.recoveredAmountPicoMob {
+            if PaymentsDisplayPreferences.shared.isSatoshiEnabled {
+                return "\(mob)"
+            }
+            return PaymentsFormat.format(picoMob: mob, isShortForm: false) ?? "\(mob)"
+        }
         return archivedPaymentAttachment.amount ?? OWSLocalizedString(
             "PAYMENTS_INFO_UNAVAILABLE_MESSAGE",
             comment: "Status indicator for invalid payments which could not be processed."
@@ -54,7 +60,11 @@ public class CVComponentArchivedPayment: CVComponentBase, CVComponent {
     }
 
     private var amountUnitText: String {
-        " " + (PaymentsDisplayPreferences.shared.isSatoshiEnabled ? "sats" : "BTC")
+        // The "sats" suffix only matches the value when it came from the picoMob receipt.
+        // The fallback string is in BTC display units, so force "BTC".
+        let useSats = archivedPaymentAttachment.recoveredAmountPicoMob != nil
+            && PaymentsDisplayPreferences.shared.isSatoshiEnabled
+        return " " + (useSats ? "sats" : "BTC")
     }
 
     private var badgeText: String {
