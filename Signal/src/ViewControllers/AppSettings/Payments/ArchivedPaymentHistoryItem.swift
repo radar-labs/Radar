@@ -60,16 +60,21 @@ public struct ArchivedPaymentHistoryItem: PaymentsHistoryItem {
     }
 
     public var paymentAmount: TSPaymentAmount? {
-        return SUIEnvironment.shared.paymentsImplRef.unmaskReceiptAmount(
+        guard let unmasked = SUIEnvironment.shared.paymentsImplRef.unmaskReceiptAmount(
             data: archivedPayment.receipt
-        )?.tsPaymentAmount
+        ) else {
+            return nil
+        }
+        // picoMob field stores sats in this codebase (picoMobPerSatoshi == 1).
+        // Tag as .bitcoin so display routes through the sats/BTC branch.
+        return TSPaymentAmount(currency: .bitcoin, picoMob: unmasked.value)
     }
 
     public var formattedFeeAmount: String? {
         guard let fee = paymentInfo.fee else { return nil }
         return PaymentsFormat.format(
             amountString: fee,
-            withCurrency: .mobileCoin,
+            withCurrency: .bitcoin,
             withSpace: true
         )
     }
@@ -103,6 +108,9 @@ public struct ArchivedPaymentHistoryItem: PaymentsHistoryItem {
     }
 
     public var attributedPaymentAmount: NSAttributedString? {
+        if let recovered = paymentAmount {
+            return PaymentsFormat.formattedBalance(recovered, paymentType: paymentType, withSpace: true)
+        }
         guard let amount = paymentInfo.amount else { return nil }
         let formattedAmount = PaymentsFormat.format(
             amountString: amount,
@@ -110,23 +118,33 @@ public struct ArchivedPaymentHistoryItem: PaymentsHistoryItem {
             withSpace: false,
             isIncoming: isIncoming
         )
-        return PaymentsFormat.attributedFormat(mobileCoinString: formattedAmount, withSpace: false)
+        return PaymentsFormat.attributedFormat(bitcoinString: formattedAmount, withSpace: true)
     }
 
     public var formattedPaymentAmount: String? {
+        if let recovered = paymentAmount {
+            return PaymentsFormat.formattedBalance(
+                recovered,
+                isShortForm: true,
+                paymentType: paymentType
+            ).string
+        }
         guard let amount = paymentInfo.amount else { return nil }
         return PaymentsFormat.format(
             amountString: amount,
-            withCurrency: .mobileCoin,
+            withCurrency: .bitcoin,
             withSpace: true
         )
     }
-    
+
     public var formattedTotalPaymentAmount: String? {
+        if let recovered = paymentAmount {
+            return PaymentsFormat.formattedBalance(recovered, withSpace: true).string
+        }
         guard let amount = paymentInfo.amount else { return nil }
         return PaymentsFormat.format(
             amountString: amount,
-            withCurrency: .mobileCoin,
+            withCurrency: .bitcoin,
             withSpace: true,
         )
     }
