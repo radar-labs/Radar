@@ -5769,6 +5769,12 @@
 /* Preamble of the 'onboarding permissions' view. */
 "ONBOARDING_PERMISSIONS_PREAMBLE" = "Signal ha bisogno delle seguenti autorizzazioni.";
 
+/* Description of the 'Notification Relay' permission in the 'onboarding permissions' view. */
+"ONBOARDING_PERMISSIONS_RELAY_DESCRIPTION" = "Enable Radar notification relay to ensure you get immediate background notifications in Radar. Relay is always privacy-preserving and keeps your messages end-to-end encrypted no matter what.";
+
+/* Title introducing the 'Notification Relay' permission in the 'onboarding permissions' view. */
+"ONBOARDING_PERMISSIONS_RELAY_TITLE" = "Notification Relay";
+
 /* Title of the 'onboarding permissions' view. */
 "ONBOARDING_PERMISSIONS_TITLE" = "Consenti permessi";
 
@@ -7357,6 +7363,18 @@ Send money securely.";
 
 /* Error message when sending a verification code via voice call failed, but resending via sms might succeed. */
 "REGISTRATION_VOICE_CODE_FAILED_TRY_SMS_ERROR" = "Non è stato possibile inviarti il codice di verifica via chiamata vocale. Prova a richiedere l'invio del codice tramite SMS.";
+
+/* Button title to allow / enable the Radar notification relay. */
+"RELAY_PERMISSION_ALERT_ALLOW" = "Allow";
+
+/* Button title to disable the Radar notification relay. */
+"RELAY_PERMISSION_ALERT_DISABLE" = "Don't Allow";
+
+/* Body of the alert asking the user whether to enable the Radar notification relay. */
+"RELAY_PERMISSION_ALERT_MESSAGE" = "Enable Radar notification relay to ensure you get immediate background notifications in Radar. Relay is always privacy-preserving and keeps your messages end-to-end encrypted no matter what.";
+
+/* Title of the alert asking the user whether to enable the Radar notification relay. */
+"RELAY_PERMISSION_ALERT_TITLE" = "Enable Notification Relay";
 
 /* Button below the warning to fix a corrupted username. */
 "REMINDER_VIEW_USERNAME_CORRUPTED_FIX_BUTTON" = "Risolvi ora";

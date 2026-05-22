@@ -1342,6 +1342,16 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
                     // restart the app, so we check every activation for users who haven't yet registered.
                     SyncPushTokensJob.run()
                 }
+
+                // If the user previously skipped the relay onboarding prompt
+                // because OS notifications were denied, but has since enabled
+                // them in Settings.app, surface the Allow/Disable prompt now.
+                if !RadarPushRelay.hasAskedAboutRelay() {
+                    Task { @MainActor in
+                        guard let frontmost = UIApplication.shared.frontmostViewControllerIgnoringAlerts else { return }
+                        await RadarPushRelay.askIfNeeded(from: frontmost)
+                    }
+                }
             }
         }
 

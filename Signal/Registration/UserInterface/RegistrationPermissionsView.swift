@@ -16,7 +16,7 @@ struct RegistrationPermissionsView: View {
     var requestingContactsAuthorization: Bool
     var permissionTask: (() async -> Void)
 
-    @State private var hasAppeared = (notifications: false, contacts: false)
+    @State private var hasAppeared = (notifications: false, relay: false, contacts: false)
     @State private var requestPermissions: RequestPermissionsTask?
 
     @Environment(\.appearanceTransitionState) private var appearanceTransitionState
@@ -53,6 +53,8 @@ struct RegistrationPermissionsView: View {
                         VStack(alignment: .leading, spacing: 32) {
                             notificationsPermissionView
 
+                            notificationRelayPermissionView
+
                             if requestingContactsAuthorization {
                                 contactsPermissionView
                             }
@@ -64,6 +66,10 @@ struct RegistrationPermissionsView: View {
                             Group {
                                 if hasAppeared.notifications {
                                     notificationsPermissionView
+                                }
+
+                                if hasAppeared.relay {
+                                    notificationRelayPermissionView
                                 }
 
                                 if requestingContactsAuthorization && hasAppeared.contacts {
@@ -95,8 +101,11 @@ struct RegistrationPermissionsView: View {
                 withAnimation(spring) {
                     hasAppeared.notifications = true
                 }
+                withAnimation(spring.delay(duration)) {
+                    hasAppeared.relay = true
+                }
                 if requestingContactsAuthorization {
-                    withAnimation(spring.delay(duration)) {
+                    withAnimation(spring.delay(duration * 2)) {
                         hasAppeared.contacts = true
                     }
                 }
@@ -121,6 +130,16 @@ struct RegistrationPermissionsView: View {
             Text(OWSLocalizedString("ONBOARDING_PERMISSIONS_NOTIFICATIONS_DESCRIPTION", comment: "Description of the 'Notifications' permission in the 'onboarding permissions' view."))
         } icon: {
             PermissionIcon(.bellRing)
+        }
+    }
+
+    private var notificationRelayPermissionView: some View {
+        PermissionDescription {
+            Text(OWSLocalizedString("ONBOARDING_PERMISSIONS_RELAY_TITLE", comment: "Title introducing the 'Notification Relay' permission in the 'onboarding permissions' view."))
+        } description: {
+            Text(OWSLocalizedString("ONBOARDING_PERMISSIONS_RELAY_DESCRIPTION", comment: "Description of the 'Notification Relay' permission in the 'onboarding permissions' view."))
+        } icon: {
+            PermissionIcon(systemName: "antenna.radiowaves.left.and.right")
         }
     }
 
@@ -182,17 +201,36 @@ private extension RegistrationPermissionsView {
     }
 
     struct PermissionIcon: View {
-        var resource: ImageResource
+        private enum Source {
+            case resource(ImageResource)
+            case systemName(String)
+        }
+
+        private let source: Source
 
         init(_ resource: ImageResource) {
-            self.resource = resource
+            self.source = .resource(resource)
+        }
+
+        init(systemName: String) {
+            self.source = .systemName(systemName)
         }
 
         var body: some View {
-            Image(resource)
-                .resizable()
-                .aspectRatio(1, contentMode: .fit)
-                .frame(maxWidth: 48)
+            Group {
+                switch source {
+                case .resource(let resource):
+                    Image(resource)
+                        .resizable()
+                        .aspectRatio(1, contentMode: .fit)
+                case .systemName(let name):
+                    Image(systemName: name)
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .foregroundStyle(Color.Signal.accent)
+                }
+            }
+            .frame(maxWidth: 48)
         }
     }
 
