@@ -34,7 +34,8 @@ public enum RadarPushRelay {
 
     // MARK: - Public surface
 
-    /// Whether the relay is currently enabled by the user. Defaults to `true`.
+    /// Whether the relay is currently enabled by the user. Defaults to `false`
+    /// — the user must opt in via the onboarding prompt or the Settings toggle.
     public static func isEnabled() -> Bool {
         return SSKEnvironment.shared.databaseStorageRef.read { tx in
             Store.isEnabled(tx: tx)
@@ -780,9 +781,10 @@ private enum Store {
         kvStore.setBool(value, key: isLinkedKey, transaction: tx)
     }
 
-    /// Defaults to `true`: relay is on unless the user has explicitly disabled it.
+    /// Defaults to `false`: relay is off until the user explicitly opts in via
+    /// the onboarding Allow/Don't-Allow prompt or the Settings toggle.
     static func isEnabled(tx: DBReadTransaction) -> Bool {
-        return kvStore.getBool(isEnabledKey, defaultValue: true, transaction: tx)
+        return kvStore.getBool(isEnabledKey, defaultValue: false, transaction: tx)
     }
 
     static func setEnabled(_ value: Bool, tx: DBWriteTransaction) {
