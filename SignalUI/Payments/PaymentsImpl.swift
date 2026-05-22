@@ -46,6 +46,8 @@ public class PaymentsImpl: NSObject, PaymentsSwift {
 
     private var onRegistrationStateChange: NotificationCenter.Observer?
 
+    private var onWalletAddressDidLoad: NotificationCenter.Observer?
+
     private var currentSdk: BreezSdk?
 
     private var currentWalletAddress: LightningAddressInfo?
@@ -81,6 +83,12 @@ public class PaymentsImpl: NSObject, PaymentsSwift {
                     self?.paymentsReconciliation.scheduleReconciliationNow(transaction: transaction)
                 }
             }
+        }
+
+        onWalletAddressDidLoad = NotificationCenter.default.addObserver(
+            name: Self.walletAddressDidLoad
+        ) { [weak self] _ in
+            self?.reuploadPaymentProfileForLoadedWalletAddress()
         }
 
         // Note: this isn't how often we refresh the balance, it's how often we
@@ -250,6 +258,34 @@ public class PaymentsImpl: NSObject, PaymentsSwift {
             } catch {
                 owsFailDebug(
                     "Failed to update last known address and re-upload profile with error: \(error)"
+                )
+            }
+        }
+    }
+
+    private func reuploadPaymentProfileForLoadedWalletAddress() {
+        guard
+            DependenciesBridge.shared.tsAccountManager.registrationStateWithMaybeSneakyTransaction
+                .isRegistered
+        else {
+            return
+        }
+        // Only meaningful when payments are enabled and not killed; otherwise
+        // there is no address to publish and VersionedProfilesImpl would drop it.
+        guard paymentsState.isEnabled, !isKillSwitchActive else {
+            return
+        }
+        // The notification is posted right after currentWalletAddress is set,
+        // but guard anyway so we never re-upload a profile without an address.
+        guard currentWalletAddress != nil else {
+            return
+        }
+        Task {
+            do {
+                try await updateLastKnownAddressAndReuploadPaymentProfile()
+            } catch {
+                owsFailDebug(
+                    "Failed to re-upload payment profile after wallet address loaded: \(error)"
                 )
             }
         }
