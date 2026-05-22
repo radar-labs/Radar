@@ -23,7 +23,11 @@ public final class PaymentsDisplayPreferences {
     }
 
     public var isSatoshiEnabled: Bool {
-        get { UserDefaults.standard.bool(forKey: PaymentsConstants.satoshiAmountTypeEnabledKey) }
+        get {
+            let defaults = UserDefaults.standard
+            let key = PaymentsConstants.satoshiAmountTypeEnabledKey
+            return defaults.object(forKey: key) as? Bool ?? true
+        }
         set {
             UserDefaults.standard.set(newValue, forKey: PaymentsConstants.satoshiAmountTypeEnabledKey)
             NotificationCenter.default.post(name: Self.amountTypeDidChange, object: nil)
