@@ -1,26 +1,27 @@
-# Signal iOS
+# Radar iOS
 
-Signal is a free and open source messaging app for simple private communication with friends.
+Radar is the Signal you love, now with simple, self-custodial payments over Bitcoin.
 
-[![Available on the App Store](https://signal.org/external/images/app-store-download-badge.svg)](https://apps.apple.com/app/id874139669)
+- Send money like a message. Just type an amount. Tap send. Settles on Bitcoin Lightning instantly.
+- Your money, always. Radar is self-custodial without the headache of seed phrases or clunky backups. Your funds live with your Signal profile, end-to-end encrypted.
+- Signal meets Lightning. Reach any Signal or Radar user. Pay any Lightning wallet. Two global networks, one app.
+- Dollars or Bitcoin. Dollars when you want stability. Bitcoin when you want maximum sovereignty. Swap at a tap.
+- Fast where it matters. Private by default. All of your messages are encrypted by default, and every Lightning payment is just between you and the recipient, no trusted third-parties.
 
-Also available on [Android](https://github.com/signalapp/signal-android) and [Desktop](https://github.com/signalapp/signal-desktop).
+[![Available on TestFlight in open beta](https://camo.githubusercontent.com/f751e3df2c11a6cf76cd7edeab241a6c5780a510063117f627ff59d7c3db5411/68747470733a2f2f61736b796f757273656c662e6170702f6173736574732f74657374666c696768742e706e67)](https://testflight.apple.com/join/AxhRCa8K)
+
 
 ## Questions?
 
-For troubleshooting and questions, please visit our [support center](https://support.signal.org/) or [unofficial community forum](https://community.signalusers.org/).
+For troubleshooting and questions, please send us an email at [support@radar.chat](mailto:support@radar.chat).
 
 ## Contributing Bug Reports
 
-The best way to submit a bug report or support request is [via the Support Center](https://support.signal.org/hc/requests/new). Signal iOS doesn't collect any analytics or telemetry, and we rely on your feedback to help us troubleshoot and fix problems when something isn't working correctly.
+The best way to submit a bug report or support request is via issues in this repo or via [email[(mailto:support@radar.chat). Radar iOS doesn't collect any analytics or telemetry, and we rely on your feedback to help us troubleshoot and fix problems when something isn't working correctly.
 
 ## Contributing Code
 
-Instructions for how to configure your development environment and build Signal iOS can be found in [BUILDING.md](https://github.com/signalapp/Signal-iOS/blob/main/BUILDING.md). We also recommend reading the [contribution guidelines](https://github.com/signalapp/Signal-iOS/blob/main/CONTRIBUTING.md).
-
-## Contributing Ideas
-
-Have something you want to say about Signal Foundation projects or want to be part of the conversation? Get involved in the [community forum](https://community.signalusers.org).
+Instructions for how to configure your development environment and build Radar iOS can be found in [BUILDING.md](https://github.com/radar-labs/Radar/blob/main/BUILDING.md). We also recommend reading the [contribution guidelines](https://github.com/radar-labs/Radar/blob/main/CONTRIBUTING.md).
 
 ## Cryptography Notice
 
@@ -34,6 +35,7 @@ The form and manner of this distribution makes it eligible for export under the 
 ## License
 
 Copyright 2013-2025 Signal Messenger, LLC
+Copyright 2026 Radar Chat, Inc.
 
 Licensed under the GNU AGPLv3: https://www.gnu.org/licenses/agpl-3.0.html
 
