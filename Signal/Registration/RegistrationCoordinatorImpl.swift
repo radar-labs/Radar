@@ -96,12 +96,13 @@ public class RegistrationCoordinatorImpl: RegistrationCoordinator {
         return Guarantee.wrapAsync { await self.nextStep() }
     }
 
-    public func requestPermissions() -> Guarantee<RegistrationStep> {
+    public func requestPermissions(betweenSteps: (@MainActor () async -> Void)?) -> Guarantee<RegistrationStep> {
         Logger.info("")
 
         return Guarantee.wrapAsync { @MainActor in
             // Notifications first, then contacts if needed.
             await self.deps.pushRegistrationManager.registerUserNotificationSettings()
+            await betweenSteps?()
             await self.deps.contactsStore.requestContactsAuthorization()
             self.inMemoryState.needsSomePermissions = false
             return await self.nextStep()

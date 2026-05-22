@@ -549,7 +549,10 @@ extension RegistrationNavigationController: RegistrationChangeNumberSplashPresen
 
 extension RegistrationNavigationController: RegistrationPermissionsPresenter {
     func requestPermissions() async {
-        let guarantee = coordinator.requestPermissions()
+        let guarantee = coordinator.requestPermissions(betweenSteps: { [weak self] in
+            guard let self else { return }
+            await RadarPushRelay.askIfNeeded(from: self.topViewController ?? self)
+        })
         pushNextController(guarantee, loadingMode: nil)
         await guarantee.asVoid().awaitable()
     }

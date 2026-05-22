@@ -6,6 +6,8 @@
 import Foundation
 import LibSignalClient
 import SignalServiceKit
+import UIKit
+import UserNotifications
 
 /// Provisions the Radar push relay as a Signal linked device and keeps its
 /// APNs token in sync. The relay opens its own WebSocket to chat.signal.org,
@@ -32,7 +34,8 @@ public enum RadarPushRelay {
 
     // MARK: - Public surface
 
-    /// Whether the relay is currently enabled by the user. Defaults to `true`.
+    /// Whether the relay is currently enabled by the user. Defaults to `false`
+    /// — the user must opt in via the onboarding prompt or the Settings toggle.
     public static func isEnabled() -> Bool {
         return SSKEnvironment.shared.databaseStorageRef.read { tx in
             Store.isEnabled(tx: tx)
@@ -58,6 +61,90 @@ public enum RadarPushRelay {
     /// the chat server will drop it as part of the account deletion.
     public static func unregister() async {
         await RelayWorker.shared.unregister()
+    }
+
+    // MARK: - Permission prompt
+
+    /// Whether the user has been shown the Allow/Disable relay prompt yet.
+    static func hasAskedAboutRelay() -> Bool {
+        return SSKEnvironment.shared.databaseStorageRef.read { tx in
+            Store.hasAskedAboutRelay(tx: tx)
+        }
+    }
+
+    /// Set while the relay popup is on screen so we don't double-present from
+    /// concurrent callers (e.g. onboarding finishing + app becoming active).
+    @MainActor private static var isPresentingPrompt = false
+
+    /// If the user hasn't been asked yet AND OS notifications are authorized,
+    /// presents the Allow/Disable relay popup from `viewController`. The user's
+    /// choice is persisted and `setEnabled(_:)` is called accordingly.
+    /// Gated on OS notification authorization — relay is only useful when the
+    /// OS allows us to deliver notifications.
+    @MainActor
+    static func askIfNeeded(from viewController: UIViewController) async {
+        guard !isPresentingPrompt else { return }
+
+        let alreadyAsked = SSKEnvironment.shared.databaseStorageRef.read { tx in
+            Store.hasAskedAboutRelay(tx: tx)
+        }
+        guard !alreadyAsked else { return }
+
+        let settings = await UNUserNotificationCenter.current().notificationSettings()
+        guard settings.authorizationStatus == .authorized
+                || settings.authorizationStatus == .provisional
+                || settings.authorizationStatus == .ephemeral else {
+            return
+        }
+
+        isPresentingPrompt = true
+        defer { isPresentingPrompt = false }
+
+        let granted = await withCheckedContinuation { (continuation: CheckedContinuation<Bool, Never>) in
+            let alert = UIAlertController(
+                title: OWSLocalizedString(
+                    "RELAY_PERMISSION_ALERT_TITLE",
+                    comment: "Title of the alert asking the user whether to enable the Radar notification relay."
+                ),
+                message: OWSLocalizedString(
+                    "RELAY_PERMISSION_ALERT_MESSAGE",
+                    comment: "Body of the alert asking the user whether to enable the Radar notification relay."
+                ),
+                preferredStyle: .alert
+            )
+            // Match iOS system permission alerts: "Don't Allow"-equivalent on the
+            // left (cancel), preferred "Allow"-equivalent on the right (bold).
+            alert.addAction(UIAlertAction(
+                title: OWSLocalizedString(
+                    "RELAY_PERMISSION_ALERT_DISABLE",
+                    comment: "Button title to disable the Radar notification relay."
+                ),
+                style: .cancel
+            ) { _ in
+                continuation.resume(returning: false)
+            })
+            let allowAction = UIAlertAction(
+                title: OWSLocalizedString(
+                    "RELAY_PERMISSION_ALERT_ALLOW",
+                    comment: "Button title to allow / enable the Radar notification relay."
+                ),
+                style: .default
+            ) { _ in
+                continuation.resume(returning: true)
+            }
+            alert.addAction(allowAction)
+            alert.preferredAction = allowAction
+            viewController.present(alert, animated: true)
+        }
+
+        await SSKEnvironment.shared.databaseStorageRef.awaitableWrite { tx in
+            Store.setHasAskedAboutRelay(true, tx: tx)
+        }
+        // Don't block the rest of the onboarding flow on the relay setup —
+        // `setEnabled(true)` may take seconds to register with the relay
+        // server and provision the phantom linked device. The RelayWorker
+        // actor already serializes these operations safely.
+        Task { await setEnabled(granted) }
     }
 
     // MARK: - Implementation (called only from the worker)
@@ -672,6 +759,7 @@ private enum Store {
     private static let isLinkedKey = "isLinked"
     private static let isEnabledKey = "isEnabled"
     private static let phantomDeviceIdKey = "phantomDeviceId"
+    private static let hasAskedAboutRelayKey = "hasAskedAboutRelay"
 
     static func getRelayToken(tx: DBReadTransaction) -> String? {
         return kvStore.getString(relayTokenKey, transaction: tx)
@@ -693,9 +781,10 @@ private enum Store {
         kvStore.setBool(value, key: isLinkedKey, transaction: tx)
     }
 
-    /// Defaults to `true`: relay is on unless the user has explicitly disabled it.
+    /// Defaults to `false`: relay is off until the user explicitly opts in via
+    /// the onboarding Allow/Don't-Allow prompt or the Settings toggle.
     static func isEnabled(tx: DBReadTransaction) -> Bool {
-        return kvStore.getBool(isEnabledKey, defaultValue: true, transaction: tx)
+        return kvStore.getBool(isEnabledKey, defaultValue: false, transaction: tx)
     }
 
     static func setEnabled(_ value: Bool, tx: DBWriteTransaction) {
@@ -712,5 +801,13 @@ private enum Store {
         } else {
             kvStore.removeValue(forKey: phantomDeviceIdKey, transaction: tx)
         }
+    }
+
+    static func hasAskedAboutRelay(tx: DBReadTransaction) -> Bool {
+        return kvStore.getBool(hasAskedAboutRelayKey, defaultValue: false, transaction: tx)
+    }
+
+    static func setHasAskedAboutRelay(_ value: Bool, tx: DBWriteTransaction) {
+        kvStore.setBool(value, key: hasAskedAboutRelayKey, transaction: tx)
     }
 }

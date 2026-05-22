@@ -43,9 +43,13 @@ public protocol RegistrationCoordinator {
 
     /// Show the system permissions prompts, proceeding to the next step when done.
     ///
+    /// `betweenSteps`, if provided, is awaited between the notification and
+    /// contacts system prompts — used by the UI layer to show app-level prompts
+    /// (e.g. the Radar push relay opt-in) while the OS prompts run sequentially.
+    ///
     /// If something goes wrong, the next step will be the same as the current step
     /// but which attached metadata giving more info on the rejection.
-    func requestPermissions() -> Guarantee<RegistrationStep>
+    func requestPermissions(betweenSteps: (@MainActor () async -> Void)?) -> Guarantee<RegistrationStep>
 
     /// Submit an e164 to confirm for change number, returning the next step to take.
     /// If the e164 is rejected for any reason, the next step will be the same current step
@@ -170,6 +174,13 @@ public protocol RegistrationCoordinator {
 
     /// Cancel from the backup entry screen and clear out any key that has been entered.
     func cancelRecoveryKeyEntry() -> Guarantee<RegistrationStep>
+}
+
+extension RegistrationCoordinator {
+    /// Convenience overload — no between-steps hook.
+    public func requestPermissions() -> Guarantee<RegistrationStep> {
+        return requestPermissions(betweenSteps: nil)
+    }
 }
 
 public enum AcknowledgeReglockResult {
