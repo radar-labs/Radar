@@ -747,6 +747,10 @@ extension PaymentsImpl {
 
 extension PaymentsImpl {
     private func updateLastKnownAddressAndReuploadPaymentProfile() async throws {
+        if paymentsState.isEnabled, currentWalletAddress == nil {
+            Logger.warn("Skipping payment profile re-upload: wallet address not loaded yet.")
+            return
+        }
         Logger.info("Re-uploading local profile as bitcoin lightning profile")
         _ = await DependenciesBridge.shared.db.awaitableWrite { transaction in
             updateLastKnownLocalPaymentAddressProtoData(transaction: transaction)
@@ -1398,8 +1402,11 @@ public class PaymentsEventsMainApp: NSObject, PaymentsEvents {
     }
 
     public func updateLastKnownLocalPaymentAddressProtoData(transaction: DBWriteTransaction) {
-        SUIEnvironment.shared.paymentsImplRef.updateLastKnownLocalPaymentAddressProtoData(
-            transaction: transaction)
+        guard let paymentsImpl = SUIEnvironment.shared.paymentsRef as? PaymentsImpl else {
+            Logger.warn("Skipping payment address refresh: PaymentsImpl not ready yet.")
+            return
+        }
+        paymentsImpl.updateLastKnownLocalPaymentAddressProtoData(transaction: transaction)
     }
 
     public func paymentsStateDidChange() {
