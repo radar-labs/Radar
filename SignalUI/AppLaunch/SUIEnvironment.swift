@@ -61,6 +61,8 @@ public class SUIEnvironment: NSObject {
 
         self.paymentsRef = paymentsImpl
 
+        await paymentsImpl.initializeComponents(warmCaches: true)
+
         contactsViewHelperRef.performInitialSetup(appReadiness: appReadiness)
         audioSessionRef.performInitialSetup(appReadiness: appReadiness)
     }
