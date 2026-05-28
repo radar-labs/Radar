@@ -269,17 +269,17 @@ public class PaymentsHelperImpl: PaymentsHelperSwift, PaymentsHelper {
                 SSKEnvironment.shared.paymentsEventsRef.paymentsStateDidChange()
 
                 if originatedLocally {
-                    // We only need to re-upload the profile if the change originated
-                    // locally.
-                    Logger.info("Re-uploading local profile due to payments state change.")
-                    await DependenciesBridge.shared.db.awaitableWrite { tx in
-                        _ = SSKEnvironment.shared.profileManagerRef.reuploadLocalProfileWithProfileKeyVersion(
-                            PaymentsConstants.bitcoinLightningProfileKeyVersion,
-                            unsavedRotatedProfileKey: nil,
-                            mustReuploadAvatar: false,
-                            authedAccount: .implicit(),
-                            tx: tx
-                        )
+                    if !newPaymentsState.isEnabled {
+                        Logger.info("Re-uploading local profile due to payments disable.")
+                        await DependenciesBridge.shared.db.awaitableWrite { tx in
+                            _ = SSKEnvironment.shared.profileManagerRef.reuploadLocalProfileWithProfileKeyVersion(
+                                PaymentsConstants.bitcoinLightningProfileKeyVersion,
+                                unsavedRotatedProfileKey: nil,
+                                mustReuploadAvatar: false,
+                                authedAccount: .implicit(),
+                                tx: tx
+                            )
+                        }
                     }
 
                     // Sync paymentsEntropy to StorageService; without this the
@@ -313,6 +313,10 @@ public class PaymentsHelperImpl: PaymentsHelperSwift, PaymentsHelper {
     }
 
     public func setLastKnownLocalPaymentAddressProtoData(_ data: Data?, transaction: DBWriteTransaction) {
+        if let data, data.isEmpty {
+            owsFailDebug("Refusing to cache empty payment address proto data.")
+            return
+        }
         Self.keyValueStore.setData(data, key: Self.lastKnownLocalPaymentAddressProtoDataKey, transaction: transaction)
     }
 
@@ -702,7 +706,6 @@ public class PaymentsHelperImpl: PaymentsHelperSwift, PaymentsHelper {
                     let hashData = hash.data(using: .utf8) {
                     return [hashData]
                 }
-                
                 return []
             }()
 

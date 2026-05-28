@@ -15,7 +15,10 @@ public class PaymentsImpl: NSObject, PaymentsSwift {
     public static let maxPaymentMemoMessageLength: Int = 32
 
     public var walletAddressLNURL: String? {
-        currentWalletAddress?.lnurl.url
+        guard let url = currentWalletAddress?.lnurl.url, !url.isEmpty else {
+            return nil
+        }
+        return url
     }
 
     public var walletLightningAddress: String? {
@@ -47,6 +50,8 @@ public class PaymentsImpl: NSObject, PaymentsSwift {
     private var onRegistrationStateChange: NotificationCenter.Observer?
 
     private var onWalletAddressDidLoad: NotificationCenter.Observer?
+
+    private let inflightReupload = AtomicOptional<Task<Void, Error>>(nil, lock: .sharedGlobal)
 
     private var currentSdk: BreezSdk?
 
@@ -747,6 +752,16 @@ extension PaymentsImpl {
 
 extension PaymentsImpl {
     private func updateLastKnownAddressAndReuploadPaymentProfile() async throws {
+        let task: Task<Void, Error> = inflightReupload.map { previous in
+            Task<Void, Error> {
+                _ = try? await previous?.value
+                try await self.performBitcoinLightningProfileReupload()
+            }
+        }!
+        try await task.value
+    }
+
+    private func performBitcoinLightningProfileReupload() async throws {
         if paymentsState.isEnabled, currentWalletAddress == nil {
             Logger.warn("Skipping payment profile re-upload: wallet address not loaded yet.")
             return

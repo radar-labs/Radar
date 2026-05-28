@@ -85,9 +85,10 @@ extension TSPaymentAddress: TSPaymentBaseModel {
             owsFailDebug("Unexpected currency.")
             return false
         }
-//        return SSKEnvironment.shared.mobileCoinHelperRef.isValidMobileCoinPublicAddress(mobileCoinPublicAddressData)
-        // FIX-ME: Hardcoded value
-        // FIXME: Hardcoded value
+        guard !mobileCoinPublicAddressData.isEmpty else {
+            owsFailDebug("Empty payment address data.")
+            return false
+        }
         return true
     }
 
