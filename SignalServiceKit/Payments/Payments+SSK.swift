@@ -60,6 +60,8 @@ public class PaymentsConstants {
     @objc
     public static let isPaymentsVersionOutdatedDidChange = Notification.Name("isPaymentsVersionOutdatedDidChange")
 
+    public static let paymentsActivatedForRecipient = Notification.Name("paymentsActivatedForRecipient")
+
     @objc
     public static let picoMobPerMob: UInt64 = 1000 * 1000 * 100
 

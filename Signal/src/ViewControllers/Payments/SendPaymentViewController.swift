@@ -4,6 +4,7 @@
 //
 
 import Lottie
+public import LibSignalClient
 public import SignalServiceKit
 public import SignalUI
 
@@ -78,7 +79,7 @@ public class SendPaymentViewController: OWSViewController {
     private var isUsingPresentedStyle: Bool {
         return presentingViewController != nil
     }
-    
+
     private var isSatoshiEnabled: Bool {
         PaymentsDisplayPreferences.shared.isSatoshiEnabled
     }
@@ -100,7 +101,7 @@ public class SendPaymentViewController: OWSViewController {
         } else {
             amounts.set(currentAmount: Amounts.defaultMCAmount, otherCurrencyAmount: nil)
         }
-    
+
         if let initialPaymentAmount = initialPaymentAmount {
             owsAssertDebug(initialPaymentAmount.currency == .bitcoin)
 
@@ -202,7 +203,21 @@ public class SendPaymentViewController: OWSViewController {
 
             return
         }
-        
+
+        // Captures the original presentation arguments so we can re-enter this
+        // flow after the recipient responds to a payments-activation request.
+        let retryPresent: () -> Void = {
+            present(
+                fromViewController: fromViewController,
+                presentationMode: presentationMode,
+                delegate: delegate,
+                recipientAddress: recipientAddress,
+                initialPaymentAmount: initialPaymentAmount,
+                isOutgoingTransfer: isOutgoingTransfer,
+                mode: mode
+            )
+        }
+
         // Check whether recipient can receive payments.
         ModalActivityIndicatorViewController.presentAsInvisible(fromViewController: fromViewController) { modalActivityIndicator in
             Task { @MainActor in
@@ -212,22 +227,28 @@ public class SendPaymentViewController: OWSViewController {
                     }
                     let profileFetcher = SSKEnvironment.shared.profileFetcherRef
                     let fetchedProfile = try await profileFetcher.fetchProfileWithLightningBitcoinAddress(for: serviceId)
-                    
+
                     modalActivityIndicator.dismiss {
                         Self.presentAfterRecipientCheck(
+                            fromViewController: fromViewController,
                             presentationMode: presentationMode,
                             delegate: delegate,
                             recipientAddress: recipientAddress,
                             profile: fetchedProfile,
                             initialPaymentAmount: initialPaymentAmount,
                             isOutgoingTransfer: isOutgoingTransfer,
-                            mode: mode
+                            mode: mode,
+                            retryPresent: retryPresent
                         )
                     }
                 } catch {
                     owsFailDebug("Error: \(error)")
                     modalActivityIndicator.dismiss {
-                        Self.showRecipientNotEnabledAlert(recipientAddress: recipientAddress)
+                        Self.showRecipientNotEnabledAlert(
+                            fromViewController: fromViewController,
+                            recipientAddress: recipientAddress,
+                            retryPresent: retryPresent
+                        )
                     }
                 }
             }
@@ -235,13 +256,15 @@ public class SendPaymentViewController: OWSViewController {
     }
 
     private static func presentAfterRecipientCheck(
+        fromViewController: UIViewController,
         presentationMode: PresentationMode,
         delegate: SendPaymentViewDelegate,
         recipientAddress: SignalServiceAddress,
         profile: FetchedProfile,
         initialPaymentAmount: TSPaymentAmount? = nil,
         isOutgoingTransfer: Bool,
-        mode: SendPaymentMode
+        mode: SendPaymentMode,
+        retryPresent: @escaping () -> Void
     ) {
         guard
             let decryptedProfile = profile.decryptedProfile,
@@ -250,10 +273,14 @@ public class SendPaymentViewController: OWSViewController {
                 paymentAddress.currency == .bitcoin,
                 (try? paymentAddress.asAddress())?.isEmpty == false
         else {
-            showRecipientNotEnabledAlert(recipientAddress: recipientAddress)
+            showRecipientNotEnabledAlert(
+                fromViewController: fromViewController,
+                recipientAddress: recipientAddress,
+                retryPresent: retryPresent
+            )
             return
         }
-    
+
         let recipient: SendPaymentRecipientImpl = .address(address: recipientAddress)
         let view = SendPaymentViewController(
             recipient: recipient,
@@ -271,7 +298,11 @@ public class SendPaymentViewController: OWSViewController {
         }
     }
 
-    private static func showRecipientNotEnabledAlert(recipientAddress: SignalServiceAddress) {
+    private static func showRecipientNotEnabledAlert(
+        fromViewController: UIViewController,
+        recipientAddress: SignalServiceAddress,
+        retryPresent: @escaping () -> Void
+    ) {
         let titleFormat = OWSLocalizedString(
             "PAYMENTS_RECIPIENT_PAYMENTS_NOT_ENABLED_TITLE",
             comment: "Title for error alert indicating that a given user cannot receive payments because they have not enabled payments. Embeds {{ the contact's name }}"
@@ -296,11 +327,76 @@ public class SendPaymentViewController: OWSViewController {
             style: .default
         ) { _ in
             sendActivationRequest(recipientAddress: recipientAddress)
+            waitForActivationAndRetry(
+                fromViewController: fromViewController,
+                recipientAddress: recipientAddress,
+                retryPresent: retryPresent
+            )
         }
         actionSheet.addAction(sendAction)
         actionSheet.addAction(OWSActionSheets.cancelAction)
 
         OWSActionSheets.showActionSheet(actionSheet)
+    }
+
+    private static func waitForActivationAndRetry(
+        fromViewController: UIViewController,
+        recipientAddress: SignalServiceAddress,
+        retryPresent: @escaping () -> Void
+    ) {
+        guard let recipientServiceId = recipientAddress.serviceId else {
+            return
+        }
+        ModalActivityIndicatorViewController.present(
+            fromViewController: fromViewController,
+            canCancel: true
+        ) { modal in
+            Task { @MainActor in
+                let activated = await waitForActivationNotification(
+                    serviceId: recipientServiceId,
+                    timeout: 30
+                )
+                modal.dismiss {
+                    // If user cancelled the modal, don't auto-retry.
+                    guard !modal.wasCancelled, activated else { return }
+                    retryPresent()
+                }
+            }
+        }
+    }
+
+    private static func waitForActivationNotification(
+        serviceId: ServiceId,
+        timeout: TimeInterval
+    ) async -> Bool {
+        let expectedServiceIdString = serviceId.serviceIdUppercaseString
+        return await withCheckedContinuation { (continuation: CheckedContinuation<Bool, Never>) in
+            let didResume = AtomicBool(false, lock: .sharedGlobal)
+            var observerToken: NSObjectProtocol?
+
+            func resumeOnce(_ value: Bool) {
+                guard didResume.swap(true) == false else { return }
+                if let observerToken {
+                    NotificationCenter.default.removeObserver(observerToken)
+                }
+                continuation.resume(returning: value)
+            }
+
+            observerToken = NotificationCenter.default.addObserver(
+                forName: PaymentsConstants.paymentsActivatedForRecipient,
+                object: nil,
+                queue: .main
+            ) { notification in
+                guard let aci = notification.object as? Aci,
+                      aci.serviceIdUppercaseString == expectedServiceIdString
+                else { return }
+                resumeOnce(true)
+            }
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + timeout) {
+                resumeOnce(false)
+            }
+        }
     }
 
     private static func sendActivationRequest(recipientAddress: SignalServiceAddress) {
@@ -1205,7 +1301,7 @@ fileprivate extension SendPaymentViewController {
         if case .satoshi = amount {
             return
         }
-        
+
         let inputString = amount.inputString.append(.decimal)
         updateAmountString(inputString)
     }
@@ -1300,7 +1396,7 @@ private enum Amount {
     case cryptoCurrency(inputString: InputString, exactAmount: TSPaymentAmount?)
     case fiatCurrency(inputString: InputString, currencyConversion: CurrencyConversionInfo)
     case satoshi(inputString: InputString)
-    
+
     var isFiat: Bool {
         switch self {
         case .cryptoCurrency, .satoshi:
@@ -1331,12 +1427,12 @@ private enum Amount {
             return inputString
         }
     }
-    
+
     var isSatoshi: Bool {
         guard case .satoshi = self else {
             return false
         }
-        
+
         return true
    }
 
@@ -1424,7 +1520,7 @@ private class Amounts {
         .cryptoCurrency(inputString: InputString.defaultString(isFiat: false),
                     exactAmount: nil)
     }
-    
+
     public static var defaultSatoshiAmount: Amount {
         .satoshi(inputString: InputString.defaultString(isFiat: false, isSatoshi: true))
     }
@@ -1632,7 +1728,7 @@ private struct InputString: Equatable {
         if isSatoshi {
             return 0
         }
-        
+
         return isFiat ? 2 : 8
     }
 
@@ -1805,7 +1901,7 @@ extension PaymentsFormat {
         text.append(NSAttributedString(string: satoshiString, attributes: [
             .foregroundColor: Theme.primaryTextColor
         ]))
-        
+
         text.append(NSAttributedString(string: withSpace ? " \(currencyCode)" : currencyCode, attributes: [
             .foregroundColor: Theme.secondaryTextAndIconColor
         ]))

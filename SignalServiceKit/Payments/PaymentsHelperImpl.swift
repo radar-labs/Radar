@@ -438,6 +438,38 @@ public class PaymentsHelperImpl: PaymentsHelperSwift, PaymentsHelper {
             hasPaymentsEnabled: true,
             transaction: transaction
         )
+
+        transaction.addSyncCompletion {
+            Task {
+                await Self.fetchBitcoinLightningProfileWithRetry(for: senderAci)
+            }
+        }
+    }
+
+    private static func fetchBitcoinLightningProfileWithRetry(for senderAci: Aci) async {
+        let attemptDelaysNs: [UInt64] = [0, 3_000_000_000, 8_000_000_000]
+        for (index, delayNs) in attemptDelaysNs.enumerated() {
+            if delayNs > 0 {
+                try? await Task.sleep(nanoseconds: delayNs)
+            }
+            do {
+                let fetched = try await SSKEnvironment.shared.profileFetcherRef
+                    .fetchProfileWithLightningBitcoinAddress(for: senderAci)
+                let paymentAddress = fetched.decryptedProfile?
+                    .paymentAddress(identityKey: fetched.identityKey)
+                if paymentAddress != nil {
+                    NotificationCenter.default.postOnMainThread(
+                        name: PaymentsConstants.paymentsActivatedForRecipient,
+                        object: senderAci
+                    )
+                    return
+                }
+                Logger.info("Activated-message profile fetch attempt \(index + 1)/\(attemptDelaysNs.count) had no paymentAddress yet for \(senderAci).")
+            } catch {
+                Logger.warn("Activated-message profile fetch attempt \(index + 1)/\(attemptDelaysNs.count) failed for \(senderAci): \(error)")
+            }
+        }
+        Logger.warn("Gave up refreshing bitcoin lightning profile after activation from \(senderAci).")
     }
 
     public func processReceivedTranscriptPaymentNotification(
