@@ -2,7 +2,7 @@
 "AB_PERMISSION_MISSING_ACTION_NOT_NOW" = "ليس الآن";
 
 /* Title for the 'about' help section */
-"ABOUT_SECTION_TITLE" = "حول سيجنال";
+"ABOUT_SECTION_TITLE" = "حول Radar";
 
 /* Accessibility label for attachment. */
 "ACCESSIBILITY_LABEL_ATTACHMENT" = "الملف المُرفَق";
@@ -32,7 +32,7 @@
 "ACCOUNT_DATA_REPORT_CONFIRM_EXPORT_CONFIRM_BUTTON" = "تصدير التقرير";
 
 /* Users can request a report of their account data. Before they get their account export, they are warned to only share account data with trustworthy sources. This is the message on that warning. */
-"ACCOUNT_DATA_REPORT_CONFIRM_EXPORT_MESSAGE" = "لا تُشارِك بيانات حساب سيجنال الخاص بك إلّا مع الأشخاص أو التطبيقات التي تثق بها.";
+"ACCOUNT_DATA_REPORT_CONFIRM_EXPORT_MESSAGE" = "لا تُشارِك بيانات حساب Radar الخاص بك إلّا مع الأشخاص أو التطبيقات التي تثق بها.";
 
 /* Users can request a report of their account data. If this request fails (probably because of a network connection problem), they will see an error sheet. This is the message on that error. */
 "ACCOUNT_DATA_REPORT_ERROR_MESSAGE" = "تحقّق من اتصالك بالشبكة ثم حاوِل مُجدَّدًا.";
@@ -56,16 +56,16 @@
 "ACCOUNT_DATA_REPORT_EXPORT_REPORT_BUTTON" = "تصدير التقرير";
 
 /* Users can request a report of their account data. This text appears at the bottom of this screen, offering more information. */
-"ACCOUNT_DATA_REPORT_FOOTER" = "يتمُّ إنشاء تقريرك فقط في وقت التصدير ولا يتم تخزينُه بواسطة سيجنال على جهازك.";
+"ACCOUNT_DATA_REPORT_FOOTER" = "يتمُّ إنشاء تقريرك فقط في وقت التصدير ولا يتم تخزينُه بواسطة Radar على جهازك.";
 
 /* Users can request a report of their account data. This is the subtitle on the screen where they do this, giving them more information. */
-"ACCOUNT_DATA_REPORT_SUBTITLE" = "تنزيل وتصدير تقرير عن بيانات حساب سيجنال الخاص بك. لا يتضمّن هذا التقرير أي رسائل أو وسائط.";
+"ACCOUNT_DATA_REPORT_SUBTITLE" = "تنزيل وتصدير تقرير عن بيانات حساب Radar الخاص بك. لا يتضمّن هذا التقرير أي رسائل أو وسائط.";
 
 /* Users can request a report of their account data. This is the title on the screen where they do this. */
 "ACCOUNT_DATA_REPORT_TITLE" = "بيانات حسابك";
 
 /* Label for 'invite' button in contact view. */
-"ACTION_INVITE" = "ادْعُ إلى سيجنال";
+"ACTION_INVITE" = "ادْعُ إلى Radar";
 
 /* Label for button that lets you send a message to a contact. */
 "ACTION_SEND_MESSAGE" = "إرسال رسالة";
@@ -83,7 +83,7 @@
 "ACTION_VIDEO_CALL" = "مكالمة فيديو";
 
 /* Label for 'voice call' button in contact view. */
-"ACTION_VOICE_CALL" = "مكالمة سيجنال";
+"ACTION_VOICE_CALL" = "مكالمة Radar";
 
 /* The title for the 'add group members' view. */
 "ADD_GROUP_MEMBERS_VIEW_TITLE" = "إضافة أعضاء";
@@ -203,40 +203,40 @@
 "APN_Message" = "قد تكون لديك رسائل جديدة";
 
 /* Default message for the 'app launch failed' alert. */
-"APP_LAUNCH_FAILURE_ALERT_MESSAGE" = "يتعذَّر بدء سيجنال. لتمكيننا من مساعدتك في حل المشكلة، يُرجى إرسال سجل الأخطاء إلى بريد الدعم: support@signal.org";
+"APP_LAUNCH_FAILURE_ALERT_MESSAGE" = "يتعذَّر بدء Radar. لتمكيننا من مساعدتك في حل المشكلة، يُرجى إرسال سجل الأخطاء إلى بريد الدعم: support@radar.chat";
 
 /* Button to try launching the app even though the last launch failed */
-"APP_LAUNCH_FAILURE_CONTINUE" = "افتح تطبيق سيجنال بدلًا من ذلك";
+"APP_LAUNCH_FAILURE_CONTINUE" = "افتح تطبيق Radar بدلًا من ذلك";
 
 /* Message for an error indicating that the app couldn't launch because some unexpected error happened with the user's registration status. */
-"APP_LAUNCH_FAILURE_CORRUPT_REGISTRATION_MESSAGE" = "يُرجى إرسال سِجلات الأخطاء إلى support@signal.org لكي نتمكّن من حل هذه المشكلة.";
+"APP_LAUNCH_FAILURE_CORRUPT_REGISTRATION_MESSAGE" = "يُرجى إرسال سِجلات الأخطاء إلى support@radar.chat لكي نتمكّن من حل هذه المشكلة.";
 
 /* Title for an error indicating that the app couldn't launch because some unexpected error happened with the user's registration status. */
-"APP_LAUNCH_FAILURE_CORRUPT_REGISTRATION_TITLE" = "تعذَّر فتح تطبيق سيجنال";
+"APP_LAUNCH_FAILURE_CORRUPT_REGISTRATION_TITLE" = "تعذَّر فتح تطبيق Radar";
 
 /* Error indicating that the app could not launch because the database could not be loaded. */
 "APP_LAUNCH_FAILURE_COULD_NOT_LOAD_DATABASE" = "تعذَّر تحميل قاعدة البيانات";
 
 /* Error indicating that the app could not launch without reverting unknown database migrations. */
-"APP_LAUNCH_FAILURE_INVALID_DATABASE_VERSION_MESSAGE" = "يُرجى التحديث لآخر إصدار من سيجنال.";
+"APP_LAUNCH_FAILURE_INVALID_DATABASE_VERSION_MESSAGE" = "يُرجى التحديث لآخر إصدار من Radar.";
 
 /* Error indicating that the app could not launch without reverting unknown database migrations. */
 "APP_LAUNCH_FAILURE_INVALID_DATABASE_VERSION_TITLE" = "إصدار قاعدة البيانات مجهول.";
 
 /* Error indicating that the app crashed during the previous launch. */
-"APP_LAUNCH_FAILURE_LAST_LAUNCH_CRASHED_MESSAGE" = "وقع خطأ لسيجنال أثناء محاولة فتحه. يُرجى إرسال سجل الاخطاء إلى support@signal.org لمساعدتنا في حل المشكلة.";
+"APP_LAUNCH_FAILURE_LAST_LAUNCH_CRASHED_MESSAGE" = "وقع خطأ لRadar أثناء محاولة فتحه. يُرجى إرسال سجل الاخطاء إلى support@radar.chat لمساعدتنا في حل المشكلة.";
 
 /* Error indicating that the app crashed during the previous launch. */
-"APP_LAUNCH_FAILURE_LAST_LAUNCH_CRASHED_TITLE" = "تعذَّر فتح تطبيق سيجنال";
+"APP_LAUNCH_FAILURE_LAST_LAUNCH_CRASHED_TITLE" = "تعذَّر فتح تطبيق Radar";
 
 /* Error description indicating that the app crashed because there was low storage space available on the device. */
-"APP_LAUNCH_FAILURE_LOW_STORAGE_SPACE_AVAILABLE_MESSAGE" = "تعذَّر فتح سيجنال لأن مساحة تخزين جهازك مُنخفضة. لاستخدام سيجنال، يُرجى إفراغ المساحة عن طريق إدارة التخزين في الإعدادات.";
+"APP_LAUNCH_FAILURE_LOW_STORAGE_SPACE_AVAILABLE_MESSAGE" = "تعذَّر فتح Radar لأن مساحة تخزين جهازك مُنخفضة. لاستخدام Radar، يُرجى إفراغ المساحة عن طريق إدارة التخزين في الإعدادات.";
 
 /* Error title indicating that the app crashed because there was low storage space available on the device. */
 "APP_LAUNCH_FAILURE_LOW_STORAGE_SPACE_AVAILABLE_TITLE" = "مساحة التخزين مُنخفضة";
 
 /* Error indicating that the app could not restore transferred data. */
-"APP_LAUNCH_FAILURE_RESTORE_FAILED_MESSAGE" = "تعذَّر استعادة البيانات المنقولة من جهازك القديم. يُرجى إرسال سجل الأخطاء إلى support@signal.org حتى نتمكّن من حل المُشكلة. إذا قُمتَ بإعادة تثبيت سيجنال، فقد تفقد سجل الرسائل لديك.";
+"APP_LAUNCH_FAILURE_RESTORE_FAILED_MESSAGE" = "تعذَّر استعادة البيانات المنقولة من جهازك القديم. يُرجى إرسال سجل الأخطاء إلى support@radar.chat حتى نتمكّن من حل المُشكلة. إذا قُمتَ بإعادة تثبيت Radar، فقد تفقد سجل الرسائل لديك.";
 
 /* Error indicating that the app could not restore transferred data. */
 "APP_LAUNCH_FAILURE_RESTORE_FAILED_TITLE" = "تعذّر إتمام عملية النقل";
@@ -260,7 +260,7 @@
 "APP_UPDATE_NAG_ALERT_MESSAGE_FORMAT" = "الإصدار %1$@ متاح الآن في متجر App Store.";
 
 /* Title for the 'new app version available' alert. */
-"APP_UPDATE_NAG_ALERT_TITLE" = "هناك إصدار سيجنال جديد متوفِّر.";
+"APP_UPDATE_NAG_ALERT_TITLE" = "هناك إصدار Radar جديد متوفِّر.";
 
 /* Label for the 'update' button in the 'new app version available' alert. */
 "APP_UPDATE_NAG_ALERT_UPDATE_BUTTON" = "تحديث";
@@ -410,7 +410,7 @@
 "ATTACHMENT_KEYBOARD_GIF" = "صورة متحركة";
 
 /* Text in chat attachment panel when Signal only has access to some photos/videos. This string is in a compact horizontal space, so it should be short if possible. */
-"ATTACHMENT_KEYBOARD_LIMITED_ACCESS" = "لدى سيجنال وصول محدود إلى الصور";
+"ATTACHMENT_KEYBOARD_LIMITED_ACCESS" = "لدى Radar وصول محدود إلى الصور";
 
 /* A button to select a location from the Attachment Keyboard */
 "ATTACHMENT_KEYBOARD_LOCATION" = "الموقع";
@@ -422,7 +422,7 @@
 "ATTACHMENT_KEYBOARD_NO_MEDIA_TITLE" = "لا توجد صور أو مقاطع فيديو";
 
 /* Text in chat attachment panel explaining that user needs to give Signal permission to access photos. */
-"ATTACHMENT_KEYBOARD_NO_PHOTO_ACCESS" = "لا يُمكن لسيجنال الوصول إلى صورك ومقاطع الفيديو الخاصة بك. لمنح الوصول، افتح \"الإعدادات\" وانقر على \"الصور\".";
+"ATTACHMENT_KEYBOARD_NO_PHOTO_ACCESS" = "لا يُمكن لRadar الوصول إلى صورك ومقاطع الفيديو الخاصة بك. لمنح الوصول، افتح \"الإعدادات\" وانقر على \"الصور\".";
 
 /* Button in chat attachment panel to let user open Settings app and give Signal persmission to access photos. */
 "ATTACHMENT_KEYBOARD_OPEN_SETTINGS" = "فتح الإعدادات";
@@ -527,7 +527,7 @@
 "BACKUP_ENABLEMENT_REMINDER_MEGAPHONE_ACTION" = "تفعيل";
 
 /* Body for Backup enablement reminder megaphone */
-"BACKUP_ENABLEMENT_REMINDER_MEGAPHONE_BODY" = "لا تُفوِّت رسالة عندما تستخدم هاتفًا جديدًا أو تعيد تثبيت سيجنال.";
+"BACKUP_ENABLEMENT_REMINDER_MEGAPHONE_BODY" = "لا تُفوِّت رسالة عندما تستخدم هاتفًا جديدًا أو تعيد تثبيت Radar.";
 
 /* Title for Backup enablement reminder megaphone */
 "BACKUP_ENABLEMENT_REMINDER_MEGAPHONE_TITLE" = "شغّل النسخ الاحتياطية المُشفَّرة";
@@ -569,7 +569,7 @@
 "BACKUP_ONBOARDING_CANCEL_SHEET_TITLE" = "هل ترغبُ بمغادرة تثبيت النسخة الاحتياطية؟";
 
 /* Body for a sheet warning users to their 'Recovery Key' safe. */
-"BACKUP_ONBOARDING_CONFIRM_KEY_KEEP_KEY_SAFE_SHEET_BODY" = "لن يتمكّن سيجنال من مُساعدتك على استعادة نسختك الاحتياطية إذا فقدتَ مفتاحك. احتفِظ بمفتاحك في مكانٍ آمن، ولا تُشاركه مع أي أحد.";
+"BACKUP_ONBOARDING_CONFIRM_KEY_KEEP_KEY_SAFE_SHEET_BODY" = "لن يتمكّن Radar من مُساعدتك على استعادة نسختك الاحتياطية إذا فقدتَ مفتاحك. احتفِظ بمفتاحك في مكانٍ آمن، ولا تُشاركه مع أي أحد.";
 
 /* Title for a sheet warning users to their 'Recovery Key' safe. */
 "BACKUP_ONBOARDING_CONFIRM_KEY_KEEP_KEY_SAFE_SHEET_TITLE" = "حافظ على مفتاحك في مكانٍ آمن.";
@@ -596,10 +596,10 @@
 "BACKUP_ONBOARDING_INTRO_NOT_NOW_TOAST" = "يمكنك تفعيل النسخ الاحتياطية في الإعدادات.";
 
 /* Subtitle for a view introducing Backups during an onboarding flow. */
-"BACKUP_ONBOARDING_INTRO_SUBTITLE" = "أنشِئ نسخة احتياطية من رسائلك ووسائطك باستخدام خدمة التخزين الآمنة المُشفَّرة من طرف لطرف من سيجنال. لا تفقد رسالة عندما تستخدم هاتفًا جديدًا أو تعيد تثبيت سيجنال.";
+"BACKUP_ONBOARDING_INTRO_SUBTITLE" = "أنشِئ نسخة احتياطية من رسائلك ووسائطك باستخدام خدمة التخزين الآمنة المُشفَّرة من طرف لطرف من Radar. لا تفقد رسالة عندما تستخدم هاتفًا جديدًا أو تعيد تثبيت Radar.";
 
 /* Title for a view introducing Backups during an onboarding flow. */
-"BACKUP_ONBOARDING_INTRO_TITLE" = "النسخ الاحتياطية الآمنة لسيجنال";
+"BACKUP_ONBOARDING_INTRO_TITLE" = "النسخ الاحتياطية الآمنة Radar";
 
 /* Text for a bullet point in a view introducing the 'Recovery Key' during an onboarding flow. */
 "BACKUP_ONBOARDING_KEY_INTRO_BULLET_1" = "مفتاح الاستعادة هو عبارة عن كود مُكوَّن من 64 رمزًا، وتحتاجه لاستعادة نسختك الاحتياطية.";
@@ -617,10 +617,10 @@
 "BACKUP_ONBOARDING_KEY_INTRO_TITLE" = "مفتاح الاستعادة";
 
 /* Body for a sheet shown when your Backup plan is downgraded. */
-"BACKUP_PLAN_DOWNGRADED_SHEET_BODY" = "انتهت صلاحية اشتراك النسخ الاحتياطي الخاص بك لأنه تعذَّر تجديده بواسطة طريقة الدفع الخاصة بك.\n\nلمواصلة النسخ الاحتياطي لوسائطك، يمكنك إعادة الاشتراك. سَيظل بإمكانك الوصول إلى خطة النسح الاحتياطي المجانية على سيجنال.";
+"BACKUP_PLAN_DOWNGRADED_SHEET_BODY" = "انتهت صلاحية اشتراك النسخ الاحتياطي الخاص بك لأنه تعذَّر تجديده بواسطة طريقة الدفع الخاصة بك.\n\nلمواصلة النسخ الاحتياطي لوسائطك، يمكنك إعادة الاشتراك. سَيظل بإمكانك الوصول إلى خطة النسح الاحتياطي المجانية على Radar.";
 
 /* Body for a sheet shown when your Backup plan is downgraded because you stopped using TestFlight. */
-"BACKUP_PLAN_DOWNGRADED_SHEET_BODY_TESTFLIGHT" = "انتهت صلاحية اشتراك النسخ الاحتياطي الخاص بك لأنك لم تعد تستخدم TestFlight.\n\nلمواصلة النسخ الاحتياطي لوسائطك، يمكنك إعادة الاشتراك. سَيظل بإمكانك الوصول إلى خطة النسح الاحتياطي المجانية على سيجنال.";
+"BACKUP_PLAN_DOWNGRADED_SHEET_BODY_TESTFLIGHT" = "انتهت صلاحية اشتراك النسخ الاحتياطي الخاص بك لأنك لم تعد تستخدم TestFlight.\n\nلمواصلة النسخ الاحتياطي لوسائطك، يمكنك إعادة الاشتراك. سَيظل بإمكانك الوصول إلى خطة النسح الاحتياطي المجانية على Radar.";
 
 /* Primary button for a sheet shown when your Backup plan is downgraded. */
 "BACKUP_PLAN_DOWNGRADED_SHEET_PRIMARY_BUTTON" = "إدارة النسخ الاحتياطية";
@@ -650,7 +650,7 @@
 "BACKUP_RESTORE_MODAL_TITLE" = "جارية استعادة الرسائل…";
 
 /* Message describing that the Background App Refresh permission is disabled for Signal. \"Background App Refresh\" should be localized the same way it is in iOS Settings app permissions. */
-"BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_MESSAGE" = "النسخ الاحتياطية التلقائية مُعطَّلة.  فعّل النسخ الاحتياطية التلقائية من خلال تحديث أذونات سيجنال.";
+"BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_MESSAGE" = "النسخ الاحتياطية التلقائية مُعطَّلة.  فعّل النسخ الاحتياطية التلقائية من خلال تحديث أذونات Radar.";
 
 /* Add-on to a message describing that the Background App Refresh permission is disabled for Signal. \"Background App Refresh\" should be localized the same way it is in iOS Settings app permissions. */
 "BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_MESSAGE_UPDATE_NOW" = "حدِّث الآن";
@@ -659,7 +659,7 @@
 "BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_SHEET_GO_TO_SETTINGS_BUTTON" = "انتقِل إلى الإعدادات";
 
 /* Message for a sheet warning the user about the Background App Refresh permission. \"Background App Refresh\" should be localized the same way it is in iOS Settings app permissions. */
-"BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_SHEET_MESSAGE" = "للسماح لسيجنال بنسخ رسائلك تلقائيًا، انقر على \"انتقل إلى الإعدادات\" أسفله وفعِّل خاصية \"تحديث التطبيق في الخلفية\"";
+"BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_SHEET_MESSAGE" = "للسماح لRadar بنسخ رسائلك تلقائيًا، انقر على \"انتقل إلى الإعدادات\" أسفله وفعِّل خاصية \"تحديث التطبيق في الخلفية\"";
 
 /* Title for a sheet warning the user about the Background App Refresh permission. \"Background App Refresh\" should be localized the same way it is in iOS Settings app permissions. */
 "BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_SHEET_TITLE" = "النسخ الاحتياطية التلقائية مُعطَّلة";
@@ -746,7 +746,7 @@
 "BACKUP_SETTINGS_BACKUP_PLAN_PAID_BUT_IAP_NOT_FOUND_LOCALLY_ACTION_BUTTON_TITLE" = "تجديد";
 
 /* Text describing that the user's paid backup plan did not correspond to a App Store subscription on this device. */
-"BACKUP_SETTINGS_BACKUP_PLAN_PAID_BUT_IAP_NOT_FOUND_LOCALLY_DESCRIPTION" = "تعذَّر العثور على اشتراكك على هذا الجهاز. جدِّد لمتابعة استخدام النسخ الاحتياطية على سيجنال.";
+"BACKUP_SETTINGS_BACKUP_PLAN_PAID_BUT_IAP_NOT_FOUND_LOCALLY_DESCRIPTION" = "تعذَّر العثور على اشتراكك على هذا الجهاز. جدِّد لمتابعة استخدام النسخ الاحتياطية على Radar.";
 
 /* Header describing what the paid backup plan includes. */
 "BACKUP_SETTINGS_BACKUP_PLAN_PAID_HEADER" = "النسخ الاحتياطي للنص وكل الوسائط";
@@ -758,16 +758,16 @@
 "BACKUP_SETTINGS_BACKUP_PLAN_PAID_RENEWAL_FORMAT" = "التجديد في %1$@";
 
 /* Footer for a menu section related to settings for when Backups are disabled. */
-"BACKUP_SETTINGS_BACKUPS_DISABLED_SECTION_FOOTER" = "تمَّ إيقاف النُسخ الاحتياطية، وتمَّ حذف بياناتك من خدمة التخزين الآمنة الخاصة بسيجنال.";
+"BACKUP_SETTINGS_BACKUPS_DISABLED_SECTION_FOOTER" = "تمَّ إيقاف النُسخ الاحتياطية، وتمَّ حذف بياناتك من خدمة التخزين الآمنة الخاصة بRadar.";
 
 /* Description for a progress view tracking media being downloaded in service of disabling Backups. */
-"BACKUP_SETTINGS_BACKUPS_DISABLING_DOWNLOADING_MEDIA_PROGRESS_VIEW_DESCRIPTION" = "تمَّ إيقاف النُسخ الاحتياطية، ويتم الآن تنزيل أي ملفات وسائط لا توجد على جهازك. وحالما يتمُّ تنزيلها، سيتمُّ حذف بياناتك بعد ذلك من خدمة التخزين الآمنة لسيجنال.";
+"BACKUP_SETTINGS_BACKUPS_DISABLING_DOWNLOADING_MEDIA_PROGRESS_VIEW_DESCRIPTION" = "تمَّ إيقاف النُسخ الاحتياطية، ويتم الآن تنزيل أي ملفات وسائط لا توجد على جهازك. وحالما يتمُّ تنزيلها، سيتمُّ حذف بياناتك بعد ذلك من خدمة التخزين الآمنة لRadar.";
 
 /* Message for a view indicating we failed to delete the user's Backup due to an unexpected error. */
 "BACKUP_SETTINGS_BACKUPS_DISABLING_GENERIC_ERROR_MESSAGE" = "حدث خطأ ما. يُرجى التواصل مع فريق الدعم.";
 
 /* Header for a menu section related to settings for when disabling Backups encountered an unexpected error. */
-"BACKUP_SETTINGS_BACKUPS_DISABLING_GENERIC_ERROR_SECTION_HEADER" = "حدث خطأ ما عند حذف بياناتك من خدمة التخزين الآمنة لسيجنال.";
+"BACKUP_SETTINGS_BACKUPS_DISABLING_GENERIC_ERROR_SECTION_HEADER" = "حدث خطأ ما عند حذف بياناتك من خدمة التخزين الآمنة لRadar.";
 
 /* Title for a view indicating we failed to delete the user's Backup due to an unexpected error. */
 "BACKUP_SETTINGS_BACKUPS_DISABLING_GENERIC_ERROR_TITLE" = "تعذَّر حذف النسخة الاحتياطية.";
@@ -776,7 +776,7 @@
 "BACKUP_SETTINGS_BACKUPS_DISABLING_PROGRESS_VIEW_DESCRIPTION" = "جارٍ حذف النسخة الاحتياطية...";
 
 /* Header for a menu section related to disabling Backups. */
-"BACKUP_SETTINGS_BACKUPS_DISABLING_SECTION_HEADER" = "تمَّ إيقاف النُسخ الاحتياطية، وسيتمَّ حذف بياناتك من خدمة التخزين الآمنة لسيجنال.";
+"BACKUP_SETTINGS_BACKUPS_DISABLING_SECTION_HEADER" = "تمَّ إيقاف النُسخ الاحتياطية، وسيتمَّ حذف بياناتك من خدمة التخزين الآمنة لRadar.";
 
 /* Header for a menu section related to settings for when Backups are enabled. */
 "BACKUP_SETTINGS_BACKUPS_ENABLED_SECTION_HEADER" = "تفاصيل النسخ الاحتياطي";
@@ -824,13 +824,13 @@
 "BACKUP_SETTINGS_DISABLING_CONFIRMATION_ACTION_SHEET_TITLE" = "هل ترغبُ بإيقاف وحذف النسخ الاحتياطية؟";
 
 /* Message shown in an action sheet when the user disables Backups, explaining that their media is downloading first. */
-"BACKUP_SETTINGS_DISABLING_DOWNLOADS_STARTED_ACTION_SHEET_MESSAGE" = "لديك ملفات وسائط في نسختك الاحتياطية غير موجودة على هذا الجهاز. قد يستغرق تنزيل نسختك الاحتياطية وقتًا طويلًا، لذا أبقِ سيجنال مفتوحًا لتفادي الانقطاعات.";
+"BACKUP_SETTINGS_DISABLING_DOWNLOADS_STARTED_ACTION_SHEET_MESSAGE" = "لديك ملفات وسائط في نسختك الاحتياطية غير موجودة على هذا الجهاز. قد يستغرق تنزيل نسختك الاحتياطية وقتًا طويلًا، لذا أبقِ Radar مفتوحًا لتفادي الانقطاعات.";
 
 /* Title shown in an action sheet when the user disables Backups, explaining that their media is downloading first. */
 "BACKUP_SETTINGS_DISABLING_DOWNLOADS_STARTED_ACTION_SHEET_TITLE" = "جارٍتنزيل النسخة الاحتياطية الخاصة بك";
 
 /* Message shown in an action sheet indicating we failed to delete the user's Backup due to an unexpected error. */
-"BACKUP_SETTINGS_DISABLING_ERROR_GENERIC_ERROR_ACTION_SHEET_MESSAGE" = "حدث خطأ ما عند حذف بياناتك من خدمة التخزين الآمنة لسيجنال.";
+"BACKUP_SETTINGS_DISABLING_ERROR_GENERIC_ERROR_ACTION_SHEET_MESSAGE" = "حدث خطأ ما عند حذف بياناتك من خدمة التخزين الآمنة لRadar.";
 
 /* Title shown in an action sheet indicating we failed to delete the user's Backup due to an unexpected error. */
 "BACKUP_SETTINGS_DISABLING_ERROR_GENERIC_ERROR_ACTION_SHEET_TITLE" = "تعذَّر حذف النسخة الاحتياطية.";
@@ -842,7 +842,7 @@
 "BACKUP_SETTINGS_DISABLING_SUBSCRIPTION_CANCEL_ACTION_SHEET_MANAGE_SUBSCRIPTION_BUTTON" = "إدارة الاشتراك";
 
 /* Message for an action sheet shown when the user disables Backups, but is still subscribed to the paid plan. */
-"BACKUP_SETTINGS_DISABLING_SUBSCRIPTION_CANCEL_ACTION_SHEET_MESSAGE" = "إذا كُنتَ تريد إلغاء اشتراكك، انقر على \"إدارة الاشتراك\" > سيجنال > إلغاء الاشتراك";
+"BACKUP_SETTINGS_DISABLING_SUBSCRIPTION_CANCEL_ACTION_SHEET_MESSAGE" = "إذا كُنتَ تريد إلغاء اشتراكك، انقر على \"إدارة الاشتراك\" > Radar > إلغاء الاشتراك";
 
 /* Title for an action sheet shown when the user disables Backups, but is still subscribed to the paid plan. */
 "BACKUP_SETTINGS_DISABLING_SUBSCRIPTION_CANCEL_ACTION_SHEET_TITLE" = "لا تزال مُشترِكًا في خطة نسخ احتياطي مدفوعة";
@@ -920,7 +920,7 @@
 "BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_DOWNLOAD_SHEET_LATER_ACTION" = "التنزيل لاحقًا";
 
 /* Message for an action sheet allowing users to download their offloaded media. */
-"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_DOWNLOAD_SHEET_MESSAGE" = "لديك وسائط في نسختك الاحتياطية غير موجودة على هذا الجهاز. قد يستغرق الأمر وقتًا طويلًا للتنزيل، أبقِ سيجنال مفتوحًا لتفادي انقطاع التنزيل.";
+"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_DOWNLOAD_SHEET_MESSAGE" = "لديك وسائط في نسختك الاحتياطية غير موجودة على هذا الجهاز. قد يستغرق الأمر وقتًا طويلًا للتنزيل، أبقِ Radar مفتوحًا لتفادي انقطاع التنزيل.";
 
 /* Action in an action sheet allowing users to download their offloaded media now. */
 "BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_DOWNLOAD_SHEET_NOW_ACTION" = "نزِّل الآن";
@@ -941,13 +941,13 @@
 "BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_TOGGLE_FOOTER_AVAILABLE_FOR_TESTERS" = "سيتمُّ تفريغ ملفات الوسائط غير المُستخدِمة، لكن يُمكن تنزيلها من النسخة الاحتياطية لديك في أيّ وقت طالما أنك تستخدم TestFlight.";
 
 /* Footer for a toggle allowing users to change the Optimize Local Storage setting, if the toggle is unavailable. */
-"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_TOGGLE_FOOTER_UNAVAILABLE" = "لا يمكن استخدام ميزة تحسين التخزين إلّا مع المُستوى المدفوع لنسخ سيجنال الاحتياطية. يُرجى ترقية خطة النسخ الاحتياطية لديك لتفعيل هذه الميزة.";
+"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_TOGGLE_FOOTER_UNAVAILABLE" = "لا يمكن استخدام ميزة تحسين التخزين إلّا مع المُستوى المدفوع لنسخ Radar الاحتياطية. يُرجى ترقية خطة النسخ الاحتياطية لديك لتفعيل هذه الميزة.";
 
 /* Title for a toggle allowing users to change the Optimize Local Storage setting. */
 "BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_TOGGLE_TITLE" = "تحسين التخزين على الجهاز";
 
 /* Subtitle for a notification telling the user they are out of remote storage space. */
-"BACKUP_SETTINGS_OUT_OF_STORAGE_SPACE_NOTIFICATION_SUBTITLE" = "بلغتَ الحد الأقصى لمساحة تخزين النسخ الاحتياطي الخاص بك. حرِّر مساحة في تطبيق سيجنال لمتابعة نسخ الدردشات والوسائط احتياطيًا.";
+"BACKUP_SETTINGS_OUT_OF_STORAGE_SPACE_NOTIFICATION_SUBTITLE" = "بلغتَ الحد الأقصى لمساحة تخزين النسخ الاحتياطي الخاص بك. حرِّر مساحة في تطبيق Radar لمتابعة نسخ الدردشات والوسائط احتياطيًا.";
 
 /* Title for a notification telling the user they are out of remote storage space. */
 "BACKUP_SETTINGS_OUT_OF_STORAGE_SPACE_NOTIFICATION_TITLE" = "مساحة تخزين النسخ الاحتياطي ممتلئة";
@@ -971,7 +971,7 @@
 "BACKUP_SETTINGS_SUBSCRIPTION_ALREADY_REDEEMED_NOTICE_TITLE" = "تعذّر استرداد اشتراك النسخ الاحتياطية الخاص بحسابك";
 
 /* Body for a sheet explaining that the user's Backups subscription was already redeemed. */
-"BACKUP_SETTINGS_SUBSCRIPTION_ALREADY_REDEEMED_SHEET_BODY" = "اُستخدِمَت أجهزةٌ عديدة لاسترداد اشتراكك هذا الشهر.\n\nقد تكون أعدت تسجيل حساب سيجنال الخاص بك عدة مرّات، أو لديك عدة أجهزة تستخدم الاشتراك نفسه.";
+"BACKUP_SETTINGS_SUBSCRIPTION_ALREADY_REDEEMED_SHEET_BODY" = "اُستخدِمَت أجهزةٌ عديدة لاسترداد اشتراكك هذا الشهر.\n\nقد تكون أعدت تسجيل حساب Radar الخاص بك عدة مرّات، أو لديك عدة أجهزة تستخدم الاشتراك نفسه.";
 
 /* Button for a sheet explaining that the user's Backups subscription was already redeemed. */
 "BACKUP_SETTINGS_SUBSCRIPTION_ALREADY_REDEEMED_SHEET_GOT_IT_BUTTON" = "تمَّ";
@@ -992,19 +992,19 @@
 "BACKUP_SETTINGS_UPLOAD_PROGRESS_SUBTITLE_PAUSED_NEEDS_WIFI" = "تمَّ إيقاف تحميل ملفات الوسائط مؤقَّتًا: في انتظار الاتصال بالواي فاي";
 
 /* Subtitle for a progress bar tracking uploads that are paused because the user is out of remote storage space. Embeds 1:{{ total storage space provided, e.g. 100 GB }}; 2:{{ space the user needs to free up by deleting media, e.g. 1 GB }}. */
-"BACKUP_SETTINGS_UPLOAD_PROGRESS_SUBTITLE_PAUSED_OUT_OF_STORAGE_SPACE_FORMAT" = "بلغتَ حد التخزين %1$@ المُضمَّن في خطة النسخ الاحتياطي الخاصة بك. لإنشاء نسخة احتياطية للدردشات والوسائط الجديدة، قُم بتحرير %2$@ في تطبيق سيجنال، ثم انقر على \"إنشاء نسخة احتياطية الآن\".";
+"BACKUP_SETTINGS_UPLOAD_PROGRESS_SUBTITLE_PAUSED_OUT_OF_STORAGE_SPACE_FORMAT" = "بلغتَ حد التخزين %1$@ المُضمَّن في خطة النسخ الاحتياطي الخاصة بك. لإنشاء نسخة احتياطية للدردشات والوسائط الجديدة، قُم بتحرير %2$@ في تطبيق Radar، ثم انقر على \"إنشاء نسخة احتياطية الآن\".";
 
 /* Subtitle for a progress bar tracking active uploading. Embeds 1:{{ the amount uploaded as a file size, e.g. 100 MB }}; 2:{{ the total amount to upload as a file size, e.g. 1 GB }}; 3:{{ the percentage uploaded as a percent, e.g. 40% }}. */
 "BACKUP_SETTINGS_UPLOAD_PROGRESS_SUBTITLE_RUNNING" = "جارٍ تحميل %1$@ من أصل %2$@ (%3$@)";
 
 /* Message for a sheet shown after the user enables backups. */
-"BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_MESSAGE" = "قد يستغرق هذا وقتًا طويلًا حسب حجم النسخة الاحتياطية الخاصة بك. يمكنك استخدام سيجنال بشكل اعتيادي أثناء إجراء عملية النسخ الاحتياطي.";
+"BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_MESSAGE" = "قد يستغرق هذا وقتًا طويلًا حسب حجم النسخة الاحتياطية الخاصة بك. يمكنك استخدام Radar بشكل اعتيادي أثناء إجراء عملية النسخ الاحتياطي.";
 
 /* Title for a sheet shown after the user enables backups. */
-"BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_TITLE" = "مرحبًا بك في النسخ الاحتياطية الآمنة لسيجنال. ابدأ النسخ الاحتياطي لديك الآن.";
+"BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_TITLE" = "مرحبًا بك في النسخ الاحتياطية الآمنة لRadar. ابدأ النسخ الاحتياطي لديك الآن.";
 
 /* Message for a sheet shown when your Backup subscription fails to renew. */
-"BACKUP_SUBSCRIPTION_FAILED_TO_RENEW_SHEET_MESSAGE" = "تأكَّد من أن طريقة الدفع الخاصة بك مُحدَّثة. انقر على \"إدارة الاشتراك\" > سيجنال > تحديث طريقة الدفع.";
+"BACKUP_SUBSCRIPTION_FAILED_TO_RENEW_SHEET_MESSAGE" = "تأكَّد من أن طريقة الدفع الخاصة بك مُحدَّثة. انقر على \"إدارة الاشتراك\" > Radar > تحديث طريقة الدفع.";
 
 /* Primary button for a sheet shown when your Backup subscription fails to renew. */
 "BACKUP_SUBSCRIPTION_FAILED_TO_RENEW_SHEET_PRIMARY_BUTTON" = "إدارة الاشتراك";
@@ -1022,7 +1022,7 @@
 "BACKUPS_SETTINGS_TITLE" = "النسخ الاحتياطية الآمنة";
 
 /* Body for system notification or megaphone when backups is enabled. Embeds {{ time backups was enabled }} */
-"BACKUPS_TURNED_ON_NOTIFICATION_BODY_FORMAT" = "تمّ تفعيل النسخ الاحتياطية على سيجنال لهذا الحساب في %1$@. انقر للمشاهدة.";
+"BACKUPS_TURNED_ON_NOTIFICATION_BODY_FORMAT" = "تمّ تفعيل النسخ الاحتياطية على Radar لهذا الحساب في %1$@. انقر للمشاهدة.";
 
 /* Title for system notification or megaphone when backups is enabled */
 "BACKUPS_TURNED_ON_TITLE" = "قُمتَ بتفعيل النسخ الاحتياطية";
@@ -1040,10 +1040,10 @@
 "BADGE_DETAILS_DONATE_TO_SIGNAL" = "تبرَّع الآن";
 
 /* When viewing someone else's donor badge, you'll see a sheet. This is the title on that sheet. Embeds {badge owner's short name} */
-"BADGE_DETAILS_TITLE_FOR_SUPPORTER" = "%1$@ يدعم سيجنال";
+"BADGE_DETAILS_TITLE_FOR_SUPPORTER" = "%1$@ يدعم Radar";
 
 /* String explaining to the user that their boost badge has expired on the badge expiry sheet. */
-"BADGE_EXPIRED_BOOST_BODY" = "نفدَت صلاحية شارة الدعم الخاصة بك، لذلك لم تعُد ظاهرة في حسابك.\n\nيُمكنك الاستمرار في استخدام سيجنال؛ لكن لتدعم التقنية التي بُنيَت من أجلك، يُرجى التفكير في أن تصبح داعمًا شهريًا.";
+"BADGE_EXPIRED_BOOST_BODY" = "نفدَت صلاحية شارة الدعم الخاصة بك، لذلك لم تعُد ظاهرة في حسابك.\n\nيُمكنك الاستمرار في استخدام Radar؛ لكن لتدعم التقنية التي بُنيَت من أجلك، يُرجى التفكير في أن تصبح داعمًا شهريًا.";
 
 /* String explaining to the user that their boost badge has expired while they are a current subscription sustainer on the badge expiry sheet. */
 "BADGE_EXPIRED_BOOST_CURRENT_SUSTAINER_BODY" = "نفدَت صلاحية شارة الدعم الخاصة بك، لذلك لم تعُد ظاهرة في حسابك.\n\nيُمكنك إعادة تفعيل شارة الدعم الخاصة بك لمدة 30 يومًا أخرى بتبرُّع لمرّة واحدة.";
@@ -1088,7 +1088,7 @@
 "BANK_DONATION_FOOTER_FIND_ACCOUNT_INFO" = "العثور على معلومات الحساب";
 
 /* On the bank transfer donation screen, a small amount of information text is shown. This is that text. It should (1) instruct users to enter their bank information (2) tell them that Signal does not collect or store their personal information. */
-"BANK_DONATION_SUBHEADER_TEXT" = "أدخِل معلومات مصرفك. لا يقوم سيجنال بجمع أو تخزين معلوماتك الشخصية.";
+"BANK_DONATION_SUBHEADER_TEXT" = "أدخِل معلومات مصرفك. لا يقوم Radar بجمع أو تخزين معلوماتك الشخصية.";
 
 /* Users can donate to Signal with a bank account. We are required to show them a mandate with information about bank transfers. This is a label for a button to agree to the mandate. */
 "BANK_MANDATE_AGREE" = "موافق";
@@ -1097,7 +1097,7 @@
 "BANK_MANDATE_READ_MORE" = "اقرأ المزيد";
 
 /* Users can donate to Signal with a bank account. We are required to show them a mandate with information about bank transfers. This is a subtitle about the payment processor Stripe above that mandate. */
-"BANK_MANDATE_SUBTITLE" = "يُعالج Stripe التبرُّعات المقدمة لسيجنال. سيجنال لا يجمع ولا يُخزِّن معلوماتك الشخصية.";
+"BANK_MANDATE_SUBTITLE" = "يُعالج Stripe التبرُّعات المقدمة لRadar. Radar لا يجمع ولا يُخزِّن معلوماتك الشخصية.";
 
 /* Users can donate to Signal with a bank account. We are required to show them a mandate with information about bank transfers. This is the title above that mandate. */
 "BANK_MANDATE_TITLE" = "تحويل مصرفي";
@@ -1253,7 +1253,7 @@
 "CALL_AUDIO_MISSED_WEEK_NOTIFICATION_BODY_FORMAT" = "📞مكالمة صوتية فائتة بتاريخ %1$@";
 
 /* Alert message when calling and permissions for microphone are missing */
-"CALL_AUDIO_PERMISSION_MESSAGE" = "يُمكِنُك تفعيل الوصول للميكروفون من خلال ‫تطبيق إعدادات iOS‬، للتمكن من إجراء مكالمات وإرسال رسائل صوتية في سيجنال.";
+"CALL_AUDIO_PERMISSION_MESSAGE" = "يُمكِنُك تفعيل الوصول للميكروفون من خلال ‫تطبيق إعدادات iOS‬، للتمكن من إجراء مكالمات وإرسال رسائل صوتية في Radar.";
 
 /* Alert title when calling and permissions for microphone are missing */
 "CALL_AUDIO_PERMISSION_TITLE" = "إذن استخدام الميكروفون ضروري";
@@ -1319,7 +1319,7 @@
 "CALL_LINK_JOIN_REQUEST_PROMPT" = "يرغب في الانضمام…";
 
 /* Shown in a message bubble when you send a call link in a Signal chat */
-"CALL_LINK_LINK_PREVIEW_DESCRIPTION" = "اِستخدم هذا الرابط للانضمام إلى مكالمة سيجنال";
+"CALL_LINK_LINK_PREVIEW_DESCRIPTION" = "اِستخدم هذا الرابط للانضمام إلى مكالمة Radar";
 
 /* Text that appears on a toast in a call lobby before joining a call link informing the user what information will be shared with other call members when they have phone number sharing turned off. */
 "CALL_LINK_LOBBY_SHARING_INFO_PHONE_NUMBER_SHARING_OFF" = "أي شخص ينضم إلى هذه المكالمة عبر الرابط سَيرى اسمك وصورتك.";
@@ -1343,7 +1343,7 @@
 "CALL_LINK_REQUIRE_APPROVAL" = "يتطلَّب موافقة المُشرِف";
 
 /* Button to open UI to share a Call Link with someone on Signal. */
-"CALL_LINK_SHARE_VIA_SIGNAL" = "مشاركة الرابط عبر سيجنال";
+"CALL_LINK_SHARE_VIA_SIGNAL" = "مشاركة الرابط عبر Radar";
 
 /* Button to open the system share sheet to share a Call Link. */
 "CALL_LINK_SHARE_VIA_SYSTEM" = "مشاركة الرابط";
@@ -1448,10 +1448,10 @@
 "CALLING_MEMBER_VIEW_YOUR_CAMERA_IS_OFF" = "الكاميرا في حالة عدم تشغيل";
 
 /* The generic name used for calls if CallKit privacy is enabled */
-"CALLKIT_ANONYMOUS_CONTACT_NAME" = "مُستخدم سيجنال";
+"CALLKIT_ANONYMOUS_CONTACT_NAME" = "مُستخدم Radar";
 
 /* The generic name used for group calls if CallKit privacy is enabled */
-"CALLKIT_ANONYMOUS_GROUP_NAME" = "مجموعة سيجنال";
+"CALLKIT_ANONYMOUS_GROUP_NAME" = "مجموعة Radar";
 
 /* Title for the calls list view. */
 "CALLS_LIST_TITLE" = "المُكالمات";
@@ -1625,7 +1625,7 @@
 "CARD_DONATION_EXPIRATION_DATE_PLACEHOLDER" = "الشهر/السنة";
 
 /* Users can choose to learn more about their credit/debit card donations, which will open a sheet with additional information. This is the body text of that sheet. */
-"CARD_DONATION_READ_MORE_SHEET_BODY" = "لا يقوم سيجنال بجمع أو تخزين معلوماتك الشخصية عند قيامك بتبرُّع.\n\nنستخدم Stripe كمعالج عمليات الدفع الخاصة بنا لتلقي تبرُّعاتك. لا يُمكننا الوصول إلى أو تخزين أو حفظ أي من المعلومات التي تُقدمها.\n\nلا يقوم تطبيق سيجنال ولا يمكنه ربط تبرعاتك بحسابك على سيجنال.\n\nشكرًا لدعمك!";
+"CARD_DONATION_READ_MORE_SHEET_BODY" = "لا يقوم Radar بجمع أو تخزين معلوماتك الشخصية عند قيامك بتبرُّع.\n\nنستخدم Stripe كمعالج عمليات الدفع الخاصة بنا لتلقي تبرُّعاتك. لا يُمكننا الوصول إلى أو تخزين أو حفظ أي من المعلومات التي تُقدمها.\n\nلا يقوم تطبيق Radar ولا يمكنه ربط تبرعاتك بحسابك على Radar.\n\nشكرًا لدعمك!";
 
 /* Users can choose to learn more about their credit/debit card donations, which will open a sheet with additional information. This is the title of that sheet. */
 "CARD_DONATION_READ_MORE_SHEET_TITLE" = "سيتمُّ المحافظة على خصوصية معلوماتك.";
@@ -1634,7 +1634,7 @@
 "CARD_DONATION_SUBHEADER_LEARN_MORE" = "اعرف المزيد";
 
 /* On the credit/debit card donation screen, a small amount of information text is shown. This is that text. It should (1) instruct users to enter their credit/debit card information (2) tell them that Signal does not collect or store their personal information. */
-"CARD_DONATION_SUBHEADER_TEXT" = "أدخِل تفاصيل بطاقتك. لا يقوم سيجنال بجمع أو تخزين معلوماتك الشخصية.";
+"CARD_DONATION_SUBHEADER_TEXT" = "أدخِل تفاصيل بطاقتك. لا يقوم Radar بجمع أو تخزين معلوماتك الشخصية.";
 
 /* Title for the 'censorship circumvention country' view. */
 "CENSORSHIP_CIRCUMVENTION_COUNTRY_VIEW_TITLE" = "اختر الدولة";
@@ -1772,7 +1772,7 @@
 "COMPARE_SAFETY_NUMBER_ACTION" = "قارِن مع الحافظة";
 
 /* Accessibility hint describing what you can do with the compose button */
-"COMPOSE_BUTTON_HINT" = "حَدِّد أو ابحث عن مُستخدِم سيجنال لِبدء دردشة مَعه.";
+"COMPOSE_BUTTON_HINT" = "حَدِّد أو ابحث عن مُستخدِم Radar لِبدء دردشة مَعه.";
 
 /* Accessibility label from compose button. */
 "COMPOSE_BUTTON_LABEL" = "تَحرِير";
@@ -1799,13 +1799,13 @@
 "COMPOSE_SCREEN_LIMITED_CONTACTS_CTA" = "إدارة";
 
 /* Multi-line label explaining why compose-screen contact picker is empty. */
-"COMPOSE_SCREEN_LIMITED_CONTACTS_PERMISSION" = "لدى سيجنال وصول محدود إلى جهات الاتصال على جهازك.";
+"COMPOSE_SCREEN_LIMITED_CONTACTS_PERMISSION" = "لدى Radar وصول محدود إلى جهات الاتصال على جهازك.";
 
 /* Button to open settings from an empty compose-screen contact picker. */
 "COMPOSE_SCREEN_MISSING_CONTACTS_CTA" = "فتح الإعدادات";
 
 /* Multi-line label explaining why compose-screen contact picker is empty. */
-"COMPOSE_SCREEN_MISSING_CONTACTS_PERMISSION" = "يمكنك تفعيل الوصول إلى جهات الاتصال من خلال تطبيق إعدادات iOS لترى من يستخدم سيجنال من جهات اتصالك.";
+"COMPOSE_SCREEN_MISSING_CONTACTS_PERMISSION" = "يمكنك تفعيل الوصول إلى جهات الاتصال من خلال تطبيق إعدادات iOS لترى من يستخدم Radar من جهات اتصالك.";
 
 /* Configure reactions title text */
 "CONFIGURE_REACTIONS" = "ضبط التفاعلات";
@@ -1847,10 +1847,10 @@
 "CONTACT_ABOUT_SHEET_PROFILE_NAMES_EDUCATION" = "أسماء الحسابات الشخصية لم يتم التحقُّق منها.";
 
 /* Message for a tooltip that appears above a parenthesized name for another user, indicating that that name is the name the other user set for themself. Embeds {{name}} */
-"CONTACT_ABOUT_SHEET_SECONDARY_NAME_TOOLTIP_MESSAGE" = "\"%1$@\" هو اسم الحساب الذي حدّده هذا الشخص لنفسه في سيجنال.";
+"CONTACT_ABOUT_SHEET_SECONDARY_NAME_TOOLTIP_MESSAGE" = "\"%1$@\" هو اسم الحساب الذي حدّده هذا الشخص لنفسه في Radar.";
 
 /* A label indicating a user is a signal connection. */
-"CONTACT_ABOUT_SHEET_SIGNAL_CONNECTION_LABEL" = "جهة اتصال سيجنال";
+"CONTACT_ABOUT_SHEET_SIGNAL_CONNECTION_LABEL" = "جهة اتصال Radar";
 
 /* The title for a contact 'about' sheet. */
 "CONTACT_ABOUT_SHEET_TITLE" = "نبذة عن";
@@ -1892,7 +1892,7 @@
 "CONTACT_NOTE_TITLE" = "ملاحظة";
 
 /* Body for contact permission action sheet */
-"CONTACT_PERMISSION_ACTION_SHEET_2_BODY" = "للعثور على الأشخاص الذين تعرفهم على سيجنال:";
+"CONTACT_PERMISSION_ACTION_SHEET_2_BODY" = "للعثور على الأشخاص الذين تعرفهم على Radar:";
 
 /* First step for contact permission action sheet */
 "CONTACT_PERMISSION_ACTION_SHEET_2_STEP_ONE" = "انقر على \"انتقِل إلى الإعدادات\" في الأسفل";
@@ -1925,10 +1925,10 @@
 "CONTACT_PERMISSION_REMINDER_MEGAPHONE_ACTION" = "منح الصلاحية";
 
 /* Body for contact permission reminder megaphone */
-"CONTACT_PERMISSION_REMINDER_MEGAPHONE_BODY" = "اسمح بالوصول إلى جهات اتصالك للعثور عليهم بسرعة على سيجنال.";
+"CONTACT_PERMISSION_REMINDER_MEGAPHONE_BODY" = "اسمح بالوصول إلى جهات اتصالك للعثور عليهم بسرعة على Radar.";
 
 /* Title for contact permission reminder megaphone */
-"CONTACT_PERMISSION_REMINDER_MEGAPHONE_TITLE" = "اعثر على جهات الاتصال على سيجنال";
+"CONTACT_PERMISSION_REMINDER_MEGAPHONE_TITLE" = "اعثر على جهات الاتصال على Radar";
 
 /* Label for a contact's phone number. */
 "CONTACT_PHONE" = "رقم الهاتف";
@@ -1952,7 +1952,7 @@
 "CONTACT_SHARE_INVALID_CONTACT" = "جهة اتصال غير صالحة";
 
 /* Alert body when contacts disabled while trying to share a contact. */
-"CONTACT_SHARING_NO_ACCESS_BODY" = "يحتاج سيجنال للوصول إلى جهات اتصالك. انتقِل إلى إعدادات iOS وفعِّل جهات اتصالك. جهات اتصالك مُشفَّرة وغير مرئية لخدمة سيجنال.";
+"CONTACT_SHARING_NO_ACCESS_BODY" = "يحتاج Radar للوصول إلى جهات اتصالك. انتقِل إلى إعدادات iOS وفعِّل جهات اتصالك. جهات اتصالك مُشفَّرة وغير مرئية لخدمة Radar.";
 
 /* Alert title when contacts disabled while trying to share a contact. */
 "CONTACT_SHARING_NO_ACCESS_TITLE" = "السماح بالوصول لجهات الاتصال";
@@ -2006,7 +2006,7 @@
 "CONTACT_SUPPORT_FILTER_SOMETHING_NOT_WORKING_SHORT" = "شيء ما لا يعمل";
 
 /* Alert body */
-"CONTACT_SUPPORT_PROMPT_ERROR_ALERT_BODY" = "تعذَّر على سيجنال إكمال طَلب الدعم الخاص بك.";
+"CONTACT_SUPPORT_PROMPT_ERROR_ALERT_BODY" = "تعذَّر على Radar إكمال طَلب الدعم الخاص بك.";
 
 /* button text */
 "CONTACT_SUPPORT_PROMPT_ERROR_TRY_AGAIN" = "حاوِل مُجدَّدًا";
@@ -2135,7 +2135,7 @@
 "CONVERSATION_SETTINGS_ATTRIBUTES_ACCESS_SECTION_FOOTER" = "اختَر الأعضاء الذين يمكنهم تحرير اسم وصورة المجموعة ووصفها وكذلك مؤقِّت اختفاء الرسائل.";
 
 /* Footer string for a contact's badges in conversation settings */
-"CONVERSATION_SETTINGS_BADGES_FOOTER" = "احصل على شارات لملفك الشخصي عن طريق دعم سيجنال. انقر على شارة لمعرفة المزيد.";
+"CONVERSATION_SETTINGS_BADGES_FOOTER" = "احصل على شارات لملفك الشخصي عن طريق دعم Radar. انقر على شارة لمعرفة المزيد.";
 
 /* Header title for a contact's badges in conversation settings */
 "CONVERSATION_SETTINGS_BADGES_HEADER" = "الشارات";
@@ -2393,7 +2393,7 @@
 "DATABASE_INTEGRITY_CHECK_ACTION_RUN" = "تشغيل";
 
 /* Message for alert before running a database integrity check */
-"DATABASE_INTEGRITY_CHECK_MESSAGE" = "سَيساعدنا هذا في حل مشكلتك وقد يستغرق استكماله عدة دقائق. يُمكنك إغلاق تطبيق سيجنال أثناء تشغيل هذا الفحص، ولكن يُرجى العودة لإرسال سِجلاتك.";
+"DATABASE_INTEGRITY_CHECK_MESSAGE" = "سَيساعدنا هذا في حل مشكلتك وقد يستغرق استكماله عدة دقائق. يُمكنك إغلاق تطبيق Radar أثناء تشغيل هذا الفحص، ولكن يُرجى العودة لإرسال سِجلاتك.";
 
 /* Button to skip database integrity check step */
 "DATABASE_INTEGRITY_CHECK_SKIP" = "تخطّي";
@@ -2417,10 +2417,10 @@
 "DATABASE_RECOVERY_MORE_STORAGE_SPACE_NEEDED_TITLE" = "مطلوب المزيد من مساحة التخزين";
 
 /* The user has tried to recover their data after it was lost due to corruption. (They have not been hacked.) This is the description on the screen where we show an error message. */
-"DATABASE_RECOVERY_RECOVERY_FAILED_DESCRIPTION" = "تعذَّرت استعادة سجل الرسائل الخاص بحسابك. يمكنك الاستمرار في استخدام تطبيق سيجنال بعد إعادة التثبيت. أرسِل سجل الأخطاء حتى نتمكن من فهم الخطأ الذي حدث بشكلٍ أفضل.";
+"DATABASE_RECOVERY_RECOVERY_FAILED_DESCRIPTION" = "تعذَّرت استعادة سجل الرسائل الخاص بحسابك. يمكنك الاستمرار في استخدام تطبيق Radar بعد إعادة التثبيت. أرسِل سجل الأخطاء حتى نتمكن من فهم الخطأ الذي حدث بشكلٍ أفضل.";
 
 /* The user has tried to recover their data after it was lost due to corruption. (They have not been hacked.) This button lets them delete all of their data. */
-"DATABASE_RECOVERY_RECOVERY_FAILED_RESET_APP_BUTTON" = "إعادة تعيين سيجنال";
+"DATABASE_RECOVERY_RECOVERY_FAILED_RESET_APP_BUTTON" = "إعادة تعيين Radar";
 
 /* The user has tried to recover their data after it was lost due to corruption. (They have not been hacked.) If they want to delete the app and restart, they will be presented with a confirmation dialog. This is the final button they will press before their data is reset. */
 "DATABASE_RECOVERY_RECOVERY_FAILED_RESET_APP_CONFIRMATION_CONFIRM" = "إعادة التعيين";
@@ -2429,7 +2429,7 @@
 "DATABASE_RECOVERY_RECOVERY_FAILED_RESET_APP_CONFIRMATION_DESCRIPTION" = "سيتمُّ إزالة معلومات حسابك وحسابك الشخصي وجميع رسائلك. سيتمُّ إغلاق التطبيق بعد اكتمال هذه العملية.";
 
 /* The user has tried to recover their data after it was lost due to corruption. (They have not been hacked.) If they want to delete the app and restart, they will be presented with a confirmation dialog. This is the title of that dialog. */
-"DATABASE_RECOVERY_RECOVERY_FAILED_RESET_APP_CONFIRMATION_TITLE" = "إعادة تعيين سيجنال";
+"DATABASE_RECOVERY_RECOVERY_FAILED_RESET_APP_CONFIRMATION_TITLE" = "إعادة تعيين Radar";
 
 /* The user has tried to recover their data after it was lost due to corruption. (They have not been hacked.) They were asked to submit a debug log. This is the button that submits this log. */
 "DATABASE_RECOVERY_RECOVERY_FAILED_SUBMIT_DEBUG_LOG_BUTTON" = "إرسال سجل الأخطاء";
@@ -2504,7 +2504,7 @@
 "DELETE_ACCOUNT_CONFIRMATION_ACTION_SHEEET_ACTION" = "حذف الحساب";
 
 /* Title for the action sheet message of the 'delete account confirmation' view controller. */
-"DELETE_ACCOUNT_CONFIRMATION_ACTION_SHEEET_MESSAGE" = "سيؤدي هذا إلى حذف حسابك على سيجنال وإعادة تعيين التطبيق. سيتمُّ إغلاق التطبيق بعد اكتمال هذه العملية.";
+"DELETE_ACCOUNT_CONFIRMATION_ACTION_SHEEET_MESSAGE" = "سيؤدي هذا إلى حذف حسابك على Radar وإعادة تعيين التطبيق. سيتمُّ إغلاق التطبيق بعد اكتمال هذه العملية.";
 
 /* Title for the action sheet confirmation title of the 'delete account confirmation' view controller. */
 "DELETE_ACCOUNT_CONFIRMATION_ACTION_SHEEET_TITLE" = "هل أنت متأكِّد مِن أنك تريد حذف حسابك؟";
@@ -2528,7 +2528,7 @@
 "DELETE_ACCOUNT_CONFIRMATION_PHONE_NUMBER_TITLE" = "رقم الهاتف";
 
 /* Section header */
-"DELETE_ACCOUNT_CONFIRMATION_SECTION_TITLE" = "قُم بتأكيد رقم سيجنال الخاص  بِك";
+"DELETE_ACCOUNT_CONFIRMATION_SECTION_TITLE" = "قُم بتأكيد رقم Radar الخاص  بِك";
 
 /* Title for the 'delete account' confirmation view. */
 "DELETE_ACCOUNT_CONFIRMATION_TITLE" = "حذف الحساب";
@@ -2575,7 +2575,7 @@
 
 
 /* Notification warning the user that they have been de-registered. */
-"DEREGISTRATION_NOTIFICATION" = "تمَّ تسجيل خروجك من تطبيق سيجنال على هذا الجهاز.";
+"DEREGISTRATION_NOTIFICATION" = "تمَّ تسجيل خروجك من تطبيق Radar على هذا الجهاز.";
 
 /* Button that lets users re-register using the same phone number. */
 "DEREGISTRATION_REREGISTER_BUTTON" = "إعادة-التسجيل";
@@ -2584,7 +2584,7 @@
 "DEREGISTRATION_REREGISTER_PROMPT_TITLE" = "هل ترغبُ بإعادة تسجيل رقم الهاتف هذا؟";
 
 /* Label warning the user that they have been de-registered. */
-"DEREGISTRATION_WARNING" = "هذا الجهاز لم يَعُد مُسجلًا. هذا على الأرجح بسبب قيامك بتسجيل رقم هاتفك على سيجنال باستخدام جهازٍ مختلف.";
+"DEREGISTRATION_WARNING" = "هذا الجهاز لم يَعُد مُسجلًا. هذا على الأرجح بسبب قيامك بتسجيل رقم هاتفك على Radar باستخدام جهازٍ مختلف.";
 
 /* If the user has been deregistered, they'll see a warning. This is This is the call to action on that warning. */
 "DEREGISTRATION_WARNING_ACTION_TITLE" = "أعِد تسجيل الجهاز";
@@ -2653,7 +2653,7 @@
 "DEVICE_TRANSFER_CONTRACT_QR_CODE_BUTTON" = "عرض بحجم أصغر";
 
 /* An error indicating that the other device closed signal mid-transfer and it could not complete */
-"DEVICE_TRANSFER_ERROR_BACKGROUNDED" = "تعذّر إتمام عملية النقل. احرص على إبقاء تطبيق سيجنال مفتوح في كلا الجهازين ثمَّ حاوِل مرّة أخرى.";
+"DEVICE_TRANSFER_ERROR_BACKGROUNDED" = "تعذّر إتمام عملية النقل. احرص على إبقاء تطبيق Radar مفتوح في كلا الجهازين ثمَّ حاوِل مرّة أخرى.";
 
 /* An error indicating that we were unable to verify the identity of the new device to complete the transfer */
 "DEVICE_TRANSFER_ERROR_CERTIFICATE_MISMATCH" = "تعذَّر التحقُّق من جهازك الجديد. يُرجى المحاولة مرّة أخرى.";
@@ -2671,13 +2671,13 @@
 "DEVICE_TRANSFER_ERROR_NOT_ENOUGH_SPACE" = "لا توجد مساحة خالية بشكلٍ كافٍ لإتمام النقل.";
 
 /* An error indicating the user must update their device before trying to transfer. */
-"DEVICE_TRANSFER_ERROR_UNSUPPORTED_VERSION" = "قُم بالتحديث إلى آخر إصدار مِن سيجنال ثم حاوِل مرّة أُخرى.";
+"DEVICE_TRANSFER_ERROR_UNSUPPORTED_VERSION" = "قُم بالتحديث إلى آخر إصدار مِن Radar ثم حاوِل مرّة أُخرى.";
 
 /* Button shown to expand a QR code and view it fullscreen. */
 "DEVICE_TRANSFER_EXPAND_QR_CODE_BUTTON" = "عرض بحجم أكبر";
 
 /* The explanation on the action sheet prompting the user if they want to transfer their device. */
-"DEVICE_TRANSFER_PROMPT_EXPLANATION" = "انقل حساب سيجنال الخاص بك إلى جهاز iOS جديد. تأكَّد من أن جهازك الجديد قريب و قيد التشغيل.";
+"DEVICE_TRANSFER_PROMPT_EXPLANATION" = "انقل حساب Radar الخاص بك إلى جهاز iOS جديد. تأكَّد من أن جهازك الجديد قريب و قيد التشغيل.";
 
 /* The title on the acttion sheet prompting the user if they want to transfer their device. */
 "DEVICE_TRANSFER_PROMPT_TITLE" = "نقل الحساب";
@@ -2695,7 +2695,7 @@
 "DEVICE_TRANSFER_QRCODE_TITLE" = "امسح ضوئيًا كود الـ QR";
 
 /* The explanation on the view that shows receiving progress */
-"DEVICE_TRANSFER_RECEIVING_EXPLANATION" = "أبقي الجهازين بالقرب من بعضهما البعض. لا تقُم بإيقاف تشغيل أيًا مِنهُما وحافِظ على سيجنال مفتوحًا. عمليات النقل مُشفَّرة من طرف لطرف.";
+"DEVICE_TRANSFER_RECEIVING_EXPLANATION" = "أبقي الجهازين بالقرب من بعضهما البعض. لا تقُم بإيقاف تشغيل أيًا مِنهُما وحافِظ على Radar مفتوحًا. عمليات النقل مُشفَّرة من طرف لطرف.";
 
 /* The title on the view that shows receiving progress */
 "DEVICE_TRANSFER_RECEIVING_TITLE" = "جارٍ استقبال البيانات";
@@ -2731,7 +2731,7 @@
 "DEVICE_TRANSFER_STATUS_NEW_DEVICE_TRANSFERRING" = "جارٍ النقل";
 
 /* Description in the progress view displayed during device transfer. */
-"DEVICE_TRANSFER_STATUS_NEW_DEVICE_TRANSFERRING_DESCRIPTION" = "أبقِ الجهازين بالقرب من بعضهما البعض. لا تقُم بإيقاف تشغيل أيًا مِنهُما وحافِظ على سيجنال مفتوحًا. عمليات النقل مُشفَّرة من طرف لطرف.";
+"DEVICE_TRANSFER_STATUS_NEW_DEVICE_TRANSFERRING_DESCRIPTION" = "أبقِ الجهازين بالقرب من بعضهما البعض. لا تقُم بإيقاف تشغيل أيًا مِنهُما وحافِظ على Radar مفتوحًا. عمليات النقل مُشفَّرة من طرف لطرف.";
 
 /* Status message on old device when cancelling transfer. */
 "DEVICE_TRANSFER_STATUS_OLD_DEVICE_CANCELLING" = "جارٍ إلغاء الاتصال بجهاز آيفون الجديد…";
@@ -2746,7 +2746,7 @@
 "DEVICE_TRANSFER_STATUS_OLD_DEVICE_STARTING" = "في انتظار الاتصال بجهاز آيفون الجديد…";
 
 /* The explanation on the action sheet that shows transfer progress */
-"DEVICE_TRANSFER_TRANSFERRING_EXPLANATION" = "أبقي الجهازين بالقرب من بعضهما البعض. لا تقُم بإيقاف تشغيل أيََا مِنهُما وأبقِ على سيجنال مفتوحًا.";
+"DEVICE_TRANSFER_TRANSFERRING_EXPLANATION" = "أبقي الجهازين بالقرب من بعضهما البعض. لا تقُم بإيقاف تشغيل أيََا مِنهُما وأبقِ على Radar مفتوحًا.";
 
 /* The title on the action sheet that shows transfer progress */
 "DEVICE_TRANSFER_TRANSFERRING_TITLE" = "جارٍ نقل البيانات";
@@ -2836,13 +2836,13 @@
 "DONATE_CHOOSE_PAYMENT_METHOD_SHEET_SUBTITLE_FOR_ONE_TIME_DONATION" = "احصل على شارة %1$@ لمدة 30 يومًا";
 
 /* When users make donations on a friend's behalf, they see a sheet that lets them pick a payment method. This is the title on that sheet. Embeds {{amount of money}}, such as \"$5\". */
-"DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_DONATION_ON_BEHALF_OF_A_FRIEND" = "%1$@ تبرَّع لسيجنال";
+"DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_DONATION_ON_BEHALF_OF_A_FRIEND" = "%1$@ تبرَّع لRadar";
 
 /* When users make monthly donations, they see a sheet that lets them pick a payment method. This is the title on that sheet. Embeds {{amount of money per month}}, such as \"$5/month\". */
-"DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_MONTHLY_DONATION" = "تبرَّع بـ %1$@ لسيجنال";
+"DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_MONTHLY_DONATION" = "تبرَّع بـ %1$@ لRadar";
 
 /* When users make one-time donations, they see a sheet that lets them pick a payment method. This is the title on that sheet. Embeds {{amount of money}}, such as \"$5\". */
-"DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_ONE_TIME_DONATION" = "تبرَّع بـ %1$@ لسيجنال";
+"DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_ONE_TIME_DONATION" = "تبرَّع بـ %1$@ لRadar";
 
 /* Users can donate on a friend's behalf and can optionally add a message. This is tells users about that optional message. */
 "DONATE_ON_BEHALF_OF_A_FRIEND_ADDITIONAL_MESSAGE_INFO" = "سَيتمُّ إخطار المُستلِم بالتبرُّع عبر رسالةٍ مباشرة منك إليه. أضِف رسالتك الخاصة أدناه.";
@@ -2959,7 +2959,7 @@
 "DONATION_ON_BEHALF_OF_A_FRIEND_BADGE_REDEEMED" = "مُستخدَم";
 
 /* Users can donate on behalf of a friend, and the friend will receive a badge. This is a short paragraph on the screen where users choose the badge their friend will receive. */
-"DONATION_ON_BEHALF_OF_A_FRIEND_CHOOSE_BADGE_DESCRIPTION" = "ادعم سيجنال عن طريق تقديم تبرُّع نيابةً عن صديق أو فرد من العائلة يستخدم سيجنال. سَيتمُّ منحهُم خيار إظهار دعمهم على حسابهم الشخصي.";
+"DONATION_ON_BEHALF_OF_A_FRIEND_CHOOSE_BADGE_DESCRIPTION" = "ادعم Radar عن طريق تقديم تبرُّع نيابةً عن صديق أو فرد من العائلة يستخدم Radar. سَيتمُّ منحهُم خيار إظهار دعمهم على حسابهم الشخصي.";
 
 /* Users can donate on behalf of a friend, and the friend will receive a badge. This is the title on the screen where users choose the badge their friend will receive. */
 "DONATION_ON_BEHALF_OF_A_FRIEND_CHOOSE_BADGE_TITLE" = "تبرَّع نيابةً عن صديق";
@@ -2983,7 +2983,7 @@
 "DONATION_ON_BEHALF_OF_A_FRIEND_PAYMENT_FAILED_ERROR_TITLE" = "فشِلت عملية الدفع";
 
 /* Users can donate on a friend's behalf. If the payment was processed but the donation failed to send, this error message will be shown. */
-"DONATION_ON_BEHALF_OF_A_FRIEND_PAYMENT_SUCCEEDED_BUT_MESSAGE_FAILED_ERROR_BODY" = "تمَّت مُعالجة عملية الدفع لديك، ولكن لم يتمكّن سيجنال من إرسال رسالة التبرُّع الخاصة بك. يُرجى التواصل مع فريق الدعم.";
+"DONATION_ON_BEHALF_OF_A_FRIEND_PAYMENT_SUCCEEDED_BUT_MESSAGE_FAILED_ERROR_BODY" = "تمَّت مُعالجة عملية الدفع لديك، ولكن لم يتمكّن Radar من إرسال رسالة التبرُّع الخاصة بك. يُرجى التواصل مع فريق الدعم.";
 
 /* Users can donate on a friend's behalf. If the payment was processed but the donation failed to send, an error dialog will be shown. This is the title of that dialog. */
 "DONATION_ON_BEHALF_OF_A_FRIEND_PAYMENT_SUCCEEDED_BUT_MESSAGE_FAILED_ERROR_TITLE" = "تعذَّر التبرُّع";
@@ -2995,7 +2995,7 @@
 "DONATION_ON_BEHALF_OF_A_FRIEND_PREVIEW_OUTGOING" = "✨قدّمتَ تبرُّعًا لـ %1$@";
 
 /* You received a donation from a friend. This is the title of that message in the chat. Embeds {{short contact name}}. */
-"DONATION_ON_BEHALF_OF_A_FRIEND_RECEIVED_TITLE_FORMAT" = "قدَّم %1$@ تبرُّعًا لسيجنال نيابةً عنك";
+"DONATION_ON_BEHALF_OF_A_FRIEND_RECEIVED_TITLE_FORMAT" = "قدَّم %1$@ تبرُّعًا لRadar نيابةً عنك";
 
 /* Users can donate on a friend's behalf. This is the error message that appears if the try to do this, but the recipient is blocked. */
 "DONATION_ON_BEHALF_OF_A_FRIEND_RECIPIENT_IS_BLOCKED_ERROR_BODY" = "لا يُمكنك تقديم تبرُّع لهذا المُستخدم لأنك قمتَ بحظره.";
@@ -3019,7 +3019,7 @@
 "DONATION_ON_BEHALF_OF_A_FRIEND_SENT_TITLE_FORMAT" = "التبرُّع نيابةً عن %1$@";
 
 /* When you donate on behalf of a friend, a thank-you sheet will appear. This is the text on that sheet. Embeds {{recipient name}}. */
-"DONATION_ON_BEHALF_OF_A_FRIEND_THANKS_BODY_FORMAT" = "قدَّمت تبرُّعًا لسيجنال نيابة عن %1$@. سَيتمُّ منحهم خيار إظهار دعمهم على حسابهم الشخصي.";
+"DONATION_ON_BEHALF_OF_A_FRIEND_THANKS_BODY_FORMAT" = "قدَّمت تبرُّعًا لRadar نيابة عن %1$@. سَيتمُّ منحهم خيار إظهار دعمهم على حسابهم الشخصي.";
 
 /* When you donate on behalf of a friend, a thank-you sheet will appear. This is the title on that sheet. */
 "DONATION_ON_BEHALF_OF_A_FRIEND_THANKS_TITLE" = "شكرًا لدعمك!";
@@ -3028,19 +3028,19 @@
 "DONATION_ON_BEHALF_OF_A_FRIEND_VIEW" = "عرض";
 
 /* A friend has donated on your behalf and you received a badge. This text says that you received a badge, and from whom. Embeds {{contact's short name, such as a first name}}. */
-"DONATION_ON_BEHALF_OF_A_FRIEND_YOU_RECEIVED_A_BADGE_FORMAT" = "قدَّم %1$@ تبرُّعًا لسيجنال نيابةً عنك! أظهِر دعمك لسيجنال على ملفك الشخصي.";
+"DONATION_ON_BEHALF_OF_A_FRIEND_YOU_RECEIVED_A_BADGE_FORMAT" = "قدَّم %1$@ تبرُّعًا لRadar نيابةً عنك! أظهِر دعمك لRadar على ملفك الشخصي.";
 
 /* There is a screen where users can read more about their donation to Signal. This is the 1st paragraph of that screen. */
 "DONATION_READ_MORE_SCREEN_PARAGRAPH_1" = "التراسل الخاص. تراسل خاص. بدون إعلانات، بدون مُتعقِّبات، بدون رقابة.";
 
 /* There is a screen where users can read more about their donation to Signal. This is the 2nd paragraph of that screen. */
-"DONATION_READ_MORE_SCREEN_PARAGRAPH_2" = "يتمُّ دعم سيجنال من خلال التبرُّعات، ممّا يعني أن خصوصيتك هي محور كل ما نقوم به. أُنشِئ تطبيق سيجنال من أجلك؛ لا لأجل بياناتك ولا لأجل الربح.";
+"DONATION_READ_MORE_SCREEN_PARAGRAPH_2" = "يتمُّ دعم Radar من خلال التبرُّعات، ممّا يعني أن خصوصيتك هي محور كل ما نقوم به. أُنشِئ تطبيق Radar من أجلك؛ لا لأجل بياناتك ولا لأجل الربح.";
 
 /* There is a screen where users can read more about their donation to Signal. This is the 3rd paragraph of that screen. */
-"DONATION_READ_MORE_SCREEN_PARAGRAPH_3" = "إذا استطعت، يُرجى التبرُّع اليوم للحفاظ على تطبيق سيجنال مُمتعًا وموثوقًا به ومتاحًا للجميع.";
+"DONATION_READ_MORE_SCREEN_PARAGRAPH_3" = "إذا استطعت، يُرجى التبرُّع اليوم للحفاظ على تطبيق Radar مُمتعًا وموثوقًا به ومتاحًا للجميع.";
 
 /* There is a screen where users can read more about their donation to Signal. This is the title of that screen. */
-"DONATION_READ_MORE_SCREEN_TITLE" = "سيجنال تطبيق مُختلف.";
+"DONATION_READ_MORE_SCREEN_TITLE" = "Radar تطبيق مُختلف.";
 
 /* Section title for donation amount on receipts */
 "DONATION_RECEIPT_AMOUNT" = "المبلغ";
@@ -3076,7 +3076,7 @@
 "DONATION_RECEIPTS" = "إيصالات التبرُّعات";
 
 /* Text at the bottom of the donation receipts list, telling users that receipts might not be available */
-"DONATION_RECEIPTS_MIGHT_BE_MISSING_IF_YOU_REINSTALLED" = "إذا أعدت تثبيت سيجنال، فلن تصبح إيصالات التبرُّعات السابقة متاحة.";
+"DONATION_RECEIPTS_MIGHT_BE_MISSING_IF_YOU_REINSTALLED" = "إذا أعدت تثبيت Radar، فلن تصبح إيصالات التبرُّعات السابقة متاحة.";
 
 /* Error message displayed if something goes wrong with 3DSecure/iDEAL payment authorization.  This will be encountered if the user cancels the webview before authrizing the payment. */
 "DONATION_REDIRECT_ERROR_CANCELLED_MESSAGE" = "أُلغيَت عملية الدفع. يُرجى المُحاولة مرّة أخرى.";
@@ -3091,7 +3091,7 @@
 "DONATION_SCREEN_DONATE_BUTTON" = "تبرَّع";
 
 /* On donation screens, a small amount of information text is shown. This is the subtitle for that text. */
-"DONATION_SCREENS_HEADER_DESCRIPTION" = "تراسُل خاص، مُموَّل من طرفك. بدون إعلانات، بدون مُتعقِّبات، بدون رقابة. تبرَّع الآن لدعم سيجنال.";
+"DONATION_SCREENS_HEADER_DESCRIPTION" = "تراسُل خاص، مُموَّل من طرفك. بدون إعلانات، بدون مُتعقِّبات، بدون رقابة. تبرَّع الآن لدعم Radar.";
 
 /* On donation screens, a small amount of information text is shown. Users can click this link to learn more information. */
 "DONATION_SCREENS_HEADER_READ_MORE" = "اقرأ المزيد";
@@ -3169,7 +3169,7 @@
 "DONATION_VIEW_DONATE_ON_BEHALF_OF_A_FRIEND" = "تبرَّع نيابةً عن صديق";
 
 /* Text describing to the user that they're going to pay a donation to Signal */
-"DONATION_VIEW_DONATION_TO_SIGNAL" = "التبرُّع لِسيجنال";
+"DONATION_VIEW_DONATION_TO_SIGNAL" = "التبرُّع لِRadar";
 
 /* Title for the 'Donor FAQ' button on the donation screen */
 "DONATION_VIEW_DONOR_FAQ" = "الأسئلة الشائعة للمُتبرِّعين";
@@ -3181,7 +3181,7 @@
 "DONATION_VIEW_MANAGE_BADGES" = "الشارات";
 
 /* Text describing to the user that they're going to pay a monthly donation to Signal */
-"DONATION_VIEW_MONTHLY_DONATION_TO_SIGNAL" = "التبرُّع الشهري لسيجنال";
+"DONATION_VIEW_MONTHLY_DONATION_TO_SIGNAL" = "التبرُّع الشهري لRadar";
 
 /* Title for the 'more' section on the donation screen */
 "DONATION_VIEW_MORE_SECTION_TITLE" = "المزيد";
@@ -3193,7 +3193,7 @@
 "DONATION_VIEW_OTHER_WAYS_TO_DONATE_TITLE" = "طُرُق أُخرَى لِلتَبرُّع";
 
 /* Title on the 'Donate to Signal' screen */
-"DONATION_VIEW_TITLE" = "تبرَّع لسيجنال";
+"DONATION_VIEW_TITLE" = "تبرَّع لRadar";
 
 /* Label for the currency picker button in donation views */
 "DONATIONS_CURRENCY_PICKER_LABEL" = "العملة";
@@ -3208,13 +3208,13 @@
 "EDIT_CONTACT_WITHOUT_CONTACTS_PERMISSION_ALERT_BODY" = "يُمكِنُك تمكين الوصول من خلال تطبيق إعدادات iOS.";
 
 /* Alert title for when the user has just tried to edit a contacts after declining to give Signal contacts permissions */
-"EDIT_CONTACT_WITHOUT_CONTACTS_PERMISSION_ALERT_TITLE" = "يحتاج سيجنال صلاحية الوصول إلى جهات الاتصال من اجل تعديل البيانات الخاصة بجهة الإتصال";
+"EDIT_CONTACT_WITHOUT_CONTACTS_PERMISSION_ALERT_TITLE" = "يحتاج Radar صلاحية الوصول إلى جهات الاتصال من اجل تعديل البيانات الخاصة بجهة الإتصال";
 
 /* The navbar title for the 'update group' view. */
 "EDIT_GROUP_DEFAULT_TITLE" = "تعديل المجموعة";
 
 /* Error message indicating the a user can't be added to a group. */
-"EDIT_GROUP_ERROR_CANNOT_ADD_MEMBER" = "لا يُمكن إضافة هذا المُستخدِم إلى المجموعة حتى يُحدِّث سيجنال.";
+"EDIT_GROUP_ERROR_CANNOT_ADD_MEMBER" = "لا يُمكن إضافة هذا المُستخدِم إلى المجموعة حتى يُحدِّث Radar.";
 
 /* Error message indicating that an avatar image is invalid and cannot be used. */
 "EDIT_GROUP_ERROR_INVALID_AVATAR" = "صورة غير صالحة";
@@ -3241,13 +3241,13 @@
 "EDIT_MESSAGE_SEND_MESSAGE_UNKNOWN_ERROR" = "EDIT_MESSAGE_SEND_MESSAGE_UNKNOWN_ERROR";
 
 /* body of email sent to contacts when inviting to install Signal. Embeds {{link to install Signal}} and {{link to the Signal home page}} */
-"EMAIL_INVITE_BODY" = "مرحبًا،\n\nمؤخّرًا كُنتُ أستخدِم سيجنال لإبقاء الدردشات على جهاز الآيفون خاصة. أريدُ منك القيام بتثبيته أيضًا، بحيث نكون واثقين من أنك أنت فقط وأنا يُمكننا قراءة رسائلنا أو سماع مكالماتنا.\n\nسيجنال مُتوفِّر للآيفون والأندرويد والكمبيوتر المكتبي. احصل عليه هنا: %1$@\n\n يعمل سيجنال مثل تطبيق المراسلة الحالي لديك. يُمكننا إرسال الصور ومقاطع الفيديو، وإجراء المكالمات، والبدء بالدردشات الجماعية. أفضل ما في الأمر هو أنه، لا يمكن لأي أحد آخر رؤية أي من تلك المراسلات، ولا حتى الأشخاص القائمين على سيجنال!\n\nيُمكنك قراءة المزيد حول سيجنال هنا: %2$@";
+"EMAIL_INVITE_BODY" = "مرحبًا،\n\nمؤخّرًا كُنتُ أستخدِم Radar لإبقاء الدردشات على جهاز الآيفون خاصة. أريدُ منك القيام بتثبيته أيضًا، بحيث نكون واثقين من أنك أنت فقط وأنا يُمكننا قراءة رسائلنا أو سماع مكالماتنا.\n\nRadar مُتوفِّر للآيفون والأندرويد والكمبيوتر المكتبي. احصل عليه هنا: %1$@\n\n يعمل Radar مثل تطبيق المراسلة الحالي لديك. يُمكننا إرسال الصور ومقاطع الفيديو، وإجراء المكالمات، والبدء بالدردشات الجماعية. أفضل ما في الأمر هو أنه، لا يمكن لأي أحد آخر رؤية أي من تلك المراسلات، ولا حتى الأشخاص القائمين على Radar!\n\nيُمكنك قراءة المزيد حول Radar هنا: %2$@";
 
 /* subject of email sent to contacts when inviting to install Signal */
-"EMAIL_INVITE_SUBJECT" = "لننتقل إلى سيجنال";
+"EMAIL_INVITE_SUBJECT" = "لننتقل إلى Radar";
 
 /* Description for the fallback support sheet if user cannot send email */
-"EMAIL_SIGNAL_MESSAGE" = "لم يتمّ تجهيز جهازك لإرسال رسائل إلكترونية. لإرسال طلب دعم، قُم بإعداد رسالة إلكترونية على جهازك أو أرسِل رسالة إلكترونية إلى support@signal.org";
+"EMAIL_SIGNAL_MESSAGE" = "لم يتمّ تجهيز جهازك لإرسال رسائل إلكترونية. لإرسال طلب دعم، قُم بإعداد رسالة إلكترونية على جهازك أو أرسِل رسالة إلكترونية إلى support@radar.chat";
 
 /* Title for the fallback support sheet if user cannot send email */
 "EMAIL_SIGNAL_TITLE" = "البريد الإلكتروني غير متاح";
@@ -3283,7 +3283,7 @@
 "EMOJI_CATEGORY_TRAVEL_NAME" = "السفر والأماكن";
 
 /* Full width label displayed when attempting to compose message */
-"EMPTY_CONTACTS_LABEL_LINE1" = "لا أحد من جهات اتصالك لديه سيجنال.";
+"EMPTY_CONTACTS_LABEL_LINE1" = "لا أحد من جهات اتصالك لديه Radar.";
 
 /* Full width label displayed when attempting to compose message */
 "EMPTY_CONTACTS_LABEL_LINE2" = "لمَ لا تدعُ أحدهم؟";
@@ -3349,7 +3349,7 @@
 "ERROR_DESCRIPTION_UNKNOWN_ERROR" = "حدث خطأ مجهول.";
 
 /* Error message when attempting to send message */
-"ERROR_DESCRIPTION_UNREGISTERED_RECIPIENT" = "تعذَّر إرسال الرسالة لأن هذا الشخص لم يعد يستخدم سيجنال.";
+"ERROR_DESCRIPTION_UNREGISTERED_RECIPIENT" = "تعذَّر إرسال الرسالة لأن هذا الشخص لم يعد يستخدم Radar.";
 
 /* Error message indicating that attachment upload(s) failed. */
 "ERROR_MESSAGE_ATTACHMENT_UPLOAD_FAILED" = "فشل تحميل الملف المُرفَق.";
@@ -3394,10 +3394,10 @@
 "ERROR_NETWORK_FAILURE" = "خطأ في الشبكة";
 
 /* Format string for an error alert notification message. Embeds {{ error string }} */
-"ERROR_NOTIFICATION_MESSAGE_FORMAT" = "‫نرجو منك مساعدتنا على تحسين سيجنال، وذلك بالإبلاغ عن هذا الخطأ مع إرفاق سِجلات الأخطاء من جهازك إلى support@signal.org؛ %1$@";
+"ERROR_NOTIFICATION_MESSAGE_FORMAT" = "‫نرجو منك مساعدتنا على تحسين Radar، وذلك بالإبلاغ عن هذا الخطأ مع إرفاق سِجلات الأخطاء من جهازك إلى support@radar.chat؛ %1$@";
 
 /* Format string for an error alert notification title. */
-"ERROR_NOTIFICATION_TITLE" = "‫إصدار سيجنال التجريبي‬: حدث خطأ ما";
+"ERROR_NOTIFICATION_TITLE" = "‫إصدار Radar التجريبي‬: حدث خطأ ما";
 
 /* Error indicating a send failure due to a delinked application. */
 "ERROR_SENDING_DELINKED" = "لم يعد جهازك مُرتبطًا. يُرجى إعادة ربطه لإرسال رسائل مستقبلًا.";
@@ -3406,7 +3406,7 @@
 "ERROR_SENDING_DEREGISTERED" = "لم يعد جهازك مُسجَّلًا. يُرجى إعادة التسجيل لإرسال رسائل مُستقبلًا.";
 
 /* Error indicating a send failure due to an expired application. */
-"ERROR_SENDING_EXPIRED" = "انتهت صلاحية إصدار سيجنال الخاص بك. يُرجى تحديثه لإرسال رسائل مُستقبلًا.";
+"ERROR_SENDING_EXPIRED" = "انتهت صلاحية إصدار Radar الخاص بك. يُرجى تحديثه لإرسال رسائل مُستقبلًا.";
 
 /* Format string for 'unregistered user' error. Embeds {{the unregistered user's name or signal id}}. */
 "ERROR_UNREGISTERED_USER_FORMAT" = "مُستخدم غير مُسجَّل: %1$@";
@@ -3418,19 +3418,19 @@
 "EXIT_REREGISTRATION" = "الخروج من التسجيل";
 
 /* Label notifying the user that the app has expired. */
-"EXPIRATION_ERROR" = "انتهت صلاحية هذا الإصدار من سيجنال. قُم بالتحديث لترسل وتستلم الرسائل.";
+"EXPIRATION_ERROR" = "انتهت صلاحية هذا الإصدار من Radar. قُم بالتحديث لترسل وتستلم الرسائل.";
 
 /* If the user's app is too old, they'll be shown a warning asking them to upgrade. This is the text on the warning, and tapping it will open the App Store page for Signal. */
 "EXPIRATION_WARNING_ACTION_TITLE" = "حدِّث الآن";
 
 /* Label warning the user that the app will expire soon. Embeds {{date}}. */
-"EXPIRATION_WARNING_SOON" = "سَتنتهي صلاحية هذا الإصدار من سيجنال في %1$@. قُم بالتحديث لتواصل المراسلة.";
+"EXPIRATION_WARNING_SOON" = "سَتنتهي صلاحية هذا الإصدار من Radar في %1$@. قُم بالتحديث لتواصل المراسلة.";
 
 /* Label warning the user that the app will expire today. */
-"EXPIRATION_WARNING_TODAY" = "سَتنتهي صلاحية هذا الإصدار من سيجنال اليوم. قُم بالتحديث لتواصل المراسلة.";
+"EXPIRATION_WARNING_TODAY" = "سَتنتهي صلاحية هذا الإصدار من Radar اليوم. قُم بالتحديث لتواصل المراسلة.";
 
 /* action sheet header when re-sending message which failed because of an invalid key signature */
-"FAILED_SENDING_BECAUSE_INVALID_KEY_SIGNATURE" = "تعذَّر إرسال الرسالة لأن %1$@ يَحتاج إلى تحديث تطبيق سيجنال وفتحه.";
+"FAILED_SENDING_BECAUSE_INVALID_KEY_SIGNATURE" = "تعذَّر إرسال الرسالة لأن %1$@ يَحتاج إلى تحديث تطبيق Radar وفتحه.";
 
 /* action sheet header when re-sending message which failed because of untrusted identity keys */
 "FAILED_SENDING_BECAUSE_UNTRUSTED_IDENTITY_KEY" = "تغيَّر رقم الأمان الخاص بك مع %1$@ مؤخَّرًا. قد ترغب بالتحقُّق منه قبل إرسال هذه الرسالة مُجدَّدًا.";
@@ -3745,10 +3745,10 @@
 "GROUP_CALL_WILL_NOTIFY_TWO_PEOPLE_FORMAT" = "سَيتمُّ إشعار %1$@ و%2$@";
 
 /* Text shown before the user starts a group call if the user has enabled ringing and there is one other person in the group. Embeds {member name} */
-"GROUP_CALL_WILL_RING_ONE_PERSON_FORMAT" = "سَيتصل سيجنال بـ %1$@";
+"GROUP_CALL_WILL_RING_ONE_PERSON_FORMAT" = "سَيتصل Radar بـ %1$@";
 
 /* Text shown before the user starts a group call if the user has enabled ringing and there are two other people in the group. Embeds {{ %1$@ participant1, %2$@ participant2 }} */
-"GROUP_CALL_WILL_RING_TWO_PEOPLE_FORMAT" = "سَيتصل سيجنال بـ %1$@ و%2$@";
+"GROUP_CALL_WILL_RING_TWO_PEOPLE_FORMAT" = "سَيتصل Radar بـ %1$@ و%2$@";
 
 /* Text explaining that you are in the group call. */
 "GROUP_CALL_YOU_ARE_HERE" = "أنت في مُكالمة جماعية";
@@ -3958,7 +3958,7 @@
 "GROUP_LINK_VIEW_SHARE_LINK_VIA_QR_CODE" = "كود الـ QR";
 
 /* Label for the 'share group link via Signal' button in the 'group link' view. */
-"GROUP_LINK_VIEW_SHARE_LINK_VIA_SIGNAL" = "مشاركة عبر سيجنال";
+"GROUP_LINK_VIEW_SHARE_LINK_VIA_SIGNAL" = "مشاركة عبر Radar";
 
 /* Message for the 'share group link' action sheet in the 'group link' view. */
 "GROUP_LINK_VIEW_SHARE_SHEET_MESSAGE" = "أي شخص لديه هذا الرابط يُمكنه رؤية اسم هذه المجموعة وأعضائها وإرسال طلب للانضمام. شاركه مع من تثق به.";
@@ -4366,13 +4366,13 @@
 "HOME_VIEW_DRAFT_PREFIX" = "مُسوَّدَة: ";
 
 /* Format string for a label offering to start a new conversation with your contacts, if you have 1 Signal contact.  Embeds {{The name of 1 of your Signal contacts}}. */
-"HOME_VIEW_FIRST_CONVERSATION_OFFER_1_CONTACT_FORMAT" = "بعض جهات اتصالك بالفعل في سيجنال، بما في ذلك %1$@.";
+"HOME_VIEW_FIRST_CONVERSATION_OFFER_1_CONTACT_FORMAT" = "بعض جهات اتصالك بالفعل في Radar، بما في ذلك %1$@.";
 
 /* Format string for a label offering to start a new conversation with your contacts, if you have 2 Signal contacts.  Embeds {{The names of 2 of your Signal contacts}}. */
-"HOME_VIEW_FIRST_CONVERSATION_OFFER_2_CONTACTS_FORMAT" = "بعض جهات اتصالك بالفعل في سيجنال، بما في ذلك %1$@ و%2$@.";
+"HOME_VIEW_FIRST_CONVERSATION_OFFER_2_CONTACTS_FORMAT" = "بعض جهات اتصالك بالفعل في Radar، بما في ذلك %1$@ و%2$@.";
 
 /* Format string for a label offering to start a new conversation with your contacts, if you have at least 3 Signal contacts.  Embeds {{The names of 3 of your Signal contacts}}. */
-"HOME_VIEW_FIRST_CONVERSATION_OFFER_3_CONTACTS_FORMAT" = "بعض جهات اتصالك بالفعل في سيجنال، بما في ذلك %1$@، %2$@ و%3$@";
+"HOME_VIEW_FIRST_CONVERSATION_OFFER_3_CONTACTS_FORMAT" = "بعض جهات اتصالك بالفعل في Radar، بما في ذلك %1$@، %2$@ و%3$@";
 
 /* A label offering to start a new conversation with your contacts, if you have no Signal contacts. */
 "HOME_VIEW_FIRST_CONVERSATION_OFFER_NO_CONTACTS" = "اِبدأ أوَّلَ دردشة لكَ مِن هُنا.";
@@ -4468,7 +4468,7 @@
 "INACTIVE_LINKED_DEVICE_REMINDER_MEGAPHONE_TITLE" = "جهاز مُرتبِط غير نشِط";
 
 /* Body for an in-app megaphone about a user's inactive primary device. */
-"INACTIVE_PRIMARY_DEVICE_REMINDER_MEGAPHONE_BODY" = "لإبقاء حسابك نشِطًا، افتح سيجنال على جهازك الأساسي.";
+"INACTIVE_PRIMARY_DEVICE_REMINDER_MEGAPHONE_BODY" = "لإبقاء حسابك نشِطًا، افتح Radar على جهازك الأساسي.";
 
 /* Title for a button in an in-app megaphone about a user's inactive primary device, temporarily dismissing the megaphone. */
 "INACTIVE_PRIMARY_DEVICE_REMINDER_MEGAPHONE_GOT_IT_BUTTON" = "تم";
@@ -4477,7 +4477,7 @@
 "INACTIVE_PRIMARY_DEVICE_REMINDER_MEGAPHONE_LEARN_MORE_BUTTON" = "اعرف المزيد";
 
 /* Title for an in-app megaphone about a user's inactive primary device. */
-"INACTIVE_PRIMARY_DEVICE_REMINDER_MEGAPHONE_TITLE" = "افتح تطبيق سيجنال على هاتفك";
+"INACTIVE_PRIMARY_DEVICE_REMINDER_MEGAPHONE_TITLE" = "افتح تطبيق Radar على هاتفك";
 
 /* Label reminding the user that they are in archive mode, and that muted chats remain archived when they receive a new message. */
 "INBOX_VIEW_ARCHIVE_MODE_MUTED_CHATS_REMINDER" = "الدردشات المكتومة المؤرشفة سَتبقى كذلك عند وصول رسالة جديدة.";
@@ -4513,10 +4513,10 @@
 "INFO_MESSAGE_BLOCKED_OTHER_USER" = "حظرتَ هذا الشخص.";
 
 /* Indicates that a previously-removed recipient has been added back to the current user's contacts. */
-"INFO_MESSAGE_CONTACT_REINSTATED" = "أُضيفَ هذا الشخص من جديد إلى لائحة جهات اتصال سيجنال الخاصة بك.";
+"INFO_MESSAGE_CONTACT_REINSTATED" = "أُضيفَ هذا الشخص من جديد إلى لائحة جهات اتصال Radar الخاصة بك.";
 
 /* Indicates that the recipient has been removed from the current user's contacts and that messaging them will re-add them. */
-"INFO_MESSAGE_CONTACT_REMOVED" = "أزلتَ هذا الشخص من لائحة جهات اتصال سيجنال الخاصة بك، وسيَرجع إلى اللائحة إذا راسلته.";
+"INFO_MESSAGE_CONTACT_REMOVED" = "أزلتَ هذا الشخص من لائحة جهات اتصال Radar الخاصة بك، وسيَرجع إلى اللائحة إذا راسلته.";
 
 /* When you start a chat with someone and then later learn their profile name, we insert an in-chat message with this string to record the identifier you originally used to contact them. Embeds {{ the identifier, either a phone number or a username }}. */
 "INFO_MESSAGE_LEARNED_PROFILE_KEY" = "بدأتَ الدردشة مع %1$@.";
@@ -4537,7 +4537,7 @@
 "INFO_MESSAGE_REPORTED_SPAM" = "تمَّ الإبلاغ عنها كرسالة غير مرغوب فيها";
 
 /* Body message of the alert shown when a user taps on 'learn more' via the spam info message. */
-"INFO_MESSAGE_REPORTED_SPAM_LEARN_MORE_MESSAGE" = "تمَّ إبلاغ سيجنال بأن هذا الشخص قد يكون أرسل رسائل غير مرغوب فيها. لا يُمكِن لسيجنال رؤية محتوى أي دردشات.";
+"INFO_MESSAGE_REPORTED_SPAM_LEARN_MORE_MESSAGE" = "تمَّ إبلاغ Radar بأن هذا الشخص قد يكون أرسل رسائل غير مرغوب فيها. لا يُمكِن لRadar رؤية محتوى أي دردشات.";
 
 /* Title of the alert shown when a user taps on 'learn more' via the spam info message. */
 "INFO_MESSAGE_REPORTED_SPAM_LEARN_MORE_TITLE" = "تمَّ الإبلاغ عنها كرسالة غير مرغوب فيها";
@@ -4555,7 +4555,7 @@
 "INFO_MESSAGE_USER_CHANGED_PHONE_NUMBER_FORMAT" = "%1$@ غيَّرَ رقم هاتفِه.";
 
 /* Shown in inbox and conversation when a user joins Signal, embeds the new user's {{contact name}} */
-"INFO_MESSAGE_USER_JOINED_SIGNAL_BODY_FORMAT" = "%1$@ متواجد على سيجنال!";
+"INFO_MESSAGE_USER_JOINED_SIGNAL_BODY_FORMAT" = "%1$@ متواجد على Radar!";
 
 /* Label at the top of the input text when editing a message */
 "INPUT_TOOLBAR_EDIT_MESSAGE_LABEL" = "تعديل الرسالة";
@@ -4582,13 +4582,13 @@
 "INVALID_PROXY_HOST_ERROR" = "عنوان البروكسي الذي أدخلته غير صحيح. يُرجى التحقُّق من العنوان والمحاولة مرّة أخرى.";
 
 /* Alert body when contacts disabled while trying to invite contacts to signal */
-"INVITE_FLOW_REQUIRES_CONTACT_ACCESS_BODY" = "يمكنك تفعيل الوصول إلى جهات الاتصال في إعدادات iOS على جهازك لدعوة أصدقائك للانضمام إلى سيجنال.";
+"INVITE_FLOW_REQUIRES_CONTACT_ACCESS_BODY" = "يمكنك تفعيل الوصول إلى جهات الاتصال في إعدادات iOS على جهازك لدعوة أصدقائك للانضمام إلى Radar.";
 
 /* Alert title when contacts disabled while trying to invite contacts to signal */
 "INVITE_FLOW_REQUIRES_CONTACT_ACCESS_TITLE" = "السماح بالوصول لجهات الاتصال";
 
 /* Label for the cell that presents the 'invite contacts' workflow. */
-"INVITE_FRIENDS_CONTACT_TABLE_BUTTON" = "اُدْعُ الأصدقاء إلى سيجنال";
+"INVITE_FRIENDS_CONTACT_TABLE_BUTTON" = "اُدْعُ الأصدقاء إلى Radar";
 
 /* Header label above a section for more options for adding contacts */
 "INVITE_FRIENDS_CONTACT_TABLE_HEADER" = "المزيد";
@@ -4711,7 +4711,7 @@
 "LINK_DEVICE_SCANNING_INSTRUCTIONS_SHEET_TITLE" = "امسح ضوئيًا كود الـ QR";
 
 /* Body text for a sheet when a user tries to link a device informing them that they will need to authenticate their device */
-"LINK_NEW_DEVICE_AUTHENTICATION_INFO_SHEET_BODY" = "انقر على \"متابعة\" وأدخِل قفل هاتفك للتأكيد. لا تُدخِل رقم التعريف الشخصي (PIN) على سيجنال الخاص بك.";
+"LINK_NEW_DEVICE_AUTHENTICATION_INFO_SHEET_BODY" = "انقر على \"متابعة\" وأدخِل قفل هاتفك للتأكيد. لا تُدخِل رقم التعريف الشخصي (PIN) على Radar الخاص بك.";
 
 /* Title for a sheet when a user tries to link a device informing them that they will need to authenticate their device */
 "LINK_NEW_DEVICE_AUTHENTICATION_INFO_SHEET_TITLE" = "قبل الربط، أكِّد هويتك";
@@ -4720,7 +4720,7 @@
 "LINK_NEW_DEVICE_AUTHENTICATION_REASON" = "تحقّق لربط جهاز";
 
 /* Body text for a sheet when a user has started linking a device informing them to finish the process on that other device */
-"LINK_NEW_DEVICE_FINISH_ON_OTHER_DEVICE_SHEET_BODY" = "استكمِل إنهاء ربط سيجنال على جهازك الآخر.";
+"LINK_NEW_DEVICE_FINISH_ON_OTHER_DEVICE_SHEET_BODY" = "استكمِل إنهاء ربط Radar على جهازك الآخر.";
 
 /* Title for a sheet when a user has started linking a device informing them to finish the process on that other device */
 "LINK_NEW_DEVICE_FINISH_ON_OTHER_DEVICE_SHEET_TITLE" = "استكمِل إنهاء الربط على جهازك الآخر.";
@@ -4762,10 +4762,10 @@
 "LINK_PREVIEW_UNKNOWN_DOMAIN" = "مُعاينة الرابط";
 
 /* Shown in an alert when trying to edit a contact. */
-"LINKED_DEVICE_CONTACTS_NOT_ALLOWED" = "لم تعد إدارة جهات اتصال الهاتف متاحة على جهاز الآيباد. لإضافة جهات اتصال سيجنال إلى جهات اتصال هاتفك، افتح تطبيق سيجنال على هاتفك.";
+"LINKED_DEVICE_CONTACTS_NOT_ALLOWED" = "لم تعد إدارة جهات اتصال الهاتف متاحة على جهاز الآيباد. لإضافة جهات اتصال Radar إلى جهات اتصال هاتفك، افتح تطبيق Radar على هاتفك.";
 
 /* Shown in a banner when you tap the 'New Chat' icon at the top of the list of chats. */
-"LINKED_DEVICE_MANAGE_CONTACTS_BANNER" = "لم تعد إدارة جهات اتصال الهاتف مدعومة على جهاز الآيباد. سَيستمر هذا الجهاز في مزامنة أي تغييرات طرأت على قائمة جهات اتصالك من سيجنال على هاتفك.";
+"LINKED_DEVICE_MANAGE_CONTACTS_BANNER" = "لم تعد إدارة جهات اتصال الهاتف مدعومة على جهاز الآيباد. سَيستمر هذا الجهاز في مزامنة أي تغييرات طرأت على قائمة جهات اتصالك من Radar على هاتفك.";
 
 /* A button shown in a banner when you tap the 'New Chat' icon at the top of the list of chats. Tapping it opens a website with more details. */
 "LINKED_DEVICE_MANAGE_CONTACTS_LEARN_MORE" = "اعرف المزيد";
@@ -4780,28 +4780,28 @@
 "LINKED_DEVICE_NOTIFICATION_TITLE" = "قُمتَ بربط جهازٍ جديد";
 
 /* Message for an action sheet telling users how to link a device, when trying to open an external device-linking URL. */
-"LINKED_DEVICE_URL_OPENED_ACTION_SHEET_EXTERNAL_URL_MESSAGE" = "لِربط حاسوب أو جهاز آيباد بحساب سيجنال هذا، انتقِل إلى \"الأجهزة المُرتبِطة\" وانقر على \"ربط جهاز جديد\" وامسح ضوئيًا كود الـ QR من جديد. تأكَّد من مسح كودات الـ QR الصادرة مباشرةً عن سيجنال فقط.";
+"LINKED_DEVICE_URL_OPENED_ACTION_SHEET_EXTERNAL_URL_MESSAGE" = "لِربط حاسوب أو جهاز آيباد بحساب Radar هذا، انتقِل إلى \"الأجهزة المُرتبِطة\" وانقر على \"ربط جهاز جديد\" وامسح ضوئيًا كود الـ QR من جديد. تأكَّد من مسح كودات الـ QR الصادرة مباشرةً عن Radar فقط.";
 
 /* Message for an action sheet telling users how to link a device, when trying to open a device-linking URL from the in-app camera. */
-"LINKED_DEVICE_URL_OPENED_ACTION_SHEET_IN_APP_CAMERA_MESSAGE" = "يبدو أنك تحاول ربط جهاز يستخدم سيجنال. انقر على \"متابعة\" ثم انقر على \"ربط جهاز جديد\" وامسح كود الـ QR من جديد.";
+"LINKED_DEVICE_URL_OPENED_ACTION_SHEET_IN_APP_CAMERA_MESSAGE" = "يبدو أنك تحاول ربط جهاز يستخدم Radar. انقر على \"متابعة\" ثم انقر على \"ربط جهاز جديد\" وامسح كود الـ QR من جديد.";
 
 /* Bullet point about downloads on the linked devices education sheet. Embeds {{ %1$@ iPad download link, %2$@ desktop download link }} */
 "LINKED_DEVICES_EDUCATION_POINT_DOWNLOADS" = "قُم بزيارة %1$@ لتثبيت تطبيق iPad أو %2$@ على جهازك لتثبيت نسخة التطبيق الخاصة بالحاسوب.";
 
 /* Bullet point about message sync on the linked devices education sheet */
-"LINKED_DEVICES_EDUCATION_POINT_MESSAGES" = "تتمُّ مُزامنة رسائل تطبيق سيجنال مع تطبيق سيجنال على هاتفك المحمول بعد ربطه.";
+"LINKED_DEVICES_EDUCATION_POINT_MESSAGES" = "تتمُّ مُزامنة رسائل تطبيق Radar مع تطبيق Radar على هاتفك المحمول بعد ربطه.";
 
 /* Bullet point about privacy on the linked devices education sheet */
 "LINKED_DEVICES_EDUCATION_POINT_PRIVACY" = "تتَّسِم جميع المراسلات في الأجهزة المُرتبِطة بالخصوصية.";
 
 /* Title for the linked device education sheet */
-"LINKED_DEVICES_EDUCATION_TITLE" = "تطبيق سيجنال على الحاسوب المكتبي أو جهاز الآيباد";
+"LINKED_DEVICES_EDUCATION_TITLE" = "تطبيق Radar على الحاسوب المكتبي أو جهاز الآيباد";
 
 /* Text that appears where the linked device list would be indicating that there are no linked devices. */
 "LINKED_DEVICES_EMPTY_STATE" = "لا توجد أجهزة مُرتبِطة";
 
 /* Description for header of the linked devices list */
-"LINKED_DEVICES_HEADER_DESCRIPTION" = "Use Signal on desktop or iPad.";
+"LINKED_DEVICES_HEADER_DESCRIPTION" = "Use Radar on desktop or iPad.";
 
 /* Footer text below the list of currently-linked devices */
 "LINKED_DEVICES_LIST_FOOTER" = "معلومات الرسائل والدردشات محمية من خلال التشفير من طرف لِطرف على جميع الأجهزة.";
@@ -4846,7 +4846,7 @@
 "LOADING_VIEW_CONTROLLER_DONT_CLOSE_APP" = "لا تغلق التطبيق.";
 
 /* Body for local network permission action sheet */
-"LOCAL_NETWORK_PERMISSION_ACTION_SHEET_BODY" = "من أجل نقل حساب سيجنال الخاص بك، يجب عليك تفعيل الوصول إلى الشبكة المحلية في كلا الجهازين.";
+"LOCAL_NETWORK_PERMISSION_ACTION_SHEET_BODY" = "من أجل نقل حساب Radar الخاص بك، يجب عليك تفعيل الوصول إلى الشبكة المحلية في كلا الجهازين.";
 
 /* A button asking the user if they need further help getting their transfer working. */
 "LOCAL_NETWORK_PERMISSION_ACTION_SHEET_NEED_HELP" = "هل تحتاج لمُساعدة؟";
@@ -4858,7 +4858,7 @@
 "LOCAL_NETWORK_PERMISSION_ACTION_SHEET_STEP_THREE" = "تشغيل \"الشبكة المحلية\"";
 
 /* Second step for local network permission action sheet */
-"LOCAL_NETWORK_PERMISSION_ACTION_SHEET_STEP_TWO" = "انتقل إلى سيجنال";
+"LOCAL_NETWORK_PERMISSION_ACTION_SHEET_STEP_TWO" = "انتقل إلى Radar";
 
 /* Title for local network permission action sheet */
 "LOCAL_NETWORK_PERMISSION_ACTION_SHEET_TITLE" = "تشغيل الوصول إلى الشبكة المحلية";
@@ -4873,7 +4873,7 @@
 "LOGGING_SECTION" = "التسجيل";
 
 /* Footer for the 'logging' help section. */
-"LOGGING_SECTION_FOOTER" = "سجلات الأخطاء يمكن أن تساعد سيجنال على إصلاح المشكلات والأخطاء.";
+"LOGGING_SECTION_FOOTER" = "سجلات الأخطاء يمكن أن تساعد Radar على إصلاح المشكلات والأخطاء.";
 
 /* Title for the 'long text message' view. */
 "LONG_TEXT_VIEW_TITLE" = "الرسالة";
@@ -4975,7 +4975,7 @@
 "MESSAGE_ACTION_DELETE_FOR_EVERYONE" = "حذف للجميع";
 
 /* A one-time confirmation that you want to delete for everyone */
-"MESSAGE_ACTION_DELETE_FOR_EVERYONE_CONFIRMATION" = "ستُحذَف هذه الرسالة لأي شخص في هذه الدردشة إن كان يستخدم إصدار حديث مِن سيجنال. سيكون بمقدوره رؤية أنك قد حذفت رسالة.";
+"MESSAGE_ACTION_DELETE_FOR_EVERYONE_CONFIRMATION" = "ستُحذَف هذه الرسالة لأي شخص في هذه الدردشة إن كان يستخدم إصدار حديث مِن Radar. سيكون بمقدوره رؤية أنك قد حذفت رسالة.";
 
 /* The title for the action sheet asking who the user wants to delete the message for. */
 "MESSAGE_ACTION_DELETE_FOR_TITLE" = "من هم الأشخاص الذين تريد حذف هذه الرسالة لديهم؟";
@@ -5020,7 +5020,7 @@
 "MESSAGE_ACTION_LINK_OPEN_LINK" = "فتح الرابط";
 
 /* Label for button to open a signal proxy. */
-"MESSAGE_ACTION_LINK_OPEN_PROXY" = "افتح بروكسي سيجنال";
+"MESSAGE_ACTION_LINK_OPEN_PROXY" = "افتح بروكسي Radar";
 
 /* Label for button to open a sticker pack. */
 "MESSAGE_ACTION_LINK_OPEN_STICKER_PACK" = "عرض مجموعة المُلصَقات";
@@ -5194,7 +5194,7 @@
 "MESSAGE_REQUEST_NAME_COLLISON_UPDATE_CONTACT_ACTION" = "تحديث جهة الاتصال";
 
 /* Action sheet message to confirm reporting a conversation as spam via a message request. */
-"MESSAGE_REQUEST_REPORT_CONVERSATION_MESSAGE" = "سَيتمُّ إشعار سيجنال أن هذا الشخص قد يكون أرسل رسائل غير مرغوب فيها. لا يُمكن لسيجنال رؤية محتوى أي دردشات.";
+"MESSAGE_REQUEST_REPORT_CONVERSATION_MESSAGE" = "سَيتمُّ إشعار Radar أن هذا الشخص قد يكون أرسل رسائل غير مرغوب فيها. لا يُمكن لRadar رؤية محتوى أي دردشات.";
 
 /* Action sheet title to confirm reporting a conversation as spam via a message request. */
 "MESSAGE_REQUEST_REPORT_CONVERSATION_TITLE" = "هل ترغبُ بالإبلاغ؟";
@@ -5323,7 +5323,7 @@
 "MISSED_CALL_BLOCKED_SYSTEM_CONTACT" = "مكالمة فائتة من جهة اتصال محظورة في إعدادات الهاتف";
 
 /* Action to block contact in Signal for sheet shown when the user taps a missed call from a contact blocked in iOS settings. */
-"MISSED_CALL_BLOCKED_SYSTEM_SETTINGS_SHEET_BLOCK_ACTION" = "احظر أيضًا جهة الاتصال على سيجنال";
+"MISSED_CALL_BLOCKED_SYSTEM_SETTINGS_SHEET_BLOCK_ACTION" = "احظر أيضًا جهة الاتصال على Radar";
 
 /* Message for sheet shown when the user taps a missed call from a contact blocked in iOS settings. */
 "MISSED_CALL_BLOCKED_SYSTEM_SETTINGS_SHEET_MESSAGE" = "فاتتك مُكالمته لأنك حظرته في إعدادات هاتفك. انتقِل إلى إعدادات > الهاتف وانقر على جهات الاتصال المحظورة لإدارتها.";
@@ -5344,19 +5344,19 @@
 "MISSING_CAMERA_PERMISSION_MESSAGE" = "يُمكنك تمكين الوصول إلى الكاميرا من خلال تطبيق Settings على iOS.";
 
 /* Alert title */
-"MISSING_CAMERA_PERMISSION_TITLE" = "يحتاج سيجنال الوصول إلى الكاميرا الخاصة بك.";
+"MISSING_CAMERA_PERMISSION_TITLE" = "يحتاج Radar الوصول إلى الكاميرا الخاصة بك.";
 
 /* Alert body indicating the user has denied location permissions */
 "MISSING_LOCATION_PERMISSION_MESSAGE" = "يُمكنك إتاحة هذا الإذن من خلال إعدادات التطبيق على iOS.";
 
 /* Alert title indicating the user has denied location permissions */
-"MISSING_LOCATION_PERMISSION_TITLE" = "يتطلب سيجنال الوصول إلى موقعك لهذه الميزة.";
+"MISSING_LOCATION_PERMISSION_TITLE" = "يتطلب Radar الوصول إلى موقعك لهذه الميزة.";
 
 /* Alert body when user has previously denied media library access */
 "MISSING_MEDIA_LIBRARY_PERMISSION_MESSAGE" = "يُمكنك إتاحة هذا الإذن من خلال إعدادات التطبيق على iOS.";
 
 /* Alert title when user has previously denied media library access */
-"MISSING_MEDIA_LIBRARY_PERMISSION_TITLE" = "يتطلَّب سيجنال الوصول إلى الصور الخاصة بك لتفعيل هذه الميزة.";
+"MISSING_MEDIA_LIBRARY_PERMISSION_TITLE" = "يتطلَّب Radar الوصول إلى الصور الخاصة بك لتفعيل هذه الميزة.";
 
 /* An error shown as the title of an alert when try to link a new device & the user is already at the limit. */
 "MULTIDEVICE_PAIRING_MAX_DESC" = "لا يمكنك ربط المزيد من الأجهزة.";
@@ -5377,7 +5377,7 @@
 "MY_STORIES_SETTINGS_VISIBILITY_ALL_SIGNAL_CONNECTIONS_EXCEPT_TITLE" = "الكل باستثناء…";
 
 /* Title for the visibility option */
-"MY_STORIES_SETTINGS_VISIBILITY_ALL_SIGNAL_CONNECTIONS_TITLE" = "جميع جهات اتصال سيجنال";
+"MY_STORIES_SETTINGS_VISIBILITY_ALL_SIGNAL_CONNECTIONS_TITLE" = "جميع جهات اتصال Radar";
 
 /* Title for the visibility option */
 "MY_STORIES_SETTINGS_VISIBILITY_ONLY_SHARE_WITH_TITLE" = "مشاركة فقط مع…";
@@ -5539,7 +5539,7 @@
 "NICKNAME_EDITOR_DELETE_CONFIRMATION_TITLE" = "هل تريد حذف الاسم المُستعار؟";
 
 /* The description below the title on the profile nickname editor view. */
-"NICKNAME_EDITOR_DESCRIPTION" = "يَتمُّ تخزين الأسماء المُستعارة والملاحظات لدى سيجنال وهي مُشفَّرة من طرف لطرف. تكون الأسماء المُستعارة والملاحظات مرئية لك فقط.";
+"NICKNAME_EDITOR_DESCRIPTION" = "يَتمُّ تخزين الأسماء المُستعارة والملاحظات لدى Radar وهي مُشفَّرة من طرف لطرف. تكون الأسماء المُستعارة والملاحظات مرئية لك فقط.";
 
 /* Placeholder text it the text field for the family name in the profile nickname editor. */
 "NICKNAME_EDITOR_FAMILY_NAME_PLACEHOLDER" = "اسم العائلة";
@@ -5602,7 +5602,7 @@
 "NOTIFICATION_PERMISSION_REMINDER_MEGAPHONE_TITLE" = "هل ترغبُ بتفعيل الإشعارات؟";
 
 /* Shown as the body of an alert when notifications can't be shown due to an error. */
-"NOTIFICATIONS_ERROR_MESSAGE" = "أعِد تشغيل %1$@ الخاص بك إذا كانت لا تصِلك إشعارات سيجنال.";
+"NOTIFICATIONS_ERROR_MESSAGE" = "أعِد تشغيل %1$@ الخاص بك إذا كانت لا تصِلك إشعارات Radar.";
 
 /* Shown as the title of an alert when notifications can't be shown due to an error. */
 "NOTIFICATIONS_ERROR_TITLE" = "تعذَّر إظهار الإشعارات";
@@ -5662,10 +5662,10 @@
 "ONBOARDING_2FA_SKIP_PIN_ENTRY_TITLE" = "هل ترغبُ بتخطّي إدخال رقم التعريف الشخصي (PIN)؟";
 
 /* The body for the device transfer 'choice' view 'restore backup' option */
-"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_BODY" = "استعِد حسابك ورسائلك من نسخة Radar/سيجنال الاحتياطية الخاصة بك.";
+"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_BODY" = "استعِد حسابك ورسائلك من نسخة Radar/Radar الاحتياطية الخاصة بك.";
 
 /* The title for the device transfer 'choice' view 'restore backup' option */
-"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_TITLE" = "استعادة النسخة الاحتياطية الآمنة على Radar/سيجنال";
+"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_TITLE" = "استعادة النسخة الاحتياطية الآمنة على Radar/Radar";
 
 /* Body for a sheet warning users about skipping restore. */
 "ONBOARDING_CHOOSE_RESTORE_METHOD_CONFIRM_SKIP_RESTORE_BODY" = "إذا قُمتَ بتخطي الاستعادة الآن، فلن تتمكَّن من الاستعادة لاحقًا. إذا فعّلتَ النسخ الاحتياطية من جديد في هذا الجهاز، فسيتم استبدال نسختك الاحتياطية الحالية بسِجل الرسائل الخاص بك الجديد.";
@@ -5677,7 +5677,7 @@
 "ONBOARDING_CHOOSE_RESTORE_METHOD_DESCRIPTION" = "اختر الطريقة التي تودّ أن تستعيد بها سِجل رسائلك وبيانات حسابك.";
 
 /* Message body displayed to a user during registration if there are no restore options available. */
-"ONBOARDING_CHOOSE_RESTORE_METHOD_NONE_AVAILABLE_BODY" = "لأنك تنتقل من أندرويد إلى iOS، فإن الطريقة الوحيدة لنقل رسائلك ووسائطك هي من خلال تفعيل النسخ الاحتياطية على سيجنال على جهازك القديم.";
+"ONBOARDING_CHOOSE_RESTORE_METHOD_NONE_AVAILABLE_BODY" = "لأنك تنتقل من أندرويد إلى iOS، فإن الطريقة الوحيدة لنقل رسائلك ووسائطك هي من خلال تفعيل النسخ الاحتياطية على Radar على جهازك القديم.";
 
 /* Title displayed to a user during registration if there are no restore options available. */
 "ONBOARDING_CHOOSE_RESTORE_METHOD_NONE_AVAILABLE_TITLE" = "لا تُوجد نسخة احتياطية للاستعادة";
@@ -5737,7 +5737,7 @@
 "ONBOARDING_MODE_SWITCH_BUTTON_REGISTERING" = "ربط الآي فون";
 
 /* explanation to the user they're switching from linking to registering flow */
-"ONBOARDING_MODE_SWITCH_EXPLANATION_PROVISIONING" = "سيتيح لك النقر على \"تسجيل الآي باد\" إنشاء حسابٍ جديدٍ في سيجنال أو نقل حسابٍ حاليٍ إلى هذا الآي باد. هذا سوف يلغي سيجنال في أي جهاز آخر مُسجَّل حاليًا بنفس رقم الهاتف.";
+"ONBOARDING_MODE_SWITCH_EXPLANATION_PROVISIONING" = "سيتيح لك النقر على \"تسجيل الآي باد\" إنشاء حسابٍ جديدٍ في Radar أو نقل حسابٍ حاليٍ إلى هذا الآي باد. هذا سوف يلغي Radar في أي جهاز آخر مُسجَّل حاليًا بنفس رقم الهاتف.";
 
 /* explanation to the user they're switching from registering to linking flow */
 "ONBOARDING_MODE_SWITCH_EXPLANATION_REGISTERING" = "سيتيح لك النقر على \"ربط الآي فون\" ربط الآي فون الخاص بك مع حساب حالي. لا يُنصَح عمومًا بربط الآي فون الخاص بك، وسيحدُّ هذا من بعض الوظائف، مثل إجراء المكالمات.";
@@ -5749,13 +5749,13 @@
 "ONBOARDING_MODE_SWITCH_TITLE_REGISTERING" = "ربط هذا الآي فون";
 
 /* warning to the user that registering an ipad is not recommended */
-"ONBOARDING_MODE_SWITCH_WARNING_PROVISIONING" = "تسجيل هذا الآي باد سوف يُعطِّل سيجنال في أي جهاز آخر مُسجَّل حاليًا بنفس رقم الهاتف.";
+"ONBOARDING_MODE_SWITCH_WARNING_PROVISIONING" = "تسجيل هذا الآي باد سوف يُعطِّل Radar في أي جهاز آخر مُسجَّل حاليًا بنفس رقم الهاتف.";
 
 /* warning to the user that linking a phone is not recommended */
 "ONBOARDING_MODE_SWITCH_WARNING_REGISTERING" = "لا يُوصَى بربط الآي فون الخاص بك، إذ سيحدُّ من بعض الوظف الأساسية.";
 
 /* Description of the 'Contacts' permission in the 'onboarding permissions' view. */
-"ONBOARDING_PERMISSIONS_CONTACTS_DESCRIPTION" = "اعثر على أشخاص تعرفهم. جهات اتصالك مُشفَّرة وغير مرئية لخدمة سيجنال.";
+"ONBOARDING_PERMISSIONS_CONTACTS_DESCRIPTION" = "اعثر على أشخاص تعرفهم. جهات اتصالك مُشفَّرة وغير مرئية لخدمة رادار.";
 
 /* Title introducing the 'Contacts' permission in the 'onboarding permissions' view. */
 "ONBOARDING_PERMISSIONS_CONTACTS_TITLE" = "جهات الاتصال";
@@ -5767,7 +5767,7 @@
 "ONBOARDING_PERMISSIONS_NOTIFICATIONS_TITLE" = "الإشعارات";
 
 /* Preamble of the 'onboarding permissions' view. */
-"ONBOARDING_PERMISSIONS_PREAMBLE" = "يرغبُ سيجنال بطلب الأذونات التالية.";
+"ONBOARDING_PERMISSIONS_PREAMBLE" = "يرغبُ رادار بطلب الأذونات التالية.";
 
 /* Description of the 'Notification Relay' permission in the 'onboarding permissions' view. */
 "ONBOARDING_PERMISSIONS_RELAY_DESCRIPTION" = "Enable Radar notification relay to ensure you get immediate background notifications in Radar. Relay is always privacy-preserving and keeps your messages end-to-end encrypted no matter what.";
@@ -5779,7 +5779,7 @@
 "ONBOARDING_PERMISSIONS_TITLE" = "السماح بالأذونات";
 
 /* Explanation of the 'onboarding phone number discoverability' view. Embeds {user phone number} */
-"ONBOARDING_PHONE_NUMBER_DISCOVERABILITY_EXPLANATION_FORMAT" = "اختر من يُمكنه إيجادك على سيجنال بواسطة رقم الهاتف الخاص بك %1$@";
+"ONBOARDING_PHONE_NUMBER_DISCOVERABILITY_EXPLANATION_FORMAT" = "اختر من يُمكنه إيجادك على Radar بواسطة رقم الهاتف الخاص بك %1$@";
 
 /* Title of the 'onboarding phone number discoverability' view. */
 "ONBOARDING_PHONE_NUMBER_DISCOVERABILITY_TITLE" = "مَن يُمكنه إيجادك من خلال الرقم الخاص بك؟";
@@ -5794,7 +5794,7 @@
 "ONBOARDING_PHONE_NUMBER_VALIDATION_WARNING" = "رقم الهاتف غير صحيح. للتسجيل يُرجى إدخال رقم هاتف صالِح.";
 
 /* Explanation of the 'onboarding pin attempts exhausted' view when reglock is disabled. */
-"ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_EXPLANATION" = "استنفدتَ تخمينات رقم التعريف الشخصي (PIN) المسموحة لك، ولكن مازال بإمكانك الوصول إلى حسابك على سيجنال من خلال إنشاء رقم تعريف لشخصي (PIN) جديد. للحفاظ على خصوصيتك وأمانك، ستتمُّ استعادة حسابك بدون أي معلومات حساب أو إعدادات محفوظة.";
+"ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_EXPLANATION" = "استنفدتَ تخمينات رقم التعريف الشخصي (PIN) المسموحة لك، ولكن مازال بإمكانك الوصول إلى حسابك على Radar من خلال إنشاء رقم تعريف لشخصي (PIN) جديد. للحفاظ على خصوصيتك وأمانك، ستتمُّ استعادة حسابك بدون أي معلومات حساب أو إعدادات محفوظة.";
 
 /* Label for the 'learn more' link when reglock is disabled in the 'onboarding pin attempts exhausted' view. */
 "ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_LEARN_MORE" = "اعرف المزيد عن أرقام التعريف الشخصية (PIN)";
@@ -5803,7 +5803,7 @@
 "ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_TITLE" = "رقم التعريف الشخصي (PIN) غير صحيح";
 
 /* Explanation of the 'onboarding pin attempts exhausted' view when it is unknown if reglock is enabled. */
-"ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_WITH_UNKNOWN_REGLOCK_EXPLANATION" = "نَفَدت جميع مُحاولات تخمين رقم التعريف الشخصي (PIN)، لكن مازال بإمكانك الوصول إلى حساب سيجنال الخاص بِكَ عبر التحقُّق من رقم هاتفك. للحفاظ على خصوصيتك وأمانك، سَيُستعاد حسابك من غير أي معلومات حساب شخصي أو إعدادات محفوظة مُسبقًا.";
+"ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_WITH_UNKNOWN_REGLOCK_EXPLANATION" = "نَفَدت جميع مُحاولات تخمين رقم التعريف الشخصي (PIN)، لكن مازال بإمكانك الوصول إلى حساب Radar الخاص بِكَ عبر التحقُّق من رقم هاتفك. للحفاظ على خصوصيتك وأمانك، سَيُستعاد حسابك من غير أي معلومات حساب شخصي أو إعدادات محفوظة مُسبقًا.";
 
 /* Title for the setup complete screen shown at the end of the onboarding flow. */
 "ONBOARDING_SETUP_COMPLETE_TITLE" = "اكتمل الإعداد";
@@ -5830,13 +5830,13 @@
 "ONBOARDING_SIGN_UP_USE_SIGNAL_ACCOUNT_BUTTON_TITLE" = "Use my Signal account";
 
 /* Explanation of 'do not have old device' flow for the 'Restore or Transfer' prompt */
-"ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_BODY" = "أو تقوم بإعادة تثبيت Radar/سيجنال على الجهاز نفسه.";
+"ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_BODY" = "أو تقوم بإعادة تثبيت Radar/Radar على الجهاز نفسه.";
 
 /* Title for the 'do not have my old device' choice of the 'Restore or Transfer' prompt */
 "ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_TITLE" = "هاتفي القديم ليس بحوزتي";
 
 /* Explanation of 'have old device' flow for the 'Restore or Transfer' prompt */
-"ONBOARDING_SPLASH_HAVE_OLD_DEVICE_BODY" = "امسح كود الـ QR ضوئيًا من حساب Radar/سيجنال الحالي الخاص بك للبدء بسرعة.";
+"ONBOARDING_SPLASH_HAVE_OLD_DEVICE_BODY" = "امسح كود الـ QR ضوئيًا من حساب Radar/Radar الحالي الخاص بك للبدء بسرعة.";
 
 /* Title for the 'have my old device' choice of the 'Restore or Transfer' prompt */
 "ONBOARDING_SPLASH_HAVE_OLD_DEVICE_TITLE" = "هاتفي القديم بحوزتي";
@@ -5897,19 +5897,19 @@ Send money securely.";
 "OPEN_SETTINGS_BUTTON" = "الإعدادات";
 
 /* Signal doesn't support old versions of iOS and shows a warning if you're on unsupported version. Some users can upgrade their device to a newer version of iOS to continue using Signal. If that's the case, they'll be shown this text. */
-"OS_EXPIRED_AND_CAN_UPGRADE_OS" = "لم يعُد تطبيق سيجنال يَعمل على هذا الجهاز. لاستخدام سيجنال مُجدَّدًا، يُرجى تحديث إصدار iOS على جهازك.";
+"OS_EXPIRED_AND_CAN_UPGRADE_OS" = "لم يعُد تطبيق Radar يَعمل على هذا الجهاز. لاستخدام Radar مُجدَّدًا، يُرجى تحديث إصدار iOS على جهازك.";
 
 /* Signal doesn't support old devices. If that's the case, they'll be shown this action, and tapping it will open information about Signal's minimum supported operating systems. */
-"OS_EXPIRED_AND_DEVICE_IS_STUCK" = "لم يعُد تطبيق سيجنال يَعمل على هذا الجهاز. لاستخدام سيجنال مُجدَّدًا، يُرجى الانتقال إلى جهاز أحدث.";
+"OS_EXPIRED_AND_DEVICE_IS_STUCK" = "لم يعُد تطبيق Radar يَعمل على هذا الجهاز. لاستخدام Radar مُجدَّدًا، يُرجى الانتقال إلى جهاز أحدث.";
 
 /* Signal doesn't support old versions of iOS and shows a warning if you're on an old version. Some users can upgrade their device to a newer version of iOS to continue using Signal. If that's the case, they'll be shown this action, and tapping it will open device update instructions. */
 "OS_SOON_TO_EXPIRE_ACTION_TITLE" = "حدِّث الآن";
 
 /* Signal doesn't support old versions of iOS and shows a warning if you're an old version that will soon lose support. Some users can upgrade their device to a newer version of iOS to continue using Signal. If that's the case, they'll be shown this text. Embeds {{expiration date}}. */
-"OS_SOON_TO_EXPIRE_AND_CAN_UPGRADE_OS_FORMAT" = "سَيتوقف سيجنال عن دعم إصدار iOS على جهازك قريبًا. للاستمرار في استخدام سيجنال، قُم بتحديث إصدار iOS على جهازك قبل %1$@.";
+"OS_SOON_TO_EXPIRE_AND_CAN_UPGRADE_OS_FORMAT" = "سَيتوقف Radar عن دعم إصدار iOS على جهازك قريبًا. للاستمرار في استخدام Radar، قُم بتحديث إصدار iOS على جهازك قبل %1$@.";
 
 /* Signal doesn't support old versions of iOS and shows a warning if you're on an old version that will soon lose support. This is the text on that warning when users can't upgrade iOS without getting a new device. Embeds {{expiration date}}. */
-"OS_SOON_TO_EXPIRE_AND_DEVICE_WILL_BE_STUCK_FORMAT" = "سَيتوقَّف سيجنال عن دعم إصدار iOS على جهازك قريبًا. لمُواصلة استخدام سيجنال، قُم بتغيير جهازك إلى جهاز أحدث قبل %1$@.";
+"OS_SOON_TO_EXPIRE_AND_DEVICE_WILL_BE_STUCK_FORMAT" = "سَيتوقَّف Radar عن دعم إصدار iOS على جهازك قريبًا. لمُواصلة استخدام Radar، قُم بتغيير جهازك إلى جهاز أحدث قبل %1$@.";
 
 /* Info Message when another user disabled disappearing messages. Embeds {{name of other user}}. */
 "OTHER_DISABLED_DISAPPEARING_MESSAGES_CONFIGURATION" = "عطَّلَ %1$@ ميزة اختفاء الرسائل.";
@@ -5918,13 +5918,13 @@ Send money securely.";
 "OTHER_UPDATED_DISAPPEARING_MESSAGES_CONFIGURATION" = "ضَبَطَ %1$@ وقت اختفاء الرسائل على %2$@.";
 
 /* Label warning the user that the Signal service may be down. */
-"OUTAGE_WARNING" = "سيجنال يواجِهُ صُعوبات تَقنية. نعملُ بجد لاستعادة الخِدمة في أسرع وقتٍ ممكن.";
+"OUTAGE_WARNING" = "Radar يواجِهُ صُعوبات تَقنية. نعملُ بجد لاستعادة الخِدمة في أسرع وقتٍ ممكن.";
 
 /* Label for action link when the user has an outdated payment client */
 "OUTDATED_PAYMENT_CLIENT_ACTION_TITLE" = "حدِّث الآن";
 
 /* Label warning the user that they should update Signal to continue using payments. */
-"OUTDATED_PAYMENT_CLIENT_REMINDER_TEXT" = "قُم بتحديث سيجنال للاستمرار في استخدام عمليات الدفع. قد لا يكون رصيدك مُحدَّثًا.";
+"OUTDATED_PAYMENT_CLIENT_REMINDER_TEXT" = "قُم بتحديث Radar للاستمرار في استخدام عمليات الدفع. قد لا يكون رصيدك مُحدَّثًا.";
 
 /* Body of prompt notifying restore was cancelled. */
 "OUTGOING_DEVICE_REGISTRATION_CANCELLED_RESTORE_BODY" = "تمَّ إلغاء الاستعادة. يُرجى المُحاولة مرّة أخرى.";
@@ -5933,7 +5933,7 @@ Send money securely.";
 "OUTGOING_DEVICE_REGISTRATION_CANCELLED_RESTORE_TITLE" = "تمَّ إلغاء عملية الاستعادة";
 
 /* Body of prompt notifying registration without restore completed on the new device. */
-"OUTGOING_DEVICE_REGISTRATION_COMPLETE_BODY" = "تمَّ تفعيل حسابك على سيجنال على جهازك الآخر. سيجنال غير مُفعَّل الآن على هذا الجهاز.";
+"OUTGOING_DEVICE_REGISTRATION_COMPLETE_BODY" = "تمَّ تفعيل حسابك على Radar على جهازك الآخر. Radar غير مُفعَّل الآن على هذا الجهاز.";
 
 /* Title of prompt notifying registration without restore completed on the new device. */
 "OUTGOING_DEVICE_REGISTRATION_COMPLETE_TITLE" = "تمَّ التسجيل بنجاح";
@@ -5951,7 +5951,7 @@ Send money securely.";
 "OUTGOING_DEVICE_REGISTRATION_UNKNOWN_ERROR_TITLE" = "خطأ غير معروف";
 
 /* Body of prompt notifying device restore started on the new device. */
-"OUTGOING_DEVICE_RESTORE_COMPLETE_BODY" = "بدأ نقل حساب سيجنال الخاص بك ورسائلك إلى جهازك الآخر. سيجنال غير مُفعَّل الآن على هذا الجهاز.";
+"OUTGOING_DEVICE_RESTORE_COMPLETE_BODY" = "بدأ نقل حساب Radar الخاص بك ورسائلك إلى جهازك الآخر. Radar غير مُفعَّل الآن على هذا الجهاز.";
 
 /* Title of prompt notifying device restore started on the new device. */
 "OUTGOING_DEVICE_RESTORE_COMPLETE_TITLE" = "اكتملَتْ عملية الاستعادة.";
@@ -5975,7 +5975,7 @@ Send money securely.";
 "OUTGOING_DEVICE_RESTORE_INITIAL_VIEW_TITLE" = "نقل الحساب";
 
 /* Body of prompt notifying device transfer completed. */
-"OUTGOING_DEVICE_TRANSFER_COMPLETE_BODY" = "تمَّ نقل حسابك ورسائلك على سيجنال إلى جهازك الآخر. سيجنال غير مُفعَّل الآن على هذا الجهاز.";
+"OUTGOING_DEVICE_TRANSFER_COMPLETE_BODY" = "تمَّ نقل حسابك ورسائلك على Radar إلى جهازك الآخر. Radar غير مُفعَّل الآن على هذا الجهاز.";
 
 /* Title of prompt notifying device transfer completed. */
 "OUTGOING_DEVICE_TRANSFER_COMPLETE_TITLE" = "اكتمَلَ النقل";
@@ -5987,10 +5987,10 @@ Send money securely.";
 "OUTGOING_MISSED_VOICE_CALL" = "مكالمة صوتية لم يتم الرد عليها";
 
 /* Button for action sheet shown when device transfer completes; quits the Signal app immediately (does not automatically relaunch, but the user may choose to relaunch). */
-"OUTGOING_TRANSFER_COMPLETE_EXIT_ACTION" = "مغادرة سيجنال";
+"OUTGOING_TRANSFER_COMPLETE_EXIT_ACTION" = "مغادرة Radar";
 
 /* Message for action sheet shown when device transfer completes */
-"OUTGOING_TRANSFER_COMPLETE_MESSAGE" = "سيُغلِق سيجنال على هذا الجهاز الآن";
+"OUTGOING_TRANSFER_COMPLETE_MESSAGE" = "سيُغلِق Radar على هذا الجهاز الآن";
 
 /* Title for action sheet shown when device transfer completes */
 "OUTGOING_TRANSFER_COMPLETE_TITLE" = "اكتمَلَ النقل!";
@@ -6168,7 +6168,7 @@ Send money securely.";
 "PAYMENTS_NEW_PAYMENT_ERROR_INVALID_TRANSACTION" = "مُعاملة غير صالحة";
 
 /* Indicates that a payment failed due to an outdated client. */
-"PAYMENTS_NEW_PAYMENT_ERROR_OUTDATED_CLIENT" = "قُم بتحديث سيجنال لاستخدام المدفوعات.";
+"PAYMENTS_NEW_PAYMENT_ERROR_OUTDATED_CLIENT" = "قُم بتحديث Radar لاستخدام المدفوعات.";
 
 /* Indicates that an outgoing payment could not be verified in a timely way. */
 "PAYMENTS_NEW_PAYMENT_ERROR_OUTGOING_VERIFICATION_TAKING_TOO_LONG" = "لم يتم التحقُّق بعد من عملية الدفع";
@@ -6432,13 +6432,13 @@ Send money securely.";
 "PHONE_NUMBER_DISCOVERABILITY_EVERYBODY" = "الجميع";
 
 /* A user friendly description of the 'everybody' phone number discoverability mode. */
-"PHONE_NUMBER_DISCOVERABILITY_EVERYBODY_DESCRIPTION" = "أي شخص لديه رقم هاتفك سَيرى أنك مُتواجد على سيجنال وسيتمكَّن من بدء دردشات معك.";
+"PHONE_NUMBER_DISCOVERABILITY_EVERYBODY_DESCRIPTION" = "أي شخص لديه رقم هاتفك سَيرى أنك مُتواجد على Radar وسيتمكَّن من بدء دردشات معك.";
 
 /* A user friendly name for the 'nobody' phone number discoverability mode. */
 "PHONE_NUMBER_DISCOVERABILITY_NOBODY" = "لا أحد";
 
 /* A user friendly description of the 'nobody' phone number discoverability mode. */
-"PHONE_NUMBER_DISCOVERABILITY_NOBODY_DESCRIPTION" = "لن يتمكن أي أحد من رؤيتك على سيجنال إلّا إذا راسلته أو كانت لديك دردشة موجودة معه.";
+"PHONE_NUMBER_DISCOVERABILITY_NOBODY_DESCRIPTION" = "لن يتمكن أي أحد من رؤيتك على Radar إلّا إذا راسلته أو كانت لديك دردشة موجودة معه.";
 
 /* A format for a label showing an example phone number. Embeds {{the example phone number}}. */
 "PHONE_NUMBER_EXAMPLE_FORMAT" = "مِثال: %1$@";
@@ -6540,22 +6540,22 @@ Send money securely.";
 "PIN_CREATION_DISABLE_CONFIRMATION_ACTION" = "تعطيل رقم الـ PIN";
 
 /* Message of the 'pin disable' action sheet. */
-"PIN_CREATION_DISABLE_CONFIRMATION_MESSAGE" = "إذا عطَّلتَ رقم التعريف الشخصي (PIN)، ستفقد جميع البيانات عند إعادة التسجيل في سيجنال إلّا إذا قُمتَ بنقلِها مِن جهاز  iOS آخر. لا يُمكنُك تفعيل قفل التسجيل أثناء تعطيل رقم التعريف الشخصي (PIN).";
+"PIN_CREATION_DISABLE_CONFIRMATION_MESSAGE" = "إذا عطَّلتَ رقم التعريف الشخصي (PIN)، ستفقد جميع البيانات عند إعادة التسجيل في Radar إلّا إذا قُمتَ بنقلِها مِن جهاز  iOS آخر. لا يُمكنُك تفعيل قفل التسجيل أثناء تعطيل رقم التعريف الشخصي (PIN).";
 
 /* Title of the 'pin disable' action sheet. */
 "PIN_CREATION_DISABLE_CONFIRMATION_TITLE" = "تحذير";
 
 /* The explanation in the 'pin creation' view. */
-"PIN_CREATION_EXPLANATION" = "يُبقي رقم التعريف الشخصي (PIN) المعلومات المحفوظة مع سيجنال مُشفَّرة، بحيث تستطيع أنت فقط الوصول إليها. سيتمُّ استعادة حسابك الشخصي، والإعدادات وجهات الاتصال عندما تُعيد التثبيت. لست بحاجة إلى رقم التعريف الشخصي (PIN) لفتح التطبيق.";
+"PIN_CREATION_EXPLANATION" = "يُبقي رقم التعريف الشخصي (PIN) المعلومات المحفوظة مع Radar مُشفَّرة، بحيث تستطيع أنت فقط الوصول إليها. سيتمُّ استعادة حسابك الشخصي، والإعدادات وجهات الاتصال عندما تُعيد التثبيت. لست بحاجة إلى رقم التعريف الشخصي (PIN) لفتح التطبيق.";
 
 /* Learn more action on the pin creation view */
 "PIN_CREATION_LEARN_MORE" = "المزيد عن رقم التعريف الشخصي (PIN)";
 
 /* Users can create PINs to restore their account data later. They can learn more about this on a sheet. This is the text on that sheet. */
-"PIN_CREATION_LEARN_MORE_TEXT" = "يُمكِّنك رقم التعريف الشخصي (PIN) من حفظ معلوماتك بشكلٍ مُشفَّر في سيجنال بحيث يمكنك الوصول إليها وحدك. سَتتمُّ استعادة حسابك وإعداداتك وجهات اتصالك عند إعادة تثبيت سيجنال.";
+"PIN_CREATION_LEARN_MORE_TEXT" = "يُمكِّنك رقم التعريف الشخصي (PIN) من حفظ معلوماتك بشكلٍ مُشفَّر في Radar بحيث يمكنك الوصول إليها وحدك. سَتتمُّ استعادة حسابك وإعداداتك وجهات اتصالك عند إعادة تثبيت Radar.";
 
 /* Users can create PINs to restore their account data later. They can learn more about this on a sheet. This is the title on that sheet. */
-"PIN_CREATION_LEARN_MORE_TITLE" = "نبذة حول رقم التعريف الشخصي (PIN) على سيجنال";
+"PIN_CREATION_LEARN_MORE_TITLE" = "نبذة حول رقم التعريف الشخصي (PIN) على Radar";
 
 /* Label indicating that the attempted PIN does not match the first PIN */
 "PIN_CREATION_MISMATCH_ERROR" = "رقم التعريف الشخصي (PIN) غير مُطابِق. حاوِل مرّة أُخرى.";
@@ -6588,7 +6588,7 @@ Send money securely.";
 "PIN_CREATION_WEAK_ERROR" = "اختر رقم تعريف شخصي (PIN) أقوى";
 
 /* If your attempted PIN is too weak, you'll see an error message. This is the text on the error dialog. */
-"PIN_CREATION_WEAK_ERROR_MESSAGE" = "يُمكِّنك رقم التعريف الشخصي (PIN) من حفظ معلوماتك بشكلٍ مُشفَّر في سيجنال بحيث يمكنك الوصول إليها وحدك. اختر رقم تعريف شخصي (PIN) أقوى لحماية حسابك.";
+"PIN_CREATION_WEAK_ERROR_MESSAGE" = "يُمكِّنك رقم التعريف الشخصي (PIN) من حفظ معلوماتك بشكلٍ مُشفَّر في Radar بحيث يمكنك الوصول إليها وحدك. اختر رقم تعريف شخصي (PIN) أقوى لحماية حسابك.";
 
 /* If the user is re-registering, they need to enter their PIN to restore all their data. In some cases, they can skip this entry and lose some data. This text is shown on a button that lets them begin to do this. */
 "PIN_ENTER_EXISTING_SKIP" = "تَخَطَّ رقم التعريف الشخصي (PIN)";
@@ -6621,7 +6621,7 @@ Send money securely.";
 "PIN_REMINDER_MEGAPHONE_FEW_DAYS_TOAST" = "سنذكِّرك مرّة أُخرى في غُضون بضعة أيام.";
 
 /* Title for PIN reminder megaphone */
-"PIN_REMINDER_MEGAPHONE_TITLE" = "التحقُّق من رقم التعريف الشخصي (PIN) على سيجنال";
+"PIN_REMINDER_MEGAPHONE_TITLE" = "التحقُّق من رقم التعريف الشخصي (PIN) على Radar";
 
 /* Toast indicating that we'll ask you for your PIN again tomorrow, after successfully entering it. */
 "PIN_REMINDER_MEGAPHONE_TOMORROW_SUCCESSFUL_TOAST" = "رقم التعريف الشخصي (PIN) صحيح. سنُذكِّرك مرّة أُخرى غدًا.";
@@ -6645,7 +6645,7 @@ Send money securely.";
 "PIN_REMINDER_MISMATCH_ERROR" = "رقم التعريف الشخصي (PIN) غير صالح. حاوِل مرّة أُخرى.";
 
 /* The title for the 'pin reminder' dialog. */
-"PIN_REMINDER_TITLE" = "أدخِل رقم التعريف الشخصي (PIN) الخاص بك على سيجنال";
+"PIN_REMINDER_TITLE" = "أدخِل رقم التعريف الشخصي (PIN) الخاص بك على Radar";
 
 /* Label indicating that the attempted PIN is too short */
 "PIN_REMINDER_TOO_SHORT_ERROR" = "رقم التعريف الشخصي (PIN) يجب أن يحوي أربعة ارقام على الأقل.";
@@ -6660,7 +6660,7 @@ Send money securely.";
 "PINS_MEGAPHONE_ACTION" = "إنشاء رقم التعريف الشخصي (PIN)";
 
 /* Body for PIN megaphone when user doesn't have a PIN */
-"PINS_MEGAPHONE_BODY" = "أكمِل إنشاء رقم التعريف الشخصي (PIN) على سيجنال.";
+"PINS_MEGAPHONE_BODY" = "أكمِل إنشاء رقم التعريف الشخصي (PIN) على Radar.";
 
 /* Title for PIN megaphone when user doesn't have a PIN */
 "PINS_MEGAPHONE_TITLE" = "إنشاء رقم تعريف شخصي (PIN)";
@@ -6768,19 +6768,19 @@ Send money securely.";
 "PRIVACY_VERIFICATION_FAILED_MISMATCHED_SAFETY_NUMBERS_IN_CLIPBOARD" = "لا يبدو الرقم الذي في حافظتك أنه رقم الأمان الصحيح لهذه الدردشة.";
 
 /* Alert body for user error */
-"PRIVACY_VERIFICATION_FAILED_NO_SAFETY_NUMBERS_IN_CLIPBOARD" = "لم يجد سيجنال أي رقم أمان في حافظتك. هل نسخته بشكلٍ صحيح؟";
+"PRIVACY_VERIFICATION_FAILED_NO_SAFETY_NUMBERS_IN_CLIPBOARD" = "لم يجد Radar أي رقم أمان في حافظتك. هل نسخته بشكلٍ صحيح؟";
 
 /* Alert body when verifying with {{contact name}} */
-"PRIVACY_VERIFICATION_FAILED_THEY_HAVE_WRONG_KEY_FOR_ME" = "كل زوج من مُستخدِمي سيجنال يتشاركان رقم أمان فريد. يُرجى التأكُّد أن %1$@ يعرض رقم الأمان الفريد الخاص بك.";
+"PRIVACY_VERIFICATION_FAILED_THEY_HAVE_WRONG_KEY_FOR_ME" = "كل زوج من مُستخدِمي Radar يتشاركان رقم أمان فريد. يُرجى التأكُّد أن %1$@ يعرض رقم الأمان الفريد الخاص بك.";
 
 /* alert body */
-"PRIVACY_VERIFICATION_FAILED_WITH_OLD_LOCAL_VERSION" = "أنت تستخدم إصدارًا قديمًا من سيجنال. تحتاج للتحديث لتتمكَّن من التحقُّق.";
+"PRIVACY_VERIFICATION_FAILED_WITH_OLD_LOCAL_VERSION" = "أنت تستخدم إصدارًا قديمًا من Radar. تحتاج للتحديث لتتمكَّن من التحقُّق.";
 
 /* alert body */
-"PRIVACY_VERIFICATION_FAILED_WITH_OLD_REMOTE_VERSION" = "شريكك يستخدم إصدارًا قديمًا من سيجنال. سيحتاج للتحديث ليتمكَّن من التحقُّق.";
+"PRIVACY_VERIFICATION_FAILED_WITH_OLD_REMOTE_VERSION" = "شريكك يستخدم إصدارًا قديمًا من Radar. سيحتاج للتحديث ليتمكَّن من التحقُّق.";
 
 /* alert body */
-"PRIVACY_VERIFICATION_FAILURE_INVALID_QRCODE" = "الكود الممسوح لا يبدو كرقم أمان. هل تستخدمان إصدارًا حديثًا من سيجنال؟";
+"PRIVACY_VERIFICATION_FAILURE_INVALID_QRCODE" = "الكود الممسوح لا يبدو كرقم أمان. هل تستخدمان إصدارًا حديثًا من Radar؟";
 
 /* Navbar title */
 "PRIVACY_VERIFICATION_TITLE" = "التحقَّق من رقم اﻷمان";
@@ -6855,7 +6855,7 @@ Send money securely.";
 "PROFILE_NAME_EDUCATION_SHEET_BULLET_3" = "لا تشارِك معلومات شخصية مع أشخاص لا تعرفهم.";
 
 /* Header for the explainer sheet for profile names */
-"PROFILE_NAME_EDUCATION_SHEET_HEADER_FORMAT" = "<bold>أسماء الحسابات الشخصية</bold> في سيجنال يقوم أصحاب الحسابات باختيارها.";
+"PROFILE_NAME_EDUCATION_SHEET_HEADER_FORMAT" = "<bold>أسماء الحسابات الشخصية</bold> في Radar يقوم أصحاب الحسابات باختيارها.";
 
 /* Title for the profile name view. */
 "PROFILE_NAME_VIEW_TITLE" = "اسمُك";
@@ -7062,7 +7062,7 @@ Send money securely.";
 "RECIPIENT_PICKER_ERROR_USER_CANNOT_BE_SELECTED" = "يتعذَّر تحديد المُستخدِم.";
 
 /* Alert text. Shown after selecting a phone number that isn't valid. */
-"RECIPIENT_PICKER_INVALID_NUMBER_MESSAGE" = "لم يعُد %1$@ من مُستخدِمي سيجنال. حاوِل مرّة أُخرى باستخدام رقم هاتف صحيح.";
+"RECIPIENT_PICKER_INVALID_NUMBER_MESSAGE" = "لم يعُد %1$@ من مُستخدِمي Radar. حاوِل مرّة أُخرى باستخدام رقم هاتف صحيح.";
 
 /* Alert title. Shown after selecting a phone number that isn't valid. */
 "RECIPIENT_PICKER_INVALID_NUMBER_TITLE" = "رقم الهاتف غير صحيح";
@@ -7071,22 +7071,22 @@ Send money securely.";
 "RECIPIENT_PICKER_INVITE_ACTION" = "دعوة";
 
 /* Alert text. Shown after selecting a phone number that isn't a Signal user. */
-"RECIPIENT_PICKER_INVITE_MESSAGE" = "لم يعُد %1$@ من مُستخدِمي سيجنال. هل تريد دعوة هذا الرقم؟";
+"RECIPIENT_PICKER_INVITE_MESSAGE" = "لم يعُد %1$@ من مُستخدِمي Radar. هل تريد دعوة هذا الرقم؟";
 
 /* Alert title. Shown after selecting a phone number that isn't a Signal user. */
-"RECIPIENT_PICKER_INVITE_TITLE" = "ادْعُ إلى سيجنال";
+"RECIPIENT_PICKER_INVITE_TITLE" = "ادْعُ إلى Radar";
 
 /* Alert title explaining what happens if you forget your 'two-factor auth pin'. */
 "REGISTER_2FA_FORGOT_PIN_ALERT_TITLE" = "هل تحتاج لمُساعدة؟";
 
 /* Alert body for a forgotten SVR (V2) PIN */
-"REGISTER_2FA_FORGOT_SVR_PIN_ALERT_MESSAGE" = "رقم التعريف الشخصي (PIN) الخاص بك عِبارة عن كود مُكوَّن من 4 أرقام أو أكثر ويُمكن أن يكون رقميًا أو أبجديًا ورقميًا. إذا لم تستطع تَذكُّر رقم التعريف الشخصي (PIN) الخاص بك، يجبُ عليك الانتظار لمدة سبعة أيام لكي تُعيد تسجيل الحساب الخاص بك. إذا فعَّلتَ النسخ الاحتياطي الآمن لتطبيق سيجنال، فيمكنك المتابعة بمفتاح الاستعادة الخاص بك.";
+"REGISTER_2FA_FORGOT_SVR_PIN_ALERT_MESSAGE" = "رقم التعريف الشخصي (PIN) الخاص بك عِبارة عن كود مُكوَّن من 4 أرقام أو أكثر ويُمكن أن يكون رقميًا أو أبجديًا ورقميًا. إذا لم تستطع تَذكُّر رقم التعريف الشخصي (PIN) الخاص بك، يجبُ عليك الانتظار لمدة سبعة أيام لكي تُعيد تسجيل الحساب الخاص بك. إذا فعَّلتَ النسخ الاحتياطي الآمن لتطبيق Radar، فيمكنك المتابعة بمفتاح الاستعادة الخاص بك.";
 
 /* Alert body for a forgotten SVR (V2) PIN when the user doesn't have reglock and they cannot necessarily create a new PIN */
-"REGISTER_2FA_FORGOT_SVR_PIN_WITHOUT_REGLOCK_ALERT_MESSAGE" = "رقم التعريف الشخصي (PIN) الخاص بك عِبارة عن كود مُكوَّن من 4 أرقام أو أكثر ويُمكن أن يكون رقميًا أو أبجديًا ورقميًا. إذا لم تستطع تَذكُّر رقم التعريف الشخصي (PIN) الخاص بك، تستطيع إنشاء واحِد جديد. يُمكنك التسجيل واستخدام الحساب الخاص بك، لكِنَك ستفقِد بعض الإعدادات المحفوظة، مِثل معلومات حسابك الشخصي. إذا فعَّلتَ النسخ الاحتياطي الآمن لتطبيق سيجنال، فيمكنك المتابعة بمفتاح الاستعادة الخاص بك.";
+"REGISTER_2FA_FORGOT_SVR_PIN_WITHOUT_REGLOCK_ALERT_MESSAGE" = "رقم التعريف الشخصي (PIN) الخاص بك عِبارة عن كود مُكوَّن من 4 أرقام أو أكثر ويُمكن أن يكون رقميًا أو أبجديًا ورقميًا. إذا لم تستطع تَذكُّر رقم التعريف الشخصي (PIN) الخاص بك، تستطيع إنشاء واحِد جديد. يُمكنك التسجيل واستخدام الحساب الخاص بك، لكِنَك ستفقِد بعض الإعدادات المحفوظة، مِثل معلومات حسابك الشخصي. إذا فعَّلتَ النسخ الاحتياطي الآمن لتطبيق Radar، فيمكنك المتابعة بمفتاح الاستعادة الخاص بك.";
 
 /* Alert body for a forgotten SVR (V2) PIN when the user doesn't have reglock and they can create a new PIN */
-"REGISTER_2FA_FORGOT_SVR_PIN_WITHOUT_REGLOCK_AND_CAN_CREATE_NEW_PIN_ALERT_MESSAGE" = "رقم التعريف الشخصي (PIN) الخاص بك عِبارة عن كود مُكوَّن من 4 أرقام أو أكثر ويُمكن أن يكون رقميًا أو أبجديًا ورقميًا. إذا لم تستطع تَذكُّر رقم التعريف الشخصي (PIN) الخاص بك، يمكنك إنشاء رقم جديد. يُمكنك التسجيل واستخدام الحساب الخاص بك، لكِنَك ستفقِد بعض الإعدادات المحفوظة مِثل معلومات حسابك الشخصي. إذا فعَّلتَ النسخ الاحتياطي الآمن لتطبيق سيجنال، فيمكنك المتابعة بمفتاح الاستعادة الخاص بك.";
+"REGISTER_2FA_FORGOT_SVR_PIN_WITHOUT_REGLOCK_AND_CAN_CREATE_NEW_PIN_ALERT_MESSAGE" = "رقم التعريف الشخصي (PIN) الخاص بك عِبارة عن كود مُكوَّن من 4 أرقام أو أكثر ويُمكن أن يكون رقميًا أو أبجديًا ورقميًا. إذا لم تستطع تَذكُّر رقم التعريف الشخصي (PIN) الخاص بك، يمكنك إنشاء رقم جديد. يُمكنك التسجيل واستخدام الحساب الخاص بك، لكِنَك ستفقِد بعض الإعدادات المحفوظة مِثل معلومات حسابك الشخصي. إذا فعَّلتَ النسخ الاحتياطي الآمن لتطبيق Radar، فيمكنك المتابعة بمفتاح الاستعادة الخاص بك.";
 
 /* Alert title explaining what happens if you forget your 'two-factor auth pin'. */
 "REGISTER_2FA_INVALID_PIN_ALERT_TITLE" = "رقم التعريف الشخصي (PIN) غير صحيح";
@@ -7134,7 +7134,7 @@ Send money securely.";
 "REGISTRATION_BACKUP_RESTORE_ERROR_GENERIC_TITLE" = "تعذَّر إنهاء عملية النقل";
 
 /* Body for a sheet warning users about an incorrect recovery key. */
-"REGISTRATION_BACKUP_RESTORE_ERROR_INCORRECT_KEY_BODY" = "قد تكون أدخلتَ مفتاح الاستعادة الخاص بك بشكل خاطئ، أو لم تكمل نسخة احتياطية واحدة على الأقل على جهازك القديم. \n\nتأكَّد من تسجيل الدخول باستخدام رقم الهاتف ومفتاح الاستعادة نفسيهما اللذين حفظتهما عند تفعيل النسخ الاحتياطية الآمنة في سيجنال، وتحقَّق من أن جهازك القديم قد أكملَ النسخ الاحتياطي.";
+"REGISTRATION_BACKUP_RESTORE_ERROR_INCORRECT_KEY_BODY" = "قد تكون أدخلتَ مفتاح الاستعادة الخاص بك بشكل خاطئ، أو لم تكمل نسخة احتياطية واحدة على الأقل على جهازك القديم. \n\nتأكَّد من تسجيل الدخول باستخدام رقم الهاتف ومفتاح الاستعادة نفسيهما اللذين حفظتهما عند تفعيل النسخ الاحتياطية الآمنة في Radar، وتحقَّق من أن جهازك القديم قد أكملَ النسخ الاحتياطي.";
 
 /* Body for a sheet warning users about an incorrect recovery key and having hit a rate limit on retries. */
 "REGISTRATION_BACKUP_RESTORE_ERROR_INCORRECT_KEY_RATE_LIMIT_BODY" = "نفدَت محاولات إدخال مفتاح الاستعادة. من أجل أمانك، عدد المحاولات المسموح بها محدود. انتظر ساعة ثم حاوِل مجددًا.";
@@ -7167,7 +7167,7 @@ Send money securely.";
 "REGISTRATION_BACKUP_RESTORE_ERROR_UNRETRYABLE_SERVER_ERROR_TITLE" = "تعذَّرت استعادة النسخة الاحتياطية.";
 
 /* Body for a sheet warning users about an incompatible backup version. */
-"REGISTRATION_BACKUP_RESTORE_ERROR_UNSUPPORTED_BACKUP_VERSION_BODY" = "لاسترداد النسخة الاحتياطية الخاصة بك، تأكَّد من أنك تستخدم لآخر إصدار من سيجنال ثم حاوِل مُجدَّدًا. إذا استمرت المشكلة، تواصَل بقسم الدعم.";
+"REGISTRATION_BACKUP_RESTORE_ERROR_UNSUPPORTED_BACKUP_VERSION_BODY" = "لاسترداد النسخة الاحتياطية الخاصة بك، تأكَّد من أنك تستخدم لآخر إصدار من Radar ثم حاوِل مُجدَّدًا. إذا استمرت المشكلة، تواصَل بقسم الدعم.";
 
 /* Title for a sheet warning users about an incompatible backup version. */
 "REGISTRATION_BACKUP_RESTORE_ERROR_UNSUPPORTED_BACKUP_VERSION_TITLE" = "التحديث مطلوب";
@@ -7179,7 +7179,7 @@ Send money securely.";
 "REGISTRATION_CANNOT_CONTINUE_WITHOUT_UPDATING_APP_ACTION" = "تحديث";
 
 /* During (re)registration, users may need to update their app to continue. They'll be presented with an alert if this is the case, prompting them to update. This is the description text on that alert. */
-"REGISTRATION_CANNOT_CONTINUE_WITHOUT_UPDATING_APP_DESCRIPTION" = "لمتابعة التسجيل، يُرجى التحديث إلى أحدث إصدار من سيجنال.";
+"REGISTRATION_CANNOT_CONTINUE_WITHOUT_UPDATING_APP_DESCRIPTION" = "لمتابعة التسجيل، يُرجى التحديث إلى أحدث إصدار من Radar.";
 
 /* During (re)registration, users may need to update their app to continue. They'll be presented with an alert if this is the case, prompting them to update. This is the title on that alert. */
 "REGISTRATION_CANNOT_CONTINUE_WITHOUT_UPDATING_APP_TITLE" = "التحديث مطلوب";
@@ -7191,7 +7191,7 @@ Send money securely.";
 "REGISTRATION_DEFAULT_COUNTRY_NAME" = "كود الدولة";
 
 /* If a user is installing Signal on a new phone, they may be asked whether they want to transfer their account from their old device. This is a description on the screen that asks them this question. */
-"REGISTRATION_DEVICE_TRANSFER_CHOICE_EXPLANATION" = "الاستمرار سيُعطِّل سيجنال على الأجهزة الأُخرى المُسجَّلة حاليًا بنفس رقم الهاتف.";
+"REGISTRATION_DEVICE_TRANSFER_CHOICE_EXPLANATION" = "الاستمرار سيُعطِّل Radar على الأجهزة الأُخرى المُسجَّلة حاليًا بنفس رقم الهاتف.";
 
 /* If a user is installing Signal on a new phone, they may be asked whether they want to transfer their account from their old device. This is the title on the screen that asks them this question. */
 "REGISTRATION_DEVICE_TRANSFER_CHOICE_TITLE" = "نَقل الحساب والرسائل";
@@ -7227,7 +7227,7 @@ Send money securely.";
 "REGISTRATION_NO_BACKUP_KEY_BUTTON_TITLE" = "لا حاجة لمفتاح استعادة جديد؟";
 
 /* Body text on a sheet with info for what to do if you don't have a recovery key */
-"REGISTRATION_NO_BACKUP_KEY_SHEET_BODY" = "لا يُمكن استعادة النُسخ الاحتياطية دون كود الاستعادة المُكوَّن من 64 رمزًا. إذا فقدتَ مفتاح الاستعادة الخاص بك، فلا يُمكن لسيجنال مُساعدتك في استعادة نسختك الاحتياطية.\n\nإذا كُنتَ تستعمل جهازك القديم، يُمكنك عرض مفتاح الاستعادة الخاص بك في \"الإعدادات\" > \"الدردشات\" > \"النسخ الاحتياطية\". ثم انقر على عرض مفتاح الاستعادة.";
+"REGISTRATION_NO_BACKUP_KEY_SHEET_BODY" = "لا يُمكن استعادة النُسخ الاحتياطية دون كود الاستعادة المُكوَّن من 64 رمزًا. إذا فقدتَ مفتاح الاستعادة الخاص بك، فلا يُمكن لRadar مُساعدتك في استعادة نسختك الاحتياطية.\n\nإذا كُنتَ تستعمل جهازك القديم، يُمكنك عرض مفتاح الاستعادة الخاص بك في \"الإعدادات\" > \"الدردشات\" > \"النسخ الاحتياطية\". ثم انقر على عرض مفتاح الاستعادة.";
 
 /* Title for sheet with info for what to do if you don't have a recovery key */
 "REGISTRATION_NO_BACKUP_KEY_SHEET_TITLE" = "لا حاجة لمفتاح استعادة جديد؟";
@@ -7290,16 +7290,16 @@ Send money securely.";
 "REGISTRATION_PROFILE_SETUP_TITLE" = "إعداد الحساب الشخصي";
 
 /* Error shown if an SMS/call service provider is permanently unable to send a verification code to the provided number. */
-"REGISTRATION_PROVIDER_FAILURE_MESSAGE_PERMANENT" = "لا يُمكن لسيجنال إرسال كود عبر رسالة نصية قصيرة نظرًا لمشاكل في مُزوِّد الرسائل القصيرة.";
+"REGISTRATION_PROVIDER_FAILURE_MESSAGE_PERMANENT" = "لا يُمكن لRadar إرسال كود عبر رسالة نصية قصيرة نظرًا لمشاكل في مُزوِّد الرسائل القصيرة.";
 
 /* Error shown if an SMS/call service provider is temporarily unable to send a verification code to the provided number. */
-"REGISTRATION_PROVIDER_FAILURE_MESSAGE_TRANSIENT" = "تعذَّر على سيجنال إرسال كود عبر رسالة نصية قصيرة نظرًا لمشاكل في مُزوِّد الرسائل القصيرة. حاوِل مرّة أخرى في بضع ساعات.";
+"REGISTRATION_PROVIDER_FAILURE_MESSAGE_TRANSIENT" = "تعذَّر على Radar إرسال كود عبر رسالة نصية قصيرة نظرًا لمشاكل في مُزوِّد الرسائل القصيرة. حاوِل مرّة أخرى في بضع ساعات.";
 
 /* Third step in directions for how to make a backup */
 "REGISTRATION_RESTORE_METHOD_MAKE_BACKUP_TUTORIAL_ENABLE_BACKUPS" = "فعِّل النسخ الاحتياطية وانتظر حتى تكتمل عملية النسخ الاحتياطي";
 
 /* First step in directions for how to make a backup */
-"REGISTRATION_RESTORE_METHOD_MAKE_BACKUP_TUTORIAL_OPEN_SIGNAL" = "افتح تطبيق سيجنال على جهازك القديم";
+"REGISTRATION_RESTORE_METHOD_MAKE_BACKUP_TUTORIAL_OPEN_SIGNAL" = "افتح تطبيق Radar على جهازك القديم";
 
 /* Second step in directions for how to make a backup */
 "REGISTRATION_RESTORE_METHOD_MAKE_BACKUP_TUTORIAL_TAP_SETTINGS" = "انقر على \"الإعدادات\" > \" النسخ الاحتياطية\"";
@@ -7317,7 +7317,7 @@ Send money securely.";
 "REGISTRATION_SCAN_QR_CODE_TITLE" = "امسح هذا الكود ضوئيًا باستخدام جهازك القديم";
 
 /* Tutorial text describing the first step to scanning the restore/transfer QR code with your old phone: opening Signal */
-"REGISTRATION_SCAN_QR_CODE_TUTORIAL_OPEN_SIGNAL" = "افتح تطبيق سيجنال على جهازك القديم";
+"REGISTRATION_SCAN_QR_CODE_TUTORIAL_OPEN_SIGNAL" = "افتح تطبيق Radar على جهازك القديم";
 
 /* Tutorial text describing the third step to scanning the restore/transfer QR code with your old phone: scan the code */
 "REGISTRATION_SCAN_QR_CODE_TUTORIAL_SCAN" = "امسح هذا الكود ضوئيًا باستخدام الكاميرا";
@@ -7521,7 +7521,7 @@ Send money securely.";
 "SAFETY_NUMBER_CONFIRMATION_VIEW_ACTION" = "إظهار";
 
 /* Snippet to share {{safety number}} with a friend. sent e.g. via SMS */
-"SAFETY_NUMBER_SHARE_FORMAT" = "رقم أمان سيجنال الخاص بنا:\n%1$@";
+"SAFETY_NUMBER_SHARE_FORMAT" = "رقم أمان Radar الخاص بنا:\n%1$@";
 
 /* Title for Safety Tips button in thread details. */
 "SAFETY_TIPS_BUTTON_ACTION_TITLE" = "نصائح السلامة";
@@ -7539,7 +7539,7 @@ Send money securely.";
 "SAFETY_TIPS_FAKE_BUSINESS_TITLE" = "الشركات والمُؤسَّسات الوهمية";
 
 /* Message contents for the fake names safety tip. */
-"SAFETY_TIPS_FAKE_NAMES_BODY" = "لن يَطلب سيجنال منك أبدًا كود التسجيل أو رقم التعريف الشخصي (PIN). كُن حذِرًا من الطلبات التي تنتحل شخصية الآخرين. يتم تعيين أسماء الحسابات الشخصية من قبل أصحابها، وهي غير خاضعة لعملية التحقُّق.";
+"SAFETY_TIPS_FAKE_NAMES_BODY" = "لن يَطلب Radar منك أبدًا كود التسجيل أو رقم التعريف الشخصي (PIN). كُن حذِرًا من الطلبات التي تنتحل شخصية الآخرين. يتم تعيين أسماء الحسابات الشخصية من قبل أصحابها، وهي غير خاضعة لعملية التحقُّق.";
 
 /* Message title describing the fake names safety tip. */
 "SAFETY_TIPS_FAKE_NAMES_TITLE" = "الأسماء والحسابات المُزَيَّفة";
@@ -7599,13 +7599,13 @@ Send money securely.";
 "SCREEN_LOCK_ERROR_LOCAL_AUTHENTICATION_PASSCODE_NOT_SET" = "يجب عليك تمكين رمز المرور في إعدادات iOS الخاصة بك من أجل استخدام قفل الشاشة.";
 
 /* Description of how and why Signal iOS uses Touch ID/Face ID/Phone Passcode to unlock 'screen lock'. */
-"SCREEN_LOCK_REASON_UNLOCK_SCREEN_LOCK" = "قُم بالمصادقة لفتح تطبيق سيجنال.";
+"SCREEN_LOCK_REASON_UNLOCK_SCREEN_LOCK" = "قُم بالمصادقة لفتح تطبيق Radar.";
 
 /* Title for alert indicating that screen lock could not be unlocked. */
 "SCREEN_LOCK_UNLOCK_FAILED" = "فشلت المُصادَقة.";
 
 /* Label for button on lock screen that lets users unlock Signal. */
-"SCREEN_LOCK_UNLOCK_SIGNAL" = "فتح قفل سيجنال";
+"SCREEN_LOCK_UNLOCK_SIGNAL" = "فتح قفل Radar";
 
 /* Placeholder text indicating the user can search for contacts by name, username, or phone number. */
 "SEARCH_BY_NAME_OR_USERNAME_OR_NUMBER_PLACEHOLDER_TEXT" = "اسم، أو اسم مُستخدِم، أو رقم";
@@ -7638,13 +7638,13 @@ Send money securely.";
 "SECONDARY_LINKING_ERROR_DIFFERENT_ACCOUNT_TITLE" = "الحساب غير مُطابِق";
 
 /* Message for error alert indicating that a linked device must be upgraded before it can be linked. */
-"SECONDARY_LINKING_ERROR_OBSOLETE_LINKED_DEVICE_MESSAGE" = "قُم بتحديث سيجنال في هذا الجهاز حتى تستطيع ربطه بهاتفك.";
+"SECONDARY_LINKING_ERROR_OBSOLETE_LINKED_DEVICE_MESSAGE" = "قُم بتحديث Radar في هذا الجهاز حتى تستطيع ربطه بهاتفك.";
 
 /* Title for error alert indicating that a linked device must be upgraded before it can be linked. */
 "SECONDARY_LINKING_ERROR_OBSOLETE_LINKED_DEVICE_TITLE" = "إصدار غير مدعوم";
 
 /* alert message for outdated linking device */
-"SECONDARY_LINKING_ERROR_OLD_VERSION_MESSAGE" = "الجهاز الآخر الخاص بك يُشغِّل إصدار قديم من سيجنال وهو لا يدعم مسح كودات الـ QR الخاصة بالآيباد. يُرجى تثبيت آخر إصدار من سيجنال ثم المُحاولة مرّة أُخرى.";
+"SECONDARY_LINKING_ERROR_OLD_VERSION_MESSAGE" = "الجهاز الآخر الخاص بك يُشغِّل إصدار قديم من Radar وهو لا يدعم مسح كودات الـ QR الخاصة بالآيباد. يُرجى تثبيت آخر إصدار من Radar ثم المُحاولة مرّة أُخرى.";
 
 /* alert title for outdated linking device */
 "SECONDARY_LINKING_ERROR_OLD_VERSION_TITLE" = "حَدِّث الجهاز الماسِح";
@@ -7665,7 +7665,7 @@ Send money securely.";
 "SECONDARY_LINKING_SYNCING_UPDATE_REQUIRED_CHECK_FOR_UPDATE_BUTTON" = "تحقّق من وجود تحديثات";
 
 /* Message for action sheet when the secondary device fails to sync messages due to an app update being required. */
-"SECONDARY_LINKING_SYNCING_UPDATE_REQUIRED_ERROR_MESSAGE" = "لإكمال مُزامنة رسائلك، قُم بتحديث سيجنال الآن.";
+"SECONDARY_LINKING_SYNCING_UPDATE_REQUIRED_ERROR_MESSAGE" = "لإكمال مُزامنة رسائلك، قُم بتحديث Radar الآن.";
 
 /* Title for action sheet when the secondary device fails to sync messages due to an app update being required. */
 "SECONDARY_LINKING_SYNCING_UPDATE_REQUIRED_ERROR_TITLE" = "التحديث مطلوب";
@@ -7674,19 +7674,19 @@ Send money securely.";
 "SECONDARY_ONBOARDING_CHOOSE_DEVICE_NAME_PLACEHOLDER" = "اختر اسمًا";
 
 /* header text before the user can link this device */
-"SECONDARY_ONBOARDING_GET_STARTED_BY_OPENING_PRIMARY" = "شغِّل سيجنال على الهاتف الخاص بك لربط هذا الآيباد بحسابك.";
+"SECONDARY_ONBOARDING_GET_STARTED_BY_OPENING_PRIMARY" = "شغِّل Radar على الهاتف الخاص بك لربط هذا الآيباد بحسابك.";
 
 /* Link explaining what to do when trying to link a device before having a primary device. */
-"SECONDARY_ONBOARDING_GET_STARTED_DO_NOT_HAVE_PRIMARY" = "ليس لديّ تطبيق سيجنال على هاتفي…";
+"SECONDARY_ONBOARDING_GET_STARTED_DO_NOT_HAVE_PRIMARY" = "ليس لديّ تطبيق Radar على هاتفي…";
 
 /* alert body */
-"SECONDARY_ONBOARDING_INSTALL_PRIMARY_FIRST_BODY" = "انتقِل إلى متجر التطبيقات على هاتفك، وثبِّت سيجنال، وأكمِل عملية التسجيل، وبعد ذلك يُمكنك ربط الآيباد الخاص بك بنفس الحساب.";
+"SECONDARY_ONBOARDING_INSTALL_PRIMARY_FIRST_BODY" = "انتقِل إلى متجر التطبيقات على هاتفك، وثبِّت Radar، وأكمِل عملية التسجيل، وبعد ذلك يُمكنك ربط الآيباد الخاص بك بنفس الحساب.";
 
 /* alert title */
-"SECONDARY_ONBOARDING_INSTALL_PRIMARY_FIRST_TITLE" = "قُم بتثبيت سيجنال على الهاتف الخاص بك";
+"SECONDARY_ONBOARDING_INSTALL_PRIMARY_FIRST_TITLE" = "قُم بتثبيت Radar على الهاتف الخاص بك";
 
 /* body text while displaying a QR code which, when scanned, will link this device. */
-"SECONDARY_ONBOARDING_SCAN_CODE_BODY" = "انقر على صورة حسابك الشخصي لفتح ‫إعدادات تطبيق ‫‫سيجنال‬‬‫ على الهاتف الخاص بك. بعد ذلك انقر على \"اﻷجهزة المُرتبطة\" ثم \"ربط جهاز جديد\" لمسح هذا الكود عن طريق هاتفك:";
+"SECONDARY_ONBOARDING_SCAN_CODE_BODY" = "انقر على صورة حسابك الشخصي لفتح ‫إعدادات تطبيق ‫‫رادار‬‬‫ على الهاتف الخاص بك. بعد ذلك انقر على \"اﻷجهزة المُرتبطة\" ثم \"ربط جهاز جديد\" لمسح هذا الكود عن طريق هاتفك:";
 
 /* Link text for page with troubleshooting info shown on the QR scanning screen */
 "SECONDARY_ONBOARDING_SCAN_CODE_HELP_TEXT" = "مِن هُنا احصل على المُساعدة في ربط الآيباد الخاص بك";
@@ -7698,7 +7698,7 @@ Send money securely.";
 "SECONDARY_ONBOARDING_SCAN_CODE_TITLE" = "امسَح كود الـ QR باستخدام هاتفك";
 
 /* header text before the user can transfer to this device */
-"SECONDARY_TRANSFER_GET_STARTED_BY_OPENING_IPAD" = "شَغِّل سيجنال على جهاز الآيباد القديم الخاص بك لكي تنقل الحساب الخاص بك.";
+"SECONDARY_TRANSFER_GET_STARTED_BY_OPENING_IPAD" = "شَغِّل Radar على جهاز الآيباد القديم الخاص بك لكي تنقل الحساب الخاص بك.";
 
 /* No comment provided by engineer. */
 "SECURE_SESSION_RESET" = "أُعيدَ ضبط الجلسة الآمنة.";
@@ -7788,7 +7788,7 @@ Send money securely.";
 "SEPA_DONATION_NAME_PLACEHOLDER" = "الاسم كما يظهر في الحساب المصرفي";
 
 /* Description for the session refresh alert */
-"SESSION_REFRESH_ALERT_MESSAGE" = "يستخدم سيجنال التشفير من طرف لِطرف، وقد يحتاج إلى تحديث جلسة الدردشة الخاصة بك في بعض الأحيان. لا يُؤثِّر هذا على أمان الدردشة ولكن رُبما تكون أنت قد فوَّتَ رسالة من جهة الاتصال هذه. ولذلك، يُمكِنُك سؤاله لإعادة إرسالها.";
+"SESSION_REFRESH_ALERT_MESSAGE" = "يستخدم Radar التشفير من طرف لِطرف، وقد يحتاج إلى تحديث جلسة الدردشة الخاصة بك في بعض الأحيان. لا يُؤثِّر هذا على أمان الدردشة ولكن رُبما تكون أنت قد فوَّتَ رسالة من جهة الاتصال هذه. ولذلك، يُمكِنُك سؤاله لإعادة إرسالها.";
 
 /* Title for the session refresh alert */
 "SESSION_REFRESH_ALERT_TITLE" = "تمَّ تحديث جلسة الدردشة";
@@ -7830,7 +7830,7 @@ Send money securely.";
 "SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_COUNTRY" = "الموقع الجغرافي";
 
 /* Table footer for the 'censorship circumvention' section when censorship circumvention can be manually enabled. */
-"SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_FOOTER" = "في حالة التفعيل، سيُحاول تطبيق سيجنال تجاوز الرقابة. لا تُفعِّل هذه الميزة إلّا إذا كُنتَ في مكان يخضع فيه سيجنال للرقابة.";
+"SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_FOOTER" = "في حالة التفعيل، سيُحاول تطبيق Radar تجاوز الرقابة. لا تُفعِّل هذه الميزة إلّا إذا كُنتَ في مكان يخضع فيه Radar للرقابة.";
 
 /* Table footer for the 'censorship circumvention' section shown when censorship circumvention has been auto-enabled based on local phone number. */
 "SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_FOOTER_AUTO_ENABLED" = "تمَّ تنشيط تجاوز الرقابة استنادًا على رقم الهاتف الخاص بحسابك.";
@@ -7842,7 +7842,7 @@ Send money securely.";
 "SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_FOOTER_NO_CONNECTION" = "لا يمكن تفعيل تجاوز الرقابة إلّا عند الاتصال بالإنترنت.";
 
 /* Table footer for the 'censorship circumvention' section shown when the app is connected to the Signal service. */
-"SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_FOOTER_WEBSOCKET_CONNECTED" = "تجاوُز الرقابة ليس ضُروريًا؛ أنت بالفعل مُتصل بخدمة سيجنال.";
+"SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_FOOTER_WEBSOCKET_CONNECTED" = "تجاوُز الرقابة ليس ضُروريًا؛ أنت بالفعل مُتصل بخدمة Radar.";
 
 /* Label for the 'advanced pin settings' button. */
 "SETTINGS_ADVANCED_PIN_SETTINGS" = "الإعدادات المُتقدِّمة لرقم الـ PIN";
@@ -7869,13 +7869,13 @@ Send money securely.";
 "SETTINGS_ADVANCED_VIEW_ERROR_LOG" = "سجلَّات الأخطاء";
 
 /* Information on sheet about changing the app icon - first line */
-"SETTINGS_APP_ICON_EDUCATION_APP_NAME" = "سيظهر اسم التطبيق \"سيجنال\" على الشاشة الرئيسية وفي الإشعارات ومكتبة التطبيقات.";
+"SETTINGS_APP_ICON_EDUCATION_APP_NAME" = "سيظهر اسم التطبيق \"Radar\" على الشاشة الرئيسية وفي الإشعارات ومكتبة التطبيقات.";
 
 /* Information on sheet about changing the app icon - second line */
-"SETTINGS_APP_ICON_EDUCATION_HOME_SCREEN_DOCK" = "يمكنك إخفاء اسم التطبيق \"سيجنال\" من الشاشة الرئيسية عبر نقل التطبيق إلى الرصيف في أسفل الصفحة الرئيسية.";
+"SETTINGS_APP_ICON_EDUCATION_HOME_SCREEN_DOCK" = "يمكنك إخفاء اسم التطبيق \"Radar\" من الشاشة الرئيسية عبر نقل التطبيق إلى الرصيف في أسفل الصفحة الرئيسية.";
 
 /* The footer for the app icon selection settings page. */
-"SETTINGS_APP_ICON_FOOTER" = "سيظهر اسم التطبيق \"سيجنال\" على الشاشة الرئيسية وفي الإشعارات ومكتبة التطبيقات.";
+"SETTINGS_APP_ICON_FOOTER" = "سيظهر اسم التطبيق \"Radar\" على الشاشة الرئيسية وفي الإشعارات ومكتبة التطبيقات.";
 
 /* The title for the app icon selection settings page. */
 "SETTINGS_APP_ICON_TITLE" = "أيقونة التطبيق";
@@ -7905,7 +7905,7 @@ Send money securely.";
 "SETTINGS_BLOCK_LIST_ADD_BUTTON" = "احظُرأحد المُستخدِمين";
 
 /* A label that indicates the user has no Signal contacts that they haven't blocked. */
-"SETTINGS_BLOCK_LIST_NO_CONTACTS" = "ليس لديك جهات اتصال على سيجنال.";
+"SETTINGS_BLOCK_LIST_NO_CONTACTS" = "ليس لديك جهات اتصال على Radar.";
 
 /* A label that indicates the user's search has no matching results. */
 "SETTINGS_BLOCK_LIST_NO_SEARCH_RESULTS" = "لا نتائج للبحث";
@@ -7917,7 +7917,7 @@ Send money securely.";
 "SETTINGS_CALLING_HIDES_IP_ADDRESS_PREFERENCE_TITLE" = "إعادة توجيه المكالمات دائمًا";
 
 /* User settings section footer, a detailed explanation */
-"SETTINGS_CALLING_HIDES_IP_ADDRESS_PREFERENCE_TITLE_DETAIL" = "إعادة توجيه جميع المكالمات عبر خادم سيجنال لتفادي كشف عنوان البروكسي الخاص بك لجهة اتصالك. ستنخفض جودة المكالمات عند التفعيل.";
+"SETTINGS_CALLING_HIDES_IP_ADDRESS_PREFERENCE_TITLE_DETAIL" = "إعادة توجيه جميع المكالمات عبر خادم Radar لتفادي كشف عنوان البروكسي الخاص بك لجهة اتصالك. ستنخفض جودة المكالمات عند التفعيل.";
 
 /* Label for the 'edit phone number' button in the 'change phone number' views. */
 "SETTINGS_CHANGE_PHONE_NUMBER_BACK_TO_EDIT_BUTTON" = "تعديل الرقم";
@@ -7962,7 +7962,7 @@ Send money securely.";
 "SETTINGS_CLEAR_HISTORY" = "إزالة سجل الدردشة";
 
 /* Footer for the 'about' help section */
-"SETTINGS_COPYRIGHT" = "حقوق النشر محفوظة لتطبيق سيجنال للدردشة\nمُرخَّص بموجب AGPLv3";
+"SETTINGS_COPYRIGHT" = "حقوق النشر محفوظة لتطبيق Radar للدردشة\nمُرخَّص بموجب AGPLv3";
 
 /* Label for the 'data' section of the app settings. */
 "SETTINGS_DATA" = "استخدام البيانات";
@@ -8034,7 +8034,7 @@ Send money securely.";
 "SETTINGS_DISAPPEARING_MESSAGES_FOOTER" = "تعيين مؤقِّت افتراضي لاختفاء الرسائل لجميع الدردشات الجديدة التي قُمتَ ببدئها.";
 
 /* Title for the 'donate to signal' link in settings. */
-"SETTINGS_DONATE" = "التبرُّع لسيجنال";
+"SETTINGS_DONATE" = "التبرُّع لRadar";
 
 /* Title for help button and help pages in app settings. */
 "SETTINGS_HELP" = "المُساعدة";
@@ -8103,7 +8103,7 @@ Send money securely.";
 "SETTINGS_NOTIFICATION_CONTENT_TITLE" = "مُحتوى الإشعارات";
 
 /* When the local device discovers a contact has recently installed signal, the app can generates a message encouraging the local user to say hello. Turning this switch off disables that feature. */
-"SETTINGS_NOTIFICATION_EVENTS_CONTACT_JOINED_SIGNAL" = "جهة اتصال انضَمَّت إلى سيجنال";
+"SETTINGS_NOTIFICATION_EVENTS_CONTACT_JOINED_SIGNAL" = "جهة اتصال انضَمَّت إلى Radar";
 
 /* table section header */
 "SETTINGS_NOTIFICATION_NOTIFY_WHEN_TITLE" = "أخبرني عندما…";
@@ -8140,7 +8140,7 @@ Send money securely.";
 "SETTINGS_PAYMENTS_BITCOIN_UNIT" = "وحدة البيتكوين";
 
 /* Error message indicating that payments could not be activated because the feature is not currently available. */
-"SETTINGS_PAYMENTS_CANNOT_ACTIVATE_PAYMENTS_KILL_SWITCH" = "لم تعد المدفوعات متاحة في سيجنال. يمكنك دومًا إرسال المدفوعات إلى منصة للتداول، لكن لم يعد بإمكانك إرسال أو استلام المدفوعات أو إضافة المبالغ.";
+"SETTINGS_PAYMENTS_CANNOT_ACTIVATE_PAYMENTS_KILL_SWITCH" = "لم تعد المدفوعات متاحة في رادار. يمكنك دومًا إرسال المدفوعات إلى منصة للتداول، لكن لم يعد بإمكانك إرسال أو استلام المدفوعات أو إضافة المبالغ.";
 
 /* Error message indicating that payments could not be deactivated because the current balance is unavailable. */
 "SETTINGS_PAYMENTS_CANNOT_DEACTIVATE_PAYMENTS_NO_BALANCE" = "تعذَّر إلغاء تفعيل المدفوعات لأن رصيدك غير مُتاح. يُرجى التحقُّق من اتصالك بالإنترنت ثم المحاولة مرّة أخرى.";
@@ -8149,10 +8149,10 @@ Send money securely.";
 "SETTINGS_PAYMENTS_CANNOT_SEND_PAYMENT_NO_BALANCE" = "تعذَّر إتمام الدفع لأن رصيدك غير متاح. يُرجى التحقُّق من اتصالك بالإنترنت ثم المحاولة مرّة أخرى.";
 
 /* Error message indicating that payments cannot be sent because the feature is not currently available. */
-"SETTINGS_PAYMENTS_CANNOT_SEND_PAYMENTS_KILL_SWITCH" = "لم تعد المدفوعات متاحة في سيجنال. يمكنك دومًا إرسال المدفوعات إلى منصة للتداول لكن لم يعد بإمكانك إرسال أو استلام المدفوعات أو إضافة مبالغ.";
+"SETTINGS_PAYMENTS_CANNOT_SEND_PAYMENTS_KILL_SWITCH" = "لم تعد المدفوعات متاحة في رادار. يمكنك دومًا إرسال المدفوعات إلى منصة للتداول لكن لم يعد بإمكانك إرسال أو استلام المدفوعات أو إضافة مبالغ.";
 
 /* Error message indicating that you cannot transfer into your payments wallet because the feature is not currently available. */
-"SETTINGS_PAYMENTS_CANNOT_TRANSFER_IN_KILL_SWITCH" = "لم تعد المدفوعات متاحة في سيجنال. يمكنك دومًا إرسال المدفوعات إلى منصة للتداول لكن لم يعد بإمكانك إرسال أو استلام المدفوعات أو إضافة مبالغ.";
+"SETTINGS_PAYMENTS_CANNOT_TRANSFER_IN_KILL_SWITCH" = "لم تعد المدفوعات متاحة في رادار. يمكنك دومًا إرسال المدفوعات إلى منصة للتداول لكن لم يعد بإمكانك إرسال أو استلام المدفوعات أو إضافة مبالغ.";
 
 /* Message for the 'currency conversions info' alert. */
 "SETTINGS_PAYMENTS_CURRENCY_CONVERSIONS_INFO_ALERT_MESSAGE" = "التحويلات هي تقديرات فقط، وقد لا تكون دقيقة.";
@@ -8179,10 +8179,10 @@ Send money securely.";
 "SETTINGS_PAYMENTS_DEACTIVATE_TITLE" = "تعطيل المدفوعات";
 
 /* Explanation of the 'deactivate payments with balance' process in the 'deactivate payments' settings. */
-"SETTINGS_PAYMENTS_DEACTIVATE_WITH_BALANCE_EXPLANATION" = "يُوصَى بإرسال رصيدك المالي إلى عنوان محفظة أخرى قبل تعطيل عمليات الدفع. إذا اخترتَ عدم إرسال أموالك الآن، سَتبقى في محفظتك مرتبطة بسيجنال إذا أعدت تفعيل المدفوعات.";
+"SETTINGS_PAYMENTS_DEACTIVATE_WITH_BALANCE_EXPLANATION" = "يُوصَى بإرسال رصيدك المالي إلى عنوان محفظة أخرى قبل تعطيل عمليات الدفع. إذا اخترتَ عدم إرسال أموالك الآن، سَتبقى في محفظتك مرتبطة بRadar إذا أعدت تفعيل المدفوعات.";
 
 /* Description for the 'deactivate payments confirmation' UI in the payment settings. */
-"SETTINGS_PAYMENTS_DEACTIVATE_WITHOUT_TRANSFER_CONFIRM_DESCRIPTION" = "سَيبقى رصيدك في محفظتك مُرتبطًا بسيجنال إذا اخترتَ إعادة تفعيل المدفوعات.";
+"SETTINGS_PAYMENTS_DEACTIVATE_WITHOUT_TRANSFER_CONFIRM_DESCRIPTION" = "سَيبقى رصيدك في محفظتك مُرتبطًا بRadar إذا اخترتَ إعادة تفعيل المدفوعات.";
 
 /* Title for the 'deactivate payments confirmation' UI in the payment settings. */
 "SETTINGS_PAYMENTS_DEACTIVATE_WITHOUT_TRANSFER_CONFIRM_TITLE" = "هل ترغبُ بالتعطيل بدون أي إرسال؟";
@@ -8420,7 +8420,7 @@ Send money securely.";
 "SETTINGS_PAYMENTS_PAYMENTS_LOCK_PROMPT_EXPLANATION_TOUCHID" = "ساعِد في منع أي شخص يستخدم هاتفكَ من الوصول إلى أموالك عن طريق تفعيل بصمة الإصبع (Touch ID). يُمكنك تعطيل هذا الخيار في \"الإعدادات\".";
 
 /* Button for payments outdated sheet. */
-"SETTINGS_PAYMENTS_PAYMENTS_OUTDATED_BUTTON" = "‫تحديث سيجنال‬";
+"SETTINGS_PAYMENTS_PAYMENTS_OUTDATED_BUTTON" = "‫تحديث Radar‬";
 
 /* Message for payments outdated sheet. */
 "SETTINGS_PAYMENTS_PAYMENTS_OUTDATED_MESSAGE" = "يَجب تحديث التطبيق لمتابعة إرسال عمليات الدفع واستلامها، ولعرض رصيد عمليات الدفع المُحدَّثة الخاصة بك.";
@@ -8558,7 +8558,7 @@ Send money securely.";
 "SETTINGS_PAYMENTS_TITLE" = "المدفوعات";
 
 /* Error indicating that it is not valid to send yourself a payment. */
-"SETTINGS_PAYMENTS_TRANSFER_OUT_CANNOT_SEND_TO_SELF" = "لا يمكنك الإرسال إلى عنوان محفظتك بسيجنال. قُم بإدخال عنوان المحفظة انطلاقًا من حسابك في منصة تداول تدعم ذلك.";
+"SETTINGS_PAYMENTS_TRANSFER_OUT_CANNOT_SEND_TO_SELF" = "لا يمكنك الإرسال إلى عنوان محفظتك بRadar. قُم بإدخال عنوان المحفظة انطلاقًا من حسابك في منصة تداول تدعم ذلك.";
 
 /* Footer of the 'transfer currency out' view in the payment settings. */
 "SETTINGS_PAYMENTS_TRANSFER_OUT_FOOTER" = "Transfer Bitcoin by sending to the Lightning address or invoice provided by the recipient. The address is typically displayed below the QR code.";
@@ -8621,7 +8621,7 @@ Send money securely.";
 "SETTINGS_PAYMENTS_VIEW_PASSPHRASE_TITLE" = "عبارة الاستعادة";
 
 /* Header text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "اكتب هذه الكلمات الـ 24 بالترتيب واحتفظ بها في مكان آمن. يمكنك استخدامها لاستعادة رصيدك في Cake Wallet أو محافظ أخرى متوافقة مع Spark.";
+"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "اكتب هذه الكلمات الـ 12 بالترتيب واحتفظ بها في مكان آمن. يمكنك استخدامها لاستعادة رصيدك في Cake Wallet أو محافظ أخرى متوافقة مع Spark.";
 
 /* Footer text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
 "SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_FOOTER_2" = "لا تشارك هذه العبارة مع أحد";
@@ -8642,7 +8642,7 @@ Send money securely.";
 "SETTINGS_PHONE_NUMBER_DISCOVERABILITY_DISABLED_TOAST" = "لتغيير هذا الإعداد، اختر \"لا أحد\" عند تحديد \"من يُمكنه رؤية رقمي\".";
 
 /* The description for a sheet asking for confirmation that the user wants to set their phone number discoverability to 'nobody'. */
-"SETTINGS_PHONE_NUMBER_DISCOVERABILITY_NOBODY_CONFIRMATION_DESCRIPTION" = "يُمكن أن يُصعِّب اختيار \"لا أحد\" في إعداد \"من يمكنه العثور عليَّ باستخدام رقمي\" على الناس العثور عليك على سيجنال.";
+"SETTINGS_PHONE_NUMBER_DISCOVERABILITY_NOBODY_CONFIRMATION_DESCRIPTION" = "يُمكن أن يُصعِّب اختيار \"لا أحد\" في إعداد \"من يمكنه العثور عليَّ باستخدام رقمي\" على الناس العثور عليك على Radar.";
 
 /* The title for a sheet asking for confirmation that the user wants to set their phone number discoverability to 'nobody'. */
 "SETTINGS_PHONE_NUMBER_DISCOVERABILITY_NOBODY_CONFIRMATION_TITLE" = "هل أنت مُتأكِّد؟";
@@ -8651,7 +8651,7 @@ Send money securely.";
 "SETTINGS_PHONE_NUMBER_DISCOVERABILITY_TITLE" = "مَن يُمكنه إيجادي من خلال رقمي";
 
 /* Description label for Phone Number Privacy */
-"SETTINGS_PHONE_NUMBER_PRIVACY_DESCRIPTION_LABEL" = "اختر من يمكنه رؤية رقم هاتفك ومن يمكنه التواصل معك على سيجنال باستخدامه.";
+"SETTINGS_PHONE_NUMBER_PRIVACY_DESCRIPTION_LABEL" = "اختر من يمكنه رؤية رقم هاتفك ومن يمكنه التواصل معك على Radar باستخدامه.";
 
 /* The title for phone number privacy settings. */
 "SETTINGS_PHONE_NUMBER_PRIVACY_TITLE" = "رقم الهاتف";
@@ -8663,16 +8663,16 @@ Send money securely.";
 "SETTINGS_PIN_REMINDER_DISABLE_CONFIRMATION_ACTION" = "إيقاف التذكيرات";
 
 /* The explanation for the dialog asking user to confirm their PIN to disable reminders */
-"SETTINGS_PIN_REMINDER_DISABLE_CONFIRMATION_EXPLANATION" = "تأكَّد من حفظ رقم التعريف الشخصي (PIN) الخاص بك أو تخزينه بشكلٍ آمن لأنه لا يُمكن استعادته. إذا نسيت رقم التعريف الشخصي (PIN) الخاص بك، قد تفقد البيانات عند إعادة تسجيل حساب سيجنال الخاص بك.";
+"SETTINGS_PIN_REMINDER_DISABLE_CONFIRMATION_EXPLANATION" = "تأكَّد من حفظ رقم التعريف الشخصي (PIN) الخاص بك أو تخزينه بشكلٍ آمن لأنه لا يُمكن استعادته. إذا نسيت رقم التعريف الشخصي (PIN) الخاص بك، قد تفقد البيانات عند إعادة تسجيل حساب Radar الخاص بك.";
 
 /* The title for the dialog asking user to confirm their PIN to disable reminders */
-"SETTINGS_PIN_REMINDER_DISABLE_CONFIRMATION_TITLE" = "تأكيد رقم PIN على سيجنال";
+"SETTINGS_PIN_REMINDER_DISABLE_CONFIRMATION_TITLE" = "تأكيد رقم PIN على Radar";
 
 /* Label for the 'pin reminder' switch of the privacy settings. */
 "SETTINGS_PIN_REMINDER_SWITCH_LABEL" = "تذكيرات رقم التعريف الشخصي (PIN)";
 
 /* Footer for the 'PINs' section of the privacy settings. */
-"SETTINGS_PINS_FOOTER" = "أرقام التعريف الشخصي (PIN) تُبقي المعلومات المحفوظة مع سيجنال مُشفَّرة، بحيث تستطيع أنت فقط الوصول إليها. لا يمكن استرداد رقم التعريف الشخصي (PIN) الخاص بك. سيتم استرجاع حسابك الشخصي، والإعدادات وجهات الاتصال عندما تُعيد تثبيت سيجنال.";
+"SETTINGS_PINS_FOOTER" = "أرقام التعريف الشخصي (PIN) تُبقي المعلومات المحفوظة مع Radar مُشفَّرة، بحيث تستطيع أنت فقط الوصول إليها. لا يمكن استرداد رقم التعريف الشخصي (PIN) الخاص بك. سيتم استرجاع حسابك الشخصي، والإعدادات وجهات الاتصال عندما تُعيد تثبيت Radar.";
 
 /* Label for the 'pins' item of the privacy settings when the user does have a pin. */
 "SETTINGS_PINS_ITEM" = "تغيير رقم الـ PIN";
@@ -8681,7 +8681,7 @@ Send money securely.";
 "SETTINGS_PINS_ITEM_CREATE" = "إنشاء رقم تعريف شخصي (PIN)";
 
 /* Title for the 'PINs' section of the privacy settings. */
-"SETTINGS_PINS_TITLE" = "رقم PIN على سيجنال";
+"SETTINGS_PINS_TITLE" = "رقم PIN على Radar";
 
 /* Footer for table section */
 "SETTINGS_PRIVACY_ADVANCED_FOOTER" = "تجاوز الرقابة، واستخدام البروكسي، ودعم المكالمات دومًا، وإعدادات المُرسِل المُشفَّر.";
@@ -8723,7 +8723,7 @@ Send money securely.";
 "SETTINGS_REGISTRATION_LOCK_TURN_ON_ERROR_PIN_REQUIRED" = "عليك أن تُنشِئ رقم تعريف شخصي (PIN) لاستخدام قفل التسجيل.";
 
 /* Body for the alert confirming that the user wants to turn on registration lock. */
-"SETTINGS_REGISTRATION_LOCK_TURN_ON_MESSAGE" = "إذا نسيتَ رقم التعريف الشخصي (PIN) الخاص بسيجنال خلال التسجيل مرّة أُخرى في سيجنال، سوف يُقفَل حسابك لمدة سبعة أيام.";
+"SETTINGS_REGISTRATION_LOCK_TURN_ON_MESSAGE" = "إذا نسيتَ رقم التعريف الشخصي (PIN) الخاص بRadar خلال التسجيل مرّة أُخرى في Radar، سوف يُقفَل حسابك لمدة سبعة أيام.";
 
 /* Title for the alert confirming that the user wants to turn on registration lock. */
 "SETTINGS_REGISTRATION_LOCK_TURN_ON_TITLE" = "هل ترغبُ بتفعيل قفل التسجيل؟";
@@ -8753,19 +8753,19 @@ Send money securely.";
 "SETTINGS_SECTION_TITLE_CALLING" = "المكالمات";
 
 /* Section footer */
-"SETTINGS_SECURITY_DETAIL" = "استخدِم بصمة الإصبع (Finger ID) أو تقنية التعرُّف على الوجه (Face ID) أو رمز المرور لجِهاز iOS الخاصّ بك لفك قفل سيجنال.";
+"SETTINGS_SECURITY_DETAIL" = "استخدِم بصمة الإصبع (Finger ID) أو تقنية التعرُّف على الوجه (Face ID) أو رمز المرور لجِهاز iOS الخاصّ بك لفك قفل Radar.";
 
 /* Section footer */
-"SETTINGS_SECURITY_DETAIL_FACEID" = "استخدِم تقنية التعرُّف على الوجه (Face ID) لفك قفل سيجنال.";
+"SETTINGS_SECURITY_DETAIL_FACEID" = "استخدِم تقنية التعرُّف على الوجه (Face ID) لفك قفل Radar.";
 
 /* Section footer */
-"SETTINGS_SECURITY_DETAIL_OPTICID" = "استخدِم Optic ID لفتح قفل سيجنال.";
+"SETTINGS_SECURITY_DETAIL_OPTICID" = "استخدِم Optic ID لفتح قفل Radar.";
 
 /* Section footer */
-"SETTINGS_SECURITY_DETAIL_PASSCODE" = "استخدِم رمز المرور الخاص بجهازك لفك قفل سيجنال.";
+"SETTINGS_SECURITY_DETAIL_PASSCODE" = "استخدِم رمز المرور الخاص بجهازك لفك قفل Radar.";
 
 /* Section footer */
-"SETTINGS_SECURITY_DETAIL_TOUCHID" = "استخدِم بصمة الإصبع (Touch ID) لفك فقل سيجنال.";
+"SETTINGS_SECURITY_DETAIL_TOUCHID" = "استخدِم بصمة الإصبع (Touch ID) لفك فقل Radar.";
 
 /* Section header */
 "SETTINGS_SECURITY_TITLE" = "أمان التطبيق";
@@ -8780,13 +8780,13 @@ Send money securely.";
 "SETTINGS_SHARING_SUGGESTIONS" = "مشاركة جهات الاتصال مع ‫نظام iOS‬";
 
 /* Footer for setting for enabling & disabling contact and notification sharing with iOS. */
-"SETTINGS_SHARING_SUGGESTIONS_NOTIFICATIONS_FOOTER" = "السماح لنظام iOS‬ بالوصول إلى جهات الاتصال على سيجنال وإلى الدردشات لاستخدام ميزات مثل مشاركة الاقتراحات والإشعارات.";
+"SETTINGS_SHARING_SUGGESTIONS_NOTIFICATIONS_FOOTER" = "السماح لنظام iOS‬ بالوصول إلى جهات الاتصال على Radar وإلى الدردشات لاستخدام ميزات مثل مشاركة الاقتراحات والإشعارات.";
 
 /* Label for the 'enable registration lock' switch of the privacy settings. */
 "SETTINGS_TWO_FACTOR_AUTH_SWITCH_LABEL" = "قفل التسجيل";
 
 /* Footer for the 'two factor auth' section of the privacy settings when Signal PINs are available. */
-"SETTINGS_TWO_FACTOR_PINS_AUTH_FOOTER" = "رقم التعريف الشخصي (PIN) على سيجنال مطلوب لتسجيل رقم هاتفك مع سيجنال مرّة أُخرى.";
+"SETTINGS_TWO_FACTOR_PINS_AUTH_FOOTER" = "رقم التعريف الشخصي (PIN) على Radar مطلوب لتسجيل رقم هاتفك مع Radar مرّة أُخرى.";
 
 /* Label for the 'typing indicators' setting. */
 "SETTINGS_TYPING_INDICATORS" = "مؤشِّرات الكتابة";
@@ -8819,7 +8819,7 @@ Send money securely.";
 "SHARE_EXTENSION_LOADING" = "جارٍ التحميل...";
 
 /* Message indicating that the share extension cannot be used until the user has registered in the main app. */
-"SHARE_EXTENSION_NOT_REGISTERED_MESSAGE" = "شغِّل تطبيق سيجنال للتسجيل.";
+"SHARE_EXTENSION_NOT_REGISTERED_MESSAGE" = "شغِّل تطبيق Radar للتسجيل.";
 
 /* Title indicating that the share extension cannot be used until the user has registered in the main app. */
 "SHARE_EXTENSION_NOT_REGISTERED_TITLE" = "غير مُسجَّل";
@@ -8837,7 +8837,7 @@ Send money securely.";
 "SHARE_EXTENSION_UNABLE_TO_BUILD_ATTACHMENT_ALERT_TITLE" = "تعذَّر تجهيز الملف المُرفَق";
 
 /* Title for the 'share extension' view. */
-"SHARE_EXTENSION_VIEW_TITLE" = "مشاركة على سيجنال";
+"SHARE_EXTENSION_VIEW_TITLE" = "مشاركة على Radar";
 
 /* Title of alert indicating sharing suggestions failed to deactivate */
 "SHARING_SUGGESTIONS_DISABLE_ERROR" = "فَشَلَ تعطيل اقتراحات المُشاركة.";
@@ -8846,10 +8846,10 @@ Send money securely.";
 "SHOW_THREAD_BUTTON_TITLE" = "إظهار الدردشة";
 
 /* Shown in the header when the user hasn't provided a custom name for a call. */
-"SIGNAL_CALL" = "مكالمة سيجنال";
+"SIGNAL_CALL" = "مكالمة Radar";
 
 /* body sent to contacts when inviting to Install Signal */
-"SMS_INVITE_BODY" = "أدعوكَ لتثبيت تطبيق سيجنال! ها هو الرابط:";
+"SMS_INVITE_BODY" = "أدعوكَ لتثبيت تطبيق Radar! ها هو الرابط:";
 
 /* An error message generically indicating that something went wrong. */
 "SOMETHING_WENT_WRONG_ERROR" = "حدث خطأ ما.";
@@ -8873,7 +8873,7 @@ Send money securely.";
 "SPAM_CAPTCHA_DISMISS_CONFIRMATION_TITLE" = "هَل تُريد المُتابعة دُونَ تَحقُّق؟";
 
 /* Body for action sheet explaining captcha requirement. */
-"SPAM_CAPTCHA_SHEET_BODY" = "للمساعدة على الوقاية من البريد العشوائي في سيجنال، يُرجى إتمام عملية التحقُّق.\n\nبعد التأكُّد من ذلك، يمكنك الاستمرار في التراسُل. أي رسالة متوقِّفة مؤقَّتًا سوف تُرسَل تلقائيًا.";
+"SPAM_CAPTCHA_SHEET_BODY" = "للمساعدة على الوقاية من البريد العشوائي في Radar، يُرجى إتمام عملية التحقُّق.\n\nبعد التأكُّد من ذلك، يمكنك الاستمرار في التراسُل. أي رسالة متوقِّفة مؤقَّتًا سوف تُرسَل تلقائيًا.";
 
 /* Title for action sheet explaining captcha requirement. */
 "SPAM_CAPTCHA_SHEET_TITLE" = "قُم بالتحقُّق لمواصلة المراسلة";
@@ -8909,7 +8909,7 @@ Send money securely.";
 "STICKERS_INSTALL_BUTTON" = "تثبيت";
 
 /* Title for the 'available built-in stickers' section of the 'manage stickers' view. */
-"STICKERS_MANAGE_VIEW_AVAILABLE_BUILT_IN_PACKS_SECTION_TITLE" = "حزَم المُلصَقات الفنية على سيجنال";
+"STICKERS_MANAGE_VIEW_AVAILABLE_BUILT_IN_PACKS_SECTION_TITLE" = "حزَم المُلصَقات الفنية على Radar";
 
 /* Title for the 'available known stickers' section of the 'manage stickers' view. */
 "STICKERS_MANAGE_VIEW_AVAILABLE_KNOWN_PACKS_SECTION_TITLE" = "حزم المُلصَقات التي قد تلقيتها";
@@ -9191,19 +9191,19 @@ Send money securely.";
 "STORY_SETTINGS_LEARN_MORE_SHEET_FOOTER" = "يمكن لِجهات اتصالكَ رؤية اسمك وصورتك، كما يمكنهم الاطِّلاع على منشوراتك في \"قصتي\" إلّا إذا أخفيتها عنهم.";
 
 /* Header for the explainer sheet for signal connections */
-"STORY_SETTINGS_LEARN_MORE_SHEET_HEADER_FORMAT" = "<strong>‫جهات اتصال سيجنال‬</strong> هم الأفراد الذي اخترت الثقة بهم، إما عبر:";
+"STORY_SETTINGS_LEARN_MORE_SHEET_HEADER_FORMAT" = "<strong>‫جهات اتصال Radar‬</strong> هم الأفراد الذي اخترت الثقة بهم، إما عبر:";
 
 /* Label for the stories section of the settings view */
 "STORY_SETTINGS_TITLE" = "القِصَص";
 
 /* Section footer for the 'viewers' section on the 'story settings' view */
-"STORY_SETTINGS_WHO_CAN_VIEW_THIS_FOOTER" = "اِختر من يُمكنه رؤية قصتك من جهات اتصال سيجنال. لن تؤثِّر التغييرات على القِصص التي أرسلتها من قبل.";
+"STORY_SETTINGS_WHO_CAN_VIEW_THIS_FOOTER" = "اِختر من يُمكنه رؤية قصتك من جهات اتصال Radar. لن تؤثِّر التغييرات على القِصص التي أرسلتها من قبل.";
 
 /* Section header for the 'viewers' section on the 'story settings' view */
 "STORY_SETTINGS_WHO_CAN_VIEW_THIS_HEADER" = "من يمكنه مشاهدة هذه القصة";
 
 /* Header for the 'viewers' section on the 'story settings' bottom sheet */
-"STORY_SETTINGS_WHO_CAN_VIEW_THIS_SHEET_HEADER" = "اختر من يُمكنه مشاهدة قصتك من جهات اتصال سيجنال. يُمكنك تغيير هذا في أي وقت ضمن إعدادات الخصوصية.";
+"STORY_SETTINGS_WHO_CAN_VIEW_THIS_SHEET_HEADER" = "اختر من يُمكنه مشاهدة قصتك من جهات اتصال Radar. يُمكنك تغيير هذا في أي وقت ضمن إعدادات الخصوصية.";
 
 /* Tooltip text shown when the user selects a story as a destination for a long duration video that will be split into shorter segments. Embeds {{ segment duration in seconds }} */
 "STORY_VIDEO_SEGMENTATION_TOOLTIP_FORMAT" = "سَيتمُّ تجزئة الفيديوهات المُرسَلة إلى القِصص إلى مقاطع من %1$d ثانية وإرسالها كعِدة قصص.";
@@ -9242,7 +9242,7 @@ Send money securely.";
 "SUPPORT_EMAIL_DEFAULT_DESCRIPTION" = "أخبِرنا حول المشكلة: ";
 
 /* Message for alert dialog presented when a support email failed to send */
-"SUPPORT_EMAIL_ERROR_ALERT_DESCRIPTION" = "يُرجى إرسال طلب الدعم بواسطة البَريد الإلكتروني إلى support@signal.org";
+"SUPPORT_EMAIL_ERROR_ALERT_DESCRIPTION" = "يُرجى إرسال طلب الدعم بواسطة البَريد الإلكتروني إلى support@radar.chat";
 
 /* Localized label for support request email filter string. Embeds {{filter text}}. */
 "SUPPORT_EMAIL_FILTER_LABEL_FORMAT" = "الفلتر: %1$@";
@@ -9266,7 +9266,7 @@ Send money securely.";
 "SUPPORT_EMAIL_LOG_URL_LABEL_FORMAT" = "Log URL: %1$@";
 
 /* Localized subject for support request emails */
-"SUPPORT_EMAIL_SUBJECT" = "طلب دعم خاص بمُستخدِمي سيجنال iOS";
+"SUPPORT_EMAIL_SUBJECT" = "طلب دعم خاص بمُستخدِمي Radar iOS";
 
 /* Header for emoji mood selection */
 "SUPPORT_EMOJI_PROMPT" = "ما هو شعورك؟ (اِختياري)";
@@ -9338,7 +9338,7 @@ Send money securely.";
 "SWITCH_ON" = "مُفعَّل";
 
 /* Name to display for the 'system' sender, e.g. for release notes and the onboarding story */
-"SYSTEM_ADDRESS_NAME" = "سيجنال";
+"SYSTEM_ADDRESS_NAME" = "Radar";
 
 /* Label for button to verify a user's safety number. */
 "SYSTEM_MESSAGE_ACTION_VERIFY_SAFETY_NUMBER" = "التحقُّق";
@@ -9497,16 +9497,16 @@ Send money securely.";
 "TIME_AMOUNT_WEEKS_SHORT_FORMAT" = "%1$@أ";
 
 /* Button for bottom sheet shown when device transfer completes on the receiving device. Tapping will terminate the Signal app and trigger a notification to relaunch. */
-"TRANSFER_COMPLETE_SHEET_BUTTON" = "أغلِق سيجنال";
+"TRANSFER_COMPLETE_SHEET_BUTTON" = "أغلِق Radar";
 
 /* Subtitle for bottom sheet shown when device transfer completes on the receiving device. */
-"TRANSFER_COMPLETE_SHEET_SUBTITLE" = "لبدء استخدام حسابك على هذا الجهاز، أغلِق سيجنال وافتحه من جديد.";
+"TRANSFER_COMPLETE_SHEET_SUBTITLE" = "لبدء استخدام حسابك على هذا الجهاز، أغلِق Radar وافتحه من جديد.";
 
 /* Title for bottom sheet shown when device transfer completes on the receiving device. */
 "TRANSFER_COMPLETE_SHEET_TITLE" = "اكتمَلَ النقل";
 
 /* Notification prompting the user to relaunch Signal after a device transfer completed. */
-"TRANSFER_RELAUNCH_NOTIFICATION" = "افتح تطبيق سيجنال للبدء في المراسلة";
+"TRANSFER_RELAUNCH_NOTIFICATION" = "افتح تطبيق Radar للبدء في المراسلة";
 
 /* Label for the cancel button in an alert or action sheet. */
 "TXT_CANCEL_TITLE" = "إلغاء";
@@ -9524,25 +9524,25 @@ Send money securely.";
 "UNKNOWN_CONTACT_BLOCK_OFFER" = "إن المُستخدم ليس ضمن جهات اتصالك. هل تود حظر هذا المُستخدم؟";
 
 /* Info message recorded in conversation history when local user receives an unknown message from a linked device and needs to upgrade. */
-"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_FROM_LINKED_DEVICE" = "أرسَلَ أحد أجهزتك رسالة لا يُمكن مُعالجتها أو عرضها هُنا لأنها تستخدم ميزة جديدة في سيجنال.";
+"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_FROM_LINKED_DEVICE" = "أرسَلَ أحد أجهزتك رسالة لا يُمكن مُعالجتها أو عرضها هُنا لأنها تستخدم ميزة جديدة في Radar.";
 
 /* Info message recorded in conversation history when local user receives an unknown message and needs to upgrade. Embeds {{user's name or phone number}}. */
-"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_WITH_NAME_FORMAT" = "أرسلَ لكَ %1$@ رِسالة لا يُمكن مُعالجتها أو عرضها لأنها تستخدم ميزة جديدة في سيجنال.";
+"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_WITH_NAME_FORMAT" = "أرسلَ لكَ %1$@ رِسالة لا يُمكن مُعالجتها أو عرضها لأنها تستخدم ميزة جديدة في Radar.";
 
 /* Info message recorded in conversation history when local user receives an unknown message and needs to upgrade. */
-"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_WITHOUT_NAME" = "تلقيتَ رسالة لا يُمكن مُعالجتها أو عرضها لأنها تستخدم ميزة جديدة في سيجنال.";
+"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_WITHOUT_NAME" = "تلقيتَ رسالة لا يُمكن مُعالجتها أو عرضها لأنها تستخدم ميزة جديدة في Radar.";
 
 /* Label for button that lets users upgrade the app. */
-"UNKNOWN_PROTOCOL_VERSION_UPGRADE_BUTTON" = "قُم بتحديث سيجنال الآن";
+"UNKNOWN_PROTOCOL_VERSION_UPGRADE_BUTTON" = "قُم بتحديث Radar الآن";
 
 /* Info message recorded in conversation history when local user has received an unknown unknown message from a linked device and has upgraded. */
-"UNKNOWN_PROTOCOL_VERSION_UPGRADE_COMPLETE_FROM_LINKED_DEVICE" = "تمَّ التحديث إلى آخر إصدار من سيجنال. يُمكنك الآن تلقي هذا النوع من الرسائل على جهازك.";
+"UNKNOWN_PROTOCOL_VERSION_UPGRADE_COMPLETE_FROM_LINKED_DEVICE" = "تمَّ التحديث إلى آخر إصدار من Radar. يُمكنك الآن تلقي هذا النوع من الرسائل على جهازك.";
 
 /* Info message recorded in conversation history when local user has received an unknown message and has upgraded. Embeds {{user's name or phone number}}. */
-"UNKNOWN_PROTOCOL_VERSION_UPGRADE_COMPLETE_WITH_NAME_FORMAT" = "يُمكن أن تطلب من %1$@ إعادة إرسال هذه الرسالة الآن بما أنك تستخدم آخر إصدارٍ من سيجنال.";
+"UNKNOWN_PROTOCOL_VERSION_UPGRADE_COMPLETE_WITH_NAME_FORMAT" = "يُمكن أن تطلب من %1$@ إعادة إرسال هذه الرسالة الآن بما أنك تستخدم آخر إصدارٍ من Radar.";
 
 /* Info message recorded in conversation history when local user has received an unknown message and has upgraded. */
-"UNKNOWN_PROTOCOL_VERSION_UPGRADE_COMPLETE_WITHOUT_NAME" = "يُمكن أن تطلب من المُرسِل إعادة إرسال هذه الرسالة الآن بما أنك تستخدم آخر إصدارٍ من سيجنال.";
+"UNKNOWN_PROTOCOL_VERSION_UPGRADE_COMPLETE_WITHOUT_NAME" = "يُمكن أن تطلب من المُرسِل إعادة إرسال هذه الرسالة الآن بما أنك تستخدم آخر إصدارٍ من Radar.";
 
 /* Label indicating an unknown user. */
 "UNKNOWN_USER" = "غير معروف";
@@ -9566,13 +9566,13 @@ Send money securely.";
 "UNLINK_CONFIRMATION_ALERT_TITLE" = "هل ترغبُ بإلغاء ارتباط \"%1$@\"؟";
 
 /* Label warning the user that they have been unlinked from their primary device. */
-"UNLINKED_WARNING" = "لم يعد هذا الجهاز مُرتبطًا. أعِد ربط سيجنال مع هاتفك لمواصلة المراسلة.";
+"UNLINKED_WARNING" = "لم يعد هذا الجهاز مُرتبطًا. أعِد ربط Radar مع هاتفك لمواصلة المراسلة.";
 
 /* If this device has become unlinked from their primary device, they'll see a warning. This is the call to action on that warning. */
 "UNLINKED_WARNING_ACTION_TITLE" = "أعِد ربط الجهاز";
 
 /* Alert title when unlinking device fails */
-"UNLINKING_FAILED_ALERT_TITLE" = "لم يتمكَّن سيجنال من إلغاء ارتباط جهازك.";
+"UNLINKING_FAILED_ALERT_TITLE" = "لم يتمكَّن Radar من إلغاء ارتباط جهازك.";
 
 /* Text for a toast confirming that the mic has been unmuted for a call. */
 "UNMUTE_CONFIRMATION_TOAST_LABEL" = "الميكروفون مُفعَّل";
@@ -9593,7 +9593,7 @@ Send money securely.";
 "UNSUPPORTED_FEATURE_ERROR" = "جهازك لا يدعم هذه الميزة.";
 
 /* Description for the unverified safety number change. Embeds {name of contact with identity change} */
-"UNVERIFIED_SAFETY_NUMBER_CHANGE_DESCRIPTION_FORMAT" = "تغيَّر رقم الامان الخاص بك مع %1$@، فمن المحتمل أن يكون ذلك الشخص قد أعاد تثبيت سيجنال أو قام بتغيير الأجهزة. يُرجى النقر لتأكيد رقم الأمان الجديد. هذا اﻹجراء اختياري.";
+"UNVERIFIED_SAFETY_NUMBER_CHANGE_DESCRIPTION_FORMAT" = "تغيَّر رقم الامان الخاص بك مع %1$@، فمن المحتمل أن يكون ذلك الشخص قد أعاد تثبيت Radar أو قام بتغيير الأجهزة. يُرجى النقر لتأكيد رقم الأمان الجديد. هذا اﻹجراء اختياري.";
 
 /* Action to verify a safety number after it has changed */
 "UNVERIFIED_SAFETY_NUMBER_VERIFY_ACTION" = "التَّحَقُق";
@@ -9611,7 +9611,7 @@ Send money securely.";
 "USE_PROXY_BUTTON" = "استخدم البروكسي";
 
 /* Explanation of when you should use a signal proxy */
-"USE_PROXY_EXPLANATION" = "استخدِم البروكسي فقط إذا تعذَّر عليك الاتصال بسيجنال عبر بيانات الجوّال أو عبر شبكة الواي فاي.";
+"USE_PROXY_EXPLANATION" = "استخدِم البروكسي فقط إذا تعذَّر عليك الاتصال بRadar عبر بيانات الجوّال أو عبر شبكة الواي فاي.";
 
 /* Description of username links and QR codes on the username education sheet */
 "USERNAME_EDUCATION_LINK_DESCRIPTION" = "أسماء المُستخدِمين لها كودات QR فريدة يُمكنك مُشاركتُهما مع أصدقائك لكي يبدؤوا الدردشة معك.";
@@ -9704,7 +9704,7 @@ Send money securely.";
 "USERNAME_LOOKUP_LINK_NO_LONGER_VALID_MESSAGE" = "رابط اسم المُستخدم لم يعد صالحًا.";
 
 /* A message indicating that the given username is not associated with a registered Signal account. Embeds {{ a username }}. */
-"USERNAME_LOOKUP_NOT_FOUND_MESSAGE_FORMAT" = "%1$@ ليس مُستخدِم سيجنال. تأكَّد من إدخالك لاسم المُستخدِم الكامل.";
+"USERNAME_LOOKUP_NOT_FOUND_MESSAGE_FORMAT" = "%1$@ ليس مُستخدِم Radar. تأكَّد من إدخالك لاسم المُستخدِم الكامل.";
 
 /* Title for an action sheet indicating that the given username is not associated with a registered Signal account. */
 "USERNAME_LOOKUP_NOT_FOUND_TITLE" = "لم يتم العثورعلى المُستخدِم.";
@@ -9728,7 +9728,7 @@ Send money securely.";
 "USERNAME_ONBOARDING_TITLE" = "Your Username";
 
 /* Instructions that appear below the username QR code on a sharable exported image. */
-"USERNAME_QR_CODE_EXPORT_INSTRUCTIONS" = "امسح كود الـ QR هذا باستخدام هاتفك للدردشة معي على سيجنال.";
+"USERNAME_QR_CODE_EXPORT_INSTRUCTIONS" = "امسح كود الـ QR هذا باستخدام هاتفك للدردشة معي على Radar.";
 
 /* A message in a toast informing the user their username, link, and QR code have successfully been reset. Embeds {{ the user's new username }}. */
 "USERNAME_RESET_SUCCESSFUL_TOAST" = "تمَّت إعادة تعيين رابط وكود الـ QR، واسم المُستخدِم الخاص بك هو %1$@";

@@ -181,27 +181,29 @@ class AppSettingsViewController: OWSTableViewController2 {
                 }
             ))
         }
-        section1.add(.init(customCellBlock: { [weak self] in
-            guard let self = self else { return UITableViewCell() }
-            let accessoryContentView: UIView?
-            if self.hasExpiredGiftBadge {
-                let imageView = UIImageView(image: UIImage(imageLiteralResourceName: "info-fill"))
-                imageView.tintColor = Theme.accentBlueColor
-                imageView.autoSetDimensions(to: CGSize(square: 24))
-                accessoryContentView = imageView
-            } else {
-                accessoryContentView = nil
-            }
-            return OWSTableItem.buildCell(
-                icon: .settingsDonate,
-                itemName: OWSLocalizedString("SETTINGS_DONATE", comment: "Title for the 'donate to signal' link in settings."),
-                accessoryType: .disclosureIndicator,
-                accessoryContentView: accessoryContentView,
-                accessibilityIdentifier: UIView.accessibilityIdentifier(in: self, name: "donate")
-            )
-        }, actionBlock: { [weak self] in
-            self?.didTapDonate()
-        }))
+        if BuildFlags.donations {
+            section1.add(.init(customCellBlock: { [weak self] in
+                guard let self = self else { return UITableViewCell() }
+                let accessoryContentView: UIView?
+                if self.hasExpiredGiftBadge {
+                    let imageView = UIImageView(image: UIImage(imageLiteralResourceName: "info-fill"))
+                    imageView.tintColor = Theme.accentBlueColor
+                    imageView.autoSetDimensions(to: CGSize(square: 24))
+                    accessoryContentView = imageView
+                } else {
+                    accessoryContentView = nil
+                }
+                return OWSTableItem.buildCell(
+                    icon: .settingsDonate,
+                    itemName: OWSLocalizedString("SETTINGS_DONATE", comment: "Title for the 'donate to signal' link in settings."),
+                    accessoryType: .disclosureIndicator,
+                    accessoryContentView: accessoryContentView,
+                    accessibilityIdentifier: UIView.accessibilityIdentifier(in: self, name: "donate")
+                )
+            }, actionBlock: { [weak self] in
+                self?.didTapDonate()
+            }))
+        }
         contents.add(section1)
 
         if SUIEnvironment.shared.paymentsRef.shouldShowPaymentsUI {

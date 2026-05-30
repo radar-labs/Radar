@@ -2,7 +2,7 @@
 "AB_PERMISSION_MISSING_ACTION_NOT_NOW" = "以后再说";
 
 /* Title for the 'about' help section */
-"ABOUT_SECTION_TITLE" = "关于 Signal";
+"ABOUT_SECTION_TITLE" = "关于 Radar";
 
 /* Accessibility label for attachment. */
 "ACCESSIBILITY_LABEL_ATTACHMENT" = "附件";
@@ -32,7 +32,7 @@
 "ACCOUNT_DATA_REPORT_CONFIRM_EXPORT_CONFIRM_BUTTON" = "导出报告";
 
 /* Users can request a report of their account data. Before they get their account export, they are warned to only share account data with trustworthy sources. This is the message on that warning. */
-"ACCOUNT_DATA_REPORT_CONFIRM_EXPORT_MESSAGE" = "请只将您的 Signal 账户数据分享给您信任的人或应用。";
+"ACCOUNT_DATA_REPORT_CONFIRM_EXPORT_MESSAGE" = "请只将您的 Radar 账户数据分享给您信任的人或应用。";
 
 /* Users can request a report of their account data. If this request fails (probably because of a network connection problem), they will see an error sheet. This is the message on that error. */
 "ACCOUNT_DATA_REPORT_ERROR_MESSAGE" = "请检查您的网络连接并重试。";
@@ -56,16 +56,16 @@
 "ACCOUNT_DATA_REPORT_EXPORT_REPORT_BUTTON" = "导出报告";
 
 /* Users can request a report of their account data. This text appears at the bottom of this screen, offering more information. */
-"ACCOUNT_DATA_REPORT_FOOTER" = "您的报告只在导出时生成，不会由 Signal 保存在您的设备上。";
+"ACCOUNT_DATA_REPORT_FOOTER" = "您的报告只在导出时生成，不会由 Radar 保存在您的设备上。";
 
 /* Users can request a report of their account data. This is the subtitle on the screen where they do this, giving them more information. */
-"ACCOUNT_DATA_REPORT_SUBTITLE" = "您可以下载和导出您的 Signal 账户数据报告。该报告不包含任何消息或媒体。";
+"ACCOUNT_DATA_REPORT_SUBTITLE" = "您可以下载和导出您的 Radar 账户数据报告。该报告不包含任何消息或媒体。";
 
 /* Users can request a report of their account data. This is the title on the screen where they do this. */
 "ACCOUNT_DATA_REPORT_TITLE" = "您的账户数据";
 
 /* Label for 'invite' button in contact view. */
-"ACTION_INVITE" = "邀请使用 Signal";
+"ACTION_INVITE" = "邀请使用 Radar";
 
 /* Label for button that lets you send a message to a contact. */
 "ACTION_SEND_MESSAGE" = "发送消息";
@@ -83,7 +83,7 @@
 "ACTION_VIDEO_CALL" = "视频通话";
 
 /* Label for 'voice call' button in contact view. */
-"ACTION_VOICE_CALL" = "Signal 通话";
+"ACTION_VOICE_CALL" = "Radar 通话";
 
 /* The title for the 'add group members' view. */
 "ADD_GROUP_MEMBERS_VIEW_TITLE" = "添加成员";
@@ -203,40 +203,40 @@
 "APN_Message" = "您有新的消息";
 
 /* Default message for the 'app launch failed' alert. */
-"APP_LAUNCH_FAILURE_ALERT_MESSAGE" = "Signal 无法启动。请将调试输出发送至 support@signal.org，以助我们解决此问题。";
+"APP_LAUNCH_FAILURE_ALERT_MESSAGE" = "Radar 无法启动。请将调试输出发送至 support@radar.chat，以助我们解决此问题。";
 
 /* Button to try launching the app even though the last launch failed */
-"APP_LAUNCH_FAILURE_CONTINUE" = "仍然打开 Signal";
+"APP_LAUNCH_FAILURE_CONTINUE" = "仍然打开 Radar";
 
 /* Message for an error indicating that the app couldn't launch because some unexpected error happened with the user's registration status. */
-"APP_LAUNCH_FAILURE_CORRUPT_REGISTRATION_MESSAGE" = "请将调试日志发送至 support@signal.org，以助我们解决此问题。";
+"APP_LAUNCH_FAILURE_CORRUPT_REGISTRATION_MESSAGE" = "请将调试日志发送至 support@radar.chat，以助我们解决此问题。";
 
 /* Title for an error indicating that the app couldn't launch because some unexpected error happened with the user's registration status. */
-"APP_LAUNCH_FAILURE_CORRUPT_REGISTRATION_TITLE" = "无法打开 Signal";
+"APP_LAUNCH_FAILURE_CORRUPT_REGISTRATION_TITLE" = "无法打开 Radar";
 
 /* Error indicating that the app could not launch because the database could not be loaded. */
 "APP_LAUNCH_FAILURE_COULD_NOT_LOAD_DATABASE" = "无法加载数据库";
 
 /* Error indicating that the app could not launch without reverting unknown database migrations. */
-"APP_LAUNCH_FAILURE_INVALID_DATABASE_VERSION_MESSAGE" = "请升级至最新版本的 Signal。";
+"APP_LAUNCH_FAILURE_INVALID_DATABASE_VERSION_MESSAGE" = "请升级至最新版本的 Radar。";
 
 /* Error indicating that the app could not launch without reverting unknown database migrations. */
 "APP_LAUNCH_FAILURE_INVALID_DATABASE_VERSION_TITLE" = "未知的数据库版本。";
 
 /* Error indicating that the app crashed during the previous launch. */
-"APP_LAUNCH_FAILURE_LAST_LAUNCH_CRASHED_MESSAGE" = "Signal 在尝试打开时出现了一个问题。请发送调试日志到 support@signal.org，以帮助我们解决此问题。";
+"APP_LAUNCH_FAILURE_LAST_LAUNCH_CRASHED_MESSAGE" = "Radar 在尝试打开时出现了一个问题。请发送调试日志到 support@radar.chat，以帮助我们解决此问题。";
 
 /* Error indicating that the app crashed during the previous launch. */
-"APP_LAUNCH_FAILURE_LAST_LAUNCH_CRASHED_TITLE" = "无法打开 Signal";
+"APP_LAUNCH_FAILURE_LAST_LAUNCH_CRASHED_TITLE" = "无法打开 Radar";
 
 /* Error description indicating that the app crashed because there was low storage space available on the device. */
-"APP_LAUNCH_FAILURE_LOW_STORAGE_SPACE_AVAILABLE_MESSAGE" = "Signal 无法打开，因为您的设备储存空间不足。如要使用 Signal，请在设置中进行管理以释放您的储存空间。";
+"APP_LAUNCH_FAILURE_LOW_STORAGE_SPACE_AVAILABLE_MESSAGE" = "Radar 无法打开，因为您的设备储存空间不足。如要使用 Radar，请在设置中进行管理以释放您的储存空间。";
 
 /* Error title indicating that the app crashed because there was low storage space available on the device. */
 "APP_LAUNCH_FAILURE_LOW_STORAGE_SPACE_AVAILABLE_TITLE" = "储存空间不足";
 
 /* Error indicating that the app could not restore transferred data. */
-"APP_LAUNCH_FAILURE_RESTORE_FAILED_MESSAGE" = "无法恢复从您的旧设备迁移的数据。请发送调试日志到 support@signal.org，以便我们解决此问题。如果您重装 Signal，您的消息记录也许会丢失。";
+"APP_LAUNCH_FAILURE_RESTORE_FAILED_MESSAGE" = "无法恢复从您的旧设备迁移的数据。请发送调试日志到 support@radar.chat，以便我们解决此问题。如果您重装 Radar，您的消息记录也许会丢失。";
 
 /* Error indicating that the app could not restore transferred data. */
 "APP_LAUNCH_FAILURE_RESTORE_FAILED_TITLE" = "迁移失败";
@@ -260,7 +260,7 @@
 "APP_UPDATE_NAG_ALERT_MESSAGE_FORMAT" = "%1$@ 版已在 App Store 上线。";
 
 /* Title for the 'new app version available' alert. */
-"APP_UPDATE_NAG_ALERT_TITLE" = "Signal 有新版本可供下载";
+"APP_UPDATE_NAG_ALERT_TITLE" = "Radar 有新版本可供下载";
 
 /* Label for the 'update' button in the 'new app version available' alert. */
 "APP_UPDATE_NAG_ALERT_UPDATE_BUTTON" = "更新";
@@ -410,7 +410,7 @@
 "ATTACHMENT_KEYBOARD_GIF" = "GIF";
 
 /* Text in chat attachment panel when Signal only has access to some photos/videos. This string is in a compact horizontal space, so it should be short if possible. */
-"ATTACHMENT_KEYBOARD_LIMITED_ACCESS" = "Signal 对照片的访问受限";
+"ATTACHMENT_KEYBOARD_LIMITED_ACCESS" = "Radar 对照片的访问受限";
 
 /* A button to select a location from the Attachment Keyboard */
 "ATTACHMENT_KEYBOARD_LOCATION" = "位置";
@@ -422,7 +422,7 @@
 "ATTACHMENT_KEYBOARD_NO_MEDIA_TITLE" = "无照片或视频";
 
 /* Text in chat attachment panel explaining that user needs to give Signal permission to access photos. */
-"ATTACHMENT_KEYBOARD_NO_PHOTO_ACCESS" = "Signal 没有访问您的照片或视频的权限。如要授予权限，请打开“设置”，然后点击“照片”";
+"ATTACHMENT_KEYBOARD_NO_PHOTO_ACCESS" = "Radar 没有访问您的照片或视频的权限。如要授予权限，请打开“设置”，然后点击“照片”";
 
 /* Button in chat attachment panel to let user open Settings app and give Signal persmission to access photos. */
 "ATTACHMENT_KEYBOARD_OPEN_SETTINGS" = "打开设置";
@@ -527,7 +527,7 @@
 "BACKUP_ENABLEMENT_REMINDER_MEGAPHONE_ACTION" = "开启";
 
 /* Body for Backup enablement reminder megaphone */
-"BACKUP_ENABLEMENT_REMINDER_MEGAPHONE_BODY" = "无论您是更换手机还是重装 Signal，您的消息都不会丢失。";
+"BACKUP_ENABLEMENT_REMINDER_MEGAPHONE_BODY" = "无论您是更换手机还是重装 Radar，您的消息都不会丢失。";
 
 /* Title for Backup enablement reminder megaphone */
 "BACKUP_ENABLEMENT_REMINDER_MEGAPHONE_TITLE" = "开启加密备份";
@@ -569,7 +569,7 @@
 "BACKUP_ONBOARDING_CANCEL_SHEET_TITLE" = "要退出备份设置吗？";
 
 /* Body for a sheet warning users to their 'Recovery Key' safe. */
-"BACKUP_ONBOARDING_CONFIRM_KEY_KEEP_KEY_SAFE_SHEET_BODY" = "如果密钥丢失，Signal 将无法帮助您恢复备份。请将其保存在安全的地方，并避免与他人共享该密钥。";
+"BACKUP_ONBOARDING_CONFIRM_KEY_KEEP_KEY_SAFE_SHEET_BODY" = "如果密钥丢失，Radar 将无法帮助您恢复备份。请将其保存在安全的地方，并避免与他人共享该密钥。";
 
 /* Title for a sheet warning users to their 'Recovery Key' safe. */
 "BACKUP_ONBOARDING_CONFIRM_KEY_KEEP_KEY_SAFE_SHEET_TITLE" = "安全保存您的密钥";
@@ -596,10 +596,10 @@
 "BACKUP_ONBOARDING_INTRO_NOT_NOW_TOAST" = "您可以在“设置”中启用备份。";
 
 /* Subtitle for a view introducing Backups during an onboarding flow. */
-"BACKUP_ONBOARDING_INTRO_SUBTITLE" = "欢迎使用 Signal 的安全端对端加密存储服务对您的消息和媒体进行备份。无论您是更换手机还是重装 Signal，您的消息都不会丢失。";
+"BACKUP_ONBOARDING_INTRO_SUBTITLE" = "欢迎使用 Radar 的安全端对端加密存储服务对您的消息和媒体进行备份。无论您是更换手机还是重装 Radar，您的消息都不会丢失。";
 
 /* Title for a view introducing Backups during an onboarding flow. */
-"BACKUP_ONBOARDING_INTRO_TITLE" = "Signal 安全备份";
+"BACKUP_ONBOARDING_INTRO_TITLE" = "Radar 安全备份";
 
 /* Text for a bullet point in a view introducing the 'Recovery Key' during an onboarding flow. */
 "BACKUP_ONBOARDING_KEY_INTRO_BULLET_1" = "您的恢复密钥是一个 64 个字符的代码，您需要用它来恢复备份。";
@@ -617,10 +617,10 @@
 "BACKUP_ONBOARDING_KEY_INTRO_TITLE" = "恢复密钥";
 
 /* Body for a sheet shown when your Backup plan is downgraded. */
-"BACKUP_PLAN_DOWNGRADED_SHEET_BODY" = "您的备份套餐已过期，因为它无法通过您的付款方式续订。\n\n要继续备份媒体，您可以重新订阅。您仍然可以继续使用免费版 Signal 备份套餐。";
+"BACKUP_PLAN_DOWNGRADED_SHEET_BODY" = "您的备份套餐已过期，因为它无法通过您的付款方式续订。\n\n要继续备份媒体，您可以重新订阅。您仍然可以继续使用免费版 Radar 备份套餐。";
 
 /* Body for a sheet shown when your Backup plan is downgraded because you stopped using TestFlight. */
-"BACKUP_PLAN_DOWNGRADED_SHEET_BODY_TESTFLIGHT" = "您的备份套餐已过期，因为您已不再使用 TestFlight。\n\n要继续备份媒体，您可以重新订阅。您仍然可以继续使用免费版 Signal 备份套餐。";
+"BACKUP_PLAN_DOWNGRADED_SHEET_BODY_TESTFLIGHT" = "您的备份套餐已过期，因为您已不再使用 TestFlight。\n\n要继续备份媒体，您可以重新订阅。您仍然可以继续使用免费版 Radar 备份套餐。";
 
 /* Primary button for a sheet shown when your Backup plan is downgraded. */
 "BACKUP_PLAN_DOWNGRADED_SHEET_PRIMARY_BUTTON" = "管理备份";
@@ -650,7 +650,7 @@
 "BACKUP_RESTORE_MODAL_TITLE" = "正在恢复消息…";
 
 /* Message describing that the Background App Refresh permission is disabled for Signal. \"Background App Refresh\" should be localized the same way it is in iOS Settings app permissions. */
-"BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_MESSAGE" = "自动备份已禁用。请更新 Signal 的权限以启用自动备份。";
+"BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_MESSAGE" = "自动备份已禁用。请更新 Radar 的权限以启用自动备份。";
 
 /* Add-on to a message describing that the Background App Refresh permission is disabled for Signal. \"Background App Refresh\" should be localized the same way it is in iOS Settings app permissions. */
 "BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_MESSAGE_UPDATE_NOW" = "立即升级";
@@ -659,7 +659,7 @@
 "BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_SHEET_GO_TO_SETTINGS_BUTTON" = "前往设置";
 
 /* Message for a sheet warning the user about the Background App Refresh permission. \"Background App Refresh\" should be localized the same way it is in iOS Settings app permissions. */
-"BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_SHEET_MESSAGE" = "如要允许 Signal 自动备份您的消息，请点击下方的“前往设置”，然后启用“后台 App 刷新”";
+"BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_SHEET_MESSAGE" = "如要允许 Radar 自动备份您的消息，请点击下方的“前往设置”，然后启用“后台 App 刷新”";
 
 /* Title for a sheet warning the user about the Background App Refresh permission. \"Background App Refresh\" should be localized the same way it is in iOS Settings app permissions. */
 "BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_SHEET_TITLE" = "自动备份已禁用";
@@ -746,7 +746,7 @@
 "BACKUP_SETTINGS_BACKUP_PLAN_PAID_BUT_IAP_NOT_FOUND_LOCALLY_ACTION_BUTTON_TITLE" = "续订";
 
 /* Text describing that the user's paid backup plan did not correspond to a App Store subscription on this device. */
-"BACKUP_SETTINGS_BACKUP_PLAN_PAID_BUT_IAP_NOT_FOUND_LOCALLY_DESCRIPTION" = "未在此设备上找到您的套餐。请续订以继续使用 Signal 备份。";
+"BACKUP_SETTINGS_BACKUP_PLAN_PAID_BUT_IAP_NOT_FOUND_LOCALLY_DESCRIPTION" = "未在此设备上找到您的套餐。请续订以继续使用 Radar 备份。";
 
 /* Header describing what the paid backup plan includes. */
 "BACKUP_SETTINGS_BACKUP_PLAN_PAID_HEADER" = "文本 + 所有媒体备份";
@@ -758,16 +758,16 @@
 "BACKUP_SETTINGS_BACKUP_PLAN_PAID_RENEWAL_FORMAT" = "到 %1$@续期";
 
 /* Footer for a menu section related to settings for when Backups are disabled. */
-"BACKUP_SETTINGS_BACKUPS_DISABLED_SECTION_FOOTER" = "备份已关闭，您的数据已从 Signal 的安全存储服务中删除。";
+"BACKUP_SETTINGS_BACKUPS_DISABLED_SECTION_FOOTER" = "备份已关闭，您的数据已从 Radar 的安全存储服务中删除。";
 
 /* Description for a progress view tracking media being downloaded in service of disabling Backups. */
-"BACKUP_SETTINGS_BACKUPS_DISABLING_DOWNLOADING_MEDIA_PROGRESS_VIEW_DESCRIPTION" = "备份已关闭，任何不在此设备上的媒体现在正在下载。下载完成后，您的数据将会从 Signal 的安全存储服务中删除。";
+"BACKUP_SETTINGS_BACKUPS_DISABLING_DOWNLOADING_MEDIA_PROGRESS_VIEW_DESCRIPTION" = "备份已关闭，任何不在此设备上的媒体现在正在下载。下载完成后，您的数据将会从 Radar 的安全存储服务中删除。";
 
 /* Message for a view indicating we failed to delete the user's Backup due to an unexpected error. */
 "BACKUP_SETTINGS_BACKUPS_DISABLING_GENERIC_ERROR_MESSAGE" = "出现了一个错误。请联系支持团队。";
 
 /* Header for a menu section related to settings for when disabling Backups encountered an unexpected error. */
-"BACKUP_SETTINGS_BACKUPS_DISABLING_GENERIC_ERROR_SECTION_HEADER" = "从 Signal 的安全存储服务器中删除您的数据时发生了错误。";
+"BACKUP_SETTINGS_BACKUPS_DISABLING_GENERIC_ERROR_SECTION_HEADER" = "从 Radar 的安全存储服务器中删除您的数据时发生了错误。";
 
 /* Title for a view indicating we failed to delete the user's Backup due to an unexpected error. */
 "BACKUP_SETTINGS_BACKUPS_DISABLING_GENERIC_ERROR_TITLE" = "无法删除备份";
@@ -776,7 +776,7 @@
 "BACKUP_SETTINGS_BACKUPS_DISABLING_PROGRESS_VIEW_DESCRIPTION" = "正在删除备份…";
 
 /* Header for a menu section related to disabling Backups. */
-"BACKUP_SETTINGS_BACKUPS_DISABLING_SECTION_HEADER" = "备份已关闭，您的数据将会从 Signal 的安全存储服务器中删除。";
+"BACKUP_SETTINGS_BACKUPS_DISABLING_SECTION_HEADER" = "备份已关闭，您的数据将会从 Radar 的安全存储服务器中删除。";
 
 /* Header for a menu section related to settings for when Backups are enabled. */
 "BACKUP_SETTINGS_BACKUPS_ENABLED_SECTION_HEADER" = "备份详情";
@@ -824,13 +824,13 @@
 "BACKUP_SETTINGS_DISABLING_CONFIRMATION_ACTION_SHEET_TITLE" = "要关闭并删除备份？";
 
 /* Message shown in an action sheet when the user disables Backups, explaining that their media is downloading first. */
-"BACKUP_SETTINGS_DISABLING_DOWNLOADS_STARTED_ACTION_SHEET_MESSAGE" = "您的备份中有一些媒体不在此设备上。下载可能需要很长时间，请保持 Signal 处于打开状态以避免下载中断。";
+"BACKUP_SETTINGS_DISABLING_DOWNLOADS_STARTED_ACTION_SHEET_MESSAGE" = "您的备份中有一些媒体不在此设备上。下载可能需要很长时间，请保持 Radar 处于打开状态以避免下载中断。";
 
 /* Title shown in an action sheet when the user disables Backups, explaining that their media is downloading first. */
 "BACKUP_SETTINGS_DISABLING_DOWNLOADS_STARTED_ACTION_SHEET_TITLE" = "正在下载您的备份";
 
 /* Message shown in an action sheet indicating we failed to delete the user's Backup due to an unexpected error. */
-"BACKUP_SETTINGS_DISABLING_ERROR_GENERIC_ERROR_ACTION_SHEET_MESSAGE" = "从 Signal 的安全存储服务器中删除您的数据时发生了错误。";
+"BACKUP_SETTINGS_DISABLING_ERROR_GENERIC_ERROR_ACTION_SHEET_MESSAGE" = "从 Radar 的安全存储服务器中删除您的数据时发生了错误。";
 
 /* Title shown in an action sheet indicating we failed to delete the user's Backup due to an unexpected error. */
 "BACKUP_SETTINGS_DISABLING_ERROR_GENERIC_ERROR_ACTION_SHEET_TITLE" = "无法删除备份";
@@ -842,7 +842,7 @@
 "BACKUP_SETTINGS_DISABLING_SUBSCRIPTION_CANCEL_ACTION_SHEET_MANAGE_SUBSCRIPTION_BUTTON" = "管理套餐";
 
 /* Message for an action sheet shown when the user disables Backups, but is still subscribed to the paid plan. */
-"BACKUP_SETTINGS_DISABLING_SUBSCRIPTION_CANCEL_ACTION_SHEET_MESSAGE" = "要取消备份套餐，请点击“管理套餐 > Signal > 取消套餐”";
+"BACKUP_SETTINGS_DISABLING_SUBSCRIPTION_CANCEL_ACTION_SHEET_MESSAGE" = "要取消备份套餐，请点击“管理套餐 > Radar > 取消套餐”";
 
 /* Title for an action sheet shown when the user disables Backups, but is still subscribed to the paid plan. */
 "BACKUP_SETTINGS_DISABLING_SUBSCRIPTION_CANCEL_ACTION_SHEET_TITLE" = "您仍在订阅一个付费备份套餐";
@@ -920,7 +920,7 @@
 "BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_DOWNLOAD_SHEET_LATER_ACTION" = "稍后下载";
 
 /* Message for an action sheet allowing users to download their offloaded media. */
-"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_DOWNLOAD_SHEET_MESSAGE" = "您的备份中有一些媒体不在此设备上。下载可能需要很长时间，请保持 Signal 处于打开状态以避免下载中断。";
+"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_DOWNLOAD_SHEET_MESSAGE" = "您的备份中有一些媒体不在此设备上。下载可能需要很长时间，请保持 Radar 处于打开状态以避免下载中断。";
 
 /* Action in an action sheet allowing users to download their offloaded media now. */
 "BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_DOWNLOAD_SHEET_NOW_ACTION" = "立即下载";
@@ -941,13 +941,13 @@
 "BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_TOGGLE_FOOTER_AVAILABLE_FOR_TESTERS" = "不使用的媒体将会被卸载，但您在使用 TestFlight 时可以随时从备份中下载这些媒体。";
 
 /* Footer for a toggle allowing users to change the Optimize Local Storage setting, if the toggle is unavailable. */
-"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_TOGGLE_FOOTER_UNAVAILABLE" = "储存优化功能仅在 Signal 备份付费套餐中可用。欢迎升级您的备份套餐以开始使用该功能。";
+"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_TOGGLE_FOOTER_UNAVAILABLE" = "储存优化功能仅在 Radar 备份付费套餐中可用。欢迎升级您的备份套餐以开始使用该功能。";
 
 /* Title for a toggle allowing users to change the Optimize Local Storage setting. */
 "BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_TOGGLE_TITLE" = "优化设备端存储";
 
 /* Subtitle for a notification telling the user they are out of remote storage space. */
-"BACKUP_SETTINGS_OUT_OF_STORAGE_SPACE_NOTIFICATION_SUBTITLE" = "您已达到备份存储空间的上限。请释放 Signal 的空间，以继续备份聊天记录和媒体。";
+"BACKUP_SETTINGS_OUT_OF_STORAGE_SPACE_NOTIFICATION_SUBTITLE" = "您已达到备份存储空间的上限。请释放 Radar 的空间，以继续备份聊天记录和媒体。";
 
 /* Title for a notification telling the user they are out of remote storage space. */
 "BACKUP_SETTINGS_OUT_OF_STORAGE_SPACE_NOTIFICATION_TITLE" = "备份存储空间已满";
@@ -971,7 +971,7 @@
 "BACKUP_SETTINGS_SUBSCRIPTION_ALREADY_REDEEMED_NOTICE_TITLE" = "无法兑换您的备份套餐";
 
 /* Body for a sheet explaining that the user's Backups subscription was already redeemed. */
-"BACKUP_SETTINGS_SUBSCRIPTION_ALREADY_REDEEMED_SHEET_BODY" = "本月有太多设备尝试兑换您的备份套餐。\n\n您可能重新注册了太多次 Signal 账户，或有太多设备使用同一套餐。";
+"BACKUP_SETTINGS_SUBSCRIPTION_ALREADY_REDEEMED_SHEET_BODY" = "本月有太多设备尝试兑换您的备份套餐。\n\n您可能重新注册了太多次 Radar 账户，或有太多设备使用同一套餐。";
 
 /* Button for a sheet explaining that the user's Backups subscription was already redeemed. */
 "BACKUP_SETTINGS_SUBSCRIPTION_ALREADY_REDEEMED_SHEET_GOT_IT_BUTTON" = "知道了";
@@ -992,19 +992,19 @@
 "BACKUP_SETTINGS_UPLOAD_PROGRESS_SUBTITLE_PAUSED_NEEDS_WIFI" = "媒体上传已暂停：正在等待 Wi-Fi 连接";
 
 /* Subtitle for a progress bar tracking uploads that are paused because the user is out of remote storage space. Embeds 1:{{ total storage space provided, e.g. 100 GB }}; 2:{{ space the user needs to free up by deleting media, e.g. 1 GB }}. */
-"BACKUP_SETTINGS_UPLOAD_PROGRESS_SUBTITLE_PAUSED_OUT_OF_STORAGE_SPACE_FORMAT" = "您已达到备份套餐的 %1$@ 存储空间上限。如要备份新的聊天记录和媒体，请在 Signal 中释放 %2$@ 的空间，然后点击“立即备份”。";
+"BACKUP_SETTINGS_UPLOAD_PROGRESS_SUBTITLE_PAUSED_OUT_OF_STORAGE_SPACE_FORMAT" = "您已达到备份套餐的 %1$@ 存储空间上限。如要备份新的聊天记录和媒体，请在 Radar 中释放 %2$@ 的空间，然后点击“立即备份”。";
 
 /* Subtitle for a progress bar tracking active uploading. Embeds 1:{{ the amount uploaded as a file size, e.g. 100 MB }}; 2:{{ the total amount to upload as a file size, e.g. 1 GB }}; 3:{{ the percentage uploaded as a percent, e.g. 40% }}. */
 "BACKUP_SETTINGS_UPLOAD_PROGRESS_SUBTITLE_RUNNING" = "正在上传 %1$@/%2$@ (%3$@)";
 
 /* Message for a sheet shown after the user enables backups. */
-"BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_MESSAGE" = "根据备份的大小，这可能需要很长时间。在备份过程中，您可以正常使用 Signal。";
+"BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_MESSAGE" = "根据备份的大小，这可能需要很长时间。在备份过程中，您可以正常使用 Radar。";
 
 /* Title for a sheet shown after the user enables backups. */
-"BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_TITLE" = "欢迎使用 Signal 安全备份。现在开始备份吧。";
+"BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_TITLE" = "欢迎使用 Radar 安全备份。现在开始备份吧。";
 
 /* Message for a sheet shown when your Backup subscription fails to renew. */
-"BACKUP_SUBSCRIPTION_FAILED_TO_RENEW_SHEET_MESSAGE" = "请确保您使用的是最新的付款方式。点击“管理套餐 > Signal > 更新付款方式”。";
+"BACKUP_SUBSCRIPTION_FAILED_TO_RENEW_SHEET_MESSAGE" = "请确保您使用的是最新的付款方式。点击“管理套餐 > Radar > 更新付款方式”。";
 
 /* Primary button for a sheet shown when your Backup subscription fails to renew. */
 "BACKUP_SUBSCRIPTION_FAILED_TO_RENEW_SHEET_PRIMARY_BUTTON" = "管理套餐";
@@ -1022,7 +1022,7 @@
 "BACKUPS_SETTINGS_TITLE" = "安全备份";
 
 /* Body for system notification or megaphone when backups is enabled. Embeds {{ time backups was enabled }} */
-"BACKUPS_TURNED_ON_NOTIFICATION_BODY_FORMAT" = "此账户的 Signal 备份已于 %1$@ 开启。点击查看。";
+"BACKUPS_TURNED_ON_NOTIFICATION_BODY_FORMAT" = "此账户的 Radar 备份已于 %1$@ 开启。点击查看。";
 
 /* Title for system notification or megaphone when backups is enabled */
 "BACKUPS_TURNED_ON_TITLE" = "您已开启备份";
@@ -1040,13 +1040,13 @@
 "BADGE_DETAILS_DONATE_TO_SIGNAL" = "立即捐款";
 
 /* When viewing someone else's donor badge, you'll see a sheet. This is the title on that sheet. Embeds {badge owner's short name} */
-"BADGE_DETAILS_TITLE_FOR_SUPPORTER" = "%1$@正在支持 Signal";
+"BADGE_DETAILS_TITLE_FOR_SUPPORTER" = "%1$@正在支持 Radar";
 
 /* String explaining to the user that their boost badge has expired on the badge expiry sheet. */
-"BADGE_EXPIRED_BOOST_BODY" = "您的随手捐徽章已到期，无法继续显示在您的个人资料中。\n\n您可以继续使用 Signal，不过您也可以考虑成为每月定期捐款人，支持为用户而生的 Signal 技术。";
+"BADGE_EXPIRED_BOOST_BODY" = "您的随手捐徽章已到期，无法继续显示在您的个人资料中。\n\n您可以继续使用 Radar，不过您也可以考虑成为每月定期捐款人，支持为用户而生的 Radar 技术。";
 
 /* String explaining to the user that their boost badge has expired while they are a current subscription sustainer on the badge expiry sheet. */
-"BADGE_EXPIRED_BOOST_CURRENT_SUSTAINER_BODY" = "您的随手捐徽章已到期，无法继续显示在您的个人资料中。\n\n您可以给 Signal 单次捐款，将您的随手捐徽章重新激活 30 天。";
+"BADGE_EXPIRED_BOOST_CURRENT_SUSTAINER_BODY" = "您的随手捐徽章已到期，无法继续显示在您的个人资料中。\n\n您可以给 Radar 单次捐款，将您的随手捐徽章重新激活 30 天。";
 
 /* Title for boost on the badge expiration sheet. */
 "BADGE_EXPIRED_BOOST_TITLE" = "徽章已到期";
@@ -1064,13 +1064,13 @@
 "BADGE_SUBSCRIPTION_EXPIRED_BECAUSE_OF_CHARGE_FAILURE_BODY_FORMAT" = "您的每月捐款已取消。%1$@\n\n您的个人资料将不再显示您的徽章。";
 
 /* Body for a sheet explaining that a bank transfer donation is complete, and that you have received a badge. */
-"BADGE_THANKS_BANK_DONATION_COMPLETE_BODY" = "我们已收到您的银行转账。您可以选择在个人资料中显示此徽章，让大家看到您对 Signal 的支持。";
+"BADGE_THANKS_BANK_DONATION_COMPLETE_BODY" = "我们已收到您的银行转账。您可以选择在个人资料中显示此徽章，让大家看到您对 Radar 的支持。";
 
 /* Title for a sheet explaining that a bank transfer donation is complete, and that you have received a badge. */
 "BADGE_THANKS_BANK_DONATION_COMPLETE_TITLE" = "捐款完成";
 
 /* When you make a donation to Signal, you will receive a badge. A thank-you sheet appears when this happens. This is the body text on that sheet. */
-"BADGE_THANKS_BODY" = "您可以选择在个人资料中显示此徽章，让大家看到您对 Signal 的支持。";
+"BADGE_THANKS_BODY" = "您可以选择在个人资料中显示此徽章，让大家看到您对 Radar 的支持。";
 
 /* Label prompting the user to display the new badge on their profile on the badge thank you sheet. */
 "BADGE_THANKS_DISPLAY_ON_PROFILE_LABEL" = "在个人资料中显示";
@@ -1088,7 +1088,7 @@
 "BANK_DONATION_FOOTER_FIND_ACCOUNT_INFO" = "查找账户信息";
 
 /* On the bank transfer donation screen, a small amount of information text is shown. This is that text. It should (1) instruct users to enter their bank information (2) tell them that Signal does not collect or store their personal information. */
-"BANK_DONATION_SUBHEADER_TEXT" = "请输入您的银行信息。Signal 不会收集或储存您的个人信息。";
+"BANK_DONATION_SUBHEADER_TEXT" = "请输入您的银行信息。Radar 不会收集或储存您的个人信息。";
 
 /* Users can donate to Signal with a bank account. We are required to show them a mandate with information about bank transfers. This is a label for a button to agree to the mandate. */
 "BANK_MANDATE_AGREE" = "同意";
@@ -1097,7 +1097,7 @@
 "BANK_MANDATE_READ_MORE" = "查看更多";
 
 /* Users can donate to Signal with a bank account. We are required to show them a mandate with information about bank transfers. This is a subtitle about the payment processor Stripe above that mandate. */
-"BANK_MANDATE_SUBTITLE" = "用户给 Signal 进行的捐款由 Stripe 处理。Signal 不会收集或储存您的个人信息。";
+"BANK_MANDATE_SUBTITLE" = "用户给 Radar 进行的捐款由 Stripe 处理。Radar 不会收集或储存您的个人信息。";
 
 /* Users can donate to Signal with a bank account. We are required to show them a mandate with information about bank transfers. This is the title above that mandate. */
 "BANK_MANDATE_TITLE" = "银行转账";
@@ -1253,7 +1253,7 @@
 "CALL_AUDIO_MISSED_WEEK_NOTIFICATION_BODY_FORMAT" = "📞 %1$@有未接语音来电";
 
 /* Alert message when calling and permissions for microphone are missing */
-"CALL_AUDIO_PERMISSION_MESSAGE" = "您可在 iOS 设置中启用麦克风权限，以允许 Signal 拨打电话或录制语音消息。";
+"CALL_AUDIO_PERMISSION_MESSAGE" = "您可在 iOS 设置中启用麦克风权限，以允许 Radar 拨打电话或录制语音消息。";
 
 /* Alert title when calling and permissions for microphone are missing */
 "CALL_AUDIO_PERMISSION_TITLE" = "需麦克风访问权限";
@@ -1319,7 +1319,7 @@
 "CALL_LINK_JOIN_REQUEST_PROMPT" = "想要加入……";
 
 /* Shown in a message bubble when you send a call link in a Signal chat */
-"CALL_LINK_LINK_PREVIEW_DESCRIPTION" = "使用此链接加入 Signal 通话";
+"CALL_LINK_LINK_PREVIEW_DESCRIPTION" = "使用此链接加入 Radar 通话";
 
 /* Text that appears on a toast in a call lobby before joining a call link informing the user what information will be shared with other call members when they have phone number sharing turned off. */
 "CALL_LINK_LOBBY_SHARING_INFO_PHONE_NUMBER_SHARING_OFF" = "通过此链接加入通话的任何人都能看到您的名称和头像。";
@@ -1343,7 +1343,7 @@
 "CALL_LINK_REQUIRE_APPROVAL" = "需要管理员批准";
 
 /* Button to open UI to share a Call Link with someone on Signal. */
-"CALL_LINK_SHARE_VIA_SIGNAL" = "通过 Signal 分享链接";
+"CALL_LINK_SHARE_VIA_SIGNAL" = "通过 Radar 分享链接";
 
 /* Button to open the system share sheet to share a Call Link. */
 "CALL_LINK_SHARE_VIA_SYSTEM" = "分享链接";
@@ -1448,10 +1448,10 @@
 "CALLING_MEMBER_VIEW_YOUR_CAMERA_IS_OFF" = "摄像头已关闭";
 
 /* The generic name used for calls if CallKit privacy is enabled */
-"CALLKIT_ANONYMOUS_CONTACT_NAME" = "Signal 用户";
+"CALLKIT_ANONYMOUS_CONTACT_NAME" = "Radar 用户";
 
 /* The generic name used for group calls if CallKit privacy is enabled */
-"CALLKIT_ANONYMOUS_GROUP_NAME" = "Signal 群组";
+"CALLKIT_ANONYMOUS_GROUP_NAME" = "Radar 群组";
 
 /* Title for the calls list view. */
 "CALLS_LIST_TITLE" = "通话";
@@ -1625,7 +1625,7 @@
 "CARD_DONATION_EXPIRATION_DATE_PLACEHOLDER" = "MM/YY";
 
 /* Users can choose to learn more about their credit/debit card donations, which will open a sheet with additional information. This is the body text of that sheet. */
-"CARD_DONATION_READ_MORE_SHEET_BODY" = "当您捐款时，Signal 不会收集或储存您的任何个人信息。\n\n我们使用 Stripe 作为接收捐款的付款处理方。我们不会访问、储存或保存您向 Stripe 提供的任何信息。\n\nSignal 不会也无法关联您的捐款和您的 Signal 账户。\n\n感谢您的支持！";
+"CARD_DONATION_READ_MORE_SHEET_BODY" = "当您捐款时，Radar 不会收集或储存您的任何个人信息。\n\n我们使用 Stripe 作为接收捐款的付款处理方。我们不会访问、储存或保存您向 Stripe 提供的任何信息。\n\nSignal 不会也无法关联您的捐款和您的 Radar 账户。\n\n感谢您的支持！";
 
 /* Users can choose to learn more about their credit/debit card donations, which will open a sheet with additional information. This is the title of that sheet. */
 "CARD_DONATION_READ_MORE_SHEET_TITLE" = "个人信息安全无忧";
@@ -1634,7 +1634,7 @@
 "CARD_DONATION_SUBHEADER_LEARN_MORE" = "了解更多。";
 
 /* On the credit/debit card donation screen, a small amount of information text is shown. This is that text. It should (1) instruct users to enter their credit/debit card information (2) tell them that Signal does not collect or store their personal information. */
-"CARD_DONATION_SUBHEADER_TEXT" = "请输入您的卡片信息。Signal 不会收集或储存您的个人信息。";
+"CARD_DONATION_SUBHEADER_TEXT" = "请输入您的卡片信息。Radar 不会收集或储存您的个人信息。";
 
 /* Title for the 'censorship circumvention country' view. */
 "CENSORSHIP_CIRCUMVENTION_COUNTRY_VIEW_TITLE" = "选择国家";
@@ -1646,7 +1646,7 @@
 "CHANGE_PHONE_NUMBER_IDENTICAL_PHONE_NUMBERS_ALERT_MESSAGE" = "您的新号码不能与旧号码相同。请输入新的手机号码以进行号码变更。";
 
 /* Error indicating that the user's old phone number was not entered correctly. */
-"CHANGE_PHONE_NUMBER_INCORRECT_OLD_PHONE_NUMBER_ALERT_MESSAGE" = "您输入的手机号码与 Signal 账户的手机号码不匹配。";
+"CHANGE_PHONE_NUMBER_INCORRECT_OLD_PHONE_NUMBER_ALERT_MESSAGE" = "您输入的手机号码与 Radar 账户的手机号码不匹配。";
 
 /* Error indicating that the user's new phone number is not valid. */
 "CHANGE_PHONE_NUMBER_INVALID_PHONE_NUMBER_ALERT_MESSAGE_NEW" = "新手机号码无效。请输入有效的手机号码以进行号码变更。";
@@ -1772,7 +1772,7 @@
 "COMPARE_SAFETY_NUMBER_ACTION" = "和剪贴板比较";
 
 /* Accessibility hint describing what you can do with the compose button */
-"COMPOSE_BUTTON_HINT" = "选择或搜索 Signal 用户，开始对话。";
+"COMPOSE_BUTTON_HINT" = "选择或搜索 Radar 用户，开始对话。";
 
 /* Accessibility label from compose button. */
 "COMPOSE_BUTTON_LABEL" = "撰写";
@@ -1799,13 +1799,13 @@
 "COMPOSE_SCREEN_LIMITED_CONTACTS_CTA" = "管理";
 
 /* Multi-line label explaining why compose-screen contact picker is empty. */
-"COMPOSE_SCREEN_LIMITED_CONTACTS_PERMISSION" = "Signal 对您的系统通讯录访问受限";
+"COMPOSE_SCREEN_LIMITED_CONTACTS_PERMISSION" = "Radar 对您的系统通讯录访问受限";
 
 /* Button to open settings from an empty compose-screen contact picker. */
 "COMPOSE_SCREEN_MISSING_CONTACTS_CTA" = "打开设置";
 
 /* Multi-line label explaining why compose-screen contact picker is empty. */
-"COMPOSE_SCREEN_MISSING_CONTACTS_PERMISSION" = "您可在 iOS 设置中启用联系人读取权限，以便查看哪些联系人使用了 Signal。";
+"COMPOSE_SCREEN_MISSING_CONTACTS_PERMISSION" = "您可在 iOS 设置中启用联系人读取权限，以便查看哪些联系人使用了 Radar。";
 
 /* Configure reactions title text */
 "CONFIGURE_REACTIONS" = "设置回应";
@@ -1847,10 +1847,10 @@
 "CONTACT_ABOUT_SHEET_PROFILE_NAMES_EDUCATION" = "昵称未经过验证";
 
 /* Message for a tooltip that appears above a parenthesized name for another user, indicating that that name is the name the other user set for themself. Embeds {{name}} */
-"CONTACT_ABOUT_SHEET_SECONDARY_NAME_TOOLTIP_MESSAGE" = "“%1$@”是此用户在 Signal 上给自己设的昵称。";
+"CONTACT_ABOUT_SHEET_SECONDARY_NAME_TOOLTIP_MESSAGE" = "“%1$@”是此用户在 Radar 上给自己设的昵称。";
 
 /* A label indicating a user is a signal connection. */
-"CONTACT_ABOUT_SHEET_SIGNAL_CONNECTION_LABEL" = "Signal 密友";
+"CONTACT_ABOUT_SHEET_SIGNAL_CONNECTION_LABEL" = "Radar 密友";
 
 /* The title for a contact 'about' sheet. */
 "CONTACT_ABOUT_SHEET_TITLE" = "关于";
@@ -1892,7 +1892,7 @@
 "CONTACT_NOTE_TITLE" = "备注";
 
 /* Body for contact permission action sheet */
-"CONTACT_PERMISSION_ACTION_SHEET_2_BODY" = "如要在 Signal 上查找认识的人：";
+"CONTACT_PERMISSION_ACTION_SHEET_2_BODY" = "如要在 Radar 上查找认识的人：";
 
 /* First step for contact permission action sheet */
 "CONTACT_PERMISSION_ACTION_SHEET_2_STEP_ONE" = "轻按下面的“去设置”";
@@ -1925,10 +1925,10 @@
 "CONTACT_PERMISSION_REMINDER_MEGAPHONE_ACTION" = "允许访问";
 
 /* Body for contact permission reminder megaphone */
-"CONTACT_PERMISSION_REMINDER_MEGAPHONE_BODY" = "允许访问您的联系人以便在 Signal 上快速找到他们。";
+"CONTACT_PERMISSION_REMINDER_MEGAPHONE_BODY" = "允许访问您的联系人以便在 Radar 上快速找到他们。";
 
 /* Title for contact permission reminder megaphone */
-"CONTACT_PERMISSION_REMINDER_MEGAPHONE_TITLE" = "在 Signal 上寻找联系人";
+"CONTACT_PERMISSION_REMINDER_MEGAPHONE_TITLE" = "在 Radar 上寻找联系人";
 
 /* Label for a contact's phone number. */
 "CONTACT_PHONE" = "电话";
@@ -1952,7 +1952,7 @@
 "CONTACT_SHARE_INVALID_CONTACT" = "无效联系人。";
 
 /* Alert body when contacts disabled while trying to share a contact. */
-"CONTACT_SHARING_NO_ACCESS_BODY" = "Signal 需要访问您的通讯录。请前往 iOS 设置，然后开启通讯录。您的联系人将会被加密，Signal 服务将无法看到您的联系人。";
+"CONTACT_SHARING_NO_ACCESS_BODY" = "Radar 需要访问您的通讯录。请前往 iOS 设置，然后开启通讯录。您的联系人将会被加密，Radar 服务将无法看到您的联系人。";
 
 /* Alert title when contacts disabled while trying to share a contact. */
 "CONTACT_SHARING_NO_ACCESS_TITLE" = "允许访问联系人";
@@ -2006,7 +2006,7 @@
 "CONTACT_SUPPORT_FILTER_SOMETHING_NOT_WORKING_SHORT" = "出现问题";
 
 /* Alert body */
-"CONTACT_SUPPORT_PROMPT_ERROR_ALERT_BODY" = "抱歉，Signal 无法完成你所需的帮助请求。";
+"CONTACT_SUPPORT_PROMPT_ERROR_ALERT_BODY" = "抱歉，Radar 无法完成你所需的帮助请求。";
 
 /* button text */
 "CONTACT_SUPPORT_PROMPT_ERROR_TRY_AGAIN" = "重试";
@@ -2135,7 +2135,7 @@
 "CONVERSATION_SETTINGS_ATTRIBUTES_ACCESS_SECTION_FOOTER" = "选择谁可以编辑群组名称、图片、描述和限时消息计时器。";
 
 /* Footer string for a contact's badges in conversation settings */
-"CONVERSATION_SETTINGS_BADGES_FOOTER" = "支持 Signal，为您的个人资料添加徽章吧。点击徽章了解详情。";
+"CONVERSATION_SETTINGS_BADGES_FOOTER" = "支持 Radar，为您的个人资料添加徽章吧。点击徽章了解详情。";
 
 /* Header title for a contact's badges in conversation settings */
 "CONVERSATION_SETTINGS_BADGES_HEADER" = "徽章";
@@ -2393,7 +2393,7 @@
 "DATABASE_INTEGRITY_CHECK_ACTION_RUN" = "运行";
 
 /* Message for alert before running a database integrity check */
-"DATABASE_INTEGRITY_CHECK_MESSAGE" = "这将能帮助我们解决您的问题，整个过程可能需要几分钟。在运行检查期间您可以关闭 Signal，不过请记得回来提交您的日志。";
+"DATABASE_INTEGRITY_CHECK_MESSAGE" = "这将能帮助我们解决您的问题，整个过程可能需要几分钟。在运行检查期间您可以关闭 Radar，不过请记得回来提交您的日志。";
 
 /* Button to skip database integrity check step */
 "DATABASE_INTEGRITY_CHECK_SKIP" = "跳过";
@@ -2417,10 +2417,10 @@
 "DATABASE_RECOVERY_MORE_STORAGE_SPACE_NEEDED_TITLE" = "需要更多存储空间";
 
 /* The user has tried to recover their data after it was lost due to corruption. (They have not been hacked.) This is the description on the screen where we show an error message. */
-"DATABASE_RECOVERY_RECOVERY_FAILED_DESCRIPTION" = "您的消息记录无法恢复。您可以重新安装并继续使用 Signal。请向我们提交调试日志，以便我们更好地了解情况。";
+"DATABASE_RECOVERY_RECOVERY_FAILED_DESCRIPTION" = "您的消息记录无法恢复。您可以重新安装并继续使用 Radar。请向我们提交调试日志，以便我们更好地了解情况。";
 
 /* The user has tried to recover their data after it was lost due to corruption. (They have not been hacked.) This button lets them delete all of their data. */
-"DATABASE_RECOVERY_RECOVERY_FAILED_RESET_APP_BUTTON" = "重置 Signal";
+"DATABASE_RECOVERY_RECOVERY_FAILED_RESET_APP_BUTTON" = "重置 Radar";
 
 /* The user has tried to recover their data after it was lost due to corruption. (They have not been hacked.) If they want to delete the app and restart, they will be presented with a confirmation dialog. This is the final button they will press before their data is reset. */
 "DATABASE_RECOVERY_RECOVERY_FAILED_RESET_APP_CONFIRMATION_CONFIRM" = "重置";
@@ -2429,7 +2429,7 @@
 "DATABASE_RECOVERY_RECOVERY_FAILED_RESET_APP_CONFIRMATION_DESCRIPTION" = "您的账户信息、个人资料和所有消息将会被清空。应用将会在这个过程完成后关闭。";
 
 /* The user has tried to recover their data after it was lost due to corruption. (They have not been hacked.) If they want to delete the app and restart, they will be presented with a confirmation dialog. This is the title of that dialog. */
-"DATABASE_RECOVERY_RECOVERY_FAILED_RESET_APP_CONFIRMATION_TITLE" = "重置 Signal";
+"DATABASE_RECOVERY_RECOVERY_FAILED_RESET_APP_CONFIRMATION_TITLE" = "重置 Radar";
 
 /* The user has tried to recover their data after it was lost due to corruption. (They have not been hacked.) They were asked to submit a debug log. This is the button that submits this log. */
 "DATABASE_RECOVERY_RECOVERY_FAILED_SUBMIT_DEBUG_LOG_BUTTON" = "提交调试日志";
@@ -2504,7 +2504,7 @@
 "DELETE_ACCOUNT_CONFIRMATION_ACTION_SHEEET_ACTION" = "删除账号";
 
 /* Title for the action sheet message of the 'delete account confirmation' view controller. */
-"DELETE_ACCOUNT_CONFIRMATION_ACTION_SHEEET_MESSAGE" = "这将删除您的 Signal 帐户并重置应用。该过程完成之后，应用将关闭。";
+"DELETE_ACCOUNT_CONFIRMATION_ACTION_SHEEET_MESSAGE" = "这将删除您的 Radar 帐户并重置应用。该过程完成之后，应用将关闭。";
 
 /* Title for the action sheet confirmation title of the 'delete account confirmation' view controller. */
 "DELETE_ACCOUNT_CONFIRMATION_ACTION_SHEEET_TITLE" = "您确定要删除您的账号吗？";
@@ -2528,13 +2528,13 @@
 "DELETE_ACCOUNT_CONFIRMATION_PHONE_NUMBER_TITLE" = "手机号码";
 
 /* Section header */
-"DELETE_ACCOUNT_CONFIRMATION_SECTION_TITLE" = "请确认您的 Signal 号码";
+"DELETE_ACCOUNT_CONFIRMATION_SECTION_TITLE" = "请确认您的 Radar 号码";
 
 /* Title for the 'delete account' confirmation view. */
 "DELETE_ACCOUNT_CONFIRMATION_TITLE" = "删除账号";
 
 /* Title for the action sheet when you enter the wrong number on the 'delete account confirmation' view controller. */
-"DELETE_ACCOUNT_CONFIRMATION_WRONG_NUMBER" = "您输入的手机号码与 Signal 账户的手机号码不匹配。";
+"DELETE_ACCOUNT_CONFIRMATION_WRONG_NUMBER" = "您输入的手机号码与 Radar 账户的手机号码不匹配。";
 
 /* action sheet body */
 "DELETE_ALL_MESSAGES_IN_CONVERSATION_ALERT_BODY" = "是否删除此聊天中的所有消息？";
@@ -2575,7 +2575,7 @@
 
 
 /* Notification warning the user that they have been de-registered. */
-"DEREGISTRATION_NOTIFICATION" = "您在此设备上已被登出 Signal。";
+"DEREGISTRATION_NOTIFICATION" = "您在此设备上已被登出 Radar。";
 
 /* Button that lets users re-register using the same phone number. */
 "DEREGISTRATION_REREGISTER_BUTTON" = "重新注册";
@@ -2584,7 +2584,7 @@
 "DEREGISTRATION_REREGISTER_PROMPT_TITLE" = "要重新注册此手机号码？";
 
 /* Label warning the user that they have been de-registered. */
-"DEREGISTRATION_WARNING" = "此设备已注销。这可能是因为您使用您的手机号码在其他设备上注册了 Signal。";
+"DEREGISTRATION_WARNING" = "此设备已注销。这可能是因为您使用您的手机号码在其他设备上注册了 Radar。";
 
 /* If the user has been deregistered, they'll see a warning. This is This is the call to action on that warning. */
 "DEREGISTRATION_WARNING_ACTION_TITLE" = "重新注册设备";
@@ -2653,7 +2653,7 @@
 "DEVICE_TRANSFER_CONTRACT_QR_CODE_BUTTON" = "缩小视图";
 
 /* An error indicating that the other device closed signal mid-transfer and it could not complete */
-"DEVICE_TRANSFER_ERROR_BACKGROUNDED" = "无法完成转移。请确保两个设备均已打开 Signal，然后重试。";
+"DEVICE_TRANSFER_ERROR_BACKGROUNDED" = "无法完成转移。请确保两个设备均已打开 Radar，然后重试。";
 
 /* An error indicating that we were unable to verify the identity of the new device to complete the transfer */
 "DEVICE_TRANSFER_ERROR_CERTIFICATE_MISMATCH" = "无法验证你的新设备，请重试";
@@ -2671,13 +2671,13 @@
 "DEVICE_TRANSFER_ERROR_NOT_ENOUGH_SPACE" = "完成迁移所需的空间不足";
 
 /* An error indicating the user must update their device before trying to transfer. */
-"DEVICE_TRANSFER_ERROR_UNSUPPORTED_VERSION" = "将 Signal 更新到最新版本并重试";
+"DEVICE_TRANSFER_ERROR_UNSUPPORTED_VERSION" = "将 Radar 更新到最新版本并重试";
 
 /* Button shown to expand a QR code and view it fullscreen. */
 "DEVICE_TRANSFER_EXPAND_QR_CODE_BUTTON" = "查看大图";
 
 /* The explanation on the action sheet prompting the user if they want to transfer their device. */
-"DEVICE_TRANSFER_PROMPT_EXPLANATION" = "将你的 Signal 账户迁移到新的 iOS 设备上。确保你的新设备足够靠近且正常开机。";
+"DEVICE_TRANSFER_PROMPT_EXPLANATION" = "将你的 Radar 账户迁移到新的 iOS 设备上。确保你的新设备足够靠近且正常开机。";
 
 /* The title on the acttion sheet prompting the user if they want to transfer their device. */
 "DEVICE_TRANSFER_PROMPT_TITLE" = "转移帐户";
@@ -2695,7 +2695,7 @@
 "DEVICE_TRANSFER_QRCODE_TITLE" = "扫描二维码";
 
 /* The explanation on the view that shows receiving progress */
-"DEVICE_TRANSFER_RECEIVING_EXPLANATION" = "请确保两个设备足够靠近。不要关闭设备并保证 Signal 运行。迁移是点对点加密的。";
+"DEVICE_TRANSFER_RECEIVING_EXPLANATION" = "请确保两个设备足够靠近。不要关闭设备并保证 Radar 运行。迁移是点对点加密的。";
 
 /* The title on the view that shows receiving progress */
 "DEVICE_TRANSFER_RECEIVING_TITLE" = "正在接受数据";
@@ -2731,7 +2731,7 @@
 "DEVICE_TRANSFER_STATUS_NEW_DEVICE_TRANSFERRING" = "正在转移";
 
 /* Description in the progress view displayed during device transfer. */
-"DEVICE_TRANSFER_STATUS_NEW_DEVICE_TRANSFERRING_DESCRIPTION" = "请确保两个设备足够靠近。不要关闭任何设备并保持 Signal 处于开启状态。转移过程为端对端加密。";
+"DEVICE_TRANSFER_STATUS_NEW_DEVICE_TRANSFERRING_DESCRIPTION" = "请确保两个设备足够靠近。不要关闭任何设备并保持 Radar 处于开启状态。转移过程为端对端加密。";
 
 /* Status message on old device when cancelling transfer. */
 "DEVICE_TRANSFER_STATUS_OLD_DEVICE_CANCELLING" = "正在取消连接到新的 iPhone…";
@@ -2746,7 +2746,7 @@
 "DEVICE_TRANSFER_STATUS_OLD_DEVICE_STARTING" = "正在等待连接到新的 iPhone…";
 
 /* The explanation on the action sheet that shows transfer progress */
-"DEVICE_TRANSFER_TRANSFERRING_EXPLANATION" = "请确保两个设备足够靠近。不要关闭设备并保证 Signal 运行。";
+"DEVICE_TRANSFER_TRANSFERRING_EXPLANATION" = "请确保两个设备足够靠近。不要关闭设备并保证 Radar 运行。";
 
 /* The title on the action sheet that shows transfer progress */
 "DEVICE_TRANSFER_TRANSFERRING_TITLE" = "正在迁移数据";
@@ -2836,13 +2836,13 @@
 "DONATE_CHOOSE_PAYMENT_METHOD_SHEET_SUBTITLE_FOR_ONE_TIME_DONATION" = "获得为期 30 天的%1$@徽章";
 
 /* When users make donations on a friend's behalf, they see a sheet that lets them pick a payment method. This is the title on that sheet. Embeds {{amount of money}}, such as \"$5\". */
-"DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_DONATION_ON_BEHALF_OF_A_FRIEND" = "给 Signal 捐款 %1$@";
+"DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_DONATION_ON_BEHALF_OF_A_FRIEND" = "给 Radar 捐款 %1$@";
 
 /* When users make monthly donations, they see a sheet that lets them pick a payment method. This is the title on that sheet. Embeds {{amount of money per month}}, such as \"$5/month\". */
-"DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_MONTHLY_DONATION" = "给 Signal 捐款 %1$@";
+"DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_MONTHLY_DONATION" = "给 Radar 捐款 %1$@";
 
 /* When users make one-time donations, they see a sheet that lets them pick a payment method. This is the title on that sheet. Embeds {{amount of money}}, such as \"$5\". */
-"DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_ONE_TIME_DONATION" = "给 Signal 捐款 %1$@";
+"DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_ONE_TIME_DONATION" = "给 Radar 捐款 %1$@";
 
 /* Users can donate on a friend's behalf and can optionally add a message. This is tells users about that optional message. */
 "DONATE_ON_BEHALF_OF_A_FRIEND_ADDITIONAL_MESSAGE_INFO" = "收礼人将会在一对一消息中看到代捐通知。您可以在下方添加自己的消息。";
@@ -2959,7 +2959,7 @@
 "DONATION_ON_BEHALF_OF_A_FRIEND_BADGE_REDEEMED" = "已领取";
 
 /* Users can donate on behalf of a friend, and the friend will receive a badge. This is a short paragraph on the screen where users choose the badge their friend will receive. */
-"DONATION_ON_BEHALF_OF_A_FRIEND_CHOOSE_BADGE_DESCRIPTION" = "代使用 Signal 的朋友或家人进行捐款，为 Signal 提供一份支持。对方可以选择是否在个人资料中显示自己对 Signal 的支持。";
+"DONATION_ON_BEHALF_OF_A_FRIEND_CHOOSE_BADGE_DESCRIPTION" = "代使用 Radar 的朋友或家人进行捐款，为 Radar 提供一份支持。对方可以选择是否在个人资料中显示自己对 Radar 的支持。";
 
 /* Users can donate on behalf of a friend, and the friend will receive a badge. This is the title on the screen where users choose the badge their friend will receive. */
 "DONATION_ON_BEHALF_OF_A_FRIEND_CHOOSE_BADGE_TITLE" = "代朋友捐款";
@@ -2983,7 +2983,7 @@
 "DONATION_ON_BEHALF_OF_A_FRIEND_PAYMENT_FAILED_ERROR_TITLE" = "付款失败";
 
 /* Users can donate on a friend's behalf. If the payment was processed but the donation failed to send, this error message will be shown. */
-"DONATION_ON_BEHALF_OF_A_FRIEND_PAYMENT_SUCCEEDED_BUT_MESSAGE_FAILED_ERROR_BODY" = "您的付款已处理，但 Signal 无法发送您的捐款消息。请联系支持团队。";
+"DONATION_ON_BEHALF_OF_A_FRIEND_PAYMENT_SUCCEEDED_BUT_MESSAGE_FAILED_ERROR_BODY" = "您的付款已处理，但 Radar 无法发送您的捐款消息。请联系支持团队。";
 
 /* Users can donate on a friend's behalf. If the payment was processed but the donation failed to send, an error dialog will be shown. This is the title of that dialog. */
 "DONATION_ON_BEHALF_OF_A_FRIEND_PAYMENT_SUCCEEDED_BUT_MESSAGE_FAILED_ERROR_TITLE" = "捐款失败";
@@ -2995,7 +2995,7 @@
 "DONATION_ON_BEHALF_OF_A_FRIEND_PREVIEW_OUTGOING" = "✨ 您代%1$@捐了款";
 
 /* You received a donation from a friend. This is the title of that message in the chat. Embeds {{short contact name}}. */
-"DONATION_ON_BEHALF_OF_A_FRIEND_RECEIVED_TITLE_FORMAT" = "%1$@代您给 Signal 捐了款";
+"DONATION_ON_BEHALF_OF_A_FRIEND_RECEIVED_TITLE_FORMAT" = "%1$@代您给 Radar 捐了款";
 
 /* Users can donate on a friend's behalf. This is the error message that appears if the try to do this, but the recipient is blocked. */
 "DONATION_ON_BEHALF_OF_A_FRIEND_RECIPIENT_IS_BLOCKED_ERROR_BODY" = "您已屏蔽此用户，因此无法代对方捐款。";
@@ -3019,7 +3019,7 @@
 "DONATION_ON_BEHALF_OF_A_FRIEND_SENT_TITLE_FORMAT" = "代%1$@捐款";
 
 /* When you donate on behalf of a friend, a thank-you sheet will appear. This is the text on that sheet. Embeds {{recipient name}}. */
-"DONATION_ON_BEHALF_OF_A_FRIEND_THANKS_BODY_FORMAT" = "您以%1$@的名义给 Signal 捐了款。对方可以选择是否在个人资料中显示自己对 Signal 的支持。";
+"DONATION_ON_BEHALF_OF_A_FRIEND_THANKS_BODY_FORMAT" = "您以%1$@的名义给 Radar 捐了款。对方可以选择是否在个人资料中显示自己对 Radar 的支持。";
 
 /* When you donate on behalf of a friend, a thank-you sheet will appear. This is the title on that sheet. */
 "DONATION_ON_BEHALF_OF_A_FRIEND_THANKS_TITLE" = "感谢您的支持！";
@@ -3028,19 +3028,19 @@
 "DONATION_ON_BEHALF_OF_A_FRIEND_VIEW" = "查看";
 
 /* A friend has donated on your behalf and you received a badge. This text says that you received a badge, and from whom. Embeds {{contact's short name, such as a first name}}. */
-"DONATION_ON_BEHALF_OF_A_FRIEND_YOU_RECEIVED_A_BADGE_FORMAT" = "%1$@以您的名义给 Signal 捐了款！在个人资料中显示您对 Signal 的支持吧。";
+"DONATION_ON_BEHALF_OF_A_FRIEND_YOU_RECEIVED_A_BADGE_FORMAT" = "%1$@以您的名义给 Radar 捐了款！在个人资料中显示您对 Radar 的支持吧。";
 
 /* There is a screen where users can read more about their donation to Signal. This is the 1st paragraph of that screen. */
 "DONATION_READ_MORE_SCREEN_PARAGRAPH_1" = "私密通信。无广告，无跟踪，无监视。";
 
 /* There is a screen where users can read more about their donation to Signal. This is the 2nd paragraph of that screen. */
-"DONATION_READ_MORE_SCREEN_PARAGRAPH_2" = "Signal 依靠捐款维持运营，这意味着在我们的经营和运作中，保护您的隐私是我们的重中之重。Signal 为用户而生，不为数据，也不为盈利。";
+"DONATION_READ_MORE_SCREEN_PARAGRAPH_2" = "Radar 依靠捐款维持运营，这意味着在我们的经营和运作中，保护您的隐私是我们的重中之重。Radar 为用户而生，不为数据，也不为盈利。";
 
 /* There is a screen where users can read more about their donation to Signal. This is the 3rd paragraph of that screen. */
-"DONATION_READ_MORE_SCREEN_PARAGRAPH_3" = "如果可以的话，欢迎立即给 Signal 捐款，让 Signal 继续成为一个充满乐趣和值得信赖的平台，供所有人自由使用。";
+"DONATION_READ_MORE_SCREEN_PARAGRAPH_3" = "如果可以的话，欢迎立即给 Radar 捐款，让 Radar 继续成为一个充满乐趣和值得信赖的平台，供所有人自由使用。";
 
 /* There is a screen where users can read more about their donation to Signal. This is the title of that screen. */
-"DONATION_READ_MORE_SCREEN_TITLE" = "Signal 与众不同。";
+"DONATION_READ_MORE_SCREEN_TITLE" = "Radar 与众不同。";
 
 /* Section title for donation amount on receipts */
 "DONATION_RECEIPT_AMOUNT" = "金额";
@@ -3076,7 +3076,7 @@
 "DONATION_RECEIPTS" = "捐款收据";
 
 /* Text at the bottom of the donation receipts list, telling users that receipts might not be available */
-"DONATION_RECEIPTS_MIGHT_BE_MISSING_IF_YOU_REINSTALLED" = "如果您重新安装了 Signal，系统将无法提供先前的捐款收据。";
+"DONATION_RECEIPTS_MIGHT_BE_MISSING_IF_YOU_REINSTALLED" = "如果您重新安装了 Radar，系统将无法提供先前的捐款收据。";
 
 /* Error message displayed if something goes wrong with 3DSecure/iDEAL payment authorization.  This will be encountered if the user cancels the webview before authrizing the payment. */
 "DONATION_REDIRECT_ERROR_CANCELLED_MESSAGE" = "付款已取消。请重试。";
@@ -3091,7 +3091,7 @@
 "DONATION_SCREEN_DONATE_BUTTON" = "捐款";
 
 /* On donation screens, a small amount of information text is shown. This is the subtitle for that text. */
-"DONATION_SCREENS_HEADER_DESCRIPTION" = "私密通信平台，依用户而生。无广告，无跟踪，服务不打折。立即捐款支持 Signal。";
+"DONATION_SCREENS_HEADER_DESCRIPTION" = "私密通信平台，依用户而生。无广告，无跟踪，服务不打折。立即捐款支持 Radar。";
 
 /* On donation screens, a small amount of information text is shown. Users can click this link to learn more information. */
 "DONATION_SCREENS_HEADER_READ_MORE" = "阅读全文";
@@ -3169,7 +3169,7 @@
 "DONATION_VIEW_DONATE_ON_BEHALF_OF_A_FRIEND" = "代朋友捐款";
 
 /* Text describing to the user that they're going to pay a donation to Signal */
-"DONATION_VIEW_DONATION_TO_SIGNAL" = "向 Signal 捐赠";
+"DONATION_VIEW_DONATION_TO_SIGNAL" = "向 Radar 捐赠";
 
 /* Title for the 'Donor FAQ' button on the donation screen */
 "DONATION_VIEW_DONOR_FAQ" = "捐款人常见问题解答";
@@ -3181,7 +3181,7 @@
 "DONATION_VIEW_MANAGE_BADGES" = "徽章";
 
 /* Text describing to the user that they're going to pay a monthly donation to Signal */
-"DONATION_VIEW_MONTHLY_DONATION_TO_SIGNAL" = "给 Signal 每月捐款";
+"DONATION_VIEW_MONTHLY_DONATION_TO_SIGNAL" = "给 Radar 每月捐款";
 
 /* Title for the 'more' section on the donation screen */
 "DONATION_VIEW_MORE_SECTION_TITLE" = "更多";
@@ -3193,7 +3193,7 @@
 "DONATION_VIEW_OTHER_WAYS_TO_DONATE_TITLE" = "其他捐赠方式";
 
 /* Title on the 'Donate to Signal' screen */
-"DONATION_VIEW_TITLE" = "捐款给 Signal";
+"DONATION_VIEW_TITLE" = "捐款给 Radar";
 
 /* Label for the currency picker button in donation views */
 "DONATIONS_CURRENCY_PICKER_LABEL" = "货币";
@@ -3208,13 +3208,13 @@
 "EDIT_CONTACT_WITHOUT_CONTACTS_PERMISSION_ALERT_BODY" = "您可在 iOS 设置中启用此权限。";
 
 /* Alert title for when the user has just tried to edit a contacts after declining to give Signal contacts permissions */
-"EDIT_CONTACT_WITHOUT_CONTACTS_PERMISSION_ALERT_TITLE" = "Signal 需要联系人访问权限来修改联系人信息";
+"EDIT_CONTACT_WITHOUT_CONTACTS_PERMISSION_ALERT_TITLE" = "Radar 需要联系人访问权限来修改联系人信息";
 
 /* The navbar title for the 'update group' view. */
 "EDIT_GROUP_DEFAULT_TITLE" = "编辑群组";
 
 /* Error message indicating the a user can't be added to a group. */
-"EDIT_GROUP_ERROR_CANNOT_ADD_MEMBER" = "此用户的 Signal 版本过低，无法加入群组。";
+"EDIT_GROUP_ERROR_CANNOT_ADD_MEMBER" = "此用户的 Radar 版本过低，无法加入群组。";
 
 /* Error message indicating that an avatar image is invalid and cannot be used. */
 "EDIT_GROUP_ERROR_INVALID_AVATAR" = "无效照片。";
@@ -3241,13 +3241,13 @@
 "EDIT_MESSAGE_SEND_MESSAGE_UNKNOWN_ERROR" = "EDIT_MESSAGE_SEND_MESSAGE_UNKNOWN_ERROR";
 
 /* body of email sent to contacts when inviting to install Signal. Embeds {{link to install Signal}} and {{link to the Signal home page}} */
-"EMAIL_INVITE_BODY" = "嗨，\n\n最近我在 iPhone 上用 Signal 进行加密聊天，希望你也能加入，这样我们就可以放心发消息和打电话而不用担心被别人偷听了。\n\nSignal 可以在 iPhone、Android 和电脑上使用，这是下载链接：%1$@\n\nSignal 和市面上的聊天软件一样，可发照片、发视频、打电话，也可以群聊。最棒的是，其他人完全无法偷看聊天内容，即便是 Signal 的创立者也看不到！\n\n你可以在这里了解有关 Signal 的更多信息：%2$@";
+"EMAIL_INVITE_BODY" = "嗨，\n\n最近我在 iPhone 上用 Radar 进行加密聊天，希望你也能加入，这样我们就可以放心发消息和打电话而不用担心被别人偷听了。\n\nSignal 可以在 iPhone、Android 和电脑上使用，这是下载链接：%1$@\n\nSignal 和市面上的聊天软件一样，可发照片、发视频、打电话，也可以群聊。最棒的是，其他人完全无法偷看聊天内容，即便是 Radar 的创立者也看不到！\n\n你可以在这里了解有关 Radar 的更多信息：%2$@";
 
 /* subject of email sent to contacts when inviting to install Signal */
-"EMAIL_INVITE_SUBJECT" = "切换到 Signal";
+"EMAIL_INVITE_SUBJECT" = "切换到 Radar";
 
 /* Description for the fallback support sheet if user cannot send email */
-"EMAIL_SIGNAL_MESSAGE" = "您的设备没有配置邮箱来发送邮件，若要请求支援，请配置您的邮箱或直接发送邮件到 support@signal.org";
+"EMAIL_SIGNAL_MESSAGE" = "您的设备没有配置邮箱来发送邮件，若要请求支援，请配置您的邮箱或直接发送邮件到 support@radar.chat";
 
 /* Title for the fallback support sheet if user cannot send email */
 "EMAIL_SIGNAL_TITLE" = "电子邮件不可用";
@@ -3283,7 +3283,7 @@
 "EMOJI_CATEGORY_TRAVEL_NAME" = "旅行和地点";
 
 /* Full width label displayed when attempting to compose message */
-"EMPTY_CONTACTS_LABEL_LINE1" = "暂时没有联系人使用 Signal.";
+"EMPTY_CONTACTS_LABEL_LINE1" = "暂时没有联系人使用 Radar.";
 
 /* Full width label displayed when attempting to compose message */
 "EMPTY_CONTACTS_LABEL_LINE2" = "为什么不邀请你的朋友?";
@@ -3349,7 +3349,7 @@
 "ERROR_DESCRIPTION_UNKNOWN_ERROR" = "发生了未知错误。";
 
 /* Error message when attempting to send message */
-"ERROR_DESCRIPTION_UNREGISTERED_RECIPIENT" = "无法发送消息，因为该用户已不再使用 Signal。";
+"ERROR_DESCRIPTION_UNREGISTERED_RECIPIENT" = "无法发送消息，因为该用户已不再使用 Radar。";
 
 /* Error message indicating that attachment upload(s) failed. */
 "ERROR_MESSAGE_ATTACHMENT_UPLOAD_FAILED" = "附件上传失败。";
@@ -3394,10 +3394,10 @@
 "ERROR_NETWORK_FAILURE" = "网络错误";
 
 /* Format string for an error alert notification message. Embeds {{ error string }} */
-"ERROR_NOTIFICATION_MESSAGE_FORMAT" = "请帮助我们优化 Signal 吧：向 support@signal.org 举报此错误并附上您设备上的调试日志；%1$@";
+"ERROR_NOTIFICATION_MESSAGE_FORMAT" = "请帮助我们优化 Radar 吧：向 support@radar.chat 举报此错误并附上您设备上的调试日志；%1$@";
 
 /* Format string for an error alert notification title. */
-"ERROR_NOTIFICATION_TITLE" = "Signal 测试版：发生错误";
+"ERROR_NOTIFICATION_TITLE" = "Radar 测试版：发生错误";
 
 /* Error indicating a send failure due to a delinked application. */
 "ERROR_SENDING_DELINKED" = "您的设备处于未关联状态。请重新关联以继续发送消息。";
@@ -3406,7 +3406,7 @@
 "ERROR_SENDING_DEREGISTERED" = "您的设备处于未注册状态。请重新注册以继续发送消息。";
 
 /* Error indicating a send failure due to an expired application. */
-"ERROR_SENDING_EXPIRED" = "您的 Signal 版本已过期，请升级到最新版本以继续发送消息。";
+"ERROR_SENDING_EXPIRED" = "您的 Radar 版本已过期，请升级到最新版本以继续发送消息。";
 
 /* Format string for 'unregistered user' error. Embeds {{the unregistered user's name or signal id}}. */
 "ERROR_UNREGISTERED_USER_FORMAT" = "用户未注册：%1$@";
@@ -3418,19 +3418,19 @@
 "EXIT_REREGISTRATION" = "退出注册";
 
 /* Label notifying the user that the app has expired. */
-"EXPIRATION_ERROR" = "此 Signal 版本已过期，请升级到更新版本以继续收发消息。";
+"EXPIRATION_ERROR" = "此 Radar 版本已过期，请升级到更新版本以继续收发消息。";
 
 /* If the user's app is too old, they'll be shown a warning asking them to upgrade. This is the text on the warning, and tapping it will open the App Store page for Signal. */
 "EXPIRATION_WARNING_ACTION_TITLE" = "立即升级";
 
 /* Label warning the user that the app will expire soon. Embeds {{date}}. */
-"EXPIRATION_WARNING_SOON" = "此 Signal 版本将于 %1$@过期，请更新到更新版本以继续收发消息。";
+"EXPIRATION_WARNING_SOON" = "此 Radar 版本将于 %1$@过期，请更新到更新版本以继续收发消息。";
 
 /* Label warning the user that the app will expire today. */
-"EXPIRATION_WARNING_TODAY" = "此 Signal 版本将在今天过期，请更新到更新版本以继续收发消息。";
+"EXPIRATION_WARNING_TODAY" = "此 Radar 版本将在今天过期，请更新到更新版本以继续收发消息。";
 
 /* action sheet header when re-sending message which failed because of an invalid key signature */
-"FAILED_SENDING_BECAUSE_INVALID_KEY_SIGNATURE" = "无法发送消息，因为%1$@需要更新和打开 Signal。";
+"FAILED_SENDING_BECAUSE_INVALID_KEY_SIGNATURE" = "无法发送消息，因为%1$@需要更新和打开 Radar。";
 
 /* action sheet header when re-sending message which failed because of untrusted identity keys */
 "FAILED_SENDING_BECAUSE_UNTRUSTED_IDENTITY_KEY" = "您与%1$@的安全码已改变，建议您验证新安全码后再发送此消息。";
@@ -3745,10 +3745,10 @@
 "GROUP_CALL_WILL_NOTIFY_TWO_PEOPLE_FORMAT" = "%1$@ 和 %2$@ 将会收到通知";
 
 /* Text shown before the user starts a group call if the user has enabled ringing and there is one other person in the group. Embeds {member name} */
-"GROUP_CALL_WILL_RING_ONE_PERSON_FORMAT" = "Signal 将会呼叫 %1$@";
+"GROUP_CALL_WILL_RING_ONE_PERSON_FORMAT" = "Radar 将会呼叫 %1$@";
 
 /* Text shown before the user starts a group call if the user has enabled ringing and there are two other people in the group. Embeds {{ %1$@ participant1, %2$@ participant2 }} */
-"GROUP_CALL_WILL_RING_TWO_PEOPLE_FORMAT" = "Signal 将会呼叫 %1$@ 和 %2$@";
+"GROUP_CALL_WILL_RING_TWO_PEOPLE_FORMAT" = "Radar 将会呼叫 %1$@ 和 %2$@";
 
 /* Text explaining that you are in the group call. */
 "GROUP_CALL_YOU_ARE_HERE" = "您在此群组通话中";
@@ -3958,7 +3958,7 @@
 "GROUP_LINK_VIEW_SHARE_LINK_VIA_QR_CODE" = "QR 代码";
 
 /* Label for the 'share group link via Signal' button in the 'group link' view. */
-"GROUP_LINK_VIEW_SHARE_LINK_VIA_SIGNAL" = "通过 Signal 分享";
+"GROUP_LINK_VIEW_SHARE_LINK_VIA_SIGNAL" = "通过 Radar 分享";
 
 /* Message for the 'share group link' action sheet in the 'group link' view. */
 "GROUP_LINK_VIEW_SHARE_SHEET_MESSAGE" = "通过该链接，任何人可查看该群组的名称和成员，并可请求加入。请与您信任的人分享。";
@@ -4468,7 +4468,7 @@
 "INACTIVE_LINKED_DEVICE_REMINDER_MEGAPHONE_TITLE" = "已链接设备不活跃";
 
 /* Body for an in-app megaphone about a user's inactive primary device. */
-"INACTIVE_PRIMARY_DEVICE_REMINDER_MEGAPHONE_BODY" = "要使您的账户保持活跃状态，请在您的主设备上打开 Signal。";
+"INACTIVE_PRIMARY_DEVICE_REMINDER_MEGAPHONE_BODY" = "要使您的账户保持活跃状态，请在您的主设备上打开 Radar。";
 
 /* Title for a button in an in-app megaphone about a user's inactive primary device, temporarily dismissing the megaphone. */
 "INACTIVE_PRIMARY_DEVICE_REMINDER_MEGAPHONE_GOT_IT_BUTTON" = "知道了";
@@ -4513,10 +4513,10 @@
 "INFO_MESSAGE_BLOCKED_OTHER_USER" = "您已屏蔽此用户。";
 
 /* Indicates that a previously-removed recipient has been added back to the current user's contacts. */
-"INFO_MESSAGE_CONTACT_REINSTATED" = "此用户已重新添加到您的 Signal 联系人列表。";
+"INFO_MESSAGE_CONTACT_REINSTATED" = "此用户已重新添加到您的 Radar 联系人列表。";
 
 /* Indicates that the recipient has been removed from the current user's contacts and that messaging them will re-add them. */
-"INFO_MESSAGE_CONTACT_REMOVED" = "您已将此用户移出您的 Signal 联系人列表，给对方发送消息会将其重新添加到列表中。";
+"INFO_MESSAGE_CONTACT_REMOVED" = "您已将此用户移出您的 Radar 联系人列表，给对方发送消息会将其重新添加到列表中。";
 
 /* When you start a chat with someone and then later learn their profile name, we insert an in-chat message with this string to record the identifier you originally used to contact them. Embeds {{ the identifier, either a phone number or a username }}. */
 "INFO_MESSAGE_LEARNED_PROFILE_KEY" = "您向 %1$@ 发起了聊天。";
@@ -4537,7 +4537,7 @@
 "INFO_MESSAGE_REPORTED_SPAM" = "已举报为垃圾消息";
 
 /* Body message of the alert shown when a user taps on 'learn more' via the spam info message. */
-"INFO_MESSAGE_REPORTED_SPAM_LEARN_MORE_MESSAGE" = "Signal 已通知此用户，其可能发送了垃圾消息。Signal 无法看到任何聊天的内容。";
+"INFO_MESSAGE_REPORTED_SPAM_LEARN_MORE_MESSAGE" = "Radar 已通知此用户，其可能发送了垃圾消息。Radar 无法看到任何聊天的内容。";
 
 /* Title of the alert shown when a user taps on 'learn more' via the spam info message. */
 "INFO_MESSAGE_REPORTED_SPAM_LEARN_MORE_TITLE" = "已举报垃圾消息";
@@ -4555,7 +4555,7 @@
 "INFO_MESSAGE_USER_CHANGED_PHONE_NUMBER_FORMAT" = "%1$@已更改手机号码。";
 
 /* Shown in inbox and conversation when a user joins Signal, embeds the new user's {{contact name}} */
-"INFO_MESSAGE_USER_JOINED_SIGNAL_BODY_FORMAT" = "%1$@ 开始使用 Signal 了！";
+"INFO_MESSAGE_USER_JOINED_SIGNAL_BODY_FORMAT" = "%1$@ 开始使用 Radar 了！";
 
 /* Label at the top of the input text when editing a message */
 "INPUT_TOOLBAR_EDIT_MESSAGE_LABEL" = "编辑消息";
@@ -4582,13 +4582,13 @@
 "INVALID_PROXY_HOST_ERROR" = "您输入的代理服务器地址无效，请检查该地址并重试。";
 
 /* Alert body when contacts disabled while trying to invite contacts to signal */
-"INVITE_FLOW_REQUIRES_CONTACT_ACCESS_BODY" = "在“iOS - 设置”中启用联系人访问权限后，您就可以邀请您的朋友加入 Signal。";
+"INVITE_FLOW_REQUIRES_CONTACT_ACCESS_BODY" = "在“iOS - 设置”中启用联系人访问权限后，您就可以邀请您的朋友加入 Radar。";
 
 /* Alert title when contacts disabled while trying to invite contacts to signal */
 "INVITE_FLOW_REQUIRES_CONTACT_ACCESS_TITLE" = "允许访问联系人";
 
 /* Label for the cell that presents the 'invite contacts' workflow. */
-"INVITE_FRIENDS_CONTACT_TABLE_BUTTON" = "邀请朋友使用 Signal";
+"INVITE_FRIENDS_CONTACT_TABLE_BUTTON" = "邀请朋友使用 Radar";
 
 /* Header label above a section for more options for adding contacts */
 "INVITE_FRIENDS_CONTACT_TABLE_HEADER" = "更多";
@@ -4711,7 +4711,7 @@
 "LINK_DEVICE_SCANNING_INSTRUCTIONS_SHEET_TITLE" = "扫描二维码";
 
 /* Body text for a sheet when a user tries to link a device informing them that they will need to authenticate their device */
-"LINK_NEW_DEVICE_AUTHENTICATION_INFO_SHEET_BODY" = "点击继续并输入您手机的屏幕锁定密码。请勿输入您的 Signal 密码。";
+"LINK_NEW_DEVICE_AUTHENTICATION_INFO_SHEET_BODY" = "点击继续并输入您手机的屏幕锁定密码。请勿输入您的 Radar 密码。";
 
 /* Title for a sheet when a user tries to link a device informing them that they will need to authenticate their device */
 "LINK_NEW_DEVICE_AUTHENTICATION_INFO_SHEET_TITLE" = "在链接之前，请确认您的身份";
@@ -4720,7 +4720,7 @@
 "LINK_NEW_DEVICE_AUTHENTICATION_REASON" = "验证以链接设备";
 
 /* Body text for a sheet when a user has started linking a device informing them to finish the process on that other device */
-"LINK_NEW_DEVICE_FINISH_ON_OTHER_DEVICE_SHEET_BODY" = "在另一台设备上完成链接 Signal。";
+"LINK_NEW_DEVICE_FINISH_ON_OTHER_DEVICE_SHEET_BODY" = "在另一台设备上完成链接 Radar。";
 
 /* Title for a sheet when a user has started linking a device informing them to finish the process on that other device */
 "LINK_NEW_DEVICE_FINISH_ON_OTHER_DEVICE_SHEET_TITLE" = "在其他设备上完成链接";
@@ -4762,10 +4762,10 @@
 "LINK_PREVIEW_UNKNOWN_DOMAIN" = "链接预览";
 
 /* Shown in an alert when trying to edit a contact. */
-"LINKED_DEVICE_CONTACTS_NOT_ALLOWED" = "iPad 上已不再提供管理手机通讯录的功能。如要将 Signal 密友添加到您的手机通讯录中，请使用手机版 Signal。";
+"LINKED_DEVICE_CONTACTS_NOT_ALLOWED" = "iPad 上已不再提供管理手机通讯录的功能。如要将 Radar 密友添加到您的手机通讯录中，请使用手机版 Radar。";
 
 /* Shown in a banner when you tap the 'New Chat' icon at the top of the list of chats. */
-"LINKED_DEVICE_MANAGE_CONTACTS_BANNER" = "iPad 已不再支持管理手机通讯录。此设备将继续同步手机版 Signal 对通讯录所做的任何更改。";
+"LINKED_DEVICE_MANAGE_CONTACTS_BANNER" = "iPad 已不再支持管理手机通讯录。此设备将继续同步手机版 Radar 对通讯录所做的任何更改。";
 
 /* A button shown in a banner when you tap the 'New Chat' icon at the top of the list of chats. Tapping it opens a website with more details. */
 "LINKED_DEVICE_MANAGE_CONTACTS_LEARN_MORE" = "了解详情";
@@ -4780,28 +4780,28 @@
 "LINKED_DEVICE_NOTIFICATION_TITLE" = "您链接了一台新设备";
 
 /* Message for an action sheet telling users how to link a device, when trying to open an external device-linking URL. */
-"LINKED_DEVICE_URL_OPENED_ACTION_SHEET_EXTERNAL_URL_MESSAGE" = "如要将电脑或 iPad 链接到此 Signal 账户，请前往“已链接设备”，然后点击“链接新设备”，并再次扫描二维码。请确保仅扫描直接来自 Signal 的二维码。";
+"LINKED_DEVICE_URL_OPENED_ACTION_SHEET_EXTERNAL_URL_MESSAGE" = "如要将电脑或 iPad 链接到此 Radar 账户，请前往“已链接设备”，然后点击“链接新设备”，并再次扫描二维码。请确保仅扫描直接来自 Radar 的二维码。";
 
 /* Message for an action sheet telling users how to link a device, when trying to open a device-linking URL from the in-app camera. */
-"LINKED_DEVICE_URL_OPENED_ACTION_SHEET_IN_APP_CAMERA_MESSAGE" = "您似乎正在尝试链接一个 Signal 设备。请点击“继续”，然后点击“链接新设备”，并再次扫描二维码。";
+"LINKED_DEVICE_URL_OPENED_ACTION_SHEET_IN_APP_CAMERA_MESSAGE" = "您似乎正在尝试链接一个 Radar 设备。请点击“继续”，然后点击“链接新设备”，并再次扫描二维码。";
 
 /* Bullet point about downloads on the linked devices education sheet. Embeds {{ %1$@ iPad download link, %2$@ desktop download link }} */
 "LINKED_DEVICES_EDUCATION_POINT_DOWNLOADS" = "在其他设备上，请访问 %1$@ 以安装 iPad 版应用，或访问 %2$@ 以安装电脑版应用。";
 
 /* Bullet point about message sync on the linked devices education sheet */
-"LINKED_DEVICES_EDUCATION_POINT_MESSAGES" = "链接后，Signal 消息会同步到您手机的 Signal 上。";
+"LINKED_DEVICES_EDUCATION_POINT_MESSAGES" = "链接后，Radar 消息会同步到您手机的 Radar 上。";
 
 /* Bullet point about privacy on the linked devices education sheet */
 "LINKED_DEVICES_EDUCATION_POINT_PRIVACY" = "链接设备上的所有消息均受私密保护";
 
 /* Title for the linked device education sheet */
-"LINKED_DEVICES_EDUCATION_TITLE" = "在电脑或 iPad 上使用 Signal";
+"LINKED_DEVICES_EDUCATION_TITLE" = "在电脑或 iPad 上使用 Radar";
 
 /* Text that appears where the linked device list would be indicating that there are no linked devices. */
 "LINKED_DEVICES_EMPTY_STATE" = "无链接设备";
 
 /* Description for header of the linked devices list */
-"LINKED_DEVICES_HEADER_DESCRIPTION" = "Use Signal on desktop or iPad.";
+"LINKED_DEVICES_HEADER_DESCRIPTION" = "Use Radar on desktop or iPad.";
 
 /* Footer text below the list of currently-linked devices */
 "LINKED_DEVICES_LIST_FOOTER" = "消息和聊天信息在所有设备上均受端对端加密保护";
@@ -4846,7 +4846,7 @@
 "LOADING_VIEW_CONTROLLER_DONT_CLOSE_APP" = "请勿关闭Signal。";
 
 /* Body for local network permission action sheet */
-"LOCAL_NETWORK_PERMISSION_ACTION_SHEET_BODY" = "为了转移您的 Signal 帐户，您需要在两个设备上启用本地网络访问权限。";
+"LOCAL_NETWORK_PERMISSION_ACTION_SHEET_BODY" = "为了转移您的 Radar 帐户，您需要在两个设备上启用本地网络访问权限。";
 
 /* A button asking the user if they need further help getting their transfer working. */
 "LOCAL_NETWORK_PERMISSION_ACTION_SHEET_NEED_HELP" = "需要协助？";
@@ -4858,7 +4858,7 @@
 "LOCAL_NETWORK_PERMISSION_ACTION_SHEET_STEP_THREE" = "打开“本地网络”";
 
 /* Second step for local network permission action sheet */
-"LOCAL_NETWORK_PERMISSION_ACTION_SHEET_STEP_TWO" = "找到 Signal";
+"LOCAL_NETWORK_PERMISSION_ACTION_SHEET_STEP_TWO" = "找到 Radar";
 
 /* Title for local network permission action sheet */
 "LOCAL_NETWORK_PERMISSION_ACTION_SHEET_TITLE" = "打开本地网络访问权限";
@@ -4873,7 +4873,7 @@
 "LOGGING_SECTION" = "信息记录日志";
 
 /* Footer for the 'logging' help section. */
-"LOGGING_SECTION_FOOTER" = "调试日志可帮助 Signal 修复问题和故障。";
+"LOGGING_SECTION_FOOTER" = "调试日志可帮助 Radar 修复问题和故障。";
 
 /* Title for the 'long text message' view. */
 "LONG_TEXT_VIEW_TITLE" = "消息";
@@ -4975,7 +4975,7 @@
 "MESSAGE_ACTION_DELETE_FOR_EVERYONE" = "对每个人删除";
 
 /* A one-time confirmation that you want to delete for everyone */
-"MESSAGE_ACTION_DELETE_FOR_EVERYONE_CONFIRMATION" = "将对所有使用较新版本 Signal 的群组用户永久删除此消息，群成员将看到您删除了一条消息。";
+"MESSAGE_ACTION_DELETE_FOR_EVERYONE_CONFIRMATION" = "将对所有使用较新版本 Radar 的群组用户永久删除此消息，群成员将看到您删除了一条消息。";
 
 /* The title for the action sheet asking who the user wants to delete the message for. */
 "MESSAGE_ACTION_DELETE_FOR_TITLE" = "您想要对谁删除此消息？";
@@ -5020,7 +5020,7 @@
 "MESSAGE_ACTION_LINK_OPEN_LINK" = "打开链接";
 
 /* Label for button to open a signal proxy. */
-"MESSAGE_ACTION_LINK_OPEN_PROXY" = "打开 Signal 服务器";
+"MESSAGE_ACTION_LINK_OPEN_PROXY" = "打开 Radar 服务器";
 
 /* Label for button to open a sticker pack. */
 "MESSAGE_ACTION_LINK_OPEN_STICKER_PACK" = "查看贴纸包";
@@ -5194,7 +5194,7 @@
 "MESSAGE_REQUEST_NAME_COLLISON_UPDATE_CONTACT_ACTION" = "更新联系人";
 
 /* Action sheet message to confirm reporting a conversation as spam via a message request. */
-"MESSAGE_REQUEST_REPORT_CONVERSATION_MESSAGE" = "Signal 将会通知此用户，其可能发送了垃圾消息。Signal 无法看到任何聊天的内容。";
+"MESSAGE_REQUEST_REPORT_CONVERSATION_MESSAGE" = "Radar 将会通知此用户，其可能发送了垃圾消息。Radar 无法看到任何聊天的内容。";
 
 /* Action sheet title to confirm reporting a conversation as spam via a message request. */
 "MESSAGE_REQUEST_REPORT_CONVERSATION_TITLE" = "要举报垃圾消息吗？";
@@ -5323,7 +5323,7 @@
 "MISSED_CALL_BLOCKED_SYSTEM_CONTACT" = "有一通未接来电来自手机设置中屏蔽的联系人";
 
 /* Action to block contact in Signal for sheet shown when the user taps a missed call from a contact blocked in iOS settings. */
-"MISSED_CALL_BLOCKED_SYSTEM_SETTINGS_SHEET_BLOCK_ACTION" = "在 Signal 中也屏蔽对方";
+"MISSED_CALL_BLOCKED_SYSTEM_SETTINGS_SHEET_BLOCK_ACTION" = "在 Radar 中也屏蔽对方";
 
 /* Message for sheet shown when the user taps a missed call from a contact blocked in iOS settings. */
 "MISSED_CALL_BLOCKED_SYSTEM_SETTINGS_SHEET_MESSAGE" = "此用户的来电未接通，因为您已在手机设置中屏蔽对方。请前往“设置>手机”页面，然后点击“已屏蔽联系人”对此进行管理。";
@@ -5350,13 +5350,13 @@
 "MISSING_LOCATION_PERMISSION_MESSAGE" = "您可在”iOS 设置“中启用此权限。";
 
 /* Alert title indicating the user has denied location permissions */
-"MISSING_LOCATION_PERMISSION_TITLE" = "Signal 需要访问您的位置以使用此功能。";
+"MISSING_LOCATION_PERMISSION_TITLE" = "Radar 需要访问您的位置以使用此功能。";
 
 /* Alert body when user has previously denied media library access */
 "MISSING_MEDIA_LIBRARY_PERMISSION_MESSAGE" = "您可在”iOS 设置“中启用此权限。";
 
 /* Alert title when user has previously denied media library access */
-"MISSING_MEDIA_LIBRARY_PERMISSION_TITLE" = "您授予照片访问权限后，Signal 才能启用此功能。";
+"MISSING_MEDIA_LIBRARY_PERMISSION_TITLE" = "您授予照片访问权限后，Radar 才能启用此功能。";
 
 /* An error shown as the title of an alert when try to link a new device & the user is already at the limit. */
 "MULTIDEVICE_PAIRING_MAX_DESC" = "您不能匹配更多设备。";
@@ -5377,7 +5377,7 @@
 "MY_STORIES_SETTINGS_VISIBILITY_ALL_SIGNAL_CONNECTIONS_EXCEPT_TITLE" = "所有人，除了……";
 
 /* Title for the visibility option */
-"MY_STORIES_SETTINGS_VISIBILITY_ALL_SIGNAL_CONNECTIONS_TITLE" = "所有 Signal 密友";
+"MY_STORIES_SETTINGS_VISIBILITY_ALL_SIGNAL_CONNECTIONS_TITLE" = "所有 Radar 密友";
 
 /* Title for the visibility option */
 "MY_STORIES_SETTINGS_VISIBILITY_ONLY_SHARE_WITH_TITLE" = "只分享给……";
@@ -5539,7 +5539,7 @@
 "NICKNAME_EDITOR_DELETE_CONFIRMATION_TITLE" = "要删除昵称吗？";
 
 /* The description below the title on the profile nickname editor view. */
-"NICKNAME_EDITOR_DESCRIPTION" = "昵称和备注通过 Signal 储存，并经过端对端加密。这些信息仅对您可见。";
+"NICKNAME_EDITOR_DESCRIPTION" = "昵称和备注通过 Radar 储存，并经过端对端加密。这些信息仅对您可见。";
 
 /* Placeholder text it the text field for the family name in the profile nickname editor. */
 "NICKNAME_EDITOR_FAMILY_NAME_PLACEHOLDER" = "姓氏";
@@ -5602,7 +5602,7 @@
 "NOTIFICATION_PERMISSION_REMINDER_MEGAPHONE_TITLE" = "是否启用通知？";
 
 /* Shown as the body of an alert when notifications can't be shown due to an error. */
-"NOTIFICATIONS_ERROR_MESSAGE" = "如果你没有收到 Signal 通知，请重启你的 %1$@。";
+"NOTIFICATIONS_ERROR_MESSAGE" = "如果你没有收到 Radar 通知，请重启你的 %1$@。";
 
 /* Shown as the title of an alert when notifications can't be shown due to an error. */
 "NOTIFICATIONS_ERROR_TITLE" = "无法显示通知";
@@ -5662,10 +5662,10 @@
 "ONBOARDING_2FA_SKIP_PIN_ENTRY_TITLE" = "跳过 PIN 码设置？";
 
 /* The body for the device transfer 'choice' view 'restore backup' option */
-"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_BODY" = "从您的 Radar/Signal 备份中恢复账户和消息";
+"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_BODY" = "从您的 Radar/Radar 备份中恢复账户和消息";
 
 /* The title for the device transfer 'choice' view 'restore backup' option */
-"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_TITLE" = "恢复 Radar/Signal 安全备份";
+"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_TITLE" = "恢复 Radar/Radar 安全备份";
 
 /* Body for a sheet warning users about skipping restore. */
 "ONBOARDING_CHOOSE_RESTORE_METHOD_CONFIRM_SKIP_RESTORE_BODY" = "如果您现在跳过恢复，以后将无法进行恢复。如果您在此设备上重启备份，您当前的备份将会被您的新消息记录取代。";
@@ -5677,7 +5677,7 @@
 "ONBOARDING_CHOOSE_RESTORE_METHOD_DESCRIPTION" = "请选择您想要如何恢复您的消息记录和账户数据。";
 
 /* Message body displayed to a user during registration if there are no restore options available. */
-"ONBOARDING_CHOOSE_RESTORE_METHOD_NONE_AVAILABLE_BODY" = "由于您要从 Android 转移到 iOS，因此转移消息和媒体的唯一办法是在您的旧设备上启用 Signal 备份。";
+"ONBOARDING_CHOOSE_RESTORE_METHOD_NONE_AVAILABLE_BODY" = "由于您要从 Android 转移到 iOS，因此转移消息和媒体的唯一办法是在您的旧设备上启用 Radar 备份。";
 
 /* Title displayed to a user during registration if there are no restore options available. */
 "ONBOARDING_CHOOSE_RESTORE_METHOD_NONE_AVAILABLE_TITLE" = "没有可恢复的备份";
@@ -5737,7 +5737,7 @@
 "ONBOARDING_MODE_SWITCH_BUTTON_REGISTERING" = "关联iPhone";
 
 /* explanation to the user they're switching from linking to registering flow */
-"ONBOARDING_MODE_SWITCH_EXPLANATION_PROVISIONING" = "点击“注册 iPad”以创建全新的 Signal 账户或将已有账户迁移至当前 iPad。此操作将在其他所有设备上停用以相同手机号码注册的 Signal 账户。";
+"ONBOARDING_MODE_SWITCH_EXPLANATION_PROVISIONING" = "点击“注册 iPad”以创建全新的 Radar 账户或将已有账户迁移至当前 iPad。此操作将在其他所有设备上停用以相同手机号码注册的 Radar 账户。";
 
 /* explanation to the user they're switching from registering to linking flow */
 "ONBOARDING_MODE_SWITCH_EXPLANATION_REGISTERING" = "点击“关联iPhone”以将您的手机关联至一个已有账户。我们通常并不建议关联您的手机，它会使语音呼叫等功能受限。";
@@ -5749,13 +5749,13 @@
 "ONBOARDING_MODE_SWITCH_TITLE_REGISTERING" = "关联当前iPhone";
 
 /* warning to the user that registering an ipad is not recommended */
-"ONBOARDING_MODE_SWITCH_WARNING_PROVISIONING" = "注册当前 iPad 将会停用在其他所有设备上以相同手机号码注册的 Signal 账户。";
+"ONBOARDING_MODE_SWITCH_WARNING_PROVISIONING" = "注册当前 iPad 将会停用在其他所有设备上以相同手机号码注册的 Radar 账户。";
 
 /* warning to the user that linking a phone is not recommended */
 "ONBOARDING_MODE_SWITCH_WARNING_REGISTERING" = "我们并不建议关联您的iPhone，它会使某些关键功能受限。";
 
 /* Description of the 'Contacts' permission in the 'onboarding permissions' view. */
-"ONBOARDING_PERMISSIONS_CONTACTS_DESCRIPTION" = "帮助您寻找认识的人。您的联系人将会被加密，Signal 服务将无法看到您的联系人。";
+"ONBOARDING_PERMISSIONS_CONTACTS_DESCRIPTION" = "帮助您寻找认识的人。您的联系人将会被加密，Radar 服务将无法看到您的联系人。";
 
 /* Title introducing the 'Contacts' permission in the 'onboarding permissions' view. */
 "ONBOARDING_PERMISSIONS_CONTACTS_TITLE" = "联系人";
@@ -5767,7 +5767,7 @@
 "ONBOARDING_PERMISSIONS_NOTIFICATIONS_TITLE" = "通知";
 
 /* Preamble of the 'onboarding permissions' view. */
-"ONBOARDING_PERMISSIONS_PREAMBLE" = "Signal 想要请求获得以下权限。";
+"ONBOARDING_PERMISSIONS_PREAMBLE" = "Radar 想要请求获得以下权限。";
 
 /* Description of the 'Notification Relay' permission in the 'onboarding permissions' view. */
 "ONBOARDING_PERMISSIONS_RELAY_DESCRIPTION" = "Enable Radar notification relay to ensure you get immediate background notifications in Radar. Relay is always privacy-preserving and keeps your messages end-to-end encrypted no matter what.";
@@ -5779,7 +5779,7 @@
 "ONBOARDING_PERMISSIONS_TITLE" = "授予权限";
 
 /* Explanation of the 'onboarding phone number discoverability' view. Embeds {user phone number} */
-"ONBOARDING_PHONE_NUMBER_DISCOVERABILITY_EXPLANATION_FORMAT" = "选择哪些人能通过手机号码 %1$@ 找到您的 Signal 帐号";
+"ONBOARDING_PHONE_NUMBER_DISCOVERABILITY_EXPLANATION_FORMAT" = "选择哪些人能通过手机号码 %1$@ 找到您的 Radar 帐号";
 
 /* Title of the 'onboarding phone number discoverability' view. */
 "ONBOARDING_PHONE_NUMBER_DISCOVERABILITY_TITLE" = "哪些人能找到您的电话号码？";
@@ -5794,7 +5794,7 @@
 "ONBOARDING_PHONE_NUMBER_VALIDATION_WARNING" = "此为无效手机号码，请输入有效的手机号码注册。";
 
 /* Explanation of the 'onboarding pin attempts exhausted' view when reglock is disabled. */
-"ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_EXPLANATION" = "你的 PIN 码错误次数达到上限，但你还是可以通过创建新的 PIN 码以进入你的 Signal 账户。出于对你的隐私和安全考虑，你的账户会在不保存任何个人资料或设置下被还原。";
+"ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_EXPLANATION" = "你的 PIN 码错误次数达到上限，但你还是可以通过创建新的 PIN 码以进入你的 Radar 账户。出于对你的隐私和安全考虑，你的账户会在不保存任何个人资料或设置下被还原。";
 
 /* Label for the 'learn more' link when reglock is disabled in the 'onboarding pin attempts exhausted' view. */
 "ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_LEARN_MORE" = "了解更多关于 PIN 的信息";
@@ -5803,7 +5803,7 @@
 "ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_TITLE" = "PIN 错误";
 
 /* Explanation of the 'onboarding pin attempts exhausted' view when it is unknown if reglock is enabled. */
-"ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_WITH_UNKNOWN_REGLOCK_EXPLANATION" = "您尝试输入密码的次数已超过限定的次数，不过您仍然可以通过验证您的手机号码来登录您的 Signal 账户。出于对您的隐私和安全的考虑，您的账户在恢复时将不保留任何保存过的个人资料信息或设置。";
+"ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_WITH_UNKNOWN_REGLOCK_EXPLANATION" = "您尝试输入密码的次数已超过限定的次数，不过您仍然可以通过验证您的手机号码来登录您的 Radar 账户。出于对您的隐私和安全的考虑，您的账户在恢复时将不保留任何保存过的个人资料信息或设置。";
 
 /* Title for the setup complete screen shown at the end of the onboarding flow. */
 "ONBOARDING_SETUP_COMPLETE_TITLE" = "设置完成";
@@ -5830,13 +5830,13 @@
 "ONBOARDING_SIGN_UP_USE_SIGNAL_ACCOUNT_BUTTON_TITLE" = "Use my Signal account";
 
 /* Explanation of 'do not have old device' flow for the 'Restore or Transfer' prompt */
-"ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_BODY" = "您可以在同一个设备上重新安装 Radar/Signal";
+"ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_BODY" = "您可以在同一个设备上重新安装 Radar/Radar";
 
 /* Title for the 'do not have my old device' choice of the 'Restore or Transfer' prompt */
 "ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_TITLE" = "我无法用旧手机";
 
 /* Explanation of 'have old device' flow for the 'Restore or Transfer' prompt */
-"ONBOARDING_SPLASH_HAVE_OLD_DEVICE_BODY" = "从您当前的 Radar/Signal 账户扫描二维码以快速开始操作";
+"ONBOARDING_SPLASH_HAVE_OLD_DEVICE_BODY" = "从您当前的 Radar/Radar 账户扫描二维码以快速开始操作";
 
 /* Title for the 'have my old device' choice of the 'Restore or Transfer' prompt */
 "ONBOARDING_SPLASH_HAVE_OLD_DEVICE_TITLE" = "我可以用旧手机";
@@ -5897,19 +5897,19 @@ Send money securely.";
 "OPEN_SETTINGS_BUTTON" = "设置";
 
 /* Signal doesn't support old versions of iOS and shows a warning if you're on unsupported version. Some users can upgrade their device to a newer version of iOS to continue using Signal. If that's the case, they'll be shown this text. */
-"OS_EXPIRED_AND_CAN_UPGRADE_OS" = "Signal 已无法在此设备上运行。如要继续使用 Signal，请将您的设备系统更新到更新的 iOS 版本。";
+"OS_EXPIRED_AND_CAN_UPGRADE_OS" = "Radar 已无法在此设备上运行。如要继续使用 Radar，请将您的设备系统更新到更新的 iOS 版本。";
 
 /* Signal doesn't support old devices. If that's the case, they'll be shown this action, and tapping it will open information about Signal's minimum supported operating systems. */
-"OS_EXPIRED_AND_DEVICE_IS_STUCK" = "Signal 已无法在此设备上运行。如要继续使用 Signal，请切换到更新的设备。";
+"OS_EXPIRED_AND_DEVICE_IS_STUCK" = "Radar 已无法在此设备上运行。如要继续使用 Radar，请切换到更新的设备。";
 
 /* Signal doesn't support old versions of iOS and shows a warning if you're on an old version. Some users can upgrade their device to a newer version of iOS to continue using Signal. If that's the case, they'll be shown this action, and tapping it will open device update instructions. */
 "OS_SOON_TO_EXPIRE_ACTION_TITLE" = "立即升级";
 
 /* Signal doesn't support old versions of iOS and shows a warning if you're an old version that will soon lose support. Some users can upgrade their device to a newer version of iOS to continue using Signal. If that's the case, they'll be shown this text. Embeds {{expiration date}}. */
-"OS_SOON_TO_EXPIRE_AND_CAN_UPGRADE_OS_FORMAT" = "Signal 很快将不再支持您设备上的 iOS 版本。如要继续使用 Signal，请在 %1$@之前将您的设备系统更新到更新的 iOS 版本。";
+"OS_SOON_TO_EXPIRE_AND_CAN_UPGRADE_OS_FORMAT" = "Radar 很快将不再支持您设备上的 iOS 版本。如要继续使用 Radar，请在 %1$@之前将您的设备系统更新到更新的 iOS 版本。";
 
 /* Signal doesn't support old versions of iOS and shows a warning if you're on an old version that will soon lose support. This is the text on that warning when users can't upgrade iOS without getting a new device. Embeds {{expiration date}}. */
-"OS_SOON_TO_EXPIRE_AND_DEVICE_WILL_BE_STUCK_FORMAT" = "Signal 很快将不再支持您设备上的 iOS 版本。如要继续使用 Signal，请在 %1$@之前切换到更新的设备。";
+"OS_SOON_TO_EXPIRE_AND_DEVICE_WILL_BE_STUCK_FORMAT" = "Radar 很快将不再支持您设备上的 iOS 版本。如要继续使用 Radar，请在 %1$@之前切换到更新的设备。";
 
 /* Info Message when another user disabled disappearing messages. Embeds {{name of other user}}. */
 "OTHER_DISABLED_DISAPPEARING_MESSAGES_CONFIGURATION" = "%1$@ 取消了阅后即焚。";
@@ -5918,13 +5918,13 @@ Send money securely.";
 "OTHER_UPDATED_DISAPPEARING_MESSAGES_CONFIGURATION" = "%1$@ 设置了消息 %2$@ 后消失。";
 
 /* Label warning the user that the Signal service may be down. */
-"OUTAGE_WARNING" = "Signal 遇到了一些技术故障。我们正努力使服务尽快恢复。";
+"OUTAGE_WARNING" = "Radar 遇到了一些技术故障。我们正努力使服务尽快恢复。";
 
 /* Label for action link when the user has an outdated payment client */
 "OUTDATED_PAYMENT_CLIENT_ACTION_TITLE" = "现在升级";
 
 /* Label warning the user that they should update Signal to continue using payments. */
-"OUTDATED_PAYMENT_CLIENT_REMINDER_TEXT" = "更新 Signal 以继续使用付款功能。您的余额可能未刷新。";
+"OUTDATED_PAYMENT_CLIENT_REMINDER_TEXT" = "更新 Radar 以继续使用付款功能。您的余额可能未刷新。";
 
 /* Body of prompt notifying restore was cancelled. */
 "OUTGOING_DEVICE_REGISTRATION_CANCELLED_RESTORE_BODY" = "恢复已被取消。请重试。";
@@ -5933,7 +5933,7 @@ Send money securely.";
 "OUTGOING_DEVICE_REGISTRATION_CANCELLED_RESTORE_TITLE" = "恢复已取消";
 
 /* Body of prompt notifying registration without restore completed on the new device. */
-"OUTGOING_DEVICE_REGISTRATION_COMPLETE_BODY" = "您的 Signal 账户已在您的其他设备上激活。Signal 在此设备上现处于非激活状态。";
+"OUTGOING_DEVICE_REGISTRATION_COMPLETE_BODY" = "您的 Radar 账户已在您的其他设备上激活。Radar 在此设备上现处于非激活状态。";
 
 /* Title of prompt notifying registration without restore completed on the new device. */
 "OUTGOING_DEVICE_REGISTRATION_COMPLETE_TITLE" = "注册完成";
@@ -5951,7 +5951,7 @@ Send money securely.";
 "OUTGOING_DEVICE_REGISTRATION_UNKNOWN_ERROR_TITLE" = "未知错误";
 
 /* Body of prompt notifying device restore started on the new device. */
-"OUTGOING_DEVICE_RESTORE_COMPLETE_BODY" = "您的 Signal 账户及消息已开始转移到您的其他设备上。现在 Signal 在此设备上处于不激活状态。";
+"OUTGOING_DEVICE_RESTORE_COMPLETE_BODY" = "您的 Radar 账户及消息已开始转移到您的其他设备上。现在 Radar 在此设备上处于不激活状态。";
 
 /* Title of prompt notifying device restore started on the new device. */
 "OUTGOING_DEVICE_RESTORE_COMPLETE_TITLE" = "恢复完成";
@@ -5975,7 +5975,7 @@ Send money securely.";
 "OUTGOING_DEVICE_RESTORE_INITIAL_VIEW_TITLE" = "转移帐户";
 
 /* Body of prompt notifying device transfer completed. */
-"OUTGOING_DEVICE_TRANSFER_COMPLETE_BODY" = "您的 Signal 账户及消息已转移到您的其他设备上。现在 Signal 在此设备上处于不激活状态。";
+"OUTGOING_DEVICE_TRANSFER_COMPLETE_BODY" = "您的 Radar 账户及消息已转移到您的其他设备上。现在 Radar 在此设备上处于不激活状态。";
 
 /* Title of prompt notifying device transfer completed. */
 "OUTGOING_DEVICE_TRANSFER_COMPLETE_TITLE" = "转移完成";
@@ -5987,10 +5987,10 @@ Send money securely.";
 "OUTGOING_MISSED_VOICE_CALL" = "未接语音通话";
 
 /* Button for action sheet shown when device transfer completes; quits the Signal app immediately (does not automatically relaunch, but the user may choose to relaunch). */
-"OUTGOING_TRANSFER_COMPLETE_EXIT_ACTION" = "退出 Signal";
+"OUTGOING_TRANSFER_COMPLETE_EXIT_ACTION" = "退出 Radar";
 
 /* Message for action sheet shown when device transfer completes */
-"OUTGOING_TRANSFER_COMPLETE_MESSAGE" = "Signal 现在将在此设备上退出";
+"OUTGOING_TRANSFER_COMPLETE_MESSAGE" = "Radar 现在将在此设备上退出";
 
 /* Title for action sheet shown when device transfer completes */
 "OUTGOING_TRANSFER_COMPLETE_TITLE" = "转移完成！";
@@ -6168,7 +6168,7 @@ Send money securely.";
 "PAYMENTS_NEW_PAYMENT_ERROR_INVALID_TRANSACTION" = "无效交易";
 
 /* Indicates that a payment failed due to an outdated client. */
-"PAYMENTS_NEW_PAYMENT_ERROR_OUTDATED_CLIENT" = "请更新 Signal 以进行付款。";
+"PAYMENTS_NEW_PAYMENT_ERROR_OUTDATED_CLIENT" = "请更新 Radar 以进行付款。";
 
 /* Indicates that an outgoing payment could not be verified in a timely way. */
 "PAYMENTS_NEW_PAYMENT_ERROR_OUTGOING_VERIFICATION_TAKING_TOO_LONG" = "付款尚未验证";
@@ -6432,13 +6432,13 @@ Send money securely.";
 "PHONE_NUMBER_DISCOVERABILITY_EVERYBODY" = "所有人";
 
 /* A user friendly description of the 'everybody' phone number discoverability mode. */
-"PHONE_NUMBER_DISCOVERABILITY_EVERYBODY_DESCRIPTION" = "知道您的手机号码的任何人均可以在 Signal 上看到您的上线状态，并可以开始跟您聊天。";
+"PHONE_NUMBER_DISCOVERABILITY_EVERYBODY_DESCRIPTION" = "知道您的手机号码的任何人均可以在 Radar 上看到您的上线状态，并可以开始跟您聊天。";
 
 /* A user friendly name for the 'nobody' phone number discoverability mode. */
 "PHONE_NUMBER_DISCOVERABILITY_NOBODY" = "没有人";
 
 /* A user friendly description of the 'nobody' phone number discoverability mode. */
-"PHONE_NUMBER_DISCOVERABILITY_NOBODY_DESCRIPTION" = "没人能在 Signal 上看到您的上线状态，除非您给对方发送消息，或与对方有一个现有的聊天窗口。";
+"PHONE_NUMBER_DISCOVERABILITY_NOBODY_DESCRIPTION" = "没人能在 Radar 上看到您的上线状态，除非您给对方发送消息，或与对方有一个现有的聊天窗口。";
 
 /* A format for a label showing an example phone number. Embeds {{the example phone number}}. */
 "PHONE_NUMBER_EXAMPLE_FORMAT" = "范例：%1$@";
@@ -6540,22 +6540,22 @@ Send money securely.";
 "PIN_CREATION_DISABLE_CONFIRMATION_ACTION" = "禁用 PIN 码";
 
 /* Message of the 'pin disable' action sheet. */
-"PIN_CREATION_DISABLE_CONFIRMATION_MESSAGE" = "若禁用 PIN 码，您在重新注册 Signal 后只能通过迁移其它 iOS 设备数据恢复账户数据，否则您将丢失所有数据。PIN 禁用时，无法启用注册锁定。";
+"PIN_CREATION_DISABLE_CONFIRMATION_MESSAGE" = "若禁用 PIN 码，您在重新注册 Radar 后只能通过迁移其它 iOS 设备数据恢复账户数据，否则您将丢失所有数据。PIN 禁用时，无法启用注册锁定。";
 
 /* Title of the 'pin disable' action sheet. */
 "PIN_CREATION_DISABLE_CONFIRMATION_TITLE" = "警告";
 
 /* The explanation in the 'pin creation' view. */
-"PIN_CREATION_EXPLANATION" = "PIN 用于加密 Signal 存储的信息，这样只有你可以访问。重装之后，可恢复你的个人资料、设置和联系人。打开 Signal 无需使用 PIN。";
+"PIN_CREATION_EXPLANATION" = "PIN 用于加密 Radar 存储的信息，这样只有你可以访问。重装之后，可恢复你的个人资料、设置和联系人。打开 Radar 无需使用 PIN。";
 
 /* Learn more action on the pin creation view */
 "PIN_CREATION_LEARN_MORE" = "进一步了解 PIN 码";
 
 /* Users can create PINs to restore their account data later. They can learn more about this on a sheet. This is the text on that sheet. */
-"PIN_CREATION_LEARN_MORE_TEXT" = "PIN 码可以为您储存在 Signal 上的信息提供加密保护，确保只有您可以访问这些信息。当您重新安装 Signal 时，PIN 码可以恢复您的个人资料、设置和联系人。";
+"PIN_CREATION_LEARN_MORE_TEXT" = "PIN 码可以为您储存在 Radar 上的信息提供加密保护，确保只有您可以访问这些信息。当您重新安装 Radar 时，PIN 码可以恢复您的个人资料、设置和联系人。";
 
 /* Users can create PINs to restore their account data later. They can learn more about this on a sheet. This is the title on that sheet. */
-"PIN_CREATION_LEARN_MORE_TITLE" = "关于 Signal PIN 码";
+"PIN_CREATION_LEARN_MORE_TITLE" = "关于 Radar PIN 码";
 
 /* Label indicating that the attempted PIN does not match the first PIN */
 "PIN_CREATION_MISMATCH_ERROR" = "PIN 不匹配。请重试。";
@@ -6588,7 +6588,7 @@ Send money securely.";
 "PIN_CREATION_WEAK_ERROR" = "此 PIN 码过于简单";
 
 /* If your attempted PIN is too weak, you'll see an error message. This is the text on the error dialog. */
-"PIN_CREATION_WEAK_ERROR_MESSAGE" = "PIN 码可以为您储存在 Signal 上的信息提供加密保护，这样只有您可以访问这些信息。请选择一个更强的 PIN 码来保护您的账户吧。";
+"PIN_CREATION_WEAK_ERROR_MESSAGE" = "PIN 码可以为您储存在 Radar 上的信息提供加密保护，这样只有您可以访问这些信息。请选择一个更强的 PIN 码来保护您的账户吧。";
 
 /* If the user is re-registering, they need to enter their PIN to restore all their data. In some cases, they can skip this entry and lose some data. This text is shown on a button that lets them begin to do this. */
 "PIN_ENTER_EXISTING_SKIP" = "跳过 PIN 码";
@@ -6645,7 +6645,7 @@ Send money securely.";
 "PIN_REMINDER_MISMATCH_ERROR" = "PIN 无效，请重新尝试。";
 
 /* The title for the 'pin reminder' dialog. */
-"PIN_REMINDER_TITLE" = "请输入您的 Signal PIN 码";
+"PIN_REMINDER_TITLE" = "请输入您的 Radar PIN 码";
 
 /* Label indicating that the attempted PIN is too short */
 "PIN_REMINDER_TOO_SHORT_ERROR" = "PIN 最少需要4位数字";
@@ -6660,7 +6660,7 @@ Send money securely.";
 "PINS_MEGAPHONE_ACTION" = "创建 PIN 码";
 
 /* Body for PIN megaphone when user doesn't have a PIN */
-"PINS_MEGAPHONE_BODY" = "完成 Signal PIN 码的创建";
+"PINS_MEGAPHONE_BODY" = "完成 Radar PIN 码的创建";
 
 /* Title for PIN megaphone when user doesn't have a PIN */
 "PINS_MEGAPHONE_TITLE" = "创建你的密码";
@@ -6768,7 +6768,7 @@ Send money securely.";
 "PRIVACY_VERIFICATION_FAILED_MISMATCHED_SAFETY_NUMBERS_IN_CLIPBOARD" = "剪贴板中的数字不是当前聊天的正确的安全码。";
 
 /* Alert body for user error */
-"PRIVACY_VERIFICATION_FAILED_NO_SAFETY_NUMBERS_IN_CLIPBOARD" = "Signal 无法在剪贴板中找到安全码. 你正确的复制了吗?";
+"PRIVACY_VERIFICATION_FAILED_NO_SAFETY_NUMBERS_IN_CLIPBOARD" = "Radar 无法在剪贴板中找到安全码. 你正确的复制了吗?";
 
 /* Alert body when verifying with {{contact name}} */
 "PRIVACY_VERIFICATION_FAILED_THEY_HAVE_WRONG_KEY_FOR_ME" = "每一组Signal用户共享一个不同的安全码. 重复检查 %1$@ 显示你的安全码.";
@@ -6780,7 +6780,7 @@ Send money securely.";
 "PRIVACY_VERIFICATION_FAILED_WITH_OLD_REMOTE_VERSION" = "您的好友版本过低。请对方升级后继续验证。";
 
 /* alert body */
-"PRIVACY_VERIFICATION_FAILURE_INVALID_QRCODE" = "此二维码不是一个有效的安全码，请确保双方都使用了最新版的 Signal。";
+"PRIVACY_VERIFICATION_FAILURE_INVALID_QRCODE" = "此二维码不是一个有效的安全码，请确保双方都使用了最新版的 Radar。";
 
 /* Navbar title */
 "PRIVACY_VERIFICATION_TITLE" = "验证安全码";
@@ -6855,7 +6855,7 @@ Send money securely.";
 "PROFILE_NAME_EDUCATION_SHEET_BULLET_3" = "请勿与陌生用户分享您的个人信息";
 
 /* Header for the explainer sheet for profile names */
-"PROFILE_NAME_EDUCATION_SHEET_HEADER_FORMAT" = "Signal 上的<bold>昵称</bold>是账户持有人自行选择的。";
+"PROFILE_NAME_EDUCATION_SHEET_HEADER_FORMAT" = "Radar 上的<bold>昵称</bold>是账户持有人自行选择的。";
 
 /* Title for the profile name view. */
 "PROFILE_NAME_VIEW_TITLE" = "你的名字";
@@ -7062,7 +7062,7 @@ Send money securely.";
 "RECIPIENT_PICKER_ERROR_USER_CANNOT_BE_SELECTED" = "无法选择用户";
 
 /* Alert text. Shown after selecting a phone number that isn't valid. */
-"RECIPIENT_PICKER_INVALID_NUMBER_MESSAGE" = "%1$@不是 Signal 用户。请使用有效的手机号码再试一次。";
+"RECIPIENT_PICKER_INVALID_NUMBER_MESSAGE" = "%1$@不是 Radar 用户。请使用有效的手机号码再试一次。";
 
 /* Alert title. Shown after selecting a phone number that isn't valid. */
 "RECIPIENT_PICKER_INVALID_NUMBER_TITLE" = "手机号码无效";
@@ -7071,22 +7071,22 @@ Send money securely.";
 "RECIPIENT_PICKER_INVITE_ACTION" = "邀请";
 
 /* Alert text. Shown after selecting a phone number that isn't a Signal user. */
-"RECIPIENT_PICKER_INVITE_MESSAGE" = "%1$@不是 Signal 用户。您想邀请这个号码加入 Signal 吗？";
+"RECIPIENT_PICKER_INVITE_MESSAGE" = "%1$@不是 Radar 用户。您想邀请这个号码加入 Radar 吗？";
 
 /* Alert title. Shown after selecting a phone number that isn't a Signal user. */
-"RECIPIENT_PICKER_INVITE_TITLE" = "邀请使用 Signal";
+"RECIPIENT_PICKER_INVITE_TITLE" = "邀请使用 Radar";
 
 /* Alert title explaining what happens if you forget your 'two-factor auth pin'. */
 "REGISTER_2FA_FORGOT_PIN_ALERT_TITLE" = "需要协助？";
 
 /* Alert body for a forgotten SVR (V2) PIN */
-"REGISTER_2FA_FORGOT_SVR_PIN_ALERT_MESSAGE" = "密码是您创建的一个不少于 4 位数的数字代码，它可以是纯数字，也可以是数字和字母的组合。如果忘记了自己的密码，您需要等待 7 天才能重新注册您的账户。如果您启用了 Signal 安全备份，可以使用您的恢复密钥继续操作。";
+"REGISTER_2FA_FORGOT_SVR_PIN_ALERT_MESSAGE" = "密码是您创建的一个不少于 4 位数的数字代码，它可以是纯数字，也可以是数字和字母的组合。如果忘记了自己的密码，您需要等待 7 天才能重新注册您的账户。如果您启用了 Radar 安全备份，可以使用您的恢复密钥继续操作。";
 
 /* Alert body for a forgotten SVR (V2) PIN when the user doesn't have reglock and they cannot necessarily create a new PIN */
-"REGISTER_2FA_FORGOT_SVR_PIN_WITHOUT_REGLOCK_ALERT_MESSAGE" = "密码是您创建的一个不少于 4 位数的数字代码，它可以是纯数字，也可以是数字和字母的组合。如果忘记了密码，您可以重新注册和使用您的账户，但您会丢失一些保存过的设置，如您的个人资料信息。如果您启用了 Signal 安全备份，可以使用您的恢复密钥继续操作。";
+"REGISTER_2FA_FORGOT_SVR_PIN_WITHOUT_REGLOCK_ALERT_MESSAGE" = "密码是您创建的一个不少于 4 位数的数字代码，它可以是纯数字，也可以是数字和字母的组合。如果忘记了密码，您可以重新注册和使用您的账户，但您会丢失一些保存过的设置，如您的个人资料信息。如果您启用了 Radar 安全备份，可以使用您的恢复密钥继续操作。";
 
 /* Alert body for a forgotten SVR (V2) PIN when the user doesn't have reglock and they can create a new PIN */
-"REGISTER_2FA_FORGOT_SVR_PIN_WITHOUT_REGLOCK_AND_CAN_CREATE_NEW_PIN_ALERT_MESSAGE" = "密码是您创建的一个不少于 4 位数的数字代码，它可以是纯数字，也可以是数字和字母的组合。如果忘记了自己的密码，您可以创建一个新的密码。您可以重新注册和使用账户，但一些已保存的设置将会丢失，如您的个人资料信息。如果您启用了 Signal 安全备份，可以使用您的恢复密钥继续操作。";
+"REGISTER_2FA_FORGOT_SVR_PIN_WITHOUT_REGLOCK_AND_CAN_CREATE_NEW_PIN_ALERT_MESSAGE" = "密码是您创建的一个不少于 4 位数的数字代码，它可以是纯数字，也可以是数字和字母的组合。如果忘记了自己的密码，您可以创建一个新的密码。您可以重新注册和使用账户，但一些已保存的设置将会丢失，如您的个人资料信息。如果您启用了 Radar 安全备份，可以使用您的恢复密钥继续操作。";
 
 /* Alert title explaining what happens if you forget your 'two-factor auth pin'. */
 "REGISTER_2FA_INVALID_PIN_ALERT_TITLE" = "PIN 错误";
@@ -7134,7 +7134,7 @@ Send money securely.";
 "REGISTRATION_BACKUP_RESTORE_ERROR_GENERIC_TITLE" = "无法完成转移";
 
 /* Body for a sheet warning users about an incorrect recovery key. */
-"REGISTRATION_BACKUP_RESTORE_ERROR_INCORRECT_KEY_BODY" = "您可能输入了错误的恢复密钥，或者您未在旧设备上完成至少一次备份。 \n\n请确保您在注册时使用的是相同的手机号码以及您保存的用于启用 Signal 安全备份的恢复密钥，并确保您的旧设备曾完成备份。";
+"REGISTRATION_BACKUP_RESTORE_ERROR_INCORRECT_KEY_BODY" = "您可能输入了错误的恢复密钥，或者您未在旧设备上完成至少一次备份。 \n\n请确保您在注册时使用的是相同的手机号码以及您保存的用于启用 Radar 安全备份的恢复密钥，并确保您的旧设备曾完成备份。";
 
 /* Body for a sheet warning users about an incorrect recovery key and having hit a rate limit on retries. */
 "REGISTRATION_BACKUP_RESTORE_ERROR_INCORRECT_KEY_RATE_LIMIT_BODY" = "您的恢复密钥尝试次数已用尽。为了您的安全，系统仅提供有限的尝试次数。请等待 1 小时后再试。";
@@ -7167,7 +7167,7 @@ Send money securely.";
 "REGISTRATION_BACKUP_RESTORE_ERROR_UNRETRYABLE_SERVER_ERROR_TITLE" = "无法恢复备份";
 
 /* Body for a sheet warning users about an incompatible backup version. */
-"REGISTRATION_BACKUP_RESTORE_ERROR_UNSUPPORTED_BACKUP_VERSION_BODY" = "要恢复您的备份，请确保您使用的是最新版本的 Signal，然后重试。如果问题仍然存在，请联系支持人员。";
+"REGISTRATION_BACKUP_RESTORE_ERROR_UNSUPPORTED_BACKUP_VERSION_BODY" = "要恢复您的备份，请确保您使用的是最新版本的 Radar，然后重试。如果问题仍然存在，请联系支持人员。";
 
 /* Title for a sheet warning users about an incompatible backup version. */
 "REGISTRATION_BACKUP_RESTORE_ERROR_UNSUPPORTED_BACKUP_VERSION_TITLE" = "需要更新";
@@ -7179,7 +7179,7 @@ Send money securely.";
 "REGISTRATION_CANNOT_CONTINUE_WITHOUT_UPDATING_APP_ACTION" = "更新";
 
 /* During (re)registration, users may need to update their app to continue. They'll be presented with an alert if this is the case, prompting them to update. This is the description text on that alert. */
-"REGISTRATION_CANNOT_CONTINUE_WITHOUT_UPDATING_APP_DESCRIPTION" = "如要继续注册，请将 Signal 更新到最新版本。";
+"REGISTRATION_CANNOT_CONTINUE_WITHOUT_UPDATING_APP_DESCRIPTION" = "如要继续注册，请将 Radar 更新到最新版本。";
 
 /* During (re)registration, users may need to update their app to continue. They'll be presented with an alert if this is the case, prompting them to update. This is the title on that alert. */
 "REGISTRATION_CANNOT_CONTINUE_WITHOUT_UPDATING_APP_TITLE" = "需要更新";
@@ -7191,7 +7191,7 @@ Send money securely.";
 "REGISTRATION_DEFAULT_COUNTRY_NAME" = "国家编码";
 
 /* If a user is installing Signal on a new phone, they may be asked whether they want to transfer their account from their old device. This is a description on the screen that asks them this question. */
-"REGISTRATION_DEVICE_TRANSFER_CHOICE_EXPLANATION" = "继续操作将会停用其他设备上使用同一个手机号码注册的 Signal 账号。";
+"REGISTRATION_DEVICE_TRANSFER_CHOICE_EXPLANATION" = "继续操作将会停用其他设备上使用同一个手机号码注册的 Radar 账号。";
 
 /* If a user is installing Signal on a new phone, they may be asked whether they want to transfer their account from their old device. This is the title on the screen that asks them this question. */
 "REGISTRATION_DEVICE_TRANSFER_CHOICE_TITLE" = "迁移账户和聊天记录";
@@ -7227,7 +7227,7 @@ Send money securely.";
 "REGISTRATION_NO_BACKUP_KEY_BUTTON_TITLE" = "没有恢复密钥？";
 
 /* Body text on a sheet with info for what to do if you don't have a recovery key */
-"REGISTRATION_NO_BACKUP_KEY_SHEET_BODY" = "如果没有 64 个字符的恢复代码，备份将无法恢复。如果您丢失了自己的恢复密钥，Signal 将无法帮助您恢复备份。\n\n如果您的旧设备可用，您可以在“设置 > 聊天 > 备份”中查看您的恢复密钥。点击“查看恢复密钥”即可查看。";
+"REGISTRATION_NO_BACKUP_KEY_SHEET_BODY" = "如果没有 64 个字符的恢复代码，备份将无法恢复。如果您丢失了自己的恢复密钥，Radar 将无法帮助您恢复备份。\n\n如果您的旧设备可用，您可以在“设置 > 聊天 > 备份”中查看您的恢复密钥。点击“查看恢复密钥”即可查看。";
 
 /* Title for sheet with info for what to do if you don't have a recovery key */
 "REGISTRATION_NO_BACKUP_KEY_SHEET_TITLE" = "没有恢复密钥？";
@@ -7290,16 +7290,16 @@ Send money securely.";
 "REGISTRATION_PROFILE_SETUP_TITLE" = "设置个人资料";
 
 /* Error shown if an SMS/call service provider is permanently unable to send a verification code to the provided number. */
-"REGISTRATION_PROVIDER_FAILURE_MESSAGE_PERMANENT" = "由于短信提供商的问题，Signal 无法发送短信代码。";
+"REGISTRATION_PROVIDER_FAILURE_MESSAGE_PERMANENT" = "由于短信提供商的问题，Radar 无法发送短信代码。";
 
 /* Error shown if an SMS/call service provider is temporarily unable to send a verification code to the provided number. */
-"REGISTRATION_PROVIDER_FAILURE_MESSAGE_TRANSIENT" = "由于短信提供商的问题，Signal 无法发送短信代码。请在几个小时后重试。";
+"REGISTRATION_PROVIDER_FAILURE_MESSAGE_TRANSIENT" = "由于短信提供商的问题，Radar 无法发送短信代码。请在几个小时后重试。";
 
 /* Third step in directions for how to make a backup */
 "REGISTRATION_RESTORE_METHOD_MAKE_BACKUP_TUTORIAL_ENABLE_BACKUPS" = "启用备份然后等待备份完成";
 
 /* First step in directions for how to make a backup */
-"REGISTRATION_RESTORE_METHOD_MAKE_BACKUP_TUTORIAL_OPEN_SIGNAL" = "在您的旧设备上打开 Signal";
+"REGISTRATION_RESTORE_METHOD_MAKE_BACKUP_TUTORIAL_OPEN_SIGNAL" = "在您的旧设备上打开 Radar";
 
 /* Second step in directions for how to make a backup */
 "REGISTRATION_RESTORE_METHOD_MAKE_BACKUP_TUTORIAL_TAP_SETTINGS" = "点击“设置 > 备份”";
@@ -7317,7 +7317,7 @@ Send money securely.";
 "REGISTRATION_SCAN_QR_CODE_TITLE" = "用您的旧手机扫描此二维码";
 
 /* Tutorial text describing the first step to scanning the restore/transfer QR code with your old phone: opening Signal */
-"REGISTRATION_SCAN_QR_CODE_TUTORIAL_OPEN_SIGNAL" = "在您的旧设备上打开 Signal";
+"REGISTRATION_SCAN_QR_CODE_TUTORIAL_OPEN_SIGNAL" = "在您的旧设备上打开 Radar";
 
 /* Tutorial text describing the third step to scanning the restore/transfer QR code with your old phone: scan the code */
 "REGISTRATION_SCAN_QR_CODE_TUTORIAL_SCAN" = "用相机扫描此二维码";
@@ -7401,7 +7401,7 @@ Send money securely.";
 "REREGISTER_INVALID_PIN_WARNING_SKIPPABLE_FORMAT" = "您还剩 %1$@。如果机会用尽，您可以创建新 PIN 码。您可以重新注册和使用账户，但一些已保存的设置将会丢失，如您的个人资料信息。";
 
 /* If the user is re-registering, they may need to enter their PIN to restore all their data. If they enter the incorrect PIN, they will be shown a warning. Embeds {{ number of attempts }}, such as \"3 attempts\". */
-"REREGISTER_INVALID_PIN_WARNING_UNSKIPPABLE_FORMAT" = "您还剩 %1$@。如果机会用尽，您的账户将会被锁定 7 天。7 天锁定期结束后，您可以在没有 PIN 码的情况下重新注册 Signal。不过您账户中的所有数据将会被删除。";
+"REREGISTER_INVALID_PIN_WARNING_UNSKIPPABLE_FORMAT" = "您还剩 %1$@。如果机会用尽，您的账户将会被锁定 7 天。7 天锁定期结束后，您可以在没有 PIN 码的情况下重新注册 Radar。不过您账户中的所有数据将会被删除。";
 
 /* Configure reactions reset button text */
 "RESET" = "重置";
@@ -7506,7 +7506,7 @@ Send money securely.";
 "SAFETY_NUMBER_CHANGED_CONFIRM_SEND_ACTION" = "依然发送";
 
 /* Message for the 'safety number confirmation' view */
-"SAFETY_NUMBER_CONFIRMATION_MESSAGE" = "以下用户可能重新安装了 Signal 或更换了设备，请重新与之验证安全码以保护您的隐私。";
+"SAFETY_NUMBER_CONFIRMATION_MESSAGE" = "以下用户可能重新安装了 Radar 或更换了设备，请重新与之验证安全码以保护您的隐私。";
 
 /* Text explaining that the given contact previously had their safety number verified. */
 "SAFETY_NUMBER_CONFIRMATION_PREVIOUSLY_VERIFIED" = "已验证";
@@ -7521,7 +7521,7 @@ Send money securely.";
 "SAFETY_NUMBER_CONFIRMATION_VIEW_ACTION" = "查看";
 
 /* Snippet to share {{safety number}} with a friend. sent e.g. via SMS */
-"SAFETY_NUMBER_SHARE_FORMAT" = "我们的 Signal 安全码:\n%1$@";
+"SAFETY_NUMBER_SHARE_FORMAT" = "我们的 Radar 安全码:\n%1$@";
 
 /* Title for Safety Tips button in thread details. */
 "SAFETY_TIPS_BUTTON_ACTION_TITLE" = "安全提示";
@@ -7539,7 +7539,7 @@ Send money securely.";
 "SAFETY_TIPS_FAKE_BUSINESS_TITLE" = "假冒企业和机构";
 
 /* Message contents for the fake names safety tip. */
-"SAFETY_TIPS_FAKE_NAMES_BODY" = "Signal 绝不会联系您获取您的注册码或 PIN 码。请谨慎甄别假冒仿冒账户提出的请求。昵称是账户持有人自行选择的，未经过验证。";
+"SAFETY_TIPS_FAKE_NAMES_BODY" = "Radar 绝不会联系您获取您的注册码或 PIN 码。请谨慎甄别假冒仿冒账户提出的请求。昵称是账户持有人自行选择的，未经过验证。";
 
 /* Message title describing the fake names safety tip. */
 "SAFETY_TIPS_FAKE_NAMES_TITLE" = "假名和虚假账户";
@@ -7599,13 +7599,13 @@ Send money securely.";
 "SCREEN_LOCK_ERROR_LOCAL_AUTHENTICATION_PASSCODE_NOT_SET" = "您需要先设置您的密码来开启屏幕锁功能。";
 
 /* Description of how and why Signal iOS uses Touch ID/Face ID/Phone Passcode to unlock 'screen lock'. */
-"SCREEN_LOCK_REASON_UNLOCK_SCREEN_LOCK" = "认证来打开 Signal。";
+"SCREEN_LOCK_REASON_UNLOCK_SCREEN_LOCK" = "认证来打开 Radar。";
 
 /* Title for alert indicating that screen lock could not be unlocked. */
 "SCREEN_LOCK_UNLOCK_FAILED" = "认证失败";
 
 /* Label for button on lock screen that lets users unlock Signal. */
-"SCREEN_LOCK_UNLOCK_SIGNAL" = "解锁 Signal";
+"SCREEN_LOCK_UNLOCK_SIGNAL" = "解锁 Radar";
 
 /* Placeholder text indicating the user can search for contacts by name, username, or phone number. */
 "SEARCH_BY_NAME_OR_USERNAME_OR_NUMBER_PLACEHOLDER_TEXT" = "姓名、用户名或手机号码";
@@ -7638,7 +7638,7 @@ Send money securely.";
 "SECONDARY_LINKING_ERROR_DIFFERENT_ACCOUNT_TITLE" = "帐户不匹配";
 
 /* Message for error alert indicating that a linked device must be upgraded before it can be linked. */
-"SECONDARY_LINKING_ERROR_OBSOLETE_LINKED_DEVICE_MESSAGE" = "升级此设备 Signal 来关联您的手机。";
+"SECONDARY_LINKING_ERROR_OBSOLETE_LINKED_DEVICE_MESSAGE" = "升级此设备 Radar 来关联您的手机。";
 
 /* Title for error alert indicating that a linked device must be upgraded before it can be linked. */
 "SECONDARY_LINKING_ERROR_OBSOLETE_LINKED_DEVICE_TITLE" = "不受支持的版本";
@@ -7665,7 +7665,7 @@ Send money securely.";
 "SECONDARY_LINKING_SYNCING_UPDATE_REQUIRED_CHECK_FOR_UPDATE_BUTTON" = "查看更新";
 
 /* Message for action sheet when the secondary device fails to sync messages due to an app update being required. */
-"SECONDARY_LINKING_SYNCING_UPDATE_REQUIRED_ERROR_MESSAGE" = "如要完成消息同步，请立即更新 Signal。";
+"SECONDARY_LINKING_SYNCING_UPDATE_REQUIRED_ERROR_MESSAGE" = "如要完成消息同步，请立即更新 Radar。";
 
 /* Title for action sheet when the secondary device fails to sync messages due to an app update being required. */
 "SECONDARY_LINKING_SYNCING_UPDATE_REQUIRED_ERROR_TITLE" = "需要更新";
@@ -7677,7 +7677,7 @@ Send money securely.";
 "SECONDARY_ONBOARDING_GET_STARTED_BY_OPENING_PRIMARY" = "在您的手机上打开Signal用以将当前iPad关联至您的账户";
 
 /* Link explaining what to do when trying to link a device before having a primary device. */
-"SECONDARY_ONBOARDING_GET_STARTED_DO_NOT_HAVE_PRIMARY" = "我手机上没下 Signal……";
+"SECONDARY_ONBOARDING_GET_STARTED_DO_NOT_HAVE_PRIMARY" = "我手机上没下 Radar……";
 
 /* alert body */
 "SECONDARY_ONBOARDING_INSTALL_PRIMARY_FIRST_BODY" = "前往你手机上的App Store安装Signal并完成注册过程，之后您可以将您的iPad关联至同一账户。";
@@ -7686,7 +7686,7 @@ Send money securely.";
 "SECONDARY_ONBOARDING_INSTALL_PRIMARY_FIRST_TITLE" = "在您的手机上安装Signal";
 
 /* body text while displaying a QR code which, when scanned, will link this device. */
-"SECONDARY_ONBOARDING_SCAN_CODE_BODY" = "点击你的简介图片打开你手机上 Signal 的设置。接着点击“已关联设备”再点“关联新设备”，用手机扫描这个二维码。";
+"SECONDARY_ONBOARDING_SCAN_CODE_BODY" = "点击你的简介图片打开你手机上 Radar 的设置。接着点击“已关联设备”再点“关联新设备”，用手机扫描这个二维码。";
 
 /* Link text for page with troubleshooting info shown on the QR scanning screen */
 "SECONDARY_ONBOARDING_SCAN_CODE_HELP_TEXT" = "在这里有关于关联你 iPad 的帮助";
@@ -7698,7 +7698,7 @@ Send money securely.";
 "SECONDARY_ONBOARDING_SCAN_CODE_TITLE" = "用你的手机扫描二维码";
 
 /* header text before the user can transfer to this device */
-"SECONDARY_TRANSFER_GET_STARTED_BY_OPENING_IPAD" = "在你原来的 iPad 上运行 Signal 以便迁移数据到你的账户。";
+"SECONDARY_TRANSFER_GET_STARTED_BY_OPENING_IPAD" = "在你原来的 iPad 上运行 Radar 以便迁移数据到你的账户。";
 
 /* No comment provided by engineer. */
 "SECURE_SESSION_RESET" = "安全会话被重置。";
@@ -7788,7 +7788,7 @@ Send money securely.";
 "SEPA_DONATION_NAME_PLACEHOLDER" = "银行账户名称";
 
 /* Description for the session refresh alert */
-"SESSION_REFRESH_ALERT_MESSAGE" = "Signal 使用端对端加密，有时可能需刷新聊天会话。虽然这并不影响聊天的安全性，但可能漏掉该联系人的消息。您可要求他们重新发送。";
+"SESSION_REFRESH_ALERT_MESSAGE" = "Radar 使用端对端加密，有时可能需刷新聊天会话。虽然这并不影响聊天的安全性，但可能漏掉该联系人的消息。您可要求他们重新发送。";
 
 /* Title for the session refresh alert */
 "SESSION_REFRESH_ALERT_TITLE" = "聊天会话已刷新";
@@ -7830,7 +7830,7 @@ Send money securely.";
 "SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_COUNTRY" = "位置";
 
 /* Table footer for the 'censorship circumvention' section when censorship circumvention can be manually enabled. */
-"SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_FOOTER" = "若启用，Signal 会尝试规避审查。除非 Signal 在您所在地受到审查，否则不要打开该功能。";
+"SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_FOOTER" = "若启用，Radar 会尝试规避审查。除非 Radar 在您所在地受到审查，否则不要打开该功能。";
 
 /* Table footer for the 'censorship circumvention' section shown when censorship circumvention has been auto-enabled based on local phone number. */
 "SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_FOOTER_AUTO_ENABLED" = "已根据您的手机号码启动审查规避。";
@@ -7842,7 +7842,7 @@ Send money securely.";
 "SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_FOOTER_NO_CONNECTION" = "审查规避只能在联网时启动。";
 
 /* Table footer for the 'censorship circumvention' section shown when the app is connected to the Signal service. */
-"SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_FOOTER_WEBSOCKET_CONNECTED" = "不需要规避审查；您已连接上了 Signal 服务。";
+"SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_FOOTER_WEBSOCKET_CONNECTED" = "不需要规避审查；您已连接上了 Radar 服务。";
 
 /* Label for the 'advanced pin settings' button. */
 "SETTINGS_ADVANCED_PIN_SETTINGS" = "高级 PIN 设置";
@@ -7869,13 +7869,13 @@ Send money securely.";
 "SETTINGS_ADVANCED_VIEW_ERROR_LOG" = "错误日志";
 
 /* Information on sheet about changing the app icon - first line */
-"SETTINGS_APP_ICON_EDUCATION_APP_NAME" = "应用名称“Signal”将会在主屏幕、通知和应用库中显示。";
+"SETTINGS_APP_ICON_EDUCATION_APP_NAME" = "应用名称“Radar”将会在主屏幕、通知和应用库中显示。";
 
 /* Information on sheet about changing the app icon - second line */
-"SETTINGS_APP_ICON_EDUCATION_HOME_SCREEN_DOCK" = "您可以将 Signal 应用移至主屏幕底部的程序坞中，从而隐藏应用名称 “Signal”。";
+"SETTINGS_APP_ICON_EDUCATION_HOME_SCREEN_DOCK" = "您可以将 Radar 应用移至主屏幕底部的程序坞中，从而隐藏应用名称 “Radar”。";
 
 /* The footer for the app icon selection settings page. */
-"SETTINGS_APP_ICON_FOOTER" = "应用名称“Signal”将会在主屏幕、通知和应用库中显示。";
+"SETTINGS_APP_ICON_FOOTER" = "应用名称“Radar”将会在主屏幕、通知和应用库中显示。";
 
 /* The title for the app icon selection settings page. */
 "SETTINGS_APP_ICON_TITLE" = "应用图标";
@@ -7905,7 +7905,7 @@ Send money securely.";
 "SETTINGS_BLOCK_LIST_ADD_BUTTON" = "添加屏蔽用户";
 
 /* A label that indicates the user has no Signal contacts that they haven't blocked. */
-"SETTINGS_BLOCK_LIST_NO_CONTACTS" = "您没有任何 Signal 联系人。";
+"SETTINGS_BLOCK_LIST_NO_CONTACTS" = "您没有任何 Radar 联系人。";
 
 /* A label that indicates the user's search has no matching results. */
 "SETTINGS_BLOCK_LIST_NO_SEARCH_RESULTS" = "无搜索结果";
@@ -7917,7 +7917,7 @@ Send money securely.";
 "SETTINGS_CALLING_HIDES_IP_ADDRESS_PREFERENCE_TITLE" = "始终使用转发通话";
 
 /* User settings section footer, a detailed explanation */
-"SETTINGS_CALLING_HIDES_IP_ADDRESS_PREFERENCE_TITLE_DETAIL" = "使用 Signal 服务器转发所有通话，这能防止联系人获取您的 IP 地址，但此功能会降低通话质量。";
+"SETTINGS_CALLING_HIDES_IP_ADDRESS_PREFERENCE_TITLE_DETAIL" = "使用 Radar 服务器转发所有通话，这能防止联系人获取您的 IP 地址，但此功能会降低通话质量。";
 
 /* Label for the 'edit phone number' button in the 'change phone number' views. */
 "SETTINGS_CHANGE_PHONE_NUMBER_BACK_TO_EDIT_BUTTON" = "编辑电话号码";
@@ -7962,7 +7962,7 @@ Send money securely.";
 "SETTINGS_CLEAR_HISTORY" = "清除聊天记录";
 
 /* Footer for the 'about' help section */
-"SETTINGS_COPYRIGHT" = "版权所有 Signal Messenger\n根据 AGPLv3 授权许可";
+"SETTINGS_COPYRIGHT" = "版权所有 Radar Messenger\n根据 AGPLv3 授权许可";
 
 /* Label for the 'data' section of the app settings. */
 "SETTINGS_DATA" = "数据使用量";
@@ -8034,7 +8034,7 @@ Send money securely.";
 "SETTINGS_DISAPPEARING_MESSAGES_FOOTER" = "对于您开启的全部新聊天，设置默认的限时消息计时器。";
 
 /* Title for the 'donate to signal' link in settings. */
-"SETTINGS_DONATE" = "捐款给 Signal";
+"SETTINGS_DONATE" = "捐款给 Radar";
 
 /* Title for help button and help pages in app settings. */
 "SETTINGS_HELP" = "帮助";
@@ -8103,7 +8103,7 @@ Send money securely.";
 "SETTINGS_NOTIFICATION_CONTENT_TITLE" = "通知内容";
 
 /* When the local device discovers a contact has recently installed signal, the app can generates a message encouraging the local user to say hello. Turning this switch off disables that feature. */
-"SETTINGS_NOTIFICATION_EVENTS_CONTACT_JOINED_SIGNAL" = "联系人加入 Signal";
+"SETTINGS_NOTIFICATION_EVENTS_CONTACT_JOINED_SIGNAL" = "联系人加入 Radar";
 
 /* table section header */
 "SETTINGS_NOTIFICATION_NOTIFY_WHEN_TITLE" = "发送通知，当…";
@@ -8140,7 +8140,7 @@ Send money securely.";
 "SETTINGS_PAYMENTS_BITCOIN_UNIT" = "Bitcoin单位";
 
 /* Error message indicating that payments could not be activated because the feature is not currently available. */
-"SETTINGS_PAYMENTS_CANNOT_ACTIVATE_PAYMENTS_KILL_SWITCH" = "Signal 的付款不再可用，不过您仍可将资金转移至交易平台，但是不可再收发付款或添加资金。";
+"SETTINGS_PAYMENTS_CANNOT_ACTIVATE_PAYMENTS_KILL_SWITCH" = "Radar 的付款不再可用，不过您仍可将资金转移至交易平台，但是不可再收发付款或添加资金。";
 
 /* Error message indicating that payments could not be deactivated because the current balance is unavailable. */
 "SETTINGS_PAYMENTS_CANNOT_DEACTIVATE_PAYMENTS_NO_BALANCE" = "因为您的余额不可用，无法停用付款。请检查您的连接并重试。";
@@ -8149,10 +8149,10 @@ Send money securely.";
 "SETTINGS_PAYMENTS_CANNOT_SEND_PAYMENT_NO_BALANCE" = "因为您的余额不可用，无法完成支持。请检查您的连接并重试。";
 
 /* Error message indicating that payments cannot be sent because the feature is not currently available. */
-"SETTINGS_PAYMENTS_CANNOT_SEND_PAYMENTS_KILL_SWITCH" = "Signal 的付款不再可用，不过您仍可将资金转移至交易平台，但是不可再收发付款或添加资金。";
+"SETTINGS_PAYMENTS_CANNOT_SEND_PAYMENTS_KILL_SWITCH" = "Radar 的付款不再可用，不过您仍可将资金转移至交易平台，但是不可再收发付款或添加资金。";
 
 /* Error message indicating that you cannot transfer into your payments wallet because the feature is not currently available. */
-"SETTINGS_PAYMENTS_CANNOT_TRANSFER_IN_KILL_SWITCH" = "Signal 的付款不再可用，不过您仍可将资金转移至交易平台，但是不可再收发付款或添加资金。";
+"SETTINGS_PAYMENTS_CANNOT_TRANSFER_IN_KILL_SWITCH" = "Radar 的付款不再可用，不过您仍可将资金转移至交易平台，但是不可再收发付款或添加资金。";
 
 /* Message for the 'currency conversions info' alert. */
 "SETTINGS_PAYMENTS_CURRENCY_CONVERSIONS_INFO_ALERT_MESSAGE" = "转换仅为估计，可能并不准确。";
@@ -8179,10 +8179,10 @@ Send money securely.";
 "SETTINGS_PAYMENTS_DEACTIVATE_TITLE" = "停用付款";
 
 /* Explanation of the 'deactivate payments with balance' process in the 'deactivate payments' settings. */
-"SETTINGS_PAYMENTS_DEACTIVATE_WITH_BALANCE_EXPLANATION" = "我们建议您在停用付款之前将资金转移至其他钱包地址。如果您当前选择不转移，在重新激活付款时，您的资金将保留在 Signal 关联的钱包内。";
+"SETTINGS_PAYMENTS_DEACTIVATE_WITH_BALANCE_EXPLANATION" = "我们建议您在停用付款之前将资金转移至其他钱包地址。如果您当前选择不转移，在重新激活付款时，您的资金将保留在 Radar 关联的钱包内。";
 
 /* Description for the 'deactivate payments confirmation' UI in the payment settings. */
-"SETTINGS_PAYMENTS_DEACTIVATE_WITHOUT_TRANSFER_CONFIRM_DESCRIPTION" = "当重新激活付款时，您的余额将保留在 Signal 关联的钱包内。";
+"SETTINGS_PAYMENTS_DEACTIVATE_WITHOUT_TRANSFER_CONFIRM_DESCRIPTION" = "当重新激活付款时，您的余额将保留在 Radar 关联的钱包内。";
 
 /* Title for the 'deactivate payments confirmation' UI in the payment settings. */
 "SETTINGS_PAYMENTS_DEACTIVATE_WITHOUT_TRANSFER_CONFIRM_TITLE" = "是否停用而不转移？";
@@ -8420,10 +8420,10 @@ Send money securely.";
 "SETTINGS_PAYMENTS_PAYMENTS_LOCK_PROMPT_EXPLANATION_TOUCHID" = "启用 Touch ID 可以防止接触到您手机的人获取您的资金。您可以在设置中禁用该选项。";
 
 /* Button for payments outdated sheet. */
-"SETTINGS_PAYMENTS_PAYMENTS_OUTDATED_BUTTON" = "升级 Signal";
+"SETTINGS_PAYMENTS_PAYMENTS_OUTDATED_BUTTON" = "升级 Radar";
 
 /* Message for payments outdated sheet. */
-"SETTINGS_PAYMENTS_PAYMENTS_OUTDATED_MESSAGE" = "如要发送和接收付款，并查看更新的付款余额，您需要更新 Signal。";
+"SETTINGS_PAYMENTS_PAYMENTS_OUTDATED_MESSAGE" = "如要发送和接收付款，并查看更新的付款余额，您需要更新 Radar。";
 
 /* Title for payments outdated sheet saying cant send. */
 "SETTINGS_PAYMENTS_PAYMENTS_OUTDATED_TITLE_CANT_SEND" = "无法发送付款";
@@ -8558,7 +8558,7 @@ Send money securely.";
 "SETTINGS_PAYMENTS_TITLE" = "付款";
 
 /* Error indicating that it is not valid to send yourself a payment. */
-"SETTINGS_PAYMENTS_TRANSFER_OUT_CANNOT_SEND_TO_SELF" = "无法向您的 Signal 钱包地址转帐。请输入支持的交易平台帐户的钱包地址。";
+"SETTINGS_PAYMENTS_TRANSFER_OUT_CANNOT_SEND_TO_SELF" = "无法向您的 Radar 钱包地址转帐。请输入支持的交易平台帐户的钱包地址。";
 
 /* Footer of the 'transfer currency out' view in the payment settings. */
 "SETTINGS_PAYMENTS_TRANSFER_OUT_FOOTER" = "Transfer Bitcoin by sending to the Lightning address or invoice provided by the recipient. The address is typically displayed below the QR code.";
@@ -8621,7 +8621,7 @@ Send money securely.";
 "SETTINGS_PAYMENTS_VIEW_PASSPHRASE_TITLE" = "恢复短语";
 
 /* Header text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "按顺序写下这24个词并妥善保存。您可以用它们在Cake Wallet或其他Spark兼容钱包中恢复余额。";
+"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "按顺序写下这12个词并妥善保存。您可以用它们在Cake Wallet或其他Spark兼容钱包中恢复余额。";
 
 /* Footer text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
 "SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_FOOTER_2" = "请勿将此短语分享给任何人";
@@ -8642,7 +8642,7 @@ Send money securely.";
 "SETTINGS_PHONE_NUMBER_DISCOVERABILITY_DISABLED_TOAST" = "如要更改此设置，请将“谁可以看到我的电话号码”设置为“没有人”。";
 
 /* The description for a sheet asking for confirmation that the user wants to set their phone number discoverability to 'nobody'. */
-"SETTINGS_PHONE_NUMBER_DISCOVERABILITY_NOBODY_CONFIRMATION_DESCRIPTION" = "如果将“谁可以通过电话号码找到我”设置为“没有人”，这将会使其他用户更难在 Signal 上找到您。";
+"SETTINGS_PHONE_NUMBER_DISCOVERABILITY_NOBODY_CONFIRMATION_DESCRIPTION" = "如果将“谁可以通过电话号码找到我”设置为“没有人”，这将会使其他用户更难在 Radar 上找到您。";
 
 /* The title for a sheet asking for confirmation that the user wants to set their phone number discoverability to 'nobody'. */
 "SETTINGS_PHONE_NUMBER_DISCOVERABILITY_NOBODY_CONFIRMATION_TITLE" = "确定要更改吗？";
@@ -8651,7 +8651,7 @@ Send money securely.";
 "SETTINGS_PHONE_NUMBER_DISCOVERABILITY_TITLE" = "谁可以通过电话号码找到我";
 
 /* Description label for Phone Number Privacy */
-"SETTINGS_PHONE_NUMBER_PRIVACY_DESCRIPTION_LABEL" = "选择谁可以在 Signal 上看到您的手机号码，以及谁可以通过您的手机号码与您联系。";
+"SETTINGS_PHONE_NUMBER_PRIVACY_DESCRIPTION_LABEL" = "选择谁可以在 Radar 上看到您的手机号码，以及谁可以通过您的手机号码与您联系。";
 
 /* The title for phone number privacy settings. */
 "SETTINGS_PHONE_NUMBER_PRIVACY_TITLE" = "手机号码";
@@ -8663,16 +8663,16 @@ Send money securely.";
 "SETTINGS_PIN_REMINDER_DISABLE_CONFIRMATION_ACTION" = "关闭提醒";
 
 /* The explanation for the dialog asking user to confirm their PIN to disable reminders */
-"SETTINGS_PIN_REMINDER_DISABLE_CONFIRMATION_EXPLANATION" = "请确保你能牢记或安全保存好你的 PIN 码，因为它不能被找回。如果你忘记了 PIN 码，你可能会在重新注册 Signal 账号时丢失一些数据。";
+"SETTINGS_PIN_REMINDER_DISABLE_CONFIRMATION_EXPLANATION" = "请确保你能牢记或安全保存好你的 PIN 码，因为它不能被找回。如果你忘记了 PIN 码，你可能会在重新注册 Radar 账号时丢失一些数据。";
 
 /* The title for the dialog asking user to confirm their PIN to disable reminders */
-"SETTINGS_PIN_REMINDER_DISABLE_CONFIRMATION_TITLE" = "请验证你的 Signal PIN 码";
+"SETTINGS_PIN_REMINDER_DISABLE_CONFIRMATION_TITLE" = "请验证你的 Radar PIN 码";
 
 /* Label for the 'pin reminder' switch of the privacy settings. */
 "SETTINGS_PIN_REMINDER_SWITCH_LABEL" = "PIN 码提醒";
 
 /* Footer for the 'PINs' section of the privacy settings. */
-"SETTINGS_PINS_FOOTER" = "PIN 码可使信息以加密方式保存在 Signal 上，并且只有您可访问。PIN 码不可还原。重新安装 Signal 时，将还原您的个人资料、设置和联系人。";
+"SETTINGS_PINS_FOOTER" = "PIN 码可使信息以加密方式保存在 Radar 上，并且只有您可访问。PIN 码不可还原。重新安装 Radar 时，将还原您的个人资料、设置和联系人。";
 
 /* Label for the 'pins' item of the privacy settings when the user does have a pin. */
 "SETTINGS_PINS_ITEM" = "更改 PIN 码";
@@ -8681,7 +8681,7 @@ Send money securely.";
 "SETTINGS_PINS_ITEM_CREATE" = "创建 PIN 码";
 
 /* Title for the 'PINs' section of the privacy settings. */
-"SETTINGS_PINS_TITLE" = "Signal PIN 码";
+"SETTINGS_PINS_TITLE" = "Radar PIN 码";
 
 /* Footer for table section */
 "SETTINGS_PRIVACY_ADVANCED_FOOTER" = "审查规避、代理、中继通话以及加密发送人设置。";
@@ -8723,7 +8723,7 @@ Send money securely.";
 "SETTINGS_REGISTRATION_LOCK_TURN_ON_ERROR_PIN_REQUIRED" = "您必须创建密码才能使用注册锁定。";
 
 /* Body for the alert confirming that the user wants to turn on registration lock. */
-"SETTINGS_REGISTRATION_LOCK_TURN_ON_MESSAGE" = "如果在再次登录时，你忘记了你的 Signal PIN 码，你将在7天内都无法登录。";
+"SETTINGS_REGISTRATION_LOCK_TURN_ON_MESSAGE" = "如果在再次登录时，你忘记了你的 Radar PIN 码，你将在7天内都无法登录。";
 
 /* Title for the alert confirming that the user wants to turn on registration lock. */
 "SETTINGS_REGISTRATION_LOCK_TURN_ON_TITLE" = "开启注册锁定？";
@@ -8753,19 +8753,19 @@ Send money securely.";
 "SETTINGS_SECTION_TITLE_CALLING" = "呼叫时";
 
 /* Section footer */
-"SETTINGS_SECURITY_DETAIL" = "使用 Touch ID、Face ID 或 iOS 设备密码来解锁 Signal。";
+"SETTINGS_SECURITY_DETAIL" = "使用 Touch ID、Face ID 或 iOS 设备密码来解锁 Radar。";
 
 /* Section footer */
-"SETTINGS_SECURITY_DETAIL_FACEID" = "使用 Face ID 解锁 Signal。";
+"SETTINGS_SECURITY_DETAIL_FACEID" = "使用 Face ID 解锁 Radar。";
 
 /* Section footer */
-"SETTINGS_SECURITY_DETAIL_OPTICID" = "使用视控 ID 解锁 Signal。";
+"SETTINGS_SECURITY_DETAIL_OPTICID" = "使用视控 ID 解锁 Radar。";
 
 /* Section footer */
-"SETTINGS_SECURITY_DETAIL_PASSCODE" = "使用设备密码解锁 Signal。";
+"SETTINGS_SECURITY_DETAIL_PASSCODE" = "使用设备密码解锁 Radar。";
 
 /* Section footer */
-"SETTINGS_SECURITY_DETAIL_TOUCHID" = "使用 Touch ID 解锁 Signal。";
+"SETTINGS_SECURITY_DETAIL_TOUCHID" = "使用 Touch ID 解锁 Radar。";
 
 /* Section header */
 "SETTINGS_SECURITY_TITLE" = "应用安全";
@@ -8780,13 +8780,13 @@ Send money securely.";
 "SETTINGS_SHARING_SUGGESTIONS" = "与 iOS 共享联系人";
 
 /* Footer for setting for enabling & disabling contact and notification sharing with iOS. */
-"SETTINGS_SHARING_SUGGESTIONS_NOTIFICATIONS_FOOTER" = "允许 iOS 访问 Signal 联系人和聊天以便使用分享建议和通知等功能。";
+"SETTINGS_SHARING_SUGGESTIONS_NOTIFICATIONS_FOOTER" = "允许 iOS 访问 Radar 联系人和聊天以便使用分享建议和通知等功能。";
 
 /* Label for the 'enable registration lock' switch of the privacy settings. */
 "SETTINGS_TWO_FACTOR_AUTH_SWITCH_LABEL" = "注册锁定";
 
 /* Footer for the 'two factor auth' section of the privacy settings when Signal PINs are available. */
-"SETTINGS_TWO_FACTOR_PINS_AUTH_FOOTER" = "使用手机号码重新注册 Signal 时，需 Signal 密码。";
+"SETTINGS_TWO_FACTOR_PINS_AUTH_FOOTER" = "使用手机号码重新注册 Radar 时，需 Radar 密码。";
 
 /* Label for the 'typing indicators' setting. */
 "SETTINGS_TYPING_INDICATORS" = "“正在输入”提示";
@@ -8819,7 +8819,7 @@ Send money securely.";
 "SHARE_EXTENSION_LOADING" = "正在加载……";
 
 /* Message indicating that the share extension cannot be used until the user has registered in the main app. */
-"SHARE_EXTENSION_NOT_REGISTERED_MESSAGE" = "启动 Signal 来注册。";
+"SHARE_EXTENSION_NOT_REGISTERED_MESSAGE" = "启动 Radar 来注册。";
 
 /* Title indicating that the share extension cannot be used until the user has registered in the main app. */
 "SHARE_EXTENSION_NOT_REGISTERED_TITLE" = "未注册";
@@ -8837,7 +8837,7 @@ Send money securely.";
 "SHARE_EXTENSION_UNABLE_TO_BUILD_ATTACHMENT_ALERT_TITLE" = "无法准备附件";
 
 /* Title for the 'share extension' view. */
-"SHARE_EXTENSION_VIEW_TITLE" = "分享到 Signal";
+"SHARE_EXTENSION_VIEW_TITLE" = "分享到 Radar";
 
 /* Title of alert indicating sharing suggestions failed to deactivate */
 "SHARING_SUGGESTIONS_DISABLE_ERROR" = "禁用分享建议失败。";
@@ -8846,7 +8846,7 @@ Send money securely.";
 "SHOW_THREAD_BUTTON_TITLE" = "显示对话";
 
 /* Shown in the header when the user hasn't provided a custom name for a call. */
-"SIGNAL_CALL" = "Signal 通话";
+"SIGNAL_CALL" = "Radar 通话";
 
 /* body sent to contacts when inviting to Install Signal */
 "SMS_INVITE_BODY" = "请你下载Signal加密通讯软件！链接：";
@@ -8873,7 +8873,7 @@ Send money securely.";
 "SPAM_CAPTCHA_DISMISS_CONFIRMATION_TITLE" = "是否继续且不验证？";
 
 /* Body for action sheet explaining captcha requirement. */
-"SPAM_CAPTCHA_SHEET_BODY" = "为了防止 Signal 垃圾消息，请完成验证。\n\n验证之后可继续发送消息。任何暂停消息将自动发送。";
+"SPAM_CAPTCHA_SHEET_BODY" = "为了防止 Radar 垃圾消息，请完成验证。\n\n验证之后可继续发送消息。任何暂停消息将自动发送。";
 
 /* Title for action sheet explaining captcha requirement. */
 "SPAM_CAPTCHA_SHEET_TITLE" = "验证以继续发送消息";
@@ -8909,7 +8909,7 @@ Send money securely.";
 "STICKERS_INSTALL_BUTTON" = "安装";
 
 /* Title for the 'available built-in stickers' section of the 'manage stickers' view. */
-"STICKERS_MANAGE_VIEW_AVAILABLE_BUILT_IN_PACKS_SECTION_TITLE" = "Signal 艺术家系列";
+"STICKERS_MANAGE_VIEW_AVAILABLE_BUILT_IN_PACKS_SECTION_TITLE" = "Radar 艺术家系列";
 
 /* Title for the 'available known stickers' section of the 'manage stickers' view. */
 "STICKERS_MANAGE_VIEW_AVAILABLE_KNOWN_PACKS_SECTION_TITLE" = "你收到的表情";
@@ -9191,19 +9191,19 @@ Send money securely.";
 "STORY_SETTINGS_LEARN_MORE_SHEET_FOOTER" = "您的密友能看到您的名称和照片，还能看到您在“我的动态”中发送的帖子，除非您向对方隐藏动态。";
 
 /* Header for the explainer sheet for signal connections */
-"STORY_SETTINGS_LEARN_MORE_SHEET_HEADER_FORMAT" = "<bold>Signal 密友</bold>是您选择信任的人，选择方式有：";
+"STORY_SETTINGS_LEARN_MORE_SHEET_HEADER_FORMAT" = "<bold>Radar 密友</bold>是您选择信任的人，选择方式有：";
 
 /* Label for the stories section of the settings view */
 "STORY_SETTINGS_TITLE" = "动态";
 
 /* Section footer for the 'viewers' section on the 'story settings' view */
-"STORY_SETTINGS_WHO_CAN_VIEW_THIS_FOOTER" = "选择哪些 Signal 密友可以查看您的动态。此更改不会影响您已发送的动态。";
+"STORY_SETTINGS_WHO_CAN_VIEW_THIS_FOOTER" = "选择哪些 Radar 密友可以查看您的动态。此更改不会影响您已发送的动态。";
 
 /* Section header for the 'viewers' section on the 'story settings' view */
 "STORY_SETTINGS_WHO_CAN_VIEW_THIS_HEADER" = "谁可以看到此动态";
 
 /* Header for the 'viewers' section on the 'story settings' bottom sheet */
-"STORY_SETTINGS_WHO_CAN_VIEW_THIS_SHEET_HEADER" = "选择哪些 Signal 密友可以看您的动态。您可以随时在隐私设置中对此进行更改。";
+"STORY_SETTINGS_WHO_CAN_VIEW_THIS_SHEET_HEADER" = "选择哪些 Radar 密友可以看您的动态。您可以随时在隐私设置中对此进行更改。";
 
 /* Tooltip text shown when the user selects a story as a destination for a long duration video that will be split into shorter segments. Embeds {{ segment duration in seconds }} */
 "STORY_VIDEO_SEGMENTATION_TOOLTIP_FORMAT" = "发送到动态的视频将会剪成 %1$d 秒的小片段并以多个动态发送。";
@@ -9242,7 +9242,7 @@ Send money securely.";
 "SUPPORT_EMAIL_DEFAULT_DESCRIPTION" = "请提供该问题的相关信息： ";
 
 /* Message for alert dialog presented when a support email failed to send */
-"SUPPORT_EMAIL_ERROR_ALERT_DESCRIPTION" = "请发送您的支援请求邮件到 support@signal.org";
+"SUPPORT_EMAIL_ERROR_ALERT_DESCRIPTION" = "请发送您的支援请求邮件到 support@radar.chat";
 
 /* Localized label for support request email filter string. Embeds {{filter text}}. */
 "SUPPORT_EMAIL_FILTER_LABEL_FORMAT" = "筛选器：%1$@";
@@ -9266,7 +9266,7 @@ Send money securely.";
 "SUPPORT_EMAIL_LOG_URL_LABEL_FORMAT" = "日志 URL：%1$@";
 
 /* Localized subject for support request emails */
-"SUPPORT_EMAIL_SUBJECT" = "Signal iOS 支援请求";
+"SUPPORT_EMAIL_SUBJECT" = "Radar iOS 支援请求";
 
 /* Header for emoji mood selection */
 "SUPPORT_EMOJI_PROMPT" = "你觉得怎么样？ （可选的）";
@@ -9338,7 +9338,7 @@ Send money securely.";
 "SWITCH_ON" = "开启";
 
 /* Name to display for the 'system' sender, e.g. for release notes and the onboarding story */
-"SYSTEM_ADDRESS_NAME" = "Signal";
+"SYSTEM_ADDRESS_NAME" = "Radar";
 
 /* Label for button to verify a user's safety number. */
 "SYSTEM_MESSAGE_ACTION_VERIFY_SAFETY_NUMBER" = "验证";
@@ -9497,16 +9497,16 @@ Send money securely.";
 "TIME_AMOUNT_WEEKS_SHORT_FORMAT" = "%1$@周";
 
 /* Button for bottom sheet shown when device transfer completes on the receiving device. Tapping will terminate the Signal app and trigger a notification to relaunch. */
-"TRANSFER_COMPLETE_SHEET_BUTTON" = "关闭 Signal";
+"TRANSFER_COMPLETE_SHEET_BUTTON" = "关闭 Radar";
 
 /* Subtitle for bottom sheet shown when device transfer completes on the receiving device. */
-"TRANSFER_COMPLETE_SHEET_SUBTITLE" = "如要开始在此设备上使用您的账户，请关闭 Signal 并重新将其打开。";
+"TRANSFER_COMPLETE_SHEET_SUBTITLE" = "如要开始在此设备上使用您的账户，请关闭 Radar 并重新将其打开。";
 
 /* Title for bottom sheet shown when device transfer completes on the receiving device. */
 "TRANSFER_COMPLETE_SHEET_TITLE" = "转移完成";
 
 /* Notification prompting the user to relaunch Signal after a device transfer completed. */
-"TRANSFER_RELAUNCH_NOTIFICATION" = "打开 Signal 开始发送消息吧";
+"TRANSFER_RELAUNCH_NOTIFICATION" = "打开 Radar 开始发送消息吧";
 
 /* Label for the cancel button in an alert or action sheet. */
 "TXT_CANCEL_TITLE" = "取消";
@@ -9524,25 +9524,25 @@ Send money securely.";
 "UNKNOWN_CONTACT_BLOCK_OFFER" = "该用户不在您的联系人里，是否屏蔽此用户？";
 
 /* Info message recorded in conversation history when local user receives an unknown message from a linked device and needs to upgrade. */
-"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_FROM_LINKED_DEVICE" = "您的某台设备发送的信息无法被处理或显示，因为它使用了新的 Signal 功能。";
+"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_FROM_LINKED_DEVICE" = "您的某台设备发送的信息无法被处理或显示，因为它使用了新的 Radar 功能。";
 
 /* Info message recorded in conversation history when local user receives an unknown message and needs to upgrade. Embeds {{user's name or phone number}}. */
-"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_WITH_NAME_FORMAT" = "%1$@ 给您发送的信息无法被处理，因为它用到了新的 Signal 功能。";
+"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_WITH_NAME_FORMAT" = "%1$@ 给您发送的信息无法被处理，因为它用到了新的 Radar 功能。";
 
 /* Info message recorded in conversation history when local user receives an unknown message and needs to upgrade. */
-"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_WITHOUT_NAME" = "收到的一条信息无法被处理，因为它用到了新的 Signal 功能。";
+"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_WITHOUT_NAME" = "收到的一条信息无法被处理，因为它用到了新的 Radar 功能。";
 
 /* Label for button that lets users upgrade the app. */
-"UNKNOWN_PROTOCOL_VERSION_UPGRADE_BUTTON" = "立即升级 Signal";
+"UNKNOWN_PROTOCOL_VERSION_UPGRADE_BUTTON" = "立即升级 Radar";
 
 /* Info message recorded in conversation history when local user has received an unknown unknown message from a linked device and has upgraded. */
-"UNKNOWN_PROTOCOL_VERSION_UPGRADE_COMPLETE_FROM_LINKED_DEVICE" = "已升级到最新版本的 Signal。您现在可以接收此类信息了。";
+"UNKNOWN_PROTOCOL_VERSION_UPGRADE_COMPLETE_FROM_LINKED_DEVICE" = "已升级到最新版本的 Radar。您现在可以接收此类信息了。";
 
 /* Info message recorded in conversation history when local user has received an unknown message and has upgraded. Embeds {{user's name or phone number}}. */
-"UNKNOWN_PROTOCOL_VERSION_UPGRADE_COMPLETE_WITH_NAME_FORMAT" = "您已经在使用最新版本的 Signal，可以请 %1$@ 重新发送这条信息。";
+"UNKNOWN_PROTOCOL_VERSION_UPGRADE_COMPLETE_WITH_NAME_FORMAT" = "您已经在使用最新版本的 Radar，可以请 %1$@ 重新发送这条信息。";
 
 /* Info message recorded in conversation history when local user has received an unknown message and has upgraded. */
-"UNKNOWN_PROTOCOL_VERSION_UPGRADE_COMPLETE_WITHOUT_NAME" = "您已经在使用最新版本的 Signal，可以请对方重新发送这条信息。";
+"UNKNOWN_PROTOCOL_VERSION_UPGRADE_COMPLETE_WITHOUT_NAME" = "您已经在使用最新版本的 Radar，可以请对方重新发送这条信息。";
 
 /* Label indicating an unknown user. */
 "UNKNOWN_USER" = "未知";
@@ -9566,7 +9566,7 @@ Send money securely.";
 "UNLINK_CONFIRMATION_ALERT_TITLE" = "确定解绑 \"%1$@\"?";
 
 /* Label warning the user that they have been unlinked from their primary device. */
-"UNLINKED_WARNING" = "此设备已取消关联。请将您的手机重新关联 Signal 以继续收发消息。";
+"UNLINKED_WARNING" = "此设备已取消关联。请将您的手机重新关联 Radar 以继续收发消息。";
 
 /* If this device has become unlinked from their primary device, they'll see a warning. This is the call to action on that warning. */
 "UNLINKED_WARNING_ACTION_TITLE" = "重新关联设备";
@@ -9593,7 +9593,7 @@ Send money securely.";
 "UNSUPPORTED_FEATURE_ERROR" = "您的设备不支持此功能。";
 
 /* Description for the unverified safety number change. Embeds {name of contact with identity change} */
-"UNVERIFIED_SAFETY_NUMBER_CHANGE_DESCRIPTION_FORMAT" = "您与 %1$@ 的安全码已更改，可能因为他们重新安装了 Signal 或更换了设备。请点击“验证”以确认新的安全码。该操作是可选的。";
+"UNVERIFIED_SAFETY_NUMBER_CHANGE_DESCRIPTION_FORMAT" = "您与 %1$@ 的安全码已更改，可能因为他们重新安装了 Radar 或更换了设备。请点击“验证”以确认新的安全码。该操作是可选的。";
 
 /* Action to verify a safety number after it has changed */
 "UNVERIFIED_SAFETY_NUMBER_VERIFY_ACTION" = "验证";
@@ -9611,7 +9611,7 @@ Send money securely.";
 "USE_PROXY_BUTTON" = "使用代理";
 
 /* Explanation of when you should use a signal proxy */
-"USE_PROXY_EXPLANATION" = "仅在无法通过移动数据或 Wi-Fi 连接 Signal 时使用代理。";
+"USE_PROXY_EXPLANATION" = "仅在无法通过移动数据或 Wi-Fi 连接 Radar 时使用代理。";
 
 /* Description of username links and QR codes on the username education sheet */
 "USERNAME_EDUCATION_LINK_DESCRIPTION" = "用户名有一个唯一的二维码和链接，您可以将其分享给您的朋友以快速开始聊天。";
@@ -9704,7 +9704,7 @@ Send money securely.";
 "USERNAME_LOOKUP_LINK_NO_LONGER_VALID_MESSAGE" = "此用户名链接已失效。";
 
 /* A message indicating that the given username is not associated with a registered Signal account. Embeds {{ a username }}. */
-"USERNAME_LOOKUP_NOT_FOUND_MESSAGE_FORMAT" = "%1$@不是 Signal 用户。请确认您输入了完整的用户名。";
+"USERNAME_LOOKUP_NOT_FOUND_MESSAGE_FORMAT" = "%1$@不是 Radar 用户。请确认您输入了完整的用户名。";
 
 /* Title for an action sheet indicating that the given username is not associated with a registered Signal account. */
 "USERNAME_LOOKUP_NOT_FOUND_TITLE" = "未找到此用户";
@@ -9728,7 +9728,7 @@ Send money securely.";
 "USERNAME_ONBOARDING_TITLE" = "Your Username";
 
 /* Instructions that appear below the username QR code on a sharable exported image. */
-"USERNAME_QR_CODE_EXPORT_INSTRUCTIONS" = "如要在 Signal 上与我聊天，请扫描此二维码吧。";
+"USERNAME_QR_CODE_EXPORT_INSTRUCTIONS" = "如要在 Radar 上与我聊天，请扫描此二维码吧。";
 
 /* A message in a toast informing the user their username, link, and QR code have successfully been reset. Embeds {{ the user's new username }}. */
 "USERNAME_RESET_SUCCESSFUL_TOAST" = "您的二维码和链接已重置，您的用户名是%1$@";

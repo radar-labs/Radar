@@ -2,7 +2,7 @@
 "AB_PERMISSION_MISSING_ACTION_NOT_NOW" = "Teraz nie";
 
 /* Title for the 'about' help section */
-"ABOUT_SECTION_TITLE" = "O aplikácií Signal";
+"ABOUT_SECTION_TITLE" = "O aplikácií Radar";
 
 /* Accessibility label for attachment. */
 "ACCESSIBILITY_LABEL_ATTACHMENT" = "Príloha";
@@ -32,7 +32,7 @@
 "ACCOUNT_DATA_REPORT_CONFIRM_EXPORT_CONFIRM_BUTTON" = "Exportovať prehľad";
 
 /* Users can request a report of their account data. Before they get their account export, they are warned to only share account data with trustworthy sources. This is the message on that warning. */
-"ACCOUNT_DATA_REPORT_CONFIRM_EXPORT_MESSAGE" = "Údaje svojho Signal účtu zdieľajte iba s ľuďmi a aplikáciami, ktorým dôverujete.";
+"ACCOUNT_DATA_REPORT_CONFIRM_EXPORT_MESSAGE" = "Údaje svojho Radar účtu zdieľajte iba s ľuďmi a aplikáciami, ktorým dôverujete.";
 
 /* Users can request a report of their account data. If this request fails (probably because of a network connection problem), they will see an error sheet. This is the message on that error. */
 "ACCOUNT_DATA_REPORT_ERROR_MESSAGE" = "Skontrolujte svoje pripojenie a skúste to znovu.";
@@ -56,10 +56,10 @@
 "ACCOUNT_DATA_REPORT_EXPORT_REPORT_BUTTON" = "Exportovať prehľad";
 
 /* Users can request a report of their account data. This text appears at the bottom of this screen, offering more information. */
-"ACCOUNT_DATA_REPORT_FOOTER" = "Váš prehľad sa vygeneruje iba v čase exportu a Signal ho neukladá vo vašom zariadení.";
+"ACCOUNT_DATA_REPORT_FOOTER" = "Váš prehľad sa vygeneruje iba v čase exportu a Radar ho neukladá vo vašom zariadení.";
 
 /* Users can request a report of their account data. This is the subtitle on the screen where they do this, giving them more information. */
-"ACCOUNT_DATA_REPORT_SUBTITLE" = "Stiahnite a exportujte si prehľad údajov svojho Signal účtu. Tento prehľad neobsahuje žiadne správy ani médiá.";
+"ACCOUNT_DATA_REPORT_SUBTITLE" = "Stiahnite a exportujte si prehľad údajov svojho Radar účtu. Tento prehľad neobsahuje žiadne správy ani médiá.";
 
 /* Users can request a report of their account data. This is the title on the screen where they do this. */
 "ACCOUNT_DATA_REPORT_TITLE" = "Údaje o vašom účte";
@@ -83,7 +83,7 @@
 "ACTION_VIDEO_CALL" = "Videohovor";
 
 /* Label for 'voice call' button in contact view. */
-"ACTION_VOICE_CALL" = "Signal hovor";
+"ACTION_VOICE_CALL" = "Radar hovor";
 
 /* The title for the 'add group members' view. */
 "ADD_GROUP_MEMBERS_VIEW_TITLE" = "Pridať členov";
@@ -203,16 +203,16 @@
 "APN_Message" = "Pravdepodobne máte nové správy";
 
 /* Default message for the 'app launch failed' alert. */
-"APP_LAUNCH_FAILURE_ALERT_MESSAGE" = "Signal sa nedá spustiť. Pošlite, prosím, denník ladenia na support@signal.org, aby sme mohli tento problém vyriešiť.";
+"APP_LAUNCH_FAILURE_ALERT_MESSAGE" = "Radar sa nedá spustiť. Pošlite, prosím, denník ladenia na support@radar.chat, aby sme mohli tento problém vyriešiť.";
 
 /* Button to try launching the app even though the last launch failed */
-"APP_LAUNCH_FAILURE_CONTINUE" = "Namiesto toho otvorte Signal";
+"APP_LAUNCH_FAILURE_CONTINUE" = "Namiesto toho otvorte Radar";
 
 /* Message for an error indicating that the app couldn't launch because some unexpected error happened with the user's registration status. */
-"APP_LAUNCH_FAILURE_CORRUPT_REGISTRATION_MESSAGE" = "Pošlite nám denník ladenia (debug log) na adresu support@signal.org, aby sme mohli daný problém vyriešiť.";
+"APP_LAUNCH_FAILURE_CORRUPT_REGISTRATION_MESSAGE" = "Pošlite nám denník ladenia (debug log) na adresu support@radar.chat, aby sme mohli daný problém vyriešiť.";
 
 /* Title for an error indicating that the app couldn't launch because some unexpected error happened with the user's registration status. */
-"APP_LAUNCH_FAILURE_CORRUPT_REGISTRATION_TITLE" = "Signal sa nepodarilo otvoriť";
+"APP_LAUNCH_FAILURE_CORRUPT_REGISTRATION_TITLE" = "Radar sa nepodarilo otvoriť";
 
 /* Error indicating that the app could not launch because the database could not be loaded. */
 "APP_LAUNCH_FAILURE_COULD_NOT_LOAD_DATABASE" = "Nepodarilo sa načítať databázu";
@@ -224,19 +224,19 @@
 "APP_LAUNCH_FAILURE_INVALID_DATABASE_VERSION_TITLE" = "Neznáma verzia databázy";
 
 /* Error indicating that the app crashed during the previous launch. */
-"APP_LAUNCH_FAILURE_LAST_LAUNCH_CRASHED_MESSAGE" = "Pri pokuse o otvorenie sa vyskytol problém so Signal. Pošlite ladiaci záznam na adresu support@signal.org, aby ste pomohli vyriešiť tento problém.";
+"APP_LAUNCH_FAILURE_LAST_LAUNCH_CRASHED_MESSAGE" = "Pri pokuse o otvorenie sa vyskytol problém so Radar. Pošlite ladiaci záznam na adresu support@radar.chat, aby ste pomohli vyriešiť tento problém.";
 
 /* Error indicating that the app crashed during the previous launch. */
-"APP_LAUNCH_FAILURE_LAST_LAUNCH_CRASHED_TITLE" = "Signal sa nepodarilo otvoriť";
+"APP_LAUNCH_FAILURE_LAST_LAUNCH_CRASHED_TITLE" = "Radar sa nepodarilo otvoriť";
 
 /* Error description indicating that the app crashed because there was low storage space available on the device. */
-"APP_LAUNCH_FAILURE_LOW_STORAGE_SPACE_AVAILABLE_MESSAGE" = "Signal sa nepodarilo otvoriť, pretože v pamäti vášho zariadenia nie je dostatok voľného miesta. Ak chcete používať Signal, uvoľnite miesto spravovaním úložiska v Nastaveniach.";
+"APP_LAUNCH_FAILURE_LOW_STORAGE_SPACE_AVAILABLE_MESSAGE" = "Radar sa nepodarilo otvoriť, pretože v pamäti vášho zariadenia nie je dostatok voľného miesta. Ak chcete používať Radar, uvoľnite miesto spravovaním úložiska v Nastaveniach.";
 
 /* Error title indicating that the app crashed because there was low storage space available on the device. */
 "APP_LAUNCH_FAILURE_LOW_STORAGE_SPACE_AVAILABLE_TITLE" = "Nedostatok úložného priestoru";
 
 /* Error indicating that the app could not restore transferred data. */
-"APP_LAUNCH_FAILURE_RESTORE_FAILED_MESSAGE" = "Údaje prenesené z vášho starého zariadenia sa nepodarilo obnoviť. Odošlite denník ladenia na adresu support@signal.org, aby sme mohli tento problém vyriešiť. Ak Signal preinštalujete, môžete prísť o vašu históriu správ.";
+"APP_LAUNCH_FAILURE_RESTORE_FAILED_MESSAGE" = "Údaje prenesené z vášho starého zariadenia sa nepodarilo obnoviť. Odošlite denník ladenia na adresu support@radar.chat, aby sme mohli tento problém vyriešiť. Ak Radar preinštalujete, môžete prísť o vašu históriu správ.";
 
 /* Error indicating that the app could not restore transferred data. */
 "APP_LAUNCH_FAILURE_RESTORE_FAILED_TITLE" = "Prenos sa nepodarilo dokončiť";
@@ -260,7 +260,7 @@
 "APP_UPDATE_NAG_ALERT_MESSAGE_FORMAT" = "V App Store je dostupná verzia %1$@.";
 
 /* Title for the 'new app version available' alert. */
-"APP_UPDATE_NAG_ALERT_TITLE" = "Je k dispozícii nová verzia Signal";
+"APP_UPDATE_NAG_ALERT_TITLE" = "Je k dispozícii nová verzia Radar";
 
 /* Label for the 'update' button in the 'new app version available' alert. */
 "APP_UPDATE_NAG_ALERT_UPDATE_BUTTON" = "Aktualizovať";
@@ -410,7 +410,7 @@
 "ATTACHMENT_KEYBOARD_GIF" = "GIF";
 
 /* Text in chat attachment panel when Signal only has access to some photos/videos. This string is in a compact horizontal space, so it should be short if possible. */
-"ATTACHMENT_KEYBOARD_LIMITED_ACCESS" = "Signal má obmedzený prístup k fotkám";
+"ATTACHMENT_KEYBOARD_LIMITED_ACCESS" = "Radar má obmedzený prístup k fotkám";
 
 /* A button to select a location from the Attachment Keyboard */
 "ATTACHMENT_KEYBOARD_LOCATION" = "Poloha";
@@ -422,7 +422,7 @@
 "ATTACHMENT_KEYBOARD_NO_MEDIA_TITLE" = "Žiadne fotky ani videá";
 
 /* Text in chat attachment panel explaining that user needs to give Signal permission to access photos. */
-"ATTACHMENT_KEYBOARD_NO_PHOTO_ACCESS" = "Signal nemá prístup k vašim fotografiám alebo videám. Ak chcete povoliť prístup, otvorte Nastavenia a ťuknite na Fotky";
+"ATTACHMENT_KEYBOARD_NO_PHOTO_ACCESS" = "Radar nemá prístup k vašim fotografiám alebo videám. Ak chcete povoliť prístup, otvorte Nastavenia a ťuknite na Fotky";
 
 /* Button in chat attachment panel to let user open Settings app and give Signal persmission to access photos. */
 "ATTACHMENT_KEYBOARD_OPEN_SETTINGS" = "Otvoriť nastavenia";
@@ -569,7 +569,7 @@
 "BACKUP_ONBOARDING_CANCEL_SHEET_TITLE" = "Ukončiť nastavenie zálohovania?";
 
 /* Body for a sheet warning users to their 'Recovery Key' safe. */
-"BACKUP_ONBOARDING_CONFIRM_KEY_KEEP_KEY_SAFE_SHEET_BODY" = "Signal vám nebude môcť pomôcť obnoviť zálohu, ak stratíte kľúč. Uschovajte ho na bezpečnom mieste a s nikým ho nezdieľajte.";
+"BACKUP_ONBOARDING_CONFIRM_KEY_KEEP_KEY_SAFE_SHEET_BODY" = "Radar vám nebude môcť pomôcť obnoviť zálohu, ak stratíte kľúč. Uschovajte ho na bezpečnom mieste a s nikým ho nezdieľajte.";
 
 /* Title for a sheet warning users to their 'Recovery Key' safe. */
 "BACKUP_ONBOARDING_CONFIRM_KEY_KEEP_KEY_SAFE_SHEET_TITLE" = "Uchovajte svoj kľúč v bezpečí";
@@ -596,10 +596,10 @@
 "BACKUP_ONBOARDING_INTRO_NOT_NOW_TOAST" = "Zálohovanie môžete povoliť v Nastaveniach.";
 
 /* Subtitle for a view introducing Backups during an onboarding flow. */
-"BACKUP_ONBOARDING_INTRO_SUBTITLE" = "Zálohujte si správy a médiá pomocou bezpečnej úložnej služby Signal chránenej end-to-end šifrovaním. Odteraz už pri výmene telefónu alebo opätovnom nainštalovaní Signalu neprídete ani o jednu správu.";
+"BACKUP_ONBOARDING_INTRO_SUBTITLE" = "Zálohujte si správy a médiá pomocou bezpečnej úložnej služby Radar chránenej end-to-end šifrovaním. Odteraz už pri výmene telefónu alebo opätovnom nainštalovaní Radaru neprídete ani o jednu správu.";
 
 /* Title for a view introducing Backups during an onboarding flow. */
-"BACKUP_ONBOARDING_INTRO_TITLE" = "Bezpečné Zálohy Signal";
+"BACKUP_ONBOARDING_INTRO_TITLE" = "Bezpečné Zálohy Radar";
 
 /* Text for a bullet point in a view introducing the 'Recovery Key' during an onboarding flow. */
 "BACKUP_ONBOARDING_KEY_INTRO_BULLET_1" = "Váš kľúč na obnovenie je 64-miestny kód, ktorý budete potrebovať na obnovenie zálohy.";
@@ -617,10 +617,10 @@
 "BACKUP_ONBOARDING_KEY_INTRO_TITLE" = "Kľúč na obnovenie";
 
 /* Body for a sheet shown when your Backup plan is downgraded. */
-"BACKUP_PLAN_DOWNGRADED_SHEET_BODY" = "Platnosť vášho predplatného záloh vypršala, pretože ho nebolo možné obnoviť pomocou vášho spôsobu platby.\n\nAk chcete zálohovať médiá aj naďalej, môžete si ho znova predplatiť. Naďalej budete mať prístup k bezplatnému plánu Záloh Signal.";
+"BACKUP_PLAN_DOWNGRADED_SHEET_BODY" = "Platnosť vášho predplatného záloh vypršala, pretože ho nebolo možné obnoviť pomocou vášho spôsobu platby.\n\nAk chcete zálohovať médiá aj naďalej, môžete si ho znova predplatiť. Naďalej budete mať prístup k bezplatnému plánu Záloh Radar.";
 
 /* Body for a sheet shown when your Backup plan is downgraded because you stopped using TestFlight. */
-"BACKUP_PLAN_DOWNGRADED_SHEET_BODY_TESTFLIGHT" = "Vaše predplatné záloh vypršalo, pretože už nepoužívate TestFlight.\n\nAk chcete zálohovať médiá aj naďalej, môžete si ho znova predplatiť. Naďalej budete mať prístup k bezplatnému plánu Záloh Signal.";
+"BACKUP_PLAN_DOWNGRADED_SHEET_BODY_TESTFLIGHT" = "Vaše predplatné záloh vypršalo, pretože už nepoužívate TestFlight.\n\nAk chcete zálohovať médiá aj naďalej, môžete si ho znova predplatiť. Naďalej budete mať prístup k bezplatnému plánu Záloh Radar.";
 
 /* Primary button for a sheet shown when your Backup plan is downgraded. */
 "BACKUP_PLAN_DOWNGRADED_SHEET_PRIMARY_BUTTON" = "Spravovať zálohy";
@@ -659,7 +659,7 @@
 "BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_SHEET_GO_TO_SETTINGS_BUTTON" = "Prejsť na Nastavenia";
 
 /* Message for a sheet warning the user about the Background App Refresh permission. \"Background App Refresh\" should be localized the same way it is in iOS Settings app permissions. */
-"BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_SHEET_MESSAGE" = "Ak chcete, aby Signal automaticky zálohoval vaše správy, ťuknite na „Prejsť na nastavenia“ nižšie a povoľte „Obnovenie aplikácie na pozadí“";
+"BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_SHEET_MESSAGE" = "Ak chcete, aby Radar automaticky zálohoval vaše správy, ťuknite na „Prejsť na nastavenia“ nižšie a povoľte „Obnovenie aplikácie na pozadí“";
 
 /* Title for a sheet warning the user about the Background App Refresh permission. \"Background App Refresh\" should be localized the same way it is in iOS Settings app permissions. */
 "BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_SHEET_TITLE" = "Automatické zálohovanie je vypnuté";
@@ -746,7 +746,7 @@
 "BACKUP_SETTINGS_BACKUP_PLAN_PAID_BUT_IAP_NOT_FOUND_LOCALLY_ACTION_BUTTON_TITLE" = "Obnoviť";
 
 /* Text describing that the user's paid backup plan did not correspond to a App Store subscription on this device. */
-"BACKUP_SETTINGS_BACKUP_PLAN_PAID_BUT_IAP_NOT_FOUND_LOCALLY_DESCRIPTION" = "Predplatné sa na tomto zariadení nenašlo. Obnovte ho, aby ste mohli Zálohy Signal používať aj naďalej.";
+"BACKUP_SETTINGS_BACKUP_PLAN_PAID_BUT_IAP_NOT_FOUND_LOCALLY_DESCRIPTION" = "Predplatné sa na tomto zariadení nenašlo. Obnovte ho, aby ste mohli Zálohy Radar používať aj naďalej.";
 
 /* Header describing what the paid backup plan includes. */
 "BACKUP_SETTINGS_BACKUP_PLAN_PAID_HEADER" = "Zálohovanie všetkých správ a médií";
@@ -758,16 +758,16 @@
 "BACKUP_SETTINGS_BACKUP_PLAN_PAID_RENEWAL_FORMAT" = "Obnoví sa %1$@";
 
 /* Footer for a menu section related to settings for when Backups are disabled. */
-"BACKUP_SETTINGS_BACKUPS_DISABLED_SECTION_FOOTER" = "Zálohovanie bolo vypnuté a vaše údaje boli vymazané zo zabezpečeného úložiska Signal.";
+"BACKUP_SETTINGS_BACKUPS_DISABLED_SECTION_FOOTER" = "Zálohovanie bolo vypnuté a vaše údaje boli vymazané zo zabezpečeného úložiska Radar.";
 
 /* Description for a progress view tracking media being downloaded in service of disabling Backups. */
-"BACKUP_SETTINGS_BACKUPS_DISABLING_DOWNLOADING_MEDIA_PROGRESS_VIEW_DESCRIPTION" = "Zálohovanie bolo vypnuté. Všetky médiá, ktoré nie sú v zariadení, sa práve sťahujú. Po stiahnutí budú vaše údaje vymazané zo zabezpečeného úložiska Signal.";
+"BACKUP_SETTINGS_BACKUPS_DISABLING_DOWNLOADING_MEDIA_PROGRESS_VIEW_DESCRIPTION" = "Zálohovanie bolo vypnuté. Všetky médiá, ktoré nie sú v zariadení, sa práve sťahujú. Po stiahnutí budú vaše údaje vymazané zo zabezpečeného úložiska Radar.";
 
 /* Message for a view indicating we failed to delete the user's Backup due to an unexpected error. */
 "BACKUP_SETTINGS_BACKUPS_DISABLING_GENERIC_ERROR_MESSAGE" = "Vyskytla sa chyba. Kontaktujte náš tím podpory.";
 
 /* Header for a menu section related to settings for when disabling Backups encountered an unexpected error. */
-"BACKUP_SETTINGS_BACKUPS_DISABLING_GENERIC_ERROR_SECTION_HEADER" = "Pri vymazávaní vašich údajov zo zabezpečeného úložiska Signal sa vyskytla chyba.";
+"BACKUP_SETTINGS_BACKUPS_DISABLING_GENERIC_ERROR_SECTION_HEADER" = "Pri vymazávaní vašich údajov zo zabezpečeného úložiska Radar sa vyskytla chyba.";
 
 /* Title for a view indicating we failed to delete the user's Backup due to an unexpected error. */
 "BACKUP_SETTINGS_BACKUPS_DISABLING_GENERIC_ERROR_TITLE" = "Zálohu sa nepodarilo odstrániť";
@@ -776,7 +776,7 @@
 "BACKUP_SETTINGS_BACKUPS_DISABLING_PROGRESS_VIEW_DESCRIPTION" = "Odstraňuje sa záloha…";
 
 /* Header for a menu section related to disabling Backups. */
-"BACKUP_SETTINGS_BACKUPS_DISABLING_SECTION_HEADER" = "Zálohovanie bolo vypnuté a vaše údaje budú vymazané zo zabezpečeného úložiska Signal.";
+"BACKUP_SETTINGS_BACKUPS_DISABLING_SECTION_HEADER" = "Zálohovanie bolo vypnuté a vaše údaje budú vymazané zo zabezpečeného úložiska Radar.";
 
 /* Header for a menu section related to settings for when Backups are enabled. */
 "BACKUP_SETTINGS_BACKUPS_ENABLED_SECTION_HEADER" = "Podrobnosti o zálohe";
@@ -824,13 +824,13 @@
 "BACKUP_SETTINGS_DISABLING_CONFIRMATION_ACTION_SHEET_TITLE" = "Vypnúť a vymazať zálohy?";
 
 /* Message shown in an action sheet when the user disables Backups, explaining that their media is downloading first. */
-"BACKUP_SETTINGS_DISABLING_DOWNLOADS_STARTED_ACTION_SHEET_MESSAGE" = "V zálohe máte médiá, ktoré nie sú na tomto zariadení. Sťahovanie zálohy môže trvať dlho. Ak nechcete, aby sa prerušilo, nezatvárajte Signal.";
+"BACKUP_SETTINGS_DISABLING_DOWNLOADS_STARTED_ACTION_SHEET_MESSAGE" = "V zálohe máte médiá, ktoré nie sú na tomto zariadení. Sťahovanie zálohy môže trvať dlho. Ak nechcete, aby sa prerušilo, nezatvárajte Radar.";
 
 /* Title shown in an action sheet when the user disables Backups, explaining that their media is downloading first. */
 "BACKUP_SETTINGS_DISABLING_DOWNLOADS_STARTED_ACTION_SHEET_TITLE" = "Sťahuje sa záloha";
 
 /* Message shown in an action sheet indicating we failed to delete the user's Backup due to an unexpected error. */
-"BACKUP_SETTINGS_DISABLING_ERROR_GENERIC_ERROR_ACTION_SHEET_MESSAGE" = "Pri vymazávaní vašich údajov zo zabezpečeného úložiska Signal sa vyskytla chyba.";
+"BACKUP_SETTINGS_DISABLING_ERROR_GENERIC_ERROR_ACTION_SHEET_MESSAGE" = "Pri vymazávaní vašich údajov zo zabezpečeného úložiska Radar sa vyskytla chyba.";
 
 /* Title shown in an action sheet indicating we failed to delete the user's Backup due to an unexpected error. */
 "BACKUP_SETTINGS_DISABLING_ERROR_GENERIC_ERROR_ACTION_SHEET_TITLE" = "Zálohu sa nepodarilo odstrániť";
@@ -842,7 +842,7 @@
 "BACKUP_SETTINGS_DISABLING_SUBSCRIPTION_CANCEL_ACTION_SHEET_MANAGE_SUBSCRIPTION_BUTTON" = "Spravovať predplatné";
 
 /* Message for an action sheet shown when the user disables Backups, but is still subscribed to the paid plan. */
-"BACKUP_SETTINGS_DISABLING_SUBSCRIPTION_CANCEL_ACTION_SHEET_MESSAGE" = "Ak chcete zrušiť svoje predplatné, ťuknite na Spravovať predplatné > Signal > Zrušiť predplatné";
+"BACKUP_SETTINGS_DISABLING_SUBSCRIPTION_CANCEL_ACTION_SHEET_MESSAGE" = "Ak chcete zrušiť svoje predplatné, ťuknite na Spravovať predplatné > Radar > Zrušiť predplatné";
 
 /* Title for an action sheet shown when the user disables Backups, but is still subscribed to the paid plan. */
 "BACKUP_SETTINGS_DISABLING_SUBSCRIPTION_CANCEL_ACTION_SHEET_TITLE" = "Stále máte aktívny platený plán záloh";
@@ -920,7 +920,7 @@
 "BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_DOWNLOAD_SHEET_LATER_ACTION" = "Stiahnuť neskôr";
 
 /* Message for an action sheet allowing users to download their offloaded media. */
-"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_DOWNLOAD_SHEET_MESSAGE" = "V zálohe máte médiá, ktoré nie sú na tomto zariadení. Sťahovanie môže trvať dlho. Ak nechcete, aby sa prerušilo, nezatvárajte Signal.";
+"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_DOWNLOAD_SHEET_MESSAGE" = "V zálohe máte médiá, ktoré nie sú na tomto zariadení. Sťahovanie môže trvať dlho. Ak nechcete, aby sa prerušilo, nezatvárajte Radar.";
 
 /* Action in an action sheet allowing users to download their offloaded media now. */
 "BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_DOWNLOAD_SHEET_NOW_ACTION" = "Stiahnuť teraz";
@@ -941,13 +941,13 @@
 "BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_TOGGLE_FOOTER_AVAILABLE_FOR_TESTERS" = "Nepoužívané médiá budú presunuté, môžete si ich však kedykoľvek stiahnuť zo zálohy, pokým používate TestFlight.";
 
 /* Footer for a toggle allowing users to change the Optimize Local Storage setting, if the toggle is unavailable. */
-"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_TOGGLE_FOOTER_UNAVAILABLE" = "Optimalizáciu úložiska je možné využiť iba v prípade, ak používate platenú verziu Záloh Signal. Ak chcete používať túto funkciu, aktualizujte svoj plán zálohovania.";
+"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_TOGGLE_FOOTER_UNAVAILABLE" = "Optimalizáciu úložiska je možné využiť iba v prípade, ak používate platenú verziu Záloh Radar. Ak chcete používať túto funkciu, aktualizujte svoj plán zálohovania.";
 
 /* Title for a toggle allowing users to change the Optimize Local Storage setting. */
 "BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_TOGGLE_TITLE" = "Optimalizovať úložisko na zariadení";
 
 /* Subtitle for a notification telling the user they are out of remote storage space. */
-"BACKUP_SETTINGS_OUT_OF_STORAGE_SPACE_NOTIFICATION_SUBTITLE" = "Dosiahli ste limit úložného priestoru. Ak chcete pokračovať v zálohovaní četov a médií, uvoľnite miesto v aplikácii Signal.";
+"BACKUP_SETTINGS_OUT_OF_STORAGE_SPACE_NOTIFICATION_SUBTITLE" = "Dosiahli ste limit úložného priestoru. Ak chcete pokračovať v zálohovaní četov a médií, uvoľnite miesto v aplikácii Radar.";
 
 /* Title for a notification telling the user they are out of remote storage space. */
 "BACKUP_SETTINGS_OUT_OF_STORAGE_SPACE_NOTIFICATION_TITLE" = "Úložný priestor je plný";
@@ -971,7 +971,7 @@
 "BACKUP_SETTINGS_SUBSCRIPTION_ALREADY_REDEEMED_NOTICE_TITLE" = "Vaše predplatné záloh sa nepodarilo uplatniť";
 
 /* Body for a sheet explaining that the user's Backups subscription was already redeemed. */
-"BACKUP_SETTINGS_SUBSCRIPTION_ALREADY_REDEEMED_SHEET_BODY" = "Vaše predplatné ste sa tento mesiac pokúsili uplatniť na príliš veľa zariadeniach.\n\nMožno ste svoj Signal účet opätovne zaregistrovali príliš veľakrát alebo ste svoje predplatné využili na príliš veľa zariadeniach.";
+"BACKUP_SETTINGS_SUBSCRIPTION_ALREADY_REDEEMED_SHEET_BODY" = "Vaše predplatné ste sa tento mesiac pokúsili uplatniť na príliš veľa zariadeniach.\n\nMožno ste svoj Radar účet opätovne zaregistrovali príliš veľakrát alebo ste svoje predplatné využili na príliš veľa zariadeniach.";
 
 /* Button for a sheet explaining that the user's Backups subscription was already redeemed. */
 "BACKUP_SETTINGS_SUBSCRIPTION_ALREADY_REDEEMED_SHEET_GOT_IT_BUTTON" = "Rozumiem";
@@ -998,13 +998,13 @@
 "BACKUP_SETTINGS_UPLOAD_PROGRESS_SUBTITLE_RUNNING" = "Nahráva sa %1$@ z %2$@ (%3$@)";
 
 /* Message for a sheet shown after the user enables backups. */
-"BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_MESSAGE" = "V závislosti od veľkosti zálohy to môže trvať dlhšie. Počas zálohovania môžete Signal používať ako obvykle.";
+"BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_MESSAGE" = "V závislosti od veľkosti zálohy to môže trvať dlhšie. Počas zálohovania môžete Radar používať ako obvykle.";
 
 /* Title for a sheet shown after the user enables backups. */
-"BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_TITLE" = "Vitajte v Bezpečných zálohách Signal. Môžete spustiť zálohovanie.";
+"BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_TITLE" = "Vitajte v Bezpečných zálohách Radar. Môžete spustiť zálohovanie.";
 
 /* Message for a sheet shown when your Backup subscription fails to renew. */
-"BACKUP_SUBSCRIPTION_FAILED_TO_RENEW_SHEET_MESSAGE" = "Skontrolujte, či je váš spôsob platby aktuálny. Ťuknite na Spravovať predplatné > Signal > Aktualizovať spôsob platby.";
+"BACKUP_SUBSCRIPTION_FAILED_TO_RENEW_SHEET_MESSAGE" = "Skontrolujte, či je váš spôsob platby aktuálny. Ťuknite na Spravovať predplatné > Radar > Aktualizovať spôsob platby.";
 
 /* Primary button for a sheet shown when your Backup subscription fails to renew. */
 "BACKUP_SUBSCRIPTION_FAILED_TO_RENEW_SHEET_PRIMARY_BUTTON" = "Spravovať predplatné";
@@ -1022,7 +1022,7 @@
 "BACKUPS_SETTINGS_TITLE" = "Bezpečné zálohy";
 
 /* Body for system notification or megaphone when backups is enabled. Embeds {{ time backups was enabled }} */
-"BACKUPS_TURNED_ON_NOTIFICATION_BODY_FORMAT" = "Zálohy Signal boli pre tento účet zapnuté o %1$@. Ťuknutím zistíte viac.";
+"BACKUPS_TURNED_ON_NOTIFICATION_BODY_FORMAT" = "Zálohy Radar boli pre tento účet zapnuté o %1$@. Ťuknutím zistíte viac.";
 
 /* Title for system notification or megaphone when backups is enabled */
 "BACKUPS_TURNED_ON_TITLE" = "Zapli ste zálohovanie";
@@ -1040,7 +1040,7 @@
 "BADGE_DETAILS_DONATE_TO_SIGNAL" = "Prispieť teraz";
 
 /* When viewing someone else's donor badge, you'll see a sheet. This is the title on that sheet. Embeds {badge owner's short name} */
-"BADGE_DETAILS_TITLE_FOR_SUPPORTER" = "%1$@ podporuje Signal";
+"BADGE_DETAILS_TITLE_FOR_SUPPORTER" = "%1$@ podporuje Radar";
 
 /* String explaining to the user that their boost badge has expired on the badge expiry sheet. */
 "BADGE_EXPIRED_BOOST_BODY" = "Platnosť vášho odznaku Boost vypršala a už sa vo vašom profile ďalej nezobrazuje.\n\nSignal môžete používať aj naďalej, ale ak chcete podporiť technológiu, ktorá je vytvorená pre vás, zvážte možnosť stať sa mesačným prispievateľom.";
@@ -1088,7 +1088,7 @@
 "BANK_DONATION_FOOTER_FIND_ACCOUNT_INFO" = "Nájsť informácie o účte";
 
 /* On the bank transfer donation screen, a small amount of information text is shown. This is that text. It should (1) instruct users to enter their bank information (2) tell them that Signal does not collect or store their personal information. */
-"BANK_DONATION_SUBHEADER_TEXT" = "Zadajte svoje bankové údaje. Signal nezhromažďuje ani neukladá vaše osobné údaje.";
+"BANK_DONATION_SUBHEADER_TEXT" = "Zadajte svoje bankové údaje. Radar nezhromažďuje ani neukladá vaše osobné údaje.";
 
 /* Users can donate to Signal with a bank account. We are required to show them a mandate with information about bank transfers. This is a label for a button to agree to the mandate. */
 "BANK_MANDATE_AGREE" = "Súhlasím";
@@ -1097,7 +1097,7 @@
 "BANK_MANDATE_READ_MORE" = "Dočítať sa viac";
 
 /* Users can donate to Signal with a bank account. We are required to show them a mandate with information about bank transfers. This is a subtitle about the payment processor Stripe above that mandate. */
-"BANK_MANDATE_SUBTITLE" = "Príspevky pre Signal spracováva Stripe. Signal nezhromažďuje ani neukladá vaše osobné údaje.";
+"BANK_MANDATE_SUBTITLE" = "Príspevky pre Radar spracováva Stripe. Radar nezhromažďuje ani neukladá vaše osobné údaje.";
 
 /* Users can donate to Signal with a bank account. We are required to show them a mandate with information about bank transfers. This is the title above that mandate. */
 "BANK_MANDATE_TITLE" = "Bankový prevod";
@@ -1319,7 +1319,7 @@
 "CALL_LINK_JOIN_REQUEST_PROMPT" = "Chce sa pridať…";
 
 /* Shown in a message bubble when you send a call link in a Signal chat */
-"CALL_LINK_LINK_PREVIEW_DESCRIPTION" = "Na pripojenie k Signal hovoru použite tento odkaz";
+"CALL_LINK_LINK_PREVIEW_DESCRIPTION" = "Na pripojenie k Radar hovoru použite tento odkaz";
 
 /* Text that appears on a toast in a call lobby before joining a call link informing the user what information will be shared with other call members when they have phone number sharing turned off. */
 "CALL_LINK_LOBBY_SHARING_INFO_PHONE_NUMBER_SHARING_OFF" = "Každý, kto sa pripojí k tomuto hovoru prostredníctvom odkazu, uvidí vaše meno a fotku.";
@@ -1343,7 +1343,7 @@
 "CALL_LINK_REQUIRE_APPROVAL" = "Vyžadovať schválenie administrátorom";
 
 /* Button to open UI to share a Call Link with someone on Signal. */
-"CALL_LINK_SHARE_VIA_SIGNAL" = "Zdieľať odkaz cez Signal";
+"CALL_LINK_SHARE_VIA_SIGNAL" = "Zdieľať odkaz cez Radar";
 
 /* Button to open the system share sheet to share a Call Link. */
 "CALL_LINK_SHARE_VIA_SYSTEM" = "Zdieľať odkaz";
@@ -1448,10 +1448,10 @@
 "CALLING_MEMBER_VIEW_YOUR_CAMERA_IS_OFF" = "Váš fotoaparát je vypnutý";
 
 /* The generic name used for calls if CallKit privacy is enabled */
-"CALLKIT_ANONYMOUS_CONTACT_NAME" = "Používateľ Signal";
+"CALLKIT_ANONYMOUS_CONTACT_NAME" = "Používateľ Radar";
 
 /* The generic name used for group calls if CallKit privacy is enabled */
-"CALLKIT_ANONYMOUS_GROUP_NAME" = "Signal skupina";
+"CALLKIT_ANONYMOUS_GROUP_NAME" = "Radar skupina";
 
 /* Title for the calls list view. */
 "CALLS_LIST_TITLE" = "Volania";
@@ -1625,7 +1625,7 @@
 "CARD_DONATION_EXPIRATION_DATE_PLACEHOLDER" = "MM/RR";
 
 /* Users can choose to learn more about their credit/debit card donations, which will open a sheet with additional information. This is the body text of that sheet. */
-"CARD_DONATION_READ_MORE_SHEET_BODY" = "Počas vášho prispievania na Signal nezhromažďujeme ani neukladáme žiadne vaše osobné údaje.\n\nNa prijímanie vašich príspevkov a spracovanie platieb používame službu Stripe. K údajom, ktoré v rámci tejto platobnej brány poskytnete, nemáme prístup ani ich neukladáme.Signal si nespája a ani si nemôže spojiť váš príspevok s vaším Signal účtom.\n\nĎakujeme za vašu podporu!";
+"CARD_DONATION_READ_MORE_SHEET_BODY" = "Počas vášho prispievania na Radar nezhromažďujeme ani neukladáme žiadne vaše osobné údaje.\n\nNa prijímanie vašich príspevkov a spracovanie platieb používame službu Stripe. K údajom, ktoré v rámci tejto platobnej brány poskytnete, nemáme prístup ani ich neukladáme.Radar si nespája a ani si nemôže spojiť váš príspevok s vaším Radar účtom.\n\nĎakujeme za vašu podporu!";
 
 /* Users can choose to learn more about their credit/debit card donations, which will open a sheet with additional information. This is the title of that sheet. */
 "CARD_DONATION_READ_MORE_SHEET_TITLE" = "Vaše údaje sú súkromné";
@@ -1634,7 +1634,7 @@
 "CARD_DONATION_SUBHEADER_LEARN_MORE" = "Dozvedieť sa viac.";
 
 /* On the credit/debit card donation screen, a small amount of information text is shown. This is that text. It should (1) instruct users to enter their credit/debit card information (2) tell them that Signal does not collect or store their personal information. */
-"CARD_DONATION_SUBHEADER_TEXT" = "Zadajte údaje z platobnej karty. Signal nezhromažďuje ani neukladá vaše osobné údaje.";
+"CARD_DONATION_SUBHEADER_TEXT" = "Zadajte údaje z platobnej karty. Radar nezhromažďuje ani neukladá vaše osobné údaje.";
 
 /* Title for the 'censorship circumvention country' view. */
 "CENSORSHIP_CIRCUMVENTION_COUNTRY_VIEW_TITLE" = "Vyberte krajinu";
@@ -1772,7 +1772,7 @@
 "COMPARE_SAFETY_NUMBER_ACTION" = "Porovnať so schránkou";
 
 /* Accessibility hint describing what you can do with the compose button */
-"COMPOSE_BUTTON_HINT" = "Vyberte alebo nájdite používateľa Signal, s ktorým chcete začať čet.";
+"COMPOSE_BUTTON_HINT" = "Vyberte alebo nájdite používateľa Radar, s ktorým chcete začať čet.";
 
 /* Accessibility label from compose button. */
 "COMPOSE_BUTTON_LABEL" = "Skladať";
@@ -1799,13 +1799,13 @@
 "COMPOSE_SCREEN_LIMITED_CONTACTS_CTA" = "Spravovať";
 
 /* Multi-line label explaining why compose-screen contact picker is empty. */
-"COMPOSE_SCREEN_LIMITED_CONTACTS_PERMISSION" = "Signal má obmedzený prístup k vašim systémovým kontaktom";
+"COMPOSE_SCREEN_LIMITED_CONTACTS_PERMISSION" = "Radar má obmedzený prístup k vašim systémovým kontaktom";
 
 /* Button to open settings from an empty compose-screen contact picker. */
 "COMPOSE_SCREEN_MISSING_CONTACTS_CTA" = "Otvoriť nastavenia";
 
 /* Multi-line label explaining why compose-screen contact picker is empty. */
-"COMPOSE_SCREEN_MISSING_CONTACTS_PERMISSION" = "V aplikácii Nastavenia iOS môžete povoliť prístup ku kontaktom, aby ste videli, kto z vašich kontaktov používa Signal.";
+"COMPOSE_SCREEN_MISSING_CONTACTS_PERMISSION" = "V aplikácii Nastavenia iOS môžete povoliť prístup ku kontaktom, aby ste videli, kto z vašich kontaktov používa Radar.";
 
 /* Configure reactions title text */
 "CONFIGURE_REACTIONS" = "Prispôsobiť reakcie";
@@ -1847,10 +1847,10 @@
 "CONTACT_ABOUT_SHEET_PROFILE_NAMES_EDUCATION" = "Názvy profilov nie sú overené";
 
 /* Message for a tooltip that appears above a parenthesized name for another user, indicating that that name is the name the other user set for themself. Embeds {{name}} */
-"CONTACT_ABOUT_SHEET_SECONDARY_NAME_TOOLTIP_MESSAGE" = "„%1$@“ je profilové meno, ktoré si táto osoba nastavila v aplikácii Signal.";
+"CONTACT_ABOUT_SHEET_SECONDARY_NAME_TOOLTIP_MESSAGE" = "„%1$@“ je profilové meno, ktoré si táto osoba nastavila v aplikácii Radar.";
 
 /* A label indicating a user is a signal connection. */
-"CONTACT_ABOUT_SHEET_SIGNAL_CONNECTION_LABEL" = "Signal spojenie";
+"CONTACT_ABOUT_SHEET_SIGNAL_CONNECTION_LABEL" = "Radar spojenie";
 
 /* The title for a contact 'about' sheet. */
 "CONTACT_ABOUT_SHEET_TITLE" = "Detaily";
@@ -1892,7 +1892,7 @@
 "CONTACT_NOTE_TITLE" = "Poznámka";
 
 /* Body for contact permission action sheet */
-"CONTACT_PERMISSION_ACTION_SHEET_2_BODY" = "Ak chcete nájsť ľudí, ktorých v aplikácii Signal poznáte:";
+"CONTACT_PERMISSION_ACTION_SHEET_2_BODY" = "Ak chcete nájsť ľudí, ktorých v aplikácii Radar poznáte:";
 
 /* First step for contact permission action sheet */
 "CONTACT_PERMISSION_ACTION_SHEET_2_STEP_ONE" = "Ťuknite na “Prejsť na Nastavenia” nižšie";
@@ -1928,7 +1928,7 @@
 "CONTACT_PERMISSION_REMINDER_MEGAPHONE_BODY" = "Povoľte prístup k svojim kontaktom, aby ste ich mohli rýchlo nájsť.";
 
 /* Title for contact permission reminder megaphone */
-"CONTACT_PERMISSION_REMINDER_MEGAPHONE_TITLE" = "Nájdite kontakty v aplikácii Signal";
+"CONTACT_PERMISSION_REMINDER_MEGAPHONE_TITLE" = "Nájdite kontakty v aplikácii Radar";
 
 /* Label for a contact's phone number. */
 "CONTACT_PHONE" = "Telefón";
@@ -1952,7 +1952,7 @@
 "CONTACT_SHARE_INVALID_CONTACT" = "Neplatný kontakt.";
 
 /* Alert body when contacts disabled while trying to share a contact. */
-"CONTACT_SHARING_NO_ACCESS_BODY" = "Signal potrebuje prístup k vašim kontaktom. Prejdite do nastavení iOS a zapnite kontakty. Vaše kontakty sú šifrované a nie sú viditeľné pre službu Signal.";
+"CONTACT_SHARING_NO_ACCESS_BODY" = "Radar potrebuje prístup k vašim kontaktom. Prejdite do nastavení iOS a zapnite kontakty. Vaše kontakty sú šifrované a nie sú viditeľné pre službu Radar.";
 
 /* Alert title when contacts disabled while trying to share a contact. */
 "CONTACT_SHARING_NO_ACCESS_TITLE" = "Povoliť prístup ku kontaktom";
@@ -2006,7 +2006,7 @@
 "CONTACT_SUPPORT_FILTER_SOMETHING_NOT_WORKING_SHORT" = "Niečo nefunguje";
 
 /* Alert body */
-"CONTACT_SUPPORT_PROMPT_ERROR_ALERT_BODY" = "Signal nemohol dokončiť vašu žiadosť o zákaznícku podporu.";
+"CONTACT_SUPPORT_PROMPT_ERROR_ALERT_BODY" = "Radar nemohol dokončiť vašu žiadosť o zákaznícku podporu.";
 
 /* button text */
 "CONTACT_SUPPORT_PROMPT_ERROR_TRY_AGAIN" = "Skúste to znovu";
@@ -2135,7 +2135,7 @@
 "CONVERSATION_SETTINGS_ATTRIBUTES_ACCESS_SECTION_FOOTER" = "Vyberte, kto môže upraviť názov skupiny, fotografiu, popis a časovač miznúcich správ.";
 
 /* Footer string for a contact's badges in conversation settings */
-"CONVERSATION_SETTINGS_BADGES_FOOTER" = "Podporou Signal získate odznaky pre svoj profil. Klepnutím na odznak získate ďalšie informácie.";
+"CONVERSATION_SETTINGS_BADGES_FOOTER" = "Podporou Radar získate odznaky pre svoj profil. Klepnutím na odznak získate ďalšie informácie.";
 
 /* Header title for a contact's badges in conversation settings */
 "CONVERSATION_SETTINGS_BADGES_HEADER" = "Odznaky";
@@ -2393,7 +2393,7 @@
 "DATABASE_INTEGRITY_CHECK_ACTION_RUN" = "Spustiť";
 
 /* Message for alert before running a database integrity check */
-"DATABASE_INTEGRITY_CHECK_MESSAGE" = "Pomôže nám to vyriešiť váš problém, dokončenie však môže trvať niekoľko minút. Počas kontroly môžete Signal zavrieť, nezabudnite sa ale následne vrátiť a odoslať svoje záznamy.";
+"DATABASE_INTEGRITY_CHECK_MESSAGE" = "Pomôže nám to vyriešiť váš problém, dokončenie však môže trvať niekoľko minút. Počas kontroly môžete Radar zavrieť, nezabudnite sa ale následne vrátiť a odoslať svoje záznamy.";
 
 /* Button to skip database integrity check step */
 "DATABASE_INTEGRITY_CHECK_SKIP" = "Preskočiť";
@@ -2417,10 +2417,10 @@
 "DATABASE_RECOVERY_MORE_STORAGE_SPACE_NEEDED_TITLE" = "Vyžaduje sa viac úložného priestoru";
 
 /* The user has tried to recover their data after it was lost due to corruption. (They have not been hacked.) This is the description on the screen where we show an error message. */
-"DATABASE_RECOVERY_RECOVERY_FAILED_DESCRIPTION" = "Históriu správ sa nepodarilo obnoviť. Po preinštalovaní môžete Signal naďalej používať. Odošlite záznam s chybou, pomôže nám lepšie pochopiť, kde sa vyskytol problém.";
+"DATABASE_RECOVERY_RECOVERY_FAILED_DESCRIPTION" = "Históriu správ sa nepodarilo obnoviť. Po preinštalovaní môžete Radar naďalej používať. Odošlite záznam s chybou, pomôže nám lepšie pochopiť, kde sa vyskytol problém.";
 
 /* The user has tried to recover their data after it was lost due to corruption. (They have not been hacked.) This button lets them delete all of their data. */
-"DATABASE_RECOVERY_RECOVERY_FAILED_RESET_APP_BUTTON" = "Resetovať Signal";
+"DATABASE_RECOVERY_RECOVERY_FAILED_RESET_APP_BUTTON" = "Resetovať Radar";
 
 /* The user has tried to recover their data after it was lost due to corruption. (They have not been hacked.) If they want to delete the app and restart, they will be presented with a confirmation dialog. This is the final button they will press before their data is reset. */
 "DATABASE_RECOVERY_RECOVERY_FAILED_RESET_APP_CONFIRMATION_CONFIRM" = "Resetovať";
@@ -2429,7 +2429,7 @@
 "DATABASE_RECOVERY_RECOVERY_FAILED_RESET_APP_CONFIRMATION_DESCRIPTION" = "Informácie o vašom účte, profil a všetky správy budú vymazané. Po dokončení tohto procesu sa aplikácia zatvorí.";
 
 /* The user has tried to recover their data after it was lost due to corruption. (They have not been hacked.) If they want to delete the app and restart, they will be presented with a confirmation dialog. This is the title of that dialog. */
-"DATABASE_RECOVERY_RECOVERY_FAILED_RESET_APP_CONFIRMATION_TITLE" = "Resetovať Signal";
+"DATABASE_RECOVERY_RECOVERY_FAILED_RESET_APP_CONFIRMATION_TITLE" = "Resetovať Radar";
 
 /* The user has tried to recover their data after it was lost due to corruption. (They have not been hacked.) They were asked to submit a debug log. This is the button that submits this log. */
 "DATABASE_RECOVERY_RECOVERY_FAILED_SUBMIT_DEBUG_LOG_BUTTON" = "Odoslať denník ladenia";
@@ -2504,7 +2504,7 @@
 "DELETE_ACCOUNT_CONFIRMATION_ACTION_SHEEET_ACTION" = "Vymazať účet";
 
 /* Title for the action sheet message of the 'delete account confirmation' view controller. */
-"DELETE_ACCOUNT_CONFIRMATION_ACTION_SHEEET_MESSAGE" = "Týmto sa vymaže váš účet Signal a aplikácia sa resetuje. Aplikácia sa po dokončení tohto procesu zavrie.";
+"DELETE_ACCOUNT_CONFIRMATION_ACTION_SHEEET_MESSAGE" = "Týmto sa vymaže váš účet Radar a aplikácia sa resetuje. Aplikácia sa po dokončení tohto procesu zavrie.";
 
 /* Title for the action sheet confirmation title of the 'delete account confirmation' view controller. */
 "DELETE_ACCOUNT_CONFIRMATION_ACTION_SHEEET_TITLE" = "Naozaj chcete vymazať svoj účet?";
@@ -2528,7 +2528,7 @@
 "DELETE_ACCOUNT_CONFIRMATION_PHONE_NUMBER_TITLE" = "Telefónne číslo";
 
 /* Section header */
-"DELETE_ACCOUNT_CONFIRMATION_SECTION_TITLE" = "Potvrďte svoje Signal číslo";
+"DELETE_ACCOUNT_CONFIRMATION_SECTION_TITLE" = "Potvrďte svoje Radar číslo";
 
 /* Title for the 'delete account' confirmation view. */
 "DELETE_ACCOUNT_CONFIRMATION_TITLE" = "Vymazať účet";
@@ -2575,7 +2575,7 @@
 
 
 /* Notification warning the user that they have been de-registered. */
-"DEREGISTRATION_NOTIFICATION" = "Na tomto zariadení ste boli odhlásení zo služby Signal.";
+"DEREGISTRATION_NOTIFICATION" = "Na tomto zariadení ste boli odhlásení zo služby Radar.";
 
 /* Button that lets users re-register using the same phone number. */
 "DEREGISTRATION_REREGISTER_BUTTON" = "Znovu zaregistrovať";
@@ -2653,7 +2653,7 @@
 "DEVICE_TRANSFER_CONTRACT_QR_CODE_BUTTON" = "Zmenšiť";
 
 /* An error indicating that the other device closed signal mid-transfer and it could not complete */
-"DEVICE_TRANSFER_ERROR_BACKGROUNDED" = "Prenos sa nepodarilo dokončiť. Uistite sa, že je Signal otvorený na oboch zariadeniach a skúste to znova.";
+"DEVICE_TRANSFER_ERROR_BACKGROUNDED" = "Prenos sa nepodarilo dokončiť. Uistite sa, že je Radar otvorený na oboch zariadeniach a skúste to znova.";
 
 /* An error indicating that we were unable to verify the identity of the new device to complete the transfer */
 "DEVICE_TRANSFER_ERROR_CERTIFICATE_MISMATCH" = "Vaše nové zariadenie sa nepodarilo overiť, skúste to prosím znovu";
@@ -2677,7 +2677,7 @@
 "DEVICE_TRANSFER_EXPAND_QR_CODE_BUTTON" = "Zväčšiť";
 
 /* The explanation on the action sheet prompting the user if they want to transfer their device. */
-"DEVICE_TRANSFER_PROMPT_EXPLANATION" = "Preneste si účet Signal do nového iOS zariadenia. Uistite sa, že vaše nové zariadenie je nablízku a že je zapnuté.";
+"DEVICE_TRANSFER_PROMPT_EXPLANATION" = "Preneste si účet Radar do nového iOS zariadenia. Uistite sa, že vaše nové zariadenie je nablízku a že je zapnuté.";
 
 /* The title on the acttion sheet prompting the user if they want to transfer their device. */
 "DEVICE_TRANSFER_PROMPT_TITLE" = "Preniesť účet";
@@ -2695,7 +2695,7 @@
 "DEVICE_TRANSFER_QRCODE_TITLE" = "Skenovať QR kód";
 
 /* The explanation on the view that shows receiving progress */
-"DEVICE_TRANSFER_RECEIVING_EXPLANATION" = "Ponechajte obe zariadenia blízko seba. Nevypínajte ani jedno zariadenie a nechajte Signal otvorený. Prenosy sú zabezpečené prostredníctvom koncového šifrovania.";
+"DEVICE_TRANSFER_RECEIVING_EXPLANATION" = "Ponechajte obe zariadenia blízko seba. Nevypínajte ani jedno zariadenie a nechajte Radar otvorený. Prenosy sú zabezpečené prostredníctvom koncového šifrovania.";
 
 /* The title on the view that shows receiving progress */
 "DEVICE_TRANSFER_RECEIVING_TITLE" = "Prijímajú sa dáta";
@@ -2731,7 +2731,7 @@
 "DEVICE_TRANSFER_STATUS_NEW_DEVICE_TRANSFERRING" = "Prenos";
 
 /* Description in the progress view displayed during device transfer. */
-"DEVICE_TRANSFER_STATUS_NEW_DEVICE_TRANSFERRING_DESCRIPTION" = "Ponechajte obe zariadenia blízko seba. Nevypínajte ani jedno zariadenie a nechajte Signal otvorený. Prenosy sú zabezpečené prostredníctvom end-to-end šifrovania.";
+"DEVICE_TRANSFER_STATUS_NEW_DEVICE_TRANSFERRING_DESCRIPTION" = "Ponechajte obe zariadenia blízko seba. Nevypínajte ani jedno zariadenie a nechajte Radar otvorený. Prenosy sú zabezpečené prostredníctvom end-to-end šifrovania.";
 
 /* Status message on old device when cancelling transfer. */
 "DEVICE_TRANSFER_STATUS_OLD_DEVICE_CANCELLING" = "Ruší sa pripojenie k novému iPhonu…";
@@ -2746,7 +2746,7 @@
 "DEVICE_TRANSFER_STATUS_OLD_DEVICE_STARTING" = "Čaká sa na pripojenie k novému iPhonu…";
 
 /* The explanation on the action sheet that shows transfer progress */
-"DEVICE_TRANSFER_TRANSFERRING_EXPLANATION" = "Ponechajte obe zariadenia blízko seba. Nevypínajte ani jedno zariadenie a nechajte Signal otvorený.";
+"DEVICE_TRANSFER_TRANSFERRING_EXPLANATION" = "Ponechajte obe zariadenia blízko seba. Nevypínajte ani jedno zariadenie a nechajte Radar otvorený.";
 
 /* The title on the action sheet that shows transfer progress */
 "DEVICE_TRANSFER_TRANSFERRING_TITLE" = "Prenášajú sa dáta";
@@ -2836,13 +2836,13 @@
 "DONATE_CHOOSE_PAYMENT_METHOD_SHEET_SUBTITLE_FOR_ONE_TIME_DONATION" = "Získajte odznak %1$@ na 30 dní";
 
 /* When users make donations on a friend's behalf, they see a sheet that lets them pick a payment method. This is the title on that sheet. Embeds {{amount of money}}, such as \"$5\". */
-"DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_DONATION_ON_BEHALF_OF_A_FRIEND" = "Príspevok na Signal v hodnote %1$@";
+"DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_DONATION_ON_BEHALF_OF_A_FRIEND" = "Príspevok na Radar v hodnote %1$@";
 
 /* When users make monthly donations, they see a sheet that lets them pick a payment method. This is the title on that sheet. Embeds {{amount of money per month}}, such as \"$5/month\". */
-"DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_MONTHLY_DONATION" = "Prispieť %1$@ na Signal";
+"DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_MONTHLY_DONATION" = "Prispieť %1$@ na Radar";
 
 /* When users make one-time donations, they see a sheet that lets them pick a payment method. This is the title on that sheet. Embeds {{amount of money}}, such as \"$5\". */
-"DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_ONE_TIME_DONATION" = "Prispieť %1$@ na Signal";
+"DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_ONE_TIME_DONATION" = "Prispieť %1$@ na Radar";
 
 /* Users can donate on a friend's behalf and can optionally add a message. This is tells users about that optional message. */
 "DONATE_ON_BEHALF_OF_A_FRIEND_ADDITIONAL_MESSAGE_INFO" = "Príjemca bude o príspevku informovaný v správe. Pridajte svoj vlastný text správy nižšie.";
@@ -2959,7 +2959,7 @@
 "DONATION_ON_BEHALF_OF_A_FRIEND_BADGE_REDEEMED" = "Odomknutý";
 
 /* Users can donate on behalf of a friend, and the friend will receive a badge. This is a short paragraph on the screen where users choose the badge their friend will receive. */
-"DONATION_ON_BEHALF_OF_A_FRIEND_CHOOSE_BADGE_DESCRIPTION" = "Podporte Signal príspevkom za priateľa alebo člena rodiny, ktorý používa Signal. Svoju podporu budú môcť zobraziť na svojom profile.";
+"DONATION_ON_BEHALF_OF_A_FRIEND_CHOOSE_BADGE_DESCRIPTION" = "Podporte Radar príspevkom za priateľa alebo člena rodiny, ktorý používa Radar. Svoju podporu budú môcť zobraziť na svojom profile.";
 
 /* Users can donate on behalf of a friend, and the friend will receive a badge. This is the title on the screen where users choose the badge their friend will receive. */
 "DONATION_ON_BEHALF_OF_A_FRIEND_CHOOSE_BADGE_TITLE" = "Prispieť za priateľa";
@@ -2995,7 +2995,7 @@
 "DONATION_ON_BEHALF_OF_A_FRIEND_PREVIEW_OUTGOING" = "✨ Poslali ste príspevok za používateľa %1$@";
 
 /* You received a donation from a friend. This is the title of that message in the chat. Embeds {{short contact name}}. */
-"DONATION_ON_BEHALF_OF_A_FRIEND_RECEIVED_TITLE_FORMAT" = "Používateľ %1$@ prispel na Signal vo vašom mene";
+"DONATION_ON_BEHALF_OF_A_FRIEND_RECEIVED_TITLE_FORMAT" = "Používateľ %1$@ prispel na Radar vo vašom mene";
 
 /* Users can donate on a friend's behalf. This is the error message that appears if the try to do this, but the recipient is blocked. */
 "DONATION_ON_BEHALF_OF_A_FRIEND_RECIPIENT_IS_BLOCKED_ERROR_BODY" = "Za tohto používateľa nemôžete poslať príspevok, pretože ste ho zablokovali.";
@@ -3019,7 +3019,7 @@
 "DONATION_ON_BEHALF_OF_A_FRIEND_SENT_TITLE_FORMAT" = "Príspevok v mene používateľa %1$@";
 
 /* When you donate on behalf of a friend, a thank-you sheet will appear. This is the text on that sheet. Embeds {{recipient name}}. */
-"DONATION_ON_BEHALF_OF_A_FRIEND_THANKS_BODY_FORMAT" = "Prispeli ste na Signal v mene používateľa %1$@. Svoju podporu bude môcť zobraziť na svojom profile.";
+"DONATION_ON_BEHALF_OF_A_FRIEND_THANKS_BODY_FORMAT" = "Prispeli ste na Radar v mene používateľa %1$@. Svoju podporu bude môcť zobraziť na svojom profile.";
 
 /* When you donate on behalf of a friend, a thank-you sheet will appear. This is the title on that sheet. */
 "DONATION_ON_BEHALF_OF_A_FRIEND_THANKS_TITLE" = "Ďakujeme za vašu podporu!";
@@ -3028,19 +3028,19 @@
 "DONATION_ON_BEHALF_OF_A_FRIEND_VIEW" = "Zobraziť";
 
 /* A friend has donated on your behalf and you received a badge. This text says that you received a badge, and from whom. Embeds {{contact's short name, such as a first name}}. */
-"DONATION_ON_BEHALF_OF_A_FRIEND_YOU_RECEIVED_A_BADGE_FORMAT" = "Používateľ %1$@ prispel na Signal vo vašom mene! Ukážte svoju podporu pre Signal vo svojom profile.";
+"DONATION_ON_BEHALF_OF_A_FRIEND_YOU_RECEIVED_A_BADGE_FORMAT" = "Používateľ %1$@ prispel na Radar vo vašom mene! Ukážte svoju podporu pre Radar vo svojom profile.";
 
 /* There is a screen where users can read more about their donation to Signal. This is the 1st paragraph of that screen. */
 "DONATION_READ_MORE_SCREEN_PARAGRAPH_1" = "Súkromné posielanie správ. Žiadne reklamy, žiadne sledovače, žiadne monitorovanie.";
 
 /* There is a screen where users can read more about their donation to Signal. This is the 2nd paragraph of that screen. */
-"DONATION_READ_MORE_SCREEN_PARAGRAPH_2" = "Signal využíva podporu v podobe príspevkov, čo znamená, že vaše súkromie je stredobodom všetkého, čo robíme. Signal je vytvorený pre vás, nie pre vaše údaje a nie za účelom zisku.";
+"DONATION_READ_MORE_SCREEN_PARAGRAPH_2" = "Radar využíva podporu v podobe príspevkov, čo znamená, že vaše súkromie je stredobodom všetkého, čo robíme. Radar je vytvorený pre vás, nie pre vaše údaje a nie za účelom zisku.";
 
 /* There is a screen where users can read more about their donation to Signal. This is the 3rd paragraph of that screen. */
 "DONATION_READ_MORE_SCREEN_PARAGRAPH_3" = "Ak môžete, prispejte ešte dnes a dopomôžte Signalu k tomu, aby bol zábavnou, spoľahlivou a dostupnou aplikáciou pre každého.";
 
 /* There is a screen where users can read more about their donation to Signal. This is the title of that screen. */
-"DONATION_READ_MORE_SCREEN_TITLE" = "Signal je odlišný.";
+"DONATION_READ_MORE_SCREEN_TITLE" = "Radar je odlišný.";
 
 /* Section title for donation amount on receipts */
 "DONATION_RECEIPT_AMOUNT" = "Suma";
@@ -3076,7 +3076,7 @@
 "DONATION_RECEIPTS" = "Potvrdenia o daroch";
 
 /* Text at the bottom of the donation receipts list, telling users that receipts might not be available */
-"DONATION_RECEIPTS_MIGHT_BE_MISSING_IF_YOU_REINSTALLED" = "Ak ste preinštalovali Signal, potvrdenky z predchádzajúcich darov nebudú k dispozícii.";
+"DONATION_RECEIPTS_MIGHT_BE_MISSING_IF_YOU_REINSTALLED" = "Ak ste preinštalovali Radar, potvrdenky z predchádzajúcich darov nebudú k dispozícii.";
 
 /* Error message displayed if something goes wrong with 3DSecure/iDEAL payment authorization.  This will be encountered if the user cancels the webview before authrizing the payment. */
 "DONATION_REDIRECT_ERROR_CANCELLED_MESSAGE" = "Platba bola zrušená. Skúste to znova.";
@@ -3091,7 +3091,7 @@
 "DONATION_SCREEN_DONATE_BUTTON" = "Prispieť";
 
 /* On donation screens, a small amount of information text is shown. This is the subtitle for that text. */
-"DONATION_SCREENS_HEADER_DESCRIPTION" = "Súkromné posielanie správ, ktoré financujete vy. Žiadne reklamy, žiadne sledovanie, žiadne kompromisy. Prispejte teraz a podporte Signal.";
+"DONATION_SCREENS_HEADER_DESCRIPTION" = "Súkromné posielanie správ, ktoré financujete vy. Žiadne reklamy, žiadne sledovanie, žiadne kompromisy. Prispejte teraz a podporte Radar.";
 
 /* On donation screens, a small amount of information text is shown. Users can click this link to learn more information. */
 "DONATION_SCREENS_HEADER_READ_MORE" = "Prečítať viac";
@@ -3169,7 +3169,7 @@
 "DONATION_VIEW_DONATE_ON_BEHALF_OF_A_FRIEND" = "Prispieť za priateľa";
 
 /* Text describing to the user that they're going to pay a donation to Signal */
-"DONATION_VIEW_DONATION_TO_SIGNAL" = "Dar na Signal";
+"DONATION_VIEW_DONATION_TO_SIGNAL" = "Dar na Radar";
 
 /* Title for the 'Donor FAQ' button on the donation screen */
 "DONATION_VIEW_DONOR_FAQ" = "Často kladené otázky prispievateľov";
@@ -3181,7 +3181,7 @@
 "DONATION_VIEW_MANAGE_BADGES" = "Odznaky";
 
 /* Text describing to the user that they're going to pay a monthly donation to Signal */
-"DONATION_VIEW_MONTHLY_DONATION_TO_SIGNAL" = "Mesačný príspevok na Signal";
+"DONATION_VIEW_MONTHLY_DONATION_TO_SIGNAL" = "Mesačný príspevok na Radar";
 
 /* Title for the 'more' section on the donation screen */
 "DONATION_VIEW_MORE_SECTION_TITLE" = "Viac";
@@ -3193,7 +3193,7 @@
 "DONATION_VIEW_OTHER_WAYS_TO_DONATE_TITLE" = "Ďalšie spôsoby prispenia";
 
 /* Title on the 'Donate to Signal' screen */
-"DONATION_VIEW_TITLE" = "Prispieť na Signal";
+"DONATION_VIEW_TITLE" = "Prispieť na Radar";
 
 /* Label for the currency picker button in donation views */
 "DONATIONS_CURRENCY_PICKER_LABEL" = "Mena";
@@ -3208,13 +3208,13 @@
 "EDIT_CONTACT_WITHOUT_CONTACTS_PERMISSION_ALERT_BODY" = "Prístup môžete povoliť v aplikácii Nastavenia iOS.";
 
 /* Alert title for when the user has just tried to edit a contacts after declining to give Signal contacts permissions */
-"EDIT_CONTACT_WITHOUT_CONTACTS_PERMISSION_ALERT_TITLE" = "Signal potrebuje prístup ku kontaktom, aby mohol upraviť informácie o kontakte";
+"EDIT_CONTACT_WITHOUT_CONTACTS_PERMISSION_ALERT_TITLE" = "Radar potrebuje prístup ku kontaktom, aby mohol upraviť informácie o kontakte";
 
 /* The navbar title for the 'update group' view. */
 "EDIT_GROUP_DEFAULT_TITLE" = "Upraviť skupinu";
 
 /* Error message indicating the a user can't be added to a group. */
-"EDIT_GROUP_ERROR_CANNOT_ADD_MEMBER" = "Tohto používateľa nie je možné pridať do skupiny, kým si neaktualizuje Signal.";
+"EDIT_GROUP_ERROR_CANNOT_ADD_MEMBER" = "Tohto používateľa nie je možné pridať do skupiny, kým si neaktualizuje Radar.";
 
 /* Error message indicating that an avatar image is invalid and cannot be used. */
 "EDIT_GROUP_ERROR_INVALID_AVATAR" = "Neplatná fotka.";
@@ -3241,13 +3241,13 @@
 "EDIT_MESSAGE_SEND_MESSAGE_UNKNOWN_ERROR" = "EDIT_MESSAGE_SEND_MESSAGE_UNKNOWN_ERROR";
 
 /* body of email sent to contacts when inviting to install Signal. Embeds {{link to install Signal}} and {{link to the Signal home page}} */
-"EMAIL_INVITE_BODY" = "Ahoj,\n\nV poslednej dobe používam Signal, aby čety v mojom iPhone zostali súkromné. Poteší ma, ak si ho nainštaluješ aj ty, aby sme si boli istí, že nikto iný nečíta naše správy a nepočúva naše hovory.\n\nSignal je dostupný pre iPhone, Android a Desktop. Stiahnuť si ho môžeš tu: %1$@\n\nSignal funguje ako tvoja súčasná aplikácia na odosielanie správ. Môžeme si posielať fotky, videá, uskutočňovať hovory a vytvárať skupinové čety. A najlepšie na tom je, že ich nemôže vidieť nikto iný, dokonca ani tí, ktorí vyvíjajú Signal!\n\nViac o aplikácii Signal si môžeš prečítať tu: %2$@";
+"EMAIL_INVITE_BODY" = "Ahoj,\n\nV poslednej dobe používam Radar, aby čety v mojom iPhone zostali súkromné. Poteší ma, ak si ho nainštaluješ aj ty, aby sme si boli istí, že nikto iný nečíta naše správy a nepočúva naše hovory.\n\nSignal je dostupný pre iPhone, Android a Desktop. Stiahnuť si ho môžeš tu: %1$@\n\nSignal funguje ako tvoja súčasná aplikácia na odosielanie správ. Môžeme si posielať fotky, videá, uskutočňovať hovory a vytvárať skupinové čety. A najlepšie na tom je, že ich nemôže vidieť nikto iný, dokonca ani tí, ktorí vyvíjajú Radar!\n\nViac o aplikácii Radar si môžeš prečítať tu: %2$@";
 
 /* subject of email sent to contacts when inviting to install Signal */
-"EMAIL_INVITE_SUBJECT" = "Prejdime na Signal";
+"EMAIL_INVITE_SUBJECT" = "Prejdime na Radar";
 
 /* Description for the fallback support sheet if user cannot send email */
-"EMAIL_SIGNAL_MESSAGE" = "Vaše zariadenie nie je nastavené na odosielanie E-mailov. Pre poslanie žiadosti o technickú podporu, nastavte E-maily na vašom zariadení, alebo napíšte na support@signal.org";
+"EMAIL_SIGNAL_MESSAGE" = "Vaše zariadenie nie je nastavené na odosielanie E-mailov. Pre poslanie žiadosti o technickú podporu, nastavte E-maily na vašom zariadení, alebo napíšte na support@radar.chat";
 
 /* Title for the fallback support sheet if user cannot send email */
 "EMAIL_SIGNAL_TITLE" = "E-mail nedostupný";
@@ -3283,7 +3283,7 @@
 "EMOJI_CATEGORY_TRAVEL_NAME" = "Cestovanie a miesta";
 
 /* Full width label displayed when attempting to compose message */
-"EMPTY_CONTACTS_LABEL_LINE1" = "Nikto z vašich kontaktov nemá Signal.";
+"EMPTY_CONTACTS_LABEL_LINE1" = "Nikto z vašich kontaktov nemá Radar.";
 
 /* Full width label displayed when attempting to compose message */
 "EMPTY_CONTACTS_LABEL_LINE2" = "Prečo niekoho nepozvete?";
@@ -3349,7 +3349,7 @@
 "ERROR_DESCRIPTION_UNKNOWN_ERROR" = "Vyskytla sa neznáma chyba.";
 
 /* Error message when attempting to send message */
-"ERROR_DESCRIPTION_UNREGISTERED_RECIPIENT" = "Správu nebolo možné odoslať, pretože táto osoba už nepoužíva Signal.";
+"ERROR_DESCRIPTION_UNREGISTERED_RECIPIENT" = "Správu nebolo možné odoslať, pretože táto osoba už nepoužíva Radar.";
 
 /* Error message indicating that attachment upload(s) failed. */
 "ERROR_MESSAGE_ATTACHMENT_UPLOAD_FAILED" = "Prílohu sa nepodarilo nahrať.";
@@ -3394,10 +3394,10 @@
 "ERROR_NETWORK_FAILURE" = "Chyba siete";
 
 /* Format string for an error alert notification message. Embeds {{ error string }} */
-"ERROR_NOTIFICATION_MESSAGE_FORMAT" = "Pomôžte nám zlepšiť Signal nahlásením tejto chyby spolu s denníkmi ladenia z vášho zariadenia na adresu support@signal.org; %1$@";
+"ERROR_NOTIFICATION_MESSAGE_FORMAT" = "Pomôžte nám zlepšiť Radar nahlásením tejto chyby spolu s denníkmi ladenia z vášho zariadenia na adresu support@radar.chat; %1$@";
 
 /* Format string for an error alert notification title. */
-"ERROR_NOTIFICATION_TITLE" = "Signal Beta: Vyskytla sa chyba";
+"ERROR_NOTIFICATION_TITLE" = "Radar Beta: Vyskytla sa chyba";
 
 /* Error indicating a send failure due to a delinked application. */
 "ERROR_SENDING_DELINKED" = "Vaše zariadenie už nie je prepojené. Pre odosielanie ďalších správ ho, prosím, znovu prepojte.";
@@ -3430,7 +3430,7 @@
 "EXPIRATION_WARNING_TODAY" = "Táto verzia Signalu vyprší dnes. Ak chcete naďalej posielať správy, je potrebná aktualizácia.";
 
 /* action sheet header when re-sending message which failed because of an invalid key signature */
-"FAILED_SENDING_BECAUSE_INVALID_KEY_SIGNATURE" = "Správu nebolo možné odoslať, pretože %1$@ si musí aktualizovať a otvoriť Signal.";
+"FAILED_SENDING_BECAUSE_INVALID_KEY_SIGNATURE" = "Správu nebolo možné odoslať, pretože %1$@ si musí aktualizovať a otvoriť Radar.";
 
 /* action sheet header when re-sending message which failed because of untrusted identity keys */
 "FAILED_SENDING_BECAUSE_UNTRUSTED_IDENTITY_KEY" = "Vaše bezpečnostné číslo s %1$@ sa nedávno zmenilo. Pred opätovným odoslaním tejto správy by ste si to mohli chcieť overiť.";
@@ -3745,10 +3745,10 @@
 "GROUP_CALL_WILL_NOTIFY_TWO_PEOPLE_FORMAT" = "%1$@ a %2$@ dostanú upozornenie";
 
 /* Text shown before the user starts a group call if the user has enabled ringing and there is one other person in the group. Embeds {member name} */
-"GROUP_CALL_WILL_RING_ONE_PERSON_FORMAT" = "Signal zavolá používateľovi %1$@";
+"GROUP_CALL_WILL_RING_ONE_PERSON_FORMAT" = "Radar zavolá používateľovi %1$@";
 
 /* Text shown before the user starts a group call if the user has enabled ringing and there are two other people in the group. Embeds {{ %1$@ participant1, %2$@ participant2 }} */
-"GROUP_CALL_WILL_RING_TWO_PEOPLE_FORMAT" = "Signal zavolá používateľom %1$@ a %2$@";
+"GROUP_CALL_WILL_RING_TWO_PEOPLE_FORMAT" = "Radar zavolá používateľom %1$@ a %2$@";
 
 /* Text explaining that you are in the group call. */
 "GROUP_CALL_YOU_ARE_HERE" = "Ste v skupinovom hovore";
@@ -3958,7 +3958,7 @@
 "GROUP_LINK_VIEW_SHARE_LINK_VIA_QR_CODE" = "QR kód";
 
 /* Label for the 'share group link via Signal' button in the 'group link' view. */
-"GROUP_LINK_VIEW_SHARE_LINK_VIA_SIGNAL" = "Zdieľať cez Signal";
+"GROUP_LINK_VIEW_SHARE_LINK_VIA_SIGNAL" = "Zdieľať cez Radar";
 
 /* Message for the 'share group link' action sheet in the 'group link' view. */
 "GROUP_LINK_VIEW_SHARE_SHEET_MESSAGE" = "Každý, kto má tento odkaz, môže vidieť názov a členov tejto skupiny a požiadať o členstvo. Zdieľajte ho s ľuďmi, ktorým dôverujete.";
@@ -4366,13 +4366,13 @@
 "HOME_VIEW_DRAFT_PREFIX" = "Koncept: ";
 
 /* Format string for a label offering to start a new conversation with your contacts, if you have 1 Signal contact.  Embeds {{The name of 1 of your Signal contacts}}. */
-"HOME_VIEW_FIRST_CONVERSATION_OFFER_1_CONTACT_FORMAT" = "Niektoré z vašich kontaktov už používajú Signal, vrátane %1$@.";
+"HOME_VIEW_FIRST_CONVERSATION_OFFER_1_CONTACT_FORMAT" = "Niektoré z vašich kontaktov už používajú Radar, vrátane %1$@.";
 
 /* Format string for a label offering to start a new conversation with your contacts, if you have 2 Signal contacts.  Embeds {{The names of 2 of your Signal contacts}}. */
-"HOME_VIEW_FIRST_CONVERSATION_OFFER_2_CONTACTS_FORMAT" = "Niektoré z vašich kontaktov už používajú Signal, vrátane %1$@ a %2$@";
+"HOME_VIEW_FIRST_CONVERSATION_OFFER_2_CONTACTS_FORMAT" = "Niektoré z vašich kontaktov už používajú Radar, vrátane %1$@ a %2$@";
 
 /* Format string for a label offering to start a new conversation with your contacts, if you have at least 3 Signal contacts.  Embeds {{The names of 3 of your Signal contacts}}. */
-"HOME_VIEW_FIRST_CONVERSATION_OFFER_3_CONTACTS_FORMAT" = "Niektoré z vašich kontaktov už používajú Signal, vrátane %1$@, %2$@ a %3$@";
+"HOME_VIEW_FIRST_CONVERSATION_OFFER_3_CONTACTS_FORMAT" = "Niektoré z vašich kontaktov už používajú Radar, vrátane %1$@, %2$@ a %3$@";
 
 /* A label offering to start a new conversation with your contacts, if you have no Signal contacts. */
 "HOME_VIEW_FIRST_CONVERSATION_OFFER_NO_CONTACTS" = "Zahájte svoj prvý čet tu.";
@@ -4468,7 +4468,7 @@
 "INACTIVE_LINKED_DEVICE_REMINDER_MEGAPHONE_TITLE" = "Neaktívne prepojené zariadenie";
 
 /* Body for an in-app megaphone about a user's inactive primary device. */
-"INACTIVE_PRIMARY_DEVICE_REMINDER_MEGAPHONE_BODY" = "Ak chcete, aby bol váš účet aktívny, otvorte Signal na svojom primárnom zariadení.";
+"INACTIVE_PRIMARY_DEVICE_REMINDER_MEGAPHONE_BODY" = "Ak chcete, aby bol váš účet aktívny, otvorte Radar na svojom primárnom zariadení.";
 
 /* Title for a button in an in-app megaphone about a user's inactive primary device, temporarily dismissing the megaphone. */
 "INACTIVE_PRIMARY_DEVICE_REMINDER_MEGAPHONE_GOT_IT_BUTTON" = "Rozumiem";
@@ -4477,7 +4477,7 @@
 "INACTIVE_PRIMARY_DEVICE_REMINDER_MEGAPHONE_LEARN_MORE_BUTTON" = "Zistiť viac";
 
 /* Title for an in-app megaphone about a user's inactive primary device. */
-"INACTIVE_PRIMARY_DEVICE_REMINDER_MEGAPHONE_TITLE" = "Otvorte Signal na svojom telefóne";
+"INACTIVE_PRIMARY_DEVICE_REMINDER_MEGAPHONE_TITLE" = "Otvorte Radar na svojom telefóne";
 
 /* Label reminding the user that they are in archive mode, and that muted chats remain archived when they receive a new message. */
 "INBOX_VIEW_ARCHIVE_MODE_MUTED_CHATS_REMINDER" = "Stlmené čety, ktoré sú archivované, zostanú archivované, keď príde nová správa.";
@@ -4513,10 +4513,10 @@
 "INFO_MESSAGE_BLOCKED_OTHER_USER" = "Túto osobu ste zablokovali.";
 
 /* Indicates that a previously-removed recipient has been added back to the current user's contacts. */
-"INFO_MESSAGE_CONTACT_REINSTATED" = "Táto osoba bola pridaná späť do vášho zoznamu kontaktov Signal.";
+"INFO_MESSAGE_CONTACT_REINSTATED" = "Táto osoba bola pridaná späť do vášho zoznamu kontaktov Radar.";
 
 /* Indicates that the recipient has been removed from the current user's contacts and that messaging them will re-add them. */
-"INFO_MESSAGE_CONTACT_REMOVED" = "Túto osobu ste odstránili zo svojho zoznamu kontaktov Signal. Odoslaním správy ju pridáte späť.";
+"INFO_MESSAGE_CONTACT_REMOVED" = "Túto osobu ste odstránili zo svojho zoznamu kontaktov Radar. Odoslaním správy ju pridáte späť.";
 
 /* When you start a chat with someone and then later learn their profile name, we insert an in-chat message with this string to record the identifier you originally used to contact them. Embeds {{ the identifier, either a phone number or a username }}. */
 "INFO_MESSAGE_LEARNED_PROFILE_KEY" = "Zahájili ste čet s používateľom %1$@.";
@@ -4537,7 +4537,7 @@
 "INFO_MESSAGE_REPORTED_SPAM" = "Nahlásené ako spam";
 
 /* Body message of the alert shown when a user taps on 'learn more' via the spam info message. */
-"INFO_MESSAGE_REPORTED_SPAM_LEARN_MORE_MESSAGE" = "Signal bol upozornený na to, že tento používateľ môže rozposielať spam. Signal nevidí obsah žiadneho četu.";
+"INFO_MESSAGE_REPORTED_SPAM_LEARN_MORE_MESSAGE" = "Radar bol upozornený na to, že tento používateľ môže rozposielať spam. Radar nevidí obsah žiadneho četu.";
 
 /* Title of the alert shown when a user taps on 'learn more' via the spam info message. */
 "INFO_MESSAGE_REPORTED_SPAM_LEARN_MORE_TITLE" = "Nahlásený spam";
@@ -4555,7 +4555,7 @@
 "INFO_MESSAGE_USER_CHANGED_PHONE_NUMBER_FORMAT" = "%1$@ si zmenil/a svoje telefónne číslo.";
 
 /* Shown in inbox and conversation when a user joins Signal, embeds the new user's {{contact name}} */
-"INFO_MESSAGE_USER_JOINED_SIGNAL_BODY_FORMAT" = "%1$@ používa Signal!";
+"INFO_MESSAGE_USER_JOINED_SIGNAL_BODY_FORMAT" = "%1$@ používa Radar!";
 
 /* Label at the top of the input text when editing a message */
 "INPUT_TOOLBAR_EDIT_MESSAGE_LABEL" = "Upraviť správu";
@@ -4711,7 +4711,7 @@
 "LINK_DEVICE_SCANNING_INSTRUCTIONS_SHEET_TITLE" = "Skenovať QR kód";
 
 /* Body text for a sheet when a user tries to link a device informing them that they will need to authenticate their device */
-"LINK_NEW_DEVICE_AUTHENTICATION_INFO_SHEET_BODY" = "Ťuknite na Pokračovať a potvrďte odomknutím telefónu. Nezadávajte svoj Signal PIN.";
+"LINK_NEW_DEVICE_AUTHENTICATION_INFO_SHEET_BODY" = "Ťuknite na Pokračovať a potvrďte odomknutím telefónu. Nezadávajte svoj Radar PIN.";
 
 /* Title for a sheet when a user tries to link a device informing them that they will need to authenticate their device */
 "LINK_NEW_DEVICE_AUTHENTICATION_INFO_SHEET_TITLE" = "Pred prepojením zariadenia potvrďte, že ste to vy";
@@ -4762,7 +4762,7 @@
 "LINK_PREVIEW_UNKNOWN_DOMAIN" = "Náhľad stránky";
 
 /* Shown in an alert when trying to edit a contact. */
-"LINKED_DEVICE_CONTACTS_NOT_ALLOWED" = "Správa kontaktov v telefóne už nie je na iPade k dispozícii. Ak chcete do kontaktov v telefóne pridať Signal spojenia, otvorte aplikáciu Signal v telefóne.";
+"LINKED_DEVICE_CONTACTS_NOT_ALLOWED" = "Správa kontaktov v telefóne už nie je na iPade k dispozícii. Ak chcete do kontaktov v telefóne pridať Radar spojenia, otvorte aplikáciu Radar v telefóne.";
 
 /* Shown in a banner when you tap the 'New Chat' icon at the top of the list of chats. */
 "LINKED_DEVICE_MANAGE_CONTACTS_BANNER" = "Správa kontaktov v telefóne už nie je na iPade podporovaná. Toto zariadenie bude pokračovať v synchronizácii všetkých zmien vo vašom zozname kontaktov zo Signalu vo vašom telefóne.";
@@ -4780,28 +4780,28 @@
 "LINKED_DEVICE_NOTIFICATION_TITLE" = "Prepojili ste nové zariadenie";
 
 /* Message for an action sheet telling users how to link a device, when trying to open an external device-linking URL. */
-"LINKED_DEVICE_URL_OPENED_ACTION_SHEET_EXTERNAL_URL_MESSAGE" = "Ak chcete prepojiť počítač alebo iPad s týmto Signal účtom, prejdite na Prepojené zariadenia, ťuknite na „Prepojiť nové zariadenie“ a znova naskenujte QR kód. Uistite sa, že skenujete iba QR kódy priamo z aplikácie Signal.";
+"LINKED_DEVICE_URL_OPENED_ACTION_SHEET_EXTERNAL_URL_MESSAGE" = "Ak chcete prepojiť počítač alebo iPad s týmto Radar účtom, prejdite na Prepojené zariadenia, ťuknite na „Prepojiť nové zariadenie“ a znova naskenujte QR kód. Uistite sa, že skenujete iba QR kódy priamo z aplikácie Radar.";
 
 /* Message for an action sheet telling users how to link a device, when trying to open a device-linking URL from the in-app camera. */
-"LINKED_DEVICE_URL_OPENED_ACTION_SHEET_IN_APP_CAMERA_MESSAGE" = "Vyzerá to, že sa snažíte prepojiť zariadenie Signal. Ťuknite na Pokračovať, potom na „Prepojiť nové zariadenie“ a znova naskenujte QR kód.";
+"LINKED_DEVICE_URL_OPENED_ACTION_SHEET_IN_APP_CAMERA_MESSAGE" = "Vyzerá to, že sa snažíte prepojiť zariadenie Radar. Ťuknite na Pokračovať, potom na „Prepojiť nové zariadenie“ a znova naskenujte QR kód.";
 
 /* Bullet point about downloads on the linked devices education sheet. Embeds {{ %1$@ iPad download link, %2$@ desktop download link }} */
 "LINKED_DEVICES_EDUCATION_POINT_DOWNLOADS" = "Na druhom zariadení prejdite na %1$@ a nainštalujte si aplikáciu pre iPad alebo na %2$@ a nainštalujte počítačovú aplikáciu.";
 
 /* Bullet point about message sync on the linked devices education sheet */
-"LINKED_DEVICES_EDUCATION_POINT_MESSAGES" = "Signal správy sú po prepojení synchronizované s aplikáciou Signal vo vašom mobilnom telefóne.";
+"LINKED_DEVICES_EDUCATION_POINT_MESSAGES" = "Radar správy sú po prepojení synchronizované s aplikáciou Radar vo vašom mobilnom telefóne.";
 
 /* Bullet point about privacy on the linked devices education sheet */
 "LINKED_DEVICES_EDUCATION_POINT_PRIVACY" = "Všetky správy na prepojených zariadeniach sú súkromné";
 
 /* Title for the linked device education sheet */
-"LINKED_DEVICES_EDUCATION_TITLE" = "Signal na počítači alebo iPade";
+"LINKED_DEVICES_EDUCATION_TITLE" = "Radar na počítači alebo iPade";
 
 /* Text that appears where the linked device list would be indicating that there are no linked devices. */
 "LINKED_DEVICES_EMPTY_STATE" = "Žiadne prepojené zariadenia";
 
 /* Description for header of the linked devices list */
-"LINKED_DEVICES_HEADER_DESCRIPTION" = "Use Signal on desktop or iPad.";
+"LINKED_DEVICES_HEADER_DESCRIPTION" = "Use Radar on desktop or iPad.";
 
 /* Footer text below the list of currently-linked devices */
 "LINKED_DEVICES_LIST_FOOTER" = "Správy a informácie o četoch sú na všetkých zariadeniach chránené end-to-end šifrovaním";
@@ -4843,10 +4843,10 @@
 "LINKING_SYNCING_TIMING_INFO" = "Môže to trvať pár minút";
 
 /* Shown to users while the app is loading, asking them not to close the app. */
-"LOADING_VIEW_CONTROLLER_DONT_CLOSE_APP" = "Nezatvárajte Signal.";
+"LOADING_VIEW_CONTROLLER_DONT_CLOSE_APP" = "Nezatvárajte Radar.";
 
 /* Body for local network permission action sheet */
-"LOCAL_NETWORK_PERMISSION_ACTION_SHEET_BODY" = "Aby ste preniesli váš Signal účet, musíte povoliť prístup k lokálnej sieti na oboch zariadeniach.";
+"LOCAL_NETWORK_PERMISSION_ACTION_SHEET_BODY" = "Aby ste preniesli váš Radar účet, musíte povoliť prístup k lokálnej sieti na oboch zariadeniach.";
 
 /* A button asking the user if they need further help getting their transfer working. */
 "LOCAL_NETWORK_PERMISSION_ACTION_SHEET_NEED_HELP" = "Potrebujete pomoc?";
@@ -4858,7 +4858,7 @@
 "LOCAL_NETWORK_PERMISSION_ACTION_SHEET_STEP_THREE" = "Zapnite “Lokálna sieť”";
 
 /* Second step for local network permission action sheet */
-"LOCAL_NETWORK_PERMISSION_ACTION_SHEET_STEP_TWO" = "Prejdite na  Signal";
+"LOCAL_NETWORK_PERMISSION_ACTION_SHEET_STEP_TWO" = "Prejdite na  Radar";
 
 /* Title for local network permission action sheet */
 "LOCAL_NETWORK_PERMISSION_ACTION_SHEET_TITLE" = "Zapnite Prístup k lokálnej sieti";
@@ -4873,7 +4873,7 @@
 "LOGGING_SECTION" = "Logovanie";
 
 /* Footer for the 'logging' help section. */
-"LOGGING_SECTION_FOOTER" = "Záznamy ladenia môžu pomôcť pri riešení problémov a zlyhaní Signal.";
+"LOGGING_SECTION_FOOTER" = "Záznamy ladenia môžu pomôcť pri riešení problémov a zlyhaní Radar.";
 
 /* Title for the 'long text message' view. */
 "LONG_TEXT_VIEW_TITLE" = "Správa";
@@ -4975,7 +4975,7 @@
 "MESSAGE_ACTION_DELETE_FOR_EVERYONE" = "Vymazať pre všetkých";
 
 /* A one-time confirmation that you want to delete for everyone */
-"MESSAGE_ACTION_DELETE_FOR_EVERYONE_CONFIRMATION" = "Táto správa sa vymaže pre každého, kto používa aktuálnu verziu aplikácie Signal. Členovia budú vidieť, že ste vymazali správu.";
+"MESSAGE_ACTION_DELETE_FOR_EVERYONE_CONFIRMATION" = "Táto správa sa vymaže pre každého, kto používa aktuálnu verziu aplikácie Radar. Členovia budú vidieť, že ste vymazali správu.";
 
 /* The title for the action sheet asking who the user wants to delete the message for. */
 "MESSAGE_ACTION_DELETE_FOR_TITLE" = "Pre koho by ste chceli túto správu vymazať?";
@@ -5020,7 +5020,7 @@
 "MESSAGE_ACTION_LINK_OPEN_LINK" = "Otvoriť odkaz";
 
 /* Label for button to open a signal proxy. */
-"MESSAGE_ACTION_LINK_OPEN_PROXY" = "Otvoriť Signal Proxy";
+"MESSAGE_ACTION_LINK_OPEN_PROXY" = "Otvoriť Radar Proxy";
 
 /* Label for button to open a sticker pack. */
 "MESSAGE_ACTION_LINK_OPEN_STICKER_PACK" = "Zobraziť balík nálepiek";
@@ -5194,7 +5194,7 @@
 "MESSAGE_REQUEST_NAME_COLLISON_UPDATE_CONTACT_ACTION" = "Aktualizovať kontakt";
 
 /* Action sheet message to confirm reporting a conversation as spam via a message request. */
-"MESSAGE_REQUEST_REPORT_CONVERSATION_MESSAGE" = "Signal bude upozornený na to, že tento používateľ môže rozposielať spam. Signal nevidí obsah žiadneho četu.";
+"MESSAGE_REQUEST_REPORT_CONVERSATION_MESSAGE" = "Radar bude upozornený na to, že tento používateľ môže rozposielať spam. Radar nevidí obsah žiadneho četu.";
 
 /* Action sheet title to confirm reporting a conversation as spam via a message request. */
 "MESSAGE_REQUEST_REPORT_CONVERSATION_TITLE" = "Nahlásiť spam?";
@@ -5344,19 +5344,19 @@
 "MISSING_CAMERA_PERMISSION_MESSAGE" = "Prístup k fotoaparátu môžete povoliť v aplikácii Nastavenia iOS.";
 
 /* Alert title */
-"MISSING_CAMERA_PERMISSION_TITLE" = "Signal potrebuje prístup k Vašej kamere.";
+"MISSING_CAMERA_PERMISSION_TITLE" = "Radar potrebuje prístup k Vašej kamere.";
 
 /* Alert body indicating the user has denied location permissions */
 "MISSING_LOCATION_PERMISSION_MESSAGE" = "Toto povolenie môžete povoliť v aplikácii Nastavenia iOS.";
 
 /* Alert title indicating the user has denied location permissions */
-"MISSING_LOCATION_PERMISSION_TITLE" = "Signal vyžaduje pre túto funkciu prístup k vašej polohe.";
+"MISSING_LOCATION_PERMISSION_TITLE" = "Radar vyžaduje pre túto funkciu prístup k vašej polohe.";
 
 /* Alert body when user has previously denied media library access */
 "MISSING_MEDIA_LIBRARY_PERMISSION_MESSAGE" = "Toto povolenie môžete povoliť v aplikácii Nastavenia iOS.";
 
 /* Alert title when user has previously denied media library access */
-"MISSING_MEDIA_LIBRARY_PERMISSION_TITLE" = "Signal vyžaduje pre túto funkciu prístup k vašim fotkám.";
+"MISSING_MEDIA_LIBRARY_PERMISSION_TITLE" = "Radar vyžaduje pre túto funkciu prístup k vašim fotkám.";
 
 /* An error shown as the title of an alert when try to link a new device & the user is already at the limit. */
 "MULTIDEVICE_PAIRING_MAX_DESC" = "Nemôžete prepojiť viac zariadení.";
@@ -5377,7 +5377,7 @@
 "MY_STORIES_SETTINGS_VISIBILITY_ALL_SIGNAL_CONNECTIONS_EXCEPT_TITLE" = "Všetci okrem…";
 
 /* Title for the visibility option */
-"MY_STORIES_SETTINGS_VISIBILITY_ALL_SIGNAL_CONNECTIONS_TITLE" = "Všetky Signal spojenia";
+"MY_STORIES_SETTINGS_VISIBILITY_ALL_SIGNAL_CONNECTIONS_TITLE" = "Všetky Radar spojenia";
 
 /* Title for the visibility option */
 "MY_STORIES_SETTINGS_VISIBILITY_ONLY_SHARE_WITH_TITLE" = "Zdieľať iba s…";
@@ -5539,7 +5539,7 @@
 "NICKNAME_EDITOR_DELETE_CONFIRMATION_TITLE" = "Vymazať prezývku?";
 
 /* The description below the title on the profile nickname editor view. */
-"NICKNAME_EDITOR_DESCRIPTION" = "Prezývky a poznámky sa ukladajú v aplikácii Signal a sú vybavené end-to-end šifrovaním. Vidíte ich len vy.";
+"NICKNAME_EDITOR_DESCRIPTION" = "Prezývky a poznámky sa ukladajú v aplikácii Radar a sú vybavené end-to-end šifrovaním. Vidíte ich len vy.";
 
 /* Placeholder text it the text field for the family name in the profile nickname editor. */
 "NICKNAME_EDITOR_FAMILY_NAME_PLACEHOLDER" = "Priezvisko";
@@ -5602,7 +5602,7 @@
 "NOTIFICATION_PERMISSION_REMINDER_MEGAPHONE_TITLE" = "Zapnúť hlásenia?";
 
 /* Shown as the body of an alert when notifications can't be shown due to an error. */
-"NOTIFICATIONS_ERROR_MESSAGE" = "Ak nedostávate Signal upozornenia, reštartujte svoj %1$@.";
+"NOTIFICATIONS_ERROR_MESSAGE" = "Ak nedostávate Radar upozornenia, reštartujte svoj %1$@.";
 
 /* Shown as the title of an alert when notifications can't be shown due to an error. */
 "NOTIFICATIONS_ERROR_TITLE" = "Nepodarilo sa zobraziť upozornenia";
@@ -5662,10 +5662,10 @@
 "ONBOARDING_2FA_SKIP_PIN_ENTRY_TITLE" = "Preskočiť zadávanie PINu?";
 
 /* The body for the device transfer 'choice' view 'restore backup' option */
-"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_BODY" = "Obnovte svoj účet a správy zo Zálohy Radar/Signal";
+"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_BODY" = "Obnovte svoj účet a správy zo Zálohy Radar/Radar";
 
 /* The title for the device transfer 'choice' view 'restore backup' option */
-"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_TITLE" = "Obnoviť bezpečnú zálohu Radar/Signal";
+"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_TITLE" = "Obnoviť bezpečnú zálohu Radar/Radar";
 
 /* Body for a sheet warning users about skipping restore. */
 "ONBOARDING_CHOOSE_RESTORE_METHOD_CONFIRM_SKIP_RESTORE_BODY" = "Ak nevykonáte obnovu teraz, neskôr to nebude možné. Ak na tomto zariadení znova povolíte zálohovanie, vaša aktuálna záloha bude nahradená novou históriou správ.";
@@ -5677,7 +5677,7 @@
 "ONBOARDING_CHOOSE_RESTORE_METHOD_DESCRIPTION" = "Vyberte, ako chcete obnoviť históriu správ a údaje účtu.";
 
 /* Message body displayed to a user during registration if there are no restore options available. */
-"ONBOARDING_CHOOSE_RESTORE_METHOD_NONE_AVAILABLE_BODY" = "Keďže prechádzate zo zariadenia Android na iOS, jediný spôsob, ako preniesť správy a médiá, je povoliť Zálohy Signal na starom zariadení.";
+"ONBOARDING_CHOOSE_RESTORE_METHOD_NONE_AVAILABLE_BODY" = "Keďže prechádzate zo zariadenia Android na iOS, jediný spôsob, ako preniesť správy a médiá, je povoliť Zálohy Radar na starom zariadení.";
 
 /* Title displayed to a user during registration if there are no restore options available. */
 "ONBOARDING_CHOOSE_RESTORE_METHOD_NONE_AVAILABLE_TITLE" = "Žiadna záloha na obnovenie";
@@ -5737,7 +5737,7 @@
 "ONBOARDING_MODE_SWITCH_BUTTON_REGISTERING" = "Prepojiť iPhone";
 
 /* explanation to the user they're switching from linking to registering flow */
-"ONBOARDING_MODE_SWITCH_EXPLANATION_PROVISIONING" = "Ťuknutím na „Registrovať iPad“ budete môcť vytvoriť čisto nový Signal účet alebo presunúť existujúci účet na tento iPad. Toto vypne Signal na akomkoľvek inom zariadení, ktoré je momentálne registrované prostredníctvom tohto istého telefónneho čísla.";
+"ONBOARDING_MODE_SWITCH_EXPLANATION_PROVISIONING" = "Ťuknutím na „Registrovať iPad“ budete môcť vytvoriť čisto nový Radar účet alebo presunúť existujúci účet na tento iPad. Toto vypne Radar na akomkoľvek inom zariadení, ktoré je momentálne registrované prostredníctvom tohto istého telefónneho čísla.";
 
 /* explanation to the user they're switching from registering to linking flow */
 "ONBOARDING_MODE_SWITCH_EXPLANATION_REGISTERING" = "Ťuknutím na “Prepojiť iPhone” budete môcť spojiť váš telefón s existujúcim účtom. Vo všeobecnosti sa to neodporúča a obmedzí to niektoré funkcie, ako uskutočňovanie hovorov.";
@@ -5749,13 +5749,13 @@
 "ONBOARDING_MODE_SWITCH_TITLE_REGISTERING" = "Prepojiť tento iPhone";
 
 /* warning to the user that registering an ipad is not recommended */
-"ONBOARDING_MODE_SWITCH_WARNING_PROVISIONING" = "Registrácia tohto iPadu vypne Signal na akomkoľvek inom zariadení, ktoré je momentálne registrované prostredníctvom tohto istého telefónneho čísla.";
+"ONBOARDING_MODE_SWITCH_WARNING_PROVISIONING" = "Registrácia tohto iPadu vypne Radar na akomkoľvek inom zariadení, ktoré je momentálne registrované prostredníctvom tohto istého telefónneho čísla.";
 
 /* warning to the user that linking a phone is not recommended */
 "ONBOARDING_MODE_SWITCH_WARNING_REGISTERING" = "Prepojenie vášho iPhonu sa neodporúča a obmedzí to základnú funkcionalitu.";
 
 /* Description of the 'Contacts' permission in the 'onboarding permissions' view. */
-"ONBOARDING_PERMISSIONS_CONTACTS_DESCRIPTION" = "Nájdite ľudí, ktorých poznáte. Vaše kontakty sú šifrované a nie sú viditeľné pre službu Signal.";
+"ONBOARDING_PERMISSIONS_CONTACTS_DESCRIPTION" = "Nájdite ľudí, ktorých poznáte. Vaše kontakty sú šifrované a nie sú viditeľné pre službu Radar.";
 
 /* Title introducing the 'Contacts' permission in the 'onboarding permissions' view. */
 "ONBOARDING_PERMISSIONS_CONTACTS_TITLE" = "Kontakty";
@@ -5767,7 +5767,7 @@
 "ONBOARDING_PERMISSIONS_NOTIFICATIONS_TITLE" = "Hlásenia";
 
 /* Preamble of the 'onboarding permissions' view. */
-"ONBOARDING_PERMISSIONS_PREAMBLE" = "Signal žiada o nasledujúce povolenia.";
+"ONBOARDING_PERMISSIONS_PREAMBLE" = "Radar žiada o nasledujúce povolenia.";
 
 /* Description of the 'Notification Relay' permission in the 'onboarding permissions' view. */
 "ONBOARDING_PERMISSIONS_RELAY_DESCRIPTION" = "Enable Radar notification relay to ensure you get immediate background notifications in Radar. Relay is always privacy-preserving and keeps your messages end-to-end encrypted no matter what.";
@@ -5779,7 +5779,7 @@
 "ONBOARDING_PERMISSIONS_TITLE" = "Povoliť povolenia";
 
 /* Explanation of the 'onboarding phone number discoverability' view. Embeds {user phone number} */
-"ONBOARDING_PHONE_NUMBER_DISCOVERABILITY_EXPLANATION_FORMAT" = "Zvoľte, kto vás môže nájsť v službe Signal podľa vášho telefónneho čísla %1$@";
+"ONBOARDING_PHONE_NUMBER_DISCOVERABILITY_EXPLANATION_FORMAT" = "Zvoľte, kto vás môže nájsť v službe Radar podľa vášho telefónneho čísla %1$@";
 
 /* Title of the 'onboarding phone number discoverability' view. */
 "ONBOARDING_PHONE_NUMBER_DISCOVERABILITY_TITLE" = "Kto vás môže nájsť podľa vášho telefónneho čísla?";
@@ -5794,7 +5794,7 @@
 "ONBOARDING_PHONE_NUMBER_VALIDATION_WARNING" = "Neplatné telefónne číslo. Pre registráciu zadajte platné telefónne číslo.";
 
 /* Explanation of the 'onboarding pin attempts exhausted' view when reglock is disabled. */
-"ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_EXPLANATION" = "Pokusy na uhádnutie PIN kódu ste si vyčerpali, ale ešte stále môžete získať prístup k vášmu účtu Signal, ak si vytvoríte nový PIN. Kvôli vášmu súkromiu a vašej bezpečnosti sa váš účet obnoví bez akýchkoľvek uložených informácií o profile či nastavení.";
+"ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_EXPLANATION" = "Pokusy na uhádnutie PIN kódu ste si vyčerpali, ale ešte stále môžete získať prístup k vášmu účtu Radar, ak si vytvoríte nový PIN. Kvôli vášmu súkromiu a vašej bezpečnosti sa váš účet obnoví bez akýchkoľvek uložených informácií o profile či nastavení.";
 
 /* Label for the 'learn more' link when reglock is disabled in the 'onboarding pin attempts exhausted' view. */
 "ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_LEARN_MORE" = "Dozvedieť sa viac o PINoch";
@@ -5803,7 +5803,7 @@
 "ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_TITLE" = "Nesprávny PIN";
 
 /* Explanation of the 'onboarding pin attempts exhausted' view when it is unknown if reglock is enabled. */
-"ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_WITH_UNKNOWN_REGLOCK_EXPLANATION" = "Minuli sa vám pokusy na zadanie PIN kódu, no stále môžete skúsiť získať prístup k svojmu Signal účtu overením cez vaše telefónne číslo. Kvôli vášmu bezpečiu a súkromiu bude váš účet obnovený bez akýchkoľvek uložených profilových údajov alebo nastavení.";
+"ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_WITH_UNKNOWN_REGLOCK_EXPLANATION" = "Minuli sa vám pokusy na zadanie PIN kódu, no stále môžete skúsiť získať prístup k svojmu Radar účtu overením cez vaše telefónne číslo. Kvôli vášmu bezpečiu a súkromiu bude váš účet obnovený bez akýchkoľvek uložených profilových údajov alebo nastavení.";
 
 /* Title for the setup complete screen shown at the end of the onboarding flow. */
 "ONBOARDING_SETUP_COMPLETE_TITLE" = "Nastavenie dokončené";
@@ -5830,13 +5830,13 @@
 "ONBOARDING_SIGN_UP_USE_SIGNAL_ACCOUNT_BUTTON_TITLE" = "Use my Signal account";
 
 /* Explanation of 'do not have old device' flow for the 'Restore or Transfer' prompt */
-"ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_BODY" = "Alebo znova inštalujete Radar/Signal na rovnakom zariadení";
+"ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_BODY" = "Alebo znova inštalujete Radar/Radar na rovnakom zariadení";
 
 /* Title for the 'do not have my old device' choice of the 'Restore or Transfer' prompt */
 "ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_TITLE" = "Nemám svoj starý telefón";
 
 /* Explanation of 'have old device' flow for the 'Restore or Transfer' prompt */
-"ONBOARDING_SPLASH_HAVE_OLD_DEVICE_BODY" = "Pre rýchle nastavenie naskenujte QR kód zo svojho aktuálneho Radar/Signal účtu";
+"ONBOARDING_SPLASH_HAVE_OLD_DEVICE_BODY" = "Pre rýchle nastavenie naskenujte QR kód zo svojho aktuálneho Radar/Radar účtu";
 
 /* Title for the 'have my old device' choice of the 'Restore or Transfer' prompt */
 "ONBOARDING_SPLASH_HAVE_OLD_DEVICE_TITLE" = "Mám svoj starý telefón";
@@ -5897,19 +5897,19 @@ Send money securely.";
 "OPEN_SETTINGS_BUTTON" = "Nastavenia";
 
 /* Signal doesn't support old versions of iOS and shows a warning if you're on unsupported version. Some users can upgrade their device to a newer version of iOS to continue using Signal. If that's the case, they'll be shown this text. */
-"OS_EXPIRED_AND_CAN_UPGRADE_OS" = "Signal už na tomto zariadení nefunguje. Ak chcete znova používať Signal, aktualizujte svoje zariadenie na novšiu verziu systému iOS.";
+"OS_EXPIRED_AND_CAN_UPGRADE_OS" = "Radar už na tomto zariadení nefunguje. Ak chcete znova používať Radar, aktualizujte svoje zariadenie na novšiu verziu systému iOS.";
 
 /* Signal doesn't support old devices. If that's the case, they'll be shown this action, and tapping it will open information about Signal's minimum supported operating systems. */
-"OS_EXPIRED_AND_DEVICE_IS_STUCK" = "Signal už na tomto zariadení nefunguje. Ak chcete znova používať Signal, prejdite na novšie zariadenie.";
+"OS_EXPIRED_AND_DEVICE_IS_STUCK" = "Radar už na tomto zariadení nefunguje. Ak chcete znova používať Radar, prejdite na novšie zariadenie.";
 
 /* Signal doesn't support old versions of iOS and shows a warning if you're on an old version. Some users can upgrade their device to a newer version of iOS to continue using Signal. If that's the case, they'll be shown this action, and tapping it will open device update instructions. */
 "OS_SOON_TO_EXPIRE_ACTION_TITLE" = "Aktualizovať teraz";
 
 /* Signal doesn't support old versions of iOS and shows a warning if you're an old version that will soon lose support. Some users can upgrade their device to a newer version of iOS to continue using Signal. If that's the case, they'll be shown this text. Embeds {{expiration date}}. */
-"OS_SOON_TO_EXPIRE_AND_CAN_UPGRADE_OS_FORMAT" = "Signal už čoskoro nebude podporovať verziu systému iOS na vašom zariadení. Ak chcete naďalej používať Signal, aktualizujte svoje zariadenie na novšiu verziu systému iOS do %1$@.";
+"OS_SOON_TO_EXPIRE_AND_CAN_UPGRADE_OS_FORMAT" = "Radar už čoskoro nebude podporovať verziu systému iOS na vašom zariadení. Ak chcete naďalej používať Radar, aktualizujte svoje zariadenie na novšiu verziu systému iOS do %1$@.";
 
 /* Signal doesn't support old versions of iOS and shows a warning if you're on an old version that will soon lose support. This is the text on that warning when users can't upgrade iOS without getting a new device. Embeds {{expiration date}}. */
-"OS_SOON_TO_EXPIRE_AND_DEVICE_WILL_BE_STUCK_FORMAT" = "Signal už čoskoro nebude podporovať verziu systému iOS na vašom zariadení. Ak chcete naďalej používať Signal, prejdite na novšie zariadenie do %1$@.";
+"OS_SOON_TO_EXPIRE_AND_DEVICE_WILL_BE_STUCK_FORMAT" = "Radar už čoskoro nebude podporovať verziu systému iOS na vašom zariadení. Ak chcete naďalej používať Radar, prejdite na novšie zariadenie do %1$@.";
 
 /* Info Message when another user disabled disappearing messages. Embeds {{name of other user}}. */
 "OTHER_DISABLED_DISAPPEARING_MESSAGES_CONFIGURATION" = "%1$@ vypol/la miznúce správy.";
@@ -5918,13 +5918,13 @@ Send money securely.";
 "OTHER_UPDATED_DISAPPEARING_MESSAGES_CONFIGURATION" = "%1$@ nastavil(a) časovač miznúcich správ na %2$@.";
 
 /* Label warning the user that the Signal service may be down. */
-"OUTAGE_WARNING" = "Signal má technické ťažkosti. Pracujeme na tom, aby sme čo najskôr obnovili našu službu.";
+"OUTAGE_WARNING" = "Radar má technické ťažkosti. Pracujeme na tom, aby sme čo najskôr obnovili našu službu.";
 
 /* Label for action link when the user has an outdated payment client */
 "OUTDATED_PAYMENT_CLIENT_ACTION_TITLE" = "Aktualizovať teraz";
 
 /* Label warning the user that they should update Signal to continue using payments. */
-"OUTDATED_PAYMENT_CLIENT_REMINDER_TEXT" = "Aktualizujte Signal, aby ste mohli naďalej používať platby. Je možné, že váš zostatok nie je aktuálny.";
+"OUTDATED_PAYMENT_CLIENT_REMINDER_TEXT" = "Aktualizujte Radar, aby ste mohli naďalej používať platby. Je možné, že váš zostatok nie je aktuálny.";
 
 /* Body of prompt notifying restore was cancelled. */
 "OUTGOING_DEVICE_REGISTRATION_CANCELLED_RESTORE_BODY" = "Obnovenie bolo zrušené. Skúste to znova.";
@@ -5933,7 +5933,7 @@ Send money securely.";
 "OUTGOING_DEVICE_REGISTRATION_CANCELLED_RESTORE_TITLE" = "Obnovenie bolo zrušené";
 
 /* Body of prompt notifying registration without restore completed on the new device. */
-"OUTGOING_DEVICE_REGISTRATION_COMPLETE_BODY" = "Váš Signal účet bol aktivovaný na vašom druhom zariadení. Signal je teraz na tomto zariadení neaktívny.";
+"OUTGOING_DEVICE_REGISTRATION_COMPLETE_BODY" = "Váš Radar účet bol aktivovaný na vašom druhom zariadení. Radar je teraz na tomto zariadení neaktívny.";
 
 /* Title of prompt notifying registration without restore completed on the new device. */
 "OUTGOING_DEVICE_REGISTRATION_COMPLETE_TITLE" = "Registrácia bola dokončená";
@@ -5951,7 +5951,7 @@ Send money securely.";
 "OUTGOING_DEVICE_REGISTRATION_UNKNOWN_ERROR_TITLE" = "Neznáma chyba";
 
 /* Body of prompt notifying device restore started on the new device. */
-"OUTGOING_DEVICE_RESTORE_COMPLETE_BODY" = "Váš Signal účet a správy sa začali prenášať do vášho druhého zariadenia. Signal je teraz na tomto zariadení neaktívny.";
+"OUTGOING_DEVICE_RESTORE_COMPLETE_BODY" = "Váš Radar účet a správy sa začali prenášať do vášho druhého zariadenia. Radar je teraz na tomto zariadení neaktívny.";
 
 /* Title of prompt notifying device restore started on the new device. */
 "OUTGOING_DEVICE_RESTORE_COMPLETE_TITLE" = "Obnova dokončená";
@@ -5975,7 +5975,7 @@ Send money securely.";
 "OUTGOING_DEVICE_RESTORE_INITIAL_VIEW_TITLE" = "Preniesť účet";
 
 /* Body of prompt notifying device transfer completed. */
-"OUTGOING_DEVICE_TRANSFER_COMPLETE_BODY" = "Váš Signal účet a správy boli prenesené do vášho druhého zariadenia. Signal je teraz na tomto zariadení neaktívny.";
+"OUTGOING_DEVICE_TRANSFER_COMPLETE_BODY" = "Váš Radar účet a správy boli prenesené do vášho druhého zariadenia. Radar je teraz na tomto zariadení neaktívny.";
 
 /* Title of prompt notifying device transfer completed. */
 "OUTGOING_DEVICE_TRANSFER_COMPLETE_TITLE" = "Prenos dokončený";
@@ -5987,10 +5987,10 @@ Send money securely.";
 "OUTGOING_MISSED_VOICE_CALL" = "Neprijatý hlasový hovor";
 
 /* Button for action sheet shown when device transfer completes; quits the Signal app immediately (does not automatically relaunch, but the user may choose to relaunch). */
-"OUTGOING_TRANSFER_COMPLETE_EXIT_ACTION" = "Zavrieť Signal";
+"OUTGOING_TRANSFER_COMPLETE_EXIT_ACTION" = "Zavrieť Radar";
 
 /* Message for action sheet shown when device transfer completes */
-"OUTGOING_TRANSFER_COMPLETE_MESSAGE" = "Signal sa teraz na tomto zariadení zavrie";
+"OUTGOING_TRANSFER_COMPLETE_MESSAGE" = "Radar sa teraz na tomto zariadení zavrie";
 
 /* Title for action sheet shown when device transfer completes */
 "OUTGOING_TRANSFER_COMPLETE_TITLE" = "Prenos dokončený!";
@@ -6168,7 +6168,7 @@ Send money securely.";
 "PAYMENTS_NEW_PAYMENT_ERROR_INVALID_TRANSACTION" = "Neplatná transakcia";
 
 /* Indicates that a payment failed due to an outdated client. */
-"PAYMENTS_NEW_PAYMENT_ERROR_OUTDATED_CLIENT" = "Aktualizujte Signal, aby ste mohli používať platby.";
+"PAYMENTS_NEW_PAYMENT_ERROR_OUTDATED_CLIENT" = "Aktualizujte Radar, aby ste mohli používať platby.";
 
 /* Indicates that an outgoing payment could not be verified in a timely way. */
 "PAYMENTS_NEW_PAYMENT_ERROR_OUTGOING_VERIFICATION_TAKING_TOO_LONG" = "Platba ešte nie je overená";
@@ -6432,13 +6432,13 @@ Send money securely.";
 "PHONE_NUMBER_DISCOVERABILITY_EVERYBODY" = "Všetci";
 
 /* A user friendly description of the 'everybody' phone number discoverability mode. */
-"PHONE_NUMBER_DISCOVERABILITY_EVERYBODY_DESCRIPTION" = "Každý, kto má vaše telefónne číslo, vás v aplikácii Signal uvidí a môže s vami začať četovať.";
+"PHONE_NUMBER_DISCOVERABILITY_EVERYBODY_DESCRIPTION" = "Každý, kto má vaše telefónne číslo, vás v aplikácii Radar uvidí a môže s vami začať četovať.";
 
 /* A user friendly name for the 'nobody' phone number discoverability mode. */
 "PHONE_NUMBER_DISCOVERABILITY_NOBODY" = "Nikto";
 
 /* A user friendly description of the 'nobody' phone number discoverability mode. */
-"PHONE_NUMBER_DISCOVERABILITY_NOBODY_DESCRIPTION" = "Nikto vás v aplikácii Signal neuvidí, pokiaľ mu nenapíšete správu alebo s ním nebudete četovať.";
+"PHONE_NUMBER_DISCOVERABILITY_NOBODY_DESCRIPTION" = "Nikto vás v aplikácii Radar neuvidí, pokiaľ mu nenapíšete správu alebo s ním nebudete četovať.";
 
 /* A format for a label showing an example phone number. Embeds {{the example phone number}}. */
 "PHONE_NUMBER_EXAMPLE_FORMAT" = "Príklad: %1$@";
@@ -6552,10 +6552,10 @@ Send money securely.";
 "PIN_CREATION_LEARN_MORE" = "Viac o PIN kódoch";
 
 /* Users can create PINs to restore their account data later. They can learn more about this on a sheet. This is the text on that sheet. */
-"PIN_CREATION_LEARN_MORE_TEXT" = "PIN kódy udržiavajú údaje uložené v aplikácii Signal zašifrované, aby ste k nim mali prístup iba vy. Váš profil, nastavenia a kontakty sa po preinštalovaní aplikácie obnovia.";
+"PIN_CREATION_LEARN_MORE_TEXT" = "PIN kódy udržiavajú údaje uložené v aplikácii Radar zašifrované, aby ste k nim mali prístup iba vy. Váš profil, nastavenia a kontakty sa po preinštalovaní aplikácie obnovia.";
 
 /* Users can create PINs to restore their account data later. They can learn more about this on a sheet. This is the title on that sheet. */
-"PIN_CREATION_LEARN_MORE_TITLE" = "Signal PIN kódy";
+"PIN_CREATION_LEARN_MORE_TITLE" = "Radar PIN kódy";
 
 /* Label indicating that the attempted PIN does not match the first PIN */
 "PIN_CREATION_MISMATCH_ERROR" = "PINy sa nezhodujú. Skúste to znovu.";
@@ -6588,7 +6588,7 @@ Send money securely.";
 "PIN_CREATION_WEAK_ERROR" = "Zvoľte si silnejší PIN";
 
 /* If your attempted PIN is too weak, you'll see an error message. This is the text on the error dialog. */
-"PIN_CREATION_WEAK_ERROR_MESSAGE" = "PIN kódy udržiavajú údaje uložené v aplikácii Signal zašifrované, aby ste k nim mali prístup iba vy. Zvoľte silnejší PIN kód a chráňte tak svoj účet.";
+"PIN_CREATION_WEAK_ERROR_MESSAGE" = "PIN kódy udržiavajú údaje uložené v aplikácii Radar zašifrované, aby ste k nim mali prístup iba vy. Zvoľte silnejší PIN kód a chráňte tak svoj účet.";
 
 /* If the user is re-registering, they need to enter their PIN to restore all their data. In some cases, they can skip this entry and lose some data. This text is shown on a button that lets them begin to do this. */
 "PIN_ENTER_EXISTING_SKIP" = "Preskočiť PIN";
@@ -6621,7 +6621,7 @@ Send money securely.";
 "PIN_REMINDER_MEGAPHONE_FEW_DAYS_TOAST" = "O tri dni vám to pripomenieme znovu.";
 
 /* Title for PIN reminder megaphone */
-"PIN_REMINDER_MEGAPHONE_TITLE" = "Overte svoj PIN pre Signal";
+"PIN_REMINDER_MEGAPHONE_TITLE" = "Overte svoj PIN pre Radar";
 
 /* Toast indicating that we'll ask you for your PIN again tomorrow, after successfully entering it. */
 "PIN_REMINDER_MEGAPHONE_TOMORROW_SUCCESSFUL_TOAST" = "Zadaný PIN je správny. Zajtra si ho od vás znova vyžiadame.";
@@ -6645,7 +6645,7 @@ Send money securely.";
 "PIN_REMINDER_MISMATCH_ERROR" = "Nesprávny PIN, skúste znovu.";
 
 /* The title for the 'pin reminder' dialog. */
-"PIN_REMINDER_TITLE" = "Zadajte svoj PIN pre Signal";
+"PIN_REMINDER_TITLE" = "Zadajte svoj PIN pre Radar";
 
 /* Label indicating that the attempted PIN is too short */
 "PIN_REMINDER_TOO_SHORT_ERROR" = "PIN musí mať aspoň 4 číslice.";
@@ -6660,7 +6660,7 @@ Send money securely.";
 "PINS_MEGAPHONE_ACTION" = "Vytvoriť PIN";
 
 /* Body for PIN megaphone when user doesn't have a PIN */
-"PINS_MEGAPHONE_BODY" = "Dokončite vytváranie Signal PIN kódu.";
+"PINS_MEGAPHONE_BODY" = "Dokončite vytváranie Radar PIN kódu.";
 
 /* Title for PIN megaphone when user doesn't have a PIN */
 "PINS_MEGAPHONE_TITLE" = "Vytvoriť si PIN";
@@ -6768,10 +6768,10 @@ Send money securely.";
 "PRIVACY_VERIFICATION_FAILED_MISMATCHED_SAFETY_NUMBERS_IN_CLIPBOARD" = "Číslo vo vašej schránke nevyzerá ako správne bezpečnostné číslo pre tento čet.";
 
 /* Alert body for user error */
-"PRIVACY_VERIFICATION_FAILED_NO_SAFETY_NUMBERS_IN_CLIPBOARD" = "Signal nenašiel v schránke žiadne bezpečnostné číslo. Okopírovali ste ho správne?";
+"PRIVACY_VERIFICATION_FAILED_NO_SAFETY_NUMBERS_IN_CLIPBOARD" = "Radar nenašiel v schránke žiadne bezpečnostné číslo. Okopírovali ste ho správne?";
 
 /* Alert body when verifying with {{contact name}} */
-"PRIVACY_VERIFICATION_FAILED_THEY_HAVE_WRONG_KEY_FOR_ME" = "Každá dvojica Signal používateľov spolu zdieľa jedinečné bezpečnostné číslo. Dobre si overte, že %1$@ zobrazuje *vaše* jedinečné bezpečnostné číslo.";
+"PRIVACY_VERIFICATION_FAILED_THEY_HAVE_WRONG_KEY_FOR_ME" = "Každá dvojica Radar používateľov spolu zdieľa jedinečné bezpečnostné číslo. Dobre si overte, že %1$@ zobrazuje *vaše* jedinečné bezpečnostné číslo.";
 
 /* alert body */
 "PRIVACY_VERIFICATION_FAILED_WITH_OLD_LOCAL_VERSION" = "Používate starú verziu Signalu. Pred overením musíte aplikáciu aktualizovať.";
@@ -6855,7 +6855,7 @@ Send money securely.";
 "PROFILE_NAME_EDUCATION_SHEET_BULLET_3" = "Nezdieľajte osobné údaje s ľuďmi, ktorých nepoznáte";
 
 /* Header for the explainer sheet for profile names */
-"PROFILE_NAME_EDUCATION_SHEET_HEADER_FORMAT" = "<bold>Názvy profilov</bold> si v aplikácii Signal vyberá majiteľ účtu.";
+"PROFILE_NAME_EDUCATION_SHEET_HEADER_FORMAT" = "<bold>Názvy profilov</bold> si v aplikácii Radar vyberá majiteľ účtu.";
 
 /* Title for the profile name view. */
 "PROFILE_NAME_VIEW_TITLE" = "Vaše meno";
@@ -7062,7 +7062,7 @@ Send money securely.";
 "RECIPIENT_PICKER_ERROR_USER_CANNOT_BE_SELECTED" = "Nie je možné vybrať používateľa.";
 
 /* Alert text. Shown after selecting a phone number that isn't valid. */
-"RECIPIENT_PICKER_INVALID_NUMBER_MESSAGE" = "%1$@ nepoužíva Signal. Skúste to znovu s platným telefónnym číslom.";
+"RECIPIENT_PICKER_INVALID_NUMBER_MESSAGE" = "%1$@ nepoužíva Radar. Skúste to znovu s platným telefónnym číslom.";
 
 /* Alert title. Shown after selecting a phone number that isn't valid. */
 "RECIPIENT_PICKER_INVALID_NUMBER_TITLE" = "Neplatné telefónne číslo";
@@ -7071,7 +7071,7 @@ Send money securely.";
 "RECIPIENT_PICKER_INVITE_ACTION" = "Pozvať";
 
 /* Alert text. Shown after selecting a phone number that isn't a Signal user. */
-"RECIPIENT_PICKER_INVITE_MESSAGE" = "%1$@ nepoužíva Signal. Chceli by ste pozvať toto číslo?";
+"RECIPIENT_PICKER_INVITE_MESSAGE" = "%1$@ nepoužíva Radar. Chceli by ste pozvať toto číslo?";
 
 /* Alert title. Shown after selecting a phone number that isn't a Signal user. */
 "RECIPIENT_PICKER_INVITE_TITLE" = "Pozvať do Signalu";
@@ -7080,13 +7080,13 @@ Send money securely.";
 "REGISTER_2FA_FORGOT_PIN_ALERT_TITLE" = "Potrebujete pomoc?";
 
 /* Alert body for a forgotten SVR (V2) PIN */
-"REGISTER_2FA_FORGOT_SVR_PIN_ALERT_MESSAGE" = "Váš PIN kód je 4 alebo viacmiestny kód, ktorý ste si vytvorili, a môže pozostávať z číselných alebo alfanumerických znakov. Ak si naň nespomeniete, budete musieť počkať 7 dní na opätovnú registráciu vášho účtu. Ak máte povolené Bezpečné zálohy Signal, môžete pokračovať s kľúčom na obnovenie.";
+"REGISTER_2FA_FORGOT_SVR_PIN_ALERT_MESSAGE" = "Váš PIN kód je 4 alebo viacmiestny kód, ktorý ste si vytvorili, a môže pozostávať z číselných alebo alfanumerických znakov. Ak si naň nespomeniete, budete musieť počkať 7 dní na opätovnú registráciu vášho účtu. Ak máte povolené Bezpečné zálohy Radar, môžete pokračovať s kľúčom na obnovenie.";
 
 /* Alert body for a forgotten SVR (V2) PIN when the user doesn't have reglock and they cannot necessarily create a new PIN */
-"REGISTER_2FA_FORGOT_SVR_PIN_WITHOUT_REGLOCK_ALERT_MESSAGE" = "Váš PIN kód je 4 alebo viacmiestny kód, ktorý ste si vytvorili, a môže pozostávať z číselných alebo alfanumerických znakov. Ak si na svoj PIN nedokážete spomenúť, môžete sa zaregistrovať a používať svoj účet, ale prídete o niektoré uložené nastavenia, ako sú informácie o vašom profile. Ak máte povolené Bezpečné zálohy Signal, môžete pokračovať s kľúčom na obnovenie.";
+"REGISTER_2FA_FORGOT_SVR_PIN_WITHOUT_REGLOCK_ALERT_MESSAGE" = "Váš PIN kód je 4 alebo viacmiestny kód, ktorý ste si vytvorili, a môže pozostávať z číselných alebo alfanumerických znakov. Ak si na svoj PIN nedokážete spomenúť, môžete sa zaregistrovať a používať svoj účet, ale prídete o niektoré uložené nastavenia, ako sú informácie o vašom profile. Ak máte povolené Bezpečné zálohy Radar, môžete pokračovať s kľúčom na obnovenie.";
 
 /* Alert body for a forgotten SVR (V2) PIN when the user doesn't have reglock and they can create a new PIN */
-"REGISTER_2FA_FORGOT_SVR_PIN_WITHOUT_REGLOCK_AND_CAN_CREATE_NEW_PIN_ALERT_MESSAGE" = "Váš PIN kód je 4 alebo viacmiestny kód, ktorý ste si vytvorili, a môže pozostávať z číselných alebo alfanumerických znakov. Ak si nepamätáte svoj PIN kód, môžete si vytvoriť nový. Môžete sa zaregistrovať a používať svoj účet, ale prídete o niektoré uložené nastavenia, ako sú informácie o vašom profile. Ak máte povolené Bezpečné zálohy Signal, môžete pokračovať s kľúčom na obnovenie.";
+"REGISTER_2FA_FORGOT_SVR_PIN_WITHOUT_REGLOCK_AND_CAN_CREATE_NEW_PIN_ALERT_MESSAGE" = "Váš PIN kód je 4 alebo viacmiestny kód, ktorý ste si vytvorili, a môže pozostávať z číselných alebo alfanumerických znakov. Ak si nepamätáte svoj PIN kód, môžete si vytvoriť nový. Môžete sa zaregistrovať a používať svoj účet, ale prídete o niektoré uložené nastavenia, ako sú informácie o vašom profile. Ak máte povolené Bezpečné zálohy Radar, môžete pokračovať s kľúčom na obnovenie.";
 
 /* Alert title explaining what happens if you forget your 'two-factor auth pin'. */
 "REGISTER_2FA_INVALID_PIN_ALERT_TITLE" = "Nesprávny PIN";
@@ -7134,7 +7134,7 @@ Send money securely.";
 "REGISTRATION_BACKUP_RESTORE_ERROR_GENERIC_TITLE" = "Prenos sa nepodarilo dokončiť";
 
 /* Body for a sheet warning users about an incorrect recovery key. */
-"REGISTRATION_BACKUP_RESTORE_ERROR_INCORRECT_KEY_BODY" = "Možno ste zadali nesprávny kľúč na obnovenie alebo ste nevytvorili aspoň jednu zálohu na starom zariadení. \n\nUistite sa, že sa registrujete pomocou rovnakého telefónneho čísla a kľúča na obnovenie, ktorý ste si uložili pri povolení bezpečných záloh Signal, a overte si, či sa na vašom starom zariadení dokončila záloha.";
+"REGISTRATION_BACKUP_RESTORE_ERROR_INCORRECT_KEY_BODY" = "Možno ste zadali nesprávny kľúč na obnovenie alebo ste nevytvorili aspoň jednu zálohu na starom zariadení. \n\nUistite sa, že sa registrujete pomocou rovnakého telefónneho čísla a kľúča na obnovenie, ktorý ste si uložili pri povolení bezpečných záloh Radar, a overte si, či sa na vašom starom zariadení dokončila záloha.";
 
 /* Body for a sheet warning users about an incorrect recovery key and having hit a rate limit on retries. */
 "REGISTRATION_BACKUP_RESTORE_ERROR_INCORRECT_KEY_RATE_LIMIT_BODY" = "Vyčerpali ste počet pokusov o zadanie kľúča na obnovenie. Z bezpečnostných dôvodov je počet pokusov, ktoré môžete vykonať, obmedzený. Skúste to znova o hodinu.";
@@ -7179,7 +7179,7 @@ Send money securely.";
 "REGISTRATION_CANNOT_CONTINUE_WITHOUT_UPDATING_APP_ACTION" = "Aktualizovať";
 
 /* During (re)registration, users may need to update their app to continue. They'll be presented with an alert if this is the case, prompting them to update. This is the description text on that alert. */
-"REGISTRATION_CANNOT_CONTINUE_WITHOUT_UPDATING_APP_DESCRIPTION" = "Ak chcete pokračovať v registrácii, aktualizujte Signal na najnovšiu verziu.";
+"REGISTRATION_CANNOT_CONTINUE_WITHOUT_UPDATING_APP_DESCRIPTION" = "Ak chcete pokračovať v registrácii, aktualizujte Radar na najnovšiu verziu.";
 
 /* During (re)registration, users may need to update their app to continue. They'll be presented with an alert if this is the case, prompting them to update. This is the title on that alert. */
 "REGISTRATION_CANNOT_CONTINUE_WITHOUT_UPDATING_APP_TITLE" = "Vyžaduje sa aktualizácia";
@@ -7191,7 +7191,7 @@ Send money securely.";
 "REGISTRATION_DEFAULT_COUNTRY_NAME" = "Kód krajiny";
 
 /* If a user is installing Signal on a new phone, they may be asked whether they want to transfer their account from their old device. This is a description on the screen that asks them this question. */
-"REGISTRATION_DEVICE_TRANSFER_CHOICE_EXPLANATION" = "Ak budete pokračovať, vypnete Signal na iných zariadeniach, ktoré sú momentálne registrované prostredníctvom toho istého telefónneho čísla.";
+"REGISTRATION_DEVICE_TRANSFER_CHOICE_EXPLANATION" = "Ak budete pokračovať, vypnete Radar na iných zariadeniach, ktoré sú momentálne registrované prostredníctvom toho istého telefónneho čísla.";
 
 /* If a user is installing Signal on a new phone, they may be asked whether they want to transfer their account from their old device. This is the title on the screen that asks them this question. */
 "REGISTRATION_DEVICE_TRANSFER_CHOICE_TITLE" = "Preniesť účet a správy";
@@ -7227,7 +7227,7 @@ Send money securely.";
 "REGISTRATION_NO_BACKUP_KEY_BUTTON_TITLE" = "Nemáte kľúč na obnovenie?";
 
 /* Body text on a sheet with info for what to do if you don't have a recovery key */
-"REGISTRATION_NO_BACKUP_KEY_SHEET_BODY" = "Zálohy nie je možné obnoviť bez ich 64-miestneho kódu na obnovenie. V prípade straty kľúča na obnovenie vám Signal nemôže pomôcť obnoviť zálohu.\n\nAk máte svoje staré zariadenie, kľúč na obnovenie si môžete pozrieť v časti Nastavenia > Čety > Zálohy. Potom ťuknite na Zobraziť kľúč na obnovenie.";
+"REGISTRATION_NO_BACKUP_KEY_SHEET_BODY" = "Zálohy nie je možné obnoviť bez ich 64-miestneho kódu na obnovenie. V prípade straty kľúča na obnovenie vám Radar nemôže pomôcť obnoviť zálohu.\n\nAk máte svoje staré zariadenie, kľúč na obnovenie si môžete pozrieť v časti Nastavenia > Čety > Zálohy. Potom ťuknite na Zobraziť kľúč na obnovenie.";
 
 /* Title for sheet with info for what to do if you don't have a recovery key */
 "REGISTRATION_NO_BACKUP_KEY_SHEET_TITLE" = "Nemáte kľúč na obnovenie?";
@@ -7290,16 +7290,16 @@ Send money securely.";
 "REGISTRATION_PROFILE_SETUP_TITLE" = "Nastavte si svoj profil";
 
 /* Error shown if an SMS/call service provider is permanently unable to send a verification code to the provided number. */
-"REGISTRATION_PROVIDER_FAILURE_MESSAGE_PERMANENT" = "Signal nemôže odoslať SMS kód pre problémy s operátorom.";
+"REGISTRATION_PROVIDER_FAILURE_MESSAGE_PERMANENT" = "Radar nemôže odoslať SMS kód pre problémy s operátorom.";
 
 /* Error shown if an SMS/call service provider is temporarily unable to send a verification code to the provided number. */
-"REGISTRATION_PROVIDER_FAILURE_MESSAGE_TRANSIENT" = "Signal nemohol odoslať SMS kód pre problémy s operátorom. Skúste to znova o pár hodín.";
+"REGISTRATION_PROVIDER_FAILURE_MESSAGE_TRANSIENT" = "Radar nemohol odoslať SMS kód pre problémy s operátorom. Skúste to znova o pár hodín.";
 
 /* Third step in directions for how to make a backup */
 "REGISTRATION_RESTORE_METHOD_MAKE_BACKUP_TUTORIAL_ENABLE_BACKUPS" = "Povoľte zálohovanie a počkajte, kým sa proces dokončí";
 
 /* First step in directions for how to make a backup */
-"REGISTRATION_RESTORE_METHOD_MAKE_BACKUP_TUTORIAL_OPEN_SIGNAL" = "Otvorte Signal na svojom starom zariadení";
+"REGISTRATION_RESTORE_METHOD_MAKE_BACKUP_TUTORIAL_OPEN_SIGNAL" = "Otvorte Radar na svojom starom zariadení";
 
 /* Second step in directions for how to make a backup */
 "REGISTRATION_RESTORE_METHOD_MAKE_BACKUP_TUTORIAL_TAP_SETTINGS" = "Ťuknite na Nastavenia > Zálohy";
@@ -7317,7 +7317,7 @@ Send money securely.";
 "REGISTRATION_SCAN_QR_CODE_TITLE" = "Naskenujte tento kód pomocou svojho starého telefónu";
 
 /* Tutorial text describing the first step to scanning the restore/transfer QR code with your old phone: opening Signal */
-"REGISTRATION_SCAN_QR_CODE_TUTORIAL_OPEN_SIGNAL" = "Otvorte Signal na svojom starom zariadení";
+"REGISTRATION_SCAN_QR_CODE_TUTORIAL_OPEN_SIGNAL" = "Otvorte Radar na svojom starom zariadení";
 
 /* Tutorial text describing the third step to scanning the restore/transfer QR code with your old phone: scan the code */
 "REGISTRATION_SCAN_QR_CODE_TUTORIAL_SCAN" = "Naskenujte tento kód pomocou fotoaparátu";
@@ -7521,7 +7521,7 @@ Send money securely.";
 "SAFETY_NUMBER_CONFIRMATION_VIEW_ACTION" = "Zobraziť";
 
 /* Snippet to share {{safety number}} with a friend. sent e.g. via SMS */
-"SAFETY_NUMBER_SHARE_FORMAT" = "Naše Signal bezpečnostné číslo:\n%1$@";
+"SAFETY_NUMBER_SHARE_FORMAT" = "Naše Radar bezpečnostné číslo:\n%1$@";
 
 /* Title for Safety Tips button in thread details. */
 "SAFETY_TIPS_BUTTON_ACTION_TITLE" = "Bezpečnostné tipy";
@@ -7539,7 +7539,7 @@ Send money securely.";
 "SAFETY_TIPS_FAKE_BUSINESS_TITLE" = "Falošné firmy a inštitúcie";
 
 /* Message contents for the fake names safety tip. */
-"SAFETY_TIPS_FAKE_NAMES_BODY" = "Signal vás nikdy nebude kontaktovať s požiadavkou o poskytnutie registračného kódu alebo PIN kódu. Buďte obozretní pri žiadostiach, ktoré sa vydávajú za iných ľudí. Názvy profilov vyberá majiteľ účtu a nie sú overené.";
+"SAFETY_TIPS_FAKE_NAMES_BODY" = "Radar vás nikdy nebude kontaktovať s požiadavkou o poskytnutie registračného kódu alebo PIN kódu. Buďte obozretní pri žiadostiach, ktoré sa vydávajú za iných ľudí. Názvy profilov vyberá majiteľ účtu a nie sú overené.";
 
 /* Message title describing the fake names safety tip. */
 "SAFETY_TIPS_FAKE_NAMES_TITLE" = "Falošné mená a účty";
@@ -7605,7 +7605,7 @@ Send money securely.";
 "SCREEN_LOCK_UNLOCK_FAILED" = "Autentifikácia Zlyhala";
 
 /* Label for button on lock screen that lets users unlock Signal. */
-"SCREEN_LOCK_UNLOCK_SIGNAL" = "Odomknúť Signal";
+"SCREEN_LOCK_UNLOCK_SIGNAL" = "Odomknúť Radar";
 
 /* Placeholder text indicating the user can search for contacts by name, username, or phone number. */
 "SEARCH_BY_NAME_OR_USERNAME_OR_NUMBER_PLACEHOLDER_TEXT" = "Meno, používateľské meno alebo číslo";
@@ -7638,7 +7638,7 @@ Send money securely.";
 "SECONDARY_LINKING_ERROR_DIFFERENT_ACCOUNT_TITLE" = "Účet sa nezhoduje";
 
 /* Message for error alert indicating that a linked device must be upgraded before it can be linked. */
-"SECONDARY_LINKING_ERROR_OBSOLETE_LINKED_DEVICE_MESSAGE" = "Na prepojenie Signalu s vašim telefónom, aktualizujte Signal na tomto zariadení.";
+"SECONDARY_LINKING_ERROR_OBSOLETE_LINKED_DEVICE_MESSAGE" = "Na prepojenie Signalu s vašim telefónom, aktualizujte Radar na tomto zariadení.";
 
 /* Title for error alert indicating that a linked device must be upgraded before it can be linked. */
 "SECONDARY_LINKING_ERROR_OBSOLETE_LINKED_DEVICE_TITLE" = "Nepodporovaná verzia";
@@ -7665,7 +7665,7 @@ Send money securely.";
 "SECONDARY_LINKING_SYNCING_UPDATE_REQUIRED_CHECK_FOR_UPDATE_BUTTON" = "Overiť dostupnosť aktualizácie";
 
 /* Message for action sheet when the secondary device fails to sync messages due to an app update being required. */
-"SECONDARY_LINKING_SYNCING_UPDATE_REQUIRED_ERROR_MESSAGE" = "Ak chcete dokončiť synchronizáciu správ, aktualizujte Signal hneď teraz.";
+"SECONDARY_LINKING_SYNCING_UPDATE_REQUIRED_ERROR_MESSAGE" = "Ak chcete dokončiť synchronizáciu správ, aktualizujte Radar hneď teraz.";
 
 /* Title for action sheet when the secondary device fails to sync messages due to an app update being required. */
 "SECONDARY_LINKING_SYNCING_UPDATE_REQUIRED_ERROR_TITLE" = "Vyžaduje sa aktualizácia";
@@ -7674,19 +7674,19 @@ Send money securely.";
 "SECONDARY_ONBOARDING_CHOOSE_DEVICE_NAME_PLACEHOLDER" = "Zvoľte názov";
 
 /* header text before the user can link this device */
-"SECONDARY_ONBOARDING_GET_STARTED_BY_OPENING_PRIMARY" = "Pre prepojenie tohto iPadu k vášmu účtu spustite Signal na vašom telefóne.";
+"SECONDARY_ONBOARDING_GET_STARTED_BY_OPENING_PRIMARY" = "Pre prepojenie tohto iPadu k vášmu účtu spustite Radar na vašom telefóne.";
 
 /* Link explaining what to do when trying to link a device before having a primary device. */
-"SECONDARY_ONBOARDING_GET_STARTED_DO_NOT_HAVE_PRIMARY" = "Nemám Signal na svojom telefóne…";
+"SECONDARY_ONBOARDING_GET_STARTED_DO_NOT_HAVE_PRIMARY" = "Nemám Radar na svojom telefóne…";
 
 /* alert body */
-"SECONDARY_ONBOARDING_INSTALL_PRIMARY_FIRST_BODY" = "Choďte do App Store na vašom telefóne, nainštalujte Signal, dokončite proces registrácie a potom budete môcť prepojiť váš iPad s tým istým účtom.";
+"SECONDARY_ONBOARDING_INSTALL_PRIMARY_FIRST_BODY" = "Choďte do App Store na vašom telefóne, nainštalujte Radar, dokončite proces registrácie a potom budete môcť prepojiť váš iPad s tým istým účtom.";
 
 /* alert title */
-"SECONDARY_ONBOARDING_INSTALL_PRIMARY_FIRST_TITLE" = "Inštalovať Signal na váš telefón";
+"SECONDARY_ONBOARDING_INSTALL_PRIMARY_FIRST_TITLE" = "Inštalovať Radar na váš telefón";
 
 /* body text while displaying a QR code which, when scanned, will link this device. */
-"SECONDARY_ONBOARDING_SCAN_CODE_BODY" = "Ťuknite na váš profilový obrázok pre otvorenie Nastavení Signal vo vašom telefóne. Potom na \"Prepojené zariadenia\" a \"Prepojiť nové zariadenie\" pre naskenovanie tohto kódu pomocou vášho telefónu:";
+"SECONDARY_ONBOARDING_SCAN_CODE_BODY" = "Ťuknite na váš profilový obrázok pre otvorenie Nastavení Radar vo vašom telefóne. Potom na \"Prepojené zariadenia\" a \"Prepojiť nové zariadenie\" pre naskenovanie tohto kódu pomocou vášho telefónu:";
 
 /* Link text for page with troubleshooting info shown on the QR scanning screen */
 "SECONDARY_ONBOARDING_SCAN_CODE_HELP_TEXT" = "Získajte tu pomoc s prepojením vášho iPadu";
@@ -7698,7 +7698,7 @@ Send money securely.";
 "SECONDARY_ONBOARDING_SCAN_CODE_TITLE" = "Zoskenujte QR kód pomocou vášho telefónu";
 
 /* header text before the user can transfer to this device */
-"SECONDARY_TRANSFER_GET_STARTED_BY_OPENING_IPAD" = "Na prenos vášho účtu, spustite Signal na vašom starom iPade";
+"SECONDARY_TRANSFER_GET_STARTED_BY_OPENING_IPAD" = "Na prenos vášho účtu, spustite Radar na vašom starom iPade";
 
 /* No comment provided by engineer. */
 "SECURE_SESSION_RESET" = "Bezpečná relácia bola obnovená.";
@@ -7788,7 +7788,7 @@ Send money securely.";
 "SEPA_DONATION_NAME_PLACEHOLDER" = "Meno majiteľa účtu";
 
 /* Description for the session refresh alert */
-"SESSION_REFRESH_ALERT_MESSAGE" = "Signal používa end-to-end šifrovanie a občas môže potrebovať obnoviť reláciu vášho četu. Nemá to vplyv na bezpečnosť vášho četu, ale mohla by vám uniknúť správa od tohto kontaktu a môžete používateľa požiadať, aby vám ju poslal znovu.";
+"SESSION_REFRESH_ALERT_MESSAGE" = "Radar používa end-to-end šifrovanie a občas môže potrebovať obnoviť reláciu vášho četu. Nemá to vplyv na bezpečnosť vášho četu, ale mohla by vám uniknúť správa od tohto kontaktu a môžete používateľa požiadať, aby vám ju poslal znovu.";
 
 /* Title for the session refresh alert */
 "SESSION_REFRESH_ALERT_TITLE" = "Relácia četu bola obnovená";
@@ -7830,7 +7830,7 @@ Send money securely.";
 "SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_COUNTRY" = "Poloha";
 
 /* Table footer for the 'censorship circumvention' section when censorship circumvention can be manually enabled. */
-"SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_FOOTER" = "Keď je povolené, Signal sa pokúsi obísť cenzúru. Nepovoľujte v umiestneniach, kde Signal nie je cenzurovaný.";
+"SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_FOOTER" = "Keď je povolené, Radar sa pokúsi obísť cenzúru. Nepovoľujte v umiestneniach, kde Radar nie je cenzurovaný.";
 
 /* Table footer for the 'censorship circumvention' section shown when censorship circumvention has been auto-enabled based on local phone number. */
 "SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_FOOTER_AUTO_ENABLED" = "Obchádzanie cenzúry bolo zapnuté na základe telefónneho čísla vášho účtu.";
@@ -7842,7 +7842,7 @@ Send money securely.";
 "SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_FOOTER_NO_CONNECTION" = "Obchádzanie cenzúry je možné zapnúť len s prístupom na internet.";
 
 /* Table footer for the 'censorship circumvention' section shown when the app is connected to the Signal service. */
-"SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_FOOTER_WEBSOCKET_CONNECTED" = "Obchádzanie cenzúry nie je nutné; už ste pripojený k službe Signal.";
+"SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_FOOTER_WEBSOCKET_CONNECTED" = "Obchádzanie cenzúry nie je nutné; už ste pripojený k službe Radar.";
 
 /* Label for the 'advanced pin settings' button. */
 "SETTINGS_ADVANCED_PIN_SETTINGS" = "Pokročilé nastavenia PINu";
@@ -7869,13 +7869,13 @@ Send money securely.";
 "SETTINGS_ADVANCED_VIEW_ERROR_LOG" = "Chybové záznamy";
 
 /* Information on sheet about changing the app icon - first line */
-"SETTINGS_APP_ICON_EDUCATION_APP_NAME" = "Názov aplikácie „Signal“ bude zobrazený na domovskej obrazovke, v upozorneniach a v knižnici aplikácií.";
+"SETTINGS_APP_ICON_EDUCATION_APP_NAME" = "Názov aplikácie „Radar“ bude zobrazený na domovskej obrazovke, v upozorneniach a v knižnici aplikácií.";
 
 /* Information on sheet about changing the app icon - second line */
-"SETTINGS_APP_ICON_EDUCATION_HOME_SCREEN_DOCK" = "Ak chcete schovať názov aplikácie „Signal“, môžete ju presunúť do doku v spodnej časti domovskej obrazovky.";
+"SETTINGS_APP_ICON_EDUCATION_HOME_SCREEN_DOCK" = "Ak chcete schovať názov aplikácie „Radar“, môžete ju presunúť do doku v spodnej časti domovskej obrazovky.";
 
 /* The footer for the app icon selection settings page. */
-"SETTINGS_APP_ICON_FOOTER" = "Názov aplikácie „Signal“ bude zobrazený na domovskej obrazovke, v upozorneniach a v knižnici aplikácií.";
+"SETTINGS_APP_ICON_FOOTER" = "Názov aplikácie „Radar“ bude zobrazený na domovskej obrazovke, v upozorneniach a v knižnici aplikácií.";
 
 /* The title for the app icon selection settings page. */
 "SETTINGS_APP_ICON_TITLE" = "Ikona aplikácie";
@@ -7917,7 +7917,7 @@ Send money securely.";
 "SETTINGS_CALLING_HIDES_IP_ADDRESS_PREFERENCE_TITLE" = "Vždy presmerovať hovory";
 
 /* User settings section footer, a detailed explanation */
-"SETTINGS_CALLING_HIDES_IP_ADDRESS_PREFERENCE_TITLE_DETAIL" = "Smerovať všetky hovory cez server Signal pre zabránenie, aby váš kontakt odhalil vašu IP adresu. Zapnutie zníži kvalitu hovoru.";
+"SETTINGS_CALLING_HIDES_IP_ADDRESS_PREFERENCE_TITLE_DETAIL" = "Smerovať všetky hovory cez server Radar pre zabránenie, aby váš kontakt odhalil vašu IP adresu. Zapnutie zníži kvalitu hovoru.";
 
 /* Label for the 'edit phone number' button in the 'change phone number' views. */
 "SETTINGS_CHANGE_PHONE_NUMBER_BACK_TO_EDIT_BUTTON" = "Upraviť číslo";
@@ -7962,7 +7962,7 @@ Send money securely.";
 "SETTINGS_CLEAR_HISTORY" = "Vymazať históriu četov";
 
 /* Footer for the 'about' help section */
-"SETTINGS_COPYRIGHT" = "Autorské práva Signal Messenger\nLicencované pod GPLv3";
+"SETTINGS_COPYRIGHT" = "Autorské práva Radar Messenger\nLicencované pod GPLv3";
 
 /* Label for the 'data' section of the app settings. */
 "SETTINGS_DATA" = "Využitie dát";
@@ -8034,7 +8034,7 @@ Send money securely.";
 "SETTINGS_DISAPPEARING_MESSAGES_FOOTER" = "Nastavte predvolený časovač miznutia správ pre všetky nové čety, ktoré začnete.";
 
 /* Title for the 'donate to signal' link in settings. */
-"SETTINGS_DONATE" = "Prispieť na Signal";
+"SETTINGS_DONATE" = "Prispieť na Radar";
 
 /* Title for help button and help pages in app settings. */
 "SETTINGS_HELP" = "Pomocník";
@@ -8103,7 +8103,7 @@ Send money securely.";
 "SETTINGS_NOTIFICATION_CONTENT_TITLE" = "Obsah hlásení";
 
 /* When the local device discovers a contact has recently installed signal, the app can generates a message encouraging the local user to say hello. Turning this switch off disables that feature. */
-"SETTINGS_NOTIFICATION_EVENTS_CONTACT_JOINED_SIGNAL" = "Kontakt sa pripojí k Signal";
+"SETTINGS_NOTIFICATION_EVENTS_CONTACT_JOINED_SIGNAL" = "Kontakt sa pripojí k Radar";
 
 /* table section header */
 "SETTINGS_NOTIFICATION_NOTIFY_WHEN_TITLE" = "Upozorniť, keď…";
@@ -8140,7 +8140,7 @@ Send money securely.";
 "SETTINGS_PAYMENTS_BITCOIN_UNIT" = "Jednotka Bitcoinu";
 
 /* Error message indicating that payments could not be activated because the feature is not currently available. */
-"SETTINGS_PAYMENTS_CANNOT_ACTIVATE_PAYMENTS_KILL_SWITCH" = "Platby v službe Signal už nie sú k dispozícii. Stále môžete prevádzať prostriedky na burzu, ale už nemôžete posielať a prijímať platby ani pridávať prostriedky.";
+"SETTINGS_PAYMENTS_CANNOT_ACTIVATE_PAYMENTS_KILL_SWITCH" = "Platby v službe Radar už nie sú k dispozícii. Stále môžete prevádzať prostriedky na burzu, ale už nemôžete posielať a prijímať platby ani pridávať prostriedky.";
 
 /* Error message indicating that payments could not be deactivated because the current balance is unavailable. */
 "SETTINGS_PAYMENTS_CANNOT_DEACTIVATE_PAYMENTS_NO_BALANCE" = "Nepodarilo sa deaktivovať platby, pretože váš zostatok nie je dostupný. Skontrolujte vaše pripojenie a skúste to znovu.";
@@ -8149,10 +8149,10 @@ Send money securely.";
 "SETTINGS_PAYMENTS_CANNOT_SEND_PAYMENT_NO_BALANCE" = "Nepodarilo sa dokončiť platbu, pretože váš zostatok nie je dostupný. Skontrolujte vaše pripojenie a skúste to znovu.";
 
 /* Error message indicating that payments cannot be sent because the feature is not currently available. */
-"SETTINGS_PAYMENTS_CANNOT_SEND_PAYMENTS_KILL_SWITCH" = "Platby v službe Signal už nie sú k dispozícii. Stále môžete prevádzať prostriedky na burzu, ale už nemôžete posielať a prijímať platby ani pridávať prostriedky.";
+"SETTINGS_PAYMENTS_CANNOT_SEND_PAYMENTS_KILL_SWITCH" = "Platby v službe Radar už nie sú k dispozícii. Stále môžete prevádzať prostriedky na burzu, ale už nemôžete posielať a prijímať platby ani pridávať prostriedky.";
 
 /* Error message indicating that you cannot transfer into your payments wallet because the feature is not currently available. */
-"SETTINGS_PAYMENTS_CANNOT_TRANSFER_IN_KILL_SWITCH" = "Platby v službe Signal už nie sú k dispozícii. Stále môžete prevádzať prostriedky na burzu, ale už nemôžete posielať a prijímať platby ani pridávať prostriedky.";
+"SETTINGS_PAYMENTS_CANNOT_TRANSFER_IN_KILL_SWITCH" = "Platby v službe Radar už nie sú k dispozícii. Stále môžete prevádzať prostriedky na burzu, ale už nemôžete posielať a prijímať platby ani pridávať prostriedky.";
 
 /* Message for the 'currency conversions info' alert. */
 "SETTINGS_PAYMENTS_CURRENCY_CONVERSIONS_INFO_ALERT_MESSAGE" = "Prepočty sú len odhadmi a nemusia byť presné.";
@@ -8179,10 +8179,10 @@ Send money securely.";
 "SETTINGS_PAYMENTS_DEACTIVATE_TITLE" = "Deaktivovať platby";
 
 /* Explanation of the 'deactivate payments with balance' process in the 'deactivate payments' settings. */
-"SETTINGS_PAYMENTS_DEACTIVATE_WITH_BALANCE_EXPLANATION" = "Odporúčame vám, aby ste pred deaktiváciou platieb previedli svoje prostriedky na adresu inej peňaženky. Ak sa rozhodnete, že svoje prostriedky neprevediete teraz, zostanú v peňaženke prepojenej so službou Signal, ak platby opätovne aktivujete.";
+"SETTINGS_PAYMENTS_DEACTIVATE_WITH_BALANCE_EXPLANATION" = "Odporúčame vám, aby ste pred deaktiváciou platieb previedli svoje prostriedky na adresu inej peňaženky. Ak sa rozhodnete, že svoje prostriedky neprevediete teraz, zostanú v peňaženke prepojenej so službou Radar, ak platby opätovne aktivujete.";
 
 /* Description for the 'deactivate payments confirmation' UI in the payment settings. */
-"SETTINGS_PAYMENTS_DEACTIVATE_WITHOUT_TRANSFER_CONFIRM_DESCRIPTION" = "V prípade, že sa rozhodnete opätovne aktivovať platby, váš zostatok zostane vo vašej peňaženke prepojenej so službou Signal.";
+"SETTINGS_PAYMENTS_DEACTIVATE_WITHOUT_TRANSFER_CONFIRM_DESCRIPTION" = "V prípade, že sa rozhodnete opätovne aktivovať platby, váš zostatok zostane vo vašej peňaženke prepojenej so službou Radar.";
 
 /* Title for the 'deactivate payments confirmation' UI in the payment settings. */
 "SETTINGS_PAYMENTS_DEACTIVATE_WITHOUT_TRANSFER_CONFIRM_TITLE" = "Deaktivovať bez prevodu?";
@@ -8420,7 +8420,7 @@ Send money securely.";
 "SETTINGS_PAYMENTS_PAYMENTS_LOCK_PROMPT_EXPLANATION_TOUCHID" = "Zabráňte osobe, ktorá používa váš telefón, pristupovať k vašim finančným prostriedkom povolením funkcie Touch ID. Túto možnosť môžete vypnúť v Nastaveniach.";
 
 /* Button for payments outdated sheet. */
-"SETTINGS_PAYMENTS_PAYMENTS_OUTDATED_BUTTON" = "Aktualizovať Signal";
+"SETTINGS_PAYMENTS_PAYMENTS_OUTDATED_BUTTON" = "Aktualizovať Radar";
 
 /* Message for payments outdated sheet. */
 "SETTINGS_PAYMENTS_PAYMENTS_OUTDATED_MESSAGE" = "Ak si želáte naďalej odosielať a prijímať platby a mať prehľad o aktuálnom zostatku platieb, aktualizujte si aplikáciu.";
@@ -8558,7 +8558,7 @@ Send money securely.";
 "SETTINGS_PAYMENTS_TITLE" = "Platby";
 
 /* Error indicating that it is not valid to send yourself a payment. */
-"SETTINGS_PAYMENTS_TRANSFER_OUT_CANNOT_SEND_TO_SELF" = "Nemôžete vykonať prevod na adresu vašej Signal peňaženky. Zadajte adresu peňaženky z vášho účtu v podporovanej zmenárni.";
+"SETTINGS_PAYMENTS_TRANSFER_OUT_CANNOT_SEND_TO_SELF" = "Nemôžete vykonať prevod na adresu vašej Radar peňaženky. Zadajte adresu peňaženky z vášho účtu v podporovanej zmenárni.";
 
 /* Footer of the 'transfer currency out' view in the payment settings. */
 "SETTINGS_PAYMENTS_TRANSFER_OUT_FOOTER" = "Transfer Bitcoin by sending to the Lightning address or invoice provided by the recipient. The address is typically displayed below the QR code.";
@@ -8621,7 +8621,7 @@ Send money securely.";
 "SETTINGS_PAYMENTS_VIEW_PASSPHRASE_TITLE" = "Fráza na obnovenie";
 
 /* Header text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "Zapíšte týchto 24 slov v poradí a uložte ich na bezpečné miesto. Môžete ich použiť na obnovenie zostatku v Cake Wallet alebo iných peňaženkách kompatibilných so Spark.";
+"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "Zapíšte týchto 12 slov v poradí a uložte ich na bezpečné miesto. Môžete ich použiť na obnovenie zostatku v Cake Wallet alebo iných peňaženkách kompatibilných so Spark.";
 
 /* Footer text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
 "SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_FOOTER_2" = "Nezdieľajte túto frázu s nikým";
@@ -8642,7 +8642,7 @@ Send money securely.";
 "SETTINGS_PHONE_NUMBER_DISCOVERABILITY_DISABLED_TOAST" = "Ak chcete toto nastavenie zmeniť, v časti „Kto môže vidieť moje telefónne číslo“ zvoľte „Nikto“.";
 
 /* The description for a sheet asking for confirmation that the user wants to set their phone number discoverability to 'nobody'. */
-"SETTINGS_PHONE_NUMBER_DISCOVERABILITY_NOBODY_CONFIRMATION_DESCRIPTION" = "Ak v časti „Kto ma môže vyhľadať pomocou telefónneho čísla“ vyberiete možnosť „Nikto“, ľudia vás v aplikácii Signal nájdu ťažšie.";
+"SETTINGS_PHONE_NUMBER_DISCOVERABILITY_NOBODY_CONFIRMATION_DESCRIPTION" = "Ak v časti „Kto ma môže vyhľadať pomocou telefónneho čísla“ vyberiete možnosť „Nikto“, ľudia vás v aplikácii Radar nájdu ťažšie.";
 
 /* The title for a sheet asking for confirmation that the user wants to set their phone number discoverability to 'nobody'. */
 "SETTINGS_PHONE_NUMBER_DISCOVERABILITY_NOBODY_CONFIRMATION_TITLE" = "Naozaj chcete pokračovať?";
@@ -8651,7 +8651,7 @@ Send money securely.";
 "SETTINGS_PHONE_NUMBER_DISCOVERABILITY_TITLE" = "Kto ma môže vyhľadať pomocou telefónneho čísla";
 
 /* Description label for Phone Number Privacy */
-"SETTINGS_PHONE_NUMBER_PRIVACY_DESCRIPTION_LABEL" = "Vyberte, kto môže vidieť vaše telefónne číslo a kto vás môže pomocou neho kontaktovať v aplikácii Signal.";
+"SETTINGS_PHONE_NUMBER_PRIVACY_DESCRIPTION_LABEL" = "Vyberte, kto môže vidieť vaše telefónne číslo a kto vás môže pomocou neho kontaktovať v aplikácii Radar.";
 
 /* The title for phone number privacy settings. */
 "SETTINGS_PHONE_NUMBER_PRIVACY_TITLE" = "Telefónne číslo";
@@ -8663,16 +8663,16 @@ Send money securely.";
 "SETTINGS_PIN_REMINDER_DISABLE_CONFIRMATION_ACTION" = "Vypnúť upomienky";
 
 /* The explanation for the dialog asking user to confirm their PIN to disable reminders */
-"SETTINGS_PIN_REMINDER_DISABLE_CONFIRMATION_EXPLANATION" = "Uistite sa, že si svoj PIN pamätáte, alebo že ho máte bezpečne uložený, pretože ho nie je možné obnoviť. Ak váš PIN zabudnete, mohli by ste stratiť dáta pri opätovnej registrácii vášho Signal účtu.";
+"SETTINGS_PIN_REMINDER_DISABLE_CONFIRMATION_EXPLANATION" = "Uistite sa, že si svoj PIN pamätáte, alebo že ho máte bezpečne uložený, pretože ho nie je možné obnoviť. Ak váš PIN zabudnete, mohli by ste stratiť dáta pri opätovnej registrácii vášho Radar účtu.";
 
 /* The title for the dialog asking user to confirm their PIN to disable reminders */
-"SETTINGS_PIN_REMINDER_DISABLE_CONFIRMATION_TITLE" = "Overte svoj PIN pre Signal";
+"SETTINGS_PIN_REMINDER_DISABLE_CONFIRMATION_TITLE" = "Overte svoj PIN pre Radar";
 
 /* Label for the 'pin reminder' switch of the privacy settings. */
 "SETTINGS_PIN_REMINDER_SWITCH_LABEL" = "PIN upomienky";
 
 /* Footer for the 'PINs' section of the privacy settings. */
-"SETTINGS_PINS_FOOTER" = "PINy uchovávajú informácie uložené pomocou šifrovania Signal, takže k nim máte prístup iba vy. Váš PIN nie je možné obnoviť. Po opätovnej inštalácii Signal sa váš profil, nastavenia a kontakty obnovia.";
+"SETTINGS_PINS_FOOTER" = "PINy uchovávajú informácie uložené pomocou šifrovania Radar, takže k nim máte prístup iba vy. Váš PIN nie je možné obnoviť. Po opätovnej inštalácii Radar sa váš profil, nastavenia a kontakty obnovia.";
 
 /* Label for the 'pins' item of the privacy settings when the user does have a pin. */
 "SETTINGS_PINS_ITEM" = "Zmente si PIN";
@@ -8681,7 +8681,7 @@ Send money securely.";
 "SETTINGS_PINS_ITEM_CREATE" = "Vytvoriť PIN";
 
 /* Title for the 'PINs' section of the privacy settings. */
-"SETTINGS_PINS_TITLE" = "PIN kód Signal";
+"SETTINGS_PINS_TITLE" = "PIN kód Radar";
 
 /* Footer for table section */
 "SETTINGS_PRIVACY_ADVANCED_FOOTER" = "Obchádzanie cenzúry, proxy, presmerované hovory a nastavenia šifrovaného odosielateľa.";
@@ -8753,19 +8753,19 @@ Send money securely.";
 "SETTINGS_SECTION_TITLE_CALLING" = "Uskutočňovanie hovorov";
 
 /* Section footer */
-"SETTINGS_SECURITY_DETAIL" = "Na odblokovanie Signal použite Touch ID, Face ID alebo prístupový kód zariadenia so systémom iOS.";
+"SETTINGS_SECURITY_DETAIL" = "Na odblokovanie Radar použite Touch ID, Face ID alebo prístupový kód zariadenia so systémom iOS.";
 
 /* Section footer */
-"SETTINGS_SECURITY_DETAIL_FACEID" = "Na odblokovanie Signal použite Face ID.";
+"SETTINGS_SECURITY_DETAIL_FACEID" = "Na odblokovanie Radar použite Face ID.";
 
 /* Section footer */
 "SETTINGS_SECURITY_DETAIL_OPTICID" = "Na odblokovanie Signalu použiť Optic ID.";
 
 /* Section footer */
-"SETTINGS_SECURITY_DETAIL_PASSCODE" = "Na odblokovanie Signal použite prístupový kód zariadenia.";
+"SETTINGS_SECURITY_DETAIL_PASSCODE" = "Na odblokovanie Radar použite prístupový kód zariadenia.";
 
 /* Section footer */
-"SETTINGS_SECURITY_DETAIL_TOUCHID" = "Na odblokovanie Signal použite Touch ID.";
+"SETTINGS_SECURITY_DETAIL_TOUCHID" = "Na odblokovanie Radar použite Touch ID.";
 
 /* Section header */
 "SETTINGS_SECURITY_TITLE" = "Zabezpečenie aplikácie";
@@ -8780,13 +8780,13 @@ Send money securely.";
 "SETTINGS_SHARING_SUGGESTIONS" = "Zdieľajte kontakty so systémom iOS";
 
 /* Footer for setting for enabling & disabling contact and notification sharing with iOS. */
-"SETTINGS_SHARING_SUGGESTIONS_NOTIFICATIONS_FOOTER" = "Povoľte systému iOS prístup ku kontaktom a četom Signal pre funkcie, ako sú návrhy na zdieľanie a upozornenia.";
+"SETTINGS_SHARING_SUGGESTIONS_NOTIFICATIONS_FOOTER" = "Povoľte systému iOS prístup ku kontaktom a četom Radar pre funkcie, ako sú návrhy na zdieľanie a upozornenia.";
 
 /* Label for the 'enable registration lock' switch of the privacy settings. */
 "SETTINGS_TWO_FACTOR_AUTH_SWITCH_LABEL" = "Registračný zámok";
 
 /* Footer for the 'two factor auth' section of the privacy settings when Signal PINs are available. */
-"SETTINGS_TWO_FACTOR_PINS_AUTH_FOOTER" = "Na opätovné zaregistrovanie telefónneho čísla v aplikácii Signal si vyžiadajte svoj Signal PIN.";
+"SETTINGS_TWO_FACTOR_PINS_AUTH_FOOTER" = "Na opätovné zaregistrovanie telefónneho čísla v aplikácii Radar si vyžiadajte svoj Radar PIN.";
 
 /* Label for the 'typing indicators' setting. */
 "SETTINGS_TYPING_INDICATORS" = "Indikátory písania";
@@ -8819,7 +8819,7 @@ Send money securely.";
 "SHARE_EXTENSION_LOADING" = "Načítava sa…";
 
 /* Message indicating that the share extension cannot be used until the user has registered in the main app. */
-"SHARE_EXTENSION_NOT_REGISTERED_MESSAGE" = "Pre registráciu spustite aplikáciu Signal.";
+"SHARE_EXTENSION_NOT_REGISTERED_MESSAGE" = "Pre registráciu spustite aplikáciu Radar.";
 
 /* Title indicating that the share extension cannot be used until the user has registered in the main app. */
 "SHARE_EXTENSION_NOT_REGISTERED_TITLE" = "Neregistrovaný/á";
@@ -8837,7 +8837,7 @@ Send money securely.";
 "SHARE_EXTENSION_UNABLE_TO_BUILD_ATTACHMENT_ALERT_TITLE" = "Prílohu sa nepodarilo pripraviť";
 
 /* Title for the 'share extension' view. */
-"SHARE_EXTENSION_VIEW_TITLE" = "Zdieľať v aplikácii Signal";
+"SHARE_EXTENSION_VIEW_TITLE" = "Zdieľať v aplikácii Radar";
 
 /* Title of alert indicating sharing suggestions failed to deactivate */
 "SHARING_SUGGESTIONS_DISABLE_ERROR" = "Návrhy pri zdieľaní sa nepodarilo vypnúť.";
@@ -8846,10 +8846,10 @@ Send money securely.";
 "SHOW_THREAD_BUTTON_TITLE" = "Zobraziť čet";
 
 /* Shown in the header when the user hasn't provided a custom name for a call. */
-"SIGNAL_CALL" = "Signal hovor";
+"SIGNAL_CALL" = "Radar hovor";
 
 /* body sent to contacts when inviting to Install Signal */
-"SMS_INVITE_BODY" = "Pozývam Vás, aby ste si nainštalovali Signal! Tu je odkaz:";
+"SMS_INVITE_BODY" = "Pozývam Vás, aby ste si nainštalovali Radar! Tu je odkaz:";
 
 /* An error message generically indicating that something went wrong. */
 "SOMETHING_WENT_WRONG_ERROR" = "Niekde sa stala chyba.";
@@ -8873,7 +8873,7 @@ Send money securely.";
 "SPAM_CAPTCHA_DISMISS_CONFIRMATION_TITLE" = "Pokračovať bez overenia?";
 
 /* Body for action sheet explaining captcha requirement. */
-"SPAM_CAPTCHA_SHEET_BODY" = "Ak chcete zabrániť spamu v Signal, dokončite overenie.\n\nPo overení môžete pokračovať v zasielaní správ. Pozastavené správy sa automaticky odošlú.";
+"SPAM_CAPTCHA_SHEET_BODY" = "Ak chcete zabrániť spamu v Radar, dokončite overenie.\n\nPo overení môžete pokračovať v zasielaní správ. Pozastavené správy sa automaticky odošlú.";
 
 /* Title for action sheet explaining captcha requirement. */
 "SPAM_CAPTCHA_SHEET_TITLE" = "Overte, či chcete pokračovať v zasielaní správ";
@@ -9191,19 +9191,19 @@ Send money securely.";
 "STORY_SETTINGS_LEARN_MORE_SHEET_FOOTER" = "Vaše spojenia môžu vidieť vaše meno a fotografiu a tiež obsah, ktorý posielate do sekcie „Môj príbeh“, pokiaľ ho pred nimi neskryjete.";
 
 /* Header for the explainer sheet for signal connections */
-"STORY_SETTINGS_LEARN_MORE_SHEET_HEADER_FORMAT" = "<bold>Signal spojenia</bold> sú ľudia, ktorým ste sa rozhodli dôverovať jedným z nasledujúcich spôsobov:";
+"STORY_SETTINGS_LEARN_MORE_SHEET_HEADER_FORMAT" = "<bold>Radar spojenia</bold> sú ľudia, ktorým ste sa rozhodli dôverovať jedným z nasledujúcich spôsobov:";
 
 /* Label for the stories section of the settings view */
 "STORY_SETTINGS_TITLE" = "Príbehy";
 
 /* Section footer for the 'viewers' section on the 'story settings' view */
-"STORY_SETTINGS_WHO_CAN_VIEW_THIS_FOOTER" = "Vyberte, ktoré Signal spojenia si môžu pozrieť váš príbeh. Zmeny neovplyvnia príbehy, ktoré ste už odoslali.";
+"STORY_SETTINGS_WHO_CAN_VIEW_THIS_FOOTER" = "Vyberte, ktoré Radar spojenia si môžu pozrieť váš príbeh. Zmeny neovplyvnia príbehy, ktoré ste už odoslali.";
 
 /* Section header for the 'viewers' section on the 'story settings' view */
 "STORY_SETTINGS_WHO_CAN_VIEW_THIS_HEADER" = "Kto si môže pozrieť tento príbeh";
 
 /* Header for the 'viewers' section on the 'story settings' bottom sheet */
-"STORY_SETTINGS_WHO_CAN_VIEW_THIS_SHEET_HEADER" = "Vyberte, ktoré Signal spojenia si môžu pozrieť váš príbeh. Výber môžete kedykoľvek zmeniť v nastaveniach súkromia.";
+"STORY_SETTINGS_WHO_CAN_VIEW_THIS_SHEET_HEADER" = "Vyberte, ktoré Radar spojenia si môžu pozrieť váš príbeh. Výber môžete kedykoľvek zmeniť v nastaveniach súkromia.";
 
 /* Tooltip text shown when the user selects a story as a destination for a long duration video that will be split into shorter segments. Embeds {{ segment duration in seconds }} */
 "STORY_VIDEO_SEGMENTATION_TOOLTIP_FORMAT" = "Videá odoslané do príbehov budú zostrihané na %1$d-sekundové klipy a odoslané vo forme viacerých príbehov.";
@@ -9242,7 +9242,7 @@ Send money securely.";
 "SUPPORT_EMAIL_DEFAULT_DESCRIPTION" = "Povedzte nám, aký máte problém: ";
 
 /* Message for alert dialog presented when a support email failed to send */
-"SUPPORT_EMAIL_ERROR_ALERT_DESCRIPTION" = "Prosím, pošlite vašu žiadosť o technickú podporu E-mailom na support@signal.org";
+"SUPPORT_EMAIL_ERROR_ALERT_DESCRIPTION" = "Prosím, pošlite vašu žiadosť o technickú podporu E-mailom na support@radar.chat";
 
 /* Localized label for support request email filter string. Embeds {{filter text}}. */
 "SUPPORT_EMAIL_FILTER_LABEL_FORMAT" = "Filter: %1$@";
@@ -9266,7 +9266,7 @@ Send money securely.";
 "SUPPORT_EMAIL_LOG_URL_LABEL_FORMAT" = "URL logu: %1$@";
 
 /* Localized subject for support request emails */
-"SUPPORT_EMAIL_SUBJECT" = "Signal iOS žiadosť o technickú podporu";
+"SUPPORT_EMAIL_SUBJECT" = "Radar iOS žiadosť o technickú podporu";
 
 /* Header for emoji mood selection */
 "SUPPORT_EMOJI_PROMPT" = "Ako sa cítite? (voliteľné)";
@@ -9338,7 +9338,7 @@ Send money securely.";
 "SWITCH_ON" = "Zapnuté";
 
 /* Name to display for the 'system' sender, e.g. for release notes and the onboarding story */
-"SYSTEM_ADDRESS_NAME" = "Signal";
+"SYSTEM_ADDRESS_NAME" = "Radar";
 
 /* Label for button to verify a user's safety number. */
 "SYSTEM_MESSAGE_ACTION_VERIFY_SAFETY_NUMBER" = "Overiť";
@@ -9497,16 +9497,16 @@ Send money securely.";
 "TIME_AMOUNT_WEEKS_SHORT_FORMAT" = "%1$@t";
 
 /* Button for bottom sheet shown when device transfer completes on the receiving device. Tapping will terminate the Signal app and trigger a notification to relaunch. */
-"TRANSFER_COMPLETE_SHEET_BUTTON" = "Zatvoriť Signal";
+"TRANSFER_COMPLETE_SHEET_BUTTON" = "Zatvoriť Radar";
 
 /* Subtitle for bottom sheet shown when device transfer completes on the receiving device. */
-"TRANSFER_COMPLETE_SHEET_SUBTITLE" = "Ak chcete začať používať svoj účet na tomto zariadení, zatvorte Signal a znova ho otvorte.";
+"TRANSFER_COMPLETE_SHEET_SUBTITLE" = "Ak chcete začať používať svoj účet na tomto zariadení, zatvorte Radar a znova ho otvorte.";
 
 /* Title for bottom sheet shown when device transfer completes on the receiving device. */
 "TRANSFER_COMPLETE_SHEET_TITLE" = "Prenos dokončený";
 
 /* Notification prompting the user to relaunch Signal after a device transfer completed. */
-"TRANSFER_RELAUNCH_NOTIFICATION" = "Otvorte Signal a začnite posielať správy";
+"TRANSFER_RELAUNCH_NOTIFICATION" = "Otvorte Radar a začnite posielať správy";
 
 /* Label for the cancel button in an alert or action sheet. */
 "TXT_CANCEL_TITLE" = "Zrušiť";
@@ -9533,7 +9533,7 @@ Send money securely.";
 "UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_WITHOUT_NAME" = "Dostali ste správu, ktorú nie je možné zobraziť alebo spracovať, pretože používa novú funkciu Signalu.";
 
 /* Label for button that lets users upgrade the app. */
-"UNKNOWN_PROTOCOL_VERSION_UPGRADE_BUTTON" = "Aktualizujte Signal teraz";
+"UNKNOWN_PROTOCOL_VERSION_UPGRADE_BUTTON" = "Aktualizujte Radar teraz";
 
 /* Info message recorded in conversation history when local user has received an unknown unknown message from a linked device and has upgraded. */
 "UNKNOWN_PROTOCOL_VERSION_UPGRADE_COMPLETE_FROM_LINKED_DEVICE" = "Aktualizované na najnovšiu verziu Signalu. Teraz môžete prijať tento typ správy na vašom zariadení.";
@@ -9566,13 +9566,13 @@ Send money securely.";
 "UNLINK_CONFIRMATION_ALERT_TITLE" = "Odpojiť \"%1$@\"?";
 
 /* Label warning the user that they have been unlinked from their primary device. */
-"UNLINKED_WARNING" = "Toto zariadenie už nie je prepojené. Ak chcete pokračovať v odosielaní správ, znova prepojte Signal so svojím telefónom.";
+"UNLINKED_WARNING" = "Toto zariadenie už nie je prepojené. Ak chcete pokračovať v odosielaní správ, znova prepojte Radar so svojím telefónom.";
 
 /* If this device has become unlinked from their primary device, they'll see a warning. This is the call to action on that warning. */
 "UNLINKED_WARNING_ACTION_TITLE" = "Znova prepojte zariadenie";
 
 /* Alert title when unlinking device fails */
-"UNLINKING_FAILED_ALERT_TITLE" = "Signal nedokázal odpojiť vaše zariadenie.";
+"UNLINKING_FAILED_ALERT_TITLE" = "Radar nedokázal odpojiť vaše zariadenie.";
 
 /* Text for a toast confirming that the mic has been unmuted for a call. */
 "UNMUTE_CONFIRMATION_TOAST_LABEL" = "Mikrofón zapnutý";
@@ -9704,7 +9704,7 @@ Send money securely.";
 "USERNAME_LOOKUP_LINK_NO_LONGER_VALID_MESSAGE" = "Tento odkaz na používateľské meno už nie je platný.";
 
 /* A message indicating that the given username is not associated with a registered Signal account. Embeds {{ a username }}. */
-"USERNAME_LOOKUP_NOT_FOUND_MESSAGE_FORMAT" = "%1$@ nepoužíva Signal. Uistite sa, že ste zadali celé používateľské meno.";
+"USERNAME_LOOKUP_NOT_FOUND_MESSAGE_FORMAT" = "%1$@ nepoužíva Radar. Uistite sa, že ste zadali celé používateľské meno.";
 
 /* Title for an action sheet indicating that the given username is not associated with a registered Signal account. */
 "USERNAME_LOOKUP_NOT_FOUND_TITLE" = "Používateľ sa nenašiel";
@@ -9728,7 +9728,7 @@ Send money securely.";
 "USERNAME_ONBOARDING_TITLE" = "Your Username";
 
 /* Instructions that appear below the username QR code on a sharable exported image. */
-"USERNAME_QR_CODE_EXPORT_INSTRUCTIONS" = "Naskenujte tento QR kód pomocou telefónu a četujte so mnou v aplikácii Signal.";
+"USERNAME_QR_CODE_EXPORT_INSTRUCTIONS" = "Naskenujte tento QR kód pomocou telefónu a četujte so mnou v aplikácii Radar.";
 
 /* A message in a toast informing the user their username, link, and QR code have successfully been reset. Embeds {{ the user's new username }}. */
 "USERNAME_RESET_SUCCESSFUL_TOAST" = "Váš QR kód a odkaz boli resetované a vaše používateľské meno je %1$@";

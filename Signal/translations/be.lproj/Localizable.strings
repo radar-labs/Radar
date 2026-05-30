@@ -2,7 +2,7 @@
 "AB_PERMISSION_MISSING_ACTION_NOT_NOW" = "Не зараз";
 
 /* Title for the 'about' help section */
-"ABOUT_SECTION_TITLE" = "Пра Signal";
+"ABOUT_SECTION_TITLE" = "Пра Radar";
 
 /* Accessibility label for attachment. */
 "ACCESSIBILITY_LABEL_ATTACHMENT" = "Далучэнне";
@@ -32,7 +32,7 @@
 "ACCOUNT_DATA_REPORT_CONFIRM_EXPORT_CONFIRM_BUTTON" = "Экспартаваць справаздачу";
 
 /* Users can request a report of their account data. Before they get their account export, they are warned to only share account data with trustworthy sources. This is the message on that warning. */
-"ACCOUNT_DATA_REPORT_CONFIRM_EXPORT_MESSAGE" = "Абагульвайце даныя вашага ўліковага запісу Signal толькі з тымі людзьмі або праграмамі, да якіх маеце давер.";
+"ACCOUNT_DATA_REPORT_CONFIRM_EXPORT_MESSAGE" = "Абагульвайце даныя вашага ўліковага запісу Radar толькі з тымі людзьмі або праграмамі, да якіх маеце давер.";
 
 /* Users can request a report of their account data. If this request fails (probably because of a network connection problem), they will see an error sheet. This is the message on that error. */
 "ACCOUNT_DATA_REPORT_ERROR_MESSAGE" = "Праверце падключэнне і паўтарыце спробу.";
@@ -56,16 +56,16 @@
 "ACCOUNT_DATA_REPORT_EXPORT_REPORT_BUTTON" = "Экспартаваць справаздачу";
 
 /* Users can request a report of their account data. This text appears at the bottom of this screen, offering more information. */
-"ACCOUNT_DATA_REPORT_FOOTER" = "Ваша справаздача ствараецца толькі падчас экспарту, і Signal не захоўвае яе на вашай прыладзе.";
+"ACCOUNT_DATA_REPORT_FOOTER" = "Ваша справаздача ствараецца толькі падчас экспарту, і Radar не захоўвае яе на вашай прыладзе.";
 
 /* Users can request a report of their account data. This is the subtitle on the screen where they do this, giving them more information. */
-"ACCOUNT_DATA_REPORT_SUBTITLE" = "Спампуйце і экспартуйце справаздачу аб даных вашага ўліковага запісу Signal. Гэтая справаздача не змяшчае ніякіх паведамленняў або медыяфайлаў.";
+"ACCOUNT_DATA_REPORT_SUBTITLE" = "Спампуйце і экспартуйце справаздачу аб даных вашага ўліковага запісу Radar. Гэтая справаздача не змяшчае ніякіх паведамленняў або медыяфайлаў.";
 
 /* Users can request a report of their account data. This is the title on the screen where they do this. */
 "ACCOUNT_DATA_REPORT_TITLE" = "Даныя аб вашым уліковым запісу";
 
 /* Label for 'invite' button in contact view. */
-"ACTION_INVITE" = "Запрасіць у Signal";
+"ACTION_INVITE" = "Запрасіць у Radar";
 
 /* Label for button that lets you send a message to a contact. */
 "ACTION_SEND_MESSAGE" = "Адправіць паведамленне";
@@ -83,7 +83,7 @@
 "ACTION_VIDEO_CALL" = "Відэазванок";
 
 /* Label for 'voice call' button in contact view. */
-"ACTION_VOICE_CALL" = "Званок Signal";
+"ACTION_VOICE_CALL" = "Званок Radar";
 
 /* The title for the 'add group members' view. */
 "ADD_GROUP_MEMBERS_VIEW_TITLE" = "Дадаць удзельнікаў";
@@ -203,40 +203,40 @@
 "APN_Message" = "У вас, мажліва, ёсць новыя паведамленні";
 
 /* Default message for the 'app launch failed' alert. */
-"APP_LAUNCH_FAILURE_ALERT_MESSAGE" = "Не атрымалася запусціць Signal. Калі ласка, адпраўце журнал адладкі на support@signal.org, каб мы змаглі выправіць гэтую непаладку.";
+"APP_LAUNCH_FAILURE_ALERT_MESSAGE" = "Не атрымалася запусціць Radar. Калі ласка, адпраўце журнал адладкі на support@radar.chat, каб мы змаглі выправіць гэтую непаладку.";
 
 /* Button to try launching the app even though the last launch failed */
-"APP_LAUNCH_FAILURE_CONTINUE" = "Адкрыць тады Signal";
+"APP_LAUNCH_FAILURE_CONTINUE" = "Адкрыць тады Radar";
 
 /* Message for an error indicating that the app couldn't launch because some unexpected error happened with the user's registration status. */
-"APP_LAUNCH_FAILURE_CORRUPT_REGISTRATION_MESSAGE" = "Калі ласка, адпраўце журнал адладкі на support@signal.org, каб мы змаглі выправіць гэтую непаладку.";
+"APP_LAUNCH_FAILURE_CORRUPT_REGISTRATION_MESSAGE" = "Калі ласка, адпраўце журнал адладкі на support@radar.chat, каб мы змаглі выправіць гэтую непаладку.";
 
 /* Title for an error indicating that the app couldn't launch because some unexpected error happened with the user's registration status. */
-"APP_LAUNCH_FAILURE_CORRUPT_REGISTRATION_TITLE" = "Не атрымалася адкрыць Signal";
+"APP_LAUNCH_FAILURE_CORRUPT_REGISTRATION_TITLE" = "Не атрымалася адкрыць Radar";
 
 /* Error indicating that the app could not launch because the database could not be loaded. */
 "APP_LAUNCH_FAILURE_COULD_NOT_LOAD_DATABASE" = "Не атрымалася загрузіць базу даных";
 
 /* Error indicating that the app could not launch without reverting unknown database migrations. */
-"APP_LAUNCH_FAILURE_INVALID_DATABASE_VERSION_MESSAGE" = "Зрабіце абнаўленне да апошняй версіі Signal.";
+"APP_LAUNCH_FAILURE_INVALID_DATABASE_VERSION_MESSAGE" = "Зрабіце абнаўленне да апошняй версіі Radar.";
 
 /* Error indicating that the app could not launch without reverting unknown database migrations. */
 "APP_LAUNCH_FAILURE_INVALID_DATABASE_VERSION_TITLE" = "Невядомая версія базы даных.";
 
 /* Error indicating that the app crashed during the previous launch. */
-"APP_LAUNCH_FAILURE_LAST_LAUNCH_CRASHED_MESSAGE" = "Signal сутыкнуўся з праблемай падчас адкрыцця праграмы. Калі ласка, адпраўце журнал адладкі на support@signal.org, каб дапамагчы нам выправіць гэтую непаладку.";
+"APP_LAUNCH_FAILURE_LAST_LAUNCH_CRASHED_MESSAGE" = "Radar сутыкнуўся з праблемай падчас адкрыцця праграмы. Калі ласка, адпраўце журнал адладкі на support@radar.chat, каб дапамагчы нам выправіць гэтую непаладку.";
 
 /* Error indicating that the app crashed during the previous launch. */
-"APP_LAUNCH_FAILURE_LAST_LAUNCH_CRASHED_TITLE" = "Не атрымалася адкрыць Signal";
+"APP_LAUNCH_FAILURE_LAST_LAUNCH_CRASHED_TITLE" = "Не атрымалася адкрыць Radar";
 
 /* Error description indicating that the app crashed because there was low storage space available on the device. */
-"APP_LAUNCH_FAILURE_LOW_STORAGE_SPACE_AVAILABLE_MESSAGE" = "Не атрымалася адкрыць Signal, таму што на вашай прыладзе недастаткова памяці. Каб выкарыстоўваць Signal, вызваліце месца ў наладах сховішча.";
+"APP_LAUNCH_FAILURE_LOW_STORAGE_SPACE_AVAILABLE_MESSAGE" = "Не атрымалася адкрыць Radar, таму што на вашай прыладзе недастаткова памяці. Каб выкарыстоўваць Radar, вызваліце месца ў наладах сховішча.";
 
 /* Error title indicating that the app crashed because there was low storage space available on the device. */
 "APP_LAUNCH_FAILURE_LOW_STORAGE_SPACE_AVAILABLE_TITLE" = "Недастаткова месца ў сховішчы";
 
 /* Error indicating that the app could not restore transferred data. */
-"APP_LAUNCH_FAILURE_RESTORE_FAILED_MESSAGE" = "Не атрымалася аднавіць даныя, што былі перанесены са старой прылады. Калі ласка, адпраўце журнал адладкі на support@signal.org, каб мы змаглі выправіць гэтую непаладку. Калі вы нанова ўсталюеце Signal, ваша гісторыя паведамленняў можа быць страчана.";
+"APP_LAUNCH_FAILURE_RESTORE_FAILED_MESSAGE" = "Не атрымалася аднавіць даныя, што былі перанесены са старой прылады. Калі ласка, адпраўце журнал адладкі на support@radar.chat, каб мы змаглі выправіць гэтую непаладку. Калі вы нанова ўсталюеце Radar, ваша гісторыя паведамленняў можа быць страчана.";
 
 /* Error indicating that the app could not restore transferred data. */
 "APP_LAUNCH_FAILURE_RESTORE_FAILED_TITLE" = "Не атрымалася завяршыць перанос";
@@ -260,7 +260,7 @@
 "APP_UPDATE_NAG_ALERT_MESSAGE_FORMAT" = "Версія %1$@ цяпер даступная ў App Store.";
 
 /* Title for the 'new app version available' alert. */
-"APP_UPDATE_NAG_ALERT_TITLE" = "Даступная новая версія Signal";
+"APP_UPDATE_NAG_ALERT_TITLE" = "Даступная новая версія Radar";
 
 /* Label for the 'update' button in the 'new app version available' alert. */
 "APP_UPDATE_NAG_ALERT_UPDATE_BUTTON" = "Абнавіць";
@@ -410,7 +410,7 @@
 "ATTACHMENT_KEYBOARD_GIF" = "GIF";
 
 /* Text in chat attachment panel when Signal only has access to some photos/videos. This string is in a compact horizontal space, so it should be short if possible. */
-"ATTACHMENT_KEYBOARD_LIMITED_ACCESS" = "Signal мае абмежаваны доступ да фота";
+"ATTACHMENT_KEYBOARD_LIMITED_ACCESS" = "Radar мае абмежаваны доступ да фота";
 
 /* A button to select a location from the Attachment Keyboard */
 "ATTACHMENT_KEYBOARD_LOCATION" = "Месца";
@@ -422,7 +422,7 @@
 "ATTACHMENT_KEYBOARD_NO_MEDIA_TITLE" = "Няма фота ці відэа";
 
 /* Text in chat attachment panel explaining that user needs to give Signal permission to access photos. */
-"ATTACHMENT_KEYBOARD_NO_PHOTO_ACCESS" = "Signal не мае доступу да вашых фота і відэа. Каб уключыць доступ, адкрыйце «Налады» і націсніце «Фота»";
+"ATTACHMENT_KEYBOARD_NO_PHOTO_ACCESS" = "Radar не мае доступу да вашых фота і відэа. Каб уключыць доступ, адкрыйце «Налады» і націсніце «Фота»";
 
 /* Button in chat attachment panel to let user open Settings app and give Signal persmission to access photos. */
 "ATTACHMENT_KEYBOARD_OPEN_SETTINGS" = "Адкрыць «Налады»";
@@ -527,7 +527,7 @@
 "BACKUP_ENABLEMENT_REMINDER_MEGAPHONE_ACTION" = "Уключыць";
 
 /* Body for Backup enablement reminder megaphone */
-"BACKUP_ENABLEMENT_REMINDER_MEGAPHONE_BODY" = "Не губляйце аніводнага паведамлення, калі вы набываеце новы тэлефон або нанова ўсталёўваеце Signal.";
+"BACKUP_ENABLEMENT_REMINDER_MEGAPHONE_BODY" = "Не губляйце аніводнага паведамлення, калі вы набываеце новы тэлефон або нанова ўсталёўваеце Radar.";
 
 /* Title for Backup enablement reminder megaphone */
 "BACKUP_ENABLEMENT_REMINDER_MEGAPHONE_TITLE" = "Уключыць функцыю «Зашыфраваныя рэзервовыя копіі»";
@@ -569,7 +569,7 @@
 "BACKUP_ONBOARDING_CANCEL_SHEET_TITLE" = "Выйсці з налады рэзервовага капіравання?";
 
 /* Body for a sheet warning users to their 'Recovery Key' safe. */
-"BACKUP_ONBOARDING_CONFIRM_KEY_KEEP_KEY_SAFE_SHEET_BODY" = "Калі вы страціце ключ, Signal не зможа аднавіць вашу рэзервовую копію. Захоўвайце яго ў бяспечным месцы і нікому не паказвайце яго.";
+"BACKUP_ONBOARDING_CONFIRM_KEY_KEEP_KEY_SAFE_SHEET_BODY" = "Калі вы страціце ключ, Radar не зможа аднавіць вашу рэзервовую копію. Захоўвайце яго ў бяспечным месцы і нікому не паказвайце яго.";
 
 /* Title for a sheet warning users to their 'Recovery Key' safe. */
 "BACKUP_ONBOARDING_CONFIRM_KEY_KEEP_KEY_SAFE_SHEET_TITLE" = "Захоўвайце свой ключ у бяспецы";
@@ -596,10 +596,10 @@
 "BACKUP_ONBOARDING_INTRO_NOT_NOW_TOAST" = "Вы можаце ўключыць рэзервовае капіраванне ў «Наладах».";
 
 /* Subtitle for a view introducing Backups during an onboarding flow. */
-"BACKUP_ONBOARDING_INTRO_SUBTITLE" = "Стварайце рэзервовыя копіі для вашых паведамленняў і медыяфайлаў з дапамогай надзейнага скразнога шыфраванага сэрвісу захоўвання даных Signal. Не губляйце аніводнага паведамлення, калі вы набываеце новы тэлефон або нанова ўсталёўваеце Signal.";
+"BACKUP_ONBOARDING_INTRO_SUBTITLE" = "Стварайце рэзервовыя копіі для вашых паведамленняў і медыяфайлаў з дапамогай надзейнага скразнога шыфраванага сэрвісу захоўвання даных Radar. Не губляйце аніводнага паведамлення, калі вы набываеце новы тэлефон або нанова ўсталёўваеце Radar.";
 
 /* Title for a view introducing Backups during an onboarding flow. */
-"BACKUP_ONBOARDING_INTRO_TITLE" = "Бяспечнае рэзервовае капіраванне Signal";
+"BACKUP_ONBOARDING_INTRO_TITLE" = "Бяспечнае рэзервовае капіраванне Radar";
 
 /* Text for a bullet point in a view introducing the 'Recovery Key' during an onboarding flow. */
 "BACKUP_ONBOARDING_KEY_INTRO_BULLET_1" = "Ваш код для аднаўлення – гэта 64-значны код, які дазваляе аднавіць рэзервовую копію.";
@@ -617,10 +617,10 @@
 "BACKUP_ONBOARDING_KEY_INTRO_TITLE" = "Код для аднаўлення";
 
 /* Body for a sheet shown when your Backup plan is downgraded. */
-"BACKUP_PLAN_DOWNGRADED_SHEET_BODY" = "Тэрмін дзеяння вашай падпіскі на рэзервовае капіраванне скончыўся, бо яе не атрымалася аднавіць з вашым спосабам аплаты.\n\nКаб працягнуць рэзервовае капіраванне медыяфайлаў, вы можаце падпісацца нанова. Вы па-ранейшаму будзеце мець доступ да бясплатнага тарыфнага плана на рэзервовыя копіі Signal.";
+"BACKUP_PLAN_DOWNGRADED_SHEET_BODY" = "Тэрмін дзеяння вашай падпіскі на рэзервовае капіраванне скончыўся, бо яе не атрымалася аднавіць з вашым спосабам аплаты.\n\nКаб працягнуць рэзервовае капіраванне медыяфайлаў, вы можаце падпісацца нанова. Вы па-ранейшаму будзеце мець доступ да бясплатнага тарыфнага плана на рэзервовыя копіі Radar.";
 
 /* Body for a sheet shown when your Backup plan is downgraded because you stopped using TestFlight. */
-"BACKUP_PLAN_DOWNGRADED_SHEET_BODY_TESTFLIGHT" = "Тэрмін дзеяння вашай падпіскі на рэзервовае капіраванне скончыўся, бо вы больш не карыстаецеся TestFlight.\n\nКаб працягнуць рэзервовае капіраванне медыяфайлаў, вы можаце падпісацца нанова. Вы па-ранейшаму будзеце мець доступ да бясплатнага тарыфнага плана на рэзервовыя копіі Signal.";
+"BACKUP_PLAN_DOWNGRADED_SHEET_BODY_TESTFLIGHT" = "Тэрмін дзеяння вашай падпіскі на рэзервовае капіраванне скончыўся, бо вы больш не карыстаецеся TestFlight.\n\nКаб працягнуць рэзервовае капіраванне медыяфайлаў, вы можаце падпісацца нанова. Вы па-ранейшаму будзеце мець доступ да бясплатнага тарыфнага плана на рэзервовыя копіі Radar.";
 
 /* Primary button for a sheet shown when your Backup plan is downgraded. */
 "BACKUP_PLAN_DOWNGRADED_SHEET_PRIMARY_BUTTON" = "Кіраваць рэзервовымі копіямі";
@@ -650,7 +650,7 @@
 "BACKUP_RESTORE_MODAL_TITLE" = "Аднаўленне паведамленняў…";
 
 /* Message describing that the Background App Refresh permission is disabled for Signal. \"Background App Refresh\" should be localized the same way it is in iOS Settings app permissions. */
-"BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_MESSAGE" = "Аўтаматычнае рэзервовае капіраванне адключана. Абнавіце дазволы Signal, каб уключыць аўтаматычнае рэзервовае капіраванне.";
+"BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_MESSAGE" = "Аўтаматычнае рэзервовае капіраванне адключана. Абнавіце дазволы Radar, каб уключыць аўтаматычнае рэзервовае капіраванне.";
 
 /* Add-on to a message describing that the Background App Refresh permission is disabled for Signal. \"Background App Refresh\" should be localized the same way it is in iOS Settings app permissions. */
 "BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_MESSAGE_UPDATE_NOW" = "Абнавіць зараз";
@@ -659,7 +659,7 @@
 "BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_SHEET_GO_TO_SETTINGS_BUTTON" = "Перайсці ў налады";
 
 /* Message for a sheet warning the user about the Background App Refresh permission. \"Background App Refresh\" should be localized the same way it is in iOS Settings app permissions. */
-"BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_SHEET_MESSAGE" = "Каб дазволіць Signal аўтаматычна ствараць рэзервовыя копіі вашых паведамленняў, націсніце «Перайсці ў налады», што ніжэй, і ўключыце «Фонавае абнаўленне праграм»";
+"BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_SHEET_MESSAGE" = "Каб дазволіць Radar аўтаматычна ствараць рэзервовыя копіі вашых паведамленняў, націсніце «Перайсці ў налады», што ніжэй, і ўключыце «Фонавае абнаўленне праграм»";
 
 /* Title for a sheet warning the user about the Background App Refresh permission. \"Background App Refresh\" should be localized the same way it is in iOS Settings app permissions. */
 "BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_SHEET_TITLE" = "Аўтаматычнае рэзервовае капіраванне адключана";
@@ -746,7 +746,7 @@
 "BACKUP_SETTINGS_BACKUP_PLAN_PAID_BUT_IAP_NOT_FOUND_LOCALLY_ACTION_BUTTON_TITLE" = "Аднавіць";
 
 /* Text describing that the user's paid backup plan did not correspond to a App Store subscription on this device. */
-"BACKUP_SETTINGS_BACKUP_PLAN_PAID_BUT_IAP_NOT_FOUND_LOCALLY_DESCRIPTION" = "На гэтай прыладзе ваша падпіска не знойдзена. Аднавіце яе, каб па-ранейшаму выкарыстоўваць рэзервовыя копіі Signal.";
+"BACKUP_SETTINGS_BACKUP_PLAN_PAID_BUT_IAP_NOT_FOUND_LOCALLY_DESCRIPTION" = "На гэтай прыладзе ваша падпіска не знойдзена. Аднавіце яе, каб па-ранейшаму выкарыстоўваць рэзервовыя копіі Radar.";
 
 /* Header describing what the paid backup plan includes. */
 "BACKUP_SETTINGS_BACKUP_PLAN_PAID_HEADER" = "Рэзервовае капіраванне SMS і ўсіх медыяфайлаў";
@@ -758,16 +758,16 @@
 "BACKUP_SETTINGS_BACKUP_PLAN_PAID_RENEWAL_FORMAT" = "Аднаўленне %1$@";
 
 /* Footer for a menu section related to settings for when Backups are disabled. */
-"BACKUP_SETTINGS_BACKUPS_DISABLED_SECTION_FOOTER" = "Рэзервовыя копіі былі адключаны, і вашы даныя былі выдалены сэрвісам бяспечнага захоўвання Signal.";
+"BACKUP_SETTINGS_BACKUPS_DISABLED_SECTION_FOOTER" = "Рэзервовыя копіі былі адключаны, і вашы даныя былі выдалены сэрвісам бяспечнага захоўвання Radar.";
 
 /* Description for a progress view tracking media being downloaded in service of disabling Backups. */
-"BACKUP_SETTINGS_BACKUPS_DISABLING_DOWNLOADING_MEDIA_PROGRESS_VIEW_DESCRIPTION" = "Рэзервовыя копіі былі адключаны, і зараз пампуюцца медыяфайлы, якіх няма на прыладзе. Калi вашы даныя будуць запампаваны на прыладу, яны будуць выдалены з сэрвісу бяспечнага захоўвання Signal.";
+"BACKUP_SETTINGS_BACKUPS_DISABLING_DOWNLOADING_MEDIA_PROGRESS_VIEW_DESCRIPTION" = "Рэзервовыя копіі былі адключаны, і зараз пампуюцца медыяфайлы, якіх няма на прыладзе. Калi вашы даныя будуць запампаваны на прыладу, яны будуць выдалены з сэрвісу бяспечнага захоўвання Radar.";
 
 /* Message for a view indicating we failed to delete the user's Backup due to an unexpected error. */
 "BACKUP_SETTINGS_BACKUPS_DISABLING_GENERIC_ERROR_MESSAGE" = "Адбылася памылка. Калі ласка, звярніцеся да службы падтрымкі.";
 
 /* Header for a menu section related to settings for when disabling Backups encountered an unexpected error. */
-"BACKUP_SETTINGS_BACKUPS_DISABLING_GENERIC_ERROR_SECTION_HEADER" = "Адбылася памылка падчас выдалення вашых дадзеных з сэрвіса бяспечнага захоўвання Signal.";
+"BACKUP_SETTINGS_BACKUPS_DISABLING_GENERIC_ERROR_SECTION_HEADER" = "Адбылася памылка падчас выдалення вашых дадзеных з сэрвіса бяспечнага захоўвання Radar.";
 
 /* Title for a view indicating we failed to delete the user's Backup due to an unexpected error. */
 "BACKUP_SETTINGS_BACKUPS_DISABLING_GENERIC_ERROR_TITLE" = "Не атрымалася выдаліць рэзервовую копію";
@@ -776,7 +776,7 @@
 "BACKUP_SETTINGS_BACKUPS_DISABLING_PROGRESS_VIEW_DESCRIPTION" = "Выдаляем рэзервовую копію...";
 
 /* Header for a menu section related to disabling Backups. */
-"BACKUP_SETTINGS_BACKUPS_DISABLING_SECTION_HEADER" = "Рэзервовыя копіі былі адключаны, і вашы дадзеныя будуць выдалены сэрвісам бяспечнага захоўвання Signal.";
+"BACKUP_SETTINGS_BACKUPS_DISABLING_SECTION_HEADER" = "Рэзервовыя копіі былі адключаны, і вашы дадзеныя будуць выдалены сэрвісам бяспечнага захоўвання Radar.";
 
 /* Header for a menu section related to settings for when Backups are enabled. */
 "BACKUP_SETTINGS_BACKUPS_ENABLED_SECTION_HEADER" = "Звесткі аб рэзервовым капіраванні";
@@ -824,13 +824,13 @@
 "BACKUP_SETTINGS_DISABLING_CONFIRMATION_ACTION_SHEET_TITLE" = "Адключыць і выдаліць рэзервовыя копіі?";
 
 /* Message shown in an action sheet when the user disables Backups, explaining that their media is downloading first. */
-"BACKUP_SETTINGS_DISABLING_DOWNLOADS_STARTED_ACTION_SHEET_MESSAGE" = "Вы можаце спампаваць медыяфайлы з вашай рэзервовай копіі, якіх няма на гэтай прыладзе. Пампаванне можа заняць шмат часу, таму не выходзьце з Signal, каб пазбегнуць перарывання.";
+"BACKUP_SETTINGS_DISABLING_DOWNLOADS_STARTED_ACTION_SHEET_MESSAGE" = "Вы можаце спампаваць медыяфайлы з вашай рэзервовай копіі, якіх няма на гэтай прыладзе. Пампаванне можа заняць шмат часу, таму не выходзьце з Radar, каб пазбегнуць перарывання.";
 
 /* Title shown in an action sheet when the user disables Backups, explaining that their media is downloading first. */
 "BACKUP_SETTINGS_DISABLING_DOWNLOADS_STARTED_ACTION_SHEET_TITLE" = "Пампуем вашу рэзервовую копію";
 
 /* Message shown in an action sheet indicating we failed to delete the user's Backup due to an unexpected error. */
-"BACKUP_SETTINGS_DISABLING_ERROR_GENERIC_ERROR_ACTION_SHEET_MESSAGE" = "Адбылася памылка падчас выдалення вашых дадзеных з сэрвіса бяспечнага захоўвання Signal.";
+"BACKUP_SETTINGS_DISABLING_ERROR_GENERIC_ERROR_ACTION_SHEET_MESSAGE" = "Адбылася памылка падчас выдалення вашых дадзеных з сэрвіса бяспечнага захоўвання Radar.";
 
 /* Title shown in an action sheet indicating we failed to delete the user's Backup due to an unexpected error. */
 "BACKUP_SETTINGS_DISABLING_ERROR_GENERIC_ERROR_ACTION_SHEET_TITLE" = "Не атрымалася выдаліць рэзервовую копію";
@@ -842,7 +842,7 @@
 "BACKUP_SETTINGS_DISABLING_SUBSCRIPTION_CANCEL_ACTION_SHEET_MANAGE_SUBSCRIPTION_BUTTON" = "Кіраваць падпіскай";
 
 /* Message for an action sheet shown when the user disables Backups, but is still subscribed to the paid plan. */
-"BACKUP_SETTINGS_DISABLING_SUBSCRIPTION_CANCEL_ACTION_SHEET_MESSAGE" = "Калі вы жадаеце скасаваць падпіску, націсніце «Кіраваць падпіскай» > Signal > «Скасаваць падпіску»";
+"BACKUP_SETTINGS_DISABLING_SUBSCRIPTION_CANCEL_ACTION_SHEET_MESSAGE" = "Калі вы жадаеце скасаваць падпіску, націсніце «Кіраваць падпіскай» > Radar > «Скасаваць падпіску»";
 
 /* Title for an action sheet shown when the user disables Backups, but is still subscribed to the paid plan. */
 "BACKUP_SETTINGS_DISABLING_SUBSCRIPTION_CANCEL_ACTION_SHEET_TITLE" = "Вы па-ранейшаму падпісаны на платны тарыфны план рэзервовага капіравання";
@@ -920,7 +920,7 @@
 "BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_DOWNLOAD_SHEET_LATER_ACTION" = "Спампаваць пазней";
 
 /* Message for an action sheet allowing users to download their offloaded media. */
-"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_DOWNLOAD_SHEET_MESSAGE" = "Вы можаце спампаваць медыяфайлы з вашай рэзервовай копіі, якіх няма на гэтай прыладзе. Пампаванне можа заняць шмат часу, таму не выходзьце з Signal, каб пазбегнуць перарывання падчас пампавання.";
+"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_DOWNLOAD_SHEET_MESSAGE" = "Вы можаце спампаваць медыяфайлы з вашай рэзервовай копіі, якіх няма на гэтай прыладзе. Пампаванне можа заняць шмат часу, таму не выходзьце з Radar, каб пазбегнуць перарывання падчас пампавання.";
 
 /* Action in an action sheet allowing users to download their offloaded media now. */
 "BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_DOWNLOAD_SHEET_NOW_ACTION" = "Спампаваць";
@@ -941,13 +941,13 @@
 "BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_TOGGLE_FOOTER_AVAILABLE_FOR_TESTERS" = "Нявыкарыстаныя медыяфайлы будуць выгружаныя, але ж могуць быць спампаваны з рэзервовай копіі ў любы момант, пакуль вы карыстаецеся TestFlight.";
 
 /* Footer for a toggle allowing users to change the Optimize Local Storage setting, if the toggle is unavailable. */
-"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_TOGGLE_FOOTER_UNAVAILABLE" = "Аптымізацыю сховішча можна зрабіць толькі на платнай аснове рэзервовага капіравання Signal. Каб выкарыстоўваць гэту функцыю, абнавіце свой план рэзервовага капіравання.";
+"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_TOGGLE_FOOTER_UNAVAILABLE" = "Аптымізацыю сховішча можна зрабіць толькі на платнай аснове рэзервовага капіравання Radar. Каб выкарыстоўваць гэту функцыю, абнавіце свой план рэзервовага капіравання.";
 
 /* Title for a toggle allowing users to change the Optimize Local Storage setting. */
 "BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_TOGGLE_TITLE" = "Зрабіце аптымізацыю сховішча на прыладзе";
 
 /* Subtitle for a notification telling the user they are out of remote storage space. */
-"BACKUP_SETTINGS_OUT_OF_STORAGE_SPACE_NOTIFICATION_SUBTITLE" = "Для вас дасягнуты ліміт захоўвання рэзервовых копій. Вызваліце месца ў Signal, каб па-ранейшаму рабіць рэзервовае капіраванне чатаў і медыяфайлаў.";
+"BACKUP_SETTINGS_OUT_OF_STORAGE_SPACE_NOTIFICATION_SUBTITLE" = "Для вас дасягнуты ліміт захоўвання рэзервовых копій. Вызваліце месца ў Radar, каб па-ранейшаму рабіць рэзервовае капіраванне чатаў і медыяфайлаў.";
 
 /* Title for a notification telling the user they are out of remote storage space. */
 "BACKUP_SETTINGS_OUT_OF_STORAGE_SPACE_NOTIFICATION_TITLE" = "Сховішча рэзервовых копій запоўнена";
@@ -971,7 +971,7 @@
 "BACKUP_SETTINGS_SUBSCRIPTION_ALREADY_REDEEMED_NOTICE_TITLE" = "Не атрымалася актываваць вашу падпіску на рэзервовае капіраванне";
 
 /* Body for a sheet explaining that the user's Backups subscription was already redeemed. */
-"BACKUP_SETTINGS_SUBSCRIPTION_ALREADY_REDEEMED_SHEET_BODY" = "У гэтым месяцы вашу падпіску спрабавалі актываваць занадта шмат прылад.\n\nМагчыма, вы занадта шмат разоў нанова рэгістравалі свой уліковы запіс Signal або адна і тая ж падпіска выкарыстоўвалася на занадта шмат прыладах.";
+"BACKUP_SETTINGS_SUBSCRIPTION_ALREADY_REDEEMED_SHEET_BODY" = "У гэтым месяцы вашу падпіску спрабавалі актываваць занадта шмат прылад.\n\nМагчыма, вы занадта шмат разоў нанова рэгістравалі свой уліковы запіс Radar або адна і тая ж падпіска выкарыстоўвалася на занадта шмат прыладах.";
 
 /* Button for a sheet explaining that the user's Backups subscription was already redeemed. */
 "BACKUP_SETTINGS_SUBSCRIPTION_ALREADY_REDEEMED_SHEET_GOT_IT_BUTTON" = "Зразумела";
@@ -992,19 +992,19 @@
 "BACKUP_SETTINGS_UPLOAD_PROGRESS_SUBTITLE_PAUSED_NEEDS_WIFI" = "Пампаванне медыяфайлаў прыпынена: чакаем Wi-Fi";
 
 /* Subtitle for a progress bar tracking uploads that are paused because the user is out of remote storage space. Embeds 1:{{ total storage space provided, e.g. 100 GB }}; 2:{{ space the user needs to free up by deleting media, e.g. 1 GB }}. */
-"BACKUP_SETTINGS_UPLOAD_PROGRESS_SUBTITLE_PAUSED_OUT_OF_STORAGE_SPACE_FORMAT" = "Вы дасягнулі ліміту сховішча %1$@, што ўключаны ў ваш план рэзервовага капіравання. Каб зрабіць рэзервовае капіраванне новых чатаў і медыяфайлаў, вызваліце %2$@ у Signal, а потым націсніце «Пачаць рэзервовае капіраванне».";
+"BACKUP_SETTINGS_UPLOAD_PROGRESS_SUBTITLE_PAUSED_OUT_OF_STORAGE_SPACE_FORMAT" = "Вы дасягнулі ліміту сховішча %1$@, што ўключаны ў ваш план рэзервовага капіравання. Каб зрабіць рэзервовае капіраванне новых чатаў і медыяфайлаў, вызваліце %2$@ у Radar, а потым націсніце «Пачаць рэзервовае капіраванне».";
 
 /* Subtitle for a progress bar tracking active uploading. Embeds 1:{{ the amount uploaded as a file size, e.g. 100 MB }}; 2:{{ the total amount to upload as a file size, e.g. 1 GB }}; 3:{{ the percentage uploaded as a percent, e.g. 40% }}. */
 "BACKUP_SETTINGS_UPLOAD_PROGRESS_SUBTITLE_RUNNING" = "Пампуецца: %1$@ з %2$@ (%3$@)";
 
 /* Message for a sheet shown after the user enables backups. */
-"BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_MESSAGE" = "У залежнасці ад памеру рэзервовай копіі гэта можа заняць пэўны час. Падчас рэзервовага капіравання вы можаце карыстацца Signal як звычайна.";
+"BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_MESSAGE" = "У залежнасці ад памеру рэзервовай копіі гэта можа заняць пэўны час. Падчас рэзервовага капіравання вы можаце карыстацца Radar як звычайна.";
 
 /* Title for a sheet shown after the user enables backups. */
-"BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_TITLE" = "Сардэчна запрашаем у «Бяспечнае рэзервовае капіраванне Signal». Пачынайце рэзервовае капіраванне.";
+"BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_TITLE" = "Сардэчна запрашаем у «Бяспечнае рэзервовае капіраванне Radar». Пачынайце рэзервовае капіраванне.";
 
 /* Message for a sheet shown when your Backup subscription fails to renew. */
-"BACKUP_SUBSCRIPTION_FAILED_TO_RENEW_SHEET_MESSAGE" = "Праверце, ці правільны ваш спосаб аплаты. Націсніце «Кіраваць падпіскай» > «Signal» > «Абнавіць спосаб аплаты».";
+"BACKUP_SUBSCRIPTION_FAILED_TO_RENEW_SHEET_MESSAGE" = "Праверце, ці правільны ваш спосаб аплаты. Націсніце «Кіраваць падпіскай» > «Radar» > «Абнавіць спосаб аплаты».";
 
 /* Primary button for a sheet shown when your Backup subscription fails to renew. */
 "BACKUP_SUBSCRIPTION_FAILED_TO_RENEW_SHEET_PRIMARY_BUTTON" = "Кіраваць падпіскай";
@@ -1022,7 +1022,7 @@
 "BACKUPS_SETTINGS_TITLE" = "Бяспечнае рэзервовае капіраванне";
 
 /* Body for system notification or megaphone when backups is enabled. Embeds {{ time backups was enabled }} */
-"BACKUPS_TURNED_ON_NOTIFICATION_BODY_FORMAT" = "Для гэтага ўліковага запісу рэзервовыя копіі Signal былі ўключаны ў %1$@. Націснуць, каб прагледзець.";
+"BACKUPS_TURNED_ON_NOTIFICATION_BODY_FORMAT" = "Для гэтага ўліковага запісу рэзервовыя копіі Radar былі ўключаны ў %1$@. Націснуць, каб прагледзець.";
 
 /* Title for system notification or megaphone when backups is enabled */
 "BACKUPS_TURNED_ON_TITLE" = "Вы ўключылі рэзервовае капіраванне";
@@ -1040,10 +1040,10 @@
 "BADGE_DETAILS_DONATE_TO_SIGNAL" = "Зрабіць ахвяраванне";
 
 /* When viewing someone else's donor badge, you'll see a sheet. This is the title on that sheet. Embeds {badge owner's short name} */
-"BADGE_DETAILS_TITLE_FOR_SUPPORTER" = "%1$@ падтрымлівае Signal";
+"BADGE_DETAILS_TITLE_FOR_SUPPORTER" = "%1$@ падтрымлівае Radar";
 
 /* String explaining to the user that their boost badge has expired on the badge expiry sheet. */
-"BADGE_EXPIRED_BOOST_BODY" = "Тэрмін дзеяння вашага значка падтрымкі скончыўся, і ён больш не бачны ў вашым профілі.\n\nВы можаце працягваць карыстацца Signal, але мы будзем вельмі ўдзячны, калі вы станеце штомесячным спонсарам, каб падтрымаць тэхналогію, зробленую для вас.";
+"BADGE_EXPIRED_BOOST_BODY" = "Тэрмін дзеяння вашага значка падтрымкі скончыўся, і ён больш не бачны ў вашым профілі.\n\nВы можаце працягваць карыстацца Radar, але мы будзем вельмі ўдзячны, калі вы станеце штомесячным спонсарам, каб падтрымаць тэхналогію, зробленую для вас.";
 
 /* String explaining to the user that their boost badge has expired while they are a current subscription sustainer on the badge expiry sheet. */
 "BADGE_EXPIRED_BOOST_CURRENT_SUSTAINER_BODY" = "Тэрмін дзеяння вашага значка падтрымкі скончыўся, і ён больш не бачны ў вашым профілі.\n\nВы можаце зноў актываваць свой значок падтрымкі яшчэ на 30 дзён пасля разавага ахвяравання.";
@@ -1088,7 +1088,7 @@
 "BANK_DONATION_FOOTER_FIND_ACCOUNT_INFO" = "Знайсці інфармацыю аб рахунку";
 
 /* On the bank transfer donation screen, a small amount of information text is shown. This is that text. It should (1) instruct users to enter their bank information (2) tell them that Signal does not collect or store their personal information. */
-"BANK_DONATION_SUBHEADER_TEXT" = "Увядзіце свае банкаўскія рэквізіты. Signal не збірае і не захоўвае вашу асабістую інфармацыю.";
+"BANK_DONATION_SUBHEADER_TEXT" = "Увядзіце свае банкаўскія рэквізіты. Radar не збірае і не захоўвае вашу асабістую інфармацыю.";
 
 /* Users can donate to Signal with a bank account. We are required to show them a mandate with information about bank transfers. This is a label for a button to agree to the mandate. */
 "BANK_MANDATE_AGREE" = "Згаджаюся";
@@ -1097,7 +1097,7 @@
 "BANK_MANDATE_READ_MORE" = "Чытаць далей";
 
 /* Users can donate to Signal with a bank account. We are required to show them a mandate with information about bank transfers. This is a subtitle about the payment processor Stripe above that mandate. */
-"BANK_MANDATE_SUBTITLE" = "Stripe апрацоўвае ахвяраванні, зробленыя для Signal. Signal не збірае і не захоўвае вашу асабістую інфармацыю.";
+"BANK_MANDATE_SUBTITLE" = "Stripe апрацоўвае ахвяраванні, зробленыя для Radar. Radar не збірае і не захоўвае вашу асабістую інфармацыю.";
 
 /* Users can donate to Signal with a bank account. We are required to show them a mandate with information about bank transfers. This is the title above that mandate. */
 "BANK_MANDATE_TITLE" = "Банкаўскі перавод";
@@ -1253,7 +1253,7 @@
 "CALL_AUDIO_MISSED_WEEK_NOTIFICATION_BODY_FORMAT" = "📞 Прапушчаны галасавы званок у %1$@";
 
 /* Alert message when calling and permissions for microphone are missing */
-"CALL_AUDIO_PERMISSION_MESSAGE" = "Уключыце доступ да мікрафона ў наладах iOS, каб рабіць званкі і запісваць галасавыя паведамленні ў Signal.";
+"CALL_AUDIO_PERMISSION_MESSAGE" = "Уключыце доступ да мікрафона ў наладах iOS, каб рабіць званкі і запісваць галасавыя паведамленні ў Radar.";
 
 /* Alert title when calling and permissions for microphone are missing */
 "CALL_AUDIO_PERMISSION_TITLE" = "Патрабуецца доступ да мікрафона";
@@ -1319,7 +1319,7 @@
 "CALL_LINK_JOIN_REQUEST_PROMPT" = "Жадае далучыцца…";
 
 /* Shown in a message bubble when you send a call link in a Signal chat */
-"CALL_LINK_LINK_PREVIEW_DESCRIPTION" = "Выкарыстайце гэтую спасылку, каб далучыцца да званка Signal";
+"CALL_LINK_LINK_PREVIEW_DESCRIPTION" = "Выкарыстайце гэтую спасылку, каб далучыцца да званка Radar";
 
 /* Text that appears on a toast in a call lobby before joining a call link informing the user what information will be shared with other call members when they have phone number sharing turned off. */
 "CALL_LINK_LOBBY_SHARING_INFO_PHONE_NUMBER_SHARING_OFF" = "Усякі, хто далучыцца да гэтага званка па спасылцы, убачыць вашы імя і фота.";
@@ -1343,7 +1343,7 @@
 "CALL_LINK_REQUIRE_APPROVAL" = "Патрабуецца пацвярджэнне адміністратара";
 
 /* Button to open UI to share a Call Link with someone on Signal. */
-"CALL_LINK_SHARE_VIA_SIGNAL" = "Абагуліць спасылку праз Signal";
+"CALL_LINK_SHARE_VIA_SIGNAL" = "Абагуліць спасылку праз Radar";
 
 /* Button to open the system share sheet to share a Call Link. */
 "CALL_LINK_SHARE_VIA_SYSTEM" = "Абагуліць спасылку";
@@ -1448,10 +1448,10 @@
 "CALLING_MEMBER_VIEW_YOUR_CAMERA_IS_OFF" = "Ваша камера адключана";
 
 /* The generic name used for calls if CallKit privacy is enabled */
-"CALLKIT_ANONYMOUS_CONTACT_NAME" = "Карыстальнік Signal";
+"CALLKIT_ANONYMOUS_CONTACT_NAME" = "Карыстальнік Radar";
 
 /* The generic name used for group calls if CallKit privacy is enabled */
-"CALLKIT_ANONYMOUS_GROUP_NAME" = "Група Signal";
+"CALLKIT_ANONYMOUS_GROUP_NAME" = "Група Radar";
 
 /* Title for the calls list view. */
 "CALLS_LIST_TITLE" = "Званкі";
@@ -1625,7 +1625,7 @@
 "CARD_DONATION_EXPIRATION_DATE_PLACEHOLDER" = "ММ/ГГ";
 
 /* Users can choose to learn more about their credit/debit card donations, which will open a sheet with additional information. This is the body text of that sheet. */
-"CARD_DONATION_READ_MORE_SHEET_BODY" = "Signal не збірае і не захоўвае вашу асабістую інфармацыю, калі вы робіце ахвяраванне.\n\nДля атрымання вашых ахвяраванняў мы выкарыстоўваем кампанію Stripe у якасці аператара плацяжоў. Мы не маем доступу ні да якой інфармацыі, што вы перадаеце іншым карыстальнікам, не захоўваем і не трымаем яе.\n\nSignal не звязвае і не можа звязаць ваша ахвяраванне з вашым уліковым запісам Signal.\n\nДзякуй за вашу падтрымку!";
+"CARD_DONATION_READ_MORE_SHEET_BODY" = "Radar не збірае і не захоўвае вашу асабістую інфармацыю, калі вы робіце ахвяраванне.\n\nДля атрымання вашых ахвяраванняў мы выкарыстоўваем кампанію Stripe у якасці аператара плацяжоў. Мы не маем доступу ні да якой інфармацыі, што вы перадаеце іншым карыстальнікам, не захоўваем і не трымаем яе.\n\nSignal не звязвае і не можа звязаць ваша ахвяраванне з вашым уліковым запісам Radar.\n\nДзякуй за вашу падтрымку!";
 
 /* Users can choose to learn more about their credit/debit card donations, which will open a sheet with additional information. This is the title of that sheet. */
 "CARD_DONATION_READ_MORE_SHEET_TITLE" = "Ваша інфармацыя застаецца канфідэнцыйнай";
@@ -1634,7 +1634,7 @@
 "CARD_DONATION_SUBHEADER_LEARN_MORE" = "Даведацца больш.";
 
 /* On the credit/debit card donation screen, a small amount of information text is shown. This is that text. It should (1) instruct users to enter their credit/debit card information (2) tell them that Signal does not collect or store their personal information. */
-"CARD_DONATION_SUBHEADER_TEXT" = "Увядзіце даныя карты. Signal не збірае і не захоўвае вашу асабістую інфармацыю.";
+"CARD_DONATION_SUBHEADER_TEXT" = "Увядзіце даныя карты. Radar не збірае і не захоўвае вашу асабістую інфармацыю.";
 
 /* Title for the 'censorship circumvention country' view. */
 "CENSORSHIP_CIRCUMVENTION_COUNTRY_VIEW_TITLE" = "Выбраць краіну";
@@ -1772,7 +1772,7 @@
 "COMPARE_SAFETY_NUMBER_ACTION" = "Параўнаць з буферам абмену";
 
 /* Accessibility hint describing what you can do with the compose button */
-"COMPOSE_BUTTON_HINT" = "Выбраць або шукаць карыстальніка Signal, каб распачаць з ім чат.";
+"COMPOSE_BUTTON_HINT" = "Выбраць або шукаць карыстальніка Radar, каб распачаць з ім чат.";
 
 /* Accessibility label from compose button. */
 "COMPOSE_BUTTON_LABEL" = "Напісаць паведамленне";
@@ -1799,13 +1799,13 @@
 "COMPOSE_SCREEN_LIMITED_CONTACTS_CTA" = "Кіраваць";
 
 /* Multi-line label explaining why compose-screen contact picker is empty. */
-"COMPOSE_SCREEN_LIMITED_CONTACTS_PERMISSION" = "Signal мае абмежаваны доступ да вашых сістэмных кантактаў";
+"COMPOSE_SCREEN_LIMITED_CONTACTS_PERMISSION" = "Radar мае абмежаваны доступ да вашых сістэмных кантактаў";
 
 /* Button to open settings from an empty compose-screen contact picker. */
 "COMPOSE_SCREEN_MISSING_CONTACTS_CTA" = "Адкрыць «Налады»";
 
 /* Multi-line label explaining why compose-screen contact picker is empty. */
-"COMPOSE_SCREEN_MISSING_CONTACTS_PERMISSION" = "Уключыце доступ да кантактаў у наладах iOS, каб бачыць, хто з вашых кантактаў з'яўляецца карыстальнікам Signal.";
+"COMPOSE_SCREEN_MISSING_CONTACTS_PERMISSION" = "Уключыце доступ да кантактаў у наладах iOS, каб бачыць, хто з вашых кантактаў з'яўляецца карыстальнікам Radar.";
 
 /* Configure reactions title text */
 "CONFIGURE_REACTIONS" = "Наладзіць рэакцыі";
@@ -1847,10 +1847,10 @@
 "CONTACT_ABOUT_SHEET_PROFILE_NAMES_EDUCATION" = "Імёны профіляў не пацверджаны";
 
 /* Message for a tooltip that appears above a parenthesized name for another user, indicating that that name is the name the other user set for themself. Embeds {{name}} */
-"CONTACT_ABOUT_SHEET_SECONDARY_NAME_TOOLTIP_MESSAGE" = "«%1$@» — назва профілю, якая гэтая асоба ўсталявала для сябе ў Signal.";
+"CONTACT_ABOUT_SHEET_SECONDARY_NAME_TOOLTIP_MESSAGE" = "«%1$@» — назва профілю, якая гэтая асоба ўсталявала для сябе ў Radar.";
 
 /* A label indicating a user is a signal connection. */
-"CONTACT_ABOUT_SHEET_SIGNAL_CONNECTION_LABEL" = "Кантакт Signal";
+"CONTACT_ABOUT_SHEET_SIGNAL_CONNECTION_LABEL" = "Кантакт Radar";
 
 /* The title for a contact 'about' sheet. */
 "CONTACT_ABOUT_SHEET_TITLE" = "Аб кантакце";
@@ -1892,7 +1892,7 @@
 "CONTACT_NOTE_TITLE" = "Нататка";
 
 /* Body for contact permission action sheet */
-"CONTACT_PERMISSION_ACTION_SHEET_2_BODY" = "Каб знайсці людзей, якіх вы ведаеце, у Signal:";
+"CONTACT_PERMISSION_ACTION_SHEET_2_BODY" = "Каб знайсці людзей, якіх вы ведаеце, у Radar:";
 
 /* First step for contact permission action sheet */
 "CONTACT_PERMISSION_ACTION_SHEET_2_STEP_ONE" = "Націсніце «Перайсці ў налады», што ніжэй";
@@ -1925,10 +1925,10 @@
 "CONTACT_PERMISSION_REMINDER_MEGAPHONE_ACTION" = "Дазволіць доступ";
 
 /* Body for contact permission reminder megaphone */
-"CONTACT_PERMISSION_REMINDER_MEGAPHONE_BODY" = "Дайце доступ да вашых кантактаў, каб хутка знайсці іх у Signal.";
+"CONTACT_PERMISSION_REMINDER_MEGAPHONE_BODY" = "Дайце доступ да вашых кантактаў, каб хутка знайсці іх у Radar.";
 
 /* Title for contact permission reminder megaphone */
-"CONTACT_PERMISSION_REMINDER_MEGAPHONE_TITLE" = "Знайсці кантакты ў Signal";
+"CONTACT_PERMISSION_REMINDER_MEGAPHONE_TITLE" = "Знайсці кантакты ў Radar";
 
 /* Label for a contact's phone number. */
 "CONTACT_PHONE" = "Тэлефон";
@@ -1952,7 +1952,7 @@
 "CONTACT_SHARE_INVALID_CONTACT" = "Несапраўдны кантакт.";
 
 /* Alert body when contacts disabled while trying to share a contact. */
-"CONTACT_SHARING_NO_ACCESS_BODY" = "Signal патрабуе доступу да вашых кантактаў. Перайдзіце ў «Налады iOS» і ўключыце «Кантакты». Вашы кантакты зашыфраваны і не бачныя сэрвісу Signal.";
+"CONTACT_SHARING_NO_ACCESS_BODY" = "Radar патрабуе доступу да вашых кантактаў. Перайдзіце ў «Налады iOS» і ўключыце «Кантакты». Вашы кантакты зашыфраваны і не бачныя сэрвісу Radar.";
 
 /* Alert title when contacts disabled while trying to share a contact. */
 "CONTACT_SHARING_NO_ACCESS_TITLE" = "Дазволіць доступ да кантакту";
@@ -2006,7 +2006,7 @@
 "CONTACT_SUPPORT_FILTER_SOMETHING_NOT_WORKING_SHORT" = "Штосьці не так";
 
 /* Alert body */
-"CONTACT_SUPPORT_PROMPT_ERROR_ALERT_BODY" = "Signal не атрымалася выканаць ваш запыт на падтрымку.";
+"CONTACT_SUPPORT_PROMPT_ERROR_ALERT_BODY" = "Radar не атрымалася выканаць ваш запыт на падтрымку.";
 
 /* button text */
 "CONTACT_SUPPORT_PROMPT_ERROR_TRY_AGAIN" = "Паўтарыць спробу";
@@ -2135,7 +2135,7 @@
 "CONVERSATION_SETTINGS_ATTRIBUTES_ACCESS_SECTION_FOOTER" = "Выберыце таго, хто зможа рэдагаваць назву групы, фота, апісанне і таймер знікнення паведамленняў.";
 
 /* Footer string for a contact's badges in conversation settings */
-"CONVERSATION_SETTINGS_BADGES_FOOTER" = "Падтрымлівайце Signal і атрымлівайце значкі для свайго профілю. Націсніце на значок, каб даведацца больш.";
+"CONVERSATION_SETTINGS_BADGES_FOOTER" = "Падтрымлівайце Radar і атрымлівайце значкі для свайго профілю. Націсніце на значок, каб даведацца больш.";
 
 /* Header title for a contact's badges in conversation settings */
 "CONVERSATION_SETTINGS_BADGES_HEADER" = "Значкі";
@@ -2393,7 +2393,7 @@
 "DATABASE_INTEGRITY_CHECK_ACTION_RUN" = "Выканаць";
 
 /* Message for alert before running a database integrity check */
-"DATABASE_INTEGRITY_CHECK_MESSAGE" = "Праверка можа заняць некалькі хвілін, але дапаможа вырашыць вашу праблему. Вы можаце закрыць Signal падчас дыягностыкі, але вярніцеся ў праграму, каб адправіць свае журналы.";
+"DATABASE_INTEGRITY_CHECK_MESSAGE" = "Праверка можа заняць некалькі хвілін, але дапаможа вырашыць вашу праблему. Вы можаце закрыць Radar падчас дыягностыкі, але вярніцеся ў праграму, каб адправіць свае журналы.";
 
 /* Button to skip database integrity check step */
 "DATABASE_INTEGRITY_CHECK_SKIP" = "Прапусціць";
@@ -2417,10 +2417,10 @@
 "DATABASE_RECOVERY_MORE_STORAGE_SPACE_NEEDED_TITLE" = "Патрэбна больш месца ў сховішчы";
 
 /* The user has tried to recover their data after it was lost due to corruption. (They have not been hacked.) This is the description on the screen where we show an error message. */
-"DATABASE_RECOVERY_RECOVERY_FAILED_DESCRIPTION" = "Не атрымалася аднавіць вашу гісторыю паведамленняў. Вы зможаце працягваць выкарыстоўваць Signal, калі паўторна ўсталюецца праграму. Адпраўце журнал адладкі, каб мы лепш зразумелі, што адбываецца не так, як трэба.";
+"DATABASE_RECOVERY_RECOVERY_FAILED_DESCRIPTION" = "Не атрымалася аднавіць вашу гісторыю паведамленняў. Вы зможаце працягваць выкарыстоўваць Radar, калі паўторна ўсталюецца праграму. Адпраўце журнал адладкі, каб мы лепш зразумелі, што адбываецца не так, як трэба.";
 
 /* The user has tried to recover their data after it was lost due to corruption. (They have not been hacked.) This button lets them delete all of their data. */
-"DATABASE_RECOVERY_RECOVERY_FAILED_RESET_APP_BUTTON" = "Усталяваць Signal нанова";
+"DATABASE_RECOVERY_RECOVERY_FAILED_RESET_APP_BUTTON" = "Усталяваць Radar нанова";
 
 /* The user has tried to recover their data after it was lost due to corruption. (They have not been hacked.) If they want to delete the app and restart, they will be presented with a confirmation dialog. This is the final button they will press before their data is reset. */
 "DATABASE_RECOVERY_RECOVERY_FAILED_RESET_APP_CONFIRMATION_CONFIRM" = "Скінуць";
@@ -2429,7 +2429,7 @@
 "DATABASE_RECOVERY_RECOVERY_FAILED_RESET_APP_CONFIRMATION_DESCRIPTION" = "Ваша інфармацыя ўліковага запісу, профіль і ўсе вашы паведамленні будуць ачышчаны. Праграма закрыецца пасля завяршэння гэтага працэсу.";
 
 /* The user has tried to recover their data after it was lost due to corruption. (They have not been hacked.) If they want to delete the app and restart, they will be presented with a confirmation dialog. This is the title of that dialog. */
-"DATABASE_RECOVERY_RECOVERY_FAILED_RESET_APP_CONFIRMATION_TITLE" = "Усталяваць Signal нанова";
+"DATABASE_RECOVERY_RECOVERY_FAILED_RESET_APP_CONFIRMATION_TITLE" = "Усталяваць Radar нанова";
 
 /* The user has tried to recover their data after it was lost due to corruption. (They have not been hacked.) They were asked to submit a debug log. This is the button that submits this log. */
 "DATABASE_RECOVERY_RECOVERY_FAILED_SUBMIT_DEBUG_LOG_BUTTON" = "Адправіць журнал адладкі";
@@ -2504,7 +2504,7 @@
 "DELETE_ACCOUNT_CONFIRMATION_ACTION_SHEEET_ACTION" = "Выдаліць уліковы запіс";
 
 /* Title for the action sheet message of the 'delete account confirmation' view controller. */
-"DELETE_ACCOUNT_CONFIRMATION_ACTION_SHEEET_MESSAGE" = "Ваш уліковы запіс Signal будзе выдалены, а праграма будзе скінута. Праграма закрыецца пасля завяршэння гэтага працэсу.";
+"DELETE_ACCOUNT_CONFIRMATION_ACTION_SHEEET_MESSAGE" = "Ваш уліковы запіс Radar будзе выдалены, а праграма будзе скінута. Праграма закрыецца пасля завяршэння гэтага працэсу.";
 
 /* Title for the action sheet confirmation title of the 'delete account confirmation' view controller. */
 "DELETE_ACCOUNT_CONFIRMATION_ACTION_SHEEET_TITLE" = "Вы ўпэўнены, што жадаеце выдаліць свой уліковы запіс?";
@@ -2528,7 +2528,7 @@
 "DELETE_ACCOUNT_CONFIRMATION_PHONE_NUMBER_TITLE" = "Нумар тэлефона";
 
 /* Section header */
-"DELETE_ACCOUNT_CONFIRMATION_SECTION_TITLE" = "Пацвердзіць свой нумар Signal";
+"DELETE_ACCOUNT_CONFIRMATION_SECTION_TITLE" = "Пацвердзіць свой нумар Radar";
 
 /* Title for the 'delete account' confirmation view. */
 "DELETE_ACCOUNT_CONFIRMATION_TITLE" = "Выдаліць уліковы запіс";
@@ -2575,7 +2575,7 @@
 
 
 /* Notification warning the user that they have been de-registered. */
-"DEREGISTRATION_NOTIFICATION" = "Вы выйшлі з Signal на гэтай прыладзе.";
+"DEREGISTRATION_NOTIFICATION" = "Вы выйшлі з Radar на гэтай прыладзе.";
 
 /* Button that lets users re-register using the same phone number. */
 "DEREGISTRATION_REREGISTER_BUTTON" = "Зарэгістравацца паўторна";
@@ -2584,7 +2584,7 @@
 "DEREGISTRATION_REREGISTER_PROMPT_TITLE" = "Паўторна зарэгістраваць гэты нумар тэлефона?";
 
 /* Label warning the user that they have been de-registered. */
-"DEREGISTRATION_WARNING" = "Гэтая прылада больш не зарэгістраваная. Магчыма, гэта здарылася таму, што вы зарэгістравалі свой нумар тэлефона ў Signal на іншай прыладзе.";
+"DEREGISTRATION_WARNING" = "Гэтая прылада больш не зарэгістраваная. Магчыма, гэта здарылася таму, што вы зарэгістравалі свой нумар тэлефона ў Radar на іншай прыладзе.";
 
 /* If the user has been deregistered, they'll see a warning. This is This is the call to action on that warning. */
 "DEREGISTRATION_WARNING_ACTION_TITLE" = "Зарэгістраваць паўторна прыладу";
@@ -2671,13 +2671,13 @@
 "DEVICE_TRANSFER_ERROR_NOT_ENOUGH_SPACE" = "Не хапае вольнага месца, каб завяршыць перанос";
 
 /* An error indicating the user must update their device before trying to transfer. */
-"DEVICE_TRANSFER_ERROR_UNSUPPORTED_VERSION" = "Зрабіце абнаўленне да апошняй версіі Signal і паўтарыце спробу";
+"DEVICE_TRANSFER_ERROR_UNSUPPORTED_VERSION" = "Зрабіце абнаўленне да апошняй версіі Radar і паўтарыце спробу";
 
 /* Button shown to expand a QR code and view it fullscreen. */
 "DEVICE_TRANSFER_EXPAND_QR_CODE_BUTTON" = "Павялічыць";
 
 /* The explanation on the action sheet prompting the user if they want to transfer their device. */
-"DEVICE_TRANSFER_PROMPT_EXPLANATION" = "Перанесці свой уліковы запіс Signal на новую прыладу iOS. Пераканайцеся, што ваша новая прылада ўключаная і знаходзіцца побач.";
+"DEVICE_TRANSFER_PROMPT_EXPLANATION" = "Перанесці свой уліковы запіс Radar на новую прыладу iOS. Пераканайцеся, што ваша новая прылада ўключаная і знаходзіцца побач.";
 
 /* The title on the acttion sheet prompting the user if they want to transfer their device. */
 "DEVICE_TRANSFER_PROMPT_TITLE" = "Перанесці ўліковы запіс";
@@ -2695,7 +2695,7 @@
 "DEVICE_TRANSFER_QRCODE_TITLE" = "Сканаваць QR-код";
 
 /* The explanation on the view that shows receiving progress */
-"DEVICE_TRANSFER_RECEIVING_EXPLANATION" = "Трымайце абедзве прылады блізка адна да адной. Не выключайце прылады і пакіньце Signal адкрытым. Пераносы абаронены скразным шыфраваннем.";
+"DEVICE_TRANSFER_RECEIVING_EXPLANATION" = "Трымайце абедзве прылады блізка адна да адной. Не выключайце прылады і пакіньце Radar адкрытым. Пераносы абаронены скразным шыфраваннем.";
 
 /* The title on the view that shows receiving progress */
 "DEVICE_TRANSFER_RECEIVING_TITLE" = "Атрыманне даных";
@@ -2731,7 +2731,7 @@
 "DEVICE_TRANSFER_STATUS_NEW_DEVICE_TRANSFERRING" = "Перанос";
 
 /* Description in the progress view displayed during device transfer. */
-"DEVICE_TRANSFER_STATUS_NEW_DEVICE_TRANSFERRING_DESCRIPTION" = "Трымайце абедзве прылады блізка адна да адной. Не выключайце прылады і пакіньце Signal адкрытым. Пераносы абаронены скразным шыфраваннем.";
+"DEVICE_TRANSFER_STATUS_NEW_DEVICE_TRANSFERRING_DESCRIPTION" = "Трымайце абедзве прылады блізка адна да адной. Не выключайце прылады і пакіньце Radar адкрытым. Пераносы абаронены скразным шыфраваннем.";
 
 /* Status message on old device when cancelling transfer. */
 "DEVICE_TRANSFER_STATUS_OLD_DEVICE_CANCELLING" = "Скасуем падключэнне да новага iPhone…";
@@ -2746,7 +2746,7 @@
 "DEVICE_TRANSFER_STATUS_OLD_DEVICE_STARTING" = "Чакаем падключэння да новага iPhone…";
 
 /* The explanation on the action sheet that shows transfer progress */
-"DEVICE_TRANSFER_TRANSFERRING_EXPLANATION" = "Трымайце абедзве прылады блізка адна да адной. Не выключайце прылады і пакіньце Signal адкрытым.";
+"DEVICE_TRANSFER_TRANSFERRING_EXPLANATION" = "Трымайце абедзве прылады блізка адна да адной. Не выключайце прылады і пакіньце Radar адкрытым.";
 
 /* The title on the action sheet that shows transfer progress */
 "DEVICE_TRANSFER_TRANSFERRING_TITLE" = "Перанос даных";
@@ -2836,13 +2836,13 @@
 "DONATE_CHOOSE_PAYMENT_METHOD_SHEET_SUBTITLE_FOR_ONE_TIME_DONATION" = "Атрымайце значок %1$@ на 30 дзён";
 
 /* When users make donations on a friend's behalf, they see a sheet that lets them pick a payment method. This is the title on that sheet. Embeds {{amount of money}}, such as \"$5\". */
-"DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_DONATION_ON_BEHALF_OF_A_FRIEND" = "Ахвяраванне %1$@ для Signal";
+"DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_DONATION_ON_BEHALF_OF_A_FRIEND" = "Ахвяраванне %1$@ для Radar";
 
 /* When users make monthly donations, they see a sheet that lets them pick a payment method. This is the title on that sheet. Embeds {{amount of money per month}}, such as \"$5/month\". */
-"DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_MONTHLY_DONATION" = "Зрабіць ахвяраванне %1$@ для Signal";
+"DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_MONTHLY_DONATION" = "Зрабіць ахвяраванне %1$@ для Radar";
 
 /* When users make one-time donations, they see a sheet that lets them pick a payment method. This is the title on that sheet. Embeds {{amount of money}}, such as \"$5\". */
-"DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_ONE_TIME_DONATION" = "Зрабіць ахвяраванне %1$@ для Signal";
+"DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_ONE_TIME_DONATION" = "Зрабіць ахвяраванне %1$@ для Radar";
 
 /* Users can donate on a friend's behalf and can optionally add a message. This is tells users about that optional message. */
 "DONATE_ON_BEHALF_OF_A_FRIEND_ADDITIONAL_MESSAGE_INFO" = "Атрымальнік будзе апавешчаны аб ахвяраванні ў індывідуальным паведамленні. Дадайце сваё паведамленне ніжэй.";
@@ -2959,7 +2959,7 @@
 "DONATION_ON_BEHALF_OF_A_FRIEND_BADGE_REDEEMED" = "Актывавана";
 
 /* Users can donate on behalf of a friend, and the friend will receive a badge. This is a short paragraph on the screen where users choose the badge their friend will receive. */
-"DONATION_ON_BEHALF_OF_A_FRIEND_CHOOSE_BADGE_DESCRIPTION" = "Зрабіце ахвяраванне ад імя сябра або члена сям'і, карыстальнікаў Signal, каб падтрымаць Signal. Гэты карыстальнік, калі пажадае, зможа прадэманстраваць сваю падтрымку ў яго профілі.";
+"DONATION_ON_BEHALF_OF_A_FRIEND_CHOOSE_BADGE_DESCRIPTION" = "Зрабіце ахвяраванне ад імя сябра або члена сям'і, карыстальнікаў Radar, каб падтрымаць Radar. Гэты карыстальнік, калі пажадае, зможа прадэманстраваць сваю падтрымку ў яго профілі.";
 
 /* Users can donate on behalf of a friend, and the friend will receive a badge. This is the title on the screen where users choose the badge their friend will receive. */
 "DONATION_ON_BEHALF_OF_A_FRIEND_CHOOSE_BADGE_TITLE" = "Зрабіць ахвяраванне для сябра";
@@ -2983,7 +2983,7 @@
 "DONATION_ON_BEHALF_OF_A_FRIEND_PAYMENT_FAILED_ERROR_TITLE" = "Плацеж не атрымаўся";
 
 /* Users can donate on a friend's behalf. If the payment was processed but the donation failed to send, this error message will be shown. */
-"DONATION_ON_BEHALF_OF_A_FRIEND_PAYMENT_SUCCEEDED_BUT_MESSAGE_FAILED_ERROR_BODY" = "Ваш плацеж быў апрацаваны, але Signal не зможа адправіць паведамленне аб гэтым ахвяраванні. Калі ласка, звярніцеся да службы падтрымкі.";
+"DONATION_ON_BEHALF_OF_A_FRIEND_PAYMENT_SUCCEEDED_BUT_MESSAGE_FAILED_ERROR_BODY" = "Ваш плацеж быў апрацаваны, але Radar не зможа адправіць паведамленне аб гэтым ахвяраванні. Калі ласка, звярніцеся да службы падтрымкі.";
 
 /* Users can donate on a friend's behalf. If the payment was processed but the donation failed to send, an error dialog will be shown. This is the title of that dialog. */
 "DONATION_ON_BEHALF_OF_A_FRIEND_PAYMENT_SUCCEEDED_BUT_MESSAGE_FAILED_ERROR_TITLE" = "Зрабіць ахвяраванне не атрымалася";
@@ -2995,7 +2995,7 @@
 "DONATION_ON_BEHALF_OF_A_FRIEND_PREVIEW_OUTGOING" = "✨ Вы зрабілі ахвяраванне для %1$@";
 
 /* You received a donation from a friend. This is the title of that message in the chat. Embeds {{short contact name}}. */
-"DONATION_ON_BEHALF_OF_A_FRIEND_RECEIVED_TITLE_FORMAT" = "%1$@ ахвяравана для Signal ад вашага імя";
+"DONATION_ON_BEHALF_OF_A_FRIEND_RECEIVED_TITLE_FORMAT" = "%1$@ ахвяравана для Radar ад вашага імя";
 
 /* Users can donate on a friend's behalf. This is the error message that appears if the try to do this, but the recipient is blocked. */
 "DONATION_ON_BEHALF_OF_A_FRIEND_RECIPIENT_IS_BLOCKED_ERROR_BODY" = "Вы не можаце зрабіць ахвяраванне для гэтага карыстальніка, таму што вы яго заблакавалі.";
@@ -3019,7 +3019,7 @@
 "DONATION_ON_BEHALF_OF_A_FRIEND_SENT_TITLE_FORMAT" = "Ахвяраванне ад імя %1$@";
 
 /* When you donate on behalf of a friend, a thank-you sheet will appear. This is the text on that sheet. Embeds {{recipient name}}. */
-"DONATION_ON_BEHALF_OF_A_FRIEND_THANKS_BODY_FORMAT" = "Вы зрабілі ахвяраванне для Signal ад імя %1$@. Гэты карыстальнік, калі пажадае, зможа прадэманстраваць сваю падтрымку ў сваім профілі.";
+"DONATION_ON_BEHALF_OF_A_FRIEND_THANKS_BODY_FORMAT" = "Вы зрабілі ахвяраванне для Radar ад імя %1$@. Гэты карыстальнік, калі пажадае, зможа прадэманстраваць сваю падтрымку ў сваім профілі.";
 
 /* When you donate on behalf of a friend, a thank-you sheet will appear. This is the title on that sheet. */
 "DONATION_ON_BEHALF_OF_A_FRIEND_THANKS_TITLE" = "Дзякуй за вашу падтрымку!";
@@ -3028,19 +3028,19 @@
 "DONATION_ON_BEHALF_OF_A_FRIEND_VIEW" = "Прагледзець";
 
 /* A friend has donated on your behalf and you received a badge. This text says that you received a badge, and from whom. Embeds {{contact's short name, such as a first name}}. */
-"DONATION_ON_BEHALF_OF_A_FRIEND_YOU_RECEIVED_A_BADGE_FORMAT" = "%1$@ зрабіў(-ла) ахвяраванне для Signal ад вашага імя! Прадэманструйце сваю падтрымку Signal у вашым профілі.";
+"DONATION_ON_BEHALF_OF_A_FRIEND_YOU_RECEIVED_A_BADGE_FORMAT" = "%1$@ зрабіў(-ла) ахвяраванне для Radar ад вашага імя! Прадэманструйце сваю падтрымку Radar у вашым профілі.";
 
 /* There is a screen where users can read more about their donation to Signal. This is the 1st paragraph of that screen. */
 "DONATION_READ_MORE_SCREEN_PARAGRAPH_1" = "Канфідэнцыйны абмен паведамленнямі. Без рэкламы, без трэкераў, без сачэння.";
 
 /* There is a screen where users can read more about their donation to Signal. This is the 2nd paragraph of that screen. */
-"DONATION_READ_MORE_SCREEN_PARAGRAPH_2" = "Signal існуе за кошт ахвяраванняў, то бок ваша канфідэнцыйнасць для нас стаіць на першым месцы. Signal створаны для вас, а не для атрымання вашых даных і прыбытку.";
+"DONATION_READ_MORE_SCREEN_PARAGRAPH_2" = "Radar існуе за кошт ахвяраванняў, то бок ваша канфідэнцыйнасць для нас стаіць на першым месцы. Radar створаны для вас, а не для атрымання вашых даных і прыбытку.";
 
 /* There is a screen where users can read more about their donation to Signal. This is the 3rd paragraph of that screen. */
-"DONATION_READ_MORE_SCREEN_PARAGRAPH_3" = "Калі гэта магчыма, зрабіце ахвяраванне сёння, каб Signal заставаўся заўсёды вясёлым, надзейным і даступным для ўсіх.";
+"DONATION_READ_MORE_SCREEN_PARAGRAPH_3" = "Калі гэта магчыма, зрабіце ахвяраванне сёння, каб Radar заставаўся заўсёды вясёлым, надзейным і даступным для ўсіх.";
 
 /* There is a screen where users can read more about their donation to Signal. This is the title of that screen. */
-"DONATION_READ_MORE_SCREEN_TITLE" = "Signal не такі, як іншыя.";
+"DONATION_READ_MORE_SCREEN_TITLE" = "Radar не такі, як іншыя.";
 
 /* Section title for donation amount on receipts */
 "DONATION_RECEIPT_AMOUNT" = "Сума";
@@ -3076,7 +3076,7 @@
 "DONATION_RECEIPTS" = "Квітанцыі аб ахвяраваннях";
 
 /* Text at the bottom of the donation receipts list, telling users that receipts might not be available */
-"DONATION_RECEIPTS_MIGHT_BE_MISSING_IF_YOU_REINSTALLED" = "Калі вы нанова ўсталявалі Signal, квітанцыі ад папярэдніх ахвяраванняў будуць недаступныя.";
+"DONATION_RECEIPTS_MIGHT_BE_MISSING_IF_YOU_REINSTALLED" = "Калі вы нанова ўсталявалі Radar, квітанцыі ад папярэдніх ахвяраванняў будуць недаступныя.";
 
 /* Error message displayed if something goes wrong with 3DSecure/iDEAL payment authorization.  This will be encountered if the user cancels the webview before authrizing the payment. */
 "DONATION_REDIRECT_ERROR_CANCELLED_MESSAGE" = "Плацеж скасаваны. Паўтарыце спробу.";
@@ -3091,7 +3091,7 @@
 "DONATION_SCREEN_DONATE_BUTTON" = "Зрабіць ахвяраванне";
 
 /* On donation screens, a small amount of information text is shown. This is the subtitle for that text. */
-"DONATION_SCREENS_HEADER_DESCRIPTION" = "Канфідэнцыйны абмен паведамленнямі, які існуе дзякуючы вашай падтрымцы. Без рэкламы, без трэкераў, без кампрамісаў. Зрабіце ахвяраванне зараз, каб падтрымаць Signal.";
+"DONATION_SCREENS_HEADER_DESCRIPTION" = "Канфідэнцыйны абмен паведамленнямі, які існуе дзякуючы вашай падтрымцы. Без рэкламы, без трэкераў, без кампрамісаў. Зрабіце ахвяраванне зараз, каб падтрымаць Radar.";
 
 /* On donation screens, a small amount of information text is shown. Users can click this link to learn more information. */
 "DONATION_SCREENS_HEADER_READ_MORE" = "Чытаць далей";
@@ -3169,7 +3169,7 @@
 "DONATION_VIEW_DONATE_ON_BEHALF_OF_A_FRIEND" = "Зрабіць ахвяраванне для сябра";
 
 /* Text describing to the user that they're going to pay a donation to Signal */
-"DONATION_VIEW_DONATION_TO_SIGNAL" = "Ахвяраванне для Signal";
+"DONATION_VIEW_DONATION_TO_SIGNAL" = "Ахвяраванне для Radar";
 
 /* Title for the 'Donor FAQ' button on the donation screen */
 "DONATION_VIEW_DONOR_FAQ" = "FAQ аб ахвяраваннях";
@@ -3181,7 +3181,7 @@
 "DONATION_VIEW_MANAGE_BADGES" = "Значкі";
 
 /* Text describing to the user that they're going to pay a monthly donation to Signal */
-"DONATION_VIEW_MONTHLY_DONATION_TO_SIGNAL" = "Штомесячнае ахвяраванне для Signal";
+"DONATION_VIEW_MONTHLY_DONATION_TO_SIGNAL" = "Штомесячнае ахвяраванне для Radar";
 
 /* Title for the 'more' section on the donation screen */
 "DONATION_VIEW_MORE_SECTION_TITLE" = "Дадаткова";
@@ -3193,7 +3193,7 @@
 "DONATION_VIEW_OTHER_WAYS_TO_DONATE_TITLE" = "Іншыя спосабы для ахвяравання";
 
 /* Title on the 'Donate to Signal' screen */
-"DONATION_VIEW_TITLE" = "Зрабіце ахвяраванне для Signal";
+"DONATION_VIEW_TITLE" = "Зрабіце ахвяраванне для Radar";
 
 /* Label for the currency picker button in donation views */
 "DONATIONS_CURRENCY_PICKER_LABEL" = "Валюта";
@@ -3208,13 +3208,13 @@
 "EDIT_CONTACT_WITHOUT_CONTACTS_PERMISSION_ALERT_BODY" = "Вы можаце ўключыць доступ у наладах iOS.";
 
 /* Alert title for when the user has just tried to edit a contacts after declining to give Signal contacts permissions */
-"EDIT_CONTACT_WITHOUT_CONTACTS_PERMISSION_ALERT_TITLE" = "Signal патрабуе доступу да кантактаў, каб рэдагаваць інфармацыю кантактаў";
+"EDIT_CONTACT_WITHOUT_CONTACTS_PERMISSION_ALERT_TITLE" = "Radar патрабуе доступу да кантактаў, каб рэдагаваць інфармацыю кантактаў";
 
 /* The navbar title for the 'update group' view. */
 "EDIT_GROUP_DEFAULT_TITLE" = "Рэдагаваць інф. аб групе";
 
 /* Error message indicating the a user can't be added to a group. */
-"EDIT_GROUP_ERROR_CANNOT_ADD_MEMBER" = "Гэты карыстальнік не можа быць дададзены ў групу, пакуль не ўсталюе абноўленую версію Signal.";
+"EDIT_GROUP_ERROR_CANNOT_ADD_MEMBER" = "Гэты карыстальнік не можа быць дададзены ў групу, пакуль не ўсталюе абноўленую версію Radar.";
 
 /* Error message indicating that an avatar image is invalid and cannot be used. */
 "EDIT_GROUP_ERROR_INVALID_AVATAR" = "Несапраўднае фота.";
@@ -3241,13 +3241,13 @@
 "EDIT_MESSAGE_SEND_MESSAGE_UNKNOWN_ERROR" = "EDIT_MESSAGE_SEND_MESSAGE_UNKNOWN_ERROR";
 
 /* body of email sent to contacts when inviting to install Signal. Embeds {{link to install Signal}} and {{link to the Signal home page}} */
-"EMAIL_INVITE_BODY" = "Прывітанне!\n\nАпошнім часам я выкарыстоўваю Signal, каб быць упэўненым у канфідэнцыйнасці чатаў на сваім iPhone. Прапаную ўсталяваць гэту праграму і табе, каб мы маглі дакладна ведаць, што ніхто, акрамя нас з табой, не чытае нашы паведамленні і не чуе нашы размовы.\n\nSignal даступны для iPhone, Android і ПК. Запампуй яго тут: %1$@\n\nSignal працуе так, як і мэсанджар, што ты ўжо выкарыстоўваеш. Мы зможам адпраўляць фота і відэа, рабіць званкі і ствараць групавыя чаты. І самае галоўнае – ніхто, акрамя нас, не можа бачыць нічога з гэтага, нават распрацоўнікі Signal!\n\nБольш падрабязна аб Signal можна даведацца тут: %2$@";
+"EMAIL_INVITE_BODY" = "Прывітанне!\n\nАпошнім часам я выкарыстоўваю Radar, каб быць упэўненым у канфідэнцыйнасці чатаў на сваім iPhone. Прапаную ўсталяваць гэту праграму і табе, каб мы маглі дакладна ведаць, што ніхто, акрамя нас з табой, не чытае нашы паведамленні і не чуе нашы размовы.\n\nSignal даступны для iPhone, Android і ПК. Запампуй яго тут: %1$@\n\nSignal працуе так, як і мэсанджар, што ты ўжо выкарыстоўваеш. Мы зможам адпраўляць фота і відэа, рабіць званкі і ствараць групавыя чаты. І самае галоўнае – ніхто, акрамя нас, не можа бачыць нічога з гэтага, нават распрацоўнікі Radar!\n\nБольш падрабязна аб Radar можна даведацца тут: %2$@";
 
 /* subject of email sent to contacts when inviting to install Signal */
-"EMAIL_INVITE_SUBJECT" = "Давайце пяройдзем на Signal";
+"EMAIL_INVITE_SUBJECT" = "Давайце пяройдзем на Radar";
 
 /* Description for the fallback support sheet if user cannot send email */
-"EMAIL_SIGNAL_MESSAGE" = "Ваша прылада не наладжана, каб адпраўляць электронны ліст. Каб адправіць запыт у службу падтрымкі, наладзьце электронную пошту на сваёй прыладзе або адпраўце электронны ліст на support@signal.org";
+"EMAIL_SIGNAL_MESSAGE" = "Ваша прылада не наладжана, каб адпраўляць электронны ліст. Каб адправіць запыт у службу падтрымкі, наладзьце электронную пошту на сваёй прыладзе або адпраўце электронны ліст на support@radar.chat";
 
 /* Title for the fallback support sheet if user cannot send email */
 "EMAIL_SIGNAL_TITLE" = "Электронная пошта недаступная";
@@ -3283,7 +3283,7 @@
 "EMOJI_CATEGORY_TRAVEL_NAME" = "Вандроўка & месцы";
 
 /* Full width label displayed when attempting to compose message */
-"EMPTY_CONTACTS_LABEL_LINE1" = "Ніхто з вашых кантактаў не мае Signal.";
+"EMPTY_CONTACTS_LABEL_LINE1" = "Ніхто з вашых кантактаў не мае Radar.";
 
 /* Full width label displayed when attempting to compose message */
 "EMPTY_CONTACTS_LABEL_LINE2" = "Чаму вам не запрасіць каго-небудзь з іх?";
@@ -3349,7 +3349,7 @@
 "ERROR_DESCRIPTION_UNKNOWN_ERROR" = "Адбылася невядомая памылка.";
 
 /* Error message when attempting to send message */
-"ERROR_DESCRIPTION_UNREGISTERED_RECIPIENT" = "Не атрымалася даслаць паведамленне, бо гэтая асоба больш не выкарыстоўвае Signal.";
+"ERROR_DESCRIPTION_UNREGISTERED_RECIPIENT" = "Не атрымалася даслаць паведамленне, бо гэтая асоба больш не выкарыстоўвае Radar.";
 
 /* Error message indicating that attachment upload(s) failed. */
 "ERROR_MESSAGE_ATTACHMENT_UPLOAD_FAILED" = "Не атрымалася запампаваць далучэнне.";
@@ -3394,10 +3394,10 @@
 "ERROR_NETWORK_FAILURE" = "Памылка сеткі";
 
 /* Format string for an error alert notification message. Embeds {{ error string }} */
-"ERROR_NOTIFICATION_MESSAGE_FORMAT" = "Вы дапаможаце нам палепшыць Signal, калі паведаміце аб гэтай памылцы і адправіце нам журналы адладкі з вашай прылады на support@signal.org; %1$@";
+"ERROR_NOTIFICATION_MESSAGE_FORMAT" = "Вы дапаможаце нам палепшыць Radar, калі паведаміце аб гэтай памылцы і адправіце нам журналы адладкі з вашай прылады на support@radar.chat; %1$@";
 
 /* Format string for an error alert notification title. */
-"ERROR_NOTIFICATION_TITLE" = "Signal Beta: адбылася памылка";
+"ERROR_NOTIFICATION_TITLE" = "Radar Beta: адбылася памылка";
 
 /* Error indicating a send failure due to a delinked application. */
 "ERROR_SENDING_DELINKED" = "Гэтая прылада больш не звязаная. Каб працягнуць абмен паведамленнямі, звяжыце яе нанова.";
@@ -3406,7 +3406,7 @@
 "ERROR_SENDING_DEREGISTERED" = "Ваша прылада больш не зарэгістраваная. Каб працягнуць абмен паведамленнямі, зарэгіструйце яе нанова.";
 
 /* Error indicating a send failure due to an expired application. */
-"ERROR_SENDING_EXPIRED" = "Тэрмін дзеяння вашай версіі Signal скончыўся. Абнавіце версію Signal, каб працягнуць абмен паведамленнямі.";
+"ERROR_SENDING_EXPIRED" = "Тэрмін дзеяння вашай версіі Radar скончыўся. Абнавіце версію Radar, каб працягнуць абмен паведамленнямі.";
 
 /* Format string for 'unregistered user' error. Embeds {{the unregistered user's name or signal id}}. */
 "ERROR_UNREGISTERED_USER_FORMAT" = "Незарэгістраваны карыстальнік: %1$@";
@@ -3418,19 +3418,19 @@
 "EXIT_REREGISTRATION" = "Выйсці з рэгістрацыі";
 
 /* Label notifying the user that the app has expired. */
-"EXPIRATION_ERROR" = "Тэрмін дзеяння гэтай версіі Signal скончаны. Абнавіце, каб адпраўляць і атрымліваць паведамленні.";
+"EXPIRATION_ERROR" = "Тэрмін дзеяння гэтай версіі Radar скончаны. Абнавіце, каб адпраўляць і атрымліваць паведамленні.";
 
 /* If the user's app is too old, they'll be shown a warning asking them to upgrade. This is the text on the warning, and tapping it will open the App Store page for Signal. */
 "EXPIRATION_WARNING_ACTION_TITLE" = "Абнавіць зараз";
 
 /* Label warning the user that the app will expire soon. Embeds {{date}}. */
-"EXPIRATION_WARNING_SOON" = "Тэрмін дзеяння гэтай версіі Signal скончыцца %1$@. Абнавіце, каб працягваць абмен паведамленнямі.";
+"EXPIRATION_WARNING_SOON" = "Тэрмін дзеяння гэтай версіі Radar скончыцца %1$@. Абнавіце, каб працягваць абмен паведамленнямі.";
 
 /* Label warning the user that the app will expire today. */
-"EXPIRATION_WARNING_TODAY" = "Тэрмін дзеяння гэтай версіі Signal скончыцца сёння. Абнавіце, каб працягваць абмен паведамленнямі.";
+"EXPIRATION_WARNING_TODAY" = "Тэрмін дзеяння гэтай версіі Radar скончыцца сёння. Абнавіце, каб працягваць абмен паведамленнямі.";
 
 /* action sheet header when re-sending message which failed because of an invalid key signature */
-"FAILED_SENDING_BECAUSE_INVALID_KEY_SIGNATURE" = "Не атрымалася адправіць паведамленне, таму што %1$@ неабходна абнавіць і адкрыць Signal.";
+"FAILED_SENDING_BECAUSE_INVALID_KEY_SIGNATURE" = "Не атрымалася адправіць паведамленне, таму што %1$@ неабходна абнавіць і адкрыць Radar.";
 
 /* action sheet header when re-sending message which failed because of untrusted identity keys */
 "FAILED_SENDING_BECAUSE_UNTRUSTED_IDENTITY_KEY" = "Ваш код бяспекі з %1$@ нядаўна змяніўся. Магчыма вы жадаеце праверыць яго, перш чым зноў адпраўляць гэта паведамленне.";
@@ -3745,10 +3745,10 @@
 "GROUP_CALL_WILL_NOTIFY_TWO_PEOPLE_FORMAT" = "%1$@ і %2$@ атрымаюць апавяшчэнне";
 
 /* Text shown before the user starts a group call if the user has enabled ringing and there is one other person in the group. Embeds {member name} */
-"GROUP_CALL_WILL_RING_ONE_PERSON_FORMAT" = "Signal будзе званіць %1$@";
+"GROUP_CALL_WILL_RING_ONE_PERSON_FORMAT" = "Radar будзе званіць %1$@";
 
 /* Text shown before the user starts a group call if the user has enabled ringing and there are two other people in the group. Embeds {{ %1$@ participant1, %2$@ participant2 }} */
-"GROUP_CALL_WILL_RING_TWO_PEOPLE_FORMAT" = "Signal будзе званіць %1$@ і %2$@";
+"GROUP_CALL_WILL_RING_TWO_PEOPLE_FORMAT" = "Radar будзе званіць %1$@ і %2$@";
 
 /* Text explaining that you are in the group call. */
 "GROUP_CALL_YOU_ARE_HERE" = "Вы ў групавым званку";
@@ -3958,7 +3958,7 @@
 "GROUP_LINK_VIEW_SHARE_LINK_VIA_QR_CODE" = "QR-код";
 
 /* Label for the 'share group link via Signal' button in the 'group link' view. */
-"GROUP_LINK_VIEW_SHARE_LINK_VIA_SIGNAL" = "Абагуліць праз Signal";
+"GROUP_LINK_VIEW_SHARE_LINK_VIA_SIGNAL" = "Абагуліць праз Radar";
 
 /* Message for the 'share group link' action sheet in the 'group link' view. */
 "GROUP_LINK_VIEW_SHARE_SHEET_MESSAGE" = "Усякі, хто мае гэтую спасылку, зможа прагледзець назву і фота групы, яе ўдзельнікаў, а таксама запытаць далучэнне.  Абагульвайце яе толькі з тымі людзьмі, да якіх маеце давер.";
@@ -4366,13 +4366,13 @@
 "HOME_VIEW_DRAFT_PREFIX" = "Чарнавік: ";
 
 /* Format string for a label offering to start a new conversation with your contacts, if you have 1 Signal contact.  Embeds {{The name of 1 of your Signal contacts}}. */
-"HOME_VIEW_FIRST_CONVERSATION_OFFER_1_CONTACT_FORMAT" = "Некаторыя з вашых кантактаў ужо ў Signal, у тым ліку %1$@.";
+"HOME_VIEW_FIRST_CONVERSATION_OFFER_1_CONTACT_FORMAT" = "Некаторыя з вашых кантактаў ужо ў Radar, у тым ліку %1$@.";
 
 /* Format string for a label offering to start a new conversation with your contacts, if you have 2 Signal contacts.  Embeds {{The names of 2 of your Signal contacts}}. */
-"HOME_VIEW_FIRST_CONVERSATION_OFFER_2_CONTACTS_FORMAT" = "Некаторыя з вашых кантактаў ужо ў Signal, у тым ліку %1$@ і %2$@";
+"HOME_VIEW_FIRST_CONVERSATION_OFFER_2_CONTACTS_FORMAT" = "Некаторыя з вашых кантактаў ужо ў Radar, у тым ліку %1$@ і %2$@";
 
 /* Format string for a label offering to start a new conversation with your contacts, if you have at least 3 Signal contacts.  Embeds {{The names of 3 of your Signal contacts}}. */
-"HOME_VIEW_FIRST_CONVERSATION_OFFER_3_CONTACTS_FORMAT" = "Некаторыя з вашых кантактаў ужо ў Signal, у тым ліку %1$@, %2$@ і %3$@";
+"HOME_VIEW_FIRST_CONVERSATION_OFFER_3_CONTACTS_FORMAT" = "Некаторыя з вашых кантактаў ужо ў Radar, у тым ліку %1$@, %2$@ і %3$@";
 
 /* A label offering to start a new conversation with your contacts, if you have no Signal contacts. */
 "HOME_VIEW_FIRST_CONVERSATION_OFFER_NO_CONTACTS" = "Распачаць свой першы чат тут.";
@@ -4468,7 +4468,7 @@
 "INACTIVE_LINKED_DEVICE_REMINDER_MEGAPHONE_TITLE" = "Неактыўная звязаная прылада";
 
 /* Body for an in-app megaphone about a user's inactive primary device. */
-"INACTIVE_PRIMARY_DEVICE_REMINDER_MEGAPHONE_BODY" = "Каб ваш уліковы запіс заставаўся актыўным, адкрыйце Signal на сваёй асноўнай прыладзе.";
+"INACTIVE_PRIMARY_DEVICE_REMINDER_MEGAPHONE_BODY" = "Каб ваш уліковы запіс заставаўся актыўным, адкрыйце Radar на сваёй асноўнай прыладзе.";
 
 /* Title for a button in an in-app megaphone about a user's inactive primary device, temporarily dismissing the megaphone. */
 "INACTIVE_PRIMARY_DEVICE_REMINDER_MEGAPHONE_GOT_IT_BUTTON" = "Зразумела";
@@ -4477,7 +4477,7 @@
 "INACTIVE_PRIMARY_DEVICE_REMINDER_MEGAPHONE_LEARN_MORE_BUTTON" = "Даведацца больш";
 
 /* Title for an in-app megaphone about a user's inactive primary device. */
-"INACTIVE_PRIMARY_DEVICE_REMINDER_MEGAPHONE_TITLE" = "Адкрыйце Signal на сваім тэлефоне";
+"INACTIVE_PRIMARY_DEVICE_REMINDER_MEGAPHONE_TITLE" = "Адкрыйце Radar на сваім тэлефоне";
 
 /* Label reminding the user that they are in archive mode, and that muted chats remain archived when they receive a new message. */
 "INBOX_VIEW_ARCHIVE_MODE_MUTED_CHATS_REMINDER" = "Чаты з адключанымі апавяшчэннямі, якія архіваваны, застануцца ў архіве, калі прыйдзе новае паведамленне.";
@@ -4513,10 +4513,10 @@
 "INFO_MESSAGE_BLOCKED_OTHER_USER" = "Вы заблакавалі гэту асобу.";
 
 /* Indicates that a previously-removed recipient has been added back to the current user's contacts. */
-"INFO_MESSAGE_CONTACT_REINSTATED" = "Гэтая асоба была нанова дададзена ў ваш спіс кантактаў Signal.";
+"INFO_MESSAGE_CONTACT_REINSTATED" = "Гэтая асоба была нанова дададзена ў ваш спіс кантактаў Radar.";
 
 /* Indicates that the recipient has been removed from the current user's contacts and that messaging them will re-add them. */
-"INFO_MESSAGE_CONTACT_REMOVED" = "Вы выдалілі гэтую асобу са свайго спісу кантактаў Signal; калі вы дашлеце ёй паведамленне, вы зможаце дадаць нанова.";
+"INFO_MESSAGE_CONTACT_REMOVED" = "Вы выдалілі гэтую асобу са свайго спісу кантактаў Radar; калі вы дашлеце ёй паведамленне, вы зможаце дадаць нанова.";
 
 /* When you start a chat with someone and then later learn their profile name, we insert an in-chat message with this string to record the identifier you originally used to contact them. Embeds {{ the identifier, either a phone number or a username }}. */
 "INFO_MESSAGE_LEARNED_PROFILE_KEY" = "Вы распачалі гэты чат з %1$@.";
@@ -4537,7 +4537,7 @@
 "INFO_MESSAGE_REPORTED_SPAM" = "Пазначана як спам";
 
 /* Body message of the alert shown when a user taps on 'learn more' via the spam info message. */
-"INFO_MESSAGE_REPORTED_SPAM_LEARN_MORE_MESSAGE" = "Signal атрымаў апавяшчэнне, што гэтая асоба можа рассылаць спам. Signal не можа бачыць змесціва ніякага чата.";
+"INFO_MESSAGE_REPORTED_SPAM_LEARN_MORE_MESSAGE" = "Radar атрымаў апавяшчэнне, што гэтая асоба можа рассылаць спам. Radar не можа бачыць змесціва ніякага чата.";
 
 /* Title of the alert shown when a user taps on 'learn more' via the spam info message. */
 "INFO_MESSAGE_REPORTED_SPAM_LEARN_MORE_TITLE" = "Паскарджаны на спам";
@@ -4555,7 +4555,7 @@
 "INFO_MESSAGE_USER_CHANGED_PHONE_NUMBER_FORMAT" = "%1$@ змяніў(-ла) свой нумар тэлефона.";
 
 /* Shown in inbox and conversation when a user joins Signal, embeds the new user's {{contact name}} */
-"INFO_MESSAGE_USER_JOINED_SIGNAL_BODY_FORMAT" = "%1$@ у Signal!";
+"INFO_MESSAGE_USER_JOINED_SIGNAL_BODY_FORMAT" = "%1$@ у Radar!";
 
 /* Label at the top of the input text when editing a message */
 "INPUT_TOOLBAR_EDIT_MESSAGE_LABEL" = "Рэдагаваць паведамленне";
@@ -4582,13 +4582,13 @@
 "INVALID_PROXY_HOST_ERROR" = "Проксі-адрас, што вы ўвялi, несапраўдны: праверце адрас і паўтарыце спробу.";
 
 /* Alert body when contacts disabled while trying to invite contacts to signal */
-"INVITE_FLOW_REQUIRES_CONTACT_ACCESS_BODY" = "Уключыце доступ да кантактаў у наладах iOS, каб запрасіць сваіх сяброў далучыцца да Signal.";
+"INVITE_FLOW_REQUIRES_CONTACT_ACCESS_BODY" = "Уключыце доступ да кантактаў у наладах iOS, каб запрасіць сваіх сяброў далучыцца да Radar.";
 
 /* Alert title when contacts disabled while trying to invite contacts to signal */
 "INVITE_FLOW_REQUIRES_CONTACT_ACCESS_TITLE" = "Дазволіць доступ да кантакту";
 
 /* Label for the cell that presents the 'invite contacts' workflow. */
-"INVITE_FRIENDS_CONTACT_TABLE_BUTTON" = "Запрасіць сяброў у Signal";
+"INVITE_FRIENDS_CONTACT_TABLE_BUTTON" = "Запрасіць сяброў у Radar";
 
 /* Header label above a section for more options for adding contacts */
 "INVITE_FRIENDS_CONTACT_TABLE_HEADER" = "Дадаткова";
@@ -4711,7 +4711,7 @@
 "LINK_DEVICE_SCANNING_INSTRUCTIONS_SHEET_TITLE" = "Сканаваць QR-код";
 
 /* Body text for a sheet when a user tries to link a device informing them that they will need to authenticate their device */
-"LINK_NEW_DEVICE_AUTHENTICATION_INFO_SHEET_BODY" = "Каб пацвердзіць, націсніце «Працягнуць» і ўвядзіце код блакіроўкі тэлефона. Свой PIN-код Signal не трэба ўводзіць.";
+"LINK_NEW_DEVICE_AUTHENTICATION_INFO_SHEET_BODY" = "Каб пацвердзіць, націсніце «Працягнуць» і ўвядзіце код блакіроўкі тэлефона. Свой PIN-код Radar не трэба ўводзіць.";
 
 /* Title for a sheet when a user tries to link a device informing them that they will need to authenticate their device */
 "LINK_NEW_DEVICE_AUTHENTICATION_INFO_SHEET_TITLE" = "Перад тым, як звязаць прыладу, пацвердзіце, што гэта вы";
@@ -4720,7 +4720,7 @@
 "LINK_NEW_DEVICE_AUTHENTICATION_REASON" = "Выканайце аўтэнтыфікацыю, каб звязаць прыладу";
 
 /* Body text for a sheet when a user has started linking a device informing them to finish the process on that other device */
-"LINK_NEW_DEVICE_FINISH_ON_OTHER_DEVICE_SHEET_BODY" = "Завяршыце звязванне Signal на іншай прыладзе.";
+"LINK_NEW_DEVICE_FINISH_ON_OTHER_DEVICE_SHEET_BODY" = "Завяршыце звязванне Radar на іншай прыладзе.";
 
 /* Title for a sheet when a user has started linking a device informing them to finish the process on that other device */
 "LINK_NEW_DEVICE_FINISH_ON_OTHER_DEVICE_SHEET_TITLE" = "Завяршыце звязванне на іншай прыладзе";
@@ -4762,10 +4762,10 @@
 "LINK_PREVIEW_UNKNOWN_DOMAIN" = "Папярэдні прагляд спасылкі";
 
 /* Shown in an alert when trying to edit a contact. */
-"LINKED_DEVICE_CONTACTS_NOT_ALLOWED" = "Кіраванне тэлефоннымі кантактамі больш недаступнае на iPad. Каб дадаць кантакты Signal да тэлефонных кантактаў, адкрыйце Signal на сваім тэлефоне.";
+"LINKED_DEVICE_CONTACTS_NOT_ALLOWED" = "Кіраванне тэлефоннымі кантактамі больш недаступнае на iPad. Каб дадаць кантакты Radar да тэлефонных кантактаў, адкрыйце Radar на сваім тэлефоне.";
 
 /* Shown in a banner when you tap the 'New Chat' icon at the top of the list of chats. */
-"LINKED_DEVICE_MANAGE_CONTACTS_BANNER" = "Кіраванне тэлефоннымі кантактамі больш не падтрымліваецца на iPad. Гэтая прылада працягне сінхранізаваць любыя змянення ў спісе кантактаў з Signal на вашым тэлефоне.";
+"LINKED_DEVICE_MANAGE_CONTACTS_BANNER" = "Кіраванне тэлефоннымі кантактамі больш не падтрымліваецца на iPad. Гэтая прылада працягне сінхранізаваць любыя змянення ў спісе кантактаў з Radar на вашым тэлефоне.";
 
 /* A button shown in a banner when you tap the 'New Chat' icon at the top of the list of chats. Tapping it opens a website with more details. */
 "LINKED_DEVICE_MANAGE_CONTACTS_LEARN_MORE" = "Даведацца больш";
@@ -4780,28 +4780,28 @@
 "LINKED_DEVICE_NOTIFICATION_TITLE" = "Вы звязалі новую прыладу";
 
 /* Message for an action sheet telling users how to link a device, when trying to open an external device-linking URL. */
-"LINKED_DEVICE_URL_OPENED_ACTION_SHEET_EXTERNAL_URL_MESSAGE" = "Каб звязаць ПК або iPad з гэтым уліковым запісам Signal, перайдзіце ў раздзел «Звязаныя прылады», націсніце «Звязаць новую прыладу» і зноў праскануйце QR-код. Абавязкова правярайце, што вы скануеце менавіта QR-коды, якія вы атрымліваеце непасрэдна ад Signal.";
+"LINKED_DEVICE_URL_OPENED_ACTION_SHEET_EXTERNAL_URL_MESSAGE" = "Каб звязаць ПК або iPad з гэтым уліковым запісам Radar, перайдзіце ў раздзел «Звязаныя прылады», націсніце «Звязаць новую прыладу» і зноў праскануйце QR-код. Абавязкова правярайце, што вы скануеце менавіта QR-коды, якія вы атрымліваеце непасрэдна ад Radar.";
 
 /* Message for an action sheet telling users how to link a device, when trying to open a device-linking URL from the in-app camera. */
-"LINKED_DEVICE_URL_OPENED_ACTION_SHEET_IN_APP_CAMERA_MESSAGE" = "Здаецца, вы спрабуеце звязаць прыладу Signal. Націсніце «Працягнуць» і потым націсніце «Звязаць новую прыладу», пасля чаго нанова праскануйце QR-код.";
+"LINKED_DEVICE_URL_OPENED_ACTION_SHEET_IN_APP_CAMERA_MESSAGE" = "Здаецца, вы спрабуеце звязаць прыладу Radar. Націсніце «Працягнуць» і потым націсніце «Звязаць новую прыладу», пасля чаго нанова праскануйце QR-код.";
 
 /* Bullet point about downloads on the linked devices education sheet. Embeds {{ %1$@ iPad download link, %2$@ desktop download link }} */
 "LINKED_DEVICES_EDUCATION_POINT_DOWNLOADS" = "Зайдзіце на %1$@ на вашай іншай прыладзе, каб усталяваць праграму для iPad, або на %2$@, каб усталяваць версію для ПК.";
 
 /* Bullet point about message sync on the linked devices education sheet */
-"LINKED_DEVICES_EDUCATION_POINT_MESSAGES" = "Паведамленні Signal будуць сінхранізаваны з Signal на вашым мабільным тэлефоне пасля таго, як ён будзе звязаны.";
+"LINKED_DEVICES_EDUCATION_POINT_MESSAGES" = "Паведамленні Radar будуць сінхранізаваны з Radar на вашым мабільным тэлефоне пасля таго, як ён будзе звязаны.";
 
 /* Bullet point about privacy on the linked devices education sheet */
 "LINKED_DEVICES_EDUCATION_POINT_PRIVACY" = "Усе паведамленні на звязаных прыладах канфідэнцыйныя";
 
 /* Title for the linked device education sheet */
-"LINKED_DEVICES_EDUCATION_TITLE" = "Signal на ПК або iPad";
+"LINKED_DEVICES_EDUCATION_TITLE" = "Radar на ПК або iPad";
 
 /* Text that appears where the linked device list would be indicating that there are no linked devices. */
 "LINKED_DEVICES_EMPTY_STATE" = "Няма звязаных прылад";
 
 /* Description for header of the linked devices list */
-"LINKED_DEVICES_HEADER_DESCRIPTION" = "Use Signal on desktop or iPad.";
+"LINKED_DEVICES_HEADER_DESCRIPTION" = "Use Radar on desktop or iPad.";
 
 /* Footer text below the list of currently-linked devices */
 "LINKED_DEVICES_LIST_FOOTER" = "Паведамленні і змесціва чатаў абаронены скразным шыфраваннем на ўсіх прыладах";
@@ -4843,10 +4843,10 @@
 "LINKING_SYNCING_TIMING_INFO" = "Гэта займае некалькі хвілін";
 
 /* Shown to users while the app is loading, asking them not to close the app. */
-"LOADING_VIEW_CONTROLLER_DONT_CLOSE_APP" = "Не зачыняйце Signal.";
+"LOADING_VIEW_CONTROLLER_DONT_CLOSE_APP" = "Не зачыняйце Radar.";
 
 /* Body for local network permission action sheet */
-"LOCAL_NETWORK_PERMISSION_ACTION_SHEET_BODY" = "Каб перанесці свой уліковы запіс Signal, вам неабходна ўключыць доступ да лакальнай сеткі на абедзвюх прыладах.";
+"LOCAL_NETWORK_PERMISSION_ACTION_SHEET_BODY" = "Каб перанесці свой уліковы запіс Radar, вам неабходна ўключыць доступ да лакальнай сеткі на абедзвюх прыладах.";
 
 /* A button asking the user if they need further help getting their transfer working. */
 "LOCAL_NETWORK_PERMISSION_ACTION_SHEET_NEED_HELP" = "Патрэбна дапамога?";
@@ -4858,7 +4858,7 @@
 "LOCAL_NETWORK_PERMISSION_ACTION_SHEET_STEP_THREE" = "Уключыць параметр «Лакальная сетка»";
 
 /* Second step for local network permission action sheet */
-"LOCAL_NETWORK_PERMISSION_ACTION_SHEET_STEP_TWO" = "Перайсці да Signal";
+"LOCAL_NETWORK_PERMISSION_ACTION_SHEET_STEP_TWO" = "Перайсці да Radar";
 
 /* Title for local network permission action sheet */
 "LOCAL_NETWORK_PERMISSION_ACTION_SHEET_TITLE" = "Уключыць доступ да лакальнай сеткі";
@@ -4873,7 +4873,7 @@
 "LOGGING_SECTION" = "Вядзенне журнала адладкі";
 
 /* Footer for the 'logging' help section. */
-"LOGGING_SECTION_FOOTER" = "З журналамі адладкі Signal будзе лягчэй выправіць непаладкі і збоі.";
+"LOGGING_SECTION_FOOTER" = "З журналамі адладкі Radar будзе лягчэй выправіць непаладкі і збоі.";
 
 /* Title for the 'long text message' view. */
 "LONG_TEXT_VIEW_TITLE" = "Паведамленне";
@@ -4975,7 +4975,7 @@
 "MESSAGE_ACTION_DELETE_FOR_EVERYONE" = "Выдаліць для ўсіх";
 
 /* A one-time confirmation that you want to delete for everyone */
-"MESSAGE_ACTION_DELETE_FOR_EVERYONE_CONFIRMATION" = "Гэта паведамленне будзе выдалена для ўсіх удзельнікаў размовы, калі яны карыстаюцца апошняй версіяй Signal. Яны змогуць убачыць, што вы выдалілі паведамленне.";
+"MESSAGE_ACTION_DELETE_FOR_EVERYONE_CONFIRMATION" = "Гэта паведамленне будзе выдалена для ўсіх удзельнікаў размовы, калі яны карыстаюцца апошняй версіяй Radar. Яны змогуць убачыць, што вы выдалілі паведамленне.";
 
 /* The title for the action sheet asking who the user wants to delete the message for. */
 "MESSAGE_ACTION_DELETE_FOR_TITLE" = "Для каго вы жадаеце выдаліць гэта паведамленне?";
@@ -5020,7 +5020,7 @@
 "MESSAGE_ACTION_LINK_OPEN_LINK" = "Адкрыць спасылку";
 
 /* Label for button to open a signal proxy. */
-"MESSAGE_ACTION_LINK_OPEN_PROXY" = "Адкрыць проксі Signal";
+"MESSAGE_ACTION_LINK_OPEN_PROXY" = "Адкрыць проксі Radar";
 
 /* Label for button to open a sticker pack. */
 "MESSAGE_ACTION_LINK_OPEN_STICKER_PACK" = "Прагледзець набор стыкераў";
@@ -5194,7 +5194,7 @@
 "MESSAGE_REQUEST_NAME_COLLISON_UPDATE_CONTACT_ACTION" = "Абнавіць кантакт";
 
 /* Action sheet message to confirm reporting a conversation as spam via a message request. */
-"MESSAGE_REQUEST_REPORT_CONVERSATION_MESSAGE" = "Signal атрымае апавяшчэнне, што гэтая асоба можа рассылаць спам. Signal не можа бачыць змесціва ніякага чата.";
+"MESSAGE_REQUEST_REPORT_CONVERSATION_MESSAGE" = "Radar атрымае апавяшчэнне, што гэтая асоба можа рассылаць спам. Radar не можа бачыць змесціва ніякага чата.";
 
 /* Action sheet title to confirm reporting a conversation as spam via a message request. */
 "MESSAGE_REQUEST_REPORT_CONVERSATION_TITLE" = "Паскардзіцца на спам?";
@@ -5323,7 +5323,7 @@
 "MISSED_CALL_BLOCKED_SYSTEM_CONTACT" = "Прапушчаны званок ад кантакту, што заблакаваны ў наладах тэлефона";
 
 /* Action to block contact in Signal for sheet shown when the user taps a missed call from a contact blocked in iOS settings. */
-"MISSED_CALL_BLOCKED_SYSTEM_SETTINGS_SHEET_BLOCK_ACTION" = "Таксама заблакаваць кантакт у Signal";
+"MISSED_CALL_BLOCKED_SYSTEM_SETTINGS_SHEET_BLOCK_ACTION" = "Таксама заблакаваць кантакт у Radar";
 
 /* Message for sheet shown when the user taps a missed call from a contact blocked in iOS settings. */
 "MISSED_CALL_BLOCKED_SYSTEM_SETTINGS_SHEET_MESSAGE" = "Вы прапусцілі яго званок, таму што ён заблакаваны ў наладах вашага тэлефона. Перайсці ў Налады > Тэлефон і націснуць «Заблакаваныя кантакты», каб унесці змяненні.";
@@ -5344,19 +5344,19 @@
 "MISSING_CAMERA_PERMISSION_MESSAGE" = "Вы можаце ўключыць доступ да камеры ў праграме «Налады» iOS.";
 
 /* Alert title */
-"MISSING_CAMERA_PERMISSION_TITLE" = "Signal патрабуе доступу да вашай камеры.";
+"MISSING_CAMERA_PERMISSION_TITLE" = "Radar патрабуе доступу да вашай камеры.";
 
 /* Alert body indicating the user has denied location permissions */
 "MISSING_LOCATION_PERMISSION_MESSAGE" = "Вы можаце ўключыць гэты дазвол у наладах iOS.";
 
 /* Alert title indicating the user has denied location permissions */
-"MISSING_LOCATION_PERMISSION_TITLE" = "Signal патрабуе доступу да вашага месцазнаходжання для гэтай функцыі.";
+"MISSING_LOCATION_PERMISSION_TITLE" = "Radar патрабуе доступу да вашага месцазнаходжання для гэтай функцыі.";
 
 /* Alert body when user has previously denied media library access */
 "MISSING_MEDIA_LIBRARY_PERMISSION_MESSAGE" = "Вы можаце ўключыць гэты дазвол у наладах iOS.";
 
 /* Alert title when user has previously denied media library access */
-"MISSING_MEDIA_LIBRARY_PERMISSION_TITLE" = "Signal патрабуе доступу да вашых фота для гэтай функцыі.";
+"MISSING_MEDIA_LIBRARY_PERMISSION_TITLE" = "Radar патрабуе доступу да вашых фота для гэтай функцыі.";
 
 /* An error shown as the title of an alert when try to link a new device & the user is already at the limit. */
 "MULTIDEVICE_PAIRING_MAX_DESC" = "Вы больш не можаце звязаць ніякія прылады.";
@@ -5377,7 +5377,7 @@
 "MY_STORIES_SETTINGS_VISIBILITY_ALL_SIGNAL_CONNECTIONS_EXCEPT_TITLE" = "Усе, акрамя…";
 
 /* Title for the visibility option */
-"MY_STORIES_SETTINGS_VISIBILITY_ALL_SIGNAL_CONNECTIONS_TITLE" = "Усе кантакты Signal";
+"MY_STORIES_SETTINGS_VISIBILITY_ALL_SIGNAL_CONNECTIONS_TITLE" = "Усе кантакты Radar";
 
 /* Title for the visibility option */
 "MY_STORIES_SETTINGS_VISIBILITY_ONLY_SHARE_WITH_TITLE" = "Абагуліць толькі з…";
@@ -5539,7 +5539,7 @@
 "NICKNAME_EDITOR_DELETE_CONFIRMATION_TITLE" = "Выдаліць псеўданім?";
 
 /* The description below the title on the profile nickname editor view. */
-"NICKNAME_EDITOR_DESCRIPTION" = "Псеўданімы & нататкі захоўваюцца з дапамогай скразнога шыфравання Signal. Толькі вы можаце бачыць іх.";
+"NICKNAME_EDITOR_DESCRIPTION" = "Псеўданімы & нататкі захоўваюцца з дапамогай скразнога шыфравання Radar. Толькі вы можаце бачыць іх.";
 
 /* Placeholder text it the text field for the family name in the profile nickname editor. */
 "NICKNAME_EDITOR_FAMILY_NAME_PLACEHOLDER" = "Прозвішча";
@@ -5602,7 +5602,7 @@
 "NOTIFICATION_PERMISSION_REMINDER_MEGAPHONE_TITLE" = "Уключыць апавяшчэнні?";
 
 /* Shown as the body of an alert when notifications can't be shown due to an error. */
-"NOTIFICATIONS_ERROR_MESSAGE" = "Запусціце нанова %1$@, калі вы не атрымліваеце апавяшчэнні Signal.";
+"NOTIFICATIONS_ERROR_MESSAGE" = "Запусціце нанова %1$@, калі вы не атрымліваеце апавяшчэнні Radar.";
 
 /* Shown as the title of an alert when notifications can't be shown due to an error. */
 "NOTIFICATIONS_ERROR_TITLE" = "Не атрымалася паказаць апавяшчэнні";
@@ -5662,10 +5662,10 @@
 "ONBOARDING_2FA_SKIP_PIN_ENTRY_TITLE" = "Прапусціць увод PIN-кода?";
 
 /* The body for the device transfer 'choice' view 'restore backup' option */
-"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_BODY" = "Аднавіце ўліковы запіс і паведамленні са сваёй рэзервовай копіі Radar/Signal";
+"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_BODY" = "Аднавіце ўліковы запіс і паведамленні са сваёй рэзервовай копіі Radar/Radar";
 
 /* The title for the device transfer 'choice' view 'restore backup' option */
-"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_TITLE" = "Аднавіць функцыю «Бяспечнае рэзервовае капіраванне Radar/Signal»";
+"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_TITLE" = "Аднавіць функцыю «Бяспечнае рэзервовае капіраванне Radar/Radar»";
 
 /* Body for a sheet warning users about skipping restore. */
 "ONBOARDING_CHOOSE_RESTORE_METHOD_CONFIRM_SKIP_RESTORE_BODY" = "Калі вы прапусціце аднаўленне зараз, пазней аднавіць гэта ўжо не атрымаецца. Калі вы паўторна ўключыце рэзервовае капіраванне на гэтай прыладзе, ваша бягучая рэзервовая копія будзе заменена на новую гісторыю паведамленняў.";
@@ -5677,7 +5677,7 @@
 "ONBOARDING_CHOOSE_RESTORE_METHOD_DESCRIPTION" = "Выберыце спосаб аднаўлення гісторыі паведамленняў і даных уліковага запісу.";
 
 /* Message body displayed to a user during registration if there are no restore options available. */
-"ONBOARDING_CHOOSE_RESTORE_METHOD_NONE_AVAILABLE_BODY" = "Паколькі вы пераходзіце з Android на iOS, для пераносу вашых паведамленняў і медыяфайлаў ёсць толькі адзіны спосаб – уключыць рэзервовыя копіі Signal на вашай старой прыладзе.";
+"ONBOARDING_CHOOSE_RESTORE_METHOD_NONE_AVAILABLE_BODY" = "Паколькі вы пераходзіце з Android на iOS, для пераносу вашых паведамленняў і медыяфайлаў ёсць толькі адзіны спосаб – уключыць рэзервовыя копіі Radar на вашай старой прыладзе.";
 
 /* Title displayed to a user during registration if there are no restore options available. */
 "ONBOARDING_CHOOSE_RESTORE_METHOD_NONE_AVAILABLE_TITLE" = "Няма рэзервовай копіі, што патрэбуе аднаўлення";
@@ -5737,7 +5737,7 @@
 "ONBOARDING_MODE_SWITCH_BUTTON_REGISTERING" = "Звязаць iPhone";
 
 /* explanation to the user they're switching from linking to registering flow */
-"ONBOARDING_MODE_SWITCH_EXPLANATION_PROVISIONING" = "Калі націснуць «Рэгістраваць iPad», можна стварыць цалкам новы ўліковы запіс Signal або перанесці існуючы ўліковы запіс на гэты iPad. Signal адключыцца на іншых прыладах, што зарэгістраваны на сённяшні час з такім жа нумарам тэлефона.";
+"ONBOARDING_MODE_SWITCH_EXPLANATION_PROVISIONING" = "Калі націснуць «Рэгістраваць iPad», можна стварыць цалкам новы ўліковы запіс Radar або перанесці існуючы ўліковы запіс на гэты iPad. Radar адключыцца на іншых прыладах, што зарэгістраваны на сённяшні час з такім жа нумарам тэлефона.";
 
 /* explanation to the user they're switching from registering to linking flow */
 "ONBOARDING_MODE_SWITCH_EXPLANATION_REGISTERING" = "Калі націснуць «Звязаць iPhone», можна падключыць тэлефон да існуючага ўліковага запісу. Звязаць тэлефон мы звычайна не рэкамендуем, бо гэта абмяжуе некаторыя функцыі, напрыклад, званкі.";
@@ -5749,13 +5749,13 @@
 "ONBOARDING_MODE_SWITCH_TITLE_REGISTERING" = "Звязаць гэты iPhone";
 
 /* warning to the user that registering an ipad is not recommended */
-"ONBOARDING_MODE_SWITCH_WARNING_PROVISIONING" = "Калі зарэгістраваць гэты iPad, Signal адключыцца на іншых прыладах, што зарэгістраваны на сённяшні час з такім жа нумарам тэлефона.";
+"ONBOARDING_MODE_SWITCH_WARNING_PROVISIONING" = "Калі зарэгістраваць гэты iPad, Radar адключыцца на іншых прыладах, што зарэгістраваны на сённяшні час з такім жа нумарам тэлефона.";
 
 /* warning to the user that linking a phone is not recommended */
 "ONBOARDING_MODE_SWITCH_WARNING_REGISTERING" = "Звязаць тэлефон мы звычайна не рэкамендуем, бо гэта абмяжуе асноўныя функцыі.";
 
 /* Description of the 'Contacts' permission in the 'onboarding permissions' view. */
-"ONBOARDING_PERMISSIONS_CONTACTS_DESCRIPTION" = "Знаходзьце людзей, якіх вы ведаеце. Вашы кантакты зашыфраваны і не бачныя сэрвісу Signal.";
+"ONBOARDING_PERMISSIONS_CONTACTS_DESCRIPTION" = "Знаходзьце людзей, якіх вы ведаеце. Вашы кантакты зашыфраваны і не бачныя сэрвісу Radar.";
 
 /* Title introducing the 'Contacts' permission in the 'onboarding permissions' view. */
 "ONBOARDING_PERMISSIONS_CONTACTS_TITLE" = "Кантакты";
@@ -5767,7 +5767,7 @@
 "ONBOARDING_PERMISSIONS_NOTIFICATIONS_TITLE" = "Апавяшчэнні";
 
 /* Preamble of the 'onboarding permissions' view. */
-"ONBOARDING_PERMISSIONS_PREAMBLE" = "Signal жадае запытаць наступныя дазволы.";
+"ONBOARDING_PERMISSIONS_PREAMBLE" = "Radar жадае запытаць наступныя дазволы.";
 
 /* Description of the 'Notification Relay' permission in the 'onboarding permissions' view. */
 "ONBOARDING_PERMISSIONS_RELAY_DESCRIPTION" = "Enable Radar notification relay to ensure you get immediate background notifications in Radar. Relay is always privacy-preserving and keeps your messages end-to-end encrypted no matter what.";
@@ -5779,7 +5779,7 @@
 "ONBOARDING_PERMISSIONS_TITLE" = "Уключыць дазволы";
 
 /* Explanation of the 'onboarding phone number discoverability' view. Embeds {user phone number} */
-"ONBOARDING_PHONE_NUMBER_DISCOVERABILITY_EXPLANATION_FORMAT" = "Выберыце тых, хто зможа знайсці вас у Signal па вашым нумары тэлефона %1$@";
+"ONBOARDING_PHONE_NUMBER_DISCOVERABILITY_EXPLANATION_FORMAT" = "Выберыце тых, хто зможа знайсці вас у Radar па вашым нумары тэлефона %1$@";
 
 /* Title of the 'onboarding phone number discoverability' view. */
 "ONBOARDING_PHONE_NUMBER_DISCOVERABILITY_TITLE" = "Хто можа знайсці вас па нумары?";
@@ -5794,7 +5794,7 @@
 "ONBOARDING_PHONE_NUMBER_VALIDATION_WARNING" = "Несапраўдны нумар тэлефона. Для рэгістрацыі ўвядзіце сапраўдны нумар тэлефона.";
 
 /* Explanation of the 'onboarding pin attempts exhausted' view when reglock is disabled. */
-"ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_EXPLANATION" = "У вас скончыліся PIN-коды, але вы па-ранейшаму зможаце мець доступ да свайго ўліковага запісу Signal, калі створыце новы PIN-код. Для канфідэнцыйнасці і бяспекі ваш уліковы запіс будзе адноўлены без захавання інфармацыі профілю або наладаў.";
+"ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_EXPLANATION" = "У вас скончыліся PIN-коды, але вы па-ранейшаму зможаце мець доступ да свайго ўліковага запісу Radar, калі створыце новы PIN-код. Для канфідэнцыйнасці і бяспекі ваш уліковы запіс будзе адноўлены без захавання інфармацыі профілю або наладаў.";
 
 /* Label for the 'learn more' link when reglock is disabled in the 'onboarding pin attempts exhausted' view. */
 "ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_LEARN_MORE" = "Даведацца больш пра PIN-коды";
@@ -5803,7 +5803,7 @@
 "ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_TITLE" = "Няправільны PIN-код";
 
 /* Explanation of the 'onboarding pin attempts exhausted' view when it is unknown if reglock is enabled. */
-"ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_WITH_UNKNOWN_REGLOCK_EXPLANATION" = "У вас скончыліся спробы ўводу PIN-кода, але вы па-ранейшаму можаце атрымаць доступ да ўліковага запісу Signal, калі пацвердзіце свой нумар тэлефона. Для канфідэнцыйнасці і бяспекі ваш уліковы запіс будзе адноўлены без захавання інфармацыі профілю або наладаў.";
+"ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_WITH_UNKNOWN_REGLOCK_EXPLANATION" = "У вас скончыліся спробы ўводу PIN-кода, але вы па-ранейшаму можаце атрымаць доступ да ўліковага запісу Radar, калі пацвердзіце свой нумар тэлефона. Для канфідэнцыйнасці і бяспекі ваш уліковы запіс будзе адноўлены без захавання інфармацыі профілю або наладаў.";
 
 /* Title for the setup complete screen shown at the end of the onboarding flow. */
 "ONBOARDING_SETUP_COMPLETE_TITLE" = "Наладка завершана";
@@ -5830,13 +5830,13 @@
 "ONBOARDING_SIGN_UP_USE_SIGNAL_ACCOUNT_BUTTON_TITLE" = "Use my Signal account";
 
 /* Explanation of 'do not have old device' flow for the 'Restore or Transfer' prompt */
-"ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_BODY" = "Або вы ўсталёўваеце нанова Radar/Signal на гэтай жа прыладзе";
+"ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_BODY" = "Або вы ўсталёўваеце нанова Radar/Radar на гэтай жа прыладзе";
 
 /* Title for the 'do not have my old device' choice of the 'Restore or Transfer' prompt */
 "ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_TITLE" = "Я не маю старога тэлефона";
 
 /* Explanation of 'have old device' flow for the 'Restore or Transfer' prompt */
-"ONBOARDING_SPLASH_HAVE_OLD_DEVICE_BODY" = "Праскануйце QR-код на вашым бягучым уліковым запісу Radar/Signal, каб пачаць працэс";
+"ONBOARDING_SPLASH_HAVE_OLD_DEVICE_BODY" = "Праскануйце QR-код на вашым бягучым уліковым запісу Radar/Radar, каб пачаць працэс";
 
 /* Title for the 'have my old device' choice of the 'Restore or Transfer' prompt */
 "ONBOARDING_SPLASH_HAVE_OLD_DEVICE_TITLE" = "Я маю стары тэлефон";
@@ -5897,19 +5897,19 @@ Send money securely.";
 "OPEN_SETTINGS_BUTTON" = "Налады";
 
 /* Signal doesn't support old versions of iOS and shows a warning if you're on unsupported version. Some users can upgrade their device to a newer version of iOS to continue using Signal. If that's the case, they'll be shown this text. */
-"OS_EXPIRED_AND_CAN_UPGRADE_OS" = "Signal ужо не працуе на гэтай прыладзе. Каб зноў выкарыстоўваць Signal, трэба абнавіць прыладу да больш новай версіі iOS.";
+"OS_EXPIRED_AND_CAN_UPGRADE_OS" = "Radar ужо не працуе на гэтай прыладзе. Каб зноў выкарыстоўваць Radar, трэба абнавіць прыладу да больш новай версіі iOS.";
 
 /* Signal doesn't support old devices. If that's the case, they'll be shown this action, and tapping it will open information about Signal's minimum supported operating systems. */
-"OS_EXPIRED_AND_DEVICE_IS_STUCK" = "Signal ужо не працуе на гэтай прыладзе. Каб зноў выкарыстоўваць Signal, трэба перайсці на больш новую прыладу.";
+"OS_EXPIRED_AND_DEVICE_IS_STUCK" = "Radar ужо не працуе на гэтай прыладзе. Каб зноў выкарыстоўваць Radar, трэба перайсці на больш новую прыладу.";
 
 /* Signal doesn't support old versions of iOS and shows a warning if you're on an old version. Some users can upgrade their device to a newer version of iOS to continue using Signal. If that's the case, they'll be shown this action, and tapping it will open device update instructions. */
 "OS_SOON_TO_EXPIRE_ACTION_TITLE" = "Абнавіць зараз";
 
 /* Signal doesn't support old versions of iOS and shows a warning if you're an old version that will soon lose support. Some users can upgrade their device to a newer version of iOS to continue using Signal. If that's the case, they'll be shown this text. Embeds {{expiration date}}. */
-"OS_SOON_TO_EXPIRE_AND_CAN_UPGRADE_OS_FORMAT" = "Хутка Signal не будзе падтрымліваць версію iOS, што ўсталявана на вашай прыладзе. Каб працягваць выкарыстоўваць Signal, трэба абнавіць версію iOS на вашай прыладзе да %1$@.";
+"OS_SOON_TO_EXPIRE_AND_CAN_UPGRADE_OS_FORMAT" = "Хутка Radar не будзе падтрымліваць версію iOS, што ўсталявана на вашай прыладзе. Каб працягваць выкарыстоўваць Radar, трэба абнавіць версію iOS на вашай прыладзе да %1$@.";
 
 /* Signal doesn't support old versions of iOS and shows a warning if you're on an old version that will soon lose support. This is the text on that warning when users can't upgrade iOS without getting a new device. Embeds {{expiration date}}. */
-"OS_SOON_TO_EXPIRE_AND_DEVICE_WILL_BE_STUCK_FORMAT" = "Хутка Signal не будзе падтрымліваць версію iOS, што ўсталявана на вашай прыладзе. Каб працягваць выкарыстоўваць Signal, трэба перайсці на больш новую прыладу да %1$@.";
+"OS_SOON_TO_EXPIRE_AND_DEVICE_WILL_BE_STUCK_FORMAT" = "Хутка Radar не будзе падтрымліваць версію iOS, што ўсталявана на вашай прыладзе. Каб працягваць выкарыстоўваць Radar, трэба перайсці на больш новую прыладу да %1$@.";
 
 /* Info Message when another user disabled disappearing messages. Embeds {{name of other user}}. */
 "OTHER_DISABLED_DISAPPEARING_MESSAGES_CONFIGURATION" = "%1$@ адключыў(-ла) знікаючыя паведамленні.";
@@ -5918,13 +5918,13 @@ Send money securely.";
 "OTHER_UPDATED_DISAPPEARING_MESSAGES_CONFIGURATION" = "%1$@ усталяваў(-ла) таймер знікнення паведамлення на %2$@.";
 
 /* Label warning the user that the Signal service may be down. */
-"OUTAGE_WARNING" = "У Signal адбываюцца тэхнічныя непаладкі. Мы прыкладаем усе намаганні, каб як мага хутчэй аднавіць абслугоўванне.";
+"OUTAGE_WARNING" = "У Radar адбываюцца тэхнічныя непаладкі. Мы прыкладаем усе намаганні, каб як мага хутчэй аднавіць абслугоўванне.";
 
 /* Label for action link when the user has an outdated payment client */
 "OUTDATED_PAYMENT_CLIENT_ACTION_TITLE" = "Абнавіць зараз";
 
 /* Label warning the user that they should update Signal to continue using payments. */
-"OUTDATED_PAYMENT_CLIENT_REMINDER_TEXT" = "Абнавіце Signal, каб па-ранейшаму выкарыстоўваць плацяжы. Мажліва, ваш баланс неактуальны.";
+"OUTDATED_PAYMENT_CLIENT_REMINDER_TEXT" = "Абнавіце Radar, каб па-ранейшаму выкарыстоўваць плацяжы. Мажліва, ваш баланс неактуальны.";
 
 /* Body of prompt notifying restore was cancelled. */
 "OUTGOING_DEVICE_REGISTRATION_CANCELLED_RESTORE_BODY" = "Аднаўленне было скасавана. Паўтарыце спробу.";
@@ -5933,7 +5933,7 @@ Send money securely.";
 "OUTGOING_DEVICE_REGISTRATION_CANCELLED_RESTORE_TITLE" = "Аднаўленне скасавана";
 
 /* Body of prompt notifying registration without restore completed on the new device. */
-"OUTGOING_DEVICE_REGISTRATION_COMPLETE_BODY" = "Ваш уліковы запіс Signal быў актываваны на іншай прыладзе. Зараз Signal неактыўны на гэтай прыладзе.";
+"OUTGOING_DEVICE_REGISTRATION_COMPLETE_BODY" = "Ваш уліковы запіс Radar быў актываваны на іншай прыладзе. Зараз Radar неактыўны на гэтай прыладзе.";
 
 /* Title of prompt notifying registration without restore completed on the new device. */
 "OUTGOING_DEVICE_REGISTRATION_COMPLETE_TITLE" = "Рэгістрацыя завершана";
@@ -5951,7 +5951,7 @@ Send money securely.";
 "OUTGOING_DEVICE_REGISTRATION_UNKNOWN_ERROR_TITLE" = "Невядомая памылка";
 
 /* Body of prompt notifying device restore started on the new device. */
-"OUTGOING_DEVICE_RESTORE_COMPLETE_BODY" = "Пачаўся перанос вашага ўліковага запісу Signal і паведамленняў на вашу іншую прыладу. Зараз Signal неактыўны на гэтай прыладзе.";
+"OUTGOING_DEVICE_RESTORE_COMPLETE_BODY" = "Пачаўся перанос вашага ўліковага запісу Radar і паведамленняў на вашу іншую прыладу. Зараз Radar неактыўны на гэтай прыладзе.";
 
 /* Title of prompt notifying device restore started on the new device. */
 "OUTGOING_DEVICE_RESTORE_COMPLETE_TITLE" = "Аднаўленне завершана";
@@ -5975,7 +5975,7 @@ Send money securely.";
 "OUTGOING_DEVICE_RESTORE_INITIAL_VIEW_TITLE" = "Перанесці ўліковы запіс";
 
 /* Body of prompt notifying device transfer completed. */
-"OUTGOING_DEVICE_TRANSFER_COMPLETE_BODY" = "Ваш уліковы запіс Signal і паведамленні былі перанесены на вашу іншую прыладу. Зараз Signal неактыўны на гэтай прыладзе.";
+"OUTGOING_DEVICE_TRANSFER_COMPLETE_BODY" = "Ваш уліковы запіс Radar і паведамленні былі перанесены на вашу іншую прыладу. Зараз Radar неактыўны на гэтай прыладзе.";
 
 /* Title of prompt notifying device transfer completed. */
 "OUTGOING_DEVICE_TRANSFER_COMPLETE_TITLE" = "Перанос завершаны";
@@ -5987,10 +5987,10 @@ Send money securely.";
 "OUTGOING_MISSED_VOICE_CALL" = "Неадказаны галасавы званок";
 
 /* Button for action sheet shown when device transfer completes; quits the Signal app immediately (does not automatically relaunch, but the user may choose to relaunch). */
-"OUTGOING_TRANSFER_COMPLETE_EXIT_ACTION" = "Пакінуць Signal";
+"OUTGOING_TRANSFER_COMPLETE_EXIT_ACTION" = "Пакінуць Radar";
 
 /* Message for action sheet shown when device transfer completes */
-"OUTGOING_TRANSFER_COMPLETE_MESSAGE" = "Гэта прылада больш не будзе звязана з Signal";
+"OUTGOING_TRANSFER_COMPLETE_MESSAGE" = "Гэта прылада больш не будзе звязана з Radar";
 
 /* Title for action sheet shown when device transfer completes */
 "OUTGOING_TRANSFER_COMPLETE_TITLE" = "Перанос завершаны!";
@@ -6168,7 +6168,7 @@ Send money securely.";
 "PAYMENTS_NEW_PAYMENT_ERROR_INVALID_TRANSACTION" = "Несапраўдная транзакцыя";
 
 /* Indicates that a payment failed due to an outdated client. */
-"PAYMENTS_NEW_PAYMENT_ERROR_OUTDATED_CLIENT" = "Абнавіць Signal, каб выкарыстоўваць плацяжы.";
+"PAYMENTS_NEW_PAYMENT_ERROR_OUTDATED_CLIENT" = "Абнавіць Radar, каб выкарыстоўваць плацяжы.";
 
 /* Indicates that an outgoing payment could not be verified in a timely way. */
 "PAYMENTS_NEW_PAYMENT_ERROR_OUTGOING_VERIFICATION_TAKING_TOO_LONG" = "Плацеж пакуль не пацверджаны";
@@ -6432,13 +6432,13 @@ Send money securely.";
 "PHONE_NUMBER_DISCOVERABILITY_EVERYBODY" = "Усе";
 
 /* A user friendly description of the 'everybody' phone number discoverability mode. */
-"PHONE_NUMBER_DISCOVERABILITY_EVERYBODY_DESCRIPTION" = "Усякі, хто мае ваш нумар тэлефона, убачыць, што вы ў Signal, і зможа распачаць з вамі чат.";
+"PHONE_NUMBER_DISCOVERABILITY_EVERYBODY_DESCRIPTION" = "Усякі, хто мае ваш нумар тэлефона, убачыць, што вы ў Radar, і зможа распачаць з вамі чат.";
 
 /* A user friendly name for the 'nobody' phone number discoverability mode. */
 "PHONE_NUMBER_DISCOVERABILITY_NOBODY" = "Ніхто";
 
 /* A user friendly description of the 'nobody' phone number discoverability mode. */
-"PHONE_NUMBER_DISCOVERABILITY_NOBODY_DESCRIPTION" = "Ніхто не ўбачыць, што вы ў Signal, пакуль вы не адправіце яму паведамленне або не распачняце з ім чат.";
+"PHONE_NUMBER_DISCOVERABILITY_NOBODY_DESCRIPTION" = "Ніхто не ўбачыць, што вы ў Radar, пакуль вы не адправіце яму паведамленне або не распачняце з ім чат.";
 
 /* A format for a label showing an example phone number. Embeds {{the example phone number}}. */
 "PHONE_NUMBER_EXAMPLE_FORMAT" = "Прыклад: %1$@";
@@ -6540,22 +6540,22 @@ Send money securely.";
 "PIN_CREATION_DISABLE_CONFIRMATION_ACTION" = "Адключыць PIN-код";
 
 /* Message of the 'pin disable' action sheet. */
-"PIN_CREATION_DISABLE_CONFIRMATION_MESSAGE" = "Калі адключыць PIN-код, вы страціце ўсе даныя пры паўторным усталяванні Signal, таму загадзя перанясіце іх з іншай прылады iOS. Пакуль PIN-код адключаны, нельга будзе ўключыць блакіроўку рэгістрацыі.";
+"PIN_CREATION_DISABLE_CONFIRMATION_MESSAGE" = "Калі адключыць PIN-код, вы страціце ўсе даныя пры паўторным усталяванні Radar, таму загадзя перанясіце іх з іншай прылады iOS. Пакуль PIN-код адключаны, нельга будзе ўключыць блакіроўку рэгістрацыі.";
 
 /* Title of the 'pin disable' action sheet. */
 "PIN_CREATION_DISABLE_CONFIRMATION_TITLE" = "Увага";
 
 /* The explanation in the 'pin creation' view. */
-"PIN_CREATION_EXPLANATION" = "PIN-коды трымаюць інфармацыю, што захоўваецца ў Signal, зашыфраванай, таму толькі вы можаце атрымаць да яе доступ. Ваш профіль, налады і кантакты будуць адноўлены, калі вы зробіце паўторнае ўсталяванне. Вам не спатрэбіцца PIN-код, каб адкрыць праграму.";
+"PIN_CREATION_EXPLANATION" = "PIN-коды трымаюць інфармацыю, што захоўваецца ў Radar, зашыфраванай, таму толькі вы можаце атрымаць да яе доступ. Ваш профіль, налады і кантакты будуць адноўлены, калі вы зробіце паўторнае ўсталяванне. Вам не спатрэбіцца PIN-код, каб адкрыць праграму.";
 
 /* Learn more action on the pin creation view */
 "PIN_CREATION_LEARN_MORE" = "Дадаткова пра PIN-коды";
 
 /* Users can create PINs to restore their account data later. They can learn more about this on a sheet. This is the text on that sheet. */
-"PIN_CREATION_LEARN_MORE_TEXT" = "PIN-коды трымаюць вашу інфармацыю, што захоўваецца ў Signal, зашыфраванай, таму толькі вы можаце атрымаць да яе доступ. Ваш профіль, налады і кантакты будуць адноўлены, калі вы зробіце паўторнае ўсталяванне.";
+"PIN_CREATION_LEARN_MORE_TEXT" = "PIN-коды трымаюць вашу інфармацыю, што захоўваецца ў Radar, зашыфраванай, таму толькі вы можаце атрымаць да яе доступ. Ваш профіль, налады і кантакты будуць адноўлены, калі вы зробіце паўторнае ўсталяванне.";
 
 /* Users can create PINs to restore their account data later. They can learn more about this on a sheet. This is the title on that sheet. */
-"PIN_CREATION_LEARN_MORE_TITLE" = "Пра PIN-коды Signal";
+"PIN_CREATION_LEARN_MORE_TITLE" = "Пра PIN-коды Radar";
 
 /* Label indicating that the attempted PIN does not match the first PIN */
 "PIN_CREATION_MISMATCH_ERROR" = "PIN-коды не супадаюць. Паўтарыце спробу.";
@@ -6588,7 +6588,7 @@ Send money securely.";
 "PIN_CREATION_WEAK_ERROR" = "Выберыце больш надзейны PIN-код";
 
 /* If your attempted PIN is too weak, you'll see an error message. This is the text on the error dialog. */
-"PIN_CREATION_WEAK_ERROR_MESSAGE" = "PIN-коды трымаюць вашу інфармацыю, што захоўваецца ў Signal, зашыфраванай, таму толькі вы можаце атрымаць да яе доступ. Выберыце больш надзейны PIN-код, каб абараніць свой уліковы запіс.";
+"PIN_CREATION_WEAK_ERROR_MESSAGE" = "PIN-коды трымаюць вашу інфармацыю, што захоўваецца ў Radar, зашыфраванай, таму толькі вы можаце атрымаць да яе доступ. Выберыце больш надзейны PIN-код, каб абараніць свой уліковы запіс.";
 
 /* If the user is re-registering, they need to enter their PIN to restore all their data. In some cases, they can skip this entry and lose some data. This text is shown on a button that lets them begin to do this. */
 "PIN_ENTER_EXISTING_SKIP" = "Прапусціць PIN-код";
@@ -6621,7 +6621,7 @@ Send money securely.";
 "PIN_REMINDER_MEGAPHONE_FEW_DAYS_TOAST" = "Мы нагадаем вам яшчэ раз праз некалькі дзён.";
 
 /* Title for PIN reminder megaphone */
-"PIN_REMINDER_MEGAPHONE_TITLE" = "Праверце свой PIN-код Signal";
+"PIN_REMINDER_MEGAPHONE_TITLE" = "Праверце свой PIN-код Radar";
 
 /* Toast indicating that we'll ask you for your PIN again tomorrow, after successfully entering it. */
 "PIN_REMINDER_MEGAPHONE_TOMORROW_SUCCESSFUL_TOAST" = "PIN-код правільны. Мы нагадаем вам яшчэ раз заўтра.";
@@ -6645,7 +6645,7 @@ Send money securely.";
 "PIN_REMINDER_MISMATCH_ERROR" = "Несапраўдны PIN-код. Паўтарыце спробу.";
 
 /* The title for the 'pin reminder' dialog. */
-"PIN_REMINDER_TITLE" = "Увядзіце свой PIN-код Signal";
+"PIN_REMINDER_TITLE" = "Увядзіце свой PIN-код Radar";
 
 /* Label indicating that the attempted PIN is too short */
 "PIN_REMINDER_TOO_SHORT_ERROR" = "PIN-код мусіць быць не менш за 4 лічбы.";
@@ -6660,7 +6660,7 @@ Send money securely.";
 "PINS_MEGAPHONE_ACTION" = "Стварыць PIN-код";
 
 /* Body for PIN megaphone when user doesn't have a PIN */
-"PINS_MEGAPHONE_BODY" = "Скончыць стварэнне PIN-кода Signal.";
+"PINS_MEGAPHONE_BODY" = "Скончыць стварэнне PIN-кода Radar.";
 
 /* Title for PIN megaphone when user doesn't have a PIN */
 "PINS_MEGAPHONE_TITLE" = "Стварыць PIN-код";
@@ -6768,19 +6768,19 @@ Send money securely.";
 "PRIVACY_VERIFICATION_FAILED_MISMATCHED_SAFETY_NUMBERS_IN_CLIPBOARD" = "Код у вашым буферы абмену не падобны на правільны код бяспекі для гэтага чата.";
 
 /* Alert body for user error */
-"PRIVACY_VERIFICATION_FAILED_NO_SAFETY_NUMBERS_IN_CLIPBOARD" = "Signal не можа знайсці код бяспекі ў вашым буферы абмену. Вы правільна скапіравалі яго?";
+"PRIVACY_VERIFICATION_FAILED_NO_SAFETY_NUMBERS_IN_CLIPBOARD" = "Radar не можа знайсці код бяспекі ў вашым буферы абмену. Вы правільна скапіравалі яго?";
 
 /* Alert body when verifying with {{contact name}} */
-"PRIVACY_VERIFICATION_FAILED_THEY_HAVE_WRONG_KEY_FOR_ME" = "Кожная пара карыстальнікаў Signal мае асобны код бяспекі. Яшчэ раз праверце, што %1$@ паказвае *ваш* асобны код бяспекі.";
+"PRIVACY_VERIFICATION_FAILED_THEY_HAVE_WRONG_KEY_FOR_ME" = "Кожная пара карыстальнікаў Radar мае асобны код бяспекі. Яшчэ раз праверце, што %1$@ паказвае *ваш* асобны код бяспекі.";
 
 /* alert body */
-"PRIVACY_VERIFICATION_FAILED_WITH_OLD_LOCAL_VERSION" = "Вы карыстаецеся старой версіяй Signal. Вам трэба зрабіць абнаўленне, перш чым вы праверыць код.";
+"PRIVACY_VERIFICATION_FAILED_WITH_OLD_LOCAL_VERSION" = "Вы карыстаецеся старой версіяй Radar. Вам трэба зрабіць абнаўленне, перш чым вы праверыць код.";
 
 /* alert body */
-"PRIVACY_VERIFICATION_FAILED_WITH_OLD_REMOTE_VERSION" = "Ваш партнёр выкарыстоўвае старую версію Signal. Яму трэба зрабіць абнаўленне, перш чым вы праверыць код.";
+"PRIVACY_VERIFICATION_FAILED_WITH_OLD_REMOTE_VERSION" = "Ваш партнёр выкарыстоўвае старую версію Radar. Яму трэба зрабіць абнаўленне, перш чым вы праверыць код.";
 
 /* alert body */
-"PRIVACY_VERIFICATION_FAILURE_INVALID_QRCODE" = "Прасканаваны код не падобны на код бяспекі. Вы абодва выкарыстоўваеце апошнюю версію Signal?";
+"PRIVACY_VERIFICATION_FAILURE_INVALID_QRCODE" = "Прасканаваны код не падобны на код бяспекі. Вы абодва выкарыстоўваеце апошнюю версію Radar?";
 
 /* Navbar title */
 "PRIVACY_VERIFICATION_TITLE" = "Праверыць код бяспекі";
@@ -6855,7 +6855,7 @@ Send money securely.";
 "PROFILE_NAME_EDUCATION_SHEET_BULLET_3" = "Не перадавайце асабістую інфармацыю тым, каго не ведаеце";
 
 /* Header for the explainer sheet for profile names */
-"PROFILE_NAME_EDUCATION_SHEET_HEADER_FORMAT" = "<bold>Імёны профіляў</bold> на Signal выбіраюць уладальнікі сваіх уліковых запісаў.";
+"PROFILE_NAME_EDUCATION_SHEET_HEADER_FORMAT" = "<bold>Імёны профіляў</bold> на Radar выбіраюць уладальнікі сваіх уліковых запісаў.";
 
 /* Title for the profile name view. */
 "PROFILE_NAME_VIEW_TITLE" = "Ваша імя";
@@ -7062,7 +7062,7 @@ Send money securely.";
 "RECIPIENT_PICKER_ERROR_USER_CANNOT_BE_SELECTED" = "Немагчыма выбраць карыстальніка.";
 
 /* Alert text. Shown after selecting a phone number that isn't valid. */
-"RECIPIENT_PICKER_INVALID_NUMBER_MESSAGE" = "%1$@ не карыстальнік Signal. Паўтарыце спробу з сапраўдным нумарам тэлефона.";
+"RECIPIENT_PICKER_INVALID_NUMBER_MESSAGE" = "%1$@ не карыстальнік Radar. Паўтарыце спробу з сапраўдным нумарам тэлефона.";
 
 /* Alert title. Shown after selecting a phone number that isn't valid. */
 "RECIPIENT_PICKER_INVALID_NUMBER_TITLE" = "Несапраўдны нумар тэлефона";
@@ -7071,10 +7071,10 @@ Send money securely.";
 "RECIPIENT_PICKER_INVITE_ACTION" = "Запрасіць";
 
 /* Alert text. Shown after selecting a phone number that isn't a Signal user. */
-"RECIPIENT_PICKER_INVITE_MESSAGE" = "%1$@ не карыстальнік Signal. Жадаеце запрасіць гэты нумар?";
+"RECIPIENT_PICKER_INVITE_MESSAGE" = "%1$@ не карыстальнік Radar. Жадаеце запрасіць гэты нумар?";
 
 /* Alert title. Shown after selecting a phone number that isn't a Signal user. */
-"RECIPIENT_PICKER_INVITE_TITLE" = "Запрасіць у Signal";
+"RECIPIENT_PICKER_INVITE_TITLE" = "Запрасіць у Radar";
 
 /* Alert title explaining what happens if you forget your 'two-factor auth pin'. */
 "REGISTER_2FA_FORGOT_PIN_ALERT_TITLE" = "Патрэбна дапамога?";
@@ -7134,7 +7134,7 @@ Send money securely.";
 "REGISTRATION_BACKUP_RESTORE_ERROR_GENERIC_TITLE" = "Немагчыма завершыць перанос";
 
 /* Body for a sheet warning users about an incorrect recovery key. */
-"REGISTRATION_BACKUP_RESTORE_ERROR_INCORRECT_KEY_BODY" = "Магчыма, вы няправільна ўвялі код для аднаўлення або не зрабілі, як мінімум, адну рэзервовую копію на сваёй старой прыладзе. \n\nПраверце падчас рэгістрацыі, што вы ўжываеце той жа нумар тэлефона і код для аднаўлення, які вы захавалі, калі ўключалі «Бяспечнае рэзервовае капіраванне Signal», і пацвердзіце, што ваша старая прылада завяршыла рэзервовае капіраванне.";
+"REGISTRATION_BACKUP_RESTORE_ERROR_INCORRECT_KEY_BODY" = "Магчыма, вы няправільна ўвялі код для аднаўлення або не зрабілі, як мінімум, адну рэзервовую копію на сваёй старой прыладзе. \n\nПраверце падчас рэгістрацыі, што вы ўжываеце той жа нумар тэлефона і код для аднаўлення, які вы захавалі, калі ўключалі «Бяспечнае рэзервовае капіраванне Radar», і пацвердзіце, што ваша старая прылада завяршыла рэзервовае капіраванне.";
 
 /* Body for a sheet warning users about an incorrect recovery key and having hit a rate limit on retries. */
 "REGISTRATION_BACKUP_RESTORE_ERROR_INCORRECT_KEY_RATE_LIMIT_BODY" = "Вы дасягнулі ліміту спроб, каб скарыстаць код для аднаўлення. Дзеля вашай бяспекі дазволеная колькасць спроб абмежавана. Пачакайце 1 гадзіну і паспрабуйце яшчэ раз.";
@@ -7167,7 +7167,7 @@ Send money securely.";
 "REGISTRATION_BACKUP_RESTORE_ERROR_UNRETRYABLE_SERVER_ERROR_TITLE" = "Не атрымалася аднавіць рэзервовую копію";
 
 /* Body for a sheet warning users about an incompatible backup version. */
-"REGISTRATION_BACKUP_RESTORE_ERROR_UNSUPPORTED_BACKUP_VERSION_BODY" = "Каб аднавіць рэзервовую копію, пераканайцеся, што вы маеце апошнюю версію Signal, і паўтарыце спробу. Калі праблема не знікне, звярніцеся да службы падтрымкі.";
+"REGISTRATION_BACKUP_RESTORE_ERROR_UNSUPPORTED_BACKUP_VERSION_BODY" = "Каб аднавіць рэзервовую копію, пераканайцеся, што вы маеце апошнюю версію Radar, і паўтарыце спробу. Калі праблема не знікне, звярніцеся да службы падтрымкі.";
 
 /* Title for a sheet warning users about an incompatible backup version. */
 "REGISTRATION_BACKUP_RESTORE_ERROR_UNSUPPORTED_BACKUP_VERSION_TITLE" = "Патрабуецца абнаўленне";
@@ -7179,7 +7179,7 @@ Send money securely.";
 "REGISTRATION_CANNOT_CONTINUE_WITHOUT_UPDATING_APP_ACTION" = "Абнавіць";
 
 /* During (re)registration, users may need to update their app to continue. They'll be presented with an alert if this is the case, prompting them to update. This is the description text on that alert. */
-"REGISTRATION_CANNOT_CONTINUE_WITHOUT_UPDATING_APP_DESCRIPTION" = "Каб працягнуць рэгістрацыю, зрабіце абнаўленне да апошняй версіі Signal.";
+"REGISTRATION_CANNOT_CONTINUE_WITHOUT_UPDATING_APP_DESCRIPTION" = "Каб працягнуць рэгістрацыю, зрабіце абнаўленне да апошняй версіі Radar.";
 
 /* During (re)registration, users may need to update their app to continue. They'll be presented with an alert if this is the case, prompting them to update. This is the title on that alert. */
 "REGISTRATION_CANNOT_CONTINUE_WITHOUT_UPDATING_APP_TITLE" = "Патрабуецца абнаўленне";
@@ -7191,7 +7191,7 @@ Send money securely.";
 "REGISTRATION_DEFAULT_COUNTRY_NAME" = "Код краіны";
 
 /* If a user is installing Signal on a new phone, they may be asked whether they want to transfer their account from their old device. This is a description on the screen that asks them this question. */
-"REGISTRATION_DEVICE_TRANSFER_CHOICE_EXPLANATION" = "Калі вы працягнеце, Signal адключыцца на іншых прыладах, што зарэгістраваны на сённяшні час з такім жа нумарам тэлефона.";
+"REGISTRATION_DEVICE_TRANSFER_CHOICE_EXPLANATION" = "Калі вы працягнеце, Radar адключыцца на іншых прыладах, што зарэгістраваны на сённяшні час з такім жа нумарам тэлефона.";
 
 /* If a user is installing Signal on a new phone, they may be asked whether they want to transfer their account from their old device. This is the title on the screen that asks them this question. */
 "REGISTRATION_DEVICE_TRANSFER_CHOICE_TITLE" = "Перанесці ўліковы запіс & паведамленні";
@@ -7227,7 +7227,7 @@ Send money securely.";
 "REGISTRATION_NO_BACKUP_KEY_BUTTON_TITLE" = "Няма кода для аднаўлення?";
 
 /* Body text on a sheet with info for what to do if you don't have a recovery key */
-"REGISTRATION_NO_BACKUP_KEY_SHEET_BODY" = "Без 64-значнага кода для аднаўлення немагчыма аднавіць рэзервовыя копіі. Калі вы згубіце свой код для аднаўлення, Signal не зможа аднавіць вашу рэзервовую копію.\n\nНа вашай старой прыладзе вы можаце прагледзець свой код для аднаўлення ў меню Налады > Чаты > Рэзервовыя копіі. Потым націсніце «Прагледзець код для аднаўлення».";
+"REGISTRATION_NO_BACKUP_KEY_SHEET_BODY" = "Без 64-значнага кода для аднаўлення немагчыма аднавіць рэзервовыя копіі. Калі вы згубіце свой код для аднаўлення, Radar не зможа аднавіць вашу рэзервовую копію.\n\nНа вашай старой прыладзе вы можаце прагледзець свой код для аднаўлення ў меню Налады > Чаты > Рэзервовыя копіі. Потым націсніце «Прагледзець код для аднаўлення».";
 
 /* Title for sheet with info for what to do if you don't have a recovery key */
 "REGISTRATION_NO_BACKUP_KEY_SHEET_TITLE" = "Няма кода для аднаўлення?";
@@ -7290,16 +7290,16 @@ Send money securely.";
 "REGISTRATION_PROFILE_SETUP_TITLE" = "Наладзьце свой профіль";
 
 /* Error shown if an SMS/call service provider is permanently unable to send a verification code to the provided number. */
-"REGISTRATION_PROVIDER_FAILURE_MESSAGE_PERMANENT" = "Signal не можа адправіць SMS-код з-за праблем, што датычацца пастаўшчыка SMS.";
+"REGISTRATION_PROVIDER_FAILURE_MESSAGE_PERMANENT" = "Radar не можа адправіць SMS-код з-за праблем, што датычацца пастаўшчыка SMS.";
 
 /* Error shown if an SMS/call service provider is temporarily unable to send a verification code to the provided number. */
-"REGISTRATION_PROVIDER_FAILURE_MESSAGE_TRANSIENT" = "Signal не зможа адправіць SMS-код з-за праблем, што датычацца пастаўшчыка SMS. Паўтарыце спробу праз некалькі гадзін.";
+"REGISTRATION_PROVIDER_FAILURE_MESSAGE_TRANSIENT" = "Radar не зможа адправіць SMS-код з-за праблем, што датычацца пастаўшчыка SMS. Паўтарыце спробу праз некалькі гадзін.";
 
 /* Third step in directions for how to make a backup */
 "REGISTRATION_RESTORE_METHOD_MAKE_BACKUP_TUTORIAL_ENABLE_BACKUPS" = "Уключыце рэзервовыя копіі і дачакайцеся завяршэння рэзервовага капіравання";
 
 /* First step in directions for how to make a backup */
-"REGISTRATION_RESTORE_METHOD_MAKE_BACKUP_TUTORIAL_OPEN_SIGNAL" = "Адкрыйце Signal на сваёй старой прыладзе";
+"REGISTRATION_RESTORE_METHOD_MAKE_BACKUP_TUTORIAL_OPEN_SIGNAL" = "Адкрыйце Radar на сваёй старой прыладзе";
 
 /* Second step in directions for how to make a backup */
 "REGISTRATION_RESTORE_METHOD_MAKE_BACKUP_TUTORIAL_TAP_SETTINGS" = "Націсніце Налады > Рэзервовыя копіі";
@@ -7317,7 +7317,7 @@ Send money securely.";
 "REGISTRATION_SCAN_QR_CODE_TITLE" = "Праскануйце гэты QR-код з дапамогай свайго старога тэлефона";
 
 /* Tutorial text describing the first step to scanning the restore/transfer QR code with your old phone: opening Signal */
-"REGISTRATION_SCAN_QR_CODE_TUTORIAL_OPEN_SIGNAL" = "Адкрыйце Signal на сваёй старой прыладзе";
+"REGISTRATION_SCAN_QR_CODE_TUTORIAL_OPEN_SIGNAL" = "Адкрыйце Radar на сваёй старой прыладзе";
 
 /* Tutorial text describing the third step to scanning the restore/transfer QR code with your old phone: scan the code */
 "REGISTRATION_SCAN_QR_CODE_TUTORIAL_SCAN" = "Праскануйце гэты код з дапамогай камеры";
@@ -7521,7 +7521,7 @@ Send money securely.";
 "SAFETY_NUMBER_CONFIRMATION_VIEW_ACTION" = "Прагледзець";
 
 /* Snippet to share {{safety number}} with a friend. sent e.g. via SMS */
-"SAFETY_NUMBER_SHARE_FORMAT" = "Наш код бяспекі Signal:\n%1$@";
+"SAFETY_NUMBER_SHARE_FORMAT" = "Наш код бяспекі Radar:\n%1$@";
 
 /* Title for Safety Tips button in thread details. */
 "SAFETY_TIPS_BUTTON_ACTION_TITLE" = "Парады па бяспецы";
@@ -7539,7 +7539,7 @@ Send money securely.";
 "SAFETY_TIPS_FAKE_BUSINESS_TITLE" = "Фэйкавыя прадпрыемствы і ўстановы";
 
 /* Message contents for the fake names safety tip. */
-"SAFETY_TIPS_FAKE_NAMES_BODY" = "Signal ніколі не запытвае ў вас код рэгістрацыі або PIN-код. Будзьце пiльнымi: за некаторымі запытамі могуць хавацца іншыя людзі. Імёны профіляў выбіраюць уладальнікі сваіх уліковых запісаў, i яны не пацверджаны.";
+"SAFETY_TIPS_FAKE_NAMES_BODY" = "Radar ніколі не запытвае ў вас код рэгістрацыі або PIN-код. Будзьце пiльнымi: за некаторымі запытамі могуць хавацца іншыя людзі. Імёны профіляў выбіраюць уладальнікі сваіх уліковых запісаў, i яны не пацверджаны.";
 
 /* Message title describing the fake names safety tip. */
 "SAFETY_TIPS_FAKE_NAMES_TITLE" = "Фэйкавыя імёны і ўліковыя запісы";
@@ -7599,13 +7599,13 @@ Send money securely.";
 "SCREEN_LOCK_ERROR_LOCAL_AUTHENTICATION_PASSCODE_NOT_SET" = "Вам неабходна ўключыць код доступу ў наладах iOS, каб выкарыстоўваць блакіроўку экрана.";
 
 /* Description of how and why Signal iOS uses Touch ID/Face ID/Phone Passcode to unlock 'screen lock'. */
-"SCREEN_LOCK_REASON_UNLOCK_SCREEN_LOCK" = "Аўтэнтыфікацыя, каб адкрыць Signal.";
+"SCREEN_LOCK_REASON_UNLOCK_SCREEN_LOCK" = "Аўтэнтыфікацыя, каб адкрыць Radar.";
 
 /* Title for alert indicating that screen lock could not be unlocked. */
 "SCREEN_LOCK_UNLOCK_FAILED" = "Памылка аўтэнтыфікацыі";
 
 /* Label for button on lock screen that lets users unlock Signal. */
-"SCREEN_LOCK_UNLOCK_SIGNAL" = "Разблакаваць Signal";
+"SCREEN_LOCK_UNLOCK_SIGNAL" = "Разблакаваць Radar";
 
 /* Placeholder text indicating the user can search for contacts by name, username, or phone number. */
 "SEARCH_BY_NAME_OR_USERNAME_OR_NUMBER_PLACEHOLDER_TEXT" = "Імя, імя карыстальніка або нумар";
@@ -7629,7 +7629,7 @@ Send money securely.";
 "SEARCH_SECTION_MESSAGES" = "Паведамленні";
 
 /* Message for error alert indicating that re-linking failed because the account did not match. */
-"SECONDARY_LINKING_ERROR_DIFFERENT_ACCOUNT_MESSAGE" = "Каб звязаць гэту прыладу да іншага ўліковага запісу, вам трэба спачатку скінуць даныя Signal на гэтай прыладзе. Вы на самой справе жадаеце выдаліць усю гісторыю (паведамленні, далучэнні, званкі і г. д.)? Гэта дзеянне нельга адмяніць.";
+"SECONDARY_LINKING_ERROR_DIFFERENT_ACCOUNT_MESSAGE" = "Каб звязаць гэту прыладу да іншага ўліковага запісу, вам трэба спачатку скінуць даныя Radar на гэтай прыладзе. Вы на самой справе жадаеце выдаліць усю гісторыю (паведамленні, далучэнні, званкі і г. д.)? Гэта дзеянне нельга адмяніць.";
 
 /* Label for the 'reset device' action in the 're-linking failed because the account did not match' alert. */
 "SECONDARY_LINKING_ERROR_DIFFERENT_ACCOUNT_RESET_DEVICE" = "Выдаліць усё";
@@ -7638,13 +7638,13 @@ Send money securely.";
 "SECONDARY_LINKING_ERROR_DIFFERENT_ACCOUNT_TITLE" = "Уліковы запіс не супадае";
 
 /* Message for error alert indicating that a linked device must be upgraded before it can be linked. */
-"SECONDARY_LINKING_ERROR_OBSOLETE_LINKED_DEVICE_MESSAGE" = "Абнавіце Signal на гэтай прыладзе, каб звязаць яе да свайго тэлефона.";
+"SECONDARY_LINKING_ERROR_OBSOLETE_LINKED_DEVICE_MESSAGE" = "Абнавіце Radar на гэтай прыладзе, каб звязаць яе да свайго тэлефона.";
 
 /* Title for error alert indicating that a linked device must be upgraded before it can be linked. */
 "SECONDARY_LINKING_ERROR_OBSOLETE_LINKED_DEVICE_TITLE" = "Версія не падтрымліваецца";
 
 /* alert message for outdated linking device */
-"SECONDARY_LINKING_ERROR_OLD_VERSION_MESSAGE" = "На іншай прыладзе ўсталявана старая версія Signal, якая не падтрымлівае сканаванне QR-кодаў iPad. Калі ласка, усталюйце апошнюю версію Signal і паўтарыце спробу.";
+"SECONDARY_LINKING_ERROR_OLD_VERSION_MESSAGE" = "На іншай прыладзе ўсталявана старая версія Radar, якая не падтрымлівае сканаванне QR-кодаў iPad. Калі ласка, усталюйце апошнюю версію Radar і паўтарыце спробу.";
 
 /* alert title for outdated linking device */
 "SECONDARY_LINKING_ERROR_OLD_VERSION_TITLE" = "Абнавіць прыладу для сканавання";
@@ -7665,7 +7665,7 @@ Send money securely.";
 "SECONDARY_LINKING_SYNCING_UPDATE_REQUIRED_CHECK_FOR_UPDATE_BUTTON" = "Праверыць абнаўленні";
 
 /* Message for action sheet when the secondary device fails to sync messages due to an app update being required. */
-"SECONDARY_LINKING_SYNCING_UPDATE_REQUIRED_ERROR_MESSAGE" = "Патрэбна абнаўленне Signal, каб выканаць сінхранізацыю паведамленняў.";
+"SECONDARY_LINKING_SYNCING_UPDATE_REQUIRED_ERROR_MESSAGE" = "Патрэбна абнаўленне Radar, каб выканаць сінхранізацыю паведамленняў.";
 
 /* Title for action sheet when the secondary device fails to sync messages due to an app update being required. */
 "SECONDARY_LINKING_SYNCING_UPDATE_REQUIRED_ERROR_TITLE" = "Патрабуецца абнаўленне";
@@ -7674,19 +7674,19 @@ Send money securely.";
 "SECONDARY_ONBOARDING_CHOOSE_DEVICE_NAME_PLACEHOLDER" = "Выбраць назву";
 
 /* header text before the user can link this device */
-"SECONDARY_ONBOARDING_GET_STARTED_BY_OPENING_PRIMARY" = "Запусціце Signal на сваім тэлефоне, каб звязаць гэты iPad да вашага ўліковага запісу";
+"SECONDARY_ONBOARDING_GET_STARTED_BY_OPENING_PRIMARY" = "Запусціце Radar на сваім тэлефоне, каб звязаць гэты iPad да вашага ўліковага запісу";
 
 /* Link explaining what to do when trying to link a device before having a primary device. */
-"SECONDARY_ONBOARDING_GET_STARTED_DO_NOT_HAVE_PRIMARY" = "Я не маю Signal на сваім тэлефоне…";
+"SECONDARY_ONBOARDING_GET_STARTED_DO_NOT_HAVE_PRIMARY" = "Я не маю Radar на сваім тэлефоне…";
 
 /* alert body */
-"SECONDARY_ONBOARDING_INSTALL_PRIMARY_FIRST_BODY" = "Перайдзіце ў App Store на сваім тэлефоне, усталюйце Signal, завяршыце працэс рэгістрацыі, і тады вы зможаце звязаць свой iPad да таго ж уліковага запісу.";
+"SECONDARY_ONBOARDING_INSTALL_PRIMARY_FIRST_BODY" = "Перайдзіце ў App Store на сваім тэлефоне, усталюйце Radar, завяршыце працэс рэгістрацыі, і тады вы зможаце звязаць свой iPad да таго ж уліковага запісу.";
 
 /* alert title */
-"SECONDARY_ONBOARDING_INSTALL_PRIMARY_FIRST_TITLE" = "Усталюйце Signal на свой тэлефон";
+"SECONDARY_ONBOARDING_INSTALL_PRIMARY_FIRST_TITLE" = "Усталюйце Radar на свой тэлефон";
 
 /* body text while displaying a QR code which, when scanned, will link this device. */
-"SECONDARY_ONBOARDING_SCAN_CODE_BODY" = "Націсніце на свае фота профілю, каб адкрыць налады Signal на тэлефоне. Потым на «Звязаныя прылады» і «Звязаць новую прыладу», пасля чаго праскануйце гэты код:";
+"SECONDARY_ONBOARDING_SCAN_CODE_BODY" = "Націсніце на свае фота профілю, каб адкрыць налады Radar на тэлефоне. Потым на «Звязаныя прылады» і «Звязаць новую прыладу», пасля чаго праскануйце гэты код:";
 
 /* Link text for page with troubleshooting info shown on the QR scanning screen */
 "SECONDARY_ONBOARDING_SCAN_CODE_HELP_TEXT" = "Дапамогу па звязванню iPad можна знайсці тут";
@@ -7698,7 +7698,7 @@ Send money securely.";
 "SECONDARY_ONBOARDING_SCAN_CODE_TITLE" = "Праскануйце QR-код з дапамогай свайго тэлефона";
 
 /* header text before the user can transfer to this device */
-"SECONDARY_TRANSFER_GET_STARTED_BY_OPENING_IPAD" = "Запусціце Signal на сваім старым iPad, каб перанесці свой уліковы запіс";
+"SECONDARY_TRANSFER_GET_STARTED_BY_OPENING_IPAD" = "Запусціце Radar на сваім старым iPad, каб перанесці свой уліковы запіс";
 
 /* No comment provided by engineer. */
 "SECURE_SESSION_RESET" = "Бяспечны сеанс быў скінуты.";
@@ -7788,7 +7788,7 @@ Send money securely.";
 "SEPA_DONATION_NAME_PLACEHOLDER" = "Імя ўладальніка банкаўскага рахунку";
 
 /* Description for the session refresh alert */
-"SESSION_REFRESH_ALERT_MESSAGE" = "Signal выкарыстоўвае скразное шыфраванне, і часам можа спатрэбіцца абнавіць сеанс чата. Гэта не ўплывае на бяспеку вашага чата, але вы, магчыма, прапусцілі паведамленне ад гэтага кантакту, таму вы можаце папрасіць яго адправіць паведамленне паўторна.";
+"SESSION_REFRESH_ALERT_MESSAGE" = "Radar выкарыстоўвае скразное шыфраванне, і часам можа спатрэбіцца абнавіць сеанс чата. Гэта не ўплывае на бяспеку вашага чата, але вы, магчыма, прапусцілі паведамленне ад гэтага кантакту, таму вы можаце папрасіць яго адправіць паведамленне паўторна.";
 
 /* Title for the session refresh alert */
 "SESSION_REFRESH_ALERT_TITLE" = "Сеанс чата абноўлены";
@@ -7830,7 +7830,7 @@ Send money securely.";
 "SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_COUNTRY" = "Месцазнаходжанне";
 
 /* Table footer for the 'censorship circumvention' section when censorship circumvention can be manually enabled. */
-"SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_FOOTER" = "Калі ўключыць гэтую опцыю, Signal будзе спрабаваць абысці цэнзуру (блакіроўку правайдарам). Не ўключайце яе, калі там, дзе вы знаходзіцеся, Signal не блакуецца.";
+"SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_FOOTER" = "Калі ўключыць гэтую опцыю, Radar будзе спрабаваць абысці цэнзуру (блакіроўку правайдарам). Не ўключайце яе, калі там, дзе вы знаходзіцеся, Radar не блакуецца.";
 
 /* Table footer for the 'censorship circumvention' section shown when censorship circumvention has been auto-enabled based on local phone number. */
 "SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_FOOTER_AUTO_ENABLED" = "Абыход цэнзуры аўтаматычна актываваны на аснове нумара тэлефона вашага ўліковага запісу.";
@@ -7842,7 +7842,7 @@ Send money securely.";
 "SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_FOOTER_NO_CONNECTION" = "Абыход цэнзуры можа быць актываваны толькі пры падключэнні да інтэрнэту.";
 
 /* Table footer for the 'censorship circumvention' section shown when the app is connected to the Signal service. */
-"SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_FOOTER_WEBSOCKET_CONNECTED" = "Абыход цэнзуры не патрэбны; вы ўжо падключаны да сэрвісу Signal.";
+"SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_FOOTER_WEBSOCKET_CONNECTED" = "Абыход цэнзуры не патрэбны; вы ўжо падключаны да сэрвісу Radar.";
 
 /* Label for the 'advanced pin settings' button. */
 "SETTINGS_ADVANCED_PIN_SETTINGS" = "Пашыраныя налады PIN-кода";
@@ -7869,13 +7869,13 @@ Send money securely.";
 "SETTINGS_ADVANCED_VIEW_ERROR_LOG" = "Журналы памылак";
 
 /* Information on sheet about changing the app icon - first line */
-"SETTINGS_APP_ICON_EDUCATION_APP_NAME" = "Назва праграмы «Signal» будзе бачная на галоўным экране, у апавяшчэннях і ў бібліятэцы праграм.";
+"SETTINGS_APP_ICON_EDUCATION_APP_NAME" = "Назва праграмы «Radar» будзе бачная на галоўным экране, у апавяшчэннях і ў бібліятэцы праграм.";
 
 /* Information on sheet about changing the app icon - second line */
-"SETTINGS_APP_ICON_EDUCATION_HOME_SCREEN_DOCK" = "Вы можаце прыхаваць назву праграмы «Signal» на галоўным экране, калі перасунеце яе на док-панэль унізе галоўнага экрана.";
+"SETTINGS_APP_ICON_EDUCATION_HOME_SCREEN_DOCK" = "Вы можаце прыхаваць назву праграмы «Radar» на галоўным экране, калі перасунеце яе на док-панэль унізе галоўнага экрана.";
 
 /* The footer for the app icon selection settings page. */
-"SETTINGS_APP_ICON_FOOTER" = "Назва праграмы «Signal» будзе бачная на галоўным экране, у апавяшчэннях і ў бібліятэцы праграм.";
+"SETTINGS_APP_ICON_FOOTER" = "Назва праграмы «Radar» будзе бачная на галоўным экране, у апавяшчэннях і ў бібліятэцы праграм.";
 
 /* The title for the app icon selection settings page. */
 "SETTINGS_APP_ICON_TITLE" = "Значок праграмы";
@@ -7905,7 +7905,7 @@ Send money securely.";
 "SETTINGS_BLOCK_LIST_ADD_BUTTON" = "Дадаць заблакаванага карыстальніка";
 
 /* A label that indicates the user has no Signal contacts that they haven't blocked. */
-"SETTINGS_BLOCK_LIST_NO_CONTACTS" = "Вы не маеце кантактаў у Signal.";
+"SETTINGS_BLOCK_LIST_NO_CONTACTS" = "Вы не маеце кантактаў у Radar.";
 
 /* A label that indicates the user's search has no matching results. */
 "SETTINGS_BLOCK_LIST_NO_SEARCH_RESULTS" = "Няма вынікаў пошуку";
@@ -7917,7 +7917,7 @@ Send money securely.";
 "SETTINGS_CALLING_HIDES_IP_ADDRESS_PREFERENCE_TITLE" = "Заўсёды рэтрансляваць званкі";
 
 /* User settings section footer, a detailed explanation */
-"SETTINGS_CALLING_HIDES_IP_ADDRESS_PREFERENCE_TITLE_DETAIL" = "Прапускаць усе званкі праз сервер Signal, каб не раскрываць IP-адрас свайму кантакту. Якасць званка пагоршыцца.";
+"SETTINGS_CALLING_HIDES_IP_ADDRESS_PREFERENCE_TITLE_DETAIL" = "Прапускаць усе званкі праз сервер Radar, каб не раскрываць IP-адрас свайму кантакту. Якасць званка пагоршыцца.";
 
 /* Label for the 'edit phone number' button in the 'change phone number' views. */
 "SETTINGS_CHANGE_PHONE_NUMBER_BACK_TO_EDIT_BUTTON" = "Рэдагаваць нумар";
@@ -7962,7 +7962,7 @@ Send money securely.";
 "SETTINGS_CLEAR_HISTORY" = "Ачысціць гісторыю чата";
 
 /* Footer for the 'about' help section */
-"SETTINGS_COPYRIGHT" = "Аўтарскія правы Signal Messenger\nЛіцэнзія AGPLv3";
+"SETTINGS_COPYRIGHT" = "Аўтарскія правы Radar Messenger\nЛіцэнзія AGPLv3";
 
 /* Label for the 'data' section of the app settings. */
 "SETTINGS_DATA" = "Выкарыстанне даных";
@@ -8034,7 +8034,7 @@ Send money securely.";
 "SETTINGS_DISAPPEARING_MESSAGES_FOOTER" = "Наладзьце таймер для знікнення паведамленняў па змоўчванні для ўсіх новых чатаў, што вы раней распачалі.";
 
 /* Title for the 'donate to signal' link in settings. */
-"SETTINGS_DONATE" = "Зрабіць ахвяраванне для Signal";
+"SETTINGS_DONATE" = "Зрабіць ахвяраванне для Radar";
 
 /* Title for help button and help pages in app settings. */
 "SETTINGS_HELP" = "Дапамога";
@@ -8103,7 +8103,7 @@ Send money securely.";
 "SETTINGS_NOTIFICATION_CONTENT_TITLE" = "Змесціва апавяшчэння";
 
 /* When the local device discovers a contact has recently installed signal, the app can generates a message encouraging the local user to say hello. Turning this switch off disables that feature. */
-"SETTINGS_NOTIFICATION_EVENTS_CONTACT_JOINED_SIGNAL" = "Кантакт далучаецца да Signal";
+"SETTINGS_NOTIFICATION_EVENTS_CONTACT_JOINED_SIGNAL" = "Кантакт далучаецца да Radar";
 
 /* table section header */
 "SETTINGS_NOTIFICATION_NOTIFY_WHEN_TITLE" = "Апавяшчаць, калі…";
@@ -8140,7 +8140,7 @@ Send money securely.";
 "SETTINGS_PAYMENTS_BITCOIN_UNIT" = "Адзінка біткоіна";
 
 /* Error message indicating that payments could not be activated because the feature is not currently available. */
-"SETTINGS_PAYMENTS_CANNOT_ACTIVATE_PAYMENTS_KILL_SWITCH" = "Опцыя «Плацяжы» ў Signal больш недаступная. Вы па-ранейшаму можаце пераводзіць сродкі для абмену, але больш не зможаце адпраўляць і атрымліваць плацяжы або дадаваць сродкі.";
+"SETTINGS_PAYMENTS_CANNOT_ACTIVATE_PAYMENTS_KILL_SWITCH" = "Опцыя «Плацяжы» ў Radar больш недаступная. Вы па-ранейшаму можаце пераводзіць сродкі для абмену, але больш не зможаце адпраўляць і атрымліваць плацяжы або дадаваць сродкі.";
 
 /* Error message indicating that payments could not be deactivated because the current balance is unavailable. */
 "SETTINGS_PAYMENTS_CANNOT_DEACTIVATE_PAYMENTS_NO_BALANCE" = "Немагчыма дэактываваць плацяжы, таму што ваш баланс недаступны. Праверце падключэнне і паўтарыце спробу.";
@@ -8149,10 +8149,10 @@ Send money securely.";
 "SETTINGS_PAYMENTS_CANNOT_SEND_PAYMENT_NO_BALANCE" = "Немагчыма завяршыць плацеж, таму што ваш баланс недаступны. Праверце падключэнне і паўтарыце спробу.";
 
 /* Error message indicating that payments cannot be sent because the feature is not currently available. */
-"SETTINGS_PAYMENTS_CANNOT_SEND_PAYMENTS_KILL_SWITCH" = "Опцыя «Плацяжы» ў Signal больш недаступная. Вы па-ранейшаму можаце пераводзіць сродкі для абмену, але больш не зможаце адпраўляць і атрымліваць плацяжы або дадаваць сродкі.";
+"SETTINGS_PAYMENTS_CANNOT_SEND_PAYMENTS_KILL_SWITCH" = "Опцыя «Плацяжы» ў Radar больш недаступная. Вы па-ранейшаму можаце пераводзіць сродкі для абмену, але больш не зможаце адпраўляць і атрымліваць плацяжы або дадаваць сродкі.";
 
 /* Error message indicating that you cannot transfer into your payments wallet because the feature is not currently available. */
-"SETTINGS_PAYMENTS_CANNOT_TRANSFER_IN_KILL_SWITCH" = "Опцыя «Плацяжы» ў Signal больш недаступная. Вы па-ранейшаму можаце пераводзіць сродкі для абмену, але больш не зможаце адпраўляць і атрымліваць плацяжы або дадаваць сродкі.";
+"SETTINGS_PAYMENTS_CANNOT_TRANSFER_IN_KILL_SWITCH" = "Опцыя «Плацяжы» ў Radar больш недаступная. Вы па-ранейшаму можаце пераводзіць сродкі для абмену, але больш не зможаце адпраўляць і атрымліваць плацяжы або дадаваць сродкі.";
 
 /* Message for the 'currency conversions info' alert. */
 "SETTINGS_PAYMENTS_CURRENCY_CONVERSIONS_INFO_ALERT_MESSAGE" = "Канверсіі з'яўляюцца прыблізнымі і могуць быць недакладнымі.";
@@ -8179,10 +8179,10 @@ Send money securely.";
 "SETTINGS_PAYMENTS_DEACTIVATE_TITLE" = "Дэактываваць «Плацяжы»";
 
 /* Explanation of the 'deactivate payments with balance' process in the 'deactivate payments' settings. */
-"SETTINGS_PAYMENTS_DEACTIVATE_WITH_BALANCE_EXPLANATION" = "Мы рэкамендуем вам перанесці свае сродкі на адрас іншага кашалька перад тым, як дэактываваць плацяжы. Калі вы не пераведзяце свае сродкі зараз, яны застануцца ў вашым кашальку, што звязаны з Signal, і вы зможаце іх выкарыстоўваць, калі пазней зноў актывуеце плацяжы.";
+"SETTINGS_PAYMENTS_DEACTIVATE_WITH_BALANCE_EXPLANATION" = "Мы рэкамендуем вам перанесці свае сродкі на адрас іншага кашалька перад тым, як дэактываваць плацяжы. Калі вы не пераведзяце свае сродкі зараз, яны застануцца ў вашым кашальку, што звязаны з Radar, і вы зможаце іх выкарыстоўваць, калі пазней зноў актывуеце плацяжы.";
 
 /* Description for the 'deactivate payments confirmation' UI in the payment settings. */
-"SETTINGS_PAYMENTS_DEACTIVATE_WITHOUT_TRANSFER_CONFIRM_DESCRIPTION" = "Вашы сродкі застануцца ў вашым кашальку, што звязаны з Signal, і вы зможаце іх выкарыстоўваць, калі пазней зноў актывуеце плацяжы.";
+"SETTINGS_PAYMENTS_DEACTIVATE_WITHOUT_TRANSFER_CONFIRM_DESCRIPTION" = "Вашы сродкі застануцца ў вашым кашальку, што звязаны з Radar, і вы зможаце іх выкарыстоўваць, калі пазней зноў актывуеце плацяжы.";
 
 /* Title for the 'deactivate payments confirmation' UI in the payment settings. */
 "SETTINGS_PAYMENTS_DEACTIVATE_WITHOUT_TRANSFER_CONFIRM_TITLE" = "Дэактываваць без пераводу сродкаў?";
@@ -8420,7 +8420,7 @@ Send money securely.";
 "SETTINGS_PAYMENTS_PAYMENTS_LOCK_PROMPT_EXPLANATION_TOUCHID" = "Каб прадухіліць доступ чалавека, які завалодаў вашым тэлефонам, да вашых грашовых сродкаў, уключыце опцыю Touch ID, дадатковы ўзровень бяспекі. Вы можаце адключыць гэтую опцыю ў Наладах.";
 
 /* Button for payments outdated sheet. */
-"SETTINGS_PAYMENTS_PAYMENTS_OUTDATED_BUTTON" = "Абнавіць Signal";
+"SETTINGS_PAYMENTS_PAYMENTS_OUTDATED_BUTTON" = "Абнавіць Radar";
 
 /* Message for payments outdated sheet. */
 "SETTINGS_PAYMENTS_PAYMENTS_OUTDATED_MESSAGE" = "Абнаўленне неабходна, каб працягваць адпраўляць і атрымліваць плацяжы, а таксама каб прагледзець ваш актуальны плацежны баланс.";
@@ -8558,7 +8558,7 @@ Send money securely.";
 "SETTINGS_PAYMENTS_TITLE" = "Плацяжы";
 
 /* Error indicating that it is not valid to send yourself a payment. */
-"SETTINGS_PAYMENTS_TRANSFER_OUT_CANNOT_SEND_TO_SELF" = "Вы не можаце перавесці сродкі на свой адрас кашалька Signal. Увядзіце адрас кашалька са свайго ўліковага запісу на біржы, што падтрымліваецца.";
+"SETTINGS_PAYMENTS_TRANSFER_OUT_CANNOT_SEND_TO_SELF" = "Вы не можаце перавесці сродкі на свой адрас кашалька Radar. Увядзіце адрас кашалька са свайго ўліковага запісу на біржы, што падтрымліваецца.";
 
 /* Footer of the 'transfer currency out' view in the payment settings. */
 "SETTINGS_PAYMENTS_TRANSFER_OUT_FOOTER" = "Transfer Bitcoin by sending to the Lightning address or invoice provided by the recipient. The address is typically displayed below the QR code.";
@@ -8621,7 +8621,7 @@ Send money securely.";
 "SETTINGS_PAYMENTS_VIEW_PASSPHRASE_TITLE" = "Фраза для аднаўлення";
 
 /* Header text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "Запішыце гэтыя 24 словы па парадку і захавайце іх у надзейным месцы. Вы можаце выкарыстоўваць іх для аднаўлення балансу ў Cake Wallet або іншых Spark-сумяшчальных кашальках.";
+"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "Запішыце гэтыя 12 словы па парадку і захавайце іх у надзейным месцы. Вы можаце выкарыстоўваць іх для аднаўлення балансу ў Cake Wallet або іншых Spark-сумяшчальных кашальках.";
 
 /* Footer text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
 "SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_FOOTER_2" = "Не дзяліцеся гэтай фразай ні з кім";
@@ -8642,7 +8642,7 @@ Send money securely.";
 "SETTINGS_PHONE_NUMBER_DISCOVERABILITY_DISABLED_TOAST" = "Каб змяніць гэту наладу, выберыце «Ніхто» для параметру «Хто можа бачыць мой нумар».";
 
 /* The description for a sheet asking for confirmation that the user wants to set their phone number discoverability to 'nobody'. */
-"SETTINGS_PHONE_NUMBER_DISCOVERABILITY_NOBODY_CONFIRMATION_DESCRIPTION" = "Калі вы ўсталюеце для параметра «Хто можа знайсці мяне па нумары» значэнне «Ніхто», знайсці вас у Signal будзе складаней.";
+"SETTINGS_PHONE_NUMBER_DISCOVERABILITY_NOBODY_CONFIRMATION_DESCRIPTION" = "Калі вы ўсталюеце для параметра «Хто можа знайсці мяне па нумары» значэнне «Ніхто», знайсці вас у Radar будзе складаней.";
 
 /* The title for a sheet asking for confirmation that the user wants to set their phone number discoverability to 'nobody'. */
 "SETTINGS_PHONE_NUMBER_DISCOVERABILITY_NOBODY_CONFIRMATION_TITLE" = "Вы ўпэўнены?";
@@ -8651,7 +8651,7 @@ Send money securely.";
 "SETTINGS_PHONE_NUMBER_DISCOVERABILITY_TITLE" = "Хто можа знайсці мяне па нумары";
 
 /* Description label for Phone Number Privacy */
-"SETTINGS_PHONE_NUMBER_PRIVACY_DESCRIPTION_LABEL" = "Выберыце тых, хто можа бачыць ваш нумар тэлефона і хто можа па ім звязвацца з вамі праз Signal.";
+"SETTINGS_PHONE_NUMBER_PRIVACY_DESCRIPTION_LABEL" = "Выберыце тых, хто можа бачыць ваш нумар тэлефона і хто можа па ім звязвацца з вамі праз Radar.";
 
 /* The title for phone number privacy settings. */
 "SETTINGS_PHONE_NUMBER_PRIVACY_TITLE" = "Нумар тэлефона";
@@ -8663,16 +8663,16 @@ Send money securely.";
 "SETTINGS_PIN_REMINDER_DISABLE_CONFIRMATION_ACTION" = "Адключыць напаміны";
 
 /* The explanation for the dialog asking user to confirm their PIN to disable reminders */
-"SETTINGS_PIN_REMINDER_DISABLE_CONFIRMATION_EXPLANATION" = "Пераканайцеся, што вы запомнілі або надзейна захавалі свой PIN-код, бо яго немагчыма аднавіць. Калі вы забудзеце PIN-код, вы можаце страціць даныя пры паўторнай рэгістрацыі свайго ўліковага запісу Signal.";
+"SETTINGS_PIN_REMINDER_DISABLE_CONFIRMATION_EXPLANATION" = "Пераканайцеся, што вы запомнілі або надзейна захавалі свой PIN-код, бо яго немагчыма аднавіць. Калі вы забудзеце PIN-код, вы можаце страціць даныя пры паўторнай рэгістрацыі свайго ўліковага запісу Radar.";
 
 /* The title for the dialog asking user to confirm their PIN to disable reminders */
-"SETTINGS_PIN_REMINDER_DISABLE_CONFIRMATION_TITLE" = "Пацвердзіць свой PIN-код Signal";
+"SETTINGS_PIN_REMINDER_DISABLE_CONFIRMATION_TITLE" = "Пацвердзіць свой PIN-код Radar";
 
 /* Label for the 'pin reminder' switch of the privacy settings. */
 "SETTINGS_PIN_REMINDER_SWITCH_LABEL" = "Напаміны PIN-кода";
 
 /* Footer for the 'PINs' section of the privacy settings. */
-"SETTINGS_PINS_FOOTER" = "PIN-коды трымаюць інфармацыю, што захоўваецца ў Signal, зашыфраванай, таму толькі вы можаце атрымаць да яе доступ. Ваш PIN-код немагчыма аднавіць. Ваш профіль, налады і кантакты будуць адноўлены, калі вы зробіце паўторнае ўсталяванне Signal.";
+"SETTINGS_PINS_FOOTER" = "PIN-коды трымаюць інфармацыю, што захоўваецца ў Radar, зашыфраванай, таму толькі вы можаце атрымаць да яе доступ. Ваш PIN-код немагчыма аднавіць. Ваш профіль, налады і кантакты будуць адноўлены, калі вы зробіце паўторнае ўсталяванне Radar.";
 
 /* Label for the 'pins' item of the privacy settings when the user does have a pin. */
 "SETTINGS_PINS_ITEM" = "Змяніць свой PIN-код";
@@ -8681,7 +8681,7 @@ Send money securely.";
 "SETTINGS_PINS_ITEM_CREATE" = "Стварыць PIN-код";
 
 /* Title for the 'PINs' section of the privacy settings. */
-"SETTINGS_PINS_TITLE" = "PIN-код Signal";
+"SETTINGS_PINS_TITLE" = "PIN-код Radar";
 
 /* Footer for table section */
 "SETTINGS_PRIVACY_ADVANCED_FOOTER" = "Налады абыходу цэнзуры, проксі, рэтрансляцыі званкоў і прыхаванага адпраўніка.";
@@ -8723,7 +8723,7 @@ Send money securely.";
 "SETTINGS_REGISTRATION_LOCK_TURN_ON_ERROR_PIN_REQUIRED" = "Вам патрэбна стварыць свой PIN-код, каб выкарыстоўваць блакіроўку рэгістрацыі.";
 
 /* Body for the alert confirming that the user wants to turn on registration lock. */
-"SETTINGS_REGISTRATION_LOCK_TURN_ON_MESSAGE" = "Калі пры паўторнай рэгістрацыі ў Signal вы зноў забудзеце свой PIN-код Signal, ваш уліковы запіс будзе заблакаваны на 7 дзён.";
+"SETTINGS_REGISTRATION_LOCK_TURN_ON_MESSAGE" = "Калі пры паўторнай рэгістрацыі ў Radar вы зноў забудзеце свой PIN-код Radar, ваш уліковы запіс будзе заблакаваны на 7 дзён.";
 
 /* Title for the alert confirming that the user wants to turn on registration lock. */
 "SETTINGS_REGISTRATION_LOCK_TURN_ON_TITLE" = "Уключыць блакіроўку рэгістрацыі?";
@@ -8753,19 +8753,19 @@ Send money securely.";
 "SETTINGS_SECTION_TITLE_CALLING" = "Званок";
 
 /* Section footer */
-"SETTINGS_SECURITY_DETAIL" = "Выкарыстаць Touch ID, Face ID або код доступу вашай прылады iOS, каб разблакаваць Signal.";
+"SETTINGS_SECURITY_DETAIL" = "Выкарыстаць Touch ID, Face ID або код доступу вашай прылады iOS, каб разблакаваць Radar.";
 
 /* Section footer */
-"SETTINGS_SECURITY_DETAIL_FACEID" = "Выкарыстаць Face ID, каб разблакаваць Signal.";
+"SETTINGS_SECURITY_DETAIL_FACEID" = "Выкарыстаць Face ID, каб разблакаваць Radar.";
 
 /* Section footer */
-"SETTINGS_SECURITY_DETAIL_OPTICID" = "Выкарыстаць Optic ID, каб разблакіраваць Signal.";
+"SETTINGS_SECURITY_DETAIL_OPTICID" = "Выкарыстаць Optic ID, каб разблакіраваць Radar.";
 
 /* Section footer */
-"SETTINGS_SECURITY_DETAIL_PASSCODE" = "Выкарыстаць код доступу вашай прылады iOS, каб разблакаваць Signal.";
+"SETTINGS_SECURITY_DETAIL_PASSCODE" = "Выкарыстаць код доступу вашай прылады iOS, каб разблакаваць Radar.";
 
 /* Section footer */
-"SETTINGS_SECURITY_DETAIL_TOUCHID" = "Выкарыстаць Touch ID, каб разблакаваць Signal.";
+"SETTINGS_SECURITY_DETAIL_TOUCHID" = "Выкарыстаць Touch ID, каб разблакаваць Radar.";
 
 /* Section header */
 "SETTINGS_SECURITY_TITLE" = "Бяспека праграмы";
@@ -8780,13 +8780,13 @@ Send money securely.";
 "SETTINGS_SHARING_SUGGESTIONS" = "Абагуліць кантакты з iOS";
 
 /* Footer for setting for enabling & disabling contact and notification sharing with iOS. */
-"SETTINGS_SHARING_SUGGESTIONS_NOTIFICATIONS_FOOTER" = "Дазволіць iOS доступ да кантактаў і чатаў Signal для такіх функцый, як прапановы абагуліць і апавяшчэнні.";
+"SETTINGS_SHARING_SUGGESTIONS_NOTIFICATIONS_FOOTER" = "Дазволіць iOS доступ да кантактаў і чатаў Radar для такіх функцый, як прапановы абагуліць і апавяшчэнні.";
 
 /* Label for the 'enable registration lock' switch of the privacy settings. */
 "SETTINGS_TWO_FACTOR_AUTH_SWITCH_LABEL" = "Блакіроўка рэгістрацыі";
 
 /* Footer for the 'two factor auth' section of the privacy settings when Signal PINs are available. */
-"SETTINGS_TWO_FACTOR_PINS_AUTH_FOOTER" = "Патрэбен ваш PIN-код Signal, каб нанова зарэгістраваць ваш нумар тэлефона ў Signal.";
+"SETTINGS_TWO_FACTOR_PINS_AUTH_FOOTER" = "Патрэбен ваш PIN-код Radar, каб нанова зарэгістраваць ваш нумар тэлефона ў Radar.";
 
 /* Label for the 'typing indicators' setting. */
 "SETTINGS_TYPING_INDICATORS" = "Індыкатары набору тэксту";
@@ -8819,7 +8819,7 @@ Send money securely.";
 "SHARE_EXTENSION_LOADING" = "Загрузка…";
 
 /* Message indicating that the share extension cannot be used until the user has registered in the main app. */
-"SHARE_EXTENSION_NOT_REGISTERED_MESSAGE" = "Запусціце праграму Signal, каб зарэгістравацца.";
+"SHARE_EXTENSION_NOT_REGISTERED_MESSAGE" = "Запусціце праграму Radar, каб зарэгістравацца.";
 
 /* Title indicating that the share extension cannot be used until the user has registered in the main app. */
 "SHARE_EXTENSION_NOT_REGISTERED_TITLE" = "Не зарэгістраваны";
@@ -8837,7 +8837,7 @@ Send money securely.";
 "SHARE_EXTENSION_UNABLE_TO_BUILD_ATTACHMENT_ALERT_TITLE" = "Немагчыма падрыхтаваць далучэнне";
 
 /* Title for the 'share extension' view. */
-"SHARE_EXTENSION_VIEW_TITLE" = "Абагуліць з Signal";
+"SHARE_EXTENSION_VIEW_TITLE" = "Абагуліць з Radar";
 
 /* Title of alert indicating sharing suggestions failed to deactivate */
 "SHARING_SUGGESTIONS_DISABLE_ERROR" = "Не атрымалася адключыць прапановы абагулiць.";
@@ -8846,10 +8846,10 @@ Send money securely.";
 "SHOW_THREAD_BUTTON_TITLE" = "Паказаць чат";
 
 /* Shown in the header when the user hasn't provided a custom name for a call. */
-"SIGNAL_CALL" = "Званок Signal";
+"SIGNAL_CALL" = "Званок Radar";
 
 /* body sent to contacts when inviting to Install Signal */
-"SMS_INVITE_BODY" = "Запрашаю вас усталяваць Signal! Вось спасылка:";
+"SMS_INVITE_BODY" = "Запрашаю вас усталяваць Radar! Вось спасылка:";
 
 /* An error message generically indicating that something went wrong. */
 "SOMETHING_WENT_WRONG_ERROR" = "Штосьці не так.";
@@ -8873,7 +8873,7 @@ Send money securely.";
 "SPAM_CAPTCHA_DISMISS_CONFIRMATION_TITLE" = "Працягнуць без праверкі?";
 
 /* Body for action sheet explaining captcha requirement. */
-"SPAM_CAPTCHA_SHEET_BODY" = "Каб прадухіліць спам у Signal, завяршыце праверку.\n\nПасля праверкі вы зможаце працягваць абмен паведамленнямі. Любыя прыпыненыя паведамленні будуць адпраўлены аўтаматычна.";
+"SPAM_CAPTCHA_SHEET_BODY" = "Каб прадухіліць спам у Radar, завяршыце праверку.\n\nПасля праверкі вы зможаце працягваць абмен паведамленнямі. Любыя прыпыненыя паведамленні будуць адпраўлены аўтаматычна.";
 
 /* Title for action sheet explaining captcha requirement. */
 "SPAM_CAPTCHA_SHEET_TITLE" = "Прайдзіце праверку, каб працягнуць абмен паведамленнямі";
@@ -8909,7 +8909,7 @@ Send money securely.";
 "STICKERS_INSTALL_BUTTON" = "Усталяваць";
 
 /* Title for the 'available built-in stickers' section of the 'manage stickers' view. */
-"STICKERS_MANAGE_VIEW_AVAILABLE_BUILT_IN_PACKS_SECTION_TITLE" = "Стыкеры ад мастакоў Signal";
+"STICKERS_MANAGE_VIEW_AVAILABLE_BUILT_IN_PACKS_SECTION_TITLE" = "Стыкеры ад мастакоў Radar";
 
 /* Title for the 'available known stickers' section of the 'manage stickers' view. */
 "STICKERS_MANAGE_VIEW_AVAILABLE_KNOWN_PACKS_SECTION_TITLE" = "Атрыманыя вамі стыкеры";
@@ -9191,19 +9191,19 @@ Send money securely.";
 "STORY_SETTINGS_LEARN_MORE_SHEET_FOOTER" = "Вашы кантакты змогуць бачыць вашы імя і фота, а таксама кантэнт, што вы адпраўляеце ў «Маю гісторыю», пакуль вы не схаваеце гэта ад іх.";
 
 /* Header for the explainer sheet for signal connections */
-"STORY_SETTINGS_LEARN_MORE_SHEET_HEADER_FORMAT" = "<bold>Кантакты Signal</bold> — гэта людзі, якім вы вырашылі давяраць адным з наступных спосабаў:";
+"STORY_SETTINGS_LEARN_MORE_SHEET_HEADER_FORMAT" = "<bold>Кантакты Radar</bold> — гэта людзі, якім вы вырашылі давяраць адным з наступных спосабаў:";
 
 /* Label for the stories section of the settings view */
 "STORY_SETTINGS_TITLE" = "Гісторыі";
 
 /* Section footer for the 'viewers' section on the 'story settings' view */
-"STORY_SETTINGS_WHO_CAN_VIEW_THIS_FOOTER" = "Выберыце тых з вашых кантактаў Signal, хто можа бачыць вашу гісторыю. Змянення не закрануць гісторый, што вы ўжо адправілі.";
+"STORY_SETTINGS_WHO_CAN_VIEW_THIS_FOOTER" = "Выберыце тых з вашых кантактаў Radar, хто можа бачыць вашу гісторыю. Змянення не закрануць гісторый, што вы ўжо адправілі.";
 
 /* Section header for the 'viewers' section on the 'story settings' view */
 "STORY_SETTINGS_WHO_CAN_VIEW_THIS_HEADER" = "Хто можа прагледзець гэту гісторыю";
 
 /* Header for the 'viewers' section on the 'story settings' bottom sheet */
-"STORY_SETTINGS_WHO_CAN_VIEW_THIS_SHEET_HEADER" = "Выберыце тых з вашых кантактаў Signal, хто можа бачыць вашу гісторыю. Вы можаце ў любы момант змяніць гэта ў наладах канфідэнцыйнасці.";
+"STORY_SETTINGS_WHO_CAN_VIEW_THIS_SHEET_HEADER" = "Выберыце тых з вашых кантактаў Radar, хто можа бачыць вашу гісторыю. Вы можаце ў любы момант змяніць гэта ў наладах канфідэнцыйнасці.";
 
 /* Tooltip text shown when the user selects a story as a destination for a long duration video that will be split into shorter segments. Embeds {{ segment duration in seconds }} */
 "STORY_VIDEO_SEGMENTATION_TOOLTIP_FORMAT" = "Відэа, што адпраўлены ў Гісторыі, будуць скарочаны да %1$d-сек кліпаў і адпраўлены як шэраг гісторый.";
@@ -9242,7 +9242,7 @@ Send money securely.";
 "SUPPORT_EMAIL_DEFAULT_DESCRIPTION" = "Паведайце нам аб праблеме: ";
 
 /* Message for alert dialog presented when a support email failed to send */
-"SUPPORT_EMAIL_ERROR_ALERT_DESCRIPTION" = "Вы можаце адправіць свой запыт на support@signal.org";
+"SUPPORT_EMAIL_ERROR_ALERT_DESCRIPTION" = "Вы можаце адправіць свой запыт на support@radar.chat";
 
 /* Localized label for support request email filter string. Embeds {{filter text}}. */
 "SUPPORT_EMAIL_FILTER_LABEL_FORMAT" = "Фільтр: %1$@";
@@ -9266,7 +9266,7 @@ Send money securely.";
 "SUPPORT_EMAIL_LOG_URL_LABEL_FORMAT" = "URL журнала: %1$@";
 
 /* Localized subject for support request emails */
-"SUPPORT_EMAIL_SUBJECT" = "Запыт падтрымкі Signal iOS";
+"SUPPORT_EMAIL_SUBJECT" = "Запыт падтрымкі Radar iOS";
 
 /* Header for emoji mood selection */
 "SUPPORT_EMOJI_PROMPT" = "Як вы сябе адчуваеце? (неабавязкова)";
@@ -9338,7 +9338,7 @@ Send money securely.";
 "SWITCH_ON" = "Укл.";
 
 /* Name to display for the 'system' sender, e.g. for release notes and the onboarding story */
-"SYSTEM_ADDRESS_NAME" = "Signal";
+"SYSTEM_ADDRESS_NAME" = "Radar";
 
 /* Label for button to verify a user's safety number. */
 "SYSTEM_MESSAGE_ACTION_VERIFY_SAFETY_NUMBER" = "Праверыць";
@@ -9497,16 +9497,16 @@ Send money securely.";
 "TIME_AMOUNT_WEEKS_SHORT_FORMAT" = "%1$@ т";
 
 /* Button for bottom sheet shown when device transfer completes on the receiving device. Tapping will terminate the Signal app and trigger a notification to relaunch. */
-"TRANSFER_COMPLETE_SHEET_BUTTON" = "Закрыць Signal";
+"TRANSFER_COMPLETE_SHEET_BUTTON" = "Закрыць Radar";
 
 /* Subtitle for bottom sheet shown when device transfer completes on the receiving device. */
-"TRANSFER_COMPLETE_SHEET_SUBTITLE" = "Закрыйце Signal і адкрыйце яго нанова, каб пачаць выкарыстоўваць свой уліковы запіс на гэтай прыладзе.";
+"TRANSFER_COMPLETE_SHEET_SUBTITLE" = "Закрыйце Radar і адкрыйце яго нанова, каб пачаць выкарыстоўваць свой уліковы запіс на гэтай прыладзе.";
 
 /* Title for bottom sheet shown when device transfer completes on the receiving device. */
 "TRANSFER_COMPLETE_SHEET_TITLE" = "Перанос завершаны";
 
 /* Notification prompting the user to relaunch Signal after a device transfer completed. */
-"TRANSFER_RELAUNCH_NOTIFICATION" = "Адкрыйце Signal, каб распачаць абмен паведамленнямі";
+"TRANSFER_RELAUNCH_NOTIFICATION" = "Адкрыйце Radar, каб распачаць абмен паведамленнямі";
 
 /* Label for the cancel button in an alert or action sheet. */
 "TXT_CANCEL_TITLE" = "Скасаваць";
@@ -9524,25 +9524,25 @@ Send money securely.";
 "UNKNOWN_CONTACT_BLOCK_OFFER" = "Карыстальніка няма ў вашых кантактах. Жадаеце заблакаваць гэтага карыстальніка?";
 
 /* Info message recorded in conversation history when local user receives an unknown message from a linked device and needs to upgrade. */
-"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_FROM_LINKED_DEVICE" = "Адна з вашых прылад адправіла паведамленне, якое не можа быць апрацавана або паказана тут, таму што яно выкарыстоўвае новую функцыю Signal.";
+"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_FROM_LINKED_DEVICE" = "Адна з вашых прылад адправіла паведамленне, якое не можа быць апрацавана або паказана тут, таму што яно выкарыстоўвае новую функцыю Radar.";
 
 /* Info message recorded in conversation history when local user receives an unknown message and needs to upgrade. Embeds {{user's name or phone number}}. */
-"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_WITH_NAME_FORMAT" = "Карыстальнік %1$@ адправіў вам паведамленне, якое не можа быць апрацавана або паказана, таму што яно выкарыстоўвае новую функцыю Signal.";
+"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_WITH_NAME_FORMAT" = "Карыстальнік %1$@ адправіў вам паведамленне, якое не можа быць апрацавана або паказана, таму што яно выкарыстоўвае новую функцыю Radar.";
 
 /* Info message recorded in conversation history when local user receives an unknown message and needs to upgrade. */
-"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_WITHOUT_NAME" = "Вы атрымалі паведамленне, якое не можа быць апрацавана або паказана, таму што яно выкарыстоўвае новую функцыю Signal.";
+"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_WITHOUT_NAME" = "Вы атрымалі паведамленне, якое не можа быць апрацавана або паказана, таму што яно выкарыстоўвае новую функцыю Radar.";
 
 /* Label for button that lets users upgrade the app. */
-"UNKNOWN_PROTOCOL_VERSION_UPGRADE_BUTTON" = "Абнавіць Signal зараз";
+"UNKNOWN_PROTOCOL_VERSION_UPGRADE_BUTTON" = "Абнавіць Radar зараз";
 
 /* Info message recorded in conversation history when local user has received an unknown unknown message from a linked device and has upgraded. */
-"UNKNOWN_PROTOCOL_VERSION_UPGRADE_COMPLETE_FROM_LINKED_DEVICE" = "Зроблена абнаўленне да апошняй версіі Signal. Цяпер вы можаце атрымліваць гэты тып паведамленняў на сваёй прыладзе.";
+"UNKNOWN_PROTOCOL_VERSION_UPGRADE_COMPLETE_FROM_LINKED_DEVICE" = "Зроблена абнаўленне да апошняй версіі Radar. Цяпер вы можаце атрымліваць гэты тып паведамленняў на сваёй прыладзе.";
 
 /* Info message recorded in conversation history when local user has received an unknown message and has upgraded. Embeds {{user's name or phone number}}. */
-"UNKNOWN_PROTOCOL_VERSION_UPGRADE_COMPLETE_WITH_NAME_FORMAT" = "Вы можаце папрасіць %1$@ адправіць паўторна гэта паведамленне, калі вы выкарыстоўваеце апошнюю версію Signal.";
+"UNKNOWN_PROTOCOL_VERSION_UPGRADE_COMPLETE_WITH_NAME_FORMAT" = "Вы можаце папрасіць %1$@ адправіць паўторна гэта паведамленне, калі вы выкарыстоўваеце апошнюю версію Radar.";
 
 /* Info message recorded in conversation history when local user has received an unknown message and has upgraded. */
-"UNKNOWN_PROTOCOL_VERSION_UPGRADE_COMPLETE_WITHOUT_NAME" = "Вы можаце папрасіць адпраўніка адправіць паўторна гэта паведамленне, калі вы выкарыстоўваеце апошнюю версію Signal.";
+"UNKNOWN_PROTOCOL_VERSION_UPGRADE_COMPLETE_WITHOUT_NAME" = "Вы можаце папрасіць адпраўніка адправіць паўторна гэта паведамленне, калі вы выкарыстоўваеце апошнюю версію Radar.";
 
 /* Label indicating an unknown user. */
 "UNKNOWN_USER" = "Невядома";
@@ -9566,13 +9566,13 @@ Send money securely.";
 "UNLINK_CONFIRMATION_ALERT_TITLE" = "Адвязаць «%1$@»?";
 
 /* Label warning the user that they have been unlinked from their primary device. */
-"UNLINKED_WARNING" = "Гэтая прылада больш не звязаная. Паўторна звязаць Signal да свайго тэлефона, каб працягнуць абмен паведамленнямі.";
+"UNLINKED_WARNING" = "Гэтая прылада больш не звязаная. Паўторна звязаць Radar да свайго тэлефона, каб працягнуць абмен паведамленнямі.";
 
 /* If this device has become unlinked from their primary device, they'll see a warning. This is the call to action on that warning. */
 "UNLINKED_WARNING_ACTION_TITLE" = "Звязаць прыладу нанова";
 
 /* Alert title when unlinking device fails */
-"UNLINKING_FAILED_ALERT_TITLE" = "Signal не атрымалася адвязаць прыладу.";
+"UNLINKING_FAILED_ALERT_TITLE" = "Radar не атрымалася адвязаць прыладу.";
 
 /* Text for a toast confirming that the mic has been unmuted for a call. */
 "UNMUTE_CONFIRMATION_TOAST_LABEL" = "Мікрафон уключаны";
@@ -9593,7 +9593,7 @@ Send money securely.";
 "UNSUPPORTED_FEATURE_ERROR" = "Ваша прылада не падтрымлівае гэтую функцыю.";
 
 /* Description for the unverified safety number change. Embeds {name of contact with identity change} */
-"UNVERIFIED_SAFETY_NUMBER_CHANGE_DESCRIPTION_FORMAT" = "Ваш код бяспекі з карыстальнікам %1$@ змяніўся, верагодна, таму што ён нанова ўсталяваў Signal або змяніў прылады. Націсніце «Праверыць», каб пацвердзіць новы код бяспекі. Але ж гэта неабавязкова.";
+"UNVERIFIED_SAFETY_NUMBER_CHANGE_DESCRIPTION_FORMAT" = "Ваш код бяспекі з карыстальнікам %1$@ змяніўся, верагодна, таму што ён нанова ўсталяваў Radar або змяніў прылады. Націсніце «Праверыць», каб пацвердзіць новы код бяспекі. Але ж гэта неабавязкова.";
 
 /* Action to verify a safety number after it has changed */
 "UNVERIFIED_SAFETY_NUMBER_VERIFY_ACTION" = "Праверыць";
@@ -9611,7 +9611,7 @@ Send money securely.";
 "USE_PROXY_BUTTON" = "Выкарыстоўваць проксі";
 
 /* Explanation of when you should use a signal proxy */
-"USE_PROXY_EXPLANATION" = "Выкарыстоўвайце проксі, толькі калі немагчыма падключыцца да Signal праз мабільныя даныя або Wi-Fi.";
+"USE_PROXY_EXPLANATION" = "Выкарыстоўвайце проксі, толькі калі немагчыма падключыцца да Radar праз мабільныя даныя або Wi-Fi.";
 
 /* Description of username links and QR codes on the username education sheet */
 "USERNAME_EDUCATION_LINK_DESCRIPTION" = "Імя карыстальніка мае ўнікальны QR-код і спасылку, якія вы можаце абагуліць з сябрамі і хутка распачаць з імі чат.";
@@ -9704,7 +9704,7 @@ Send money securely.";
 "USERNAME_LOOKUP_LINK_NO_LONGER_VALID_MESSAGE" = "Гэта спасылка на імя карыстальніка больш не сапраўдная.";
 
 /* A message indicating that the given username is not associated with a registered Signal account. Embeds {{ a username }}. */
-"USERNAME_LOOKUP_NOT_FOUND_MESSAGE_FORMAT" = "%1$@ не карыстальнік Signal. Праверце, ці вы ўвялі поўнае імя карыстальніка.";
+"USERNAME_LOOKUP_NOT_FOUND_MESSAGE_FORMAT" = "%1$@ не карыстальнік Radar. Праверце, ці вы ўвялі поўнае імя карыстальніка.";
 
 /* Title for an action sheet indicating that the given username is not associated with a registered Signal account. */
 "USERNAME_LOOKUP_NOT_FOUND_TITLE" = "Карыстальнік не знойдзены";
@@ -9728,7 +9728,7 @@ Send money securely.";
 "USERNAME_ONBOARDING_TITLE" = "Your Username";
 
 /* Instructions that appear below the username QR code on a sharable exported image. */
-"USERNAME_QR_CODE_EXPORT_INSTRUCTIONS" = "Праскануйце гэты QR-код з дапамогай свайго тэлефона, каб размаўляць са мной у Signal.";
+"USERNAME_QR_CODE_EXPORT_INSTRUCTIONS" = "Праскануйце гэты QR-код з дапамогай свайго тэлефона, каб размаўляць са мной у Radar.";
 
 /* A message in a toast informing the user their username, link, and QR code have successfully been reset. Embeds {{ the user's new username }}. */
 "USERNAME_RESET_SUCCESSFUL_TOAST" = "Ваш QR-код і спасылка былі скінуты, i ваша імя карыстальніка %1$@";

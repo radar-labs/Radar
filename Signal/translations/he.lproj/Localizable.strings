@@ -2,7 +2,7 @@
 "AB_PERMISSION_MISSING_ACTION_NOT_NOW" = "לא עכשיו";
 
 /* Title for the 'about' help section */
-"ABOUT_SECTION_TITLE" = "אודות Signal";
+"ABOUT_SECTION_TITLE" = "אודות Radar";
 
 /* Accessibility label for attachment. */
 "ACCESSIBILITY_LABEL_ATTACHMENT" = "צרופה";
@@ -32,7 +32,7 @@
 "ACCOUNT_DATA_REPORT_CONFIRM_EXPORT_CONFIRM_BUTTON" = "יצוא דוח";
 
 /* Users can request a report of their account data. Before they get their account export, they are warned to only share account data with trustworthy sources. This is the message on that warning. */
-"ACCOUNT_DATA_REPORT_CONFIRM_EXPORT_MESSAGE" = "כדאי לשתף את נתוני חשבון Signal שלך רק עם אנשים או אפליקציות שבוטחים בהם.";
+"ACCOUNT_DATA_REPORT_CONFIRM_EXPORT_MESSAGE" = "כדאי לשתף את נתוני חשבון Radar שלך רק עם אנשים או אפליקציות שבוטחים בהם.";
 
 /* Users can request a report of their account data. If this request fails (probably because of a network connection problem), they will see an error sheet. This is the message on that error. */
 "ACCOUNT_DATA_REPORT_ERROR_MESSAGE" = "כדאי לבדוק את החיבור שלך ולנסות שוב.";
@@ -56,16 +56,16 @@
 "ACCOUNT_DATA_REPORT_EXPORT_REPORT_BUTTON" = "יצוא דוח";
 
 /* Users can request a report of their account data. This text appears at the bottom of this screen, offering more information. */
-"ACCOUNT_DATA_REPORT_FOOTER" = "הדוח שלך נוצר רק בזמן הייצוא ואינו מאוחסן על ידי Signal במכשיר שלך.";
+"ACCOUNT_DATA_REPORT_FOOTER" = "הדוח שלך נוצר רק בזמן הייצוא ואינו מאוחסן על ידי Radar במכשיר שלך.";
 
 /* Users can request a report of their account data. This is the subtitle on the screen where they do this, giving them more information. */
-"ACCOUNT_DATA_REPORT_SUBTITLE" = "אפשר להוריד ולייצא דוח של נתוני חשבון Signal שלך. הדוח הזה לא כולל הודעות או מדיה.";
+"ACCOUNT_DATA_REPORT_SUBTITLE" = "אפשר להוריד ולייצא דוח של נתוני חשבון Radar שלך. הדוח הזה לא כולל הודעות או מדיה.";
 
 /* Users can request a report of their account data. This is the title on the screen where they do this. */
 "ACCOUNT_DATA_REPORT_TITLE" = "נתוני החשבון שלך";
 
 /* Label for 'invite' button in contact view. */
-"ACTION_INVITE" = "הזמן אל Signal";
+"ACTION_INVITE" = "הזמן אל Radar";
 
 /* Label for button that lets you send a message to a contact. */
 "ACTION_SEND_MESSAGE" = "שלח הודעה";
@@ -83,7 +83,7 @@
 "ACTION_VIDEO_CALL" = "שיחת וידאו";
 
 /* Label for 'voice call' button in contact view. */
-"ACTION_VOICE_CALL" = "שיחת Signal";
+"ACTION_VOICE_CALL" = "שיחת Radar";
 
 /* The title for the 'add group members' view. */
 "ADD_GROUP_MEMBERS_VIEW_TITLE" = "הוסף חברי קבוצה";
@@ -197,46 +197,46 @@
 "ALL_MEDIA_THUMBNAIL_LABEL_VIDEO" = "סרטון";
 
 /* Title for the view of all your signal connections */
-"ALL_SIGNAL_CONNECTIONS_TITLE" = "כל חברי ה–Signal";
+"ALL_SIGNAL_CONNECTIONS_TITLE" = "כל חברי ה–Radar";
 
 /* notification body */
 "APN_Message" = "ייתכן שיש לך הודעות חדשות";
 
 /* Default message for the 'app launch failed' alert. */
-"APP_LAUNCH_FAILURE_ALERT_MESSAGE" = "Signal אינו יכול להיות מופעל. אנא שלח יומן ניפוי תקלים אל support@signal.org כך שנוכל לפתור סוגייה זו.";
+"APP_LAUNCH_FAILURE_ALERT_MESSAGE" = "Radar אינו יכול להיות מופעל. אנא שלח יומן ניפוי תקלים אל support@radar.chat כך שנוכל לפתור סוגייה זו.";
 
 /* Button to try launching the app even though the last launch failed */
-"APP_LAUNCH_FAILURE_CONTINUE" = "פתח את Signal במקום";
+"APP_LAUNCH_FAILURE_CONTINUE" = "פתח את Radar במקום";
 
 /* Message for an error indicating that the app couldn't launch because some unexpected error happened with the user's registration status. */
-"APP_LAUNCH_FAILURE_CORRUPT_REGISTRATION_MESSAGE" = "מומלץ לשלוח יומן ניפוי באגים ל–support@signal.org כדי שנוכל לטפל בבעיה.";
+"APP_LAUNCH_FAILURE_CORRUPT_REGISTRATION_MESSAGE" = "מומלץ לשלוח יומן ניפוי באגים ל–support@radar.chat כדי שנוכל לטפל בבעיה.";
 
 /* Title for an error indicating that the app couldn't launch because some unexpected error happened with the user's registration status. */
-"APP_LAUNCH_FAILURE_CORRUPT_REGISTRATION_TITLE" = "פתיחת Signal נכשלה";
+"APP_LAUNCH_FAILURE_CORRUPT_REGISTRATION_TITLE" = "פתיחת Radar נכשלה";
 
 /* Error indicating that the app could not launch because the database could not be loaded. */
 "APP_LAUNCH_FAILURE_COULD_NOT_LOAD_DATABASE" = "לא היה ניתן לטעון מסד נתונים";
 
 /* Error indicating that the app could not launch without reverting unknown database migrations. */
-"APP_LAUNCH_FAILURE_INVALID_DATABASE_VERSION_MESSAGE" = "אנא שדרג אל הגרסה האחרונה של Signal.";
+"APP_LAUNCH_FAILURE_INVALID_DATABASE_VERSION_MESSAGE" = "אנא שדרג אל הגרסה האחרונה של Radar.";
 
 /* Error indicating that the app could not launch without reverting unknown database migrations. */
 "APP_LAUNCH_FAILURE_INVALID_DATABASE_VERSION_TITLE" = "גרסת מסד נתונים בלתי ידועה.";
 
 /* Error indicating that the app crashed during the previous launch. */
-"APP_LAUNCH_FAILURE_LAST_LAUNCH_CRASHED_MESSAGE" = "אל Signal הייתה בעיה בזמן ניסיון לפתוח. אנא שלח יומן ניפוי תקלים אל support@signal.org כדי לעזור לפתור את הסוגייה הזו.";
+"APP_LAUNCH_FAILURE_LAST_LAUNCH_CRASHED_MESSAGE" = "אל Radar הייתה בעיה בזמן ניסיון לפתוח. אנא שלח יומן ניפוי תקלים אל support@radar.chat כדי לעזור לפתור את הסוגייה הזו.";
 
 /* Error indicating that the app crashed during the previous launch. */
-"APP_LAUNCH_FAILURE_LAST_LAUNCH_CRASHED_TITLE" = "לא היה ניתן לפתוח את Signal";
+"APP_LAUNCH_FAILURE_LAST_LAUNCH_CRASHED_TITLE" = "לא היה ניתן לפתוח את Radar";
 
 /* Error description indicating that the app crashed because there was low storage space available on the device. */
-"APP_LAUNCH_FAILURE_LOW_STORAGE_SPACE_AVAILABLE_MESSAGE" = "Signal לא יכול להיפתח כי למכשיר שלך אין מספיק נפח אחסון פנוי. כדי להשתמש ב-Signal, צריך לפנות מקום על ידי ניהול האחסון שלך באזור ההגדרות.";
+"APP_LAUNCH_FAILURE_LOW_STORAGE_SPACE_AVAILABLE_MESSAGE" = "Radar לא יכול להיפתח כי למכשיר שלך אין מספיק נפח אחסון פנוי. כדי להשתמש ב-Radar, צריך לפנות מקום על ידי ניהול האחסון שלך באזור ההגדרות.";
 
 /* Error title indicating that the app crashed because there was low storage space available on the device. */
 "APP_LAUNCH_FAILURE_LOW_STORAGE_SPACE_AVAILABLE_TITLE" = "נפח אחסון נמוך";
 
 /* Error indicating that the app could not restore transferred data. */
-"APP_LAUNCH_FAILURE_RESTORE_FAILED_MESSAGE" = "לא הצלחנו לשחזר את הנתונים שהועברו מהמכשיר הישן שלכם. אנא שלחו יומן ניפוי באגים ל–support@signal.org כדי שנוכל לפתור בעיה זו. אם תתקינו מחדש את Signal, היסטוריית ההודעות שלכם תאבד.";
+"APP_LAUNCH_FAILURE_RESTORE_FAILED_MESSAGE" = "לא הצלחנו לשחזר את הנתונים שהועברו מהמכשיר הישן שלכם. אנא שלחו יומן ניפוי באגים ל–support@radar.chat כדי שנוכל לפתור בעיה זו. אם תתקינו מחדש את Radar, היסטוריית ההודעות שלכם תאבד.";
 
 /* Error indicating that the app could not restore transferred data. */
 "APP_LAUNCH_FAILURE_RESTORE_FAILED_TITLE" = "לא היה ניתן להשלים את ההעברה";
@@ -260,7 +260,7 @@
 "APP_UPDATE_NAG_ALERT_MESSAGE_FORMAT" = "גרסה %1$@ זמינה כעת להורדה מחנות האפליקציות";
 
 /* Title for the 'new app version available' alert. */
-"APP_UPDATE_NAG_ALERT_TITLE" = "גרסה חדשה של Signal זמינה";
+"APP_UPDATE_NAG_ALERT_TITLE" = "גרסה חדשה של Radar זמינה";
 
 /* Label for the 'update' button in the 'new app version available' alert. */
 "APP_UPDATE_NAG_ALERT_UPDATE_BUTTON" = "עדכן";
@@ -410,7 +410,7 @@
 "ATTACHMENT_KEYBOARD_GIF" = "GIF";
 
 /* Text in chat attachment panel when Signal only has access to some photos/videos. This string is in a compact horizontal space, so it should be short if possible. */
-"ATTACHMENT_KEYBOARD_LIMITED_ACCESS" = "ל–Signal יש גישה מוגבלת לתמונות";
+"ATTACHMENT_KEYBOARD_LIMITED_ACCESS" = "ל–Radar יש גישה מוגבלת לתמונות";
 
 /* A button to select a location from the Attachment Keyboard */
 "ATTACHMENT_KEYBOARD_LOCATION" = "מיקום";
@@ -422,7 +422,7 @@
 "ATTACHMENT_KEYBOARD_NO_MEDIA_TITLE" = "אין תמונות או סרטונים";
 
 /* Text in chat attachment panel explaining that user needs to give Signal permission to access photos. */
-"ATTACHMENT_KEYBOARD_NO_PHOTO_ACCESS" = "ל–Signal אין גישה לתמונות או לסרטונים שלך. כדי לאפשר גישה, יש לפתוח את ההגדרות וללחוץ על ׳תמונות׳";
+"ATTACHMENT_KEYBOARD_NO_PHOTO_ACCESS" = "ל–Radar אין גישה לתמונות או לסרטונים שלך. כדי לאפשר גישה, יש לפתוח את ההגדרות וללחוץ על ׳תמונות׳";
 
 /* Button in chat attachment panel to let user open Settings app and give Signal persmission to access photos. */
 "ATTACHMENT_KEYBOARD_OPEN_SETTINGS" = "פתיחת הגדרות";
@@ -527,7 +527,7 @@
 "BACKUP_ENABLEMENT_REMINDER_MEGAPHONE_ACTION" = "הפעל";
 
 /* Body for Backup enablement reminder megaphone */
-"BACKUP_ENABLEMENT_REMINDER_MEGAPHONE_BODY" = "ככה, לא מאבדים אף הודעה כשמחליפים טלפון או מתקינים מחדש את Signal.";
+"BACKUP_ENABLEMENT_REMINDER_MEGAPHONE_BODY" = "ככה, לא מאבדים אף הודעה כשמחליפים טלפון או מתקינים מחדש את Radar.";
 
 /* Title for Backup enablement reminder megaphone */
 "BACKUP_ENABLEMENT_REMINDER_MEGAPHONE_TITLE" = "הפעלת גיבויים מוצפנים";
@@ -569,7 +569,7 @@
 "BACKUP_ONBOARDING_CANCEL_SHEET_TITLE" = "לצאת מהגדרת גיבוי?";
 
 /* Body for a sheet warning users to their 'Recovery Key' safe. */
-"BACKUP_ONBOARDING_CONFIRM_KEY_KEEP_KEY_SAFE_SHEET_BODY" = "Signal לא תוכל לעזור לך לשחזר את הגיבוי שלך אם איבדת את המפתח שלך. חשוב לאחסן אותו במקום בטוח ומאובטח, ולא לשתף אותו עם אחרים.";
+"BACKUP_ONBOARDING_CONFIRM_KEY_KEEP_KEY_SAFE_SHEET_BODY" = "Radar לא תוכל לעזור לך לשחזר את הגיבוי שלך אם איבדת את המפתח שלך. חשוב לאחסן אותו במקום בטוח ומאובטח, ולא לשתף אותו עם אחרים.";
 
 /* Title for a sheet warning users to their 'Recovery Key' safe. */
 "BACKUP_ONBOARDING_CONFIRM_KEY_KEEP_KEY_SAFE_SHEET_TITLE" = "יש לשמור על בטיחות המפתח שלך";
@@ -596,10 +596,10 @@
 "BACKUP_ONBOARDING_INTRO_NOT_NOW_TOAST" = "אפשר להפעיל גיבויים בהגדרות.";
 
 /* Subtitle for a view introducing Backups during an onboarding flow. */
-"BACKUP_ONBOARDING_INTRO_SUBTITLE" = "אפשר לגבות את ההודעות והמדיה ששלך באמצעות שירות האחסון המאובטח המוצפן מקצה לקצה של Signal. ככה, לא מאבדים אף הודעה כשמחליפים טלפון או מתקינים מחדש את Signal.";
+"BACKUP_ONBOARDING_INTRO_SUBTITLE" = "אפשר לגבות את ההודעות והמדיה ששלך באמצעות שירות האחסון המאובטח המוצפן מקצה לקצה של Radar. ככה, לא מאבדים אף הודעה כשמחליפים טלפון או מתקינים מחדש את Radar.";
 
 /* Title for a view introducing Backups during an onboarding flow. */
-"BACKUP_ONBOARDING_INTRO_TITLE" = "גיבויים מאובטחים של Signal";
+"BACKUP_ONBOARDING_INTRO_TITLE" = "גיבויים מאובטחים של Radar";
 
 /* Text for a bullet point in a view introducing the 'Recovery Key' during an onboarding flow. */
 "BACKUP_ONBOARDING_KEY_INTRO_BULLET_1" = "מפתח השחזור שלך הוא קוד בן 64 ספרות שנדרש כדי לשחזר את הגיבוי שלך.";
@@ -617,10 +617,10 @@
 "BACKUP_ONBOARDING_KEY_INTRO_TITLE" = "מפתח שחזור";
 
 /* Body for a sheet shown when your Backup plan is downgraded. */
-"BACKUP_PLAN_DOWNGRADED_SHEET_BODY" = "מנוי הגיבויים שלך פג תוקף כי לא היה ניתן לחדש אותו עם אמצעי התשלום שלך.\n\nכדי להמשיך לגבות מדיה, אפשר לעשות מנוי חדש. תמשיך להיות לך גישה לתכנית גיבויי Signal החינמית.";
+"BACKUP_PLAN_DOWNGRADED_SHEET_BODY" = "מנוי הגיבויים שלך פג תוקף כי לא היה ניתן לחדש אותו עם אמצעי התשלום שלך.\n\nכדי להמשיך לגבות מדיה, אפשר לעשות מנוי חדש. תמשיך להיות לך גישה לתכנית גיבויי Radar החינמית.";
 
 /* Body for a sheet shown when your Backup plan is downgraded because you stopped using TestFlight. */
-"BACKUP_PLAN_DOWNGRADED_SHEET_BODY_TESTFLIGHT" = "מנוי הגיבויים שלך פג תוקף כי אינך משתמש/ת יותר ב–TestFlight.\n\nכדי להמשיך לגבות מדיה, אפשר לעשות מנוי חדש. תמשיך להיות לך גישה לתכנית גיבויי Signal החינמית.";
+"BACKUP_PLAN_DOWNGRADED_SHEET_BODY_TESTFLIGHT" = "מנוי הגיבויים שלך פג תוקף כי אינך משתמש/ת יותר ב–TestFlight.\n\nכדי להמשיך לגבות מדיה, אפשר לעשות מנוי חדש. תמשיך להיות לך גישה לתכנית גיבויי Radar החינמית.";
 
 /* Primary button for a sheet shown when your Backup plan is downgraded. */
 "BACKUP_PLAN_DOWNGRADED_SHEET_PRIMARY_BUTTON" = "ניהול גיבויים";
@@ -650,7 +650,7 @@
 "BACKUP_RESTORE_MODAL_TITLE" = "משחזרים הודעות…";
 
 /* Message describing that the Background App Refresh permission is disabled for Signal. \"Background App Refresh\" should be localized the same way it is in iOS Settings app permissions. */
-"BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_MESSAGE" = "גיבויים אוטומטיים מושבתים. אפשר להפעיל גיבויים אוטומטיים על ידי עדכון ההרשאות של Signal.";
+"BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_MESSAGE" = "גיבויים אוטומטיים מושבתים. אפשר להפעיל גיבויים אוטומטיים על ידי עדכון ההרשאות של Radar.";
 
 /* Add-on to a message describing that the Background App Refresh permission is disabled for Signal. \"Background App Refresh\" should be localized the same way it is in iOS Settings app permissions. */
 "BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_MESSAGE_UPDATE_NOW" = "עדכון כעת";
@@ -659,7 +659,7 @@
 "BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_SHEET_GO_TO_SETTINGS_BUTTON" = "לך אל הגדרות";
 
 /* Message for a sheet warning the user about the Background App Refresh permission. \"Background App Refresh\" should be localized the same way it is in iOS Settings app permissions. */
-"BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_SHEET_MESSAGE" = "כדי לאפשר ל–Signal לגבות אוטומטית את ההודעות שלך, יש ללחוץ על ״מעבר להגדרות״ למטה ולהפעיל את האפשרות ״רענון אפליקציות ברקע״";
+"BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_SHEET_MESSAGE" = "כדי לאפשר ל–Radar לגבות אוטומטית את ההודעות שלך, יש ללחוץ על ״מעבר להגדרות״ למטה ולהפעיל את האפשרות ״רענון אפליקציות ברקע״";
 
 /* Title for a sheet warning the user about the Background App Refresh permission. \"Background App Refresh\" should be localized the same way it is in iOS Settings app permissions. */
 "BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_SHEET_TITLE" = "גיבויים אוטומטיים מושבתים";
@@ -746,7 +746,7 @@
 "BACKUP_SETTINGS_BACKUP_PLAN_PAID_BUT_IAP_NOT_FOUND_LOCALLY_ACTION_BUTTON_TITLE" = "חידוש";
 
 /* Text describing that the user's paid backup plan did not correspond to a App Store subscription on this device. */
-"BACKUP_SETTINGS_BACKUP_PLAN_PAID_BUT_IAP_NOT_FOUND_LOCALLY_DESCRIPTION" = "המנוי שלך לא נמצא במכשיר זה. יש לחדש כדי להמשיך להשתמש בגיבויי Signal.";
+"BACKUP_SETTINGS_BACKUP_PLAN_PAID_BUT_IAP_NOT_FOUND_LOCALLY_DESCRIPTION" = "המנוי שלך לא נמצא במכשיר זה. יש לחדש כדי להמשיך להשתמש בגיבויי Radar.";
 
 /* Header describing what the paid backup plan includes. */
 "BACKUP_SETTINGS_BACKUP_PLAN_PAID_HEADER" = "גיבוי טקסט + כל המדיה";
@@ -758,16 +758,16 @@
 "BACKUP_SETTINGS_BACKUP_PLAN_PAID_RENEWAL_FORMAT" = "מתחדש ב–%1$@";
 
 /* Footer for a menu section related to settings for when Backups are disabled. */
-"BACKUP_SETTINGS_BACKUPS_DISABLED_SECTION_FOOTER" = "הגיבויים הושבתו והנתונים שלך נמחקו משירות האחסון המאובטח של Signal.";
+"BACKUP_SETTINGS_BACKUPS_DISABLED_SECTION_FOOTER" = "הגיבויים הושבתו והנתונים שלך נמחקו משירות האחסון המאובטח של Radar.";
 
 /* Description for a progress view tracking media being downloaded in service of disabling Backups. */
-"BACKUP_SETTINGS_BACKUPS_DISABLING_DOWNLOADING_MEDIA_PROGRESS_VIEW_DESCRIPTION" = "הגיבויים הושבתו, וכל מדיה שאינה נמצאת על המכשיר כעת נמצאת בתהליך הורדה. ברגע שההורדה תסתיים, הנתונים שלך יימחקו משירות האחסון המאובטח של Signal.";
+"BACKUP_SETTINGS_BACKUPS_DISABLING_DOWNLOADING_MEDIA_PROGRESS_VIEW_DESCRIPTION" = "הגיבויים הושבתו, וכל מדיה שאינה נמצאת על המכשיר כעת נמצאת בתהליך הורדה. ברגע שההורדה תסתיים, הנתונים שלך יימחקו משירות האחסון המאובטח של Radar.";
 
 /* Message for a view indicating we failed to delete the user's Backup due to an unexpected error. */
 "BACKUP_SETTINGS_BACKUPS_DISABLING_GENERIC_ERROR_MESSAGE" = "אירעה שגיאה. יש ליצור קשר עם התמיכה.";
 
 /* Header for a menu section related to settings for when disabling Backups encountered an unexpected error. */
-"BACKUP_SETTINGS_BACKUPS_DISABLING_GENERIC_ERROR_SECTION_HEADER" = "אירעה שגיאה בעת מחיקת הנתונים שלך משירות האחסון המאובטח של Signal.";
+"BACKUP_SETTINGS_BACKUPS_DISABLING_GENERIC_ERROR_SECTION_HEADER" = "אירעה שגיאה בעת מחיקת הנתונים שלך משירות האחסון המאובטח של Radar.";
 
 /* Title for a view indicating we failed to delete the user's Backup due to an unexpected error. */
 "BACKUP_SETTINGS_BACKUPS_DISABLING_GENERIC_ERROR_TITLE" = "מחיקת הגיבוי נכשלה";
@@ -776,7 +776,7 @@
 "BACKUP_SETTINGS_BACKUPS_DISABLING_PROGRESS_VIEW_DESCRIPTION" = "גיבוי במחיקה…";
 
 /* Header for a menu section related to disabling Backups. */
-"BACKUP_SETTINGS_BACKUPS_DISABLING_SECTION_HEADER" = "הגיבויים הושבתו והנתונים שלך יימחקו משירות האחסון המאובטח של Signal.";
+"BACKUP_SETTINGS_BACKUPS_DISABLING_SECTION_HEADER" = "הגיבויים הושבתו והנתונים שלך יימחקו משירות האחסון המאובטח של Radar.";
 
 /* Header for a menu section related to settings for when Backups are enabled. */
 "BACKUP_SETTINGS_BACKUPS_ENABLED_SECTION_HEADER" = "פרטי גיבוי";
@@ -824,13 +824,13 @@
 "BACKUP_SETTINGS_DISABLING_CONFIRMATION_ACTION_SHEET_TITLE" = "לכבות ולמחוק גיבויים?";
 
 /* Message shown in an action sheet when the user disables Backups, explaining that their media is downloading first. */
-"BACKUP_SETTINGS_DISABLING_DOWNLOADS_STARTED_ACTION_SHEET_MESSAGE" = "יש לך מדיה בגיבוי שאינה נמצאת במכשיר זה. ייתכן שהורדת הגיבוי שלך תיקח זמן רב, יש להשאיר את Signal פתוחה כדי למנוע הפרעות.";
+"BACKUP_SETTINGS_DISABLING_DOWNLOADS_STARTED_ACTION_SHEET_MESSAGE" = "יש לך מדיה בגיבוי שאינה נמצאת במכשיר זה. ייתכן שהורדת הגיבוי שלך תיקח זמן רב, יש להשאיר את Radar פתוחה כדי למנוע הפרעות.";
 
 /* Title shown in an action sheet when the user disables Backups, explaining that their media is downloading first. */
 "BACKUP_SETTINGS_DISABLING_DOWNLOADS_STARTED_ACTION_SHEET_TITLE" = "מורידים את הגיבוי שלך";
 
 /* Message shown in an action sheet indicating we failed to delete the user's Backup due to an unexpected error. */
-"BACKUP_SETTINGS_DISABLING_ERROR_GENERIC_ERROR_ACTION_SHEET_MESSAGE" = "אירעה שגיאה בעת מחיקת הנתונים שלך משירות האחסון המאובטח של Signal.";
+"BACKUP_SETTINGS_DISABLING_ERROR_GENERIC_ERROR_ACTION_SHEET_MESSAGE" = "אירעה שגיאה בעת מחיקת הנתונים שלך משירות האחסון המאובטח של Radar.";
 
 /* Title shown in an action sheet indicating we failed to delete the user's Backup due to an unexpected error. */
 "BACKUP_SETTINGS_DISABLING_ERROR_GENERIC_ERROR_ACTION_SHEET_TITLE" = "מחיקת הגיבוי נכשלה";
@@ -842,7 +842,7 @@
 "BACKUP_SETTINGS_DISABLING_SUBSCRIPTION_CANCEL_ACTION_SHEET_MANAGE_SUBSCRIPTION_BUTTON" = "נהל מינוי";
 
 /* Message for an action sheet shown when the user disables Backups, but is still subscribed to the paid plan. */
-"BACKUP_SETTINGS_DISABLING_SUBSCRIPTION_CANCEL_ACTION_SHEET_MESSAGE" = "אם ברצונך לבטל את המנוי שלך, יש ללחוץ על על ניהול מנוי > Signal > ביטול מנוי";
+"BACKUP_SETTINGS_DISABLING_SUBSCRIPTION_CANCEL_ACTION_SHEET_MESSAGE" = "אם ברצונך לבטל את המנוי שלך, יש ללחוץ על על ניהול מנוי > Radar > ביטול מנוי";
 
 /* Title for an action sheet shown when the user disables Backups, but is still subscribed to the paid plan. */
 "BACKUP_SETTINGS_DISABLING_SUBSCRIPTION_CANCEL_ACTION_SHEET_TITLE" = "עדיין יש לך מנוי פעיל לתוכנית גיבוי בתשלום";
@@ -920,7 +920,7 @@
 "BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_DOWNLOAD_SHEET_LATER_ACTION" = "הורדה אחר כך";
 
 /* Message for an action sheet allowing users to download their offloaded media. */
-"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_DOWNLOAD_SHEET_MESSAGE" = "יש לך מדיה בגיבוי שאינה נמצאת במכשיר זה. ייתכן שההורדה תיקח זמן רב, יש להשאיר את Signal פתוחה כדי למנוע הפרעות בהורדה.";
+"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_DOWNLOAD_SHEET_MESSAGE" = "יש לך מדיה בגיבוי שאינה נמצאת במכשיר זה. ייתכן שההורדה תיקח זמן רב, יש להשאיר את Radar פתוחה כדי למנוע הפרעות בהורדה.";
 
 /* Action in an action sheet allowing users to download their offloaded media now. */
 "BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_DOWNLOAD_SHEET_NOW_ACTION" = "להוריד עכשיו";
@@ -941,13 +941,13 @@
 "BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_TOGGLE_FOOTER_AVAILABLE_FOR_TESTERS" = "מדיה שאינה בשימוש תוסר מהאחסון המקומי, אך ניתן להוריד אותה מהגיבוי שלך בכל עת בזמן השימוש ב–TestFlight.";
 
 /* Footer for a toggle allowing users to change the Optimize Local Storage setting, if the toggle is unavailable. */
-"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_TOGGLE_FOOTER_UNAVAILABLE" = "ניתן להשתמש באופטימיזציה של אחסון רק עם אפשרות הגיבוי בתשלום של Signal. אפשר לשדרג את תכנית הגיבוי שלך כדי להתחיל להשתמש בפיצ׳ר.";
+"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_TOGGLE_FOOTER_UNAVAILABLE" = "ניתן להשתמש באופטימיזציה של אחסון רק עם אפשרות הגיבוי בתשלום של Radar. אפשר לשדרג את תכנית הגיבוי שלך כדי להתחיל להשתמש בפיצ׳ר.";
 
 /* Title for a toggle allowing users to change the Optimize Local Storage setting. */
 "BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_TOGGLE_TITLE" = "אופטימיזציה של אחסון במכשיר";
 
 /* Subtitle for a notification telling the user they are out of remote storage space. */
-"BACKUP_SETTINGS_OUT_OF_STORAGE_SPACE_NOTIFICATION_SUBTITLE" = "הגעת למגבלת אחסון הגיבוי שלך. יש לפנות מקום ב–Signal כדי להמשיך לגבות צ׳אטים ומדיה.";
+"BACKUP_SETTINGS_OUT_OF_STORAGE_SPACE_NOTIFICATION_SUBTITLE" = "הגעת למגבלת אחסון הגיבוי שלך. יש לפנות מקום ב–Radar כדי להמשיך לגבות צ׳אטים ומדיה.";
 
 /* Title for a notification telling the user they are out of remote storage space. */
 "BACKUP_SETTINGS_OUT_OF_STORAGE_SPACE_NOTIFICATION_TITLE" = "אחסון הגיבוי מלא";
@@ -971,7 +971,7 @@
 "BACKUP_SETTINGS_SUBSCRIPTION_ALREADY_REDEEMED_NOTICE_TITLE" = "לא ניתן היה לממש את מנוי הגיבויים שלך";
 
 /* Body for a sheet explaining that the user's Backups subscription was already redeemed. */
-"BACKUP_SETTINGS_SUBSCRIPTION_ALREADY_REDEEMED_SHEET_BODY" = "יותר מדי מכשירים ניסו לממש את המנוי שלך החודש.\n\nיתכן שרשמת מחדש את חשבון ה-Signal שלך יותר מדי פעמים, או שיש לך יותר מדי מכשירים שמשתמשים באותו מנוי.";
+"BACKUP_SETTINGS_SUBSCRIPTION_ALREADY_REDEEMED_SHEET_BODY" = "יותר מדי מכשירים ניסו לממש את המנוי שלך החודש.\n\nיתכן שרשמת מחדש את חשבון ה-Radar שלך יותר מדי פעמים, או שיש לך יותר מדי מכשירים שמשתמשים באותו מנוי.";
 
 /* Button for a sheet explaining that the user's Backups subscription was already redeemed. */
 "BACKUP_SETTINGS_SUBSCRIPTION_ALREADY_REDEEMED_SHEET_GOT_IT_BUTTON" = "הבנתי";
@@ -992,19 +992,19 @@
 "BACKUP_SETTINGS_UPLOAD_PROGRESS_SUBTITLE_PAUSED_NEEDS_WIFI" = "העלאת מדיה מושהית: בהמתנה ל–Wi–Fi";
 
 /* Subtitle for a progress bar tracking uploads that are paused because the user is out of remote storage space. Embeds 1:{{ total storage space provided, e.g. 100 GB }}; 2:{{ space the user needs to free up by deleting media, e.g. 1 GB }}. */
-"BACKUP_SETTINGS_UPLOAD_PROGRESS_SUBTITLE_PAUSED_OUT_OF_STORAGE_SPACE_FORMAT" = "הגעת למגבלת האחסון של %1$@ הכלולה בתכנית הגיבוי שלך. כדי לגבות צ׳אטים ומדיה חדשים, יש לפנות %2$@ ב–Signal, ואז ללחוץ על ״גיבוי כעת״.";
+"BACKUP_SETTINGS_UPLOAD_PROGRESS_SUBTITLE_PAUSED_OUT_OF_STORAGE_SPACE_FORMAT" = "הגעת למגבלת האחסון של %1$@ הכלולה בתכנית הגיבוי שלך. כדי לגבות צ׳אטים ומדיה חדשים, יש לפנות %2$@ ב–Radar, ואז ללחוץ על ״גיבוי כעת״.";
 
 /* Subtitle for a progress bar tracking active uploading. Embeds 1:{{ the amount uploaded as a file size, e.g. 100 MB }}; 2:{{ the total amount to upload as a file size, e.g. 1 GB }}; 3:{{ the percentage uploaded as a percent, e.g. 40% }}. */
 "BACKUP_SETTINGS_UPLOAD_PROGRESS_SUBTITLE_RUNNING" = "בהעלאה: %1$@ מתוך %2$@ (%3$@)";
 
 /* Message for a sheet shown after the user enables backups. */
-"BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_MESSAGE" = "בהתאם לגודל הגיבוי שלך, זה עשוי להימשך זמן רב. אפשר להשתמש ב–Signal כרגיל בזמן שהגיבוי מתבצע.";
+"BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_MESSAGE" = "בהתאם לגודל הגיבוי שלך, זה עשוי להימשך זמן רב. אפשר להשתמש ב–Radar כרגיל בזמן שהגיבוי מתבצע.";
 
 /* Title for a sheet shown after the user enables backups. */
-"BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_TITLE" = "ברוכ/ה הבא/ה אל גיבויי Signal מאובטחים. אפשר להתחיל את הגיבוי.";
+"BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_TITLE" = "ברוכ/ה הבא/ה אל גיבויי Radar מאובטחים. אפשר להתחיל את הגיבוי.";
 
 /* Message for a sheet shown when your Backup subscription fails to renew. */
-"BACKUP_SUBSCRIPTION_FAILED_TO_RENEW_SHEET_MESSAGE" = "כדאי לוודא שאמצעי התשלום שלך מעודכן. יש ללחוץ על ניהול מנוי > Signal > עדכון אמצעי תשלום.";
+"BACKUP_SUBSCRIPTION_FAILED_TO_RENEW_SHEET_MESSAGE" = "כדאי לוודא שאמצעי התשלום שלך מעודכן. יש ללחוץ על ניהול מנוי > Radar > עדכון אמצעי תשלום.";
 
 /* Primary button for a sheet shown when your Backup subscription fails to renew. */
 "BACKUP_SUBSCRIPTION_FAILED_TO_RENEW_SHEET_PRIMARY_BUTTON" = "נהל מינוי";
@@ -1022,7 +1022,7 @@
 "BACKUPS_SETTINGS_TITLE" = "גיבויים מאובטחים";
 
 /* Body for system notification or megaphone when backups is enabled. Embeds {{ time backups was enabled }} */
-"BACKUPS_TURNED_ON_NOTIFICATION_BODY_FORMAT" = "גיבויי Signal הופעלו עבור חשבון זה ב–%1$@. הקישו לצפייה";
+"BACKUPS_TURNED_ON_NOTIFICATION_BODY_FORMAT" = "גיבויי Radar הופעלו עבור חשבון זה ב–%1$@. הקישו לצפייה";
 
 /* Title for system notification or megaphone when backups is enabled */
 "BACKUPS_TURNED_ON_TITLE" = "הפעלת את הגיבויים";
@@ -1040,10 +1040,10 @@
 "BADGE_DETAILS_DONATE_TO_SIGNAL" = "ביצוע תרומה עכשיו";
 
 /* When viewing someone else's donor badge, you'll see a sheet. This is the title on that sheet. Embeds {badge owner's short name} */
-"BADGE_DETAILS_TITLE_FOR_SUPPORTER" = "Signal מקבלת תמיכה מ%1$@";
+"BADGE_DETAILS_TITLE_FOR_SUPPORTER" = "Radar מקבלת תמיכה מ%1$@";
 
 /* String explaining to the user that their boost badge has expired on the badge expiry sheet. */
-"BADGE_EXPIRED_BOOST_BODY" = "תג הבוסט שלכם פג תוקף והוא לא גלוי יותר בפרופיל שלכם.\n\nאפשר להמשיך להשתמש ב–Signal אבל כדי לתמוך בטכנולוגיה שנבנתה עבורכם, נשמח אם תשקלו להפוך לתורמים על בסיס חודשי.";
+"BADGE_EXPIRED_BOOST_BODY" = "תג הבוסט שלכם פג תוקף והוא לא גלוי יותר בפרופיל שלכם.\n\nאפשר להמשיך להשתמש ב–Radar אבל כדי לתמוך בטכנולוגיה שנבנתה עבורכם, נשמח אם תשקלו להפוך לתורמים על בסיס חודשי.";
 
 /* String explaining to the user that their boost badge has expired while they are a current subscription sustainer on the badge expiry sheet. */
 "BADGE_EXPIRED_BOOST_CURRENT_SUSTAINER_BODY" = "תג הבוסט שלך פג תוקף והוא לא גלוי יותר בפרופיל שלך.\n\nאפשר להפעיל מחדש את תג הבוסט שלך למשך 30 ימים נוספים עם תרומה חד פעמית.";
@@ -1088,7 +1088,7 @@
 "BANK_DONATION_FOOTER_FIND_ACCOUNT_INFO" = "מציאת פרטי חשבון";
 
 /* On the bank transfer donation screen, a small amount of information text is shown. This is that text. It should (1) instruct users to enter their bank information (2) tell them that Signal does not collect or store their personal information. */
-"BANK_DONATION_SUBHEADER_TEXT" = "יש להזין את פרטי הבנק שלך. Signal לא אוספת או מאחסנת את המידע האישי שלך.";
+"BANK_DONATION_SUBHEADER_TEXT" = "יש להזין את פרטי הבנק שלך. Radar לא אוספת או מאחסנת את המידע האישי שלך.";
 
 /* Users can donate to Signal with a bank account. We are required to show them a mandate with information about bank transfers. This is a label for a button to agree to the mandate. */
 "BANK_MANDATE_AGREE" = "הסכמה";
@@ -1097,7 +1097,7 @@
 "BANK_MANDATE_READ_MORE" = "קרא עוד";
 
 /* Users can donate to Signal with a bank account. We are required to show them a mandate with information about bank transfers. This is a subtitle about the payment processor Stripe above that mandate. */
-"BANK_MANDATE_SUBTITLE" = "Stripe מעבדת תרומות שמתבצעות עבור Signal. Signal לא אוספת או מאחסנת את המידע האישי שלך.";
+"BANK_MANDATE_SUBTITLE" = "Stripe מעבדת תרומות שמתבצעות עבור Radar. Radar לא אוספת או מאחסנת את המידע האישי שלך.";
 
 /* Users can donate to Signal with a bank account. We are required to show them a mandate with information about bank transfers. This is the title above that mandate. */
 "BANK_MANDATE_TITLE" = "העברה בנקאית";
@@ -1253,7 +1253,7 @@
 "CALL_AUDIO_MISSED_WEEK_NOTIFICATION_BODY_FORMAT" = "📞 שיחה קולית שלא נענתה ביום %1$@";
 
 /* Alert message when calling and permissions for microphone are missing */
-"CALL_AUDIO_PERMISSION_MESSAGE" = "אתה יכול לאפשר גישה אל מיקרופון ביישום הגדרות של iOS כדי לבצע שיחות ולהקליט הודעות קוליות ב־Signal.";
+"CALL_AUDIO_PERMISSION_MESSAGE" = "אתה יכול לאפשר גישה אל מיקרופון ביישום הגדרות של iOS כדי לבצע שיחות ולהקליט הודעות קוליות ב־Radar.";
 
 /* Alert title when calling and permissions for microphone are missing */
 "CALL_AUDIO_PERMISSION_TITLE" = "נדרשת גישה למיקרופון";
@@ -1319,7 +1319,7 @@
 "CALL_LINK_JOIN_REQUEST_PROMPT" = "רוצה להצטרף…";
 
 /* Shown in a message bubble when you send a call link in a Signal chat */
-"CALL_LINK_LINK_PREVIEW_DESCRIPTION" = "אפשר להשתמש בלינק הזה כדי להצטרף לשיחת Signal";
+"CALL_LINK_LINK_PREVIEW_DESCRIPTION" = "אפשר להשתמש בלינק הזה כדי להצטרף לשיחת Radar";
 
 /* Text that appears on a toast in a call lobby before joining a call link informing the user what information will be shared with other call members when they have phone number sharing turned off. */
 "CALL_LINK_LOBBY_SHARING_INFO_PHONE_NUMBER_SHARING_OFF" = "כל מי שיצטרפו לשיחה הזו באמצעות הלינק יוכלו לראות את השם והתמונה שלך.";
@@ -1343,7 +1343,7 @@
 "CALL_LINK_REQUIRE_APPROVAL" = "לדרוש אישור מנהל/ת";
 
 /* Button to open UI to share a Call Link with someone on Signal. */
-"CALL_LINK_SHARE_VIA_SIGNAL" = "שיתוף לינק דרך Signal";
+"CALL_LINK_SHARE_VIA_SIGNAL" = "שיתוף לינק דרך Radar";
 
 /* Button to open the system share sheet to share a Call Link. */
 "CALL_LINK_SHARE_VIA_SYSTEM" = "שתף קישור";
@@ -1448,10 +1448,10 @@
 "CALLING_MEMBER_VIEW_YOUR_CAMERA_IS_OFF" = "המצלמה שלך כבויה";
 
 /* The generic name used for calls if CallKit privacy is enabled */
-"CALLKIT_ANONYMOUS_CONTACT_NAME" = "משתמש Signal";
+"CALLKIT_ANONYMOUS_CONTACT_NAME" = "משתמש Radar";
 
 /* The generic name used for group calls if CallKit privacy is enabled */
-"CALLKIT_ANONYMOUS_GROUP_NAME" = "קבוצת Signal";
+"CALLKIT_ANONYMOUS_GROUP_NAME" = "קבוצת Radar";
 
 /* Title for the calls list view. */
 "CALLS_LIST_TITLE" = "שיחות";
@@ -1625,7 +1625,7 @@
 "CARD_DONATION_EXPIRATION_DATE_PLACEHOLDER" = "חודש/שנה";
 
 /* Users can choose to learn more about their credit/debit card donations, which will open a sheet with additional information. This is the body text of that sheet. */
-"CARD_DONATION_READ_MORE_SHEET_BODY" = "Signal לא אוספת או מאחסנת את המידע האישי שלך בעת ביצוע תרומה.\n\nאנחנו משתמשים ב–Stripe בתור מעבד התשלומים שלנו כדי לקבל את התרומות שלך. אנחנו לא ניגשים לשום מידע שהם מקבלים ממך ולא מאחסנים או שומרים אותו.\n\nSignal אינה מקשרת את התרומה שלך לחשבון Signal שלך ואין לה אפשרות לעשות זאת.\n\nתודה על התמיכה שלך!";
+"CARD_DONATION_READ_MORE_SHEET_BODY" = "Radar לא אוספת או מאחסנת את המידע האישי שלך בעת ביצוע תרומה.\n\nאנחנו משתמשים ב–Stripe בתור מעבד התשלומים שלנו כדי לקבל את התרומות שלך. אנחנו לא ניגשים לשום מידע שהם מקבלים ממך ולא מאחסנים או שומרים אותו.\n\nSignal אינה מקשרת את התרומה שלך לחשבון Radar שלך ואין לה אפשרות לעשות זאת.\n\nתודה על התמיכה שלך!";
 
 /* Users can choose to learn more about their credit/debit card donations, which will open a sheet with additional information. This is the title of that sheet. */
 "CARD_DONATION_READ_MORE_SHEET_TITLE" = "המידע שלך פרטי";
@@ -1634,7 +1634,7 @@
 "CARD_DONATION_SUBHEADER_LEARN_MORE" = "למד עוד.";
 
 /* On the credit/debit card donation screen, a small amount of information text is shown. This is that text. It should (1) instruct users to enter their credit/debit card information (2) tell them that Signal does not collect or store their personal information. */
-"CARD_DONATION_SUBHEADER_TEXT" = "יש להזין את פרטי הכרטיס שלך. Signal לא אוספת או מאחסנת את המידע האישי שלך.";
+"CARD_DONATION_SUBHEADER_TEXT" = "יש להזין את פרטי הכרטיס שלך. Radar לא אוספת או מאחסנת את המידע האישי שלך.";
 
 /* Title for the 'censorship circumvention country' view. */
 "CENSORSHIP_CIRCUMVENTION_COUNTRY_VIEW_TITLE" = "בחר מדינה";
@@ -1772,7 +1772,7 @@
 "COMPARE_SAFETY_NUMBER_ACTION" = "השווה עם לוח עריכה";
 
 /* Accessibility hint describing what you can do with the compose button */
-"COMPOSE_BUTTON_HINT" = "אפשר לבחור או לחפש משתמש/ת Signal כדי להתחיל איתו או איתה צ׳אט.";
+"COMPOSE_BUTTON_HINT" = "אפשר לבחור או לחפש משתמש/ת Radar כדי להתחיל איתו או איתה צ׳אט.";
 
 /* Accessibility label from compose button. */
 "COMPOSE_BUTTON_LABEL" = "חַבֵּר";
@@ -1799,13 +1799,13 @@
 "COMPOSE_SCREEN_LIMITED_CONTACTS_CTA" = "ניהול";
 
 /* Multi-line label explaining why compose-screen contact picker is empty. */
-"COMPOSE_SCREEN_LIMITED_CONTACTS_PERMISSION" = "ל–Signal יש גישה מוגבלת לאנשי הקשר שלך";
+"COMPOSE_SCREEN_LIMITED_CONTACTS_PERMISSION" = "ל–Radar יש גישה מוגבלת לאנשי הקשר שלך";
 
 /* Button to open settings from an empty compose-screen contact picker. */
 "COMPOSE_SCREEN_MISSING_CONTACTS_CTA" = "פתיחת הגדרות";
 
 /* Multi-line label explaining why compose-screen contact picker is empty. */
-"COMPOSE_SCREEN_MISSING_CONTACTS_PERMISSION" = "אתה יכול לאפשר גישה אל אנשי קשר ביישום הגדרות של iOS כדי לראות אילו מאנשי הקשר שלך הם משתמשי Signal.";
+"COMPOSE_SCREEN_MISSING_CONTACTS_PERMISSION" = "אתה יכול לאפשר גישה אל אנשי קשר ביישום הגדרות של iOS כדי לראות אילו מאנשי הקשר שלך הם משתמשי Radar.";
 
 /* Configure reactions title text */
 "CONFIGURE_REACTIONS" = "התאמה אישית של תגובות";
@@ -1847,10 +1847,10 @@
 "CONTACT_ABOUT_SHEET_PROFILE_NAMES_EDUCATION" = "שמות פרופילים אינם מאומתים";
 
 /* Message for a tooltip that appears above a parenthesized name for another user, indicating that that name is the name the other user set for themself. Embeds {{name}} */
-"CONTACT_ABOUT_SHEET_SECONDARY_NAME_TOOLTIP_MESSAGE" = "״%1$@״ הוא שם הפרופיל שהאדם הזה יצר לעצמו ב–Signal.";
+"CONTACT_ABOUT_SHEET_SECONDARY_NAME_TOOLTIP_MESSAGE" = "״%1$@״ הוא שם הפרופיל שהאדם הזה יצר לעצמו ב–Radar.";
 
 /* A label indicating a user is a signal connection. */
-"CONTACT_ABOUT_SHEET_SIGNAL_CONNECTION_LABEL" = "חבר/ת Signal";
+"CONTACT_ABOUT_SHEET_SIGNAL_CONNECTION_LABEL" = "חבר/ת Radar";
 
 /* The title for a contact 'about' sheet. */
 "CONTACT_ABOUT_SHEET_TITLE" = "אודות";
@@ -1892,7 +1892,7 @@
 "CONTACT_NOTE_TITLE" = "הערה";
 
 /* Body for contact permission action sheet */
-"CONTACT_PERMISSION_ACTION_SHEET_2_BODY" = "כדי למצוא אנשים שמכירים ב–Signal:";
+"CONTACT_PERMISSION_ACTION_SHEET_2_BODY" = "כדי למצוא אנשים שמכירים ב–Radar:";
 
 /* First step for contact permission action sheet */
 "CONTACT_PERMISSION_ACTION_SHEET_2_STEP_ONE" = "הקש על ”לך אל הגדרות” למטה";
@@ -1925,10 +1925,10 @@
 "CONTACT_PERMISSION_REMINDER_MEGAPHONE_ACTION" = "התר גישה";
 
 /* Body for contact permission reminder megaphone */
-"CONTACT_PERMISSION_REMINDER_MEGAPHONE_BODY" = "לאפשר גישה לאנשי הקשר שלך כדי למצוא אותם במהירות ב–Signal.";
+"CONTACT_PERMISSION_REMINDER_MEGAPHONE_BODY" = "לאפשר גישה לאנשי הקשר שלך כדי למצוא אותם במהירות ב–Radar.";
 
 /* Title for contact permission reminder megaphone */
-"CONTACT_PERMISSION_REMINDER_MEGAPHONE_TITLE" = "חיפוש אנשי קשר ב–Signal";
+"CONTACT_PERMISSION_REMINDER_MEGAPHONE_TITLE" = "חיפוש אנשי קשר ב–Radar";
 
 /* Label for a contact's phone number. */
 "CONTACT_PHONE" = "טלפון";
@@ -1952,7 +1952,7 @@
 "CONTACT_SHARE_INVALID_CONTACT" = "איש קשר בלתי תקף.";
 
 /* Alert body when contacts disabled while trying to share a contact. */
-"CONTACT_SHARING_NO_ACCESS_BODY" = "Signal זקוקה לגישה לאנשי הקשר שלך. צריך ללכת להגדרות iOS ולהפעיל גישה לאנשי קשר. אנשי הקשר שלך מוצפנים ואינם גלויים לשירות Signal.";
+"CONTACT_SHARING_NO_ACCESS_BODY" = "Radar זקוקה לגישה לאנשי הקשר שלך. צריך ללכת להגדרות iOS ולהפעיל גישה לאנשי קשר. אנשי הקשר שלך מוצפנים ואינם גלויים לשירות Radar.";
 
 /* Alert title when contacts disabled while trying to share a contact. */
 "CONTACT_SHARING_NO_ACCESS_TITLE" = "אפשר גישה אל אנשי קשר";
@@ -2006,7 +2006,7 @@
 "CONTACT_SUPPORT_FILTER_SOMETHING_NOT_WORKING_SHORT" = "משהו לא עובד";
 
 /* Alert body */
-"CONTACT_SUPPORT_PROMPT_ERROR_ALERT_BODY" = "Signal לא היה יכול להשלים את בקשת התמיכה שלך.";
+"CONTACT_SUPPORT_PROMPT_ERROR_ALERT_BODY" = "Radar לא היה יכול להשלים את בקשת התמיכה שלך.";
 
 /* button text */
 "CONTACT_SUPPORT_PROMPT_ERROR_TRY_AGAIN" = "נסה שוב";
@@ -2135,7 +2135,7 @@
 "CONVERSATION_SETTINGS_ATTRIBUTES_ACCESS_SECTION_FOOTER" = "בחר מי יכול לערוך את השם, התמונה, התיאור וקוצב זמן ההודעות הנעלמות של הקבוצה.";
 
 /* Footer string for a contact's badges in conversation settings */
-"CONVERSATION_SETTINGS_BADGES_FOOTER" = "השג תגים עבור הפרופיל שלך ע״י תמיכה ב־Signal. הקש על תג כדי ללמוד עוד.";
+"CONVERSATION_SETTINGS_BADGES_FOOTER" = "השג תגים עבור הפרופיל שלך ע״י תמיכה ב־Radar. הקש על תג כדי ללמוד עוד.";
 
 /* Header title for a contact's badges in conversation settings */
 "CONVERSATION_SETTINGS_BADGES_HEADER" = "תגים";
@@ -2393,7 +2393,7 @@
 "DATABASE_INTEGRITY_CHECK_ACTION_RUN" = "הרץ";
 
 /* Message for alert before running a database integrity check */
-"DATABASE_INTEGRITY_CHECK_MESSAGE" = "זה יסייע לנו לפתור את הבעיה שלך ועשוי לקחת מספר דקות. אפשר לסגור את Signal בזמן שאנחנו מריצים את הבדיקה, אבל חשוב לחזור כדי להגיש את הלוגים שלך.";
+"DATABASE_INTEGRITY_CHECK_MESSAGE" = "זה יסייע לנו לפתור את הבעיה שלך ועשוי לקחת מספר דקות. אפשר לסגור את Radar בזמן שאנחנו מריצים את הבדיקה, אבל חשוב לחזור כדי להגיש את הלוגים שלך.";
 
 /* Button to skip database integrity check step */
 "DATABASE_INTEGRITY_CHECK_SKIP" = "דלג";
@@ -2417,10 +2417,10 @@
 "DATABASE_RECOVERY_MORE_STORAGE_SPACE_NEEDED_TITLE" = "דרוש עוד שטח אחסון";
 
 /* The user has tried to recover their data after it was lost due to corruption. (They have not been hacked.) This is the description on the screen where we show an error message. */
-"DATABASE_RECOVERY_RECOVERY_FAILED_DESCRIPTION" = "לא הצלחנו לשחזר את היסטוריית ההודעות שלך. באפשרותך להמשיך להשתמש ב–Signal לאחר התקנה מחדש. מומלץ לשלוח יומן ניפוי באגים כדי שנוכל להבין טוב יותר מה השתבש.";
+"DATABASE_RECOVERY_RECOVERY_FAILED_DESCRIPTION" = "לא הצלחנו לשחזר את היסטוריית ההודעות שלך. באפשרותך להמשיך להשתמש ב–Radar לאחר התקנה מחדש. מומלץ לשלוח יומן ניפוי באגים כדי שנוכל להבין טוב יותר מה השתבש.";
 
 /* The user has tried to recover their data after it was lost due to corruption. (They have not been hacked.) This button lets them delete all of their data. */
-"DATABASE_RECOVERY_RECOVERY_FAILED_RESET_APP_BUTTON" = "איפוס של Signal";
+"DATABASE_RECOVERY_RECOVERY_FAILED_RESET_APP_BUTTON" = "איפוס של Radar";
 
 /* The user has tried to recover their data after it was lost due to corruption. (They have not been hacked.) If they want to delete the app and restart, they will be presented with a confirmation dialog. This is the final button they will press before their data is reset. */
 "DATABASE_RECOVERY_RECOVERY_FAILED_RESET_APP_CONFIRMATION_CONFIRM" = "אפס";
@@ -2429,7 +2429,7 @@
 "DATABASE_RECOVERY_RECOVERY_FAILED_RESET_APP_CONFIRMATION_DESCRIPTION" = "פרטי החשבון, הפרופיל, וכל ההודעות שלך ימחקו. האפליקציה תיסגר לאחר השלמת התהליך.";
 
 /* The user has tried to recover their data after it was lost due to corruption. (They have not been hacked.) If they want to delete the app and restart, they will be presented with a confirmation dialog. This is the title of that dialog. */
-"DATABASE_RECOVERY_RECOVERY_FAILED_RESET_APP_CONFIRMATION_TITLE" = "איפוס של Signal";
+"DATABASE_RECOVERY_RECOVERY_FAILED_RESET_APP_CONFIRMATION_TITLE" = "איפוס של Radar";
 
 /* The user has tried to recover their data after it was lost due to corruption. (They have not been hacked.) They were asked to submit a debug log. This is the button that submits this log. */
 "DATABASE_RECOVERY_RECOVERY_FAILED_SUBMIT_DEBUG_LOG_BUTTON" = "הגש יומן ניפוי תקלים";
@@ -2504,7 +2504,7 @@
 "DELETE_ACCOUNT_CONFIRMATION_ACTION_SHEEET_ACTION" = "מחיקת חשבון";
 
 /* Title for the action sheet message of the 'delete account confirmation' view controller. */
-"DELETE_ACCOUNT_CONFIRMATION_ACTION_SHEEET_MESSAGE" = "זה ימחק את חשבון Signal שלך ויאפס את היישום. היישום ייסגר לאחר שתהליך זה יושלם.";
+"DELETE_ACCOUNT_CONFIRMATION_ACTION_SHEEET_MESSAGE" = "זה ימחק את חשבון Radar שלך ויאפס את היישום. היישום ייסגר לאחר שתהליך זה יושלם.";
 
 /* Title for the action sheet confirmation title of the 'delete account confirmation' view controller. */
 "DELETE_ACCOUNT_CONFIRMATION_ACTION_SHEEET_TITLE" = "בטוח שבא לך למחוק את החשבון שלך?";
@@ -2528,7 +2528,7 @@
 "DELETE_ACCOUNT_CONFIRMATION_PHONE_NUMBER_TITLE" = "מספר טלפון";
 
 /* Section header */
-"DELETE_ACCOUNT_CONFIRMATION_SECTION_TITLE" = "אשר את מספר Signal שלך";
+"DELETE_ACCOUNT_CONFIRMATION_SECTION_TITLE" = "אשר את מספר Radar שלך";
 
 /* Title for the 'delete account' confirmation view. */
 "DELETE_ACCOUNT_CONFIRMATION_TITLE" = "מחיקת חשבון";
@@ -2575,7 +2575,7 @@
 
 
 /* Notification warning the user that they have been de-registered. */
-"DEREGISTRATION_NOTIFICATION" = "התנתקת מ–Signal במכשיר זה.";
+"DEREGISTRATION_NOTIFICATION" = "התנתקת מ–Radar במכשיר זה.";
 
 /* Button that lets users re-register using the same phone number. */
 "DEREGISTRATION_REREGISTER_BUTTON" = "רשום מחדש";
@@ -2584,7 +2584,7 @@
 "DEREGISTRATION_REREGISTER_PROMPT_TITLE" = "לרשום מחדש את מספר טלפון זה?";
 
 /* Label warning the user that they have been de-registered. */
-"DEREGISTRATION_WARNING" = "המכשיר הזה כבר לא רשום. זה כנראה בגלל שרשמת את מספר הטלפון שלך ב–Signal על מכשיר אחר.";
+"DEREGISTRATION_WARNING" = "המכשיר הזה כבר לא רשום. זה כנראה בגלל שרשמת את מספר הטלפון שלך ב–Radar על מכשיר אחר.";
 
 /* If the user has been deregistered, they'll see a warning. This is This is the call to action on that warning. */
 "DEREGISTRATION_WARNING_ACTION_TITLE" = "רישום מכשיר מחדש";
@@ -2653,7 +2653,7 @@
 "DEVICE_TRANSFER_CONTRACT_QR_CODE_BUTTON" = "תצוגה קטנה יותר";
 
 /* An error indicating that the other device closed signal mid-transfer and it could not complete */
-"DEVICE_TRANSFER_ERROR_BACKGROUNDED" = "לא הצלחנו להשלים את ההעברה. חשוב לוודא ש–Signal פתוחה בשני המכשירים שלך ולנסות שוב.";
+"DEVICE_TRANSFER_ERROR_BACKGROUNDED" = "לא הצלחנו להשלים את ההעברה. חשוב לוודא ש–Radar פתוחה בשני המכשירים שלך ולנסות שוב.";
 
 /* An error indicating that we were unable to verify the identity of the new device to complete the transfer */
 "DEVICE_TRANSFER_ERROR_CERTIFICATE_MISMATCH" = "לא היה ניתן לוודא את המכשיר החדש שלך, אנא נסה שוב";
@@ -2671,13 +2671,13 @@
 "DEVICE_TRANSFER_ERROR_NOT_ENOUGH_SPACE" = "אין מספיק שטח פנוי כדי להשלים את ההעברה";
 
 /* An error indicating the user must update their device before trying to transfer. */
-"DEVICE_TRANSFER_ERROR_UNSUPPORTED_VERSION" = "עדכן אל הגרסה האחרונה של Signal ונסה שוב";
+"DEVICE_TRANSFER_ERROR_UNSUPPORTED_VERSION" = "עדכן אל הגרסה האחרונה של Radar ונסה שוב";
 
 /* Button shown to expand a QR code and view it fullscreen. */
 "DEVICE_TRANSFER_EXPAND_QR_CODE_BUTTON" = "תצוגה גדולה יותר";
 
 /* The explanation on the action sheet prompting the user if they want to transfer their device. */
-"DEVICE_TRANSFER_PROMPT_EXPLANATION" = "העבר את חשבון Signal שלך אל מכשיר iOS חדש. וודא שהמכשיר החדש שלך בקרבה ושהוא דלוק.";
+"DEVICE_TRANSFER_PROMPT_EXPLANATION" = "העבר את חשבון Radar שלך אל מכשיר iOS חדש. וודא שהמכשיר החדש שלך בקרבה ושהוא דלוק.";
 
 /* The title on the acttion sheet prompting the user if they want to transfer their device. */
 "DEVICE_TRANSFER_PROMPT_TITLE" = "העבר חשבון";
@@ -2695,7 +2695,7 @@
 "DEVICE_TRANSFER_QRCODE_TITLE" = "סריקת קוד QR";
 
 /* The explanation on the view that shows receiving progress */
-"DEVICE_TRANSFER_RECEIVING_EXPLANATION" = "השאר את שני המכשירים קרובים זה לזה. אל תכבה אף מכשיר והשאר את Signal פתוח. העברות מוצפנות מקצה־אל־קצה.";
+"DEVICE_TRANSFER_RECEIVING_EXPLANATION" = "השאר את שני המכשירים קרובים זה לזה. אל תכבה אף מכשיר והשאר את Radar פתוח. העברות מוצפנות מקצה־אל־קצה.";
 
 /* The title on the view that shows receiving progress */
 "DEVICE_TRANSFER_RECEIVING_TITLE" = "מקבל נתונים";
@@ -2731,7 +2731,7 @@
 "DEVICE_TRANSFER_STATUS_NEW_DEVICE_TRANSFERRING" = "העברה בתהליך";
 
 /* Description in the progress view displayed during device transfer. */
-"DEVICE_TRANSFER_STATUS_NEW_DEVICE_TRANSFERRING_DESCRIPTION" = "השאר את שני המכשירים קרובים זה לזה. אל תכבה אף מכשיר והשאר את Signal פתוח. העברות מוצפנות מקצה־אל־קצה.";
+"DEVICE_TRANSFER_STATUS_NEW_DEVICE_TRANSFERRING_DESCRIPTION" = "השאר את שני המכשירים קרובים זה לזה. אל תכבה אף מכשיר והשאר את Radar פתוח. העברות מוצפנות מקצה־אל־קצה.";
 
 /* Status message on old device when cancelling transfer. */
 "DEVICE_TRANSFER_STATUS_OLD_DEVICE_CANCELLING" = "מבטלים חיבור ל–iPhone חדש…";
@@ -2746,7 +2746,7 @@
 "DEVICE_TRANSFER_STATUS_OLD_DEVICE_STARTING" = "בהמתנה לחיבור ל–iPhone חדש…";
 
 /* The explanation on the action sheet that shows transfer progress */
-"DEVICE_TRANSFER_TRANSFERRING_EXPLANATION" = "השאר את שני המכשירים קרובים זה לזה. אל תכבה אף מכשיר והשאר את Signal פתוח.";
+"DEVICE_TRANSFER_TRANSFERRING_EXPLANATION" = "השאר את שני המכשירים קרובים זה לזה. אל תכבה אף מכשיר והשאר את Radar פתוח.";
 
 /* The title on the action sheet that shows transfer progress */
 "DEVICE_TRANSFER_TRANSFERRING_TITLE" = "מעביר נתונים";
@@ -2836,13 +2836,13 @@
 "DONATE_CHOOSE_PAYMENT_METHOD_SHEET_SUBTITLE_FOR_ONE_TIME_DONATION" = "קבלת תג %1$@ למשך 30 יום";
 
 /* When users make donations on a friend's behalf, they see a sheet that lets them pick a payment method. This is the title on that sheet. Embeds {{amount of money}}, such as \"$5\". */
-"DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_DONATION_ON_BEHALF_OF_A_FRIEND" = "תרומה של %1$@ ל–Signal";
+"DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_DONATION_ON_BEHALF_OF_A_FRIEND" = "תרומה של %1$@ ל–Radar";
 
 /* When users make monthly donations, they see a sheet that lets them pick a payment method. This is the title on that sheet. Embeds {{amount of money per month}}, such as \"$5/month\". */
-"DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_MONTHLY_DONATION" = "תרומה של %1$@ ל–Signal";
+"DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_MONTHLY_DONATION" = "תרומה של %1$@ ל–Radar";
 
 /* When users make one-time donations, they see a sheet that lets them pick a payment method. This is the title on that sheet. Embeds {{amount of money}}, such as \"$5\". */
-"DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_ONE_TIME_DONATION" = "תרומה של %1$@ ל–Signal";
+"DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_ONE_TIME_DONATION" = "תרומה של %1$@ ל–Radar";
 
 /* Users can donate on a friend's behalf and can optionally add a message. This is tells users about that optional message. */
 "DONATE_ON_BEHALF_OF_A_FRIEND_ADDITIONAL_MESSAGE_INFO" = "נעדכן את הנמען/ת על התרומה בהודעת 1–על–1. אפשר להוסיף הודעה משלך למטה.";
@@ -2959,7 +2959,7 @@
 "DONATION_ON_BEHALF_OF_A_FRIEND_BADGE_REDEEMED" = "מומש";
 
 /* Users can donate on behalf of a friend, and the friend will receive a badge. This is a short paragraph on the screen where users choose the badge their friend will receive. */
-"DONATION_ON_BEHALF_OF_A_FRIEND_CHOOSE_BADGE_DESCRIPTION" = "אפשר לתמוך ב–Signal על ידי ביצוע תרומה בשביל חבר/ה או קרוב/ת משפחה שמשתמשים ב–Signal. הוא או היא יקבלו את האפשרות להשוויץ בתמיכה שלהם בפרופיל.";
+"DONATION_ON_BEHALF_OF_A_FRIEND_CHOOSE_BADGE_DESCRIPTION" = "אפשר לתמוך ב–Radar על ידי ביצוע תרומה בשביל חבר/ה או קרוב/ת משפחה שמשתמשים ב–Radar. הוא או היא יקבלו את האפשרות להשוויץ בתמיכה שלהם בפרופיל.";
 
 /* Users can donate on behalf of a friend, and the friend will receive a badge. This is the title on the screen where users choose the badge their friend will receive. */
 "DONATION_ON_BEHALF_OF_A_FRIEND_CHOOSE_BADGE_TITLE" = "ביצוע תרומה בשביל חבר/ה";
@@ -2983,7 +2983,7 @@
 "DONATION_ON_BEHALF_OF_A_FRIEND_PAYMENT_FAILED_ERROR_TITLE" = "תשלום נכשל";
 
 /* Users can donate on a friend's behalf. If the payment was processed but the donation failed to send, this error message will be shown. */
-"DONATION_ON_BEHALF_OF_A_FRIEND_PAYMENT_SUCCEEDED_BUT_MESSAGE_FAILED_ERROR_BODY" = "התשלום שלך עבד אבל Signal לא הצליחה לשלוח את ההודעה על התרומה. יש ליצור קשר עם התמיכה.";
+"DONATION_ON_BEHALF_OF_A_FRIEND_PAYMENT_SUCCEEDED_BUT_MESSAGE_FAILED_ERROR_BODY" = "התשלום שלך עבד אבל Radar לא הצליחה לשלוח את ההודעה על התרומה. יש ליצור קשר עם התמיכה.";
 
 /* Users can donate on a friend's behalf. If the payment was processed but the donation failed to send, an error dialog will be shown. This is the title of that dialog. */
 "DONATION_ON_BEHALF_OF_A_FRIEND_PAYMENT_SUCCEEDED_BUT_MESSAGE_FAILED_ERROR_TITLE" = "התרומה נכשלה";
@@ -2995,7 +2995,7 @@
 "DONATION_ON_BEHALF_OF_A_FRIEND_PREVIEW_OUTGOING" = "✨ תרמת בשביל %1$@";
 
 /* You received a donation from a friend. This is the title of that message in the chat. Embeds {{short contact name}}. */
-"DONATION_ON_BEHALF_OF_A_FRIEND_RECEIVED_TITLE_FORMAT" = "%1$@ תרם/ה ל–Signal בשמך";
+"DONATION_ON_BEHALF_OF_A_FRIEND_RECEIVED_TITLE_FORMAT" = "%1$@ תרם/ה ל–Radar בשמך";
 
 /* Users can donate on a friend's behalf. This is the error message that appears if the try to do this, but the recipient is blocked. */
 "DONATION_ON_BEHALF_OF_A_FRIEND_RECIPIENT_IS_BLOCKED_ERROR_BODY" = "אין לך אפשרות לתרום בשביל המשתמש/ת כי חסמת אותם.";
@@ -3019,7 +3019,7 @@
 "DONATION_ON_BEHALF_OF_A_FRIEND_SENT_TITLE_FORMAT" = "תרומה בשם %1$@";
 
 /* When you donate on behalf of a friend, a thank-you sheet will appear. This is the text on that sheet. Embeds {{recipient name}}. */
-"DONATION_ON_BEHALF_OF_A_FRIEND_THANKS_BODY_FORMAT" = "ביצעת תרומה ל–Signal בשם %1$@. הוא או היא יקבלו את האפשרות להשוויץ בתמיכה שלהם בפרופיל.";
+"DONATION_ON_BEHALF_OF_A_FRIEND_THANKS_BODY_FORMAT" = "ביצעת תרומה ל–Radar בשם %1$@. הוא או היא יקבלו את האפשרות להשוויץ בתמיכה שלהם בפרופיל.";
 
 /* When you donate on behalf of a friend, a thank-you sheet will appear. This is the title on that sheet. */
 "DONATION_ON_BEHALF_OF_A_FRIEND_THANKS_TITLE" = "תודה על התמיכה שלך!";
@@ -3028,19 +3028,19 @@
 "DONATION_ON_BEHALF_OF_A_FRIEND_VIEW" = "הצגה";
 
 /* A friend has donated on your behalf and you received a badge. This text says that you received a badge, and from whom. Embeds {{contact's short name, such as a first name}}. */
-"DONATION_ON_BEHALF_OF_A_FRIEND_YOU_RECEIVED_A_BADGE_FORMAT" = "%1$@ ביצע/ה תרומה ל–Signal בשמך! אפשר להשוויץ בתמיכה שלך ב–Signal בפרופיל.";
+"DONATION_ON_BEHALF_OF_A_FRIEND_YOU_RECEIVED_A_BADGE_FORMAT" = "%1$@ ביצע/ה תרומה ל–Radar בשמך! אפשר להשוויץ בתמיכה שלך ב–Radar בפרופיל.";
 
 /* There is a screen where users can read more about their donation to Signal. This is the 1st paragraph of that screen. */
 "DONATION_READ_MORE_SCREEN_PARAGRAPH_1" = "תכתובת פרטית. בלי מודעות פרסום, בלי מעקב, בלי פיקוח.";
 
 /* There is a screen where users can read more about their donation to Signal. This is the 2nd paragraph of that screen. */
-"DONATION_READ_MORE_SCREEN_PARAGRAPH_2" = "Signal נתמכת על ידי התרומות שלך, מה שאומר שהפרטיות שלך נמצאת במרכז סדר העדיפויות שלנו. Signal נבנתה בשבילך; לא בשביל הנתונים שלך ולא בשביל רווחים.";
+"DONATION_READ_MORE_SCREEN_PARAGRAPH_2" = "Radar נתמכת על ידי התרומות שלך, מה שאומר שהפרטיות שלך נמצאת במרכז סדר העדיפויות שלנו. Radar נבנתה בשבילך; לא בשביל הנתונים שלך ולא בשביל רווחים.";
 
 /* There is a screen where users can read more about their donation to Signal. This is the 3rd paragraph of that screen. */
-"DONATION_READ_MORE_SCREEN_PARAGRAPH_3" = "אם יש לך אפשרות, נשמח לקבל ממך תרומה עוד היום כדי לשמור על Signal כיפית, מהימנה וזמינה לכולם.";
+"DONATION_READ_MORE_SCREEN_PARAGRAPH_3" = "אם יש לך אפשרות, נשמח לקבל ממך תרומה עוד היום כדי לשמור על Radar כיפית, מהימנה וזמינה לכולם.";
 
 /* There is a screen where users can read more about their donation to Signal. This is the title of that screen. */
-"DONATION_READ_MORE_SCREEN_TITLE" = "Signal היא שונה.";
+"DONATION_READ_MORE_SCREEN_TITLE" = "Radar היא שונה.";
 
 /* Section title for donation amount on receipts */
 "DONATION_RECEIPT_AMOUNT" = "סכום";
@@ -3076,7 +3076,7 @@
 "DONATION_RECEIPTS" = "קבלות תרומה";
 
 /* Text at the bottom of the donation receipts list, telling users that receipts might not be available */
-"DONATION_RECEIPTS_MIGHT_BE_MISSING_IF_YOU_REINSTALLED" = "אם התקנת מחדש את Signal, קבלות מתרומות קודמות לא יהיו זמינות.";
+"DONATION_RECEIPTS_MIGHT_BE_MISSING_IF_YOU_REINSTALLED" = "אם התקנת מחדש את Radar, קבלות מתרומות קודמות לא יהיו זמינות.";
 
 /* Error message displayed if something goes wrong with 3DSecure/iDEAL payment authorization.  This will be encountered if the user cancels the webview before authrizing the payment. */
 "DONATION_REDIRECT_ERROR_CANCELLED_MESSAGE" = "התשלום בוטל. יש לנסות שוב.";
@@ -3091,7 +3091,7 @@
 "DONATION_SCREEN_DONATE_BUTTON" = "ביצוע תרומה";
 
 /* On donation screens, a small amount of information text is shown. This is the subtitle for that text. */
-"DONATION_SCREENS_HEADER_DESCRIPTION" = "תכתובת פרטית, ממומנת על ידך. בלי מודעות פרסום, בלי מעקב, בלי פשרות. תורמים עכשיו ותומכים ב–Signal.";
+"DONATION_SCREENS_HEADER_DESCRIPTION" = "תכתובת פרטית, ממומנת על ידך. בלי מודעות פרסום, בלי מעקב, בלי פשרות. תורמים עכשיו ותומכים ב–Radar.";
 
 /* On donation screens, a small amount of information text is shown. Users can click this link to learn more information. */
 "DONATION_SCREENS_HEADER_READ_MORE" = "קרא עוד";
@@ -3169,7 +3169,7 @@
 "DONATION_VIEW_DONATE_ON_BEHALF_OF_A_FRIEND" = "ביצוע תרומה בשביל חבר/ה";
 
 /* Text describing to the user that they're going to pay a donation to Signal */
-"DONATION_VIEW_DONATION_TO_SIGNAL" = "תרומה אל Signal";
+"DONATION_VIEW_DONATION_TO_SIGNAL" = "תרומה אל Radar";
 
 /* Title for the 'Donor FAQ' button on the donation screen */
 "DONATION_VIEW_DONOR_FAQ" = "שאלות נפוצות של תורמים";
@@ -3181,7 +3181,7 @@
 "DONATION_VIEW_MANAGE_BADGES" = "תגים";
 
 /* Text describing to the user that they're going to pay a monthly donation to Signal */
-"DONATION_VIEW_MONTHLY_DONATION_TO_SIGNAL" = "תרומה חודשית ל–Signal";
+"DONATION_VIEW_MONTHLY_DONATION_TO_SIGNAL" = "תרומה חודשית ל–Radar";
 
 /* Title for the 'more' section on the donation screen */
 "DONATION_VIEW_MORE_SECTION_TITLE" = "עוד";
@@ -3193,7 +3193,7 @@
 "DONATION_VIEW_OTHER_WAYS_TO_DONATE_TITLE" = "דרכים אחרות לתרום";
 
 /* Title on the 'Donate to Signal' screen */
-"DONATION_VIEW_TITLE" = "תרומה ל–Signal";
+"DONATION_VIEW_TITLE" = "תרומה ל–Radar";
 
 /* Label for the currency picker button in donation views */
 "DONATIONS_CURRENCY_PICKER_LABEL" = "מטבע";
@@ -3208,13 +3208,13 @@
 "EDIT_CONTACT_WITHOUT_CONTACTS_PERMISSION_ALERT_BODY" = "אתה יכול לאפשר גישה ביישום הגדרות של iOS.";
 
 /* Alert title for when the user has just tried to edit a contacts after declining to give Signal contacts permissions */
-"EDIT_CONTACT_WITHOUT_CONTACTS_PERMISSION_ALERT_TITLE" = "Signal צריך גישה אל אנשי הקשר כדי לערוך מידע איש קשר";
+"EDIT_CONTACT_WITHOUT_CONTACTS_PERMISSION_ALERT_TITLE" = "Radar צריך גישה אל אנשי הקשר כדי לערוך מידע איש קשר";
 
 /* The navbar title for the 'update group' view. */
 "EDIT_GROUP_DEFAULT_TITLE" = "ערוך קבוצה";
 
 /* Error message indicating the a user can't be added to a group. */
-"EDIT_GROUP_ERROR_CANNOT_ADD_MEMBER" = "משתמש זה אינו יכול להתווסף אל הקבוצה עד שהוא ישדרג את Signal.";
+"EDIT_GROUP_ERROR_CANNOT_ADD_MEMBER" = "משתמש זה אינו יכול להתווסף אל הקבוצה עד שהוא ישדרג את Radar.";
 
 /* Error message indicating that an avatar image is invalid and cannot be used. */
 "EDIT_GROUP_ERROR_INVALID_AVATAR" = "תמונה בלתי תקפה.";
@@ -3241,13 +3241,13 @@
 "EDIT_MESSAGE_SEND_MESSAGE_UNKNOWN_ERROR" = "EDIT_MESSAGE_SEND_MESSAGE_UNKNOWN_ERROR";
 
 /* body of email sent to contacts when inviting to install Signal. Embeds {{link to install Signal}} and {{link to the Signal home page}} */
-"EMAIL_INVITE_BODY" = "היי,\n\nלאחרונה עברתי להשתמש ב–Signal כדי לשמור על הצ׳אטים ב–iPhone שלי פרטיים. זה יהיה מעולה אם גם לך תהיה את האפליקציה, כדי שנוכל לדעת בוודאות שרק לנו יש גישה להודעות ולשיחות הקוליות שלנו.\n\nSignal זמינה עבור iPhone, Android, ושולחן העבודה. אפשר להוריד אותה כאן: %1$@\n\nSignal עובדת כמו אפליקציית ההודעות הקיימת שלך. אפשר לשלוח תמונות וסרטונים, לבצע שיחות ולהתחיל צ׳אטים קבוצתיים. החלק הכי טוב הוא שאף אחד לא יכול לראות שום דבר מזה, אפילו לא האנשים שיוצרים את Signal!\n\nאפשר לקרוא עוד על Signal כאן: %2$@";
+"EMAIL_INVITE_BODY" = "היי,\n\nלאחרונה עברתי להשתמש ב–Radar כדי לשמור על הצ׳אטים ב–iPhone שלי פרטיים. זה יהיה מעולה אם גם לך תהיה את האפליקציה, כדי שנוכל לדעת בוודאות שרק לנו יש גישה להודעות ולשיחות הקוליות שלנו.\n\nSignal זמינה עבור iPhone, Android, ושולחן העבודה. אפשר להוריד אותה כאן: %1$@\n\nSignal עובדת כמו אפליקציית ההודעות הקיימת שלך. אפשר לשלוח תמונות וסרטונים, לבצע שיחות ולהתחיל צ׳אטים קבוצתיים. החלק הכי טוב הוא שאף אחד לא יכול לראות שום דבר מזה, אפילו לא האנשים שיוצרים את Radar!\n\nאפשר לקרוא עוד על Radar כאן: %2$@";
 
 /* subject of email sent to contacts when inviting to install Signal */
-"EMAIL_INVITE_SUBJECT" = "בוא נחליף אל Signal";
+"EMAIL_INVITE_SUBJECT" = "בוא נחליף אל Radar";
 
 /* Description for the fallback support sheet if user cannot send email */
-"EMAIL_SIGNAL_MESSAGE" = "המכשיר שלך אינו מתוצר לשלוח דוא״ל. כדי לשלוח בקשת תמיכה, הגדר דוא״ל במכשיר שלך או שלח דוא״ל אל support@signal.org";
+"EMAIL_SIGNAL_MESSAGE" = "המכשיר שלך אינו מתוצר לשלוח דוא״ל. כדי לשלוח בקשת תמיכה, הגדר דוא״ל במכשיר שלך או שלח דוא״ל אל support@radar.chat";
 
 /* Title for the fallback support sheet if user cannot send email */
 "EMAIL_SIGNAL_TITLE" = "דוא״ל בלתי זמין";
@@ -3283,7 +3283,7 @@
 "EMOJI_CATEGORY_TRAVEL_NAME" = "טיול ומקומות";
 
 /* Full width label displayed when attempting to compose message */
-"EMPTY_CONTACTS_LABEL_LINE1" = "לאף אחד מאנשי הקשר שלך אין Signal.";
+"EMPTY_CONTACTS_LABEL_LINE1" = "לאף אחד מאנשי הקשר שלך אין Radar.";
 
 /* Full width label displayed when attempting to compose message */
 "EMPTY_CONTACTS_LABEL_LINE2" = "למה אינך מזמין מישהו?";
@@ -3349,7 +3349,7 @@
 "ERROR_DESCRIPTION_UNKNOWN_ERROR" = "התרחשה שגיאה לא ידועה";
 
 /* Error message when attempting to send message */
-"ERROR_DESCRIPTION_UNREGISTERED_RECIPIENT" = "לא ניתן לשלוח הודעה כי האדם הזה לא משתמש יותר ב–Signal.";
+"ERROR_DESCRIPTION_UNREGISTERED_RECIPIENT" = "לא ניתן לשלוח הודעה כי האדם הזה לא משתמש יותר ב–Radar.";
 
 /* Error message indicating that attachment upload(s) failed. */
 "ERROR_MESSAGE_ATTACHMENT_UPLOAD_FAILED" = "העלאת הקובץ המצורף נכשלה.";
@@ -3394,10 +3394,10 @@
 "ERROR_NETWORK_FAILURE" = "שגיאת רשת";
 
 /* Format string for an error alert notification message. Embeds {{ error string }} */
-"ERROR_NOTIFICATION_MESSAGE_FORMAT" = "עזור לנו לשפר את Signal ע״י דיווח על שגיאה זו ביחד עם יומני ניפוי תקלים מהמכשיר שלך אל support@signal.org; %1$@";
+"ERROR_NOTIFICATION_MESSAGE_FORMAT" = "עזור לנו לשפר את Radar ע״י דיווח על שגיאה זו ביחד עם יומני ניפוי תקלים מהמכשיר שלך אל support@radar.chat; %1$@";
 
 /* Format string for an error alert notification title. */
-"ERROR_NOTIFICATION_TITLE" = "Signal בטא: שגיאה התרחשה";
+"ERROR_NOTIFICATION_TITLE" = "Radar בטא: שגיאה התרחשה";
 
 /* Error indicating a send failure due to a delinked application. */
 "ERROR_SENDING_DELINKED" = "המכשיר שלך אינו מקושר יותר. אנא קשר מחדש כדי לשלוח הודעות נוספות.";
@@ -3406,7 +3406,7 @@
 "ERROR_SENDING_DEREGISTERED" = "המכשיר שלך אינו רשום יותר. אנא הירשם מחדש כדי לשלוח הודעות נוספות.";
 
 /* Error indicating a send failure due to an expired application. */
-"ERROR_SENDING_EXPIRED" = "גרסת Signal שלך פגה. אנא עדכן כדי לשלוח הודעות נוספות.";
+"ERROR_SENDING_EXPIRED" = "גרסת Radar שלך פגה. אנא עדכן כדי לשלוח הודעות נוספות.";
 
 /* Format string for 'unregistered user' error. Embeds {{the unregistered user's name or signal id}}. */
 "ERROR_UNREGISTERED_USER_FORMAT" = "משתמש בלתי רשום: %1$@";
@@ -3418,19 +3418,19 @@
 "EXIT_REREGISTRATION" = "יציאה מהרשמה";
 
 /* Label notifying the user that the app has expired. */
-"EXPIRATION_ERROR" = "גרסה זו של Signal כבר לא בתוקף. צריך לעדכן כדי לשלוח ולקבל הודעות.";
+"EXPIRATION_ERROR" = "גרסה זו של Radar כבר לא בתוקף. צריך לעדכן כדי לשלוח ולקבל הודעות.";
 
 /* If the user's app is too old, they'll be shown a warning asking them to upgrade. This is the text on the warning, and tapping it will open the App Store page for Signal. */
 "EXPIRATION_WARNING_ACTION_TITLE" = "עדכון כעת";
 
 /* Label warning the user that the app will expire soon. Embeds {{date}}. */
-"EXPIRATION_WARNING_SOON" = "גרסה זו של Signal תצא מתוקף ב–%1$@. כדאי לעדכן כדי להמשיך לשלוח הודעות.";
+"EXPIRATION_WARNING_SOON" = "גרסה זו של Radar תצא מתוקף ב–%1$@. כדאי לעדכן כדי להמשיך לשלוח הודעות.";
 
 /* Label warning the user that the app will expire today. */
-"EXPIRATION_WARNING_TODAY" = "גרסה זו של Signal פגה תוקף היום. כדאי לעדכן כדי להמשיך לשלוח הודעות.";
+"EXPIRATION_WARNING_TODAY" = "גרסה זו של Radar פגה תוקף היום. כדאי לעדכן כדי להמשיך לשלוח הודעות.";
 
 /* action sheet header when re-sending message which failed because of an invalid key signature */
-"FAILED_SENDING_BECAUSE_INVALID_KEY_SIGNATURE" = "לא ניתן לשלוח הודעה כי %1$@ צריך.ה לעדכן ולפתוח את Signal.";
+"FAILED_SENDING_BECAUSE_INVALID_KEY_SIGNATURE" = "לא ניתן לשלוח הודעה כי %1$@ צריך.ה לעדכן ולפתוח את Radar.";
 
 /* action sheet header when re-sending message which failed because of untrusted identity keys */
 "FAILED_SENDING_BECAUSE_UNTRUSTED_IDENTITY_KEY" = "מספר הביטחון שלך עם %1$@ השתנה לאחרונה. מומלץ לוודא לפני שליחת הודעה זו שוב.";
@@ -3745,10 +3745,10 @@
 "GROUP_CALL_WILL_NOTIFY_TWO_PEOPLE_FORMAT" = "%1$@ ו%2$@ יקבלו התראה";
 
 /* Text shown before the user starts a group call if the user has enabled ringing and there is one other person in the group. Embeds {member name} */
-"GROUP_CALL_WILL_RING_ONE_PERSON_FORMAT" = "Signal תתקשר ל%1$@";
+"GROUP_CALL_WILL_RING_ONE_PERSON_FORMAT" = "Radar תתקשר ל%1$@";
 
 /* Text shown before the user starts a group call if the user has enabled ringing and there are two other people in the group. Embeds {{ %1$@ participant1, %2$@ participant2 }} */
-"GROUP_CALL_WILL_RING_TWO_PEOPLE_FORMAT" = "Signal תתקשר ל%1$@ ול%2$@";
+"GROUP_CALL_WILL_RING_TWO_PEOPLE_FORMAT" = "Radar תתקשר ל%1$@ ול%2$@";
 
 /* Text explaining that you are in the group call. */
 "GROUP_CALL_YOU_ARE_HERE" = "את/ה בשיחה הקבוצתית";
@@ -3958,7 +3958,7 @@
 "GROUP_LINK_VIEW_SHARE_LINK_VIA_QR_CODE" = "קוד QR:";
 
 /* Label for the 'share group link via Signal' button in the 'group link' view. */
-"GROUP_LINK_VIEW_SHARE_LINK_VIA_SIGNAL" = "שתף באמצעות Signal";
+"GROUP_LINK_VIEW_SHARE_LINK_VIA_SIGNAL" = "שתף באמצעות Radar";
 
 /* Message for the 'share group link' action sheet in the 'group link' view. */
 "GROUP_LINK_VIEW_SHARE_SHEET_MESSAGE" = "כל אחד עם קישור זה יכול לראות את שם הקבוצה ואת חברי הקבוצה ולבקש להצטרף. שתף אותו עם אנשים שאתה בוטח בהם.";
@@ -4366,13 +4366,13 @@
 "HOME_VIEW_DRAFT_PREFIX" = "טיוטה: ";
 
 /* Format string for a label offering to start a new conversation with your contacts, if you have 1 Signal contact.  Embeds {{The name of 1 of your Signal contacts}}. */
-"HOME_VIEW_FIRST_CONVERSATION_OFFER_1_CONTACT_FORMAT" = "כמה מאנשי הקשר שלך כבר ב־Signal, כולל %1$@.";
+"HOME_VIEW_FIRST_CONVERSATION_OFFER_1_CONTACT_FORMAT" = "כמה מאנשי הקשר שלך כבר ב־Radar, כולל %1$@.";
 
 /* Format string for a label offering to start a new conversation with your contacts, if you have 2 Signal contacts.  Embeds {{The names of 2 of your Signal contacts}}. */
-"HOME_VIEW_FIRST_CONVERSATION_OFFER_2_CONTACTS_FORMAT" = "כמה מאנשי הקשר שלך כבר ב־Signal, כולל %1$@ ו%2$@";
+"HOME_VIEW_FIRST_CONVERSATION_OFFER_2_CONTACTS_FORMAT" = "כמה מאנשי הקשר שלך כבר ב־Radar, כולל %1$@ ו%2$@";
 
 /* Format string for a label offering to start a new conversation with your contacts, if you have at least 3 Signal contacts.  Embeds {{The names of 3 of your Signal contacts}}. */
-"HOME_VIEW_FIRST_CONVERSATION_OFFER_3_CONTACTS_FORMAT" = "כמה מאנשי הקשר שלך כבר ב־Signal, כולל %1$@, %2$@ ו%3$@";
+"HOME_VIEW_FIRST_CONVERSATION_OFFER_3_CONTACTS_FORMAT" = "כמה מאנשי הקשר שלך כבר ב־Radar, כולל %1$@, %2$@ ו%3$@";
 
 /* A label offering to start a new conversation with your contacts, if you have no Signal contacts. */
 "HOME_VIEW_FIRST_CONVERSATION_OFFER_NO_CONTACTS" = "אפשר להתחיל את הצ׳אט הראשון שלך כאן.";
@@ -4468,7 +4468,7 @@
 "INACTIVE_LINKED_DEVICE_REMINDER_MEGAPHONE_TITLE" = "מכשיר מקושר לא פעיל";
 
 /* Body for an in-app megaphone about a user's inactive primary device. */
-"INACTIVE_PRIMARY_DEVICE_REMINDER_MEGAPHONE_BODY" = "כדי לשמור על החשבון שלך פעיל, צריך לפתוח את Signal במכשיר הראשי שלך.";
+"INACTIVE_PRIMARY_DEVICE_REMINDER_MEGAPHONE_BODY" = "כדי לשמור על החשבון שלך פעיל, צריך לפתוח את Radar במכשיר הראשי שלך.";
 
 /* Title for a button in an in-app megaphone about a user's inactive primary device, temporarily dismissing the megaphone. */
 "INACTIVE_PRIMARY_DEVICE_REMINDER_MEGAPHONE_GOT_IT_BUTTON" = "הבנתי";
@@ -4477,7 +4477,7 @@
 "INACTIVE_PRIMARY_DEVICE_REMINDER_MEGAPHONE_LEARN_MORE_BUTTON" = "למידע נוסף";
 
 /* Title for an in-app megaphone about a user's inactive primary device. */
-"INACTIVE_PRIMARY_DEVICE_REMINDER_MEGAPHONE_TITLE" = "פתח את Signal בטלפון שלך";
+"INACTIVE_PRIMARY_DEVICE_REMINDER_MEGAPHONE_TITLE" = "פתח את Radar בטלפון שלך";
 
 /* Label reminding the user that they are in archive mode, and that muted chats remain archived when they receive a new message. */
 "INBOX_VIEW_ARCHIVE_MODE_MUTED_CHATS_REMINDER" = "צ׳אטים מושתקים שמאוחסנים בארכיון יישארו בארכיון כשהודעה חדשה מגיעה.";
@@ -4513,10 +4513,10 @@
 "INFO_MESSAGE_BLOCKED_OTHER_USER" = "חסמת את האדם הזה.";
 
 /* Indicates that a previously-removed recipient has been added back to the current user's contacts. */
-"INFO_MESSAGE_CONTACT_REINSTATED" = "האדם הזה נוסף חזרה לרשימת אנשי הקשר שלך ב–Signal.";
+"INFO_MESSAGE_CONTACT_REINSTATED" = "האדם הזה נוסף חזרה לרשימת אנשי הקשר שלך ב–Radar.";
 
 /* Indicates that the recipient has been removed from the current user's contacts and that messaging them will re-add them. */
-"INFO_MESSAGE_CONTACT_REMOVED" = "הסרת את האדם הזה מרשימת אנשי הקשר שלך ב–Signal, שליחת הודעה תוסיף אותו או אותה מחדש.";
+"INFO_MESSAGE_CONTACT_REMOVED" = "הסרת את האדם הזה מרשימת אנשי הקשר שלך ב–Radar, שליחת הודעה תוסיף אותו או אותה מחדש.";
 
 /* When you start a chat with someone and then later learn their profile name, we insert an in-chat message with this string to record the identifier you originally used to contact them. Embeds {{ the identifier, either a phone number or a username }}. */
 "INFO_MESSAGE_LEARNED_PROFILE_KEY" = "התחלת את הצ׳אט הזה עם %1$@.";
@@ -4537,7 +4537,7 @@
 "INFO_MESSAGE_REPORTED_SPAM" = "דוּוח/ה כספאם";
 
 /* Body message of the alert shown when a user taps on 'learn more' via the spam info message. */
-"INFO_MESSAGE_REPORTED_SPAM_LEARN_MORE_MESSAGE" = "Signal קיבלה הודעה שהאדם הזה חשוד בשליחת ספאם. Signal לא יכולה לראות את התוכן של אף צ׳אט.";
+"INFO_MESSAGE_REPORTED_SPAM_LEARN_MORE_MESSAGE" = "Radar קיבלה הודעה שהאדם הזה חשוד בשליחת ספאם. Radar לא יכולה לראות את התוכן של אף צ׳אט.";
 
 /* Title of the alert shown when a user taps on 'learn more' via the spam info message. */
 "INFO_MESSAGE_REPORTED_SPAM_LEARN_MORE_TITLE" = "דוּוח/ה כספאם";
@@ -4555,7 +4555,7 @@
 "INFO_MESSAGE_USER_CHANGED_PHONE_NUMBER_FORMAT" = "%1$@ שינה/שינתה את המספר שלו/שלה.";
 
 /* Shown in inbox and conversation when a user joins Signal, embeds the new user's {{contact name}} */
-"INFO_MESSAGE_USER_JOINED_SIGNAL_BODY_FORMAT" = "%1$@ נמצא ב־Signal!";
+"INFO_MESSAGE_USER_JOINED_SIGNAL_BODY_FORMAT" = "%1$@ נמצא ב־Radar!";
 
 /* Label at the top of the input text when editing a message */
 "INPUT_TOOLBAR_EDIT_MESSAGE_LABEL" = "עריכת הודעה";
@@ -4582,13 +4582,13 @@
 "INVALID_PROXY_HOST_ERROR" = "כתובת הפרוקסי שהכנסת אינה חוקית, יש לבדוק את הכתובת ולנסות שוב.";
 
 /* Alert body when contacts disabled while trying to invite contacts to signal */
-"INVITE_FLOW_REQUIRES_CONTACT_ACCESS_BODY" = "אתה יכול לאפשר גישה אל אנשי קשר ביישום הגדרות של iOS כדי להזמין את חבריך להצטרף אל Signal.";
+"INVITE_FLOW_REQUIRES_CONTACT_ACCESS_BODY" = "אתה יכול לאפשר גישה אל אנשי קשר ביישום הגדרות של iOS כדי להזמין את חבריך להצטרף אל Radar.";
 
 /* Alert title when contacts disabled while trying to invite contacts to signal */
 "INVITE_FLOW_REQUIRES_CONTACT_ACCESS_TITLE" = "אפשר גישה אל אנשי קשר";
 
 /* Label for the cell that presents the 'invite contacts' workflow. */
-"INVITE_FRIENDS_CONTACT_TABLE_BUTTON" = "הזמן חברים אל Signal";
+"INVITE_FRIENDS_CONTACT_TABLE_BUTTON" = "הזמן חברים אל Radar";
 
 /* Header label above a section for more options for adding contacts */
 "INVITE_FRIENDS_CONTACT_TABLE_HEADER" = "עוד";
@@ -4711,7 +4711,7 @@
 "LINK_DEVICE_SCANNING_INSTRUCTIONS_SHEET_TITLE" = "סריקת קוד QR";
 
 /* Body text for a sheet when a user tries to link a device informing them that they will need to authenticate their device */
-"LINK_NEW_DEVICE_AUTHENTICATION_INFO_SHEET_BODY" = "יש ללחוץ על ״המשך״ ולהזין את ביטול נעילת הטלפון שלך כדי לאשר. אין להזין את קוד ה‑PIN של Signal.";
+"LINK_NEW_DEVICE_AUTHENTICATION_INFO_SHEET_BODY" = "יש ללחוץ על ״המשך״ ולהזין את ביטול נעילת הטלפון שלך כדי לאשר. אין להזין את קוד ה‑PIN של Radar.";
 
 /* Title for a sheet when a user tries to link a device informing them that they will need to authenticate their device */
 "LINK_NEW_DEVICE_AUTHENTICATION_INFO_SHEET_TITLE" = "לפני הקישור, צריך לאשר שמדובר בך";
@@ -4720,7 +4720,7 @@
 "LINK_NEW_DEVICE_AUTHENTICATION_REASON" = "אימות כדי לקשר מכשיר";
 
 /* Body text for a sheet when a user has started linking a device informing them to finish the process on that other device */
-"LINK_NEW_DEVICE_FINISH_ON_OTHER_DEVICE_SHEET_BODY" = "יש לסיים את הקישור של Signal במכשיר האחר שלך.";
+"LINK_NEW_DEVICE_FINISH_ON_OTHER_DEVICE_SHEET_BODY" = "יש לסיים את הקישור של Radar במכשיר האחר שלך.";
 
 /* Title for a sheet when a user has started linking a device informing them to finish the process on that other device */
 "LINK_NEW_DEVICE_FINISH_ON_OTHER_DEVICE_SHEET_TITLE" = "יש לסיים את הקישור במכשיר האחר שלך";
@@ -4762,10 +4762,10 @@
 "LINK_PREVIEW_UNKNOWN_DOMAIN" = "תצוגה מקדימה של קישור";
 
 /* Shown in an alert when trying to edit a contact. */
-"LINKED_DEVICE_CONTACTS_NOT_ALLOWED" = "ניהול אנשי הקשר של הטלפון כבר לא זמין ב–iPad. כדי להוסיף חברי Signal לאנשי הקשר של הטלפון שלך, צריך לפתוח את Signal בטלפון.";
+"LINKED_DEVICE_CONTACTS_NOT_ALLOWED" = "ניהול אנשי הקשר של הטלפון כבר לא זמין ב–iPad. כדי להוסיף חברי Radar לאנשי הקשר של הטלפון שלך, צריך לפתוח את Radar בטלפון.";
 
 /* Shown in a banner when you tap the 'New Chat' icon at the top of the list of chats. */
-"LINKED_DEVICE_MANAGE_CONTACTS_BANNER" = "ניהול אנשי הקשר של הטלפון כבר לא נתמך ב–iPad. המכשיר הזה ימשיך לסנכרן כל שינוי ברשימת אנשי הקשר שלך מ–Signal בטלפון שלך.";
+"LINKED_DEVICE_MANAGE_CONTACTS_BANNER" = "ניהול אנשי הקשר של הטלפון כבר לא נתמך ב–iPad. המכשיר הזה ימשיך לסנכרן כל שינוי ברשימת אנשי הקשר שלך מ–Radar בטלפון שלך.";
 
 /* A button shown in a banner when you tap the 'New Chat' icon at the top of the list of chats. Tapping it opens a website with more details. */
 "LINKED_DEVICE_MANAGE_CONTACTS_LEARN_MORE" = "למידע נוסף";
@@ -4780,28 +4780,28 @@
 "LINKED_DEVICE_NOTIFICATION_TITLE" = "קישרת מכשיר חדש";
 
 /* Message for an action sheet telling users how to link a device, when trying to open an external device-linking URL. */
-"LINKED_DEVICE_URL_OPENED_ACTION_SHEET_EXTERNAL_URL_MESSAGE" = "כדי לקשר שולחן עבודה או iPad לחשבון Signal זה, יש לעבור אל ״מכשירים מקושרים״ וללחוץ על \"קישור מכשיר חדש\" ולסרוק שוב את קוד ה–QR. חשוב לוודא שסורקים רק את קודי ה–QR שמגיעים ישירות מ–Signal.";
+"LINKED_DEVICE_URL_OPENED_ACTION_SHEET_EXTERNAL_URL_MESSAGE" = "כדי לקשר שולחן עבודה או iPad לחשבון Radar זה, יש לעבור אל ״מכשירים מקושרים״ וללחוץ על \"קישור מכשיר חדש\" ולסרוק שוב את קוד ה–QR. חשוב לוודא שסורקים רק את קודי ה–QR שמגיעים ישירות מ–Radar.";
 
 /* Message for an action sheet telling users how to link a device, when trying to open a device-linking URL from the in-app camera. */
-"LINKED_DEVICE_URL_OPENED_ACTION_SHEET_IN_APP_CAMERA_MESSAGE" = "נראה שאת/ה מנסה לקשר מכשיר Signal. יש ללחוץ על המשך ואז ללחוץ על ״קישור מכשיר חדש״ ולסרוק שנית את קוד ה–QR.";
+"LINKED_DEVICE_URL_OPENED_ACTION_SHEET_IN_APP_CAMERA_MESSAGE" = "נראה שאת/ה מנסה לקשר מכשיר Radar. יש ללחוץ על המשך ואז ללחוץ על ״קישור מכשיר חדש״ ולסרוק שנית את קוד ה–QR.";
 
 /* Bullet point about downloads on the linked devices education sheet. Embeds {{ %1$@ iPad download link, %2$@ desktop download link }} */
 "LINKED_DEVICES_EDUCATION_POINT_DOWNLOADS" = "במכשיר האחר שלך, יש לבקר ב–%1$@ כדי להתקין את האפליקציה למכשיר iPad או %2$@ כדי להתקין את האפליקציה לשולחן העבודה.";
 
 /* Bullet point about message sync on the linked devices education sheet */
-"LINKED_DEVICES_EDUCATION_POINT_MESSAGES" = "הודעות Signal יסונכרנו עם Signal בטלפון הנייד שלך לאחר שהוא יקושר.";
+"LINKED_DEVICES_EDUCATION_POINT_MESSAGES" = "הודעות Radar יסונכרנו עם Radar בטלפון הנייד שלך לאחר שהוא יקושר.";
 
 /* Bullet point about privacy on the linked devices education sheet */
 "LINKED_DEVICES_EDUCATION_POINT_PRIVACY" = "כל התכתבות במכשירים המקושרים היא פרטית";
 
 /* Title for the linked device education sheet */
-"LINKED_DEVICES_EDUCATION_TITLE" = "Signal לשולחן העבודה או ל–iPad";
+"LINKED_DEVICES_EDUCATION_TITLE" = "Radar לשולחן העבודה או ל–iPad";
 
 /* Text that appears where the linked device list would be indicating that there are no linked devices. */
 "LINKED_DEVICES_EMPTY_STATE" = "אין מכשירים מקושרים";
 
 /* Description for header of the linked devices list */
-"LINKED_DEVICES_HEADER_DESCRIPTION" = "Use Signal on desktop or iPad.";
+"LINKED_DEVICES_HEADER_DESCRIPTION" = "Use Radar on desktop or iPad.";
 
 /* Footer text below the list of currently-linked devices */
 "LINKED_DEVICES_LIST_FOOTER" = "הודעות ופרטי צ׳אט מוגנים באמצעות הצפנה מקצה לקצה בכל המכשירים";
@@ -4843,10 +4843,10 @@
 "LINKING_SYNCING_TIMING_INFO" = "זה עשוי לקחת כמה דקות";
 
 /* Shown to users while the app is loading, asking them not to close the app. */
-"LOADING_VIEW_CONTROLLER_DONT_CLOSE_APP" = "אל תסגור Signal.";
+"LOADING_VIEW_CONTROLLER_DONT_CLOSE_APP" = "אל תסגור Radar.";
 
 /* Body for local network permission action sheet */
-"LOCAL_NETWORK_PERMISSION_ACTION_SHEET_BODY" = "על מנת להעביר את חשבון Signal שלך, אתה צריך לאפשר גישה אל רשת מקומית בשני המכשירים.";
+"LOCAL_NETWORK_PERMISSION_ACTION_SHEET_BODY" = "על מנת להעביר את חשבון Radar שלך, אתה צריך לאפשר גישה אל רשת מקומית בשני המכשירים.";
 
 /* A button asking the user if they need further help getting their transfer working. */
 "LOCAL_NETWORK_PERMISSION_ACTION_SHEET_NEED_HELP" = "צריך עזרה?";
@@ -4858,7 +4858,7 @@
 "LOCAL_NETWORK_PERMISSION_ACTION_SHEET_STEP_THREE" = "הפעל את ”רשת מקומית“";
 
 /* Second step for local network permission action sheet */
-"LOCAL_NETWORK_PERMISSION_ACTION_SHEET_STEP_TWO" = "נווט אל Signal";
+"LOCAL_NETWORK_PERMISSION_ACTION_SHEET_STEP_TWO" = "נווט אל Radar";
 
 /* Title for local network permission action sheet */
 "LOCAL_NETWORK_PERMISSION_ACTION_SHEET_TITLE" = "הפעל גישה אל רשת מקומית";
@@ -4873,7 +4873,7 @@
 "LOGGING_SECTION" = "רישום יומן";
 
 /* Footer for the 'logging' help section. */
-"LOGGING_SECTION_FOOTER" = "יומני ניפוי תקלים יכולים לעזור אל Signal לתקן סוגיות וקריסות.";
+"LOGGING_SECTION_FOOTER" = "יומני ניפוי תקלים יכולים לעזור אל Radar לתקן סוגיות וקריסות.";
 
 /* Title for the 'long text message' view. */
 "LONG_TEXT_VIEW_TITLE" = "הודעה";
@@ -4975,7 +4975,7 @@
 "MESSAGE_ACTION_DELETE_FOR_EVERYONE" = "מחיקה עבור כולם";
 
 /* A one-time confirmation that you want to delete for everyone */
-"MESSAGE_ACTION_DELETE_FOR_EVERYONE_CONFIRMATION" = "הודעה זו תימחק עבור כל מי שנמצא בצ'אט אם הם משתמשים בגרסה עדכנית של Signal. הם יוכלו לראות שמחקת הודעה.";
+"MESSAGE_ACTION_DELETE_FOR_EVERYONE_CONFIRMATION" = "הודעה זו תימחק עבור כל מי שנמצא בצ'אט אם הם משתמשים בגרסה עדכנית של Radar. הם יוכלו לראות שמחקת הודעה.";
 
 /* The title for the action sheet asking who the user wants to delete the message for. */
 "MESSAGE_ACTION_DELETE_FOR_TITLE" = "עבור מי בא לך למחוק הודעה זו?";
@@ -5020,7 +5020,7 @@
 "MESSAGE_ACTION_LINK_OPEN_LINK" = "פתח קישור";
 
 /* Label for button to open a signal proxy. */
-"MESSAGE_ACTION_LINK_OPEN_PROXY" = "פתיחת פרוקסי של Signal";
+"MESSAGE_ACTION_LINK_OPEN_PROXY" = "פתיחת פרוקסי של Radar";
 
 /* Label for button to open a sticker pack. */
 "MESSAGE_ACTION_LINK_OPEN_STICKER_PACK" = "הצג חבילת מדבקות";
@@ -5194,7 +5194,7 @@
 "MESSAGE_REQUEST_NAME_COLLISON_UPDATE_CONTACT_ACTION" = "עדכן איש קשר";
 
 /* Action sheet message to confirm reporting a conversation as spam via a message request. */
-"MESSAGE_REQUEST_REPORT_CONVERSATION_MESSAGE" = "Signal תקבל הודעה שהאדם הזה חשוד בשליחת ספאם. Signal לא יכולה לראות את התוכן של אף צ׳אט.";
+"MESSAGE_REQUEST_REPORT_CONVERSATION_MESSAGE" = "Radar תקבל הודעה שהאדם הזה חשוד בשליחת ספאם. Radar לא יכולה לראות את התוכן של אף צ׳אט.";
 
 /* Action sheet title to confirm reporting a conversation as spam via a message request. */
 "MESSAGE_REQUEST_REPORT_CONVERSATION_TITLE" = "לדווח על ספאם?";
@@ -5323,7 +5323,7 @@
 "MISSED_CALL_BLOCKED_SYSTEM_CONTACT" = "שיחה שלא נענתה מאיש קשר חסום בהגדרות הטלפון";
 
 /* Action to block contact in Signal for sheet shown when the user taps a missed call from a contact blocked in iOS settings. */
-"MISSED_CALL_BLOCKED_SYSTEM_SETTINGS_SHEET_BLOCK_ACTION" = "לחסום איש קשר גם ב–Signal";
+"MISSED_CALL_BLOCKED_SYSTEM_SETTINGS_SHEET_BLOCK_ACTION" = "לחסום איש קשר גם ב–Radar";
 
 /* Message for sheet shown when the user taps a missed call from a contact blocked in iOS settings. */
 "MISSED_CALL_BLOCKED_SYSTEM_SETTINGS_SHEET_MESSAGE" = "פספסת את השיחה בגלל שהאדם הזה חסום בהגדרות הטלפון שלך. כדי לנהל את זה, יש לעבור להגדרות > טלפון וללחוץ על אנשי קשר חסומים.";
@@ -5344,19 +5344,19 @@
 "MISSING_CAMERA_PERMISSION_MESSAGE" = "באפשרותך להפעיל גישה למצלמה באפליקציית ההגדרות של iOS.";
 
 /* Alert title */
-"MISSING_CAMERA_PERMISSION_TITLE" = "Signal צריך לקבל גישה אל מצלמה שלך.";
+"MISSING_CAMERA_PERMISSION_TITLE" = "Radar צריך לקבל גישה אל מצלמה שלך.";
 
 /* Alert body indicating the user has denied location permissions */
 "MISSING_LOCATION_PERMISSION_MESSAGE" = "אתה יכול לאפשר הרשאה זו ביישום הגדרות של iOS.";
 
 /* Alert title indicating the user has denied location permissions */
-"MISSING_LOCATION_PERMISSION_TITLE" = "Signal דורש גישה אל המיקום שלך עבור מאפיין זה.";
+"MISSING_LOCATION_PERMISSION_TITLE" = "Radar דורש גישה אל המיקום שלך עבור מאפיין זה.";
 
 /* Alert body when user has previously denied media library access */
 "MISSING_MEDIA_LIBRARY_PERMISSION_MESSAGE" = "אתה יכול לאפשר הרשאה זו ביישום הגדרות של iOS.";
 
 /* Alert title when user has previously denied media library access */
-"MISSING_MEDIA_LIBRARY_PERMISSION_TITLE" = "Signal דורש גישה אל התמונות שלך עבור מאפיין זה.";
+"MISSING_MEDIA_LIBRARY_PERMISSION_TITLE" = "Radar דורש גישה אל התמונות שלך עבור מאפיין זה.";
 
 /* An error shown as the title of an alert when try to link a new device & the user is already at the limit. */
 "MULTIDEVICE_PAIRING_MAX_DESC" = "אינך יכול לקשר עוד מכשירים כלשהם.";
@@ -5377,7 +5377,7 @@
 "MY_STORIES_SETTINGS_VISIBILITY_ALL_SIGNAL_CONNECTIONS_EXCEPT_TITLE" = "כולם חוץ מ…";
 
 /* Title for the visibility option */
-"MY_STORIES_SETTINGS_VISIBILITY_ALL_SIGNAL_CONNECTIONS_TITLE" = "כל חברי ה–Signal";
+"MY_STORIES_SETTINGS_VISIBILITY_ALL_SIGNAL_CONNECTIONS_TITLE" = "כל חברי ה–Radar";
 
 /* Title for the visibility option */
 "MY_STORIES_SETTINGS_VISIBILITY_ONLY_SHARE_WITH_TITLE" = "שיתוף רק עם…";
@@ -5539,7 +5539,7 @@
 "NICKNAME_EDITOR_DELETE_CONFIRMATION_TITLE" = "למחוק כינוי?";
 
 /* The description below the title on the profile nickname editor view. */
-"NICKNAME_EDITOR_DESCRIPTION" = "כינויים והערות מאוחסנים באמצעות Signal ומוצפנים מקצה לקצה. הם גלויים רק לך.";
+"NICKNAME_EDITOR_DESCRIPTION" = "כינויים והערות מאוחסנים באמצעות Radar ומוצפנים מקצה לקצה. הם גלויים רק לך.";
 
 /* Placeholder text it the text field for the family name in the profile nickname editor. */
 "NICKNAME_EDITOR_FAMILY_NAME_PLACEHOLDER" = "שם משפחה";
@@ -5602,7 +5602,7 @@
 "NOTIFICATION_PERMISSION_REMINDER_MEGAPHONE_TITLE" = "להפעיל התראות?";
 
 /* Shown as the body of an alert when notifications can't be shown due to an error. */
-"NOTIFICATIONS_ERROR_MESSAGE" = "יש להפעיל מחדש את ה–%1$@ שלך אם לא מתקבלות אצלך התראות Signal.";
+"NOTIFICATIONS_ERROR_MESSAGE" = "יש להפעיל מחדש את ה–%1$@ שלך אם לא מתקבלות אצלך התראות Radar.";
 
 /* Shown as the title of an alert when notifications can't be shown due to an error. */
 "NOTIFICATIONS_ERROR_TITLE" = "לא ניתן להציג התראות";
@@ -5662,10 +5662,10 @@
 "ONBOARDING_2FA_SKIP_PIN_ENTRY_TITLE" = "לדלג על הכנסת PIN?";
 
 /* The body for the device transfer 'choice' view 'restore backup' option */
-"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_BODY" = "שחזור החשבון וההודעות שלך מתוך גיבוי Radar/Signal שלך";
+"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_BODY" = "שחזור החשבון וההודעות שלך מתוך גיבוי Radar/Radar שלך";
 
 /* The title for the device transfer 'choice' view 'restore backup' option */
-"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_TITLE" = "שחזור גיבוי Radar/Signal מאובטח";
+"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_TITLE" = "שחזור גיבוי Radar/Radar מאובטח";
 
 /* Body for a sheet warning users about skipping restore. */
 "ONBOARDING_CHOOSE_RESTORE_METHOD_CONFIRM_SKIP_RESTORE_BODY" = "אם תדלג/י על השחזור כעת, לא תהיה לך אפשרות לשחזר מאוחר יותר. אם תפעיל/י מחדש גיבויים במכשיר זה, הגיבוי הנוכחי שלך יוחלף עם היסטוריית ההודעות החדשה שלך.";
@@ -5677,7 +5677,7 @@
 "ONBOARDING_CHOOSE_RESTORE_METHOD_DESCRIPTION" = "איך ברצונך לשחזר את היסטוריית ההודעות ונתוני החשבון שלך?";
 
 /* Message body displayed to a user during registration if there are no restore options available. */
-"ONBOARDING_CHOOSE_RESTORE_METHOD_NONE_AVAILABLE_BODY" = "מכיוון שאת/ה עובר/ת מ–Android ל–iOS, הדרך היחידה להעביר את ההודעות והמדיה שלך היא על ידי הפעלת גיבויי Signal במכשיר הישן שלך.";
+"ONBOARDING_CHOOSE_RESTORE_METHOD_NONE_AVAILABLE_BODY" = "מכיוון שאת/ה עובר/ת מ–Android ל–iOS, הדרך היחידה להעביר את ההודעות והמדיה שלך היא על ידי הפעלת גיבויי Radar במכשיר הישן שלך.";
 
 /* Title displayed to a user during registration if there are no restore options available. */
 "ONBOARDING_CHOOSE_RESTORE_METHOD_NONE_AVAILABLE_TITLE" = "אין גיבוי לשחזור";
@@ -5737,7 +5737,7 @@
 "ONBOARDING_MODE_SWITCH_BUTTON_REGISTERING" = "קשר iPhone";
 
 /* explanation to the user they're switching from linking to registering flow */
-"ONBOARDING_MODE_SWITCH_EXPLANATION_PROVISIONING" = "הקשה על \"רשום iPad\" תיצור חשבון Signal חדש לגמרי או תעביר חשבון קיים אל iPad זה. זה ישבית את Signal על מכשירים אחרים כלשהם שרשומים כיום עם אותו מספר טלפון.";
+"ONBOARDING_MODE_SWITCH_EXPLANATION_PROVISIONING" = "הקשה על \"רשום iPad\" תיצור חשבון Radar חדש לגמרי או תעביר חשבון קיים אל iPad זה. זה ישבית את Radar על מכשירים אחרים כלשהם שרשומים כיום עם אותו מספר טלפון.";
 
 /* explanation to the user they're switching from registering to linking flow */
 "ONBOARDING_MODE_SWITCH_EXPLANATION_REGISTERING" = "הקשה על \"קשר iPhone\" תיתן לך לחבר את הטלפון שלך אל חשבון קיים. קישור הטלפון שלך אינו מומלץ באופן כללי ויגביל מעט תפקודיות, כגון ביצוע שיחות.";
@@ -5749,13 +5749,13 @@
 "ONBOARDING_MODE_SWITCH_TITLE_REGISTERING" = "קשר iPhone זה";
 
 /* warning to the user that registering an ipad is not recommended */
-"ONBOARDING_MODE_SWITCH_WARNING_PROVISIONING" = "רישום iPad זה ישבית את Signal על מכשירים אחרים כלשהם שרשומים כיום עם אותו מספר טלפון.";
+"ONBOARDING_MODE_SWITCH_WARNING_PROVISIONING" = "רישום iPad זה ישבית את Radar על מכשירים אחרים כלשהם שרשומים כיום עם אותו מספר טלפון.";
 
 /* warning to the user that linking a phone is not recommended */
 "ONBOARDING_MODE_SWITCH_WARNING_REGISTERING" = "קישור iPhone שלך אינו מומלץ ויגביל תפקודיות ליבה.";
 
 /* Description of the 'Contacts' permission in the 'onboarding permissions' view. */
-"ONBOARDING_PERMISSIONS_CONTACTS_DESCRIPTION" = "למצוא אנשים שאת.ה מכיר.ה. אנשי הקשר שלך מוצפנים ואינם גלויים לשירות Signal.";
+"ONBOARDING_PERMISSIONS_CONTACTS_DESCRIPTION" = "למצוא אנשים שאת.ה מכיר.ה. אנשי הקשר שלך מוצפנים ואינם גלויים לשירות Radar.";
 
 /* Title introducing the 'Contacts' permission in the 'onboarding permissions' view. */
 "ONBOARDING_PERMISSIONS_CONTACTS_TITLE" = "אנשי קשר";
@@ -5767,7 +5767,7 @@
 "ONBOARDING_PERMISSIONS_NOTIFICATIONS_TITLE" = "התראות";
 
 /* Preamble of the 'onboarding permissions' view. */
-"ONBOARDING_PERMISSIONS_PREAMBLE" = "Signal רוצה לבקש את ההרשאות הבאות.";
+"ONBOARDING_PERMISSIONS_PREAMBLE" = "Radar רוצה לבקש את ההרשאות הבאות.";
 
 /* Description of the 'Notification Relay' permission in the 'onboarding permissions' view. */
 "ONBOARDING_PERMISSIONS_RELAY_DESCRIPTION" = "Enable Radar notification relay to ensure you get immediate background notifications in Radar. Relay is always privacy-preserving and keeps your messages end-to-end encrypted no matter what.";
@@ -5779,7 +5779,7 @@
 "ONBOARDING_PERMISSIONS_TITLE" = "התר הרשאות";
 
 /* Explanation of the 'onboarding phone number discoverability' view. Embeds {user phone number} */
-"ONBOARDING_PHONE_NUMBER_DISCOVERABILITY_EXPLANATION_FORMAT" = "בחר מי יכול למצוא אותך ב־Signal עם מספר הטלפון שלך %1$@";
+"ONBOARDING_PHONE_NUMBER_DISCOVERABILITY_EXPLANATION_FORMAT" = "בחר מי יכול למצוא אותך ב־Radar עם מספר הטלפון שלך %1$@";
 
 /* Title of the 'onboarding phone number discoverability' view. */
 "ONBOARDING_PHONE_NUMBER_DISCOVERABILITY_TITLE" = "מי יכול למצוא אותך עם המספר שלך?";
@@ -5794,7 +5794,7 @@
 "ONBOARDING_PHONE_NUMBER_VALIDATION_WARNING" = "מספר טלפון בלתי תקף. אנא הכנס מספר טלפון תקף כדי להירשם.";
 
 /* Explanation of the 'onboarding pin attempts exhausted' view when reglock is disabled. */
-"ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_EXPLANATION" = "ניחושי PIN אזלו לך, אבל אתה עדין יכול להשיג גישה אל חשבון Signal שלך ע״י יצירת PIN חדש. למען פרטיותך ואבטחתך, חשבונך ישוחזר בלי מידע פרופיל שמור כלשהו או הגדרות שמורות כלשהן.";
+"ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_EXPLANATION" = "ניחושי PIN אזלו לך, אבל אתה עדין יכול להשיג גישה אל חשבון Radar שלך ע״י יצירת PIN חדש. למען פרטיותך ואבטחתך, חשבונך ישוחזר בלי מידע פרופיל שמור כלשהו או הגדרות שמורות כלשהן.";
 
 /* Label for the 'learn more' link when reglock is disabled in the 'onboarding pin attempts exhausted' view. */
 "ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_LEARN_MORE" = "למד עוד על קודי PIN";
@@ -5803,7 +5803,7 @@
 "ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_TITLE" = "PIN שגוי";
 
 /* Explanation of the 'onboarding pin attempts exhausted' view when it is unknown if reglock is enabled. */
-"ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_WITH_UNKNOWN_REGLOCK_EXPLANATION" = "נגמרו לך ניחושי ה–PIN, אבל עדיין אפשר לנסות לגשת לחשבון Signal שלך באמצעות אימות מספר הטלפון שלך. למען הפרטיות והאבטחה שלך, החשבון שלך ישוחזר בלי מידע פרופיל שמור או הגדרות שמורות.";
+"ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_WITH_UNKNOWN_REGLOCK_EXPLANATION" = "נגמרו לך ניחושי ה–PIN, אבל עדיין אפשר לנסות לגשת לחשבון Radar שלך באמצעות אימות מספר הטלפון שלך. למען הפרטיות והאבטחה שלך, החשבון שלך ישוחזר בלי מידע פרופיל שמור או הגדרות שמורות.";
 
 /* Title for the setup complete screen shown at the end of the onboarding flow. */
 "ONBOARDING_SETUP_COMPLETE_TITLE" = "ההגדרה הושלמה";
@@ -5830,13 +5830,13 @@
 "ONBOARDING_SIGN_UP_USE_SIGNAL_ACCOUNT_BUTTON_TITLE" = "Use my Signal account";
 
 /* Explanation of 'do not have old device' flow for the 'Restore or Transfer' prompt */
-"ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_BODY" = "או שמדובר בהתקנה חוזרת של Radar/Signal על אותו מכשיר";
+"ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_BODY" = "או שמדובר בהתקנה חוזרת של Radar/Radar על אותו מכשיר";
 
 /* Title for the 'do not have my old device' choice of the 'Restore or Transfer' prompt */
 "ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_TITLE" = "אין לי את הטלפון הישן שלי";
 
 /* Explanation of 'have old device' flow for the 'Restore or Transfer' prompt */
-"ONBOARDING_SPLASH_HAVE_OLD_DEVICE_BODY" = "אפשר לסרוק קוד QR מחשבון Radar/Signal הנוכחי שלך כדי להתחיל במהירות";
+"ONBOARDING_SPLASH_HAVE_OLD_DEVICE_BODY" = "אפשר לסרוק קוד QR מחשבון Radar/Radar הנוכחי שלך כדי להתחיל במהירות";
 
 /* Title for the 'have my old device' choice of the 'Restore or Transfer' prompt */
 "ONBOARDING_SPLASH_HAVE_OLD_DEVICE_TITLE" = "יש לי את הטלפון הישן שלי";
@@ -5897,19 +5897,19 @@ Send money securely.";
 "OPEN_SETTINGS_BUTTON" = "הגדרות";
 
 /* Signal doesn't support old versions of iOS and shows a warning if you're on unsupported version. Some users can upgrade their device to a newer version of iOS to continue using Signal. If that's the case, they'll be shown this text. */
-"OS_EXPIRED_AND_CAN_UPGRADE_OS" = "אפליקציית Signal כבר לא פועלת במכשיר הזה. כדי להשתמש ב–Signal שוב, צריך לעדכן את המכשיר לגרסה חדשה יותר של iOS.";
+"OS_EXPIRED_AND_CAN_UPGRADE_OS" = "אפליקציית Radar כבר לא פועלת במכשיר הזה. כדי להשתמש ב–Radar שוב, צריך לעדכן את המכשיר לגרסה חדשה יותר של iOS.";
 
 /* Signal doesn't support old devices. If that's the case, they'll be shown this action, and tapping it will open information about Signal's minimum supported operating systems. */
-"OS_EXPIRED_AND_DEVICE_IS_STUCK" = "אפליקציית Signal כבר לא פועלת במכשיר הזה. כדי להשתמש ב–Signal שוב, צריך להחליף למכשיר חדש יותר.";
+"OS_EXPIRED_AND_DEVICE_IS_STUCK" = "אפליקציית Radar כבר לא פועלת במכשיר הזה. כדי להשתמש ב–Radar שוב, צריך להחליף למכשיר חדש יותר.";
 
 /* Signal doesn't support old versions of iOS and shows a warning if you're on an old version. Some users can upgrade their device to a newer version of iOS to continue using Signal. If that's the case, they'll be shown this action, and tapping it will open device update instructions. */
 "OS_SOON_TO_EXPIRE_ACTION_TITLE" = "עדכון כעת";
 
 /* Signal doesn't support old versions of iOS and shows a warning if you're an old version that will soon lose support. Some users can upgrade their device to a newer version of iOS to continue using Signal. If that's the case, they'll be shown this text. Embeds {{expiration date}}. */
-"OS_SOON_TO_EXPIRE_AND_CAN_UPGRADE_OS_FORMAT" = "בקרוב Signal תפסיק לתמוך בגרסת iOS של המכשיר שלך. כדי להמשיך להשתמש ב–Signal, צריך לעדכן את המכשיר לגרסה חדשה יותר של iOS עד %1$@.";
+"OS_SOON_TO_EXPIRE_AND_CAN_UPGRADE_OS_FORMAT" = "בקרוב Radar תפסיק לתמוך בגרסת iOS של המכשיר שלך. כדי להמשיך להשתמש ב–Radar, צריך לעדכן את המכשיר לגרסה חדשה יותר של iOS עד %1$@.";
 
 /* Signal doesn't support old versions of iOS and shows a warning if you're on an old version that will soon lose support. This is the text on that warning when users can't upgrade iOS without getting a new device. Embeds {{expiration date}}. */
-"OS_SOON_TO_EXPIRE_AND_DEVICE_WILL_BE_STUCK_FORMAT" = "בקרוב Signal תפסיק לתמוך בגרסת iOS של המכשיר שלך. כדי להמשיך להשתמש ב–Signal, צריך להחליף למכשיר חדש יותר עד %1$@.";
+"OS_SOON_TO_EXPIRE_AND_DEVICE_WILL_BE_STUCK_FORMAT" = "בקרוב Radar תפסיק לתמוך בגרסת iOS של המכשיר שלך. כדי להמשיך להשתמש ב–Radar, צריך להחליף למכשיר חדש יותר עד %1$@.";
 
 /* Info Message when another user disabled disappearing messages. Embeds {{name of other user}}. */
 "OTHER_DISABLED_DISAPPEARING_MESSAGES_CONFIGURATION" = "%1$@ השבית/ה הודעות נעלמות.";
@@ -5918,13 +5918,13 @@ Send money securely.";
 "OTHER_UPDATED_DISAPPEARING_MESSAGES_CONFIGURATION" = "%1$@ הגדיר את זמן ההודעות הנעלמות אל %2$@.";
 
 /* Label warning the user that the Signal service may be down. */
-"OUTAGE_WARNING" = "Signal חווה קשיים טכניים. אנו עובדים קשות כדי לשחזר את השירות מהר ככל האפשר.";
+"OUTAGE_WARNING" = "Radar חווה קשיים טכניים. אנו עובדים קשות כדי לשחזר את השירות מהר ככל האפשר.";
 
 /* Label for action link when the user has an outdated payment client */
 "OUTDATED_PAYMENT_CLIENT_ACTION_TITLE" = "עדכן עכשיו";
 
 /* Label warning the user that they should update Signal to continue using payments. */
-"OUTDATED_PAYMENT_CLIENT_REMINDER_TEXT" = "יש לעדכן את Signal כדי להמשיך להשתמש בתשלומים. יתכן שהיתרה שלך לא מעודכנת.";
+"OUTDATED_PAYMENT_CLIENT_REMINDER_TEXT" = "יש לעדכן את Radar כדי להמשיך להשתמש בתשלומים. יתכן שהיתרה שלך לא מעודכנת.";
 
 /* Body of prompt notifying restore was cancelled. */
 "OUTGOING_DEVICE_REGISTRATION_CANCELLED_RESTORE_BODY" = "השחזור בוטל. נא לנסות שוב.";
@@ -5933,7 +5933,7 @@ Send money securely.";
 "OUTGOING_DEVICE_REGISTRATION_CANCELLED_RESTORE_TITLE" = "שחזור בוטל";
 
 /* Body of prompt notifying registration without restore completed on the new device. */
-"OUTGOING_DEVICE_REGISTRATION_COMPLETE_BODY" = "חשבון Signal שלך הופעל במכשיר האחר שלך. Signal לא פעילה כעת במכשיר זה.";
+"OUTGOING_DEVICE_REGISTRATION_COMPLETE_BODY" = "חשבון Radar שלך הופעל במכשיר האחר שלך. Radar לא פעילה כעת במכשיר זה.";
 
 /* Title of prompt notifying registration without restore completed on the new device. */
 "OUTGOING_DEVICE_REGISTRATION_COMPLETE_TITLE" = "ההרשמה הושלמה";
@@ -5951,7 +5951,7 @@ Send money securely.";
 "OUTGOING_DEVICE_REGISTRATION_UNKNOWN_ERROR_TITLE" = "שגיאה לא ידועה";
 
 /* Body of prompt notifying device restore started on the new device. */
-"OUTGOING_DEVICE_RESTORE_COMPLETE_BODY" = "התחילה ההעברה של חשבון Signal וההודעות שלך למכשיר האחר שלך. Signal לא פעילה כעת במכשיר זה.";
+"OUTGOING_DEVICE_RESTORE_COMPLETE_BODY" = "התחילה ההעברה של חשבון Radar וההודעות שלך למכשיר האחר שלך. Radar לא פעילה כעת במכשיר זה.";
 
 /* Title of prompt notifying device restore started on the new device. */
 "OUTGOING_DEVICE_RESTORE_COMPLETE_TITLE" = "שחזור הושלם";
@@ -5975,7 +5975,7 @@ Send money securely.";
 "OUTGOING_DEVICE_RESTORE_INITIAL_VIEW_TITLE" = "העבר חשבון";
 
 /* Body of prompt notifying device transfer completed. */
-"OUTGOING_DEVICE_TRANSFER_COMPLETE_BODY" = "חשבון Signal שלך וההודעות שלך הועברו למכשיר האחר שלך. Signal לא פעילה כעת במכשיר זה.";
+"OUTGOING_DEVICE_TRANSFER_COMPLETE_BODY" = "חשבון Radar שלך וההודעות שלך הועברו למכשיר האחר שלך. Radar לא פעילה כעת במכשיר זה.";
 
 /* Title of prompt notifying device transfer completed. */
 "OUTGOING_DEVICE_TRANSFER_COMPLETE_TITLE" = "העברה הושלמה";
@@ -5987,10 +5987,10 @@ Send money securely.";
 "OUTGOING_MISSED_VOICE_CALL" = "שיחה קולית שלא נענתה";
 
 /* Button for action sheet shown when device transfer completes; quits the Signal app immediately (does not automatically relaunch, but the user may choose to relaunch). */
-"OUTGOING_TRANSFER_COMPLETE_EXIT_ACTION" = "יציאה מ–Signal";
+"OUTGOING_TRANSFER_COMPLETE_EXIT_ACTION" = "יציאה מ–Radar";
 
 /* Message for action sheet shown when device transfer completes */
-"OUTGOING_TRANSFER_COMPLETE_MESSAGE" = "Signal יתנתק כעת במכשיר זה";
+"OUTGOING_TRANSFER_COMPLETE_MESSAGE" = "Radar יתנתק כעת במכשיר זה";
 
 /* Title for action sheet shown when device transfer completes */
 "OUTGOING_TRANSFER_COMPLETE_TITLE" = "העברה הושלמה!";
@@ -6168,7 +6168,7 @@ Send money securely.";
 "PAYMENTS_NEW_PAYMENT_ERROR_INVALID_TRANSACTION" = "עסקה בלתי תקפה";
 
 /* Indicates that a payment failed due to an outdated client. */
-"PAYMENTS_NEW_PAYMENT_ERROR_OUTDATED_CLIENT" = "עדכן את Signal כדי להשתמש בתשלומים.";
+"PAYMENTS_NEW_PAYMENT_ERROR_OUTDATED_CLIENT" = "עדכן את Radar כדי להשתמש בתשלומים.";
 
 /* Indicates that an outgoing payment could not be verified in a timely way. */
 "PAYMENTS_NEW_PAYMENT_ERROR_OUTGOING_VERIFICATION_TAKING_TOO_LONG" = "תשלום אינו מוודא עדיין";
@@ -6432,13 +6432,13 @@ Send money securely.";
 "PHONE_NUMBER_DISCOVERABILITY_EVERYBODY" = "כולם";
 
 /* A user friendly description of the 'everybody' phone number discoverability mode. */
-"PHONE_NUMBER_DISCOVERABILITY_EVERYBODY_DESCRIPTION" = "כל מי שיש להם את מספר הטלפון שלך יראו אותך ב–Signal ויוכלו להתחיל איתך צ׳אט.";
+"PHONE_NUMBER_DISCOVERABILITY_EVERYBODY_DESCRIPTION" = "כל מי שיש להם את מספר הטלפון שלך יראו אותך ב–Radar ויוכלו להתחיל איתך צ׳אט.";
 
 /* A user friendly name for the 'nobody' phone number discoverability mode. */
 "PHONE_NUMBER_DISCOVERABILITY_NOBODY" = "אף אחד";
 
 /* A user friendly description of the 'nobody' phone number discoverability mode. */
-"PHONE_NUMBER_DISCOVERABILITY_NOBODY_DESCRIPTION" = "אנשים לא יוכלו לראות אותך ב–Signal אלא אם שלחת להם הודעה או שיש לך צ'אט קיים איתם.";
+"PHONE_NUMBER_DISCOVERABILITY_NOBODY_DESCRIPTION" = "אנשים לא יוכלו לראות אותך ב–Radar אלא אם שלחת להם הודעה או שיש לך צ'אט קיים איתם.";
 
 /* A format for a label showing an example phone number. Embeds {{the example phone number}}. */
 "PHONE_NUMBER_EXAMPLE_FORMAT" = "דוגמה: %1$@";
@@ -6540,22 +6540,22 @@ Send money securely.";
 "PIN_CREATION_DISABLE_CONFIRMATION_ACTION" = "השבת PIN";
 
 /* Message of the 'pin disable' action sheet. */
-"PIN_CREATION_DISABLE_CONFIRMATION_MESSAGE" = "אם תשבית את ה־PIN, תאבד את כל הנתונים כאשר תירשם מחדש אל Signal אלא אם תעביר אותו ממכשיר iOS אחר. אינך יכול להפעיל נעילת הרשמה בזמן שה־PIN מושבת.";
+"PIN_CREATION_DISABLE_CONFIRMATION_MESSAGE" = "אם תשבית את ה־PIN, תאבד את כל הנתונים כאשר תירשם מחדש אל Radar אלא אם תעביר אותו ממכשיר iOS אחר. אינך יכול להפעיל נעילת הרשמה בזמן שה־PIN מושבת.";
 
 /* Title of the 'pin disable' action sheet. */
 "PIN_CREATION_DISABLE_CONFIRMATION_TITLE" = "אזהרה";
 
 /* The explanation in the 'pin creation' view. */
-"PIN_CREATION_EXPLANATION" = "קודי PIN שומרים על מידע מאוחסן עם Signal מוצפן כך שרק אתה יכול להשיג גישה אליו. הפרופיל, ההגדרות ואנשי הקשר שלך ישוחזרו כשתתקין מחדש את Signal. לא תצטרך את ה־PIN שלך כדי לפתוח את היישום.";
+"PIN_CREATION_EXPLANATION" = "קודי PIN שומרים על מידע מאוחסן עם Radar מוצפן כך שרק אתה יכול להשיג גישה אליו. הפרופיל, ההגדרות ואנשי הקשר שלך ישוחזרו כשתתקין מחדש את Radar. לא תצטרך את ה־PIN שלך כדי לפתוח את היישום.";
 
 /* Learn more action on the pin creation view */
 "PIN_CREATION_LEARN_MORE" = "עוד על קודי PIN";
 
 /* Users can create PINs to restore their account data later. They can learn more about this on a sheet. This is the text on that sheet. */
-"PIN_CREATION_LEARN_MORE_TEXT" = "קודי PIN שומרים על המידע שלך שמאוחסן ב–Signal מוצפן כך שרק לך תהיה גישה אליו. הפרופיל, ההגדרות ואנשי הקשר שלך ישוחזרו בעת התקנה מחדש.";
+"PIN_CREATION_LEARN_MORE_TEXT" = "קודי PIN שומרים על המידע שלך שמאוחסן ב–Radar מוצפן כך שרק לך תהיה גישה אליו. הפרופיל, ההגדרות ואנשי הקשר שלך ישוחזרו בעת התקנה מחדש.";
 
 /* Users can create PINs to restore their account data later. They can learn more about this on a sheet. This is the title on that sheet. */
-"PIN_CREATION_LEARN_MORE_TITLE" = "עוד על קודי PIN של Signal";
+"PIN_CREATION_LEARN_MORE_TITLE" = "עוד על קודי PIN של Radar";
 
 /* Label indicating that the attempted PIN does not match the first PIN */
 "PIN_CREATION_MISMATCH_ERROR" = "קודי PIN אינם תואמים. נסה שוב.";
@@ -6588,7 +6588,7 @@ Send money securely.";
 "PIN_CREATION_WEAK_ERROR" = "בחר PIN חזק יותר";
 
 /* If your attempted PIN is too weak, you'll see an error message. This is the text on the error dialog. */
-"PIN_CREATION_WEAK_ERROR_MESSAGE" = "קודי PIN שומרים על המידע שלך שמאוחסן ב–Signal מוצפן כך שרק לך תהיה גישה אליו. יש לבחור PIN חזק יותר כדי להגן על החשבון שלך.";
+"PIN_CREATION_WEAK_ERROR_MESSAGE" = "קודי PIN שומרים על המידע שלך שמאוחסן ב–Radar מוצפן כך שרק לך תהיה גישה אליו. יש לבחור PIN חזק יותר כדי להגן על החשבון שלך.";
 
 /* If the user is re-registering, they need to enter their PIN to restore all their data. In some cases, they can skip this entry and lose some data. This text is shown on a button that lets them begin to do this. */
 "PIN_ENTER_EXISTING_SKIP" = "דילוג על PIN";
@@ -6621,7 +6621,7 @@ Send money securely.";
 "PIN_REMINDER_MEGAPHONE_FEW_DAYS_TOAST" = "נזכיר לך שוב עוד מספר ימים.";
 
 /* Title for PIN reminder megaphone */
-"PIN_REMINDER_MEGAPHONE_TITLE" = "וודא את Signal PIN שלך";
+"PIN_REMINDER_MEGAPHONE_TITLE" = "וודא את Radar PIN שלך";
 
 /* Toast indicating that we'll ask you for your PIN again tomorrow, after successfully entering it. */
 "PIN_REMINDER_MEGAPHONE_TOMORROW_SUCCESSFUL_TOAST" = "PIN נכון. נזכיר לך שוב מחר.";
@@ -6645,7 +6645,7 @@ Send money securely.";
 "PIN_REMINDER_MISMATCH_ERROR" = "PIN בלתי תקף, נסה שוב.";
 
 /* The title for the 'pin reminder' dialog. */
-"PIN_REMINDER_TITLE" = "הכנס את Signal PIN שלך";
+"PIN_REMINDER_TITLE" = "הכנס את Radar PIN שלך";
 
 /* Label indicating that the attempted PIN is too short */
 "PIN_REMINDER_TOO_SHORT_ERROR" = "PIN חייב להיות לפחות 4 ספרות.";
@@ -6660,7 +6660,7 @@ Send money securely.";
 "PINS_MEGAPHONE_ACTION" = "צור PIN";
 
 /* Body for PIN megaphone when user doesn't have a PIN */
-"PINS_MEGAPHONE_BODY" = "סיים ליצור את PIN של Signal שלך.";
+"PINS_MEGAPHONE_BODY" = "סיים ליצור את PIN של Radar שלך.";
 
 /* Title for PIN megaphone when user doesn't have a PIN */
 "PINS_MEGAPHONE_TITLE" = "צור PIN";
@@ -6768,19 +6768,19 @@ Send money securely.";
 "PRIVACY_VERIFICATION_FAILED_MISMATCHED_SAFETY_NUMBERS_IN_CLIPBOARD" = "המספר בלוח העריכה שלך לא נראה כמו מספר הבטיחות הנכון עבור צ׳אט זה.";
 
 /* Alert body for user error */
-"PRIVACY_VERIFICATION_FAILED_NO_SAFETY_NUMBERS_IN_CLIPBOARD" = "Signal לא היה יכול למצוא מספר ביטחון כלשהו בלוח העריכה שלך. האם העתקת אותו כראוי?";
+"PRIVACY_VERIFICATION_FAILED_NO_SAFETY_NUMBERS_IN_CLIPBOARD" = "Radar לא היה יכול למצוא מספר ביטחון כלשהו בלוח העריכה שלך. האם העתקת אותו כראוי?";
 
 /* Alert body when verifying with {{contact name}} */
-"PRIVACY_VERIFICATION_FAILED_THEY_HAVE_WRONG_KEY_FOR_ME" = "כל זוג של משתמשי Signal חולק מספר ביטחון ייחודי. חשוב לבדוק שוב ש%1$@ מציג את מספר הביטחון הייחודי *שלך*.";
+"PRIVACY_VERIFICATION_FAILED_THEY_HAVE_WRONG_KEY_FOR_ME" = "כל זוג של משתמשי Radar חולק מספר ביטחון ייחודי. חשוב לבדוק שוב ש%1$@ מציג את מספר הביטחון הייחודי *שלך*.";
 
 /* alert body */
-"PRIVACY_VERIFICATION_FAILED_WITH_OLD_LOCAL_VERSION" = "אתה מריץ גרסה ישנה של Signal. אתה צריך לעדכן גרסה לפני שתוכל לוודא.";
+"PRIVACY_VERIFICATION_FAILED_WITH_OLD_LOCAL_VERSION" = "אתה מריץ גרסה ישנה של Radar. אתה צריך לעדכן גרסה לפני שתוכל לוודא.";
 
 /* alert body */
-"PRIVACY_VERIFICATION_FAILED_WITH_OLD_REMOTE_VERSION" = "השותף שלך מריץ גרסה ישנה של Signal. הוא צריך לעדכן גרסה לפני שתוכל לוודא.";
+"PRIVACY_VERIFICATION_FAILED_WITH_OLD_REMOTE_VERSION" = "השותף שלך מריץ גרסה ישנה של Radar. הוא צריך לעדכן גרסה לפני שתוכל לוודא.";
 
 /* alert body */
-"PRIVACY_VERIFICATION_FAILURE_INVALID_QRCODE" = "הקוד הסרוק לא נראה כמו מספר ביטחון. האם שניכם על גרסה מעודכנת של Signal?";
+"PRIVACY_VERIFICATION_FAILURE_INVALID_QRCODE" = "הקוד הסרוק לא נראה כמו מספר ביטחון. האם שניכם על גרסה מעודכנת של Radar?";
 
 /* Navbar title */
 "PRIVACY_VERIFICATION_TITLE" = "אימות מספר בטיחות";
@@ -6855,7 +6855,7 @@ Send money securely.";
 "PROFILE_NAME_EDUCATION_SHEET_BULLET_3" = "אין לשתף מידע אישי עם אנשים שלא מוכרים לך";
 
 /* Header for the explainer sheet for profile names */
-"PROFILE_NAME_EDUCATION_SHEET_HEADER_FORMAT" = "<bold>שמות פרופילים</bold> ב–Signal נבחרים על ידי בעל/ת החשבון.";
+"PROFILE_NAME_EDUCATION_SHEET_HEADER_FORMAT" = "<bold>שמות פרופילים</bold> ב–Radar נבחרים על ידי בעל/ת החשבון.";
 
 /* Title for the profile name view. */
 "PROFILE_NAME_VIEW_TITLE" = "שמך";
@@ -7062,7 +7062,7 @@ Send money securely.";
 "RECIPIENT_PICKER_ERROR_USER_CANNOT_BE_SELECTED" = "המשתמש אינו יכול להיבחר.";
 
 /* Alert text. Shown after selecting a phone number that isn't valid. */
-"RECIPIENT_PICKER_INVALID_NUMBER_MESSAGE" = "%1$@ לא משתמש/ת ב–Signal. יש לנסות שוב עם מספר טלפון תקין.";
+"RECIPIENT_PICKER_INVALID_NUMBER_MESSAGE" = "%1$@ לא משתמש/ת ב–Radar. יש לנסות שוב עם מספר טלפון תקין.";
 
 /* Alert title. Shown after selecting a phone number that isn't valid. */
 "RECIPIENT_PICKER_INVALID_NUMBER_TITLE" = "מספר טלפון לא תקין";
@@ -7071,22 +7071,22 @@ Send money securely.";
 "RECIPIENT_PICKER_INVITE_ACTION" = "הזמן";
 
 /* Alert text. Shown after selecting a phone number that isn't a Signal user. */
-"RECIPIENT_PICKER_INVITE_MESSAGE" = "%1$@ לא משתמש/ת ב–Signal. רוצה להזמין את המספר הזה?";
+"RECIPIENT_PICKER_INVITE_MESSAGE" = "%1$@ לא משתמש/ת ב–Radar. רוצה להזמין את המספר הזה?";
 
 /* Alert title. Shown after selecting a phone number that isn't a Signal user. */
-"RECIPIENT_PICKER_INVITE_TITLE" = "הזמנה ל–Signal";
+"RECIPIENT_PICKER_INVITE_TITLE" = "הזמנה ל–Radar";
 
 /* Alert title explaining what happens if you forget your 'two-factor auth pin'. */
 "REGISTER_2FA_FORGOT_PIN_ALERT_TITLE" = "צריך עזרה?";
 
 /* Alert body for a forgotten SVR (V2) PIN */
-"REGISTER_2FA_FORGOT_SVR_PIN_ALERT_MESSAGE" = "ה–PIN שלך הוא קוד בעל 4 תווים או יותר שיצרת ויכול להיות מספרי או אלפא–נומרי. אם שכחת את ה–PIN שלך, יהיה עליך להמתין 7 ימים כדי להירשם מחדש לחשבון שלך. אם הפעלת גיבויי Signal מאובטחים, יש לך אפשרות להמשיך עם מפתח השחזור שלך.";
+"REGISTER_2FA_FORGOT_SVR_PIN_ALERT_MESSAGE" = "ה–PIN שלך הוא קוד בעל 4 תווים או יותר שיצרת ויכול להיות מספרי או אלפא–נומרי. אם שכחת את ה–PIN שלך, יהיה עליך להמתין 7 ימים כדי להירשם מחדש לחשבון שלך. אם הפעלת גיבויי Radar מאובטחים, יש לך אפשרות להמשיך עם מפתח השחזור שלך.";
 
 /* Alert body for a forgotten SVR (V2) PIN when the user doesn't have reglock and they cannot necessarily create a new PIN */
-"REGISTER_2FA_FORGOT_SVR_PIN_WITHOUT_REGLOCK_ALERT_MESSAGE" = "ה–PIN שלך הוא קוד בעל 4 תווים או יותר שיצרת ויכול להיות מספרי או אלפאנומרי. אם שכחת את ה–PIN שלך, אפשר להירשם ולהשתמש בחשבון שלך אבל יאבדו לך הגדרות מסוימות כמו מידע הפרופיל שלך. אם הפעלת גיבויי Signal מאובטחים, יש לך אפשרות להמשיך עם מפתח השחזור שלך.";
+"REGISTER_2FA_FORGOT_SVR_PIN_WITHOUT_REGLOCK_ALERT_MESSAGE" = "ה–PIN שלך הוא קוד בעל 4 תווים או יותר שיצרת ויכול להיות מספרי או אלפאנומרי. אם שכחת את ה–PIN שלך, אפשר להירשם ולהשתמש בחשבון שלך אבל יאבדו לך הגדרות מסוימות כמו מידע הפרופיל שלך. אם הפעלת גיבויי Radar מאובטחים, יש לך אפשרות להמשיך עם מפתח השחזור שלך.";
 
 /* Alert body for a forgotten SVR (V2) PIN when the user doesn't have reglock and they can create a new PIN */
-"REGISTER_2FA_FORGOT_SVR_PIN_WITHOUT_REGLOCK_AND_CAN_CREATE_NEW_PIN_ALERT_MESSAGE" = "ה–PIN שלך הוא קוד בעל 4 תווים או יותר שיצרת ויכול להיות מספרי או אלפא–נומרי. אם שכחת את ה–PIN שלך, אפשר ליצור אחד חדש. ניתן להירשם ולהשתמש בחשבון שלך אבל אז יאבדו כמה הגדרות שמורות כמו נתוני הפרופיל שלך. אם הפעלת גיבויי Signal מאובטחים, יש לך אפשרות להמשיך עם מפתח השחזור שלך.";
+"REGISTER_2FA_FORGOT_SVR_PIN_WITHOUT_REGLOCK_AND_CAN_CREATE_NEW_PIN_ALERT_MESSAGE" = "ה–PIN שלך הוא קוד בעל 4 תווים או יותר שיצרת ויכול להיות מספרי או אלפא–נומרי. אם שכחת את ה–PIN שלך, אפשר ליצור אחד חדש. ניתן להירשם ולהשתמש בחשבון שלך אבל אז יאבדו כמה הגדרות שמורות כמו נתוני הפרופיל שלך. אם הפעלת גיבויי Radar מאובטחים, יש לך אפשרות להמשיך עם מפתח השחזור שלך.";
 
 /* Alert title explaining what happens if you forget your 'two-factor auth pin'. */
 "REGISTER_2FA_INVALID_PIN_ALERT_TITLE" = "PIN שגוי";
@@ -7134,7 +7134,7 @@ Send money securely.";
 "REGISTRATION_BACKUP_RESTORE_ERROR_GENERIC_TITLE" = "לא ניתן היה לסיים את ההעברה";
 
 /* Body for a sheet warning users about an incorrect recovery key. */
-"REGISTRATION_BACKUP_RESTORE_ERROR_INCORRECT_KEY_BODY" = "יתכן שהזנת את מפתח השחזור שלך באופן שגוי, או שלא השלמת לפחות גיבוי אחד במכשיר הישן שלך. \n\nחשוב לוודא שההרשמה מתבצעת עם אותו מספר טלפון ואותו מפתח שחזור ששמרת בעת הפעלת גיבויי Signal מאובטחים, וכן שהושלם גיבוי במכשיר הישן שלך.";
+"REGISTRATION_BACKUP_RESTORE_ERROR_INCORRECT_KEY_BODY" = "יתכן שהזנת את מפתח השחזור שלך באופן שגוי, או שלא השלמת לפחות גיבוי אחד במכשיר הישן שלך. \n\nחשוב לוודא שההרשמה מתבצעת עם אותו מספר טלפון ואותו מפתח שחזור ששמרת בעת הפעלת גיבויי Radar מאובטחים, וכן שהושלם גיבוי במכשיר הישן שלך.";
 
 /* Body for a sheet warning users about an incorrect recovery key and having hit a rate limit on retries. */
 "REGISTRATION_BACKUP_RESTORE_ERROR_INCORRECT_KEY_RATE_LIMIT_BODY" = "נגמרו לך ניסיונות מפתח השחזור. למען ביטחונך, מספר הניסיונות שאפשר לבצע מוגבל. יש להמתין שעה ולנסות שוב.";
@@ -7167,7 +7167,7 @@ Send money securely.";
 "REGISTRATION_BACKUP_RESTORE_ERROR_UNRETRYABLE_SERVER_ERROR_TITLE" = "לא ניתן לשחזר גיבוי";
 
 /* Body for a sheet warning users about an incompatible backup version. */
-"REGISTRATION_BACKUP_RESTORE_ERROR_UNSUPPORTED_BACKUP_VERSION_BODY" = "כדי לאחסן את הגיבוי שלך, יש לוודא שיש לך את הגרסה האחרונה של Signal ולנסות שוב. אם הבעיה הזו נמשכת, יש ליצור קשר עם התמיכה.";
+"REGISTRATION_BACKUP_RESTORE_ERROR_UNSUPPORTED_BACKUP_VERSION_BODY" = "כדי לאחסן את הגיבוי שלך, יש לוודא שיש לך את הגרסה האחרונה של Radar ולנסות שוב. אם הבעיה הזו נמשכת, יש ליצור קשר עם התמיכה.";
 
 /* Title for a sheet warning users about an incompatible backup version. */
 "REGISTRATION_BACKUP_RESTORE_ERROR_UNSUPPORTED_BACKUP_VERSION_TITLE" = "נדרש עדכון";
@@ -7179,7 +7179,7 @@ Send money securely.";
 "REGISTRATION_CANNOT_CONTINUE_WITHOUT_UPDATING_APP_ACTION" = "עדכון";
 
 /* During (re)registration, users may need to update their app to continue. They'll be presented with an alert if this is the case, prompting them to update. This is the description text on that alert. */
-"REGISTRATION_CANNOT_CONTINUE_WITHOUT_UPDATING_APP_DESCRIPTION" = "כדי להמשיך ברישום, צריך לעדכן לגרסה האחרונה של Signal.";
+"REGISTRATION_CANNOT_CONTINUE_WITHOUT_UPDATING_APP_DESCRIPTION" = "כדי להמשיך ברישום, צריך לעדכן לגרסה האחרונה של Radar.";
 
 /* During (re)registration, users may need to update their app to continue. They'll be presented with an alert if this is the case, prompting them to update. This is the title on that alert. */
 "REGISTRATION_CANNOT_CONTINUE_WITHOUT_UPDATING_APP_TITLE" = "נדרש עדכון";
@@ -7191,7 +7191,7 @@ Send money securely.";
 "REGISTRATION_DEFAULT_COUNTRY_NAME" = "קוד מדינה";
 
 /* If a user is installing Signal on a new phone, they may be asked whether they want to transfer their account from their old device. This is a description on the screen that asks them this question. */
-"REGISTRATION_DEVICE_TRANSFER_CHOICE_EXPLANATION" = "המשך ישבית את Signal במכשירים אחרים שרשומים כרגע עם אותו מספר טלפון.";
+"REGISTRATION_DEVICE_TRANSFER_CHOICE_EXPLANATION" = "המשך ישבית את Radar במכשירים אחרים שרשומים כרגע עם אותו מספר טלפון.";
 
 /* If a user is installing Signal on a new phone, they may be asked whether they want to transfer their account from their old device. This is the title on the screen that asks them this question. */
 "REGISTRATION_DEVICE_TRANSFER_CHOICE_TITLE" = "העברת חשבון והודעות";
@@ -7227,7 +7227,7 @@ Send money securely.";
 "REGISTRATION_NO_BACKUP_KEY_BUTTON_TITLE" = "אין מפתח שחזור?";
 
 /* Body text on a sheet with info for what to do if you don't have a recovery key */
-"REGISTRATION_NO_BACKUP_KEY_SHEET_BODY" = "לא ניתן לשחזר גיבויים ללא קוד השחזור בן 64 התווים. אם איבדת את מפתח השחזור, Signal לא תוכל לעזור לשחזר את הגיבוי שלך.\n\nאם יש לך את המכשיר הישן שלך, יש לך אפשרות לראות את מפתח השחזור באמצעות כניסה להגדרות > צ׳אטים > גיבויים. לאחר מכן יש ללחוץ על ״הצגת מפתח שחזור״.";
+"REGISTRATION_NO_BACKUP_KEY_SHEET_BODY" = "לא ניתן לשחזר גיבויים ללא קוד השחזור בן 64 התווים. אם איבדת את מפתח השחזור, Radar לא תוכל לעזור לשחזר את הגיבוי שלך.\n\nאם יש לך את המכשיר הישן שלך, יש לך אפשרות לראות את מפתח השחזור באמצעות כניסה להגדרות > צ׳אטים > גיבויים. לאחר מכן יש ללחוץ על ״הצגת מפתח שחזור״.";
 
 /* Title for sheet with info for what to do if you don't have a recovery key */
 "REGISTRATION_NO_BACKUP_KEY_SHEET_TITLE" = "אין מפתח שחזור?";
@@ -7290,16 +7290,16 @@ Send money securely.";
 "REGISTRATION_PROFILE_SETUP_TITLE" = "הגדרת הפרופיל שלך";
 
 /* Error shown if an SMS/call service provider is permanently unable to send a verification code to the provided number. */
-"REGISTRATION_PROVIDER_FAILURE_MESSAGE_PERMANENT" = "Signal לא יכולה לשלוח קוד SMS בגלל בעיות עם ספק ה–SMS.";
+"REGISTRATION_PROVIDER_FAILURE_MESSAGE_PERMANENT" = "Radar לא יכולה לשלוח קוד SMS בגלל בעיות עם ספק ה–SMS.";
 
 /* Error shown if an SMS/call service provider is temporarily unable to send a verification code to the provided number. */
-"REGISTRATION_PROVIDER_FAILURE_MESSAGE_TRANSIENT" = "Signal לא הצליחה לשלוח קוד SMS בגלל בעיות עם ספק ה–SMS. יש לנסות שוב בעוד מספר שעות.";
+"REGISTRATION_PROVIDER_FAILURE_MESSAGE_TRANSIENT" = "Radar לא הצליחה לשלוח קוד SMS בגלל בעיות עם ספק ה–SMS. יש לנסות שוב בעוד מספר שעות.";
 
 /* Third step in directions for how to make a backup */
 "REGISTRATION_RESTORE_METHOD_MAKE_BACKUP_TUTORIAL_ENABLE_BACKUPS" = "להפעיל גיבויים ולהמתין עד להשלמת הגיבוי";
 
 /* First step in directions for how to make a backup */
-"REGISTRATION_RESTORE_METHOD_MAKE_BACKUP_TUTORIAL_OPEN_SIGNAL" = "יש לפתוח את Signal במכשיר הישן";
+"REGISTRATION_RESTORE_METHOD_MAKE_BACKUP_TUTORIAL_OPEN_SIGNAL" = "יש לפתוח את Radar במכשיר הישן";
 
 /* Second step in directions for how to make a backup */
 "REGISTRATION_RESTORE_METHOD_MAKE_BACKUP_TUTORIAL_TAP_SETTINGS" = "ללחוץ על הגדרות > גיבויים";
@@ -7317,7 +7317,7 @@ Send money securely.";
 "REGISTRATION_SCAN_QR_CODE_TITLE" = "סריקת הקוד הזה עם הטלפון הישן שלך";
 
 /* Tutorial text describing the first step to scanning the restore/transfer QR code with your old phone: opening Signal */
-"REGISTRATION_SCAN_QR_CODE_TUTORIAL_OPEN_SIGNAL" = "יש לפתוח את Signal במכשיר הישן";
+"REGISTRATION_SCAN_QR_CODE_TUTORIAL_OPEN_SIGNAL" = "יש לפתוח את Radar במכשיר הישן";
 
 /* Tutorial text describing the third step to scanning the restore/transfer QR code with your old phone: scan the code */
 "REGISTRATION_SCAN_QR_CODE_TUTORIAL_SCAN" = "לסרוק את הקוד הזה עם המצלמה";
@@ -7521,7 +7521,7 @@ Send money securely.";
 "SAFETY_NUMBER_CONFIRMATION_VIEW_ACTION" = "הצג";
 
 /* Snippet to share {{safety number}} with a friend. sent e.g. via SMS */
-"SAFETY_NUMBER_SHARE_FORMAT" = "מספר ביטחון Signal שלנו:\n%1$@";
+"SAFETY_NUMBER_SHARE_FORMAT" = "מספר ביטחון Radar שלנו:\n%1$@";
 
 /* Title for Safety Tips button in thread details. */
 "SAFETY_TIPS_BUTTON_ACTION_TITLE" = "טיפים לבטיחות";
@@ -7539,7 +7539,7 @@ Send money securely.";
 "SAFETY_TIPS_FAKE_BUSINESS_TITLE" = "עסקים ומוסדות מזויפים";
 
 /* Message contents for the fake names safety tip. */
-"SAFETY_TIPS_FAKE_NAMES_BODY" = "Signal לעולם לא תיצור איתך קשר עבור קוד הרישום או ה–PIN שלך. יש להיזהר מבקשות שנשלחות על ידי מתחזים. שמות פרופילים נבחרים על ידי בעל/ת החשבון ואינם מאומתים.";
+"SAFETY_TIPS_FAKE_NAMES_BODY" = "Radar לעולם לא תיצור איתך קשר עבור קוד הרישום או ה–PIN שלך. יש להיזהר מבקשות שנשלחות על ידי מתחזים. שמות פרופילים נבחרים על ידי בעל/ת החשבון ואינם מאומתים.";
 
 /* Message title describing the fake names safety tip. */
 "SAFETY_TIPS_FAKE_NAMES_TITLE" = "שמות וחשבונות מזויפים";
@@ -7599,13 +7599,13 @@ Send money securely.";
 "SCREEN_LOCK_ERROR_LOCAL_AUTHENTICATION_PASSCODE_NOT_SET" = "אתה חייב לאפשר קוד גישה בהגדרות iOS שלך על מנת להשתמש בנעילת מסך.";
 
 /* Description of how and why Signal iOS uses Touch ID/Face ID/Phone Passcode to unlock 'screen lock'. */
-"SCREEN_LOCK_REASON_UNLOCK_SCREEN_LOCK" = "אמת כדי לפתוח את Signal.";
+"SCREEN_LOCK_REASON_UNLOCK_SCREEN_LOCK" = "אמת כדי לפתוח את Radar.";
 
 /* Title for alert indicating that screen lock could not be unlocked. */
 "SCREEN_LOCK_UNLOCK_FAILED" = "אימות נכשל";
 
 /* Label for button on lock screen that lets users unlock Signal. */
-"SCREEN_LOCK_UNLOCK_SIGNAL" = "שחרר נעילת Signal";
+"SCREEN_LOCK_UNLOCK_SIGNAL" = "שחרר נעילת Radar";
 
 /* Placeholder text indicating the user can search for contacts by name, username, or phone number. */
 "SEARCH_BY_NAME_OR_USERNAME_OR_NUMBER_PLACEHOLDER_TEXT" = "שם, שם משתמש או מספר";
@@ -7638,13 +7638,13 @@ Send money securely.";
 "SECONDARY_LINKING_ERROR_DIFFERENT_ACCOUNT_TITLE" = "חשבונות אינם תואמים";
 
 /* Message for error alert indicating that a linked device must be upgraded before it can be linked. */
-"SECONDARY_LINKING_ERROR_OBSOLETE_LINKED_DEVICE_MESSAGE" = "עדכן את Signal על מכשיר זה כדי לקשר אותו עם הטלפון שלך.";
+"SECONDARY_LINKING_ERROR_OBSOLETE_LINKED_DEVICE_MESSAGE" = "עדכן את Radar על מכשיר זה כדי לקשר אותו עם הטלפון שלך.";
 
 /* Title for error alert indicating that a linked device must be upgraded before it can be linked. */
 "SECONDARY_LINKING_ERROR_OBSOLETE_LINKED_DEVICE_TITLE" = "גרסה בלתי נתמכת";
 
 /* alert message for outdated linking device */
-"SECONDARY_LINKING_ERROR_OLD_VERSION_MESSAGE" = "המכשיר האחר שלך מריץ גרסת מורשת של Signal שאינה תומכת סריקת קודי QR של iPad. אנא התקן את השחרור האחרון ונסה שוב.";
+"SECONDARY_LINKING_ERROR_OLD_VERSION_MESSAGE" = "המכשיר האחר שלך מריץ גרסת מורשת של Radar שאינה תומכת סריקת קודי QR של iPad. אנא התקן את השחרור האחרון ונסה שוב.";
 
 /* alert title for outdated linking device */
 "SECONDARY_LINKING_ERROR_OLD_VERSION_TITLE" = "עדכן מכשיר סריקה";
@@ -7665,7 +7665,7 @@ Send money securely.";
 "SECONDARY_LINKING_SYNCING_UPDATE_REQUIRED_CHECK_FOR_UPDATE_BUTTON" = "בדיקת עדכונים";
 
 /* Message for action sheet when the secondary device fails to sync messages due to an app update being required. */
-"SECONDARY_LINKING_SYNCING_UPDATE_REQUIRED_ERROR_MESSAGE" = "כדי להשלים את סנכרון ההודעות, יש לעדכן את Signal כעת.";
+"SECONDARY_LINKING_SYNCING_UPDATE_REQUIRED_ERROR_MESSAGE" = "כדי להשלים את סנכרון ההודעות, יש לעדכן את Radar כעת.";
 
 /* Title for action sheet when the secondary device fails to sync messages due to an app update being required. */
 "SECONDARY_LINKING_SYNCING_UPDATE_REQUIRED_ERROR_TITLE" = "נדרש עדכון";
@@ -7674,19 +7674,19 @@ Send money securely.";
 "SECONDARY_ONBOARDING_CHOOSE_DEVICE_NAME_PLACEHOLDER" = "בחר שם";
 
 /* header text before the user can link this device */
-"SECONDARY_ONBOARDING_GET_STARTED_BY_OPENING_PRIMARY" = "הפעל את Signal בטלפון שלך וקשר iPad זה אל החשבון שלך";
+"SECONDARY_ONBOARDING_GET_STARTED_BY_OPENING_PRIMARY" = "הפעל את Radar בטלפון שלך וקשר iPad זה אל החשבון שלך";
 
 /* Link explaining what to do when trying to link a device before having a primary device. */
-"SECONDARY_ONBOARDING_GET_STARTED_DO_NOT_HAVE_PRIMARY" = "אין לי Signal בטלפון שלי…";
+"SECONDARY_ONBOARDING_GET_STARTED_DO_NOT_HAVE_PRIMARY" = "אין לי Radar בטלפון שלי…";
 
 /* alert body */
-"SECONDARY_ONBOARDING_INSTALL_PRIMARY_FIRST_BODY" = "לך אל חנות היישומים בטלפון שלך, התקן את Signal, השלם את תהליך ההרשמה, ואז תוכל לקשר את iPad שלך אל אותו חשבון.";
+"SECONDARY_ONBOARDING_INSTALL_PRIMARY_FIRST_BODY" = "לך אל חנות היישומים בטלפון שלך, התקן את Radar, השלם את תהליך ההרשמה, ואז תוכל לקשר את iPad שלך אל אותו חשבון.";
 
 /* alert title */
-"SECONDARY_ONBOARDING_INSTALL_PRIMARY_FIRST_TITLE" = "התקן את Signal על הטלפון שלך";
+"SECONDARY_ONBOARDING_INSTALL_PRIMARY_FIRST_TITLE" = "התקן את Radar על הטלפון שלך";
 
 /* body text while displaying a QR code which, when scanned, will link this device. */
-"SECONDARY_ONBOARDING_SCAN_CODE_BODY" = "הקש על תמונת הפרופיל שלך כדי לפתוח את הגדרות Signal בטלפון שלך. לאחר מכן \"מכשירים מקושרים\" ואז \"קשר מכשיר חדש\" כדי לסרוק קוד זה עם הטלפון שלך:";
+"SECONDARY_ONBOARDING_SCAN_CODE_BODY" = "הקש על תמונת הפרופיל שלך כדי לפתוח את הגדרות Radar בטלפון שלך. לאחר מכן \"מכשירים מקושרים\" ואז \"קשר מכשיר חדש\" כדי לסרוק קוד זה עם הטלפון שלך:";
 
 /* Link text for page with troubleshooting info shown on the QR scanning screen */
 "SECONDARY_ONBOARDING_SCAN_CODE_HELP_TEXT" = "קבל עזרה בקישור iPad כאן";
@@ -7698,7 +7698,7 @@ Send money securely.";
 "SECONDARY_ONBOARDING_SCAN_CODE_TITLE" = "סרוק את קוד ה־QR עם הטלפון שלך";
 
 /* header text before the user can transfer to this device */
-"SECONDARY_TRANSFER_GET_STARTED_BY_OPENING_IPAD" = "הרץ את Signal על ה־iPad הישן שלך כדי להעביר את החשבון שלך";
+"SECONDARY_TRANSFER_GET_STARTED_BY_OPENING_IPAD" = "הרץ את Radar על ה־iPad הישן שלך כדי להעביר את החשבון שלך";
 
 /* No comment provided by engineer. */
 "SECURE_SESSION_RESET" = "שיח מאובטח אופס.";
@@ -7788,7 +7788,7 @@ Send money securely.";
 "SEPA_DONATION_NAME_PLACEHOLDER" = "שם בעל.ת חשבון הבנק";
 
 /* Description for the session refresh alert */
-"SESSION_REFRESH_ALERT_MESSAGE" = "Signal משתמשת בהצפנה מקצה לקצה ויתכן שהיא תצטרך לרענן את הצ'אט שלך מדי פעם. זה לא משפיע על אבטחת הצ'אט שלך, אבל יכול להיות שפספסת הודעה מאיש קשר זה ואפשר לבקש ממנו לשלוח אותה מחדש.";
+"SESSION_REFRESH_ALERT_MESSAGE" = "Radar משתמשת בהצפנה מקצה לקצה ויתכן שהיא תצטרך לרענן את הצ'אט שלך מדי פעם. זה לא משפיע על אבטחת הצ'אט שלך, אבל יכול להיות שפספסת הודעה מאיש קשר זה ואפשר לבקש ממנו לשלוח אותה מחדש.";
 
 /* Title for the session refresh alert */
 "SESSION_REFRESH_ALERT_TITLE" = "צ'אט רוענן";
@@ -7830,7 +7830,7 @@ Send money securely.";
 "SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_COUNTRY" = "מיקום";
 
 /* Table footer for the 'censorship circumvention' section when censorship circumvention can be manually enabled. */
-"SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_FOOTER" = "אם מאופשר, Signal ינסה לעקוף צנזורה. אל תאפשר מאפיין זה אלא אם אתה במיקום שבו Signal מצונזר.";
+"SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_FOOTER" = "אם מאופשר, Radar ינסה לעקוף צנזורה. אל תאפשר מאפיין זה אלא אם אתה במיקום שבו Radar מצונזר.";
 
 /* Table footer for the 'censorship circumvention' section shown when censorship circumvention has been auto-enabled based on local phone number. */
 "SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_FOOTER_AUTO_ENABLED" = "עקיפת צנזורה הופעלה על סמך מספר הטלפון של החשבון שלך.";
@@ -7842,7 +7842,7 @@ Send money securely.";
 "SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_FOOTER_NO_CONNECTION" = "עקיפת צנזורה יכולה להיפעל בעת התחברות אל האינטרנט.";
 
 /* Table footer for the 'censorship circumvention' section shown when the app is connected to the Signal service. */
-"SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_FOOTER_WEBSOCKET_CONNECTED" = "עקיפת צנזורה אינה הכרחית; אתה מחובר כבר אל שירות Signal.";
+"SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_FOOTER_WEBSOCKET_CONNECTED" = "עקיפת צנזורה אינה הכרחית; אתה מחובר כבר אל שירות Radar.";
 
 /* Label for the 'advanced pin settings' button. */
 "SETTINGS_ADVANCED_PIN_SETTINGS" = "הגדרות PIN מתקדמות";
@@ -7869,13 +7869,13 @@ Send money securely.";
 "SETTINGS_ADVANCED_VIEW_ERROR_LOG" = "יומני שגיאות";
 
 /* Information on sheet about changing the app icon - first line */
-"SETTINGS_APP_ICON_EDUCATION_APP_NAME" = "שם האפליקציה ״Signal״ יהיה גלוי במסך הבית, באזור ההתראות ובספריית האפליקציות.";
+"SETTINGS_APP_ICON_EDUCATION_APP_NAME" = "שם האפליקציה ״Radar״ יהיה גלוי במסך הבית, באזור ההתראות ובספריית האפליקציות.";
 
 /* Information on sheet about changing the app icon - second line */
-"SETTINGS_APP_ICON_EDUCATION_HOME_SCREEN_DOCK" = "אפשר להסתיר את שם האפליקציה ״Signal״ ממסך הבית באמצעות העברת האפליקציה למקטע בתחתית מסך הבית.";
+"SETTINGS_APP_ICON_EDUCATION_HOME_SCREEN_DOCK" = "אפשר להסתיר את שם האפליקציה ״Radar״ ממסך הבית באמצעות העברת האפליקציה למקטע בתחתית מסך הבית.";
 
 /* The footer for the app icon selection settings page. */
-"SETTINGS_APP_ICON_FOOTER" = "שם האפליקציה ״Signal״ יהיה גלוי במסך הבית, באזור ההתראות ובספריית האפליקציות.";
+"SETTINGS_APP_ICON_FOOTER" = "שם האפליקציה ״Radar״ יהיה גלוי במסך הבית, באזור ההתראות ובספריית האפליקציות.";
 
 /* The title for the app icon selection settings page. */
 "SETTINGS_APP_ICON_TITLE" = "סמל האפליקציה";
@@ -7905,7 +7905,7 @@ Send money securely.";
 "SETTINGS_BLOCK_LIST_ADD_BUTTON" = "הוספת משתמש/ת חסום/ה";
 
 /* A label that indicates the user has no Signal contacts that they haven't blocked. */
-"SETTINGS_BLOCK_LIST_NO_CONTACTS" = "אין לך אנשי קשר ב־Signal.";
+"SETTINGS_BLOCK_LIST_NO_CONTACTS" = "אין לך אנשי קשר ב־Radar.";
 
 /* A label that indicates the user's search has no matching results. */
 "SETTINGS_BLOCK_LIST_NO_SEARCH_RESULTS" = "אין תוצאות חיפוש";
@@ -7917,7 +7917,7 @@ Send money securely.";
 "SETTINGS_CALLING_HIDES_IP_ADDRESS_PREFERENCE_TITLE" = "שדר מחדש שיחות תמיד";
 
 /* User settings section footer, a detailed explanation */
-"SETTINGS_CALLING_HIDES_IP_ADDRESS_PREFERENCE_TITLE_DETAIL" = "שדר מחדש את כל השיחות דרך שרת Signal כדי למנוע את חשיפת כתובת ה־IP שלך אל אנשי הקשר שלך. אפשור יפחית איכות שיחות.";
+"SETTINGS_CALLING_HIDES_IP_ADDRESS_PREFERENCE_TITLE_DETAIL" = "שדר מחדש את כל השיחות דרך שרת Radar כדי למנוע את חשיפת כתובת ה־IP שלך אל אנשי הקשר שלך. אפשור יפחית איכות שיחות.";
 
 /* Label for the 'edit phone number' button in the 'change phone number' views. */
 "SETTINGS_CHANGE_PHONE_NUMBER_BACK_TO_EDIT_BUTTON" = "ערוך מספר";
@@ -7962,7 +7962,7 @@ Send money securely.";
 "SETTINGS_CLEAR_HISTORY" = "ניקוי היסטוריית צ׳אט";
 
 /* Footer for the 'about' help section */
-"SETTINGS_COPYRIGHT" = "זכויות יוצרים Signal Messenger\nברישיון תחת AGPLv3";
+"SETTINGS_COPYRIGHT" = "זכויות יוצרים Radar Messenger\nברישיון תחת AGPLv3";
 
 /* Label for the 'data' section of the app settings. */
 "SETTINGS_DATA" = "שימוש בנתונים";
@@ -8034,7 +8034,7 @@ Send money securely.";
 "SETTINGS_DISAPPEARING_MESSAGES_FOOTER" = "אפשר להגדיר קוצב זמן ברירת מחדל של הודעות נעלמות עבור כל הצ'אטים החדשים שהותחלו על ידך.";
 
 /* Title for the 'donate to signal' link in settings. */
-"SETTINGS_DONATE" = "תרומה ל–Signal";
+"SETTINGS_DONATE" = "תרומה ל–Radar";
 
 /* Title for help button and help pages in app settings. */
 "SETTINGS_HELP" = "עזרה";
@@ -8103,7 +8103,7 @@ Send money securely.";
 "SETTINGS_NOTIFICATION_CONTENT_TITLE" = "תוכן התראה";
 
 /* When the local device discovers a contact has recently installed signal, the app can generates a message encouraging the local user to say hello. Turning this switch off disables that feature. */
-"SETTINGS_NOTIFICATION_EVENTS_CONTACT_JOINED_SIGNAL" = "איש קשר מצטרף אל Signal";
+"SETTINGS_NOTIFICATION_EVENTS_CONTACT_JOINED_SIGNAL" = "איש קשר מצטרף אל Radar";
 
 /* table section header */
 "SETTINGS_NOTIFICATION_NOTIFY_WHEN_TITLE" = "יידע כאשר…";
@@ -8140,7 +8140,7 @@ Send money securely.";
 "SETTINGS_PAYMENTS_BITCOIN_UNIT" = "יחידת ביטקוין";
 
 /* Error message indicating that payments could not be activated because the feature is not currently available. */
-"SETTINGS_PAYMENTS_CANNOT_ACTIVATE_PAYMENTS_KILL_SWITCH" = "תשלומים ב־Signal אינם זמינים יותר. אתה עדיין יכול להעביר כספים אל מסחר אבל אתה לא יכול יותר לשלוח ולקבל תשלומים או להוסיף כספים.";
+"SETTINGS_PAYMENTS_CANNOT_ACTIVATE_PAYMENTS_KILL_SWITCH" = "תשלומים ב־Radar אינם זמינים יותר. אתה עדיין יכול להעביר כספים אל מסחר אבל אתה לא יכול יותר לשלוח ולקבל תשלומים או להוסיף כספים.";
 
 /* Error message indicating that payments could not be deactivated because the current balance is unavailable. */
 "SETTINGS_PAYMENTS_CANNOT_DEACTIVATE_PAYMENTS_NO_BALANCE" = "לא ניתן לבטל הפעלת תשלומים מאחר שמהאזן שלך אינו זמין. בדוק את החיבור שלך ונסה שוב.";
@@ -8149,10 +8149,10 @@ Send money securely.";
 "SETTINGS_PAYMENTS_CANNOT_SEND_PAYMENT_NO_BALANCE" = "לא היה ניתן להשלים את התשלום מאחר שהמאזן שלך אינו זמין. בדוק את החיבור שלך ונסה שוב.";
 
 /* Error message indicating that payments cannot be sent because the feature is not currently available. */
-"SETTINGS_PAYMENTS_CANNOT_SEND_PAYMENTS_KILL_SWITCH" = "תשלומים ב־Signal אינם זמינים יותר. אתה עדיין יכול להעביר כספים אל מסחר אבל אתה לא יכול יותר לשלוח ולקבל תשלומים או להוסיף כספים.";
+"SETTINGS_PAYMENTS_CANNOT_SEND_PAYMENTS_KILL_SWITCH" = "תשלומים ב־Radar אינם זמינים יותר. אתה עדיין יכול להעביר כספים אל מסחר אבל אתה לא יכול יותר לשלוח ולקבל תשלומים או להוסיף כספים.";
 
 /* Error message indicating that you cannot transfer into your payments wallet because the feature is not currently available. */
-"SETTINGS_PAYMENTS_CANNOT_TRANSFER_IN_KILL_SWITCH" = "תשלומים ב־Signal אינם זמינים יותר. אתה עדיין יכול להעביר כספים אל מסחר אבל אתה לא יכול יותר לשלוח ולקבל תשלומים או להוסיף כספים.";
+"SETTINGS_PAYMENTS_CANNOT_TRANSFER_IN_KILL_SWITCH" = "תשלומים ב־Radar אינם זמינים יותר. אתה עדיין יכול להעביר כספים אל מסחר אבל אתה לא יכול יותר לשלוח ולקבל תשלומים או להוסיף כספים.";
 
 /* Message for the 'currency conversions info' alert. */
 "SETTINGS_PAYMENTS_CURRENCY_CONVERSIONS_INFO_ALERT_MESSAGE" = "המרות הן רק השערות ויתכן שהן לא מדויקות.";
@@ -8179,10 +8179,10 @@ Send money securely.";
 "SETTINGS_PAYMENTS_DEACTIVATE_TITLE" = "בטל הפעלת תשלומים";
 
 /* Explanation of the 'deactivate payments with balance' process in the 'deactivate payments' settings. */
-"SETTINGS_PAYMENTS_DEACTIVATE_WITH_BALANCE_EXPLANATION" = "מומלץ להעביר את הכספים שלך לכתובת ארנק אחרת לפני ביטול ההפעלה של תשלומים. במקרה של בחירה לא להעביר את הכספים עכשיו, הם יישארו בארנק שמקושר אל Signal בעת הפעלה מחדש של תשלומים.";
+"SETTINGS_PAYMENTS_DEACTIVATE_WITH_BALANCE_EXPLANATION" = "מומלץ להעביר את הכספים שלך לכתובת ארנק אחרת לפני ביטול ההפעלה של תשלומים. במקרה של בחירה לא להעביר את הכספים עכשיו, הם יישארו בארנק שמקושר אל Radar בעת הפעלה מחדש של תשלומים.";
 
 /* Description for the 'deactivate payments confirmation' UI in the payment settings. */
-"SETTINGS_PAYMENTS_DEACTIVATE_WITHOUT_TRANSFER_CONFIRM_DESCRIPTION" = "היתרה שלך תישאר בארנק שמקושר אל Signal במקרה של בחירה להפעיל מחדש את תשלומים.";
+"SETTINGS_PAYMENTS_DEACTIVATE_WITHOUT_TRANSFER_CONFIRM_DESCRIPTION" = "היתרה שלך תישאר בארנק שמקושר אל Radar במקרה של בחירה להפעיל מחדש את תשלומים.";
 
 /* Title for the 'deactivate payments confirmation' UI in the payment settings. */
 "SETTINGS_PAYMENTS_DEACTIVATE_WITHOUT_TRANSFER_CONFIRM_TITLE" = "לבטל הפעלה בלי להעביר?";
@@ -8420,10 +8420,10 @@ Send money securely.";
 "SETTINGS_PAYMENTS_PAYMENTS_LOCK_PROMPT_EXPLANATION_TOUCHID" = "עוזרים למנוע מאדם שמחזיק במכשיר הטלפון שלך לגשת לכספים שלך באמצעות הפעלת זיהוי טביעת אצבע. אפשר לכבות את האפשרות הזו בהגדרות.";
 
 /* Button for payments outdated sheet. */
-"SETTINGS_PAYMENTS_PAYMENTS_OUTDATED_BUTTON" = "עדכן את Signal";
+"SETTINGS_PAYMENTS_PAYMENTS_OUTDATED_BUTTON" = "עדכן את Radar";
 
 /* Message for payments outdated sheet. */
-"SETTINGS_PAYMENTS_PAYMENTS_OUTDATED_MESSAGE" = "יש לעדכן את Signal כדי להמשיך לשלוח ולקבל תשלומים, ולראות את יתרת התשלומים המעודכנת שלך.";
+"SETTINGS_PAYMENTS_PAYMENTS_OUTDATED_MESSAGE" = "יש לעדכן את Radar כדי להמשיך לשלוח ולקבל תשלומים, ולראות את יתרת התשלומים המעודכנת שלך.";
 
 /* Title for payments outdated sheet saying cant send. */
 "SETTINGS_PAYMENTS_PAYMENTS_OUTDATED_TITLE_CANT_SEND" = "לא ניתן לשלוח תשלום";
@@ -8558,7 +8558,7 @@ Send money securely.";
 "SETTINGS_PAYMENTS_TITLE" = "תשלומים";
 
 /* Error indicating that it is not valid to send yourself a payment. */
-"SETTINGS_PAYMENTS_TRANSFER_OUT_CANNOT_SEND_TO_SELF" = "אתה לא יכול להעביר אל כתובת הארנק של Signal שלך. הכנס את כתובת הארנק מהחשבון שלך במסחר נתמך.";
+"SETTINGS_PAYMENTS_TRANSFER_OUT_CANNOT_SEND_TO_SELF" = "אתה לא יכול להעביר אל כתובת הארנק של Radar שלך. הכנס את כתובת הארנק מהחשבון שלך במסחר נתמך.";
 
 /* Footer of the 'transfer currency out' view in the payment settings. */
 "SETTINGS_PAYMENTS_TRANSFER_OUT_FOOTER" = "Transfer Bitcoin by sending to the Lightning address or invoice provided by the recipient. The address is typically displayed below the QR code.";
@@ -8621,7 +8621,7 @@ Send money securely.";
 "SETTINGS_PAYMENTS_VIEW_PASSPHRASE_TITLE" = "משפט השבה";
 
 /* Header text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "כתוב את 24 המילים האלה בסדר ושמור אותן במקום בטוח. תוכל להשתמש בהן לשחזור יתרתך ב-Cake Wallet או בארנקים אחרים התואמים ל-Spark.";
+"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "כתוב את 12 המילים האלה בסדר ושמור אותן במקום בטוח. תוכל להשתמש בהן לשחזור יתרתך ב-Cake Wallet או בארנקים אחרים התואמים ל-Spark.";
 
 /* Footer text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
 "SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_FOOTER_2" = "אל תשתף ביטוי זה עם אף אחד";
@@ -8642,7 +8642,7 @@ Send money securely.";
 "SETTINGS_PHONE_NUMBER_DISCOVERABILITY_DISABLED_TOAST" = "כדי לשנות את ההגדרה הזו, יש להגדיר את \"מי יכול לראות את המספר שלי\" כ\"אף אחד\".";
 
 /* The description for a sheet asking for confirmation that the user wants to set their phone number discoverability to 'nobody'. */
-"SETTINGS_PHONE_NUMBER_DISCOVERABILITY_NOBODY_CONFIRMATION_DESCRIPTION" = "להגדיר את ״מי יכול למצוא אותי לפי המספר שלי״ כ״אף אחד״ יקשה על אנשים למצוא אותך ב–Signal.";
+"SETTINGS_PHONE_NUMBER_DISCOVERABILITY_NOBODY_CONFIRMATION_DESCRIPTION" = "להגדיר את ״מי יכול למצוא אותי לפי המספר שלי״ כ״אף אחד״ יקשה על אנשים למצוא אותך ב–Radar.";
 
 /* The title for a sheet asking for confirmation that the user wants to set their phone number discoverability to 'nobody'. */
 "SETTINGS_PHONE_NUMBER_DISCOVERABILITY_NOBODY_CONFIRMATION_TITLE" = "להמשיך?";
@@ -8651,7 +8651,7 @@ Send money securely.";
 "SETTINGS_PHONE_NUMBER_DISCOVERABILITY_TITLE" = "מי יכול למצוא אותי לפי המספר שלי?";
 
 /* Description label for Phone Number Privacy */
-"SETTINGS_PHONE_NUMBER_PRIVACY_DESCRIPTION_LABEL" = "אפשר לבחור מי יוכל לראות את מספר הטלפון שלך ומי יוכל ליצור איתך קשר באמצעותו ב–Signal.";
+"SETTINGS_PHONE_NUMBER_PRIVACY_DESCRIPTION_LABEL" = "אפשר לבחור מי יוכל לראות את מספר הטלפון שלך ומי יוכל ליצור איתך קשר באמצעותו ב–Radar.";
 
 /* The title for phone number privacy settings. */
 "SETTINGS_PHONE_NUMBER_PRIVACY_TITLE" = "מספר טלפון";
@@ -8663,16 +8663,16 @@ Send money securely.";
 "SETTINGS_PIN_REMINDER_DISABLE_CONFIRMATION_ACTION" = "כבה תזכורות";
 
 /* The explanation for the dialog asking user to confirm their PIN to disable reminders */
-"SETTINGS_PIN_REMINDER_DISABLE_CONFIRMATION_EXPLANATION" = "וודא ששיננת או שאחסנת בבטחה את ה־PIN שלך הואיל והוא בלתי ניתן להשבה. אם תשכח את ה־PIN שלך, ייתכן שתאבד נתונים כשתרשום שוב את חשבון Signal שלך.";
+"SETTINGS_PIN_REMINDER_DISABLE_CONFIRMATION_EXPLANATION" = "וודא ששיננת או שאחסנת בבטחה את ה־PIN שלך הואיל והוא בלתי ניתן להשבה. אם תשכח את ה־PIN שלך, ייתכן שתאבד נתונים כשתרשום שוב את חשבון Radar שלך.";
 
 /* The title for the dialog asking user to confirm their PIN to disable reminders */
-"SETTINGS_PIN_REMINDER_DISABLE_CONFIRMATION_TITLE" = "אשר את ה־PIN של Signal שלך";
+"SETTINGS_PIN_REMINDER_DISABLE_CONFIRMATION_TITLE" = "אשר את ה־PIN של Radar שלך";
 
 /* Label for the 'pin reminder' switch of the privacy settings. */
 "SETTINGS_PIN_REMINDER_SWITCH_LABEL" = "תזכורות PIN";
 
 /* Footer for the 'PINs' section of the privacy settings. */
-"SETTINGS_PINS_FOOTER" = "קודי PIN שומרים על מידע שמאוחסן ב־Signal מוצפן כך שרק אתה תוכל להשיג גישה אליו. קוד ה־PIN שלך בלתי ניתן להשבה. הפרופיל, ההגדרות ואנשי הקשר שלך ישוחזרו כשתתקין מחדש את Signal.";
+"SETTINGS_PINS_FOOTER" = "קודי PIN שומרים על מידע שמאוחסן ב־Radar מוצפן כך שרק אתה תוכל להשיג גישה אליו. קוד ה־PIN שלך בלתי ניתן להשבה. הפרופיל, ההגדרות ואנשי הקשר שלך ישוחזרו כשתתקין מחדש את Radar.";
 
 /* Label for the 'pins' item of the privacy settings when the user does have a pin. */
 "SETTINGS_PINS_ITEM" = "שנה את ה־PIN שלך";
@@ -8681,7 +8681,7 @@ Send money securely.";
 "SETTINGS_PINS_ITEM_CREATE" = "צור PIN";
 
 /* Title for the 'PINs' section of the privacy settings. */
-"SETTINGS_PINS_TITLE" = "PIN של Signal";
+"SETTINGS_PINS_TITLE" = "PIN של Radar";
 
 /* Footer for table section */
 "SETTINGS_PRIVACY_ADVANCED_FOOTER" = "הגדרות של עקיפת צנזורה, שיחות ממסר, ושולח אטום.";
@@ -8723,7 +8723,7 @@ Send money securely.";
 "SETTINGS_REGISTRATION_LOCK_TURN_ON_ERROR_PIN_REQUIRED" = "יש ליצור קוד PIN כדי להשתמש בנעילת ההרשמה.";
 
 /* Body for the alert confirming that the user wants to turn on registration lock. */
-"SETTINGS_REGISTRATION_LOCK_TURN_ON_MESSAGE" = "אם תשכח את ה־PIN של Signal שלך בעת הרשמה מחדש אל Signal, תינעל מחוץ אל חשבונך למשך 7 ימים.";
+"SETTINGS_REGISTRATION_LOCK_TURN_ON_MESSAGE" = "אם תשכח את ה־PIN של Radar שלך בעת הרשמה מחדש אל Radar, תינעל מחוץ אל חשבונך למשך 7 ימים.";
 
 /* Title for the alert confirming that the user wants to turn on registration lock. */
 "SETTINGS_REGISTRATION_LOCK_TURN_ON_TITLE" = "להפעיל נעילת הרשמה?";
@@ -8753,19 +8753,19 @@ Send money securely.";
 "SETTINGS_SECTION_TITLE_CALLING" = "התקשרות";
 
 /* Section footer */
-"SETTINGS_SECURITY_DETAIL" = "השתמש בזיהוי טביעת אצבע, זיהוי פנים או סיסמת מכשיר iOS שלך כדי לשחרר נעילת Signal.";
+"SETTINGS_SECURITY_DETAIL" = "השתמש בזיהוי טביעת אצבע, זיהוי פנים או סיסמת מכשיר iOS שלך כדי לשחרר נעילת Radar.";
 
 /* Section footer */
-"SETTINGS_SECURITY_DETAIL_FACEID" = "השתמש בזיהוי פנים כדי לשחרר נעילת Signal.";
+"SETTINGS_SECURITY_DETAIL_FACEID" = "השתמש בזיהוי פנים כדי לשחרר נעילת Radar.";
 
 /* Section footer */
-"SETTINGS_SECURITY_DETAIL_OPTICID" = "שימוש ב–Optic ID כדי לשחרר את הנעילה של Signal.";
+"SETTINGS_SECURITY_DETAIL_OPTICID" = "שימוש ב–Optic ID כדי לשחרר את הנעילה של Radar.";
 
 /* Section footer */
-"SETTINGS_SECURITY_DETAIL_PASSCODE" = "השתמש בסיסמת המכשיר שלך כדי לשחרר נעילת Signal.";
+"SETTINGS_SECURITY_DETAIL_PASSCODE" = "השתמש בסיסמת המכשיר שלך כדי לשחרר נעילת Radar.";
 
 /* Section footer */
-"SETTINGS_SECURITY_DETAIL_TOUCHID" = "השתמש בזיהוי טביעת אצבע כדי לשחרר נעילת Signal.";
+"SETTINGS_SECURITY_DETAIL_TOUCHID" = "השתמש בזיהוי טביעת אצבע כדי לשחרר נעילת Radar.";
 
 /* Section header */
 "SETTINGS_SECURITY_TITLE" = "אבטחת יישום";
@@ -8780,13 +8780,13 @@ Send money securely.";
 "SETTINGS_SHARING_SUGGESTIONS" = "שתף אנשי קשר עם iOS";
 
 /* Footer for setting for enabling & disabling contact and notification sharing with iOS. */
-"SETTINGS_SHARING_SUGGESTIONS_NOTIFICATIONS_FOOTER" = "התרת גישת iOS לאנשי קשר וצ׳אטים של Signal עבור פיצ׳רים כמו הצעות שיתוף והתראות.";
+"SETTINGS_SHARING_SUGGESTIONS_NOTIFICATIONS_FOOTER" = "התרת גישת iOS לאנשי קשר וצ׳אטים של Radar עבור פיצ׳רים כמו הצעות שיתוף והתראות.";
 
 /* Label for the 'enable registration lock' switch of the privacy settings. */
 "SETTINGS_TWO_FACTOR_AUTH_SWITCH_LABEL" = "נעילת הרשמה";
 
 /* Footer for the 'two factor auth' section of the privacy settings when Signal PINs are available. */
-"SETTINGS_TWO_FACTOR_PINS_AUTH_FOOTER" = "דרוש את ה־PIN של Signal שלך כדי להירשם שוב אל Signal עם מספר הטלפון שלך.";
+"SETTINGS_TWO_FACTOR_PINS_AUTH_FOOTER" = "דרוש את ה־PIN של Radar שלך כדי להירשם שוב אל Radar עם מספר הטלפון שלך.";
 
 /* Label for the 'typing indicators' setting. */
 "SETTINGS_TYPING_INDICATORS" = "מחווני הקלדה";
@@ -8819,7 +8819,7 @@ Send money securely.";
 "SHARE_EXTENSION_LOADING" = "טוען…";
 
 /* Message indicating that the share extension cannot be used until the user has registered in the main app. */
-"SHARE_EXTENSION_NOT_REGISTERED_MESSAGE" = "הפעל את היישום Signal כדי להירשם.";
+"SHARE_EXTENSION_NOT_REGISTERED_MESSAGE" = "הפעל את היישום Radar כדי להירשם.";
 
 /* Title indicating that the share extension cannot be used until the user has registered in the main app. */
 "SHARE_EXTENSION_NOT_REGISTERED_TITLE" = "לא רשום";
@@ -8837,7 +8837,7 @@ Send money securely.";
 "SHARE_EXTENSION_UNABLE_TO_BUILD_ATTACHMENT_ALERT_TITLE" = "לא היה ניתן להכין צרופה";
 
 /* Title for the 'share extension' view. */
-"SHARE_EXTENSION_VIEW_TITLE" = "שתף ב־Signal";
+"SHARE_EXTENSION_VIEW_TITLE" = "שתף ב־Radar";
 
 /* Title of alert indicating sharing suggestions failed to deactivate */
 "SHARING_SUGGESTIONS_DISABLE_ERROR" = "נכשל בהשבתת הצעות שיתוף.";
@@ -8846,10 +8846,10 @@ Send money securely.";
 "SHOW_THREAD_BUTTON_TITLE" = "הצגת צ׳אט";
 
 /* Shown in the header when the user hasn't provided a custom name for a call. */
-"SIGNAL_CALL" = "שיחת Signal";
+"SIGNAL_CALL" = "שיחת Radar";
 
 /* body sent to contacts when inviting to Install Signal */
-"SMS_INVITE_BODY" = "אני מזמין אותך להתקין Signal! הנה הקישור:";
+"SMS_INVITE_BODY" = "אני מזמין אותך להתקין Radar! הנה הקישור:";
 
 /* An error message generically indicating that something went wrong. */
 "SOMETHING_WENT_WRONG_ERROR" = "משהו השתבש.";
@@ -8873,7 +8873,7 @@ Send money securely.";
 "SPAM_CAPTCHA_DISMISS_CONFIRMATION_TITLE" = "להמשיך בלי לוודא?";
 
 /* Body for action sheet explaining captcha requirement. */
-"SPAM_CAPTCHA_SHEET_BODY" = "כדי לעזור למנוע זבל ב‏‏־Signal, אנא השלם וידוא.\n\nלאחר וידוא, אתה יכול להמשיך להתכתב. הודעות מושהות כלשהן יישלחו באופן אוטומטי.";
+"SPAM_CAPTCHA_SHEET_BODY" = "כדי לעזור למנוע זבל ב‏‏־Radar, אנא השלם וידוא.\n\nלאחר וידוא, אתה יכול להמשיך להתכתב. הודעות מושהות כלשהן יישלחו באופן אוטומטי.";
 
 /* Title for action sheet explaining captcha requirement. */
 "SPAM_CAPTCHA_SHEET_TITLE" = "וודא כדי להמשיך להתכתב";
@@ -8909,7 +8909,7 @@ Send money securely.";
 "STICKERS_INSTALL_BUTTON" = "התקן";
 
 /* Title for the 'available built-in stickers' section of the 'manage stickers' view. */
-"STICKERS_MANAGE_VIEW_AVAILABLE_BUILT_IN_PACKS_SECTION_TITLE" = "סדרת אומנים Signal";
+"STICKERS_MANAGE_VIEW_AVAILABLE_BUILT_IN_PACKS_SECTION_TITLE" = "סדרת אומנים Radar";
 
 /* Title for the 'available known stickers' section of the 'manage stickers' view. */
 "STICKERS_MANAGE_VIEW_AVAILABLE_KNOWN_PACKS_SECTION_TITLE" = "מדבקות שקיבלת";
@@ -9188,22 +9188,22 @@ Send money securely.";
 "STORY_SETTINGS_LEARN_MORE_SHEET_BULLET_3" = "שמירה שלהם באנשי הקשר של הטלפון שלך";
 
 /* Footer for the explainer sheet for signal connections */
-"STORY_SETTINGS_LEARN_MORE_SHEET_FOOTER" = "חברי ה–Signal שלך יוכלו לראות את השם והתמונה שלך, וגם את מה ששלחת ל״הסטורי שלי״ אלא אם כן הסתרת זאת מהם.";
+"STORY_SETTINGS_LEARN_MORE_SHEET_FOOTER" = "חברי ה–Radar שלך יוכלו לראות את השם והתמונה שלך, וגם את מה ששלחת ל״הסטורי שלי״ אלא אם כן הסתרת זאת מהם.";
 
 /* Header for the explainer sheet for signal connections */
-"STORY_SETTINGS_LEARN_MORE_SHEET_HEADER_FORMAT" = "<bold>חברי Signal</bold> הם אנשים שבחרת לבטוח בהם, באמצעות אחת מהפעולות הבאות:";
+"STORY_SETTINGS_LEARN_MORE_SHEET_HEADER_FORMAT" = "<bold>חברי Radar</bold> הם אנשים שבחרת לבטוח בהם, באמצעות אחת מהפעולות הבאות:";
 
 /* Label for the stories section of the settings view */
 "STORY_SETTINGS_TITLE" = "סטוריז";
 
 /* Section footer for the 'viewers' section on the 'story settings' view */
-"STORY_SETTINGS_WHO_CAN_VIEW_THIS_FOOTER" = "אפשר לבחור אילו חברי Signal יוכלו לצפות בסטורי שלך. השינויים לא ישפיעו על סטוריז שכבר שלחת.";
+"STORY_SETTINGS_WHO_CAN_VIEW_THIS_FOOTER" = "אפשר לבחור אילו חברי Radar יוכלו לצפות בסטורי שלך. השינויים לא ישפיעו על סטוריז שכבר שלחת.";
 
 /* Section header for the 'viewers' section on the 'story settings' view */
 "STORY_SETTINGS_WHO_CAN_VIEW_THIS_HEADER" = "מי יכול לצפות בסטורי הזה";
 
 /* Header for the 'viewers' section on the 'story settings' bottom sheet */
-"STORY_SETTINGS_WHO_CAN_VIEW_THIS_SHEET_HEADER" = "אפשר לבחור אילו חברי Signal יוכלו לראות את הסטורי שלך. תמיד אפשר לשנות את זה בהגדרות הפרטיות.";
+"STORY_SETTINGS_WHO_CAN_VIEW_THIS_SHEET_HEADER" = "אפשר לבחור אילו חברי Radar יוכלו לראות את הסטורי שלך. תמיד אפשר לשנות את זה בהגדרות הפרטיות.";
 
 /* Tooltip text shown when the user selects a story as a destination for a long duration video that will be split into shorter segments. Embeds {{ segment duration in seconds }} */
 "STORY_VIDEO_SEGMENTATION_TOOLTIP_FORMAT" = "סרטונים שנשלחים לסטוריז ייחתכו לקליפים של %1$d שניות ויישלחו כסטוריז נפרדים.";
@@ -9242,7 +9242,7 @@ Send money securely.";
 "SUPPORT_EMAIL_DEFAULT_DESCRIPTION" = "ספר לנו על הסוגייה: ";
 
 /* Message for alert dialog presented when a support email failed to send */
-"SUPPORT_EMAIL_ERROR_ALERT_DESCRIPTION" = "אנא שלח בדוא״ל את בקשת התמיכה שלך אל support@signal.org";
+"SUPPORT_EMAIL_ERROR_ALERT_DESCRIPTION" = "אנא שלח בדוא״ל את בקשת התמיכה שלך אל support@radar.chat";
 
 /* Localized label for support request email filter string. Embeds {{filter text}}. */
 "SUPPORT_EMAIL_FILTER_LABEL_FORMAT" = "מסנן: %1$@";
@@ -9266,7 +9266,7 @@ Send money securely.";
 "SUPPORT_EMAIL_LOG_URL_LABEL_FORMAT" = "כתובת יומן: %1$@";
 
 /* Localized subject for support request emails */
-"SUPPORT_EMAIL_SUBJECT" = "בקשת תמיכה של Signal iOS";
+"SUPPORT_EMAIL_SUBJECT" = "בקשת תמיכה של Radar iOS";
 
 /* Header for emoji mood selection */
 "SUPPORT_EMOJI_PROMPT" = "איך אתה מרגיש? (רשותי)";
@@ -9338,7 +9338,7 @@ Send money securely.";
 "SWITCH_ON" = "מופעל";
 
 /* Name to display for the 'system' sender, e.g. for release notes and the onboarding story */
-"SYSTEM_ADDRESS_NAME" = "Signal";
+"SYSTEM_ADDRESS_NAME" = "Radar";
 
 /* Label for button to verify a user's safety number. */
 "SYSTEM_MESSAGE_ACTION_VERIFY_SAFETY_NUMBER" = "וודא";
@@ -9497,16 +9497,16 @@ Send money securely.";
 "TIME_AMOUNT_WEEKS_SHORT_FORMAT" = "%1$@שב";
 
 /* Button for bottom sheet shown when device transfer completes on the receiving device. Tapping will terminate the Signal app and trigger a notification to relaunch. */
-"TRANSFER_COMPLETE_SHEET_BUTTON" = "סגירת Signal";
+"TRANSFER_COMPLETE_SHEET_BUTTON" = "סגירת Radar";
 
 /* Subtitle for bottom sheet shown when device transfer completes on the receiving device. */
-"TRANSFER_COMPLETE_SHEET_SUBTITLE" = "כדי להתחיל להשתמש בחשבון שלך במכשיר זה, יש לסגור את Signal ולפתוח אותו מחדש.";
+"TRANSFER_COMPLETE_SHEET_SUBTITLE" = "כדי להתחיל להשתמש בחשבון שלך במכשיר זה, יש לסגור את Radar ולפתוח אותו מחדש.";
 
 /* Title for bottom sheet shown when device transfer completes on the receiving device. */
 "TRANSFER_COMPLETE_SHEET_TITLE" = "העברה הושלמה";
 
 /* Notification prompting the user to relaunch Signal after a device transfer completed. */
-"TRANSFER_RELAUNCH_NOTIFICATION" = "יש לפתוח את Signal כדי להתחיל לשלוח הודעות";
+"TRANSFER_RELAUNCH_NOTIFICATION" = "יש לפתוח את Radar כדי להתחיל לשלוח הודעות";
 
 /* Label for the cancel button in an alert or action sheet. */
 "TXT_CANCEL_TITLE" = "בטל";
@@ -9524,25 +9524,25 @@ Send money securely.";
 "UNKNOWN_CONTACT_BLOCK_OFFER" = "המשתמש/ת לא באנשי הקשר שלך. רוצה לחסום אותו או אותה?";
 
 /* Info message recorded in conversation history when local user receives an unknown message from a linked device and needs to upgrade. */
-"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_FROM_LINKED_DEVICE" = "אחד מהמכשירים שלך שלח הודעה שאינה יכולה להיות מעובדת או להיות מוצגת כאן מאחר שהיא משתמשת במאפיין Signal חדש.";
+"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_FROM_LINKED_DEVICE" = "אחד מהמכשירים שלך שלח הודעה שאינה יכולה להיות מעובדת או להיות מוצגת כאן מאחר שהיא משתמשת במאפיין Radar חדש.";
 
 /* Info message recorded in conversation history when local user receives an unknown message and needs to upgrade. Embeds {{user's name or phone number}}. */
-"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_WITH_NAME_FORMAT" = "%1$@ שלח לך הודעה שאינה יכולה להיות מעובדת או להיות מוצגת מאחר שהיא משתמשת במאפיין Signal חדש.";
+"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_WITH_NAME_FORMAT" = "%1$@ שלח לך הודעה שאינה יכולה להיות מעובדת או להיות מוצגת מאחר שהיא משתמשת במאפיין Radar חדש.";
 
 /* Info message recorded in conversation history when local user receives an unknown message and needs to upgrade. */
-"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_WITHOUT_NAME" = "קיבלת הודעה שאינה יכולה להיות מעובדת או להיות מוצגת מאחר שהיא משתמשת במאפיין Signal חדש.";
+"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_WITHOUT_NAME" = "קיבלת הודעה שאינה יכולה להיות מעובדת או להיות מוצגת מאחר שהיא משתמשת במאפיין Radar חדש.";
 
 /* Label for button that lets users upgrade the app. */
-"UNKNOWN_PROTOCOL_VERSION_UPGRADE_BUTTON" = "עדכן את Signal כעת";
+"UNKNOWN_PROTOCOL_VERSION_UPGRADE_BUTTON" = "עדכן את Radar כעת";
 
 /* Info message recorded in conversation history when local user has received an unknown unknown message from a linked device and has upgraded. */
-"UNKNOWN_PROTOCOL_VERSION_UPGRADE_COMPLETE_FROM_LINKED_DEVICE" = "עודכן אל הגרסה האחרונה של Signal. אתה יכול לקבל כעת סוג הודעה זה במכשיר שלך.";
+"UNKNOWN_PROTOCOL_VERSION_UPGRADE_COMPLETE_FROM_LINKED_DEVICE" = "עודכן אל הגרסה האחרונה של Radar. אתה יכול לקבל כעת סוג הודעה זה במכשיר שלך.";
 
 /* Info message recorded in conversation history when local user has received an unknown message and has upgraded. Embeds {{user's name or phone number}}. */
-"UNKNOWN_PROTOCOL_VERSION_UPGRADE_COMPLETE_WITH_NAME_FORMAT" = "אתה יכול לבקש מן %1$@ לשלוח מחדש הודעה זו כעת כשאתה משתמש בגרסה מעודכנת של Signal.";
+"UNKNOWN_PROTOCOL_VERSION_UPGRADE_COMPLETE_WITH_NAME_FORMAT" = "אתה יכול לבקש מן %1$@ לשלוח מחדש הודעה זו כעת כשאתה משתמש בגרסה מעודכנת של Radar.";
 
 /* Info message recorded in conversation history when local user has received an unknown message and has upgraded. */
-"UNKNOWN_PROTOCOL_VERSION_UPGRADE_COMPLETE_WITHOUT_NAME" = "אתה יכול לבקש מן השולח לשלוח מחדש הודעה זו כעת כשאתה משתמש בגרסה מעודכנת של Signal.";
+"UNKNOWN_PROTOCOL_VERSION_UPGRADE_COMPLETE_WITHOUT_NAME" = "אתה יכול לבקש מן השולח לשלוח מחדש הודעה זו כעת כשאתה משתמש בגרסה מעודכנת של Radar.";
 
 /* Label indicating an unknown user. */
 "UNKNOWN_USER" = "בלתי ידוע";
@@ -9566,13 +9566,13 @@ Send money securely.";
 "UNLINK_CONFIRMATION_ALERT_TITLE" = "לבטל קישור \"%1$@\"?";
 
 /* Label warning the user that they have been unlinked from their primary device. */
-"UNLINKED_WARNING" = "המכשיר הזה כבר לא מקושר. אפשר לקשר מחדש את Signal עם הטלפון שלך כדי להמשיך לשלוח הודעות.";
+"UNLINKED_WARNING" = "המכשיר הזה כבר לא מקושר. אפשר לקשר מחדש את Radar עם הטלפון שלך כדי להמשיך לשלוח הודעות.";
 
 /* If this device has become unlinked from their primary device, they'll see a warning. This is the call to action on that warning. */
 "UNLINKED_WARNING_ACTION_TITLE" = "קישור מכשיר מחדש";
 
 /* Alert title when unlinking device fails */
-"UNLINKING_FAILED_ALERT_TITLE" = "Signal לא היה יכול לבטל את קישור המכשיר שלך.";
+"UNLINKING_FAILED_ALERT_TITLE" = "Radar לא היה יכול לבטל את קישור המכשיר שלך.";
 
 /* Text for a toast confirming that the mic has been unmuted for a call. */
 "UNMUTE_CONFIRMATION_TOAST_LABEL" = "מיקרופון מופעל";
@@ -9593,7 +9593,7 @@ Send money securely.";
 "UNSUPPORTED_FEATURE_ERROR" = "המכשיר שלך אינו תומך במאפיין זה.";
 
 /* Description for the unverified safety number change. Embeds {name of contact with identity change} */
-"UNVERIFIED_SAFETY_NUMBER_CHANGE_DESCRIPTION_FORMAT" = "מספר הביטחון שלך עם %1$@ השתנה כנראה מאחר שהצד השני התקין מחדש את Signal או שינה מכשירים. הקש וודא כדי לאשר את המספר החדש של הביטחון. זה רשותי.";
+"UNVERIFIED_SAFETY_NUMBER_CHANGE_DESCRIPTION_FORMAT" = "מספר הביטחון שלך עם %1$@ השתנה כנראה מאחר שהצד השני התקין מחדש את Radar או שינה מכשירים. הקש וודא כדי לאשר את המספר החדש של הביטחון. זה רשותי.";
 
 /* Action to verify a safety number after it has changed */
 "UNVERIFIED_SAFETY_NUMBER_VERIFY_ACTION" = "וודא";
@@ -9611,7 +9611,7 @@ Send money securely.";
 "USE_PROXY_BUTTON" = "השתמש ביפוי כוח";
 
 /* Explanation of when you should use a signal proxy */
-"USE_PROXY_EXPLANATION" = "יש להשתמש בפרוקסי רק אם אין לך אפשרות להתחבר ל–Signal דרך נתונים סלולריים או Wi-Fi.";
+"USE_PROXY_EXPLANATION" = "יש להשתמש בפרוקסי רק אם אין לך אפשרות להתחבר ל–Radar דרך נתונים סלולריים או Wi-Fi.";
 
 /* Description of username links and QR codes on the username education sheet */
 "USERNAME_EDUCATION_LINK_DESCRIPTION" = "לכל שם משתמש יש קוד QR ולינק ייחודיים שאפשר לשתף עם חברים כדי שהם יוכלו להתחיל איתך צ׳אט במהירות.";
@@ -9704,7 +9704,7 @@ Send money securely.";
 "USERNAME_LOOKUP_LINK_NO_LONGER_VALID_MESSAGE" = "לינק שם המשתמש הזה לא תקף יותר.";
 
 /* A message indicating that the given username is not associated with a registered Signal account. Embeds {{ a username }}. */
-"USERNAME_LOOKUP_NOT_FOUND_MESSAGE_FORMAT" = "%1$@ הוא/היא לא משתמש/ת Signal. וודא שהכנסת את שם המשתמש השלם.";
+"USERNAME_LOOKUP_NOT_FOUND_MESSAGE_FORMAT" = "%1$@ הוא/היא לא משתמש/ת Radar. וודא שהכנסת את שם המשתמש השלם.";
 
 /* Title for an action sheet indicating that the given username is not associated with a registered Signal account. */
 "USERNAME_LOOKUP_NOT_FOUND_TITLE" = "משתמש/ת לא נמצא/ה";
@@ -9728,7 +9728,7 @@ Send money securely.";
 "USERNAME_ONBOARDING_TITLE" = "Your Username";
 
 /* Instructions that appear below the username QR code on a sharable exported image. */
-"USERNAME_QR_CODE_EXPORT_INSTRUCTIONS" = "אפשר לסרוק את קוד ה–QR הזה עם הטלפון שלך כדי לשוחח איתי ב–Signal.";
+"USERNAME_QR_CODE_EXPORT_INSTRUCTIONS" = "אפשר לסרוק את קוד ה–QR הזה עם הטלפון שלך כדי לשוחח איתי ב–Radar.";
 
 /* A message in a toast informing the user their username, link, and QR code have successfully been reset. Embeds {{ the user's new username }}. */
 "USERNAME_RESET_SUCCESSFUL_TOAST" = "קוד ה–QR והלינק שלך אופסו ושם המשתמש שלך הוא %1$@";

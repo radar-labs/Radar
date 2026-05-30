@@ -2,7 +2,7 @@
 "AB_PERMISSION_MISSING_ACTION_NOT_NOW" = "ھازىر ئەمەس";
 
 /* Title for the 'about' help section */
-"ABOUT_SECTION_TITLE" = "‫Signal ھەققىدە";
+"ABOUT_SECTION_TITLE" = "‫Radar ھەققىدە";
 
 /* Accessibility label for attachment. */
 "ACCESSIBILITY_LABEL_ATTACHMENT" = "قوشۇمچە";
@@ -32,7 +32,7 @@
 "ACCOUNT_DATA_REPORT_CONFIRM_EXPORT_CONFIRM_BUTTON" = "دوكلاتنى چىقىرىش";
 
 /* Users can request a report of their account data. Before they get their account export, they are warned to only share account data with trustworthy sources. This is the message on that warning. */
-"ACCOUNT_DATA_REPORT_CONFIRM_EXPORT_MESSAGE" = "Signal ھېسابات ئۇچۇرلىرىڭىزنى پەقەت ئۆزىڭىز ئىشىنىدىغان كىشىلەر ياكى ئەپلەر بىلەن ئورتاقلىشىڭ.";
+"ACCOUNT_DATA_REPORT_CONFIRM_EXPORT_MESSAGE" = "Radar ھېسابات ئۇچۇرلىرىڭىزنى پەقەت ئۆزىڭىز ئىشىنىدىغان كىشىلەر ياكى ئەپلەر بىلەن ئورتاقلىشىڭ.";
 
 /* Users can request a report of their account data. If this request fails (probably because of a network connection problem), they will see an error sheet. This is the message on that error. */
 "ACCOUNT_DATA_REPORT_ERROR_MESSAGE" = "تور ئۇلىنىشىڭىزنى تەكشۈرۈپ قايتا سىناڭ.";
@@ -56,16 +56,16 @@
 "ACCOUNT_DATA_REPORT_EXPORT_REPORT_BUTTON" = "دوكلاتنى چىقىرىش";
 
 /* Users can request a report of their account data. This text appears at the bottom of this screen, offering more information. */
-"ACCOUNT_DATA_REPORT_FOOTER" = "دوكلاتىڭىز چىقىرىلىدىغان ۋاقىتتىلا ھاسىللىنىدىغان بولۇپ، ئۇنى Signal ئۈسكۈنىڭىزدە ساقلىمايدۇ.";
+"ACCOUNT_DATA_REPORT_FOOTER" = "دوكلاتىڭىز چىقىرىلىدىغان ۋاقىتتىلا ھاسىللىنىدىغان بولۇپ، ئۇنى Radar ئۈسكۈنىڭىزدە ساقلىمايدۇ.";
 
 /* Users can request a report of their account data. This is the subtitle on the screen where they do this, giving them more information. */
-"ACCOUNT_DATA_REPORT_SUBTITLE" = "Signal ھېساباتىڭىزنىڭ سانلىق مەلۇماتلىرىنى چۈشۈرۈپ چىقىرىشقا بولىدۇ. بۇ دوكلات ھېچقانداق ئۇچۇر ياكى مېدىيانى ئۆز ئىچىگە ئالمايدۇ.";
+"ACCOUNT_DATA_REPORT_SUBTITLE" = "Radar ھېساباتىڭىزنىڭ سانلىق مەلۇماتلىرىنى چۈشۈرۈپ چىقىرىشقا بولىدۇ. بۇ دوكلات ھېچقانداق ئۇچۇر ياكى مېدىيانى ئۆز ئىچىگە ئالمايدۇ.";
 
 /* Users can request a report of their account data. This is the title on the screen where they do this. */
 "ACCOUNT_DATA_REPORT_TITLE" = "ھېساباتىڭىزنىڭ سانلىق مەلۇماتلىرى";
 
 /* Label for 'invite' button in contact view. */
-"ACTION_INVITE" = "Signal ئىشلىتىش تەكلىپى";
+"ACTION_INVITE" = "Radar ئىشلىتىش تەكلىپى";
 
 /* Label for button that lets you send a message to a contact. */
 "ACTION_SEND_MESSAGE" = "ئۇچۇر يوللا";
@@ -83,7 +83,7 @@
 "ACTION_VIDEO_CALL" = "سىنلىق چاقىرىش";
 
 /* Label for 'voice call' button in contact view. */
-"ACTION_VOICE_CALL" = "‫Signal چاقىرىقى";
+"ACTION_VOICE_CALL" = "‫Radar چاقىرىقى";
 
 /* The title for the 'add group members' view. */
 "ADD_GROUP_MEMBERS_VIEW_TITLE" = "ئەزا قوش";
@@ -203,40 +203,40 @@
 "APN_Message" = "يېڭى ئۇچۇرىڭىز بار";
 
 /* Default message for the 'app launch failed' alert. */
-"APP_LAUNCH_FAILURE_ALERT_MESSAGE" = "‫Signal قوزغىلالمىدى. support@signal.org غا سازلاش خاتىرىسى ئەۋەتىپ بۇ كاشىلىنى ھەل قىلىشىمىزغا ياردەم قىلىڭ.";
+"APP_LAUNCH_FAILURE_ALERT_MESSAGE" = "‫Radar قوزغىلالمىدى. support@radar.chat غا سازلاش خاتىرىسى ئەۋەتىپ بۇ كاشىلىنى ھەل قىلىشىمىزغا ياردەم قىلىڭ.";
 
 /* Button to try launching the app even though the last launch failed */
-"APP_LAUNCH_FAILURE_CONTINUE" = "ئۇنىڭ ئورنىغا Signal نى ئېچىش";
+"APP_LAUNCH_FAILURE_CONTINUE" = "ئۇنىڭ ئورنىغا Radar نى ئېچىش";
 
 /* Message for an error indicating that the app couldn't launch because some unexpected error happened with the user's registration status. */
-"APP_LAUNCH_FAILURE_CORRUPT_REGISTRATION_MESSAGE" = "بۇ مەسىلىنى ھەل قىلىشىمىز ئۈچۈن support@signal.org گە كاشىلا ھەل قىلىش خاتىرىسىنى يوللاڭ.";
+"APP_LAUNCH_FAILURE_CORRUPT_REGISTRATION_MESSAGE" = "بۇ مەسىلىنى ھەل قىلىشىمىز ئۈچۈن support@radar.chat گە كاشىلا ھەل قىلىش خاتىرىسىنى يوللاڭ.";
 
 /* Title for an error indicating that the app couldn't launch because some unexpected error happened with the user's registration status. */
-"APP_LAUNCH_FAILURE_CORRUPT_REGISTRATION_TITLE" = "Signal ئېچىلمىدى";
+"APP_LAUNCH_FAILURE_CORRUPT_REGISTRATION_TITLE" = "Radar ئېچىلمىدى";
 
 /* Error indicating that the app could not launch because the database could not be loaded. */
 "APP_LAUNCH_FAILURE_COULD_NOT_LOAD_DATABASE" = "سانداننى يۈكلىيەلمىدى";
 
 /* Error indicating that the app could not launch without reverting unknown database migrations. */
-"APP_LAUNCH_FAILURE_INVALID_DATABASE_VERSION_MESSAGE" = "ئەڭ يېڭى نەشرىدىكى Signal غا يۈكسەلتىڭ.";
+"APP_LAUNCH_FAILURE_INVALID_DATABASE_VERSION_MESSAGE" = "ئەڭ يېڭى نەشرىدىكى Radar غا يۈكسەلتىڭ.";
 
 /* Error indicating that the app could not launch without reverting unknown database migrations. */
 "APP_LAUNCH_FAILURE_INVALID_DATABASE_VERSION_TITLE" = "يوچۇن ساندان نەشرى.";
 
 /* Error indicating that the app crashed during the previous launch. */
-"APP_LAUNCH_FAILURE_LAST_LAUNCH_CRASHED_MESSAGE" = "Signal نى ئېچىشتا مەسىلە كۆرۈلدى. بۇ مەسىلىنى ھەل قىلىشقا ياردەم قىلىش ئۈچۈن، خاتالىق خاتىرىسىنى support@signal.org غا يوللاپ بېرىڭ.";
+"APP_LAUNCH_FAILURE_LAST_LAUNCH_CRASHED_MESSAGE" = "Radar نى ئېچىشتا مەسىلە كۆرۈلدى. بۇ مەسىلىنى ھەل قىلىشقا ياردەم قىلىش ئۈچۈن، خاتالىق خاتىرىسىنى support@radar.chat غا يوللاپ بېرىڭ.";
 
 /* Error indicating that the app crashed during the previous launch. */
-"APP_LAUNCH_FAILURE_LAST_LAUNCH_CRASHED_TITLE" = "Signal ئېچىلمىدى";
+"APP_LAUNCH_FAILURE_LAST_LAUNCH_CRASHED_TITLE" = "Radar ئېچىلمىدى";
 
 /* Error description indicating that the app crashed because there was low storage space available on the device. */
-"APP_LAUNCH_FAILURE_LOW_STORAGE_SPACE_AVAILABLE_MESSAGE" = "ئۈسكۈنىڭىزنىڭ بوشلۇقى ئاز بولغاچقا Signal ئېچىلمىدى. Signal نى ئىشلىتىش ئۈچۈن، تەڭشەكتە ساقلاش بوشلۇقىنى بىكارلاڭ.";
+"APP_LAUNCH_FAILURE_LOW_STORAGE_SPACE_AVAILABLE_MESSAGE" = "ئۈسكۈنىڭىزنىڭ بوشلۇقى ئاز بولغاچقا Radar ئېچىلمىدى. Radar نى ئىشلىتىش ئۈچۈن، تەڭشەكتە ساقلاش بوشلۇقىنى بىكارلاڭ.";
 
 /* Error title indicating that the app crashed because there was low storage space available on the device. */
 "APP_LAUNCH_FAILURE_LOW_STORAGE_SPACE_AVAILABLE_TITLE" = "ساقلاش بوشلۇقى ئاز";
 
 /* Error indicating that the app could not restore transferred data. */
-"APP_LAUNCH_FAILURE_RESTORE_FAILED_MESSAGE" = "كونا ئەسكۈنىڭىزدىن يوللىغان سانلىق مەلۇماتنى ئەسلىگە كەلتۈرگىلى بولمىدى. support@signal.org غا سازلاش خاتىرىسى ئەۋەتىپ بۇ كاشىلىنى ھەل قىلىشىمىزغا ياردەم قىلىڭ.  ئەگەر Signal نى قايتا ئورناتسىڭىز ئۇچۇر تارىخىڭىزنى يوقىتىشىڭىز مۇمكىن.";
+"APP_LAUNCH_FAILURE_RESTORE_FAILED_MESSAGE" = "كونا ئەسكۈنىڭىزدىن يوللىغان سانلىق مەلۇماتنى ئەسلىگە كەلتۈرگىلى بولمىدى. support@radar.chat غا سازلاش خاتىرىسى ئەۋەتىپ بۇ كاشىلىنى ھەل قىلىشىمىزغا ياردەم قىلىڭ.  ئەگەر Radar نى قايتا ئورناتسىڭىز ئۇچۇر تارىخىڭىزنى يوقىتىشىڭىز مۇمكىن.";
 
 /* Error indicating that the app could not restore transferred data. */
 "APP_LAUNCH_FAILURE_RESTORE_FAILED_TITLE" = "يۆتكەشنى تاماملىيالمىدى.";
@@ -260,7 +260,7 @@
 "APP_UPDATE_NAG_ALERT_MESSAGE_FORMAT" = "%1$@ نەشرىنى App Store دىن چۈشۈرۈشكە بولىدۇ.";
 
 /* Title for the 'new app version available' alert. */
-"APP_UPDATE_NAG_ALERT_TITLE" = "يېڭى نەشرىدىكى Signal نى ئىشلىتەلەيسىز.";
+"APP_UPDATE_NAG_ALERT_TITLE" = "يېڭى نەشرىدىكى Radar نى ئىشلىتەلەيسىز.";
 
 /* Label for the 'update' button in the 'new app version available' alert. */
 "APP_UPDATE_NAG_ALERT_UPDATE_BUTTON" = "يېڭىلا";
@@ -410,7 +410,7 @@
 "ATTACHMENT_KEYBOARD_GIF" = "GIF";
 
 /* Text in chat attachment panel when Signal only has access to some photos/videos. This string is in a compact horizontal space, so it should be short if possible. */
-"ATTACHMENT_KEYBOARD_LIMITED_ACCESS" = "Signal رەسىملەرنى چەكلىك دائىرىدىلا زىيارەت قىلالايدۇ";
+"ATTACHMENT_KEYBOARD_LIMITED_ACCESS" = "Radar رەسىملەرنى چەكلىك دائىرىدىلا زىيارەت قىلالايدۇ";
 
 /* A button to select a location from the Attachment Keyboard */
 "ATTACHMENT_KEYBOARD_LOCATION" = "ئورنى";
@@ -422,7 +422,7 @@
 "ATTACHMENT_KEYBOARD_NO_MEDIA_TITLE" = "رەسىم ياكى ۋېدىيو يوق";
 
 /* Text in chat attachment panel explaining that user needs to give Signal permission to access photos. */
-"ATTACHMENT_KEYBOARD_NO_PHOTO_ACCESS" = "Signal سىزنىڭ رەسىم ۋە سىنلىرىڭىزغا ئېرىشەلمەيدۇ. ئېرىشىش ئىجازىتى ئۈچۈن تەڭشەكلەرنى ئېچىڭ ۋە رەسىملەرنى چېكىڭ";
+"ATTACHMENT_KEYBOARD_NO_PHOTO_ACCESS" = "Radar سىزنىڭ رەسىم ۋە سىنلىرىڭىزغا ئېرىشەلمەيدۇ. ئېرىشىش ئىجازىتى ئۈچۈن تەڭشەكلەرنى ئېچىڭ ۋە رەسىملەرنى چېكىڭ";
 
 /* Button in chat attachment panel to let user open Settings app and give Signal persmission to access photos. */
 "ATTACHMENT_KEYBOARD_OPEN_SETTINGS" = "تەڭشەكنى ئېچىش";
@@ -596,10 +596,10 @@
 "BACKUP_ONBOARDING_INTRO_NOT_NOW_TOAST" = "«تەڭشەك»تىن زاپاسلاشنى قوزغىتالايسىز.";
 
 /* Subtitle for a view introducing Backups during an onboarding flow. */
-"BACKUP_ONBOARDING_INTRO_SUBTITLE" = "ئۇچۇرلىرىڭىزنى ۋە مېدىيانى Signalنىڭ بىخەتەر ، ئاخىرىغىچە مەخپىيلەشتۈرۈلگەن ساقلاش مۇلازىمىتىنى ئىشلىتىپ زاپاسلاڭ. يېڭى تېلېفون ئالغاندا ياكى Signalنى قايتا قاچىلىغاندا ھەرقانداق ئۇچۇرنى يۈتتۈرۈپ قويمايسىز.";
+"BACKUP_ONBOARDING_INTRO_SUBTITLE" = "ئۇچۇرلىرىڭىزنى ۋە مېدىيانى Radarنىڭ بىخەتەر ، ئاخىرىغىچە مەخپىيلەشتۈرۈلگەن ساقلاش مۇلازىمىتىنى ئىشلىتىپ زاپاسلاڭ. يېڭى تېلېفون ئالغاندا ياكى Radarنى قايتا قاچىلىغاندا ھەرقانداق ئۇچۇرنى يۈتتۈرۈپ قويمايسىز.";
 
 /* Title for a view introducing Backups during an onboarding flow. */
-"BACKUP_ONBOARDING_INTRO_TITLE" = "Signal بىخەتەر زاپاسلانمىللىرى";
+"BACKUP_ONBOARDING_INTRO_TITLE" = "Radar بىخەتەر زاپاسلانمىللىرى";
 
 /* Text for a bullet point in a view introducing the 'Recovery Key' during an onboarding flow. */
 "BACKUP_ONBOARDING_KEY_INTRO_BULLET_1" = "ئەسلىگە كەلتۈرۈش ئاچقۇچىڭىز، زاپاسلاشنى ئەسلىگە كەلتۈرۈش ئۈچۈن ئىشلىتىلىدىغان 64 خانىلىق كود.";
@@ -617,10 +617,10 @@
 "BACKUP_ONBOARDING_KEY_INTRO_TITLE" = "ئەسلىگە كەلتۈرۈش ئاچقۇچى";
 
 /* Body for a sheet shown when your Backup plan is downgraded. */
-"BACKUP_PLAN_DOWNGRADED_SHEET_BODY" = "زاپاسلاش مۇشتەرىلىكىڭىزنىڭ ۋاقتى ئۆتتى، چۈنكى پۇل تۆلەش ئۇسۇلىڭىز بىلەن يېڭىلىغىلى بولمىدى.\n\nمېدىيانى زاپاسلاشنى داۋاملاشتۇرۇش ئۈچۈن قايتا مۇشتەرى بولۇڭ. ھەقسىز Signal زاپاسلانمىسى پىلانىنى داۋاملىق زىيارەت قىلالايسىز.";
+"BACKUP_PLAN_DOWNGRADED_SHEET_BODY" = "زاپاسلاش مۇشتەرىلىكىڭىزنىڭ ۋاقتى ئۆتتى، چۈنكى پۇل تۆلەش ئۇسۇلىڭىز بىلەن يېڭىلىغىلى بولمىدى.\n\nمېدىيانى زاپاسلاشنى داۋاملاشتۇرۇش ئۈچۈن قايتا مۇشتەرى بولۇڭ. ھەقسىز Radar زاپاسلانمىسى پىلانىنى داۋاملىق زىيارەت قىلالايسىز.";
 
 /* Body for a sheet shown when your Backup plan is downgraded because you stopped using TestFlight. */
-"BACKUP_PLAN_DOWNGRADED_SHEET_BODY_TESTFLIGHT" = "TestFlightنى داۋاملىق ئىشلەتمىگەچكە زاپاسلاش مۇشتەرىلىكىڭىزنىڭ ۋاقتى ئۆتكەن.\n\nمېدىيانى زاپاسلاشنى داۋاملاشتۇرۇش ئۈچۈن قايتا مۇشتەرى بولۇڭ. ھەقسىز Signal زاپاسلانمىسى پىلانىنى داۋاملىق زىيارەت قىلالايسىز.";
+"BACKUP_PLAN_DOWNGRADED_SHEET_BODY_TESTFLIGHT" = "TestFlightنى داۋاملىق ئىشلەتمىگەچكە زاپاسلاش مۇشتەرىلىكىڭىزنىڭ ۋاقتى ئۆتكەن.\n\nمېدىيانى زاپاسلاشنى داۋاملاشتۇرۇش ئۈچۈن قايتا مۇشتەرى بولۇڭ. ھەقسىز Radar زاپاسلانمىسى پىلانىنى داۋاملىق زىيارەت قىلالايسىز.";
 
 /* Primary button for a sheet shown when your Backup plan is downgraded. */
 "BACKUP_PLAN_DOWNGRADED_SHEET_PRIMARY_BUTTON" = "زاپاسلارنى باشقۇرۇش";
@@ -746,7 +746,7 @@
 "BACKUP_SETTINGS_BACKUP_PLAN_PAID_BUT_IAP_NOT_FOUND_LOCALLY_ACTION_BUTTON_TITLE" = "يېڭىلاش";
 
 /* Text describing that the user's paid backup plan did not correspond to a App Store subscription on this device. */
-"BACKUP_SETTINGS_BACKUP_PLAN_PAID_BUT_IAP_NOT_FOUND_LOCALLY_DESCRIPTION" = "مۇشتەرىلىكىڭىز بۇ ئۈسكۈنىدە تېپىلمىدى. Signal زاپاسلانمىسىنى ئشلىتىش ئۈچۈن يېڭىلاڭ.";
+"BACKUP_SETTINGS_BACKUP_PLAN_PAID_BUT_IAP_NOT_FOUND_LOCALLY_DESCRIPTION" = "مۇشتەرىلىكىڭىز بۇ ئۈسكۈنىدە تېپىلمىدى. Radar زاپاسلانمىسىنى ئشلىتىش ئۈچۈن يېڭىلاڭ.";
 
 /* Header describing what the paid backup plan includes. */
 "BACKUP_SETTINGS_BACKUP_PLAN_PAID_HEADER" = "تېكىست + بارلىق مېدىيانى زاپاسلاش";
@@ -842,7 +842,7 @@
 "BACKUP_SETTINGS_DISABLING_SUBSCRIPTION_CANCEL_ACTION_SHEET_MANAGE_SUBSCRIPTION_BUTTON" = "مۇشتەرىلىكنى باشقۇرۇش";
 
 /* Message for an action sheet shown when the user disables Backups, but is still subscribed to the paid plan. */
-"BACKUP_SETTINGS_DISABLING_SUBSCRIPTION_CANCEL_ACTION_SHEET_MESSAGE" = "مۇشتەرىلىكىڭىزنى ئەمەلدىن قالدۇرماقچى بولسىڭىز «مۇشتەرىلىكنى باشقۇرۇش>Signal > مۇشتەرىلىكنى بىكار قىلىش»نى چېكىڭ";
+"BACKUP_SETTINGS_DISABLING_SUBSCRIPTION_CANCEL_ACTION_SHEET_MESSAGE" = "مۇشتەرىلىكىڭىزنى ئەمەلدىن قالدۇرماقچى بولسىڭىز «مۇشتەرىلىكنى باشقۇرۇش>Radar > مۇشتەرىلىكنى بىكار قىلىش»نى چېكىڭ";
 
 /* Title for an action sheet shown when the user disables Backups, but is still subscribed to the paid plan. */
 "BACKUP_SETTINGS_DISABLING_SUBSCRIPTION_CANCEL_ACTION_SHEET_TITLE" = "سىز يەنىلا ھەقلىق زاپاسلاش پىلانىغا مۇشتەرى";
@@ -920,7 +920,7 @@
 "BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_DOWNLOAD_SHEET_LATER_ACTION" = "كېيىن چۈشۈرۈڭ";
 
 /* Message for an action sheet allowing users to download their offloaded media. */
-"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_DOWNLOAD_SHEET_MESSAGE" = "زاپاس سانلىق مەلۇماتىڭىزدا بۇ ئۈسكۈنىدە يوق مېدىيا بار. بۇنى چۈشۈرۈشكە ئۇزۇن ۋاقىت كېتىشى مۇمكىن ، چۈشۈرۈشكە دەخلى قىلىنىشتىن ساقلىنىش ئۈچۈن Signal نى ئېچىپ قۇيۇڭ.";
+"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_DOWNLOAD_SHEET_MESSAGE" = "زاپاس سانلىق مەلۇماتىڭىزدا بۇ ئۈسكۈنىدە يوق مېدىيا بار. بۇنى چۈشۈرۈشكە ئۇزۇن ۋاقىت كېتىشى مۇمكىن ، چۈشۈرۈشكە دەخلى قىلىنىشتىن ساقلىنىش ئۈچۈن Radar نى ئېچىپ قۇيۇڭ.";
 
 /* Action in an action sheet allowing users to download their offloaded media now. */
 "BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_DOWNLOAD_SHEET_NOW_ACTION" = "ھازىر چۈشۈرۈڭ";
@@ -971,7 +971,7 @@
 "BACKUP_SETTINGS_SUBSCRIPTION_ALREADY_REDEEMED_NOTICE_TITLE" = "زاپاسلاش مۇشتەرىلىكىڭىزنى ئەسلىگە كەلتۈرەلمىدى";
 
 /* Body for a sheet explaining that the user's Backups subscription was already redeemed. */
-"BACKUP_SETTINGS_SUBSCRIPTION_ALREADY_REDEEMED_SHEET_BODY" = "بەك كۆپ ئۈسكۈنىلەر بۇ ئايدا مۇشتەرىلىكىڭىزنى ئەسلىگە كەلتۈرۈشكە ئۇرۇندى.\n\nسىز Signal ھېساباتىڭىزنى قايتا-قايتا تىزىملاتقان بولۇشىڭىز ياكى ئوخشاش مۇشتەرىلىكنى ئىشلىتىۋاتقان ئۈسكۈنىلىرىڭىز بەك كۆپ بولۇپ كەتكەن بولۇشى مۇمكىن.";
+"BACKUP_SETTINGS_SUBSCRIPTION_ALREADY_REDEEMED_SHEET_BODY" = "بەك كۆپ ئۈسكۈنىلەر بۇ ئايدا مۇشتەرىلىكىڭىزنى ئەسلىگە كەلتۈرۈشكە ئۇرۇندى.\n\nسىز Radar ھېساباتىڭىزنى قايتا-قايتا تىزىملاتقان بولۇشىڭىز ياكى ئوخشاش مۇشتەرىلىكنى ئىشلىتىۋاتقان ئۈسكۈنىلىرىڭىز بەك كۆپ بولۇپ كەتكەن بولۇشى مۇمكىن.";
 
 /* Button for a sheet explaining that the user's Backups subscription was already redeemed. */
 "BACKUP_SETTINGS_SUBSCRIPTION_ALREADY_REDEEMED_SHEET_GOT_IT_BUTTON" = "بىلدىم";
@@ -998,13 +998,13 @@
 "BACKUP_SETTINGS_UPLOAD_PROGRESS_SUBTITLE_RUNNING" = "%2$@ نىڭ %1$@ تى يۈكلىنىۋاتىدۇ(%3$@)";
 
 /* Message for a sheet shown after the user enables backups. */
-"BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_MESSAGE" = "زاپاسلايدىغان مەلۇماتلارنىڭ ھەجىمىگە قارىتا، بۇنىڭغا ئۇزۇن ۋاقىت كېتىشى مۇمكىن. زاپاسلاش ئېلىپ بېرىلىۋاتقاندىمۇ Signal نى ئادەتتىكىدەكلا ئىشلىتەلەيسىز.";
+"BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_MESSAGE" = "زاپاسلايدىغان مەلۇماتلارنىڭ ھەجىمىگە قارىتا، بۇنىڭغا ئۇزۇن ۋاقىت كېتىشى مۇمكىن. زاپاسلاش ئېلىپ بېرىلىۋاتقاندىمۇ Radar نى ئادەتتىكىدەكلا ئىشلىتەلەيسىز.";
 
 /* Title for a sheet shown after the user enables backups. */
-"BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_TITLE" = "«Signal بىخەتەر زاپاسلانمىللىرى»نى ئىشلىتىشىڭىزنى قارشى ئالىمىز. زاپاسلاشنى ھازىرلا باشلاڭ.";
+"BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_TITLE" = "«Radar بىخەتەر زاپاسلانمىللىرى»نى ئىشلىتىشىڭىزنى قارشى ئالىمىز. زاپاسلاشنى ھازىرلا باشلاڭ.";
 
 /* Message for a sheet shown when your Backup subscription fails to renew. */
-"BACKUP_SUBSCRIPTION_FAILED_TO_RENEW_SHEET_MESSAGE" = "پۇل تۆلەش ئۇسۇلىڭىزنىڭ ئەڭ يېڭى ئىكەنلىكىنى جەزملەشتۈرۈڭ. «مۇشتەرىلىكنى باشقۇرۇش> Signal> ھەق تۆلەش ئۇسۇلىنى يېڭىلاش»نى چېكىڭ.";
+"BACKUP_SUBSCRIPTION_FAILED_TO_RENEW_SHEET_MESSAGE" = "پۇل تۆلەش ئۇسۇلىڭىزنىڭ ئەڭ يېڭى ئىكەنلىكىنى جەزملەشتۈرۈڭ. «مۇشتەرىلىكنى باشقۇرۇش> Radar> ھەق تۆلەش ئۇسۇلىنى يېڭىلاش»نى چېكىڭ.";
 
 /* Primary button for a sheet shown when your Backup subscription fails to renew. */
 "BACKUP_SUBSCRIPTION_FAILED_TO_RENEW_SHEET_PRIMARY_BUTTON" = "مۇشتەرىلىكنى باشقۇرۇش";
@@ -1022,7 +1022,7 @@
 "BACKUPS_SETTINGS_TITLE" = "بىخەتەر زاپاسلانمىلار";
 
 /* Body for system notification or megaphone when backups is enabled. Embeds {{ time backups was enabled }} */
-"BACKUPS_TURNED_ON_NOTIFICATION_BODY_FORMAT" = "بۇ ھېسابات ئۈچۈن Signal زاپاسلانمىسى %1$@ دە ئېچىلدى. كۆرۈش ئۈچۈن چېكىڭ.";
+"BACKUPS_TURNED_ON_NOTIFICATION_BODY_FORMAT" = "بۇ ھېسابات ئۈچۈن Radar زاپاسلانمىسى %1$@ دە ئېچىلدى. كۆرۈش ئۈچۈن چېكىڭ.";
 
 /* Title for system notification or megaphone when backups is enabled */
 "BACKUPS_TURNED_ON_TITLE" = "زاپاسلاشنى ئاچتىڭىز";
@@ -1040,7 +1040,7 @@
 "BADGE_DETAILS_DONATE_TO_SIGNAL" = "دەرھال ئىئانە قىلىش";
 
 /* When viewing someone else's donor badge, you'll see a sheet. This is the title on that sheet. Embeds {badge owner's short name} */
-"BADGE_DETAILS_TITLE_FOR_SUPPORTER" = "%1$@ Signal نى قوللايدۇ";
+"BADGE_DETAILS_TITLE_FOR_SUPPORTER" = "%1$@ Radar نى قوللايدۇ";
 
 /* String explaining to the user that their boost badge has expired on the badge expiry sheet. */
 "BADGE_EXPIRED_BOOST_BODY" = "Boost ئىزنىكىڭىزنىڭ ۋاقتى ئۆتكەن بولۇپ، ئەمدى ئۇنى ئارخىپىڭىزدا كۆرەلمەيسىز.\n\nSignal نى داۋاملىق ئىشلىتەلەيسىز، لېكىن شۇنداقتىمۇ سىز ئۈچۈن بەرپا قىلىنغان تېخنىكىنى داۋاملىق قوللاش ئۈچۈن، ئايلىق قوللىغۇچى بولۇشنى ئويلىشىپ بېقىڭ.";
@@ -1088,7 +1088,7 @@
 "BANK_DONATION_FOOTER_FIND_ACCOUNT_INFO" = "ھېسابات ئۇچۇرىنى ئىزدەش";
 
 /* On the bank transfer donation screen, a small amount of information text is shown. This is that text. It should (1) instruct users to enter their bank information (2) tell them that Signal does not collect or store their personal information. */
-"BANK_DONATION_SUBHEADER_TEXT" = "بانكا تەپسىلاتىنى كىرگۈزۈڭ. Signal شەخسىي ئۇچۇرلىرىڭىزنى توپلىمايدۇ ياكى ساقلىمايدۇ.";
+"BANK_DONATION_SUBHEADER_TEXT" = "بانكا تەپسىلاتىنى كىرگۈزۈڭ. Radar شەخسىي ئۇچۇرلىرىڭىزنى توپلىمايدۇ ياكى ساقلىمايدۇ.";
 
 /* Users can donate to Signal with a bank account. We are required to show them a mandate with information about bank transfers. This is a label for a button to agree to the mandate. */
 "BANK_MANDATE_AGREE" = "قوشۇلىمەن";
@@ -1097,7 +1097,7 @@
 "BANK_MANDATE_READ_MORE" = "تېخىمۇ كۆپ";
 
 /* Users can donate to Signal with a bank account. We are required to show them a mandate with information about bank transfers. This is a subtitle about the payment processor Stripe above that mandate. */
-"BANK_MANDATE_SUBTITLE" = "Signal غا قىلغان ئىئانىنى Stripe بىر تەرەپ قىلىدۇ. Signal شەخسىي ئۇچۇرىڭىزنى توپلىمايدۇ ياكى ساقلىمايدۇ.";
+"BANK_MANDATE_SUBTITLE" = "Radar غا قىلغان ئىئانىنى Stripe بىر تەرەپ قىلىدۇ. Radar شەخسىي ئۇچۇرىڭىزنى توپلىمايدۇ ياكى ساقلىمايدۇ.";
 
 /* Users can donate to Signal with a bank account. We are required to show them a mandate with information about bank transfers. This is the title above that mandate. */
 "BANK_MANDATE_TITLE" = "بانكىدىن ئاغدۇرۇش";
@@ -1253,7 +1253,7 @@
 "CALL_AUDIO_MISSED_WEEK_NOTIFICATION_BODY_FORMAT" = "📞ئېلىنمىغان ئاۋازلىق چاقىرىق %1$@";
 
 /* Alert message when calling and permissions for microphone are missing */
-"CALL_AUDIO_PERMISSION_MESSAGE" = "سىز iOS نىڭ تەڭشەكلەردىن مىكروفون ھوقۇقىنى قوزغىتىپ، Signal نىڭ چاقىرىش ۋە ئۈن ئۇچۇرى خاتىرىلىشىگە يول قويالايسىز.";
+"CALL_AUDIO_PERMISSION_MESSAGE" = "سىز iOS نىڭ تەڭشەكلەردىن مىكروفون ھوقۇقىنى قوزغىتىپ، Radar نىڭ چاقىرىش ۋە ئۈن ئۇچۇرى خاتىرىلىشىگە يول قويالايسىز.";
 
 /* Alert title when calling and permissions for microphone are missing */
 "CALL_AUDIO_PERMISSION_TITLE" = "مىكروفون زىيارەت ھوقۇقى زۆرۈر";
@@ -1319,7 +1319,7 @@
 "CALL_LINK_JOIN_REQUEST_PROMPT" = "...گە قېتىلىشنى خالامسىز؟";
 
 /* Shown in a message bubble when you send a call link in a Signal chat */
-"CALL_LINK_LINK_PREVIEW_DESCRIPTION" = "بۇ ئۇلانما بىلەن Signal چاقىرىقىغا قوشۇلۇش";
+"CALL_LINK_LINK_PREVIEW_DESCRIPTION" = "بۇ ئۇلانما بىلەن Radar چاقىرىقىغا قوشۇلۇش";
 
 /* Text that appears on a toast in a call lobby before joining a call link informing the user what information will be shared with other call members when they have phone number sharing turned off. */
 "CALL_LINK_LOBBY_SHARING_INFO_PHONE_NUMBER_SHARING_OFF" = "بۇ چاقىرىققا ئۇلانما ئارقىلىق قوشۇلغان ھەرقانداق كىشى ئىسمىڭىز ۋە رەسىمىڭىزنى كۆرەلەيدۇ.";
@@ -1343,7 +1343,7 @@
 "CALL_LINK_REQUIRE_APPROVAL" = "باشقۇرغۇچىنىڭ تەستىقىنى تەلەپ قىلىش";
 
 /* Button to open UI to share a Call Link with someone on Signal. */
-"CALL_LINK_SHARE_VIA_SIGNAL" = "ئۇلانمىنى Signal ئارقىلىق ئورتاقلىشىش";
+"CALL_LINK_SHARE_VIA_SIGNAL" = "ئۇلانمىنى Radar ئارقىلىق ئورتاقلىشىش";
 
 /* Button to open the system share sheet to share a Call Link. */
 "CALL_LINK_SHARE_VIA_SYSTEM" = "ئۇلانما ھەمبەھىر";
@@ -1448,10 +1448,10 @@
 "CALLING_MEMBER_VIEW_YOUR_CAMERA_IS_OFF" = "كامېرا تاقاق";
 
 /* The generic name used for calls if CallKit privacy is enabled */
-"CALLKIT_ANONYMOUS_CONTACT_NAME" = "‫Signal ئىشلەتكۈچى";
+"CALLKIT_ANONYMOUS_CONTACT_NAME" = "‫Radar ئىشلەتكۈچى";
 
 /* The generic name used for group calls if CallKit privacy is enabled */
-"CALLKIT_ANONYMOUS_GROUP_NAME" = "Signal گۇرۇپپىسى";
+"CALLKIT_ANONYMOUS_GROUP_NAME" = "Radar گۇرۇپپىسى";
 
 /* Title for the calls list view. */
 "CALLS_LIST_TITLE" = "چاقىرىشلار";
@@ -1625,7 +1625,7 @@
 "CARD_DONATION_EXPIRATION_DATE_PLACEHOLDER" = "MM / YY";
 
 /* Users can choose to learn more about their credit/debit card donations, which will open a sheet with additional information. This is the body text of that sheet. */
-"CARD_DONATION_READ_MORE_SHEET_BODY" = "سىز ئىئانە قىلغاندا Signal شەخسىي ئۇچۇرلىرىڭىزنى توپلىمايدۇ ياكى ساقلىمايدۇ.\n\nئىئانىڭىزنى تاپشۇرۇۋېلىش ئۈچۈن Stripe پۇل تۆلەش بىر تەرەپ قىلغۇچىسى ئورنىدا ئىشلىتىمىز. سىز ئۇلارغا تەمىنلىگەن ئۇچۇرلارنى بىز كۆرەلمەيمىز ياكى ساقلىيالمايمىز.Signal سىزنىڭ ئىئانىڭىزنى سىزنىڭ Signal ھېساباتىڭىزغا باغلىمايدۇ ۋە ئۇنداق قىلىش ھوقۇقىمۇ بولمايدۇ.قوللىغىنىڭىزغا رەھمەت!";
+"CARD_DONATION_READ_MORE_SHEET_BODY" = "سىز ئىئانە قىلغاندا Radar شەخسىي ئۇچۇرلىرىڭىزنى توپلىمايدۇ ياكى ساقلىمايدۇ.\n\nئىئانىڭىزنى تاپشۇرۇۋېلىش ئۈچۈن Stripe پۇل تۆلەش بىر تەرەپ قىلغۇچىسى ئورنىدا ئىشلىتىمىز. سىز ئۇلارغا تەمىنلىگەن ئۇچۇرلارنى بىز كۆرەلمەيمىز ياكى ساقلىيالمايمىز.Radar سىزنىڭ ئىئانىڭىزنى سىزنىڭ Radar ھېساباتىڭىزغا باغلىمايدۇ ۋە ئۇنداق قىلىش ھوقۇقىمۇ بولمايدۇ.قوللىغىنىڭىزغا رەھمەت!";
 
 /* Users can choose to learn more about their credit/debit card donations, which will open a sheet with additional information. This is the title of that sheet. */
 "CARD_DONATION_READ_MORE_SHEET_TITLE" = "ئۇچۇرلىرىڭىز شەخسىي";
@@ -1634,7 +1634,7 @@
 "CARD_DONATION_SUBHEADER_LEARN_MORE" = "تېخىمۇ كۆپ بىلدۈرگۈ";
 
 /* On the credit/debit card donation screen, a small amount of information text is shown. This is that text. It should (1) instruct users to enter their credit/debit card information (2) tell them that Signal does not collect or store their personal information. */
-"CARD_DONATION_SUBHEADER_TEXT" = "كارتا تەپسىلاتىنى كىرگۈزۈڭ. Signal شەخسىي ئۇچۇرلىرىڭىزنى توپلىمايدۇ ياكى ساقلىمايدۇ.";
+"CARD_DONATION_SUBHEADER_TEXT" = "كارتا تەپسىلاتىنى كىرگۈزۈڭ. Radar شەخسىي ئۇچۇرلىرىڭىزنى توپلىمايدۇ ياكى ساقلىمايدۇ.";
 
 /* Title for the 'censorship circumvention country' view. */
 "CENSORSHIP_CIRCUMVENTION_COUNTRY_VIEW_TITLE" = "دۆلەت تاللاڭ";
@@ -1772,7 +1772,7 @@
 "COMPARE_SAFETY_NUMBER_ACTION" = "چاپلاش تاختىسىدى بىلەن سېلىشتۇر";
 
 /* Accessibility hint describing what you can do with the compose button */
-"COMPOSE_BUTTON_HINT" = "سۆھبەتلىشىدىغان Signal ئىشلەتكۈچىنى تاللايدۇ ياكى ئىزدەيدۇ.";
+"COMPOSE_BUTTON_HINT" = "سۆھبەتلىشىدىغان Radar ئىشلەتكۈچىنى تاللايدۇ ياكى ئىزدەيدۇ.";
 
 /* Accessibility label from compose button. */
 "COMPOSE_BUTTON_LABEL" = "ياز";
@@ -1805,7 +1805,7 @@
 "COMPOSE_SCREEN_MISSING_CONTACTS_CTA" = "تەڭشەكنى ئېچىش";
 
 /* Multi-line label explaining why compose-screen contact picker is empty. */
-"COMPOSE_SCREEN_MISSING_CONTACTS_PERMISSION" = "سىز iOS نىڭ تەڭشەكلەردىن ئالاقەداشلار زىيارەت ھوقۇقىنى قوزغىتىپ، كىملەرنىڭ Signal ئىشلەتكۈچىسى ئىكەنلىكىنى كۆرەلەيسىز.";
+"COMPOSE_SCREEN_MISSING_CONTACTS_PERMISSION" = "سىز iOS نىڭ تەڭشەكلەردىن ئالاقەداشلار زىيارەت ھوقۇقىنى قوزغىتىپ، كىملەرنىڭ Radar ئىشلەتكۈچىسى ئىكەنلىكىنى كۆرەلەيسىز.";
 
 /* Configure reactions title text */
 "CONFIGURE_REACTIONS" = "ئىنكاسلارنى بەلگىلەش";
@@ -1847,10 +1847,10 @@
 "CONTACT_ABOUT_SHEET_PROFILE_NAMES_EDUCATION" = "ئارخىپ ناملىرى دەلىللەنمىگەن";
 
 /* Message for a tooltip that appears above a parenthesized name for another user, indicating that that name is the name the other user set for themself. Embeds {{name}} */
-"CONTACT_ABOUT_SHEET_SECONDARY_NAME_TOOLTIP_MESSAGE" = "«%1$@» بولسا بۇ كىشى Signal دا ئۆزى ئۈچۈن بەلگىلىگەن ئارخىپ نامى.";
+"CONTACT_ABOUT_SHEET_SECONDARY_NAME_TOOLTIP_MESSAGE" = "«%1$@» بولسا بۇ كىشى Radar دا ئۆزى ئۈچۈن بەلگىلىگەن ئارخىپ نامى.";
 
 /* A label indicating a user is a signal connection. */
-"CONTACT_ABOUT_SHEET_SIGNAL_CONNECTION_LABEL" = "Signal ئۇلىنىشى";
+"CONTACT_ABOUT_SHEET_SIGNAL_CONNECTION_LABEL" = "Radar ئۇلىنىشى";
 
 /* The title for a contact 'about' sheet. */
 "CONTACT_ABOUT_SHEET_TITLE" = "ھەققىدە";
@@ -1892,7 +1892,7 @@
 "CONTACT_NOTE_TITLE" = "خاتىرە";
 
 /* Body for contact permission action sheet */
-"CONTACT_PERMISSION_ACTION_SHEET_2_BODY" = "Signal دا تونۇيدىغان كىشىلەرنى تېپىش:";
+"CONTACT_PERMISSION_ACTION_SHEET_2_BODY" = "Radar دا تونۇيدىغان كىشىلەرنى تېپىش:";
 
 /* First step for contact permission action sheet */
 "CONTACT_PERMISSION_ACTION_SHEET_2_STEP_ONE" = "تۆۋەندىكى «تەڭشەكلەرگە يۆتكەل» نى چېكىڭ";
@@ -1952,7 +1952,7 @@
 "CONTACT_SHARE_INVALID_CONTACT" = "ئىناۋەتسىز ئالاقەداش.";
 
 /* Alert body when contacts disabled while trying to share a contact. */
-"CONTACT_SHARING_NO_ACCESS_BODY" = "Signal غا ئالاقىداشلارنى زىيارەت قىلىش ھوقۇقى لازىم. IOS تەڭشەكلىرىگە كىرىپ ئالاقىداشلارنى قوزغىتىڭ. ئالاقىداشلىرىڭىز مەخپىيلەشتۈرۈلگەن بولۇپ، Signal مۇلازىمىتىگە كۆرۈنمەيدۇ.";
+"CONTACT_SHARING_NO_ACCESS_BODY" = "Radar غا ئالاقىداشلارنى زىيارەت قىلىش ھوقۇقى لازىم. IOS تەڭشەكلىرىگە كىرىپ ئالاقىداشلارنى قوزغىتىڭ. ئالاقىداشلىرىڭىز مەخپىيلەشتۈرۈلگەن بولۇپ، Radar مۇلازىمىتىگە كۆرۈنمەيدۇ.";
 
 /* Alert title when contacts disabled while trying to share a contact. */
 "CONTACT_SHARING_NO_ACCESS_TITLE" = "ئالاقىداشنى زىيارەت قىلىشىغا رۇخسەت قىلىڭ";
@@ -2006,7 +2006,7 @@
 "CONTACT_SUPPORT_FILTER_SOMETHING_NOT_WORKING_SHORT" = "بەزى نەرسە ئىشلىمەيۋاتىدۇ";
 
 /* Alert body */
-"CONTACT_SUPPORT_PROMPT_ERROR_ALERT_BODY" = "Signal ياردەم ئىلتىماسىڭىزنى تاماملىيالمايدۇ.";
+"CONTACT_SUPPORT_PROMPT_ERROR_ALERT_BODY" = "Radar ياردەم ئىلتىماسىڭىزنى تاماملىيالمايدۇ.";
 
 /* button text */
 "CONTACT_SUPPORT_PROMPT_ERROR_TRY_AGAIN" = "قايتا سىنا";
@@ -2135,7 +2135,7 @@
 "CONVERSATION_SETTINGS_ATTRIBUTES_ACCESS_SECTION_FOOTER" = "گۇرۇپپىنىڭ ئىسمى، سۈرىتى، تونۇشتۇرۇشى ۋە كۆرۈن-غايىب ئۇچۇرنىڭ ۋاقىت خاتىرىلىگۈچىنى كىم ئۆزگەرتەلەيدىغانلىقىنى تاللاڭ.";
 
 /* Footer string for a contact's badges in conversation settings */
-"CONVERSATION_SETTINGS_BADGES_FOOTER" = "Signal نى قوللاپ، ئارخىپىڭىزدا ئىزنەكلەرگە ئېرىشىڭ. تەپسىلاتى ئۈچۈن خالىغان ئىزنەكنى چېكىڭ.";
+"CONVERSATION_SETTINGS_BADGES_FOOTER" = "Radar نى قوللاپ، ئارخىپىڭىزدا ئىزنەكلەرگە ئېرىشىڭ. تەپسىلاتى ئۈچۈن خالىغان ئىزنەكنى چېكىڭ.";
 
 /* Header title for a contact's badges in conversation settings */
 "CONVERSATION_SETTINGS_BADGES_HEADER" = "ئىزناكلار";
@@ -2393,7 +2393,7 @@
 "DATABASE_INTEGRITY_CHECK_ACTION_RUN" = "ئىجرا قىلىش";
 
 /* Message for alert before running a database integrity check */
-"DATABASE_INTEGRITY_CHECK_MESSAGE" = "بۇ بىزنىڭ مەسىلىڭىزنى ھەل قىلىشىمىزغا ياردەم بېرىدۇ. بۇ جەريانغا بىر قانچە مىنۇت كېتىشى مۇمكىن. بۇ تەكشۈرۈش جەريانىدا Signal نى ئەتسىڭىز بولىدۇ، لېكىن قايتا كىرىپ خاتىرىڭىزنى تاپشۇرۇڭ.";
+"DATABASE_INTEGRITY_CHECK_MESSAGE" = "بۇ بىزنىڭ مەسىلىڭىزنى ھەل قىلىشىمىزغا ياردەم بېرىدۇ. بۇ جەريانغا بىر قانچە مىنۇت كېتىشى مۇمكىن. بۇ تەكشۈرۈش جەريانىدا Radar نى ئەتسىڭىز بولىدۇ، لېكىن قايتا كىرىپ خاتىرىڭىزنى تاپشۇرۇڭ.";
 
 /* Button to skip database integrity check step */
 "DATABASE_INTEGRITY_CHECK_SKIP" = "ئاتلا";
@@ -2417,10 +2417,10 @@
 "DATABASE_RECOVERY_MORE_STORAGE_SPACE_NEEDED_TITLE" = "كۆپرەك بوشلۇق لازىم";
 
 /* The user has tried to recover their data after it was lost due to corruption. (They have not been hacked.) This is the description on the screen where we show an error message. */
-"DATABASE_RECOVERY_RECOVERY_FAILED_DESCRIPTION" = "ئۇچۇرلىشىش خاتىرىڭىزنى ئەسلىگە كەلتۈرگىلى بولمىدى. Signal نى قايتا قاچىلىغاندىن كېيىن داۋاملىق ئىشلەتسىڭىز بولىدۇ. قەيەردە مەسىلە كۆرۈلگەنلىكىنى ئايدىڭلاشتۇرۇش ئۈچۈن خاتالىق خاتىرىسىنى يوللاپ بەرسىڭىز بولىدۇ.";
+"DATABASE_RECOVERY_RECOVERY_FAILED_DESCRIPTION" = "ئۇچۇرلىشىش خاتىرىڭىزنى ئەسلىگە كەلتۈرگىلى بولمىدى. Radar نى قايتا قاچىلىغاندىن كېيىن داۋاملىق ئىشلەتسىڭىز بولىدۇ. قەيەردە مەسىلە كۆرۈلگەنلىكىنى ئايدىڭلاشتۇرۇش ئۈچۈن خاتالىق خاتىرىسىنى يوللاپ بەرسىڭىز بولىدۇ.";
 
 /* The user has tried to recover their data after it was lost due to corruption. (They have not been hacked.) This button lets them delete all of their data. */
-"DATABASE_RECOVERY_RECOVERY_FAILED_RESET_APP_BUTTON" = "Signal نى قايتا تەڭشەش";
+"DATABASE_RECOVERY_RECOVERY_FAILED_RESET_APP_BUTTON" = "Radar نى قايتا تەڭشەش";
 
 /* The user has tried to recover their data after it was lost due to corruption. (They have not been hacked.) If they want to delete the app and restart, they will be presented with a confirmation dialog. This is the final button they will press before their data is reset. */
 "DATABASE_RECOVERY_RECOVERY_FAILED_RESET_APP_CONFIRMATION_CONFIRM" = "ئەسلىگە قايتۇر";
@@ -2429,7 +2429,7 @@
 "DATABASE_RECOVERY_RECOVERY_FAILED_RESET_APP_CONFIRMATION_DESCRIPTION" = "ھېسابات ئۇچۇرىڭىز، ئارخىپىڭىز ۋە بارلىق ئۇچۇر خاتىرىڭىز ئۆچۈرۈلىدۇ. بۇ جەريان تاماملانغاندىن كېيىن ئەپ ئېتىلىدۇ.";
 
 /* The user has tried to recover their data after it was lost due to corruption. (They have not been hacked.) If they want to delete the app and restart, they will be presented with a confirmation dialog. This is the title of that dialog. */
-"DATABASE_RECOVERY_RECOVERY_FAILED_RESET_APP_CONFIRMATION_TITLE" = "Signal نى قايتا تەڭشەش";
+"DATABASE_RECOVERY_RECOVERY_FAILED_RESET_APP_CONFIRMATION_TITLE" = "Radar نى قايتا تەڭشەش";
 
 /* The user has tried to recover their data after it was lost due to corruption. (They have not been hacked.) They were asked to submit a debug log. This is the button that submits this log. */
 "DATABASE_RECOVERY_RECOVERY_FAILED_SUBMIT_DEBUG_LOG_BUTTON" = "سازلاش خاتىرەسى يوللا";
@@ -2504,7 +2504,7 @@
 "DELETE_ACCOUNT_CONFIRMATION_ACTION_SHEEET_ACTION" = "ھېساباتنى ئۆچۈر";
 
 /* Title for the action sheet message of the 'delete account confirmation' view controller. */
-"DELETE_ACCOUNT_CONFIRMATION_ACTION_SHEEET_MESSAGE" = "بۇ مەشغۇلات Signal ھېساباتىنى ئۆچۈرۈپ، ئەپنى ئەسلىگە قايتۇرىدۇ. بۇ مەشغۇلات تاماملانغاندا ئەپ تاقىلىدۇ.";
+"DELETE_ACCOUNT_CONFIRMATION_ACTION_SHEEET_MESSAGE" = "بۇ مەشغۇلات Radar ھېساباتىنى ئۆچۈرۈپ، ئەپنى ئەسلىگە قايتۇرىدۇ. بۇ مەشغۇلات تاماملانغاندا ئەپ تاقىلىدۇ.";
 
 /* Title for the action sheet confirmation title of the 'delete account confirmation' view controller. */
 "DELETE_ACCOUNT_CONFIRMATION_ACTION_SHEEET_TITLE" = "راستلا ھېساباتىڭىزنى ئۆچۈرۈۋېتەمسىز؟";
@@ -2528,7 +2528,7 @@
 "DELETE_ACCOUNT_CONFIRMATION_PHONE_NUMBER_TITLE" = "تېلېفون نومۇرى";
 
 /* Section header */
-"DELETE_ACCOUNT_CONFIRMATION_SECTION_TITLE" = "Signal نومۇرىڭىزنى جەزملەڭ";
+"DELETE_ACCOUNT_CONFIRMATION_SECTION_TITLE" = "Radar نومۇرىڭىزنى جەزملەڭ";
 
 /* Title for the 'delete account' confirmation view. */
 "DELETE_ACCOUNT_CONFIRMATION_TITLE" = "ھېساباتنى ئۆچۈر";
@@ -2575,7 +2575,7 @@
 
 
 /* Notification warning the user that they have been de-registered. */
-"DEREGISTRATION_NOTIFICATION" = "سىز بۇ ئۈسكۈنىدە Signal دىن چېكىنىپ چىققان.";
+"DEREGISTRATION_NOTIFICATION" = "سىز بۇ ئۈسكۈنىدە Radar دىن چېكىنىپ چىققان.";
 
 /* Button that lets users re-register using the same phone number. */
 "DEREGISTRATION_REREGISTER_BUTTON" = "قايتا تىزىملاش";
@@ -2584,7 +2584,7 @@
 "DEREGISTRATION_REREGISTER_PROMPT_TITLE" = "بۇ تېلېفون نومۇرىنى قايتا تىزىملىتامسىز؟";
 
 /* Label warning the user that they have been de-registered. */
-"DEREGISTRATION_WARNING" = "بۇ ئۈسكۈنە تىزىملاشتىن چىقىپ كەتكەن. بۇنىڭ سەۋەبى سىز تېلېفون نومۇرىڭىز بىلەن Signal نى باشقا بىر ئۈسكۈنىدە تىزىملاتقان بولۇشىڭىز مۇمكىن.";
+"DEREGISTRATION_WARNING" = "بۇ ئۈسكۈنە تىزىملاشتىن چىقىپ كەتكەن. بۇنىڭ سەۋەبى سىز تېلېفون نومۇرىڭىز بىلەن Radar نى باشقا بىر ئۈسكۈنىدە تىزىملاتقان بولۇشىڭىز مۇمكىن.";
 
 /* If the user has been deregistered, they'll see a warning. This is This is the call to action on that warning. */
 "DEREGISTRATION_WARNING_ACTION_TITLE" = "قايتا تىزىملىتىلغان ئۈسكۈنە";
@@ -2653,7 +2653,7 @@
 "DEVICE_TRANSFER_CONTRACT_QR_CODE_BUTTON" = "كىچىكرەك كۆرۈڭ";
 
 /* An error indicating that the other device closed signal mid-transfer and it could not complete */
-"DEVICE_TRANSFER_ERROR_BACKGROUNDED" = "پۇل يۆتكەشنى تاماملىيالمىدى. ئىككىلى ئۈسكۈنىدە Signal نىڭ بار بولۇشىغا كاپالەتلىك قىلىپ قايتا سىناڭ.";
+"DEVICE_TRANSFER_ERROR_BACKGROUNDED" = "پۇل يۆتكەشنى تاماملىيالمىدى. ئىككىلى ئۈسكۈنىدە Radar نىڭ بار بولۇشىغا كاپالەتلىك قىلىپ قايتا سىناڭ.";
 
 /* An error indicating that we were unable to verify the identity of the new device to complete the transfer */
 "DEVICE_TRANSFER_ERROR_CERTIFICATE_MISMATCH" = "يېڭى ئۈسكۈنىڭىزنى دەلىللىيەلمىدى. قايتا سىناڭ.";
@@ -2671,13 +2671,13 @@
 "DEVICE_TRANSFER_ERROR_NOT_ENOUGH_SPACE" = "يۆتكەشنى تاماملاشقا يېتەرلىك بوشلۇق يوق";
 
 /* An error indicating the user must update their device before trying to transfer. */
-"DEVICE_TRANSFER_ERROR_UNSUPPORTED_VERSION" = "‫Signal نىڭ ئەڭ يېڭى نەشرىگە يېڭىلاپ ئاندىن قايتا سىناڭ";
+"DEVICE_TRANSFER_ERROR_UNSUPPORTED_VERSION" = "‫Radar نىڭ ئەڭ يېڭى نەشرىگە يېڭىلاپ ئاندىن قايتا سىناڭ";
 
 /* Button shown to expand a QR code and view it fullscreen. */
 "DEVICE_TRANSFER_EXPAND_QR_CODE_BUTTON" = "چوڭراق كۆرۈڭ";
 
 /* The explanation on the action sheet prompting the user if they want to transfer their device. */
-"DEVICE_TRANSFER_PROMPT_EXPLANATION" = "‫Signal ھېساباتىڭىزنى يېڭى iOS ئۈسكۈنىسىگە يۆتكەيدۇ. يېڭى ئۈسكۈنىڭىزنى يېقىن ئەتراپتا قويۇپ ئوچۇق ھالەتتە ئىكەنلىكىگە كاپالەتلىك قىلىڭ.";
+"DEVICE_TRANSFER_PROMPT_EXPLANATION" = "‫Radar ھېساباتىڭىزنى يېڭى iOS ئۈسكۈنىسىگە يۆتكەيدۇ. يېڭى ئۈسكۈنىڭىزنى يېقىن ئەتراپتا قويۇپ ئوچۇق ھالەتتە ئىكەنلىكىگە كاپالەتلىك قىلىڭ.";
 
 /* The title on the acttion sheet prompting the user if they want to transfer their device. */
 "DEVICE_TRANSFER_PROMPT_TITLE" = "ھېساباتنى يۆتكە";
@@ -2695,7 +2695,7 @@
 "DEVICE_TRANSFER_QRCODE_TITLE" = "QR كودى تارا";
 
 /* The explanation on the view that shows receiving progress */
-"DEVICE_TRANSFER_RECEIVING_EXPLANATION" = "ئىككى ئۈسكۈنىنى يېقىنلاشتۇرۇڭ. ئۈسكۈتە ۋە Signal ئوچۇق تۇرسۇن. يۆتكەنش نۇقتىدىن نۇقتىغا شىفىرلانغان.";
+"DEVICE_TRANSFER_RECEIVING_EXPLANATION" = "ئىككى ئۈسكۈنىنى يېقىنلاشتۇرۇڭ. ئۈسكۈتە ۋە Radar ئوچۇق تۇرسۇن. يۆتكەنش نۇقتىدىن نۇقتىغا شىفىرلانغان.";
 
 /* The title on the view that shows receiving progress */
 "DEVICE_TRANSFER_RECEIVING_TITLE" = "مەلۇمات قوبۇللىنىۋاتىدۇ";
@@ -2731,7 +2731,7 @@
 "DEVICE_TRANSFER_STATUS_NEW_DEVICE_TRANSFERRING" = "يۆتكەش";
 
 /* Description in the progress view displayed during device transfer. */
-"DEVICE_TRANSFER_STATUS_NEW_DEVICE_TRANSFERRING_DESCRIPTION" = "ئىككى ئۈسكۈنىنى يېقىنلاشتۇرۇڭ. ئۈسكۈتە ۋە Signal ئوچۇق تۇرسۇن. يۆتكەنش نۇقتىدىن نۇقتىغا شىفىرلانغان.";
+"DEVICE_TRANSFER_STATUS_NEW_DEVICE_TRANSFERRING_DESCRIPTION" = "ئىككى ئۈسكۈنىنى يېقىنلاشتۇرۇڭ. ئۈسكۈتە ۋە Radar ئوچۇق تۇرسۇن. يۆتكەنش نۇقتىدىن نۇقتىغا شىفىرلانغان.";
 
 /* Status message on old device when cancelling transfer. */
 "DEVICE_TRANSFER_STATUS_OLD_DEVICE_CANCELLING" = "يېڭى ئايفونغا ئۇلىنىشنى بىكار قىلىۋاتىدۇ…";
@@ -2746,7 +2746,7 @@
 "DEVICE_TRANSFER_STATUS_OLD_DEVICE_STARTING" = "يېڭى ئايفونغا ئۇلىنىشنى ساقلاۋاتىدۇ…";
 
 /* The explanation on the action sheet that shows transfer progress */
-"DEVICE_TRANSFER_TRANSFERRING_EXPLANATION" = "ئىككى ئۈسكىنىنى يېقىن تۇتۇڭ. ئۈسكۈنىلەر ئېتىلىپ قالمىسۇن، Signal ئوچۇق ھالەتتە تۇرسۇن. يۆتكەش ئۇچتىن-ئۇچقا شىفرىلىنىدۇ.";
+"DEVICE_TRANSFER_TRANSFERRING_EXPLANATION" = "ئىككى ئۈسكىنىنى يېقىن تۇتۇڭ. ئۈسكۈنىلەر ئېتىلىپ قالمىسۇن، Radar ئوچۇق ھالەتتە تۇرسۇن. يۆتكەش ئۇچتىن-ئۇچقا شىفرىلىنىدۇ.";
 
 /* The title on the action sheet that shows transfer progress */
 "DEVICE_TRANSFER_TRANSFERRING_TITLE" = "مەلۇمات يۆتكىلىۋاتىدۇ";
@@ -2836,13 +2836,13 @@
 "DONATE_CHOOSE_PAYMENT_METHOD_SHEET_SUBTITLE_FOR_ONE_TIME_DONATION" = "30 كۈنلۈك %1$@ ئىزنىكىگە ئېرىشىڭ";
 
 /* When users make donations on a friend's behalf, they see a sheet that lets them pick a payment method. This is the title on that sheet. Embeds {{amount of money}}, such as \"$5\". */
-"DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_DONATION_ON_BEHALF_OF_A_FRIEND" = "Signal غا %1$@ ئىئانە قىلىش";
+"DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_DONATION_ON_BEHALF_OF_A_FRIEND" = "Radar غا %1$@ ئىئانە قىلىش";
 
 /* When users make monthly donations, they see a sheet that lets them pick a payment method. This is the title on that sheet. Embeds {{amount of money per month}}, such as \"$5/month\". */
-"DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_MONTHLY_DONATION" = "‫Signal غا %1$@ ئىئانە قىلىمەن";
+"DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_MONTHLY_DONATION" = "‫Radar غا %1$@ ئىئانە قىلىمەن";
 
 /* When users make one-time donations, they see a sheet that lets them pick a payment method. This is the title on that sheet. Embeds {{amount of money}}, such as \"$5\". */
-"DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_ONE_TIME_DONATION" = "‫Signal غا %1$@ ئىئانە قىلىمەن";
+"DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_ONE_TIME_DONATION" = "‫Radar غا %1$@ ئىئانە قىلىمەن";
 
 /* Users can donate on a friend's behalf and can optionally add a message. This is tells users about that optional message. */
 "DONATE_ON_BEHALF_OF_A_FRIEND_ADDITIONAL_MESSAGE_INFO" = "تاپشۇرۇۋالغۇچى نۇقتىدىن نۇقتىغا ئەۋەتىلگەن ئۇچۇر ئارقىلىق ئىئانە ھەققىدە ئۇقتۇرۇش قىلىنىدۇ. ئۆزىڭىزنىڭ ئۇچۇرىنى تۆۋەنگە قوشۇڭ.";
@@ -2959,7 +2959,7 @@
 "DONATION_ON_BEHALF_OF_A_FRIEND_BADGE_REDEEMED" = "نەقلەشتۈرۈلگەن";
 
 /* Users can donate on behalf of a friend, and the friend will receive a badge. This is a short paragraph on the screen where users choose the badge their friend will receive. */
-"DONATION_ON_BEHALF_OF_A_FRIEND_CHOOSE_BADGE_DESCRIPTION" = "Signal ئىشلىتىدىغان دوستىڭىز ياكى ئائىلە ئەزالىرىڭىزنىڭ ئورنىدا ئىئانە قىلىپ Signal نى قوللاپ قويۇڭ. ئۇلار قوللىغانلىقىنى ئارخىپىدا نامايەن قىلسا بولىدۇ.";
+"DONATION_ON_BEHALF_OF_A_FRIEND_CHOOSE_BADGE_DESCRIPTION" = "Radar ئىشلىتىدىغان دوستىڭىز ياكى ئائىلە ئەزالىرىڭىزنىڭ ئورنىدا ئىئانە قىلىپ Radar نى قوللاپ قويۇڭ. ئۇلار قوللىغانلىقىنى ئارخىپىدا نامايەن قىلسا بولىدۇ.";
 
 /* Users can donate on behalf of a friend, and the friend will receive a badge. This is the title on the screen where users choose the badge their friend will receive. */
 "DONATION_ON_BEHALF_OF_A_FRIEND_CHOOSE_BADGE_TITLE" = "دوستىڭىزغا ۋاكالىتەن ئىئانە قىلىش";
@@ -2983,7 +2983,7 @@
 "DONATION_ON_BEHALF_OF_A_FRIEND_PAYMENT_FAILED_ERROR_TITLE" = "چىقىم قىلالمىدى";
 
 /* Users can donate on a friend's behalf. If the payment was processed but the donation failed to send, this error message will be shown. */
-"DONATION_ON_BEHALF_OF_A_FRIEND_PAYMENT_SUCCEEDED_BUT_MESSAGE_FAILED_ERROR_BODY" = "پۇل تۆلىشىڭىز بىر تەرەپ قىلىندى، لېكىن Signal سىزگە ئىئانە ئۇچۇرىنى يوللىيالمىدى. ياردەم خادىمى بىلەن ئالاقىلىشىڭ.";
+"DONATION_ON_BEHALF_OF_A_FRIEND_PAYMENT_SUCCEEDED_BUT_MESSAGE_FAILED_ERROR_BODY" = "پۇل تۆلىشىڭىز بىر تەرەپ قىلىندى، لېكىن Radar سىزگە ئىئانە ئۇچۇرىنى يوللىيالمىدى. ياردەم خادىمى بىلەن ئالاقىلىشىڭ.";
 
 /* Users can donate on a friend's behalf. If the payment was processed but the donation failed to send, an error dialog will be shown. This is the title of that dialog. */
 "DONATION_ON_BEHALF_OF_A_FRIEND_PAYMENT_SUCCEEDED_BUT_MESSAGE_FAILED_ERROR_TITLE" = "ئىئانە مەغلۇب بولدى";
@@ -2995,7 +2995,7 @@
 "DONATION_ON_BEHALF_OF_A_FRIEND_PREVIEW_OUTGOING" = "✨«%1$@» گە ۋاكالىتەن ئىئانە قىلدىڭىز";
 
 /* You received a donation from a friend. This is the title of that message in the chat. Embeds {{short contact name}}. */
-"DONATION_ON_BEHALF_OF_A_FRIEND_RECEIVED_TITLE_FORMAT" = "%1$@ سىزنىڭ ئورنىڭىزدا Signal ئۈچۈن ئىئانە قىلدى";
+"DONATION_ON_BEHALF_OF_A_FRIEND_RECEIVED_TITLE_FORMAT" = "%1$@ سىزنىڭ ئورنىڭىزدا Radar ئۈچۈن ئىئانە قىلدى";
 
 /* Users can donate on a friend's behalf. This is the error message that appears if the try to do this, but the recipient is blocked. */
 "DONATION_ON_BEHALF_OF_A_FRIEND_RECIPIENT_IS_BLOCKED_ERROR_BODY" = "بۇ ئىشلەتكۈچىنى چەكلىگەنلىكىڭىز ئۈچۈن ئۇنىڭ ئورنىدا ئىئانە قىلالمايسىز.";
@@ -3019,7 +3019,7 @@
 "DONATION_ON_BEHALF_OF_A_FRIEND_SENT_TITLE_FORMAT" = "«%1$@» گە ۋاكالىتەن ئىئانە قىلىش";
 
 /* When you donate on behalf of a friend, a thank-you sheet will appear. This is the text on that sheet. Embeds {{recipient name}}. */
-"DONATION_ON_BEHALF_OF_A_FRIEND_THANKS_BODY_FORMAT" = "سىز «%1$@» نىڭ ئورنىدا Signal غا ئىئانە قىلدىڭىز. ئۇلار ئۆزىنىڭ قوللىشىنى ئارخىپتا نامايەن قىلىش-قىلماسلىقنى قارار قىلسا بولىدۇ.";
+"DONATION_ON_BEHALF_OF_A_FRIEND_THANKS_BODY_FORMAT" = "سىز «%1$@» نىڭ ئورنىدا Radar غا ئىئانە قىلدىڭىز. ئۇلار ئۆزىنىڭ قوللىشىنى ئارخىپتا نامايەن قىلىش-قىلماسلىقنى قارار قىلسا بولىدۇ.";
 
 /* When you donate on behalf of a friend, a thank-you sheet will appear. This is the title on that sheet. */
 "DONATION_ON_BEHALF_OF_A_FRIEND_THANKS_TITLE" = "قوللىغانلىقىڭىزغا رەھمەت!";
@@ -3028,19 +3028,19 @@
 "DONATION_ON_BEHALF_OF_A_FRIEND_VIEW" = "كۆرسەت";
 
 /* A friend has donated on your behalf and you received a badge. This text says that you received a badge, and from whom. Embeds {{contact's short name, such as a first name}}. */
-"DONATION_ON_BEHALF_OF_A_FRIEND_YOU_RECEIVED_A_BADGE_FORMAT" = "%1$@ سىزنىڭ ئورنىڭىزدا Signal غا ئىئانە قىلدى! Signal غا بولغان قوللىشىڭىزنى ئارخىپىڭىزدا نامايەن قىلىڭ.";
+"DONATION_ON_BEHALF_OF_A_FRIEND_YOU_RECEIVED_A_BADGE_FORMAT" = "%1$@ سىزنىڭ ئورنىڭىزدا Radar غا ئىئانە قىلدى! Radar غا بولغان قوللىشىڭىزنى ئارخىپىڭىزدا نامايەن قىلىڭ.";
 
 /* There is a screen where users can read more about their donation to Signal. This is the 1st paragraph of that screen. */
 "DONATION_READ_MORE_SCREEN_PARAGRAPH_1" = "ئۇچۇرلىشىش بىخەتەر. ئېلان يوق، ئىز قوغلاش يوق، نازارەت يوق.";
 
 /* There is a screen where users can read more about their donation to Signal. This is the 2nd paragraph of that screen. */
-"DONATION_READ_MORE_SCREEN_PARAGRAPH_2" = "Signal نىڭ بارلىق تىرىشچانلىقى سىزنىڭ مەخپىيەتلىكىڭىز ئۈچۈن. Signal سىزنىڭ سانلىق مەلۇماتىڭىزنى دەپ ئەمەس، سىزنى دەپ قۇرۇلغان؛ Signal پايدا بىلەن ئەمەس، ئىئانە بىلەن يۈرۈشىدۇ.";
+"DONATION_READ_MORE_SCREEN_PARAGRAPH_2" = "Radar نىڭ بارلىق تىرىشچانلىقى سىزنىڭ مەخپىيەتلىكىڭىز ئۈچۈن. Radar سىزنىڭ سانلىق مەلۇماتىڭىزنى دەپ ئەمەس، سىزنى دەپ قۇرۇلغان؛ Radar پايدا بىلەن ئەمەس، ئىئانە بىلەن يۈرۈشىدۇ.";
 
 /* There is a screen where users can read more about their donation to Signal. This is the 3rd paragraph of that screen. */
-"DONATION_READ_MORE_SCREEN_PARAGRAPH_3" = "ئەگەر شارائىتىڭىز يار بەرسە، Signal نى قىزىقارلىق، ئىشەنچىلىك، ئاممىباب قىلىش ئۈچۈن بۈگۈنلا ئىئانە قىلىڭ.";
+"DONATION_READ_MORE_SCREEN_PARAGRAPH_3" = "ئەگەر شارائىتىڭىز يار بەرسە، Radar نى قىزىقارلىق، ئىشەنچىلىك، ئاممىباب قىلىش ئۈچۈن بۈگۈنلا ئىئانە قىلىڭ.";
 
 /* There is a screen where users can read more about their donation to Signal. This is the title of that screen. */
-"DONATION_READ_MORE_SCREEN_TITLE" = "Signal باشقىچە.";
+"DONATION_READ_MORE_SCREEN_TITLE" = "Radar باشقىچە.";
 
 /* Section title for donation amount on receipts */
 "DONATION_RECEIPT_AMOUNT" = "سومما";
@@ -3076,7 +3076,7 @@
 "DONATION_RECEIPTS" = "ئىئانە تالونى";
 
 /* Text at the bottom of the donation receipts list, telling users that receipts might not be available */
-"DONATION_RECEIPTS_MIGHT_BE_MISSING_IF_YOU_REINSTALLED" = "ئەگەر Signal نى قايتا قاچىلىغان بولسىڭىز، بۇرۇنقى ئىئانىلەرنىڭ تالونىنى كۆرگىلى بولمايدۇ.";
+"DONATION_RECEIPTS_MIGHT_BE_MISSING_IF_YOU_REINSTALLED" = "ئەگەر Radar نى قايتا قاچىلىغان بولسىڭىز، بۇرۇنقى ئىئانىلەرنىڭ تالونىنى كۆرگىلى بولمايدۇ.";
 
 /* Error message displayed if something goes wrong with 3DSecure/iDEAL payment authorization.  This will be encountered if the user cancels the webview before authrizing the payment. */
 "DONATION_REDIRECT_ERROR_CANCELLED_MESSAGE" = "پۇل تۆلەش ئەمەلدىن قالدۇرۇلدى. قايتا سىناڭ.";
@@ -3091,7 +3091,7 @@
 "DONATION_SCREEN_DONATE_BUTTON" = "ئىئانە قىلىڭ";
 
 /* On donation screens, a small amount of information text is shown. This is the subtitle for that text. */
-"DONATION_SCREENS_HEADER_DESCRIPTION" = "بىخەتەر ئۇچۇرلىشىش - سىزنىڭ ياردىمىڭىزدە. ئېلان ۋە ئىز قوغلاشقا ھېچقانداق يول يوق. Signal نى قوللاش ئۈچۈن ئىئانە قىلىڭ.";
+"DONATION_SCREENS_HEADER_DESCRIPTION" = "بىخەتەر ئۇچۇرلىشىش - سىزنىڭ ياردىمىڭىزدە. ئېلان ۋە ئىز قوغلاشقا ھېچقانداق يول يوق. Radar نى قوللاش ئۈچۈن ئىئانە قىلىڭ.";
 
 /* On donation screens, a small amount of information text is shown. Users can click this link to learn more information. */
 "DONATION_SCREENS_HEADER_READ_MORE" = "تېخىمۇ كۆپ";
@@ -3169,7 +3169,7 @@
 "DONATION_VIEW_DONATE_ON_BEHALF_OF_A_FRIEND" = "دوستىڭىزغا ۋاكالىتەن ئىئانە قىلىش";
 
 /* Text describing to the user that they're going to pay a donation to Signal */
-"DONATION_VIEW_DONATION_TO_SIGNAL" = "Signal غا ئىئانە قىلىش";
+"DONATION_VIEW_DONATION_TO_SIGNAL" = "Radar غا ئىئانە قىلىش";
 
 /* Title for the 'Donor FAQ' button on the donation screen */
 "DONATION_VIEW_DONOR_FAQ" = "ئىئانە قىلغۇچىلار كۆپ سورايدىغان سوئاللار";
@@ -3181,7 +3181,7 @@
 "DONATION_VIEW_MANAGE_BADGES" = "ئىزناكلار";
 
 /* Text describing to the user that they're going to pay a monthly donation to Signal */
-"DONATION_VIEW_MONTHLY_DONATION_TO_SIGNAL" = "Signal غا ئايلىق ئىئانە قىلىش";
+"DONATION_VIEW_MONTHLY_DONATION_TO_SIGNAL" = "Radar غا ئايلىق ئىئانە قىلىش";
 
 /* Title for the 'more' section on the donation screen */
 "DONATION_VIEW_MORE_SECTION_TITLE" = "تېخىمۇ كۆپ";
@@ -3193,7 +3193,7 @@
 "DONATION_VIEW_OTHER_WAYS_TO_DONATE_TITLE" = "باشقا يول بىلەن ئىئانە قىلىش";
 
 /* Title on the 'Donate to Signal' screen */
-"DONATION_VIEW_TITLE" = "‫Signal غا ئىئانە قىلىڭ";
+"DONATION_VIEW_TITLE" = "‫Radar غا ئىئانە قىلىڭ";
 
 /* Label for the currency picker button in donation views */
 "DONATIONS_CURRENCY_PICKER_LABEL" = "پۇل تۈرى";
@@ -3208,13 +3208,13 @@
 "EDIT_CONTACT_WITHOUT_CONTACTS_PERMISSION_ALERT_BODY" = "سىز iOS تەڭشەكلىرىدىن ئەپ زىيارەت ھوقۇقىنى قوزغىتالايسىز.";
 
 /* Alert title for when the user has just tried to edit a contacts after declining to give Signal contacts permissions */
-"EDIT_CONTACT_WITHOUT_CONTACTS_PERMISSION_ALERT_TITLE" = "‫Signal ئالاقىداش ئۇچۇرلىرىنى تەھرىرلەشكە «ئالاقىداش» زىيارەت ھوقۇقى تەلەپ قىلىدۇ";
+"EDIT_CONTACT_WITHOUT_CONTACTS_PERMISSION_ALERT_TITLE" = "‫Radar ئالاقىداش ئۇچۇرلىرىنى تەھرىرلەشكە «ئالاقىداش» زىيارەت ھوقۇقى تەلەپ قىلىدۇ";
 
 /* The navbar title for the 'update group' view. */
 "EDIT_GROUP_DEFAULT_TITLE" = "گۇرۇپپا تەھرىرلەڭ";
 
 /* Error message indicating the a user can't be added to a group. */
-"EDIT_GROUP_ERROR_CANNOT_ADD_MEMBER" = "بۇ ئىشلەتكۈچى Signal نى يۇقىرىلاتمىغىچە بۇ گۇرۇپپىغا قوشقىلى بولمايدۇ.";
+"EDIT_GROUP_ERROR_CANNOT_ADD_MEMBER" = "بۇ ئىشلەتكۈچى Radar نى يۇقىرىلاتمىغىچە بۇ گۇرۇپپىغا قوشقىلى بولمايدۇ.";
 
 /* Error message indicating that an avatar image is invalid and cannot be used. */
 "EDIT_GROUP_ERROR_INVALID_AVATAR" = "ئىناۋەتسىز رەسىم.";
@@ -3241,13 +3241,13 @@
 "EDIT_MESSAGE_SEND_MESSAGE_UNKNOWN_ERROR" = "EDIT_MESSAGE_SEND_MESSAGE_UNKNOWN_ERROR";
 
 /* body of email sent to contacts when inviting to install Signal. Embeds {{link to install Signal}} and {{link to the Signal home page}} */
-"EMAIL_INVITE_BODY" = "ياخشىمۇسىز ، \n\nيېقىندىن بېرى مەن ئالما تېلېفونۇمدا Signal نى ئىشلىتىپ باشقىلار بىلەن بىخەتەر پاراڭلىشىۋاتىمەن. مەنمۇ Signal نى قاچىلاشنى خالايمەن ، بۇنداق بولغاندا پەقەت ئككىمىزلا ئوتتۇرىمىزدىكى ئۇچۇرلارنى ئوقۇپ ، پاراڭلارنى ئاڭلاشقا كاپالەتلىك قىلالايمىز.\n\nSignal نى ئايفون ، ئاندىرويىد ۋە ئۈستەل يۈزىدە ئشلەتكىلى بولىدۇ. بۇ يەردىن قاچىلاڭ: %1$@\n\nSignal سىزدە بار ئۇچۇرلىشىش دېتالىغا ئوخشاشلا خىزمەت قىلىدۇ. رەسىم ۋە سىنلارنى ئەۋەتەلەيمىز ، تېلېفون قىلالايمىز ۋە گۇرۇپپا پاراڭلىرىنى باشلىيالايمىز. ئەڭ ياخشى يېرى شۇكى ، ھېچكىم بۇلارنىڭ ھەرقاندىقىنى كۆرەلمەيدۇ ، ھەتتا Signal نى ياسىغان كىشىلەرمۇ كۆرەلمەيدۇ!\n\nSignal ھەققىدىكى تەپسىلاتلارنى بۇ يەردىن كۆرەلەيسىز: %2$@";
+"EMAIL_INVITE_BODY" = "ياخشىمۇسىز ، \n\nيېقىندىن بېرى مەن ئالما تېلېفونۇمدا Radar نى ئىشلىتىپ باشقىلار بىلەن بىخەتەر پاراڭلىشىۋاتىمەن. مەنمۇ Radar نى قاچىلاشنى خالايمەن ، بۇنداق بولغاندا پەقەت ئككىمىزلا ئوتتۇرىمىزدىكى ئۇچۇرلارنى ئوقۇپ ، پاراڭلارنى ئاڭلاشقا كاپالەتلىك قىلالايمىز.\n\nSignal نى ئايفون ، ئاندىرويىد ۋە ئۈستەل يۈزىدە ئشلەتكىلى بولىدۇ. بۇ يەردىن قاچىلاڭ: %1$@\n\nSignal سىزدە بار ئۇچۇرلىشىش دېتالىغا ئوخشاشلا خىزمەت قىلىدۇ. رەسىم ۋە سىنلارنى ئەۋەتەلەيمىز ، تېلېفون قىلالايمىز ۋە گۇرۇپپا پاراڭلىرىنى باشلىيالايمىز. ئەڭ ياخشى يېرى شۇكى ، ھېچكىم بۇلارنىڭ ھەرقاندىقىنى كۆرەلمەيدۇ ، ھەتتا Radar نى ياسىغان كىشىلەرمۇ كۆرەلمەيدۇ!\n\nSignal ھەققىدىكى تەپسىلاتلارنى بۇ يەردىن كۆرەلەيسىز: %2$@";
 
 /* subject of email sent to contacts when inviting to install Signal */
-"EMAIL_INVITE_SUBJECT" = "‫Signal دا پاراڭلىشايلى";
+"EMAIL_INVITE_SUBJECT" = "‫Radar دا پاراڭلىشايلى";
 
 /* Description for the fallback support sheet if user cannot send email */
-"EMAIL_SIGNAL_MESSAGE" = "ئۈسكۈنىڭىزدە ئېلخەت يوللاش تەڭشىكى سەپلەنمىگەن. ياردەم ئىلتىماسى يوللاش ئۈچۈن، ئۈسكۈنىڭىزدە تورخەتنى تەڭشەڭ ياكى support@signal.org غا ئېلخەت يوللاڭ";
+"EMAIL_SIGNAL_MESSAGE" = "ئۈسكۈنىڭىزدە ئېلخەت يوللاش تەڭشىكى سەپلەنمىگەن. ياردەم ئىلتىماسى يوللاش ئۈچۈن، ئۈسكۈنىڭىزدە تورخەتنى تەڭشەڭ ياكى support@radar.chat غا ئېلخەت يوللاڭ";
 
 /* Title for the fallback support sheet if user cannot send email */
 "EMAIL_SIGNAL_TITLE" = "ئېلخەت يوق";
@@ -3283,7 +3283,7 @@
 "EMOJI_CATEGORY_TRAVEL_NAME" = "ساياھەت & يەرلەر";
 
 /* Full width label displayed when attempting to compose message */
-"EMPTY_CONTACTS_LABEL_LINE1" = "ئالاقىداشلىرىڭىزنىڭ ھېچقايسىسىدا Signal يوق.";
+"EMPTY_CONTACTS_LABEL_LINE1" = "ئالاقىداشلىرىڭىزنىڭ ھېچقايسىسىدا Radar يوق.";
 
 /* Full width label displayed when attempting to compose message */
 "EMPTY_CONTACTS_LABEL_LINE2" = "باشقىلارنى تەكلىپ قىلىپ باقمامسىز؟";
@@ -3349,7 +3349,7 @@
 "ERROR_DESCRIPTION_UNKNOWN_ERROR" = "يوچۇن خاتالىققا يولۇقتى.";
 
 /* Error message when attempting to send message */
-"ERROR_DESCRIPTION_UNREGISTERED_RECIPIENT" = "ئۇچۇر يوللانمىدى ، چۈنكى بۇ ئادەم Signal ئىشلىتىشنى توختاتقان.";
+"ERROR_DESCRIPTION_UNREGISTERED_RECIPIENT" = "ئۇچۇر يوللانمىدى ، چۈنكى بۇ ئادەم Radar ئىشلىتىشنى توختاتقان.";
 
 /* Error message indicating that attachment upload(s) failed. */
 "ERROR_MESSAGE_ATTACHMENT_UPLOAD_FAILED" = "قىستۇرما يۈكلەنمىدى.";
@@ -3394,10 +3394,10 @@
 "ERROR_NETWORK_FAILURE" = "تور خاتالىقى";
 
 /* Format string for an error alert notification message. Embeds {{ error string }} */
-"ERROR_NOTIFICATION_MESSAGE_FORMAT" = "ئۈسكۈنىڭىزدىكى كاشىلا بىر تەرەپ قىلىش خاتىرىسى ۋە بۇ خاتالىق دوكىلاتىنى support@signal.org گە يوللاپ، Signal نى ياخشىلىشىمىزغا ياردەم بېرىڭ. %1$@";
+"ERROR_NOTIFICATION_MESSAGE_FORMAT" = "ئۈسكۈنىڭىزدىكى كاشىلا بىر تەرەپ قىلىش خاتىرىسى ۋە بۇ خاتالىق دوكىلاتىنى support@radar.chat گە يوللاپ، Radar نى ياخشىلىشىمىزغا ياردەم بېرىڭ. %1$@";
 
 /* Format string for an error alert notification title. */
-"ERROR_NOTIFICATION_TITLE" = "Signal سىناق نەشرى: خاتالىق كۆرۈلدى";
+"ERROR_NOTIFICATION_TITLE" = "Radar سىناق نەشرى: خاتالىق كۆرۈلدى";
 
 /* Error indicating a send failure due to a delinked application. */
 "ERROR_SENDING_DELINKED" = "ئۈسكۈنىڭىز باغلانمىغان ھالەتتە. ئۇچۇر يوللاش ئۈچۈن قايتا باغلاڭ.";
@@ -3406,7 +3406,7 @@
 "ERROR_SENDING_DEREGISTERED" = "ئۈسكۈنىڭىز تىزىملىتىلمىغان. ئۇچۇر يوللاش ئۈچۈن قايتا تىزىملىتىڭ.";
 
 /* Error indicating a send failure due to an expired application. */
-"ERROR_SENDING_EXPIRED" = "‫Signal نەشرىڭىزنىڭ ۋاقتى ئۆتتى. ئۇچۇر يوللاش ئۈچۈن ئەڭ يېڭى نەشرىگە يېڭىلاڭ.";
+"ERROR_SENDING_EXPIRED" = "‫Radar نەشرىڭىزنىڭ ۋاقتى ئۆتتى. ئۇچۇر يوللاش ئۈچۈن ئەڭ يېڭى نەشرىگە يېڭىلاڭ.";
 
 /* Format string for 'unregistered user' error. Embeds {{the unregistered user's name or signal id}}. */
 "ERROR_UNREGISTERED_USER_FORMAT" = "تىزىملاتمىغان ئىشلەتكۈچى: %1$@";
@@ -3418,19 +3418,19 @@
 "EXIT_REREGISTRATION" = "تىزىملىتىشتىن چېكىنىش";
 
 /* Label notifying the user that the app has expired. */
-"EXPIRATION_ERROR" = "بۇ Signal نەشرىنىڭ ۋاقتى توشتى. ئۇچۇر يوللاش ۋە قوبۇل قىلىش ئۈچۈن دەرھال يېڭىلاڭ.";
+"EXPIRATION_ERROR" = "بۇ Radar نەشرىنىڭ ۋاقتى توشتى. ئۇچۇر يوللاش ۋە قوبۇل قىلىش ئۈچۈن دەرھال يېڭىلاڭ.";
 
 /* If the user's app is too old, they'll be shown a warning asking them to upgrade. This is the text on the warning, and tapping it will open the App Store page for Signal. */
 "EXPIRATION_WARNING_ACTION_TITLE" = "دەرھال يېڭىلاش";
 
 /* Label warning the user that the app will expire soon. Embeds {{date}}. */
-"EXPIRATION_WARNING_SOON" = "Signal نىڭ بۇ نەشرىنىڭ %1$@ دە ۋاقتى ئۆتىدۇ. داۋاملىق ئۇچۇرلىشىش ئۈچۈن نەشرىنى يېڭىلاڭ.";
+"EXPIRATION_WARNING_SOON" = "Radar نىڭ بۇ نەشرىنىڭ %1$@ دە ۋاقتى ئۆتىدۇ. داۋاملىق ئۇچۇرلىشىش ئۈچۈن نەشرىنى يېڭىلاڭ.";
 
 /* Label warning the user that the app will expire today. */
-"EXPIRATION_WARNING_TODAY" = "Signal نىڭ بۇ نەشرىنىڭ بۈگۈن ۋاقتى توشىدۇ. داۋاملىق ئۇچۇرلىشىش ئۈچۈن نەشرىنى يېڭىلاڭ.";
+"EXPIRATION_WARNING_TODAY" = "Radar نىڭ بۇ نەشرىنىڭ بۈگۈن ۋاقتى توشىدۇ. داۋاملىق ئۇچۇرلىشىش ئۈچۈن نەشرىنى يېڭىلاڭ.";
 
 /* action sheet header when re-sending message which failed because of an invalid key signature */
-"FAILED_SENDING_BECAUSE_INVALID_KEY_SIGNATURE" = "%1$@ Signal نى يېڭىلىماقچى ۋە ئاچماقچى بولغاچقا ئۇچۇرنى يوللىيالمىدى.";
+"FAILED_SENDING_BECAUSE_INVALID_KEY_SIGNATURE" = "%1$@ Radar نى يېڭىلىماقچى ۋە ئاچماقچى بولغاچقا ئۇچۇرنى يوللىيالمىدى.";
 
 /* action sheet header when re-sending message which failed because of untrusted identity keys */
 "FAILED_SENDING_BECAUSE_UNTRUSTED_IDENTITY_KEY" = "سىزنىڭ %1$@ بىلەن بولغان بىخەتەرلىك نومۇرىڭىز يېقىندا ئۆزگەرگەن. بۇ ئۇچۇرنى يوللاشتىن بۇرۇن دەلىللەش تەۋسىيە قىلىنىدۇ.";
@@ -3745,10 +3745,10 @@
 "GROUP_CALL_WILL_NOTIFY_TWO_PEOPLE_FORMAT" = "%1$@ ۋە %2$@ كە ئۇقتۇرۇش قىلىنىدۇ";
 
 /* Text shown before the user starts a group call if the user has enabled ringing and there is one other person in the group. Embeds {member name} */
-"GROUP_CALL_WILL_RING_ONE_PERSON_FORMAT" = "Signal %1$@ نى چاقىرىدۇ";
+"GROUP_CALL_WILL_RING_ONE_PERSON_FORMAT" = "Radar %1$@ نى چاقىرىدۇ";
 
 /* Text shown before the user starts a group call if the user has enabled ringing and there are two other people in the group. Embeds {{ %1$@ participant1, %2$@ participant2 }} */
-"GROUP_CALL_WILL_RING_TWO_PEOPLE_FORMAT" = "‏Signal %1$@ بىلەن %2$@ نى چاقىرىدۇ";
+"GROUP_CALL_WILL_RING_TWO_PEOPLE_FORMAT" = "‏Radar %1$@ بىلەن %2$@ نى چاقىرىدۇ";
 
 /* Text explaining that you are in the group call. */
 "GROUP_CALL_YOU_ARE_HERE" = "سىز بۇ گۇرۇپپا چاقىرىقىدا";
@@ -3958,7 +3958,7 @@
 "GROUP_LINK_VIEW_SHARE_LINK_VIA_QR_CODE" = "QR كودى";
 
 /* Label for the 'share group link via Signal' button in the 'group link' view. */
-"GROUP_LINK_VIEW_SHARE_LINK_VIA_SIGNAL" = "Signal ئارقىلىق ھەمبەھىرلە";
+"GROUP_LINK_VIEW_SHARE_LINK_VIA_SIGNAL" = "Radar ئارقىلىق ھەمبەھىرلە";
 
 /* Message for the 'share group link' action sheet in the 'group link' view. */
 "GROUP_LINK_VIEW_SHARE_SHEET_MESSAGE" = "بۇ ئۇلانما ئارقىلىق خالىغان كىشى مەزكۇر گۇرۇپپىنىڭ ئاتى ۋە ئەزالىرىنى كۆرەلەيدۇ ھەمدە گۇرۇپپىغا قوشۇلۇشنى ئىلتىماس قىلالايدۇ. سىز ئىشىنىدىغان كىشىلەرگە ھەمبەھىرلەڭ.";
@@ -4366,13 +4366,13 @@
 "HOME_VIEW_DRAFT_PREFIX" = "ئارگىنال: ";
 
 /* Format string for a label offering to start a new conversation with your contacts, if you have 1 Signal contact.  Embeds {{The name of 1 of your Signal contacts}}. */
-"HOME_VIEW_FIRST_CONVERSATION_OFFER_1_CONTACT_FORMAT" = "%1$@نى ئۆز ئىچىگە ئالغان بىر قىسىم ئالاقىداشلىرىڭىز ئاللىقاچان Signal دا.";
+"HOME_VIEW_FIRST_CONVERSATION_OFFER_1_CONTACT_FORMAT" = "%1$@نى ئۆز ئىچىگە ئالغان بىر قىسىم ئالاقىداشلىرىڭىز ئاللىقاچان Radar دا.";
 
 /* Format string for a label offering to start a new conversation with your contacts, if you have 2 Signal contacts.  Embeds {{The names of 2 of your Signal contacts}}. */
-"HOME_VIEW_FIRST_CONVERSATION_OFFER_2_CONTACTS_FORMAT" = "%1$@ ۋە «%2$@» نى ئۆز ئىچىگە ئالغان بىر قىسىم ئالاقىداشلىرىڭىز ئاللىقاچان Signal دا";
+"HOME_VIEW_FIRST_CONVERSATION_OFFER_2_CONTACTS_FORMAT" = "%1$@ ۋە «%2$@» نى ئۆز ئىچىگە ئالغان بىر قىسىم ئالاقىداشلىرىڭىز ئاللىقاچان Radar دا";
 
 /* Format string for a label offering to start a new conversation with your contacts, if you have at least 3 Signal contacts.  Embeds {{The names of 3 of your Signal contacts}}. */
-"HOME_VIEW_FIRST_CONVERSATION_OFFER_3_CONTACTS_FORMAT" = "%1$@، %2$@ ۋە «%3$@» نى ئۆز ئىچىگە ئالغان بىر قىسىم ئالاقىداشلىرىڭىز ئاللىقاچان Signal دا";
+"HOME_VIEW_FIRST_CONVERSATION_OFFER_3_CONTACTS_FORMAT" = "%1$@، %2$@ ۋە «%3$@» نى ئۆز ئىچىگە ئالغان بىر قىسىم ئالاقىداشلىرىڭىز ئاللىقاچان Radar دا";
 
 /* A label offering to start a new conversation with your contacts, if you have no Signal contacts. */
 "HOME_VIEW_FIRST_CONVERSATION_OFFER_NO_CONTACTS" = "تۇنجى پاراڭنى بۇ يەردىن باشلاڭ.";
@@ -4477,7 +4477,7 @@
 "INACTIVE_PRIMARY_DEVICE_REMINDER_MEGAPHONE_LEARN_MORE_BUTTON" = "تەپسىلاتى";
 
 /* Title for an in-app megaphone about a user's inactive primary device. */
-"INACTIVE_PRIMARY_DEVICE_REMINDER_MEGAPHONE_TITLE" = "تېلېفونىڭىزدا Signal نى ئېچىڭ";
+"INACTIVE_PRIMARY_DEVICE_REMINDER_MEGAPHONE_TITLE" = "تېلېفونىڭىزدا Radar نى ئېچىڭ";
 
 /* Label reminding the user that they are in archive mode, and that muted chats remain archived when they receive a new message. */
 "INBOX_VIEW_ARCHIVE_MODE_MUTED_CHATS_REMINDER" = "ئارخىپلانغان ئۈنسىز پاراڭلار يېڭى ئۇچۇر كەلگۈچە ئارخىپتا ساقلىنىدۇ.";
@@ -4537,7 +4537,7 @@
 "INFO_MESSAGE_REPORTED_SPAM" = "ئالدامچى ئۇچۇر دەپ مەلۇم قىلىندى";
 
 /* Body message of the alert shown when a user taps on 'learn more' via the spam info message. */
-"INFO_MESSAGE_REPORTED_SPAM_LEARN_MORE_MESSAGE" = "Signal بۇ كىشىنىڭ بەلكىم ئالدامچى ئۇچۇر يوللاۋاتقانلىقى توغرىسىدا ئۇقتۇرۇش تاپشۇرۇۋالدى. Signal ھەرقانداق پاراڭ مەزمۇنىنى كۆرەلمەيدۇ.";
+"INFO_MESSAGE_REPORTED_SPAM_LEARN_MORE_MESSAGE" = "Radar بۇ كىشىنىڭ بەلكىم ئالدامچى ئۇچۇر يوللاۋاتقانلىقى توغرىسىدا ئۇقتۇرۇش تاپشۇرۇۋالدى. Radar ھەرقانداق پاراڭ مەزمۇنىنى كۆرەلمەيدۇ.";
 
 /* Title of the alert shown when a user taps on 'learn more' via the spam info message. */
 "INFO_MESSAGE_REPORTED_SPAM_LEARN_MORE_TITLE" = "مەلۇم قىلىنغان ئالدامچىلىق";
@@ -4555,7 +4555,7 @@
 "INFO_MESSAGE_USER_CHANGED_PHONE_NUMBER_FORMAT" = "%1$@ تېلېفون نومۇرىنى ئۆزگەرتتى.";
 
 /* Shown in inbox and conversation when a user joins Signal, embeds the new user's {{contact name}} */
-"INFO_MESSAGE_USER_JOINED_SIGNAL_BODY_FORMAT" = "%1$@ Signal غا قوشۇلدى!";
+"INFO_MESSAGE_USER_JOINED_SIGNAL_BODY_FORMAT" = "%1$@ Radar غا قوشۇلدى!";
 
 /* Label at the top of the input text when editing a message */
 "INPUT_TOOLBAR_EDIT_MESSAGE_LABEL" = "ئۇچۇر تەھرىرلەش";
@@ -4582,13 +4582,13 @@
 "INVALID_PROXY_HOST_ERROR" = "سىز كىرگۈزگەن ۋاكالەتچى ئادرېس ئىناۋەتسىز، ئادرېسنى تەكشۈرۈپ قايتا سىناڭ.";
 
 /* Alert body when contacts disabled while trying to invite contacts to signal */
-"INVITE_FLOW_REQUIRES_CONTACT_ACCESS_BODY" = "‫iOS تەڭشەكلەردىن ئالاقەداش زىيارەت ھوقۇقىنى ئاچقاندىن كېيىن، دوستلىرىڭىزنى Signal ئىشلىتىشكە تەكلىپ قىلالايسىز.";
+"INVITE_FLOW_REQUIRES_CONTACT_ACCESS_BODY" = "‫iOS تەڭشەكلەردىن ئالاقەداش زىيارەت ھوقۇقىنى ئاچقاندىن كېيىن، دوستلىرىڭىزنى Radar ئىشلىتىشكە تەكلىپ قىلالايسىز.";
 
 /* Alert title when contacts disabled while trying to invite contacts to signal */
 "INVITE_FLOW_REQUIRES_CONTACT_ACCESS_TITLE" = "ئالاقىداشنى زىيارەت قىلىشىغا رۇخسەت قىلىڭ";
 
 /* Label for the cell that presents the 'invite contacts' workflow. */
-"INVITE_FRIENDS_CONTACT_TABLE_BUTTON" = "دوستلىرىڭىزنى Signal غا تەكلىپ قىلىڭ";
+"INVITE_FRIENDS_CONTACT_TABLE_BUTTON" = "دوستلىرىڭىزنى Radar غا تەكلىپ قىلىڭ";
 
 /* Header label above a section for more options for adding contacts */
 "INVITE_FRIENDS_CONTACT_TABLE_HEADER" = "تېخىمۇ كۆپ";
@@ -4711,7 +4711,7 @@
 "LINK_DEVICE_SCANNING_INSTRUCTIONS_SHEET_TITLE" = "QR كودى تارا";
 
 /* Body text for a sheet when a user tries to link a device informing them that they will need to authenticate their device */
-"LINK_NEW_DEVICE_AUTHENTICATION_INFO_SHEET_BODY" = "«داۋاملاشتۇرۇڭ» نى چېكىڭ ۋە جەزملەشتۈرۈش ئۈچۈن تېلېفونىڭىزنىڭ قۇلۇپلاش نۇمۇرىنى كىرگۈزۈڭ. Signal PIN نومۇرىڭىزنى كىرگۈزمەڭ.";
+"LINK_NEW_DEVICE_AUTHENTICATION_INFO_SHEET_BODY" = "«داۋاملاشتۇرۇڭ» نى چېكىڭ ۋە جەزملەشتۈرۈش ئۈچۈن تېلېفونىڭىزنىڭ قۇلۇپلاش نۇمۇرىنى كىرگۈزۈڭ. Radar PIN نومۇرىڭىزنى كىرگۈزمەڭ.";
 
 /* Title for a sheet when a user tries to link a device informing them that they will need to authenticate their device */
 "LINK_NEW_DEVICE_AUTHENTICATION_INFO_SHEET_TITLE" = "ئۇلاشتىن بۇرۇن ، ئۆزىڭىز ئىكەنلىكىڭىزنى جەزملەشتۈرۈڭ";
@@ -4720,7 +4720,7 @@
 "LINK_NEW_DEVICE_AUTHENTICATION_REASON" = "ئۈسكۈنىنى ئۇلاشنى دەلىللەڭ";
 
 /* Body text for a sheet when a user has started linking a device informing them to finish the process on that other device */
-"LINK_NEW_DEVICE_FINISH_ON_OTHER_DEVICE_SHEET_BODY" = "باشقا ئۈسكۈنىلەردىكى Signal نى ئۇلاشنى تاماملاش";
+"LINK_NEW_DEVICE_FINISH_ON_OTHER_DEVICE_SHEET_BODY" = "باشقا ئۈسكۈنىلەردىكى Radar نى ئۇلاشنى تاماملاش";
 
 /* Title for a sheet when a user has started linking a device informing them to finish the process on that other device */
 "LINK_NEW_DEVICE_FINISH_ON_OTHER_DEVICE_SHEET_TITLE" = "باشقا ئۈسكۈنىلەردە ئۇلاشنى تاماملاش";
@@ -4762,10 +4762,10 @@
 "LINK_PREVIEW_UNKNOWN_DOMAIN" = "ئۇلانما ئالدىن كۆرۈش";
 
 /* Shown in an alert when trying to edit a contact. */
-"LINKED_DEVICE_CONTACTS_NOT_ALLOWED" = "تېلېفون ئالاقىداشلىرىنى ئەمدى iPad دە باشقۇرغىلى بولمايدۇ. Signal  ئالاقىداشلىرىنى تېلېفون ئالاقىداشلىرىڭىزغا قوشۇش ئۈچۈن Signal نى تېلېفونىڭىزدا ئېچىڭ.";
+"LINKED_DEVICE_CONTACTS_NOT_ALLOWED" = "تېلېفون ئالاقىداشلىرىنى ئەمدى iPad دە باشقۇرغىلى بولمايدۇ. Radar  ئالاقىداشلىرىنى تېلېفون ئالاقىداشلىرىڭىزغا قوشۇش ئۈچۈن Radar نى تېلېفونىڭىزدا ئېچىڭ.";
 
 /* Shown in a banner when you tap the 'New Chat' icon at the top of the list of chats. */
-"LINKED_DEVICE_MANAGE_CONTACTS_BANNER" = "iPad ئەمدى تېلېفون ئالاقىداشلىرىنى باشقۇرۇش ئىقتىدارىنى قوللىمايدۇ. بۇ ئۈسكۈنە Signal دىكى تېلېفون ئالاقىداشلار تىزىملىكىگە قىلىنغان ھەر قانداق ئۆزگىرىشىنى داۋاملىق ماسقەدەملەيدۇ.";
+"LINKED_DEVICE_MANAGE_CONTACTS_BANNER" = "iPad ئەمدى تېلېفون ئالاقىداشلىرىنى باشقۇرۇش ئىقتىدارىنى قوللىمايدۇ. بۇ ئۈسكۈنە Radar دىكى تېلېفون ئالاقىداشلار تىزىملىكىگە قىلىنغان ھەر قانداق ئۆزگىرىشىنى داۋاملىق ماسقەدەملەيدۇ.";
 
 /* A button shown in a banner when you tap the 'New Chat' icon at the top of the list of chats. Tapping it opens a website with more details. */
 "LINKED_DEVICE_MANAGE_CONTACTS_LEARN_MORE" = "تەپسىلاتى";
@@ -4780,10 +4780,10 @@
 "LINKED_DEVICE_NOTIFICATION_TITLE" = "سىز يېڭى ئۈسكۈنىنى ئۇلىدىڭىز";
 
 /* Message for an action sheet telling users how to link a device, when trying to open an external device-linking URL. */
-"LINKED_DEVICE_URL_OPENED_ACTION_SHEET_EXTERNAL_URL_MESSAGE" = "ئۈستەل يۈزى ياكى iPad نى بۇ سىگنال ھېساباتىغا ئۇلاش ئۈچۈن ، «ئۇلانغان ئۈسكۈنىلەر»گە كىرىپ «بىر يېڭى ئۈسكۈنىنى ئۇلاش» نى چېكىپ ، QR كودىنى قايتا سكاننېرلاڭ. پەقەت Signal دىنلا كەلگەن QR كودىنى سكاننېرلاڭ.";
+"LINKED_DEVICE_URL_OPENED_ACTION_SHEET_EXTERNAL_URL_MESSAGE" = "ئۈستەل يۈزى ياكى iPad نى بۇ سىگنال ھېساباتىغا ئۇلاش ئۈچۈن ، «ئۇلانغان ئۈسكۈنىلەر»گە كىرىپ «بىر يېڭى ئۈسكۈنىنى ئۇلاش» نى چېكىپ ، QR كودىنى قايتا سكاننېرلاڭ. پەقەت Radar دىنلا كەلگەن QR كودىنى سكاننېرلاڭ.";
 
 /* Message for an action sheet telling users how to link a device, when trying to open a device-linking URL from the in-app camera. */
-"LINKED_DEVICE_URL_OPENED_ACTION_SHEET_IN_APP_CAMERA_MESSAGE" = "بىر Signal ئۈسكۈنىسىنى ئۇلىماقچى بولغاندەك تۇرىسىز. داۋاملاشتۇرۇشنى چېكىپ ئاندىن «يېڭى ئۈسكۈنىنى ئۇلاش» نى چېكىڭ ھەمدە QR كودىنى قايتا سىكانېرلاڭ.";
+"LINKED_DEVICE_URL_OPENED_ACTION_SHEET_IN_APP_CAMERA_MESSAGE" = "بىر Radar ئۈسكۈنىسىنى ئۇلىماقچى بولغاندەك تۇرىسىز. داۋاملاشتۇرۇشنى چېكىپ ئاندىن «يېڭى ئۈسكۈنىنى ئۇلاش» نى چېكىڭ ھەمدە QR كودىنى قايتا سىكانېرلاڭ.";
 
 /* Bullet point about downloads on the linked devices education sheet. Embeds {{ %1$@ iPad download link, %2$@ desktop download link }} */
 "LINKED_DEVICES_EDUCATION_POINT_DOWNLOADS" = "باشقا ئۈسكۈنىڭىزدە ، ئەپنى %1$@ نى زىيارەت قىلىپ iPad كە قاچىلاڭ ياكى %2$@ نى چېكىپ ئۈستەل يۈزىگە ئورنىتىڭ.";
@@ -4795,13 +4795,13 @@
 "LINKED_DEVICES_EDUCATION_POINT_PRIVACY" = "بارلىق باغلانغان ئۈسكۈنىلەردە ئۇچۇرلىشىش مەخپىيەتلىككە كاپالەتلىك قىلىنغان ئاساسدا ئېلىپ بېرىلىدۇ";
 
 /* Title for the linked device education sheet */
-"LINKED_DEVICES_EDUCATION_TITLE" = "Signal ئۈستەل يۈزىدە ياكى iPad دە";
+"LINKED_DEVICES_EDUCATION_TITLE" = "Radar ئۈستەل يۈزىدە ياكى iPad دە";
 
 /* Text that appears where the linked device list would be indicating that there are no linked devices. */
 "LINKED_DEVICES_EMPTY_STATE" = "باغلانغان ئۈسكۈنە يوق";
 
 /* Description for header of the linked devices list */
-"LINKED_DEVICES_HEADER_DESCRIPTION" = "Use Signal on desktop or iPad.";
+"LINKED_DEVICES_HEADER_DESCRIPTION" = "Use Radar on desktop or iPad.";
 
 /* Footer text below the list of currently-linked devices */
 "LINKED_DEVICES_LIST_FOOTER" = "ئۇچۇر ۋە پاراڭلار بارلىق ئۈسكۈنىلىرىڭىزدە ئاخىرىغىچە مەخپىيلەشتۈرۈلگەن";
@@ -4843,10 +4843,10 @@
 "LINKING_SYNCING_TIMING_INFO" = "بۇنىڭغا بىر قانچە مىنۇت كېتىشى مۇمكىن";
 
 /* Shown to users while the app is loading, asking them not to close the app. */
-"LOADING_VIEW_CONTROLLER_DONT_CLOSE_APP" = "Signal نى ياپماڭ.";
+"LOADING_VIEW_CONTROLLER_DONT_CLOSE_APP" = "Radar نى ياپماڭ.";
 
 /* Body for local network permission action sheet */
-"LOCAL_NETWORK_PERMISSION_ACTION_SHEET_BODY" = "‫Signal ھېساباتىڭىزنى يۆتكەش ئۈچۈن، ئىككى ئۈسكۈنىدە يەرلىك تور زىيارەت ھوقۇقىنى قوزغىتىشىڭىز كېرەك.";
+"LOCAL_NETWORK_PERMISSION_ACTION_SHEET_BODY" = "‫Radar ھېساباتىڭىزنى يۆتكەش ئۈچۈن، ئىككى ئۈسكۈنىدە يەرلىك تور زىيارەت ھوقۇقىنى قوزغىتىشىڭىز كېرەك.";
 
 /* A button asking the user if they need further help getting their transfer working. */
 "LOCAL_NETWORK_PERMISSION_ACTION_SHEET_NEED_HELP" = "ياردەم كېرەكمۇ؟";
@@ -4858,7 +4858,7 @@
 "LOCAL_NETWORK_PERMISSION_ACTION_SHEET_STEP_THREE" = "«يەرلىك تور» نى قوزغىتىڭ";
 
 /* Second step for local network permission action sheet */
-"LOCAL_NETWORK_PERMISSION_ACTION_SHEET_STEP_TWO" = "‫Signal نى تېپىڭ";
+"LOCAL_NETWORK_PERMISSION_ACTION_SHEET_STEP_TWO" = "‫Radar نى تېپىڭ";
 
 /* Title for local network permission action sheet */
 "LOCAL_NETWORK_PERMISSION_ACTION_SHEET_TITLE" = "يەرلىك تور زىيارەت ھوقۇقىنى قوزغىتىڭ";
@@ -4873,7 +4873,7 @@
 "LOGGING_SECTION" = "ئۇچۇر خاتىرەسى";
 
 /* Footer for the 'logging' help section. */
-"LOGGING_SECTION_FOOTER" = "سازلاش خاتىرىسى Signal نىڭ مەسىلە ۋە كاشىلىنى ئوڭشىشىغا ياردەم بېرىدۇ.";
+"LOGGING_SECTION_FOOTER" = "سازلاش خاتىرىسى Radar نىڭ مەسىلە ۋە كاشىلىنى ئوڭشىشىغا ياردەم بېرىدۇ.";
 
 /* Title for the 'long text message' view. */
 "LONG_TEXT_VIEW_TITLE" = "ئۇچۇر";
@@ -4975,7 +4975,7 @@
 "MESSAGE_ACTION_DELETE_FOR_EVERYONE" = "ھەممەيلەن ئۈچۈن ئۆچۈرۈڭ";
 
 /* A one-time confirmation that you want to delete for everyone */
-"MESSAGE_ACTION_DELETE_FOR_EVERYONE_CONFIRMATION" = "ئەگەر پاراڭدىكى كىشىلەر Signal نىڭ يېقىنقى نەشرىنى ئىشلىتىۋاتقان بولسا، بۇ ئۇچۇر پاراڭدىكى ھەممەيلەن ئۈچۈن ئۆچۈرۈلىدۇ. ئۇلار سىزنىڭ ئۇچۇرنى ئۆچۈرگەنلىكىڭىزنى كۆرەلەيدۇ.";
+"MESSAGE_ACTION_DELETE_FOR_EVERYONE_CONFIRMATION" = "ئەگەر پاراڭدىكى كىشىلەر Radar نىڭ يېقىنقى نەشرىنى ئىشلىتىۋاتقان بولسا، بۇ ئۇچۇر پاراڭدىكى ھەممەيلەن ئۈچۈن ئۆچۈرۈلىدۇ. ئۇلار سىزنىڭ ئۇچۇرنى ئۆچۈرگەنلىكىڭىزنى كۆرەلەيدۇ.";
 
 /* The title for the action sheet asking who the user wants to delete the message for. */
 "MESSAGE_ACTION_DELETE_FOR_TITLE" = "بۇ ئۇچۇرنى كىم ئۈچۈن ئۆچۈرمەكچىسىز؟";
@@ -5020,7 +5020,7 @@
 "MESSAGE_ACTION_LINK_OPEN_LINK" = "ئۇلانمىنى ئاچ";
 
 /* Label for button to open a signal proxy. */
-"MESSAGE_ACTION_LINK_OPEN_PROXY" = "Signal ۋاكالەتچىسىنى ئېچىش";
+"MESSAGE_ACTION_LINK_OPEN_PROXY" = "Radar ۋاكالەتچىسىنى ئېچىش";
 
 /* Label for button to open a sticker pack. */
 "MESSAGE_ACTION_LINK_OPEN_STICKER_PACK" = "چاپلاق بوغچىسىنى كۆرۈش";
@@ -5194,7 +5194,7 @@
 "MESSAGE_REQUEST_NAME_COLLISON_UPDATE_CONTACT_ACTION" = "ئالاقەداش يېڭىلا";
 
 /* Action sheet message to confirm reporting a conversation as spam via a message request. */
-"MESSAGE_REQUEST_REPORT_CONVERSATION_MESSAGE" = "Signal بۇ كىشىنىڭ بەلكىم ئالدامچى ئۇچۇرى يوللاۋاتقانلىقى ھەققىدە ئۇقتۇرۇش تاپشۇرۇۋالىدۇ. Signal ھەرقانداق پاراڭ مەزمۇنىنى كۆرەلمەيدۇ.";
+"MESSAGE_REQUEST_REPORT_CONVERSATION_MESSAGE" = "Radar بۇ كىشىنىڭ بەلكىم ئالدامچى ئۇچۇرى يوللاۋاتقانلىقى ھەققىدە ئۇقتۇرۇش تاپشۇرۇۋالىدۇ. Radar ھەرقانداق پاراڭ مەزمۇنىنى كۆرەلمەيدۇ.";
 
 /* Action sheet title to confirm reporting a conversation as spam via a message request. */
 "MESSAGE_REQUEST_REPORT_CONVERSATION_TITLE" = "ئالدامچى مەلۇم قىلامسىز؟";
@@ -5344,19 +5344,19 @@
 "MISSING_CAMERA_PERMISSION_MESSAGE" = "سىز iOS تەڭشەكلىرىدىن ئەپ زىيارەت ھوقۇقىنى قوزغىتالايسىز.";
 
 /* Alert title */
-"MISSING_CAMERA_PERMISSION_TITLE" = "‫Signal كامېرانى زىيارەت قىلالىشى كېرەك.";
+"MISSING_CAMERA_PERMISSION_TITLE" = "‫Radar كامېرانى زىيارەت قىلالىشى كېرەك.";
 
 /* Alert body indicating the user has denied location permissions */
 "MISSING_LOCATION_PERMISSION_MESSAGE" = "سىز iOS تەڭشەكلىرىدىن ئەپ زىيارەت ھوقۇقىنى قوزغىتالايسىز.";
 
 /* Alert title indicating the user has denied location permissions */
-"MISSING_LOCATION_PERMISSION_TITLE" = "بۇ ئىقتىدارنى ئىشلىتىش ئۈچۈن Signal ئورۇن ئۇچۇرىڭىزنى زىيارەت قىلىشقا ئېھتىياجلىق.";
+"MISSING_LOCATION_PERMISSION_TITLE" = "بۇ ئىقتىدارنى ئىشلىتىش ئۈچۈن Radar ئورۇن ئۇچۇرىڭىزنى زىيارەت قىلىشقا ئېھتىياجلىق.";
 
 /* Alert body when user has previously denied media library access */
 "MISSING_MEDIA_LIBRARY_PERMISSION_MESSAGE" = "سىز iOS تەڭشەكلىرىدىن ئەپ زىيارەت ھوقۇقىنى قوزغىتالايسىز.";
 
 /* Alert title when user has previously denied media library access */
-"MISSING_MEDIA_LIBRARY_PERMISSION_TITLE" = "بۇ ئىقتىدارنى ئىشلىتىش ئۈچۈن Signal سۈرەت زىيارەت قىلىش ھوقۇقىغا ئېھتىياجلىق.";
+"MISSING_MEDIA_LIBRARY_PERMISSION_TITLE" = "بۇ ئىقتىدارنى ئىشلىتىش ئۈچۈن Radar سۈرەت زىيارەت قىلىش ھوقۇقىغا ئېھتىياجلىق.";
 
 /* An error shown as the title of an alert when try to link a new device & the user is already at the limit. */
 "MULTIDEVICE_PAIRING_MAX_DESC" = "تېخىمۇ كۆپ ئۈسكۈنە بىلەن باغلىيالمايسىز.";
@@ -5377,7 +5377,7 @@
 "MY_STORIES_SETTINGS_VISIBILITY_ALL_SIGNAL_CONNECTIONS_EXCEPT_TITLE" = "تۆۋەندىكىدىن باشقىلار...";
 
 /* Title for the visibility option */
-"MY_STORIES_SETTINGS_VISIBILITY_ALL_SIGNAL_CONNECTIONS_TITLE" = "Signal دىكى بارلىق ئالاقىداشلار";
+"MY_STORIES_SETTINGS_VISIBILITY_ALL_SIGNAL_CONNECTIONS_TITLE" = "Radar دىكى بارلىق ئالاقىداشلار";
 
 /* Title for the visibility option */
 "MY_STORIES_SETTINGS_VISIBILITY_ONLY_SHARE_WITH_TITLE" = "تۆۋەندىكىلەر بىلەنلا ئورتاقلىشىش...";
@@ -5539,7 +5539,7 @@
 "NICKNAME_EDITOR_DELETE_CONFIRMATION_TITLE" = "لەقەمنى ئۆچۈرەمسىز؟";
 
 /* The description below the title on the profile nickname editor view. */
-"NICKNAME_EDITOR_DESCRIPTION" = "لەقەم ۋە خاتىرىلەر Signal دا ئۇچتىن ئۇچقا مەخپىيلەشتۈرۈلگەن ھالدا ساقلىنىدۇ. ئۇلارنى پەقەت سىز كۆرەلەيسىز.";
+"NICKNAME_EDITOR_DESCRIPTION" = "لەقەم ۋە خاتىرىلەر Radar دا ئۇچتىن ئۇچقا مەخپىيلەشتۈرۈلگەن ھالدا ساقلىنىدۇ. ئۇلارنى پەقەت سىز كۆرەلەيسىز.";
 
 /* Placeholder text it the text field for the family name in the profile nickname editor. */
 "NICKNAME_EDITOR_FAMILY_NAME_PLACEHOLDER" = "فامىلە";
@@ -5602,7 +5602,7 @@
 "NOTIFICATION_PERMISSION_REMINDER_MEGAPHONE_TITLE" = "ئۇقتۇرۇشنى قوزغىتامدۇ؟";
 
 /* Shown as the body of an alert when notifications can't be shown due to an error. */
-"NOTIFICATIONS_ERROR_MESSAGE" = "Signal ئۇقتۇرۇشلىرىنى تاپشۇرۇۋالمىغان بولسىڭىز %1$@ نى قايتا قوزغىتىڭ.";
+"NOTIFICATIONS_ERROR_MESSAGE" = "Radar ئۇقتۇرۇشلىرىنى تاپشۇرۇۋالمىغان بولسىڭىز %1$@ نى قايتا قوزغىتىڭ.";
 
 /* Shown as the title of an alert when notifications can't be shown due to an error. */
 "NOTIFICATIONS_ERROR_TITLE" = "ئۇقتۇرۇشلارنى كۆرسىتەلمىدى";
@@ -5662,10 +5662,10 @@
 "ONBOARDING_2FA_SKIP_PIN_ENTRY_TITLE" = "PIN كىرگۈزۈشتىن ئاتلاپ كېتەمسىز؟";
 
 /* The body for the device transfer 'choice' view 'restore backup' option */
-"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_BODY" = "ھېساباتىڭىز ۋە ئۇچۇرلىرىڭىزنى Radar/Signal زاپاسلانمىسىدىن ئەسلىگە كەلتۈرۈڭ";
+"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_BODY" = "ھېساباتىڭىز ۋە ئۇچۇرلىرىڭىزنى Radar/Radar زاپاسلانمىسىدىن ئەسلىگە كەلتۈرۈڭ";
 
 /* The title for the device transfer 'choice' view 'restore backup' option */
-"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_TITLE" = "Radar/Signal بىخەتەر زاپاسلانمىللىرىنى ئەسلىگە كەلتۈرۈش";
+"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_TITLE" = "Radar/Radar بىخەتەر زاپاسلانمىللىرىنى ئەسلىگە كەلتۈرۈش";
 
 /* Body for a sheet warning users about skipping restore. */
 "ONBOARDING_CHOOSE_RESTORE_METHOD_CONFIRM_SKIP_RESTORE_BODY" = "ئەگەر ھازىر ئەسلىگە كەلتۈرۈشنى ئاتلىسىڭىز، كېيىن ئەسلىگە كەلتۈرەلمەيسىز. ئەگەر بۇ ئۈسكۈنىدە زاپاسلاشنى قايتا قوزغاتسىڭىز، نۆۋەتتىكى زاپاسلاش، يېڭى ئۇچۇر تارىخىڭىزغا ئالماشتۇرۇلىدۇ.";
@@ -5677,7 +5677,7 @@
 "ONBOARDING_CHOOSE_RESTORE_METHOD_DESCRIPTION" = "ئۇچۇر تارىخىڭىز ۋە ھېسابات سانلىق-مەلۇماتلىرىڭىزنى قانداق ئەسلىگە كەلتۈرۈشنى خالايدىغانلىقىڭىزنى تاللاڭ.";
 
 /* Message body displayed to a user during registration if there are no restore options available. */
-"ONBOARDING_CHOOSE_RESTORE_METHOD_NONE_AVAILABLE_BODY" = "سىز ئاندىرويىدتىن iOS قا يۆتكىلىۋاتقانلىقىڭىز ئۈچۈن، ئۇچۇر ۋە مېدىيانى يۆتكەشنىڭ بىردىنبىر ئۇسۇلى كونا ئۈسكۈنىڭىزدە Signal زاپاسلانمىسىنى قوزغىتىش.";
+"ONBOARDING_CHOOSE_RESTORE_METHOD_NONE_AVAILABLE_BODY" = "سىز ئاندىرويىدتىن iOS قا يۆتكىلىۋاتقانلىقىڭىز ئۈچۈن، ئۇچۇر ۋە مېدىيانى يۆتكەشنىڭ بىردىنبىر ئۇسۇلى كونا ئۈسكۈنىڭىزدە Radar زاپاسلانمىسىنى قوزغىتىش.";
 
 /* Title displayed to a user during registration if there are no restore options available. */
 "ONBOARDING_CHOOSE_RESTORE_METHOD_NONE_AVAILABLE_TITLE" = "ئەسلىگە كەلتۈرىدىغان زاپاسلاش يوق";
@@ -5737,7 +5737,7 @@
 "ONBOARDING_MODE_SWITCH_BUTTON_REGISTERING" = "iPhone باغلاڭ";
 
 /* explanation to the user they're switching from linking to registering flow */
-"ONBOARDING_MODE_SWITCH_EXPLANATION_PROVISIONING" = "«IPad نى تىزىملاش» نى چىكىش ئارقىلىق يېڭى Signal ھېساباتى قۇرالايسىز ياكى بار بولغان ھېساباتنى بۇ iPad غا يۆتكىيەلەيسىز. ئەمما بۇنداق قىلىش ئوخشاش تېلېفون نومۇرى بىلەن تىزىملاتقان باشقا ئۈسكۈنىلەردىكى Signalنى چەكلەپ قويىدۇ.";
+"ONBOARDING_MODE_SWITCH_EXPLANATION_PROVISIONING" = "«IPad نى تىزىملاش» نى چىكىش ئارقىلىق يېڭى Radar ھېساباتى قۇرالايسىز ياكى بار بولغان ھېساباتنى بۇ iPad غا يۆتكىيەلەيسىز. ئەمما بۇنداق قىلىش ئوخشاش تېلېفون نومۇرى بىلەن تىزىملاتقان باشقا ئۈسكۈنىلەردىكى Signalنى چەكلەپ قويىدۇ.";
 
 /* explanation to the user they're switching from registering to linking flow */
 "ONBOARDING_MODE_SWITCH_EXPLANATION_REGISTERING" = "«iPhone نى باغلاش» نى چېكىش ئارقىلىق، تېلېفونىڭىزنى ھازىرقى ھېساباتىڭىزغا باغلىيالايسىز. تېلېفونىڭىزنى باغلاش ئادەتتە تەۋسىيە قىلىنمايدۇ ۋە تېلېفون قىلىش قاتارلىق بەزى ئىقتىدارلار چەكلىنىپ قالىدۇ.";
@@ -5755,7 +5755,7 @@
 "ONBOARDING_MODE_SWITCH_WARNING_REGISTERING" = "iPhone نىڭىزنى باغلاش ئادەتتە تەۋسىيە قىلىنمايدۇ ۋە بەزى نۇقتىلىق ئىقتىدارلار چەكلىنىپ قالىدۇ.";
 
 /* Description of the 'Contacts' permission in the 'onboarding permissions' view. */
-"ONBOARDING_PERMISSIONS_CONTACTS_DESCRIPTION" = "سىز تونۇيدىغان كىشىلەرنى تېپىڭ. ئالاقىداشلىرىڭىز مەخپىيلەشتۈرۈلگەن بولۇپ، سىگنال مۇلازىمىتىگە كۆرۈنمەيدۇ.";
+"ONBOARDING_PERMISSIONS_CONTACTS_DESCRIPTION" = "سىز تونۇيدىغان كىشىلەرنى تېپىڭ. ئالاقىداشلىرىڭىز مەخپىيلەشتۈرۈلگەن بولۇپ، رادار مۇلازىمىتىگە كۆرۈنمەيدۇ.";
 
 /* Title introducing the 'Contacts' permission in the 'onboarding permissions' view. */
 "ONBOARDING_PERMISSIONS_CONTACTS_TITLE" = "ئالاقەداشلار";
@@ -5767,7 +5767,7 @@
 "ONBOARDING_PERMISSIONS_NOTIFICATIONS_TITLE" = "ئۇقتۇرۇشلار";
 
 /* Preamble of the 'onboarding permissions' view. */
-"ONBOARDING_PERMISSIONS_PREAMBLE" = "سىگنال تۆۋەندىكى ئىجازەتلەرنى تەلەپ قىلماقچى.";
+"ONBOARDING_PERMISSIONS_PREAMBLE" = "رادار تۆۋەندىكى ئىجازەتلەرنى تەلەپ قىلماقچى.";
 
 /* Description of the 'Notification Relay' permission in the 'onboarding permissions' view. */
 "ONBOARDING_PERMISSIONS_RELAY_DESCRIPTION" = "Enable Radar notification relay to ensure you get immediate background notifications in Radar. Relay is always privacy-preserving and keeps your messages end-to-end encrypted no matter what.";
@@ -5779,7 +5779,7 @@
 "ONBOARDING_PERMISSIONS_TITLE" = "ھوقۇق بېرىڭ";
 
 /* Explanation of the 'onboarding phone number discoverability' view. Embeds {user phone number} */
-"ONBOARDING_PHONE_NUMBER_DISCOVERABILITY_EXPLANATION_FORMAT" = "تېلېفون نومۇرىڭىز %1$@ بىلەن سىزنى Signal دا تاپالايدىغان كىشىلەرنى تاللاڭ";
+"ONBOARDING_PHONE_NUMBER_DISCOVERABILITY_EXPLANATION_FORMAT" = "تېلېفون نومۇرىڭىز %1$@ بىلەن سىزنى Radar دا تاپالايدىغان كىشىلەرنى تاللاڭ";
 
 /* Title of the 'onboarding phone number discoverability' view. */
 "ONBOARDING_PHONE_NUMBER_DISCOVERABILITY_TITLE" = "تېلىفون نومۇرىڭىز بىلەن كىملەر سىزنى تاپالايدۇ؟";
@@ -5794,7 +5794,7 @@
 "ONBOARDING_PHONE_NUMBER_VALIDATION_WARNING" = "ئىناۋەتسىز تېلېفون نومۇرى. تىزىملىتىش ئۈچۈن ئىناۋەتلىك تېلېفون نومۇرىنى كىرگۈزۈڭ.";
 
 /* Explanation of the 'onboarding pin attempts exhausted' view when reglock is disabled. */
-"ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_EXPLANATION" = "‫PIN پەرەزلىرىڭىز تۈگەپ كەتتى ، ئەمما يېڭى PIN قۇرۇش ئارقىلىق Signal ھېساباتىڭىزنى يەنىلا زىيارەت قىلالايسىز. شەخسىي مەخپىيەتلىكىڭىز ۋە بىخەتەرلىكىڭىز ئۈچۈن ھېساباتىڭىز ساقلانغان ئارخىپ ئۇچۇرلىرىڭىزسىز ۋە تەڭشەكلىرىڭىزسىز ئەسلىگە كېلىدۇ.";
+"ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_EXPLANATION" = "‫PIN پەرەزلىرىڭىز تۈگەپ كەتتى ، ئەمما يېڭى PIN قۇرۇش ئارقىلىق Radar ھېساباتىڭىزنى يەنىلا زىيارەت قىلالايسىز. شەخسىي مەخپىيەتلىكىڭىز ۋە بىخەتەرلىكىڭىز ئۈچۈن ھېساباتىڭىز ساقلانغان ئارخىپ ئۇچۇرلىرىڭىزسىز ۋە تەڭشەكلىرىڭىزسىز ئەسلىگە كېلىدۇ.";
 
 /* Label for the 'learn more' link when reglock is disabled in the 'onboarding pin attempts exhausted' view. */
 "ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_LEARN_MORE" = "PIN ھەققىدە تېخىمۇ كۆپ بىلىم";
@@ -5803,7 +5803,7 @@
 "ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_TITLE" = "خاتا PIN";
 
 /* Explanation of the 'onboarding pin attempts exhausted' view when it is unknown if reglock is enabled. */
-"ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_WITH_UNKNOWN_REGLOCK_EXPLANATION" = "‫PIN پۇرسىتىڭىز تۈگەپ كەتتى ، ئەمما تېلېفون نومۇرىڭىزنى دەلىللەش ئارقىلىق Signal ھېساباتىڭىزنى يەنىلا زىيارەت قىلالايسىز. شەخسىي مەخپىيەتلىكىڭىز ۋە بىخەتەرلىكىڭىز ئۈچۈن ھېساباتىڭىز ساقلانغان ئارخىپ ئۇچۇرلىرىڭىز ۋە تەڭشەكلىرىڭىز ساقلانمىغان ھالەتتە ئەسلىگە كېلىدۇ.";
+"ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_WITH_UNKNOWN_REGLOCK_EXPLANATION" = "‫PIN پۇرسىتىڭىز تۈگەپ كەتتى ، ئەمما تېلېفون نومۇرىڭىزنى دەلىللەش ئارقىلىق Radar ھېساباتىڭىزنى يەنىلا زىيارەت قىلالايسىز. شەخسىي مەخپىيەتلىكىڭىز ۋە بىخەتەرلىكىڭىز ئۈچۈن ھېساباتىڭىز ساقلانغان ئارخىپ ئۇچۇرلىرىڭىز ۋە تەڭشەكلىرىڭىز ساقلانمىغان ھالەتتە ئەسلىگە كېلىدۇ.";
 
 /* Title for the setup complete screen shown at the end of the onboarding flow. */
 "ONBOARDING_SETUP_COMPLETE_TITLE" = "تەڭشەش تامام بولدى";
@@ -5897,19 +5897,19 @@ Send money securely.";
 "OPEN_SETTINGS_BUTTON" = "تەڭشەكلەر";
 
 /* Signal doesn't support old versions of iOS and shows a warning if you're on unsupported version. Some users can upgrade their device to a newer version of iOS to continue using Signal. If that's the case, they'll be shown this text. */
-"OS_EXPIRED_AND_CAN_UPGRADE_OS" = "Signal بۇ ئۈسكۈنىدە ئەمدى ئىشلىمەيدۇ. Signal نى قايتا ئىشلىتىش ئۈچۈن، ئۈسكۈنىڭىزنى iOS نىڭ يېڭىراق نەشرىگە يېڭىلاڭ.";
+"OS_EXPIRED_AND_CAN_UPGRADE_OS" = "Radar بۇ ئۈسكۈنىدە ئەمدى ئىشلىمەيدۇ. Radar نى قايتا ئىشلىتىش ئۈچۈن، ئۈسكۈنىڭىزنى iOS نىڭ يېڭىراق نەشرىگە يېڭىلاڭ.";
 
 /* Signal doesn't support old devices. If that's the case, they'll be shown this action, and tapping it will open information about Signal's minimum supported operating systems. */
-"OS_EXPIRED_AND_DEVICE_IS_STUCK" = "Signal بۇ ئۈسكۈنىدە ئەمدى ئىشلىمەيدۇ. Signal نى قايتا ئىشلىتىش ئۈچۈن ئۈسكۈنىڭىزنى يېڭىلاڭ.";
+"OS_EXPIRED_AND_DEVICE_IS_STUCK" = "Radar بۇ ئۈسكۈنىدە ئەمدى ئىشلىمەيدۇ. Radar نى قايتا ئىشلىتىش ئۈچۈن ئۈسكۈنىڭىزنى يېڭىلاڭ.";
 
 /* Signal doesn't support old versions of iOS and shows a warning if you're on an old version. Some users can upgrade their device to a newer version of iOS to continue using Signal. If that's the case, they'll be shown this action, and tapping it will open device update instructions. */
 "OS_SOON_TO_EXPIRE_ACTION_TITLE" = "دەرھال يېڭىلاش";
 
 /* Signal doesn't support old versions of iOS and shows a warning if you're an old version that will soon lose support. Some users can upgrade their device to a newer version of iOS to continue using Signal. If that's the case, they'll be shown this text. Embeds {{expiration date}}. */
-"OS_SOON_TO_EXPIRE_AND_CAN_UPGRADE_OS_FORMAT" = "قىسقا ۋاقىتتىن كېيىن Signal ئۈسكۈنىڭىزنىڭ بۇ iOS نەشرىنى قوللىمايدۇ. Signal نى داۋاملىق ئىشلىتىش ئۈچۈن، %1$@ دىن بۇرۇن ئۈسكۈنىڭىزنى iOS نىڭ يېڭى نەشرىگە يېڭىلاڭ.";
+"OS_SOON_TO_EXPIRE_AND_CAN_UPGRADE_OS_FORMAT" = "قىسقا ۋاقىتتىن كېيىن Radar ئۈسكۈنىڭىزنىڭ بۇ iOS نەشرىنى قوللىمايدۇ. Radar نى داۋاملىق ئىشلىتىش ئۈچۈن، %1$@ دىن بۇرۇن ئۈسكۈنىڭىزنى iOS نىڭ يېڭى نەشرىگە يېڭىلاڭ.";
 
 /* Signal doesn't support old versions of iOS and shows a warning if you're on an old version that will soon lose support. This is the text on that warning when users can't upgrade iOS without getting a new device. Embeds {{expiration date}}. */
-"OS_SOON_TO_EXPIRE_AND_DEVICE_WILL_BE_STUCK_FORMAT" = "قىسقا ۋاقىتتىن كېيىن Signal ئۈسكۈنىڭىزنىڭ بۇ iOS نەشرىنى قوللىمايدۇ. Signal نى داۋاملىق ئىشلىتىش ئۈچۈن، %1$@ دىن بۇرۇن ئۈسكۈنىڭىزنى يېڭىراق ئۈسكۈنىگە ئالماشتۇرۇڭ.";
+"OS_SOON_TO_EXPIRE_AND_DEVICE_WILL_BE_STUCK_FORMAT" = "قىسقا ۋاقىتتىن كېيىن Radar ئۈسكۈنىڭىزنىڭ بۇ iOS نەشرىنى قوللىمايدۇ. Radar نى داۋاملىق ئىشلىتىش ئۈچۈن، %1$@ دىن بۇرۇن ئۈسكۈنىڭىزنى يېڭىراق ئۈسكۈنىگە ئالماشتۇرۇڭ.";
 
 /* Info Message when another user disabled disappearing messages. Embeds {{name of other user}}. */
 "OTHER_DISABLED_DISAPPEARING_MESSAGES_CONFIGURATION" = "%1$@ غايىب ئۇچۇرنى چەكلىدى.";
@@ -5918,13 +5918,13 @@ Send money securely.";
 "OTHER_UPDATED_DISAPPEARING_MESSAGES_CONFIGURATION" = "%1$@ ئۇچۇرنىڭ ئۆچۈرۈلۈش ۋاقتىنى %2$@ قىلىپ تەڭشىدى.";
 
 /* Label warning the user that the Signal service may be down. */
-"OUTAGE_WARNING" = "Signal دا تېخنىكىلىق قىيىنچىلىق كۆرۈلدى. بىز ئامالنىڭ بارىچە تىرىشىپ ئىشلەپ مۇلازىمەتنى ئەڭ تېز سۈرئەتتە ئەسلىگە كەلتۈرىمىز.";
+"OUTAGE_WARNING" = "Radar دا تېخنىكىلىق قىيىنچىلىق كۆرۈلدى. بىز ئامالنىڭ بارىچە تىرىشىپ ئىشلەپ مۇلازىمەتنى ئەڭ تېز سۈرئەتتە ئەسلىگە كەلتۈرىمىز.";
 
 /* Label for action link when the user has an outdated payment client */
 "OUTDATED_PAYMENT_CLIENT_ACTION_TITLE" = "ھازىر يېڭىلاڭ";
 
 /* Label warning the user that they should update Signal to continue using payments. */
-"OUTDATED_PAYMENT_CLIENT_REMINDER_TEXT" = "پۇل تۆلەش ئىقتىدارىنى داۋاملىق ئىشلىتىش ئۈچۈن Signal نى يېڭىلاڭ. قالدۇق سوممىڭىز ئەڭ يېڭى ھالەتتە بولماسلىقى مۇمكىن.";
+"OUTDATED_PAYMENT_CLIENT_REMINDER_TEXT" = "پۇل تۆلەش ئىقتىدارىنى داۋاملىق ئىشلىتىش ئۈچۈن Radar نى يېڭىلاڭ. قالدۇق سوممىڭىز ئەڭ يېڭى ھالەتتە بولماسلىقى مۇمكىن.";
 
 /* Body of prompt notifying restore was cancelled. */
 "OUTGOING_DEVICE_REGISTRATION_CANCELLED_RESTORE_BODY" = "ئەسلىگە كەلتۈرۈش ئەمەلدىن قالدۇرۇلغان. قايتا سىناڭ.";
@@ -5933,7 +5933,7 @@ Send money securely.";
 "OUTGOING_DEVICE_REGISTRATION_CANCELLED_RESTORE_TITLE" = "ئەسلىگە كەلتۈرۈش ئەمەلدىن قالدۇرۇلدى";
 
 /* Body of prompt notifying registration without restore completed on the new device. */
-"OUTGOING_DEVICE_REGISTRATION_COMPLETE_BODY" = "Signal ھېساباتىڭىز باشقا ئۈسكۈنىڭىزدە قوزغىتىلدى. Signal ئەمدى بۇ ئۈسكۈنىدە ئىشلىمەيدۇ.";
+"OUTGOING_DEVICE_REGISTRATION_COMPLETE_BODY" = "Radar ھېساباتىڭىز باشقا ئۈسكۈنىڭىزدە قوزغىتىلدى. Radar ئەمدى بۇ ئۈسكۈنىدە ئىشلىمەيدۇ.";
 
 /* Title of prompt notifying registration without restore completed on the new device. */
 "OUTGOING_DEVICE_REGISTRATION_COMPLETE_TITLE" = "تىزىملىتىش تاماملاندى";
@@ -6168,7 +6168,7 @@ Send money securely.";
 "PAYMENTS_NEW_PAYMENT_ERROR_INVALID_TRANSACTION" = "ئىناۋەتسىز مۇئامىلە";
 
 /* Indicates that a payment failed due to an outdated client. */
-"PAYMENTS_NEW_PAYMENT_ERROR_OUTDATED_CLIENT" = "چىقىم ئىقتىدارى ئۈچۈن Signal نى يېڭىلاڭ.";
+"PAYMENTS_NEW_PAYMENT_ERROR_OUTDATED_CLIENT" = "چىقىم ئىقتىدارى ئۈچۈن Radar نى يېڭىلاڭ.";
 
 /* Indicates that an outgoing payment could not be verified in a timely way. */
 "PAYMENTS_NEW_PAYMENT_ERROR_OUTGOING_VERIFICATION_TAKING_TOO_LONG" = "چىقىم تېخى دەلىللەنمىدى";
@@ -6432,13 +6432,13 @@ Send money securely.";
 "PHONE_NUMBER_DISCOVERABILITY_EVERYBODY" = "ھەممەيلەن";
 
 /* A user friendly description of the 'everybody' phone number discoverability mode. */
-"PHONE_NUMBER_DISCOVERABILITY_EVERYBODY_DESCRIPTION" = "تېلېفون نومۇرىڭىز بار ھەرقانداق كىشى سىزنىڭ Signal دا ئىكەنلىكىڭىزنى كۆرەلەيدۇ ۋە سىز بىلەن پاراڭ باشلىيالايدۇ.";
+"PHONE_NUMBER_DISCOVERABILITY_EVERYBODY_DESCRIPTION" = "تېلېفون نومۇرىڭىز بار ھەرقانداق كىشى سىزنىڭ Radar دا ئىكەنلىكىڭىزنى كۆرەلەيدۇ ۋە سىز بىلەن پاراڭ باشلىيالايدۇ.";
 
 /* A user friendly name for the 'nobody' phone number discoverability mode. */
 "PHONE_NUMBER_DISCOVERABILITY_NOBODY" = "ھېچكىم";
 
 /* A user friendly description of the 'nobody' phone number discoverability mode. */
-"PHONE_NUMBER_DISCOVERABILITY_NOBODY_DESCRIPTION" = "ئەگەر باشقىلارغا ئۇچۇر يوللىسىمىڭىز ياكى باشقىلار بىلەن بۇرۇندىنلا مەۋجۇت پارىڭىڭىز بولمىسا، باشقىلار سىزنىڭ Signal دا ئىكەنلىكىڭىزنى كۆرەلمەيدۇ.";
+"PHONE_NUMBER_DISCOVERABILITY_NOBODY_DESCRIPTION" = "ئەگەر باشقىلارغا ئۇچۇر يوللىسىمىڭىز ياكى باشقىلار بىلەن بۇرۇندىنلا مەۋجۇت پارىڭىڭىز بولمىسا، باشقىلار سىزنىڭ Radar دا ئىكەنلىكىڭىزنى كۆرەلمەيدۇ.";
 
 /* A format for a label showing an example phone number. Embeds {{the example phone number}}. */
 "PHONE_NUMBER_EXAMPLE_FORMAT" = "مىسال: %1$@";
@@ -6540,22 +6540,22 @@ Send money securely.";
 "PIN_CREATION_DISABLE_CONFIRMATION_ACTION" = "PIN چەكلە";
 
 /* Message of the 'pin disable' action sheet. */
-"PIN_CREATION_DISABLE_CONFIRMATION_MESSAGE" = "ئەگەر PIN نى چەكلىسىڭىز، Signal غا قايتا تىزىملاتقاندا باشقا iOS ئەسلىگە كەلتۈرمىگۈچە ھەممە سانلىق مەلۇماتلىرىڭىز يوقىلىدۇ، PIN چەكلەنسە تىزىملىتىش قۇلۇپىنى ئاچالمايسىز.";
+"PIN_CREATION_DISABLE_CONFIRMATION_MESSAGE" = "ئەگەر PIN نى چەكلىسىڭىز، Radar غا قايتا تىزىملاتقاندا باشقا iOS ئەسلىگە كەلتۈرمىگۈچە ھەممە سانلىق مەلۇماتلىرىڭىز يوقىلىدۇ، PIN چەكلەنسە تىزىملىتىش قۇلۇپىنى ئاچالمايسىز.";
 
 /* Title of the 'pin disable' action sheet. */
 "PIN_CREATION_DISABLE_CONFIRMATION_TITLE" = "ئاگاھلاندۇرۇش";
 
 /* The explanation in the 'pin creation' view. */
-"PIN_CREATION_EXPLANATION" = "PINلەر Signalدا ساقلانغان ئۇچۇرلارنى مەخپىيلەشتۈرۈپ ساقلايدۇ. شۇڭا سىزلا زىيارەت قىلالايسىز. ئارخىپىڭىز، سەپلىمىلىرىڭىز ۋە ئالاقەداشلىرىڭىز Signal نى قايتا قاچىلىغىنىڭىزدا ئەسلىگە كەلتۈرىلىدۇ. ئەپنى ئېچىش PIN نىڭىز كېرەك ئەمەس.";
+"PIN_CREATION_EXPLANATION" = "PINلەر Signalدا ساقلانغان ئۇچۇرلارنى مەخپىيلەشتۈرۈپ ساقلايدۇ. شۇڭا سىزلا زىيارەت قىلالايسىز. ئارخىپىڭىز، سەپلىمىلىرىڭىز ۋە ئالاقەداشلىرىڭىز Radar نى قايتا قاچىلىغىنىڭىزدا ئەسلىگە كەلتۈرىلىدۇ. ئەپنى ئېچىش PIN نىڭىز كېرەك ئەمەس.";
 
 /* Learn more action on the pin creation view */
 "PIN_CREATION_LEARN_MORE" = "PIN ھەققىدە تەپسىلاتلار";
 
 /* Users can create PINs to restore their account data later. They can learn more about this on a sheet. This is the text on that sheet. */
-"PIN_CREATION_LEARN_MORE_TEXT" = "PIN لار Signal دا ساقلانغان ئۇچۇرلارنى مەخپىيلەشتۈرۈپ ساقلايدۇ. شۇڭا ئۇنى سىزلا زىيارەت قىلالايسىز. ئارخىپىڭىز، سەپلىمىلىرىڭىز ۋە ئالاقىداشلىرىڭىز Signal نى قايتا قاچىلىغىنىڭىزدا ئەسلىگە كەلتۈرۈلىدۇ.";
+"PIN_CREATION_LEARN_MORE_TEXT" = "PIN لار Radar دا ساقلانغان ئۇچۇرلارنى مەخپىيلەشتۈرۈپ ساقلايدۇ. شۇڭا ئۇنى سىزلا زىيارەت قىلالايسىز. ئارخىپىڭىز، سەپلىمىلىرىڭىز ۋە ئالاقىداشلىرىڭىز Radar نى قايتا قاچىلىغىنىڭىزدا ئەسلىگە كەلتۈرۈلىدۇ.";
 
 /* Users can create PINs to restore their account data later. They can learn more about this on a sheet. This is the title on that sheet. */
-"PIN_CREATION_LEARN_MORE_TITLE" = "Signal PIN ھەققىدە";
+"PIN_CREATION_LEARN_MORE_TITLE" = "Radar PIN ھەققىدە";
 
 /* Label indicating that the attempted PIN does not match the first PIN */
 "PIN_CREATION_MISMATCH_ERROR" = "PIN ماس كەلمىدى. قايتا سىناڭ.";
@@ -6588,7 +6588,7 @@ Send money securely.";
 "PIN_CREATION_WEAK_ERROR" = "تېخىمۇ بىخەتەر PIN تاللاڭ";
 
 /* If your attempted PIN is too weak, you'll see an error message. This is the text on the error dialog. */
-"PIN_CREATION_WEAK_ERROR_MESSAGE" = "PIN ئارقىلىق ئۇچۇرلىرىڭىزنى Signal دا مەخپىيلەشتۈرۈپ ساقلىيالايسىز، شۇنىڭ ئۈچۈن PIN نى ئۆزىڭىزلا بىلىسىز. ھېساباتىڭىزنىڭ بىخەتەرلىكىگە كاپالەتلىك قىلىش ئۈچۈن قىيىنراق PIN تاللاڭ.";
+"PIN_CREATION_WEAK_ERROR_MESSAGE" = "PIN ئارقىلىق ئۇچۇرلىرىڭىزنى Radar دا مەخپىيلەشتۈرۈپ ساقلىيالايسىز، شۇنىڭ ئۈچۈن PIN نى ئۆزىڭىزلا بىلىسىز. ھېساباتىڭىزنىڭ بىخەتەرلىكىگە كاپالەتلىك قىلىش ئۈچۈن قىيىنراق PIN تاللاڭ.";
 
 /* If the user is re-registering, they need to enter their PIN to restore all their data. In some cases, they can skip this entry and lose some data. This text is shown on a button that lets them begin to do this. */
 "PIN_ENTER_EXISTING_SKIP" = "PIN كىرگۈزۈشتىن ئاتلاش";
@@ -6621,7 +6621,7 @@ Send money securely.";
 "PIN_REMINDER_MEGAPHONE_FEW_DAYS_TOAST" = "بىر قانچە كۈندىن كېيىن سىزنى قايتا ئەسكەرتىمىز.";
 
 /* Title for PIN reminder megaphone */
-"PIN_REMINDER_MEGAPHONE_TITLE" = "Signal PIN نى دەلىللەڭ";
+"PIN_REMINDER_MEGAPHONE_TITLE" = "Radar PIN نى دەلىللەڭ";
 
 /* Toast indicating that we'll ask you for your PIN again tomorrow, after successfully entering it. */
 "PIN_REMINDER_MEGAPHONE_TOMORROW_SUCCESSFUL_TOAST" = "توغرا PIN نومۇر. ئەتە سىزنى قايتا ئەسكەرتىمىز.";
@@ -6645,7 +6645,7 @@ Send money securely.";
 "PIN_REMINDER_MISMATCH_ERROR" = "PIN  خاتا، قايتا سىناڭ.";
 
 /* The title for the 'pin reminder' dialog. */
-"PIN_REMINDER_TITLE" = "Signal PIN نى كىرگۈزۈڭ";
+"PIN_REMINDER_TITLE" = "Radar PIN نى كىرگۈزۈڭ";
 
 /* Label indicating that the attempted PIN is too short */
 "PIN_REMINDER_TOO_SHORT_ERROR" = "PIN ئەڭ ئاز 4 ھەرپلەردىن تۈزۈلۈشى كېرەك";
@@ -6660,7 +6660,7 @@ Send money securely.";
 "PINS_MEGAPHONE_ACTION" = "PIN قۇر";
 
 /* Body for PIN megaphone when user doesn't have a PIN */
-"PINS_MEGAPHONE_BODY" = "Signal PIN قۇرۇشنى تاماملاڭ.";
+"PINS_MEGAPHONE_BODY" = "Radar PIN قۇرۇشنى تاماملاڭ.";
 
 /* Title for PIN megaphone when user doesn't have a PIN */
 "PINS_MEGAPHONE_TITLE" = "بىر PIN قۇر";
@@ -6768,19 +6768,19 @@ Send money securely.";
 "PRIVACY_VERIFICATION_FAILED_MISMATCHED_SAFETY_NUMBERS_IN_CLIPBOARD" = "چاپلاش تاختىسىدىكى سان نۆۋەتتىكى سۆھبەتنىڭ بىخەتەرلىك نومۇرى ئەمەستەك قىلىدۇ.";
 
 /* Alert body for user error */
-"PRIVACY_VERIFICATION_FAILED_NO_SAFETY_NUMBERS_IN_CLIPBOARD" = "‫Signal چاپلاش تاختىسىدىن ھېچقانداق بىخەتەرلىك نومۇرى تاپالمىدى. ئۇنى توغرا كۆچۈرگەنمۇ؟";
+"PRIVACY_VERIFICATION_FAILED_NO_SAFETY_NUMBERS_IN_CLIPBOARD" = "‫Radar چاپلاش تاختىسىدىن ھېچقانداق بىخەتەرلىك نومۇرى تاپالمىدى. ئۇنى توغرا كۆچۈرگەنمۇ؟";
 
 /* Alert body when verifying with {{contact name}} */
-"PRIVACY_VERIFICATION_FAILED_THEY_HAVE_WRONG_KEY_FOR_ME" = "ھەر بىر جۈپ Signal ئىشلەتكۈچىسى ئۈچۈن ئوخشاش بولمىغان بىخەتەرلىك نومۇرى بولىدۇ. «%1$@» دا كۆرسىتىلگىنى *سىزگە خاس* بىخەتەرلىك نومۇرى ئىكەنلىكىنى قايتا تەكشۈرۈڭ.";
+"PRIVACY_VERIFICATION_FAILED_THEY_HAVE_WRONG_KEY_FOR_ME" = "ھەر بىر جۈپ Radar ئىشلەتكۈچىسى ئۈچۈن ئوخشاش بولمىغان بىخەتەرلىك نومۇرى بولىدۇ. «%1$@» دا كۆرسىتىلگىنى *سىزگە خاس* بىخەتەرلىك نومۇرى ئىكەنلىكىنى قايتا تەكشۈرۈڭ.";
 
 /* alert body */
-"PRIVACY_VERIFICATION_FAILED_WITH_OLD_LOCAL_VERSION" = "سىز Signal نىڭ كونا نەشرىنى ئىشلىتىۋېتىپسىز. دەلىللەشتىن ئىلگىرى نەشرىنى يېڭىلاڭ.";
+"PRIVACY_VERIFICATION_FAILED_WITH_OLD_LOCAL_VERSION" = "سىز Radar نىڭ كونا نەشرىنى ئىشلىتىۋېتىپسىز. دەلىللەشتىن ئىلگىرى نەشرىنى يېڭىلاڭ.";
 
 /* alert body */
-"PRIVACY_VERIFICATION_FAILED_WITH_OLD_REMOTE_VERSION" = "دوستىڭىز كونا نەشرىدىكى Signal نى ئىشلىتىۋېتىپتۇ. سىز دەلىللەشتىن ئىلگىرى ئۇلار نەشرىنى يېڭىلىشى كېرەك.";
+"PRIVACY_VERIFICATION_FAILED_WITH_OLD_REMOTE_VERSION" = "دوستىڭىز كونا نەشرىدىكى Radar نى ئىشلىتىۋېتىپتۇ. سىز دەلىللەشتىن ئىلگىرى ئۇلار نەشرىنى يېڭىلىشى كېرەك.";
 
 /* alert body */
-"PRIVACY_VERIFICATION_FAILURE_INVALID_QRCODE" = "تارىغان كود بىخەتەرلىك نومۇرىدەك قىلمايدۇ. ھەر ئىككىڭلار ئەڭ يېڭى نەشرىدىكى Signal نى ئىشلىتىۋاتامسىلەر؟";
+"PRIVACY_VERIFICATION_FAILURE_INVALID_QRCODE" = "تارىغان كود بىخەتەرلىك نومۇرىدەك قىلمايدۇ. ھەر ئىككىڭلار ئەڭ يېڭى نەشرىدىكى Radar نى ئىشلىتىۋاتامسىلەر؟";
 
 /* Navbar title */
 "PRIVACY_VERIFICATION_TITLE" = "بىخەتەرلىك نومۇرنى دەلىللەڭ";
@@ -6855,7 +6855,7 @@ Send money securely.";
 "PROFILE_NAME_EDUCATION_SHEET_BULLET_3" = "شەخسىي ئۇچۇرلىرىڭىزنى تونۇمايدىغان كىشىلەر بىلەن ئورتاقلاشماڭ";
 
 /* Header for the explainer sheet for profile names */
-"PROFILE_NAME_EDUCATION_SHEET_HEADER_FORMAT" = "Signal دىكى<bold>ئارخىپ ناملىرى</bold>ئۇلارنىڭ ھېسابات ئىگىسى تەرىپىدىن تاللىنىدۇ.";
+"PROFILE_NAME_EDUCATION_SHEET_HEADER_FORMAT" = "Radar دىكى<bold>ئارخىپ ناملىرى</bold>ئۇلارنىڭ ھېسابات ئىگىسى تەرىپىدىن تاللىنىدۇ.";
 
 /* Title for the profile name view. */
 "PROFILE_NAME_VIEW_TITLE" = "ئىسمىڭىز";
@@ -7062,7 +7062,7 @@ Send money securely.";
 "RECIPIENT_PICKER_ERROR_USER_CANNOT_BE_SELECTED" = "ئىشلەتكۈچىنى تاللىيالمايدۇ.";
 
 /* Alert text. Shown after selecting a phone number that isn't valid. */
-"RECIPIENT_PICKER_INVALID_NUMBER_MESSAGE" = "%1$@ Signal ئىشلەتكۈچى ئەمەس. ئىناۋەتلىك تېلېفون نومۇرى بىلەن قايتا سىناڭ.";
+"RECIPIENT_PICKER_INVALID_NUMBER_MESSAGE" = "%1$@ Radar ئىشلەتكۈچى ئەمەس. ئىناۋەتلىك تېلېفون نومۇرى بىلەن قايتا سىناڭ.";
 
 /* Alert title. Shown after selecting a phone number that isn't valid. */
 "RECIPIENT_PICKER_INVALID_NUMBER_TITLE" = "ئىناۋەتسىز تېلېفون نومۇر";
@@ -7071,22 +7071,22 @@ Send money securely.";
 "RECIPIENT_PICKER_INVITE_ACTION" = "تەكلىپ";
 
 /* Alert text. Shown after selecting a phone number that isn't a Signal user. */
-"RECIPIENT_PICKER_INVITE_MESSAGE" = "%1$@ Signal ئىشلەتكۈچى ئەمەس. بۇ نومۇرنى تەكلىپ قىلامسىز؟";
+"RECIPIENT_PICKER_INVITE_MESSAGE" = "%1$@ Radar ئىشلەتكۈچى ئەمەس. بۇ نومۇرنى تەكلىپ قىلامسىز؟";
 
 /* Alert title. Shown after selecting a phone number that isn't a Signal user. */
-"RECIPIENT_PICKER_INVITE_TITLE" = "Signal ئىشلىتىش تەكلىپى";
+"RECIPIENT_PICKER_INVITE_TITLE" = "Radar ئىشلىتىش تەكلىپى";
 
 /* Alert title explaining what happens if you forget your 'two-factor auth pin'. */
 "REGISTER_2FA_FORGOT_PIN_ALERT_TITLE" = "ياردەم كېرەكمۇ؟";
 
 /* Alert body for a forgotten SVR (V2) PIN */
-"REGISTER_2FA_FORGOT_SVR_PIN_ALERT_MESSAGE" = "PIN نومۇر بولسا سىز قۇرغان 4 خانىلىق (ياكى 4 خانىدىن كۆپ) كود بولۇپ، سانلىق ياكى ئېلپبە-رەقەملىك بولىدۇ. ئەگەر PIN نومۇرىنى ئەسلىيەلمىسىڭىز، ھېساباتىڭىزنى قايتا تىزىملىتىش ئۈچۈن 7 كۈن ساقلاشقا توغرا كېلىدۇ. ئەگەر Signal بىخەتەر زاپاسلانمىلىرىنى قوزغاتقان بولسىڭىز، ئەسلىگە كەلتۈرۈش ئاچقۇچى ئارقىلىق داۋاملاشتۇرالايسىز.";
+"REGISTER_2FA_FORGOT_SVR_PIN_ALERT_MESSAGE" = "PIN نومۇر بولسا سىز قۇرغان 4 خانىلىق (ياكى 4 خانىدىن كۆپ) كود بولۇپ، سانلىق ياكى ئېلپبە-رەقەملىك بولىدۇ. ئەگەر PIN نومۇرىنى ئەسلىيەلمىسىڭىز، ھېساباتىڭىزنى قايتا تىزىملىتىش ئۈچۈن 7 كۈن ساقلاشقا توغرا كېلىدۇ. ئەگەر Radar بىخەتەر زاپاسلانمىلىرىنى قوزغاتقان بولسىڭىز، ئەسلىگە كەلتۈرۈش ئاچقۇچى ئارقىلىق داۋاملاشتۇرالايسىز.";
 
 /* Alert body for a forgotten SVR (V2) PIN when the user doesn't have reglock and they cannot necessarily create a new PIN */
-"REGISTER_2FA_FORGOT_SVR_PIN_WITHOUT_REGLOCK_ALERT_MESSAGE" = "PIN نومۇر بولسا سىز قۇرغان 4 خانىلىق (ياكى 4 خانىدىن كۆپ) كود بولۇپ، سانلىق ياكى ئېلپبە-رەقەملىك بولىدۇ. ئەگەر PIN نومۇرىنى ئەسلىيەلمىسىڭىز، ھېساباتىڭىزنى تىزىملىتالايسىز ۋە ئىشلىتەلەيسىز، ئەمما ساقلانغان تەڭشەكلەرنى يوقىتىسىز، مەسىلەن ئارخىپ ئۇچۇرىڭىز دىگەندەكلەر. ئەگەر Signal بىخەتەر زاپاسلانمىلىرىنى قوزغاتقان بولسىڭىز، ئەسلىگە كەلتۈرۈش ئاچقۇچى ئارقىلىق داۋاملاشتۇرالايسىز.";
+"REGISTER_2FA_FORGOT_SVR_PIN_WITHOUT_REGLOCK_ALERT_MESSAGE" = "PIN نومۇر بولسا سىز قۇرغان 4 خانىلىق (ياكى 4 خانىدىن كۆپ) كود بولۇپ، سانلىق ياكى ئېلپبە-رەقەملىك بولىدۇ. ئەگەر PIN نومۇرىنى ئەسلىيەلمىسىڭىز، ھېساباتىڭىزنى تىزىملىتالايسىز ۋە ئىشلىتەلەيسىز، ئەمما ساقلانغان تەڭشەكلەرنى يوقىتىسىز، مەسىلەن ئارخىپ ئۇچۇرىڭىز دىگەندەكلەر. ئەگەر Radar بىخەتەر زاپاسلانمىلىرىنى قوزغاتقان بولسىڭىز، ئەسلىگە كەلتۈرۈش ئاچقۇچى ئارقىلىق داۋاملاشتۇرالايسىز.";
 
 /* Alert body for a forgotten SVR (V2) PIN when the user doesn't have reglock and they can create a new PIN */
-"REGISTER_2FA_FORGOT_SVR_PIN_WITHOUT_REGLOCK_AND_CAN_CREATE_NEW_PIN_ALERT_MESSAGE" = "PIN نومۇر بولسا سىز قۇرغان 4 خانىلىق (ياكى 4 خانىدىن كۆپ) كود بولۇپ، سانلىق ياكى ئېلپبە-رەقەملىك بولىدۇ. PIN نومۇرىنى ئۇنتۇپ قالغان بولسىڭىز، يېڭىدىن بىرنى قۇرسىڭىز بولىدۇ. ھېساباتىڭىزنى تىزىملىتالايسىز ۋە ئىشلىتەلەيسىز، ئەمما ساقلانغان تەڭشەكلەرنى يوقىتىسىز، مەسىلەن ئارخىپ ئۇچۇرىڭىز دىگەندەكلەر. ئەگەر Signal بىخەتەر زاپاسلانمىلىرىنى قوزغاتقان بولسىڭىز، ئەسلىگە كەلتۈرۈش ئاچقۇچى ئارقىلىق داۋاملاشتۇرالايسىز.";
+"REGISTER_2FA_FORGOT_SVR_PIN_WITHOUT_REGLOCK_AND_CAN_CREATE_NEW_PIN_ALERT_MESSAGE" = "PIN نومۇر بولسا سىز قۇرغان 4 خانىلىق (ياكى 4 خانىدىن كۆپ) كود بولۇپ، سانلىق ياكى ئېلپبە-رەقەملىك بولىدۇ. PIN نومۇرىنى ئۇنتۇپ قالغان بولسىڭىز، يېڭىدىن بىرنى قۇرسىڭىز بولىدۇ. ھېساباتىڭىزنى تىزىملىتالايسىز ۋە ئىشلىتەلەيسىز، ئەمما ساقلانغان تەڭشەكلەرنى يوقىتىسىز، مەسىلەن ئارخىپ ئۇچۇرىڭىز دىگەندەكلەر. ئەگەر Radar بىخەتەر زاپاسلانمىلىرىنى قوزغاتقان بولسىڭىز، ئەسلىگە كەلتۈرۈش ئاچقۇچى ئارقىلىق داۋاملاشتۇرالايسىز.";
 
 /* Alert title explaining what happens if you forget your 'two-factor auth pin'. */
 "REGISTER_2FA_INVALID_PIN_ALERT_TITLE" = "خاتا PIN";
@@ -7167,7 +7167,7 @@ Send money securely.";
 "REGISTRATION_BACKUP_RESTORE_ERROR_UNRETRYABLE_SERVER_ERROR_TITLE" = "زاپاسلاشنى ئەسلىگە كەلتۈرگىلى بولمىدى";
 
 /* Body for a sheet warning users about an incompatible backup version. */
-"REGISTRATION_BACKUP_RESTORE_ERROR_UNSUPPORTED_BACKUP_VERSION_BODY" = "زاپاسلاشنى ئەسلىگە كەلتۈرۈش ئۈچۈن ، Signalنىڭ ئەڭ يېڭى نەشرىدە ئىكەنلىكىڭىزنى جەزملەشتۈرۈڭ ۋە قايتا سىناڭ. ئەگەر بۇ مەسىلە داۋاملاشسا ، Signal ياردەم مەركىزى بىلەن ئالاقىلىشىڭ.";
+"REGISTRATION_BACKUP_RESTORE_ERROR_UNSUPPORTED_BACKUP_VERSION_BODY" = "زاپاسلاشنى ئەسلىگە كەلتۈرۈش ئۈچۈن ، Signalنىڭ ئەڭ يېڭى نەشرىدە ئىكەنلىكىڭىزنى جەزملەشتۈرۈڭ ۋە قايتا سىناڭ. ئەگەر بۇ مەسىلە داۋاملاشسا ، Radar ياردەم مەركىزى بىلەن ئالاقىلىشىڭ.";
 
 /* Title for a sheet warning users about an incompatible backup version. */
 "REGISTRATION_BACKUP_RESTORE_ERROR_UNSUPPORTED_BACKUP_VERSION_TITLE" = "يېڭىلاش لازىم";
@@ -7179,7 +7179,7 @@ Send money securely.";
 "REGISTRATION_CANNOT_CONTINUE_WITHOUT_UPDATING_APP_ACTION" = "يېڭىلاش";
 
 /* During (re)registration, users may need to update their app to continue. They'll be presented with an alert if this is the case, prompting them to update. This is the description text on that alert. */
-"REGISTRATION_CANNOT_CONTINUE_WITHOUT_UPDATING_APP_DESCRIPTION" = "Signal نىڭ ئەڭ يېڭى نەشرىگە يېڭىلاپ تىزىملىتىشنى داۋاملاشتۇرۇڭ.";
+"REGISTRATION_CANNOT_CONTINUE_WITHOUT_UPDATING_APP_DESCRIPTION" = "Radar نىڭ ئەڭ يېڭى نەشرىگە يېڭىلاپ تىزىملىتىشنى داۋاملاشتۇرۇڭ.";
 
 /* During (re)registration, users may need to update their app to continue. They'll be presented with an alert if this is the case, prompting them to update. This is the title on that alert. */
 "REGISTRATION_CANNOT_CONTINUE_WITHOUT_UPDATING_APP_TITLE" = "يېڭىلاش كېرەك";
@@ -7191,7 +7191,7 @@ Send money securely.";
 "REGISTRATION_DEFAULT_COUNTRY_NAME" = "دۆلەت كودى";
 
 /* If a user is installing Signal on a new phone, they may be asked whether they want to transfer their account from their old device. This is a description on the screen that asks them this question. */
-"REGISTRATION_DEVICE_TRANSFER_CHOICE_EXPLANATION" = "بۇ مەشغۇلات داۋاملاشسا ئوخشاش نومۇر بىلەن تىزىملىتىلغان باشقا ئۈسكۈنىدىكى Signal چەكلىنىدۇ.";
+"REGISTRATION_DEVICE_TRANSFER_CHOICE_EXPLANATION" = "بۇ مەشغۇلات داۋاملاشسا ئوخشاش نومۇر بىلەن تىزىملىتىلغان باشقا ئۈسكۈنىدىكى Radar چەكلىنىدۇ.";
 
 /* If a user is installing Signal on a new phone, they may be asked whether they want to transfer their account from their old device. This is the title on the screen that asks them this question. */
 "REGISTRATION_DEVICE_TRANSFER_CHOICE_TITLE" = "ھېسابات ۋە ئۇچۇرلارنى يۆتكەش";
@@ -7227,7 +7227,7 @@ Send money securely.";
 "REGISTRATION_NO_BACKUP_KEY_BUTTON_TITLE" = "ئەسلىگە كەلتۈرۈش ئاچقۇچى يوقمۇ؟";
 
 /* Body text on a sheet with info for what to do if you don't have a recovery key */
-"REGISTRATION_NO_BACKUP_KEY_SHEET_BODY" = "زاپاسلارنى 64 خانىلىق ئەسلىگە كەلتۈرۈش كودى بولمىسا ئەسلىگە كەلتۈرگىلى بولمايدۇ. ئەگەر ئەسلىگە كەلتۈرۈش ئاچقۇچىڭىزنى يوقىتىپ قويغان بولسىڭىز، Signal ياردەملىشىپ زاپاسلاشنى ئەسلىگە كەلتۈرەلمەيدۇ.\n\nئەگەر كونا ئۈسكۈنىڭىز بولسا « تەڭشەك >پاراڭلار> زاپاسلانمىلار» دىن ئەسلىگە كەلتۈرۈش ئاچقۇچىنى كۆرەلەيسىز. ئاندىن « ئەسلىگە كەلتۈرۈش ئاچقۇچىنى كۆرۈش» نى چېكىڭ.";
+"REGISTRATION_NO_BACKUP_KEY_SHEET_BODY" = "زاپاسلارنى 64 خانىلىق ئەسلىگە كەلتۈرۈش كودى بولمىسا ئەسلىگە كەلتۈرگىلى بولمايدۇ. ئەگەر ئەسلىگە كەلتۈرۈش ئاچقۇچىڭىزنى يوقىتىپ قويغان بولسىڭىز، Radar ياردەملىشىپ زاپاسلاشنى ئەسلىگە كەلتۈرەلمەيدۇ.\n\nئەگەر كونا ئۈسكۈنىڭىز بولسا « تەڭشەك >پاراڭلار> زاپاسلانمىلار» دىن ئەسلىگە كەلتۈرۈش ئاچقۇچىنى كۆرەلەيسىز. ئاندىن « ئەسلىگە كەلتۈرۈش ئاچقۇچىنى كۆرۈش» نى چېكىڭ.";
 
 /* Title for sheet with info for what to do if you don't have a recovery key */
 "REGISTRATION_NO_BACKUP_KEY_SHEET_TITLE" = "ئەسلىگە كەلتۈرۈش ئاچقۇچى يوقمۇ؟";
@@ -7521,7 +7521,7 @@ Send money securely.";
 "SAFETY_NUMBER_CONFIRMATION_VIEW_ACTION" = "كۆرسەت";
 
 /* Snippet to share {{safety number}} with a friend. sent e.g. via SMS */
-"SAFETY_NUMBER_SHARE_FORMAT" = "بىزنىڭ Signal بىخەتەرلىك نومۇرىمىز:\n%1$@";
+"SAFETY_NUMBER_SHARE_FORMAT" = "بىزنىڭ Radar بىخەتەرلىك نومۇرىمىز:\n%1$@";
 
 /* Title for Safety Tips button in thread details. */
 "SAFETY_TIPS_BUTTON_ACTION_TITLE" = "بىخەتەرلىك ئەسكەرتىشلىرى";
@@ -7539,7 +7539,7 @@ Send money securely.";
 "SAFETY_TIPS_FAKE_BUSINESS_TITLE" = "ساختا كارخانا ۋە ئورگانلار";
 
 /* Message contents for the fake names safety tip. */
-"SAFETY_TIPS_FAKE_NAMES_BODY" = "Signal ھەرگىز سىزنىڭ تىزىملاش كودىڭىز ياكى PIN نومۇرىڭىز ئۈچۈن سىز بىلەن ئالاقىلاشمايدۇ. باشقىلارنىڭ قىياپىتىگە كىرىۋالغانلارنىڭ تەلەپلىرىدىن ئېھتىيات قىلىڭ. ئارخىپ ناملىرى ئۇلارنىڭ ھېسابات ئىگىسى تەرىپىدىن تاللانغان بولۇپ ، ئۇلار دەلىللەنمىگەن.";
+"SAFETY_TIPS_FAKE_NAMES_BODY" = "Radar ھەرگىز سىزنىڭ تىزىملاش كودىڭىز ياكى PIN نومۇرىڭىز ئۈچۈن سىز بىلەن ئالاقىلاشمايدۇ. باشقىلارنىڭ قىياپىتىگە كىرىۋالغانلارنىڭ تەلەپلىرىدىن ئېھتىيات قىلىڭ. ئارخىپ ناملىرى ئۇلارنىڭ ھېسابات ئىگىسى تەرىپىدىن تاللانغان بولۇپ ، ئۇلار دەلىللەنمىگەن.";
 
 /* Message title describing the fake names safety tip. */
 "SAFETY_TIPS_FAKE_NAMES_TITLE" = "ساختا ئىسىملار ۋە ھېساباتلار";
@@ -7599,13 +7599,13 @@ Send money securely.";
 "SCREEN_LOCK_ERROR_LOCAL_AUTHENTICATION_PASSCODE_NOT_SET" = "ئېكران قۇلۇپىنى ئىشلىتىش ئۈچۈن چوقۇم iOS تەڭشەكلىرىڭىزدىن مەخپىي نومۇرنى قوزغىتىشىڭىز كېرەك.";
 
 /* Description of how and why Signal iOS uses Touch ID/Face ID/Phone Passcode to unlock 'screen lock'. */
-"SCREEN_LOCK_REASON_UNLOCK_SCREEN_LOCK" = "دەلىللەپ Signal ئېچىش.";
+"SCREEN_LOCK_REASON_UNLOCK_SCREEN_LOCK" = "دەلىللەپ Radar ئېچىش.";
 
 /* Title for alert indicating that screen lock could not be unlocked. */
 "SCREEN_LOCK_UNLOCK_FAILED" = "دەلىللىيەلمىدى";
 
 /* Label for button on lock screen that lets users unlock Signal. */
-"SCREEN_LOCK_UNLOCK_SIGNAL" = "Signal نى ئاجرىتىڭ";
+"SCREEN_LOCK_UNLOCK_SIGNAL" = "Radar نى ئاجرىتىڭ";
 
 /* Placeholder text indicating the user can search for contacts by name, username, or phone number. */
 "SEARCH_BY_NAME_OR_USERNAME_OR_NUMBER_PLACEHOLDER_TEXT" = "نام، ئىشلەتكۈچى نامى ياكى تېلېفون نومۇرى";
@@ -7638,13 +7638,13 @@ Send money securely.";
 "SECONDARY_LINKING_ERROR_DIFFERENT_ACCOUNT_TITLE" = "ھېسابات ماس كەلمىدى";
 
 /* Message for error alert indicating that a linked device must be upgraded before it can be linked. */
-"SECONDARY_LINKING_ERROR_OBSOLETE_LINKED_DEVICE_MESSAGE" = "بۇ ئۈسكۈنىدىكى Signal نى يېڭىلاپ تېلېفونىڭىزغا باغلاڭ.";
+"SECONDARY_LINKING_ERROR_OBSOLETE_LINKED_DEVICE_MESSAGE" = "بۇ ئۈسكۈنىدىكى Radar نى يېڭىلاپ تېلېفونىڭىزغا باغلاڭ.";
 
 /* Title for error alert indicating that a linked device must be upgraded before it can be linked. */
 "SECONDARY_LINKING_ERROR_OBSOLETE_LINKED_DEVICE_TITLE" = "قوللىمايدىغان نەشرى";
 
 /* alert message for outdated linking device */
-"SECONDARY_LINKING_ERROR_OLD_VERSION_MESSAGE" = "باشقا ئۈسكۈنىڭىزدە كونا نەشرىدىكى Signal ئىجرا قىلىنىۋاتىدۇ، ئۇنىڭدا iPad QR كودىنى تارىيالمايدۇ، ئەڭ يېڭى نەشرىدىكى  Signal نى ئورنىتىپ ئاندىن قايتا سىناڭ.";
+"SECONDARY_LINKING_ERROR_OLD_VERSION_MESSAGE" = "باشقا ئۈسكۈنىڭىزدە كونا نەشرىدىكى Radar ئىجرا قىلىنىۋاتىدۇ، ئۇنىڭدا iPad QR كودىنى تارىيالمايدۇ، ئەڭ يېڭى نەشرىدىكى  Radar نى ئورنىتىپ ئاندىن قايتا سىناڭ.";
 
 /* alert title for outdated linking device */
 "SECONDARY_LINKING_ERROR_OLD_VERSION_TITLE" = "تارايدىغان ئۈسكۈنەنى يېڭىلاڭ";
@@ -7674,19 +7674,19 @@ Send money securely.";
 "SECONDARY_ONBOARDING_CHOOSE_DEVICE_NAME_PLACEHOLDER" = "ئات قويۇڭ";
 
 /* header text before the user can link this device */
-"SECONDARY_ONBOARDING_GET_STARTED_BY_OPENING_PRIMARY" = "تېلېفونىڭىزدا  Signal نى قوزغىتىپ نۆۋەتتىكى iPad نى ھېساباتىڭىزغا باغلاڭ";
+"SECONDARY_ONBOARDING_GET_STARTED_BY_OPENING_PRIMARY" = "تېلېفونىڭىزدا  Radar نى قوزغىتىپ نۆۋەتتىكى iPad نى ھېساباتىڭىزغا باغلاڭ";
 
 /* Link explaining what to do when trying to link a device before having a primary device. */
-"SECONDARY_ONBOARDING_GET_STARTED_DO_NOT_HAVE_PRIMARY" = "تېلېفونومدا Signal يوق…";
+"SECONDARY_ONBOARDING_GET_STARTED_DO_NOT_HAVE_PRIMARY" = "تېلېفونومدا Radar يوق…";
 
 /* alert body */
-"SECONDARY_ONBOARDING_INSTALL_PRIMARY_FIRST_BODY" = "تېلېفونىڭىزدىكى App Store دىن، Signal نى ئورنىتىپ، تىزىملىتىش جەريانىنى تاماملىغاندىن كېيىن، iPad نى ئوخشاش بىر ھېساباتقا باغلىيالايسىز.";
+"SECONDARY_ONBOARDING_INSTALL_PRIMARY_FIRST_BODY" = "تېلېفونىڭىزدىكى App Store دىن، Radar نى ئورنىتىپ، تىزىملىتىش جەريانىنى تاماملىغاندىن كېيىن، iPad نى ئوخشاش بىر ھېساباتقا باغلىيالايسىز.";
 
 /* alert title */
-"SECONDARY_ONBOARDING_INSTALL_PRIMARY_FIRST_TITLE" = "تېلېفونىڭىزغا Signal نى ئورنىتىڭ";
+"SECONDARY_ONBOARDING_INSTALL_PRIMARY_FIRST_TITLE" = "تېلېفونىڭىزغا Radar نى ئورنىتىڭ";
 
 /* body text while displaying a QR code which, when scanned, will link this device. */
-"SECONDARY_ONBOARDING_SCAN_CODE_BODY" = "سەپلىمە ھۆججەت رەسىمىنى چېكىپ، تېلېفونىڭىزدىكى Signal نىڭ تەڭشەكلەرنى ئېچىڭ. ئاندىن «باغلانغان ئۈسكۈنىلەر» ۋە «يېڭى ئۈسكۈنىگە باغلا» نى چېكىپ، تېلېفونىڭىزدا بو كودنى تاراڭ.";
+"SECONDARY_ONBOARDING_SCAN_CODE_BODY" = "سەپلىمە ھۆججەت رەسىمىنى چېكىپ، تېلېفونىڭىزدىكى Radar نىڭ تەڭشەكلەرنى ئېچىڭ. ئاندىن «باغلانغان ئۈسكۈنىلەر» ۋە «يېڭى ئۈسكۈنىگە باغلا» نى چېكىپ، تېلېفونىڭىزدا بو كودنى تاراڭ.";
 
 /* Link text for page with troubleshooting info shown on the QR scanning screen */
 "SECONDARY_ONBOARDING_SCAN_CODE_HELP_TEXT" = "بۇ جايدا  iPad نى باغلاش ھەققىدىكى ياردەم ئۇچۇرىغا ئېرىشەلەيسىز";
@@ -7698,7 +7698,7 @@ Send money securely.";
 "SECONDARY_ONBOARDING_SCAN_CODE_TITLE" = "تېلېفونىڭىزدا QR كودىنى تاراڭ";
 
 /* header text before the user can transfer to this device */
-"SECONDARY_TRANSFER_GET_STARTED_BY_OPENING_IPAD" = "كونا iPad ڭىزدە Signal نى قوزغىتىپ ھېساباتىڭىزنى يۆتكەڭ.";
+"SECONDARY_TRANSFER_GET_STARTED_BY_OPENING_IPAD" = "كونا iPad ڭىزدە Radar نى قوزغىتىپ ھېساباتىڭىزنى يۆتكەڭ.";
 
 /* No comment provided by engineer. */
 "SECURE_SESSION_RESET" = "بىخەتەر سۆزلىشىش ئەسلىگە قايتۇرۇلدى.";
@@ -7788,7 +7788,7 @@ Send money securely.";
 "SEPA_DONATION_NAME_PLACEHOLDER" = "بانكا ھېسابات ئىگىسىنىڭ ئىسمى";
 
 /* Description for the session refresh alert */
-"SESSION_REFRESH_ALERT_MESSAGE" = "‫Signal ئۇچتىن ئۇچقا شىفىرلاش ئىشلىتىدۇ، بەزىدە سۆھبەتتىكى سۆزلىشىشلەرنى يېڭىلاش زۆرۈر بولۇشى مۇمكىن. گەرچە بۇ سۆھبەتنىڭ بىخەتەرلىكىگە تەسىر كۆرسەتمىسىمۇ ئەمما بۇ ئالاقەداشنىڭ ئۇچۇرىنى ئۆتكۈزۈۋېتىشىڭىز مۇمكىن، ئۇنىڭدىن قايتا ئەۋەتىشنى تەلەپ قىلسىڭىز بولىدۇ.";
+"SESSION_REFRESH_ALERT_MESSAGE" = "‫Radar ئۇچتىن ئۇچقا شىفىرلاش ئىشلىتىدۇ، بەزىدە سۆھبەتتىكى سۆزلىشىشلەرنى يېڭىلاش زۆرۈر بولۇشى مۇمكىن. گەرچە بۇ سۆھبەتنىڭ بىخەتەرلىكىگە تەسىر كۆرسەتمىسىمۇ ئەمما بۇ ئالاقەداشنىڭ ئۇچۇرىنى ئۆتكۈزۈۋېتىشىڭىز مۇمكىن، ئۇنىڭدىن قايتا ئەۋەتىشنى تەلەپ قىلسىڭىز بولىدۇ.";
 
 /* Title for the session refresh alert */
 "SESSION_REFRESH_ALERT_TITLE" = "پاراڭ يېڭىلاندى";
@@ -7830,7 +7830,7 @@ Send money securely.";
 "SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_COUNTRY" = "ئورنى";
 
 /* Table footer for the 'censorship circumvention' section when censorship circumvention can be manually enabled. */
-"SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_FOOTER" = "ئەگەر قوزغىتىلسا، Signal تەكشۈرۈشتىن دالدىلىنىشنى سىنايدۇ. Signal سىز تۇرۇۋاتقان جايدا تەكشۈرۈلمىسە بۇ ئىقتىدارنى قوزغاتماڭ.";
+"SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_FOOTER" = "ئەگەر قوزغىتىلسا، Radar تەكشۈرۈشتىن دالدىلىنىشنى سىنايدۇ. Radar سىز تۇرۇۋاتقان جايدا تەكشۈرۈلمىسە بۇ ئىقتىدارنى قوزغاتماڭ.";
 
 /* Table footer for the 'censorship circumvention' section shown when censorship circumvention has been auto-enabled based on local phone number. */
 "SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_FOOTER_AUTO_ENABLED" = "تەكشۈرۈشتىن دالدىلىنىش ھېساباتىڭىزدىكى تېلېفون نومۇرىغا ئاساسەن ئاكتىپلىنىدۇ.";
@@ -7842,7 +7842,7 @@ Send money securely.";
 "SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_FOOTER_NO_CONNECTION" = "تەكشۈرۈشتىن دالدىلىنىش پەقەت ئىنتېرنىتقا باغلانغاندىلا ئاكتىپلىنىدۇ.";
 
 /* Table footer for the 'censorship circumvention' section shown when the app is connected to the Signal service. */
-"SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_FOOTER_WEBSOCKET_CONNECTED" = "تەكشۈرۈشتىن دالدىلىنىش ھاجەتسىز، Signal مۇلازىمىتىگە ئاللىبۇرۇن باغلاندىڭىز.";
+"SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_FOOTER_WEBSOCKET_CONNECTED" = "تەكشۈرۈشتىن دالدىلىنىش ھاجەتسىز، Radar مۇلازىمىتىگە ئاللىبۇرۇن باغلاندىڭىز.";
 
 /* Label for the 'advanced pin settings' button. */
 "SETTINGS_ADVANCED_PIN_SETTINGS" = "ئالىي PIN تەڭشەكلىرى";
@@ -7869,13 +7869,13 @@ Send money securely.";
 "SETTINGS_ADVANCED_VIEW_ERROR_LOG" = "خاتالىق خاتىرەلەر";
 
 /* Information on sheet about changing the app icon - first line */
-"SETTINGS_APP_ICON_EDUCATION_APP_NAME" = "ئەپ ئسىمى «Signal» ئانا ئېكراندا، ئۇقتۇرۇشلاردا ۋە ئەپ كۈتۈپخانىسىدا كۆرۈنىدۇ.";
+"SETTINGS_APP_ICON_EDUCATION_APP_NAME" = "ئەپ ئسىمى «Radar» ئانا ئېكراندا، ئۇقتۇرۇشلاردا ۋە ئەپ كۈتۈپخانىسىدا كۆرۈنىدۇ.";
 
 /* Information on sheet about changing the app icon - second line */
-"SETTINGS_APP_ICON_EDUCATION_HOME_SCREEN_DOCK" = "ئەپنى ئانا ئېكراننىڭ ئاستىدىكى پورتقا يۆتكەش ئارقىلىق، «Signal» دېگەن ئەپ ئىسمىنى ئانا ئېكراندىن ئېلىۋېتەلەيسىز.";
+"SETTINGS_APP_ICON_EDUCATION_HOME_SCREEN_DOCK" = "ئەپنى ئانا ئېكراننىڭ ئاستىدىكى پورتقا يۆتكەش ئارقىلىق، «Radar» دېگەن ئەپ ئىسمىنى ئانا ئېكراندىن ئېلىۋېتەلەيسىز.";
 
 /* The footer for the app icon selection settings page. */
-"SETTINGS_APP_ICON_FOOTER" = "ئەپ ئسىمى «Signal» ئانا ئېكراندا، ئۇقتۇرۇشلاردا ۋە ئەپ كۈتۈپخانىسىدا كۆرۈنىدۇ.";
+"SETTINGS_APP_ICON_FOOTER" = "ئەپ ئسىمى «Radar» ئانا ئېكراندا، ئۇقتۇرۇشلاردا ۋە ئەپ كۈتۈپخانىسىدا كۆرۈنىدۇ.";
 
 /* The title for the app icon selection settings page. */
 "SETTINGS_APP_ICON_TITLE" = "ئەپ سىنبەلگىسى";
@@ -7905,7 +7905,7 @@ Send money securely.";
 "SETTINGS_BLOCK_LIST_ADD_BUTTON" = "چەكلەنگەن ئىشلەتكۈچى قوشۇش";
 
 /* A label that indicates the user has no Signal contacts that they haven't blocked. */
-"SETTINGS_BLOCK_LIST_NO_CONTACTS" = "‫Signal دا ھېچقانداق ئالاقەداشىڭىز يوق.";
+"SETTINGS_BLOCK_LIST_NO_CONTACTS" = "‫Radar دا ھېچقانداق ئالاقەداشىڭىز يوق.";
 
 /* A label that indicates the user's search has no matching results. */
 "SETTINGS_BLOCK_LIST_NO_SEARCH_RESULTS" = "ئىزدەش نەتىجەسى يوق";
@@ -7917,7 +7917,7 @@ Send money securely.";
 "SETTINGS_CALLING_HIDES_IP_ADDRESS_PREFERENCE_TITLE" = "ھەمىشە ئۇلاپ چاقىرىشنى ئىشلەت";
 
 /* User settings section footer, a detailed explanation */
-"SETTINGS_CALLING_HIDES_IP_ADDRESS_PREFERENCE_TITLE_DETAIL" = "ھەممە چاقىرىشتا Signal مۇلازىمېتىرى ئىشلىتىلسە ئالاقەداشىڭىزنىڭ IP ئادرېسىڭىزغا ئېرىشىشنىڭ ئالدىنى ئالغىلى بولىدۇ، ئەمما بۇ ئىقتىدار سۆزلىشىش سۈپىتىنى تۆۋەنلىتىۋېتىدۇ.";
+"SETTINGS_CALLING_HIDES_IP_ADDRESS_PREFERENCE_TITLE_DETAIL" = "ھەممە چاقىرىشتا Radar مۇلازىمېتىرى ئىشلىتىلسە ئالاقەداشىڭىزنىڭ IP ئادرېسىڭىزغا ئېرىشىشنىڭ ئالدىنى ئالغىلى بولىدۇ، ئەمما بۇ ئىقتىدار سۆزلىشىش سۈپىتىنى تۆۋەنلىتىۋېتىدۇ.";
 
 /* Label for the 'edit phone number' button in the 'change phone number' views. */
 "SETTINGS_CHANGE_PHONE_NUMBER_BACK_TO_EDIT_BUTTON" = "نومۇرنى تەھرىرلەش";
@@ -7962,7 +7962,7 @@ Send money securely.";
 "SETTINGS_CLEAR_HISTORY" = "سۆھبەت خاتىرەسىنى تازىلا";
 
 /* Footer for the 'about' help section */
-"SETTINGS_COPYRIGHT" = "‫Signal Messenger نەشر ھوقۇقىغا ئىگە\nGPLv3 ئىجازىتىدە تارقىتىلدى";
+"SETTINGS_COPYRIGHT" = "‫Radar Messenger نەشر ھوقۇقىغا ئىگە\nGPLv3 ئىجازىتىدە تارقىتىلدى";
 
 /* Label for the 'data' section of the app settings. */
 "SETTINGS_DATA" = "مەلۇمات ئىشلىتىلىشى";
@@ -8034,7 +8034,7 @@ Send money securely.";
 "SETTINGS_DISAPPEARING_MESSAGES_FOOTER" = "سىز باشلىغان بارلىق يېڭى سۆھبەتلەر ئۈچۈن كۆڭۈلدىكى غايىب ئۇچۇر ۋاقىت خاتىرىلىگۈچنى تەڭشەڭ.";
 
 /* Title for the 'donate to signal' link in settings. */
-"SETTINGS_DONATE" = "‫Signal غا ئىئانە قىلىڭ";
+"SETTINGS_DONATE" = "‫Radar غا ئىئانە قىلىڭ";
 
 /* Title for help button and help pages in app settings. */
 "SETTINGS_HELP" = "ياردەم";
@@ -8103,7 +8103,7 @@ Send money securely.";
 "SETTINGS_NOTIFICATION_CONTENT_TITLE" = "ئۇقتۇرۇش مەزمۇنى";
 
 /* When the local device discovers a contact has recently installed signal, the app can generates a message encouraging the local user to say hello. Turning this switch off disables that feature. */
-"SETTINGS_NOTIFICATION_EVENTS_CONTACT_JOINED_SIGNAL" = "ئالاقەداش Signal غا قوشۇلدى";
+"SETTINGS_NOTIFICATION_EVENTS_CONTACT_JOINED_SIGNAL" = "ئالاقەداش Radar غا قوشۇلدى";
 
 /* table section header */
 "SETTINGS_NOTIFICATION_NOTIFY_WHEN_TITLE" = "ئۇقتۇرۇش ۋاقتى…";
@@ -8140,7 +8140,7 @@ Send money securely.";
 "SETTINGS_PAYMENTS_BITCOIN_UNIT" = "Bitcoin ئۆلچىمى";
 
 /* Error message indicating that payments could not be activated because the feature is not currently available. */
-"SETTINGS_PAYMENTS_CANNOT_ACTIVATE_PAYMENTS_KILL_SWITCH" = "‫Signal دا چىقىم ئەمدى ئىشلىمەيدۇ. سىز مەبلەغلىرىڭىزنى ئالماشتۇرۇش ئورنىغا داۋاملىق يۆتكىيەلەيسىز. ئەمما ئەمدى چىقىمنى يوللاپ ۋە تاپشۇرىۋالالمايسىز ياكى مەبلەغ قوشالمايسىز.";
+"SETTINGS_PAYMENTS_CANNOT_ACTIVATE_PAYMENTS_KILL_SWITCH" = "‫Radar دا چىقىم ئەمدى ئىشلىمەيدۇ. سىز مەبلەغلىرىڭىزنى ئالماشتۇرۇش ئورنىغا داۋاملىق يۆتكىيەلەيسىز. ئەمما ئەمدى چىقىمنى يوللاپ ۋە تاپشۇرىۋالالمايسىز ياكى مەبلەغ قوشالمايسىز.";
 
 /* Error message indicating that payments could not be deactivated because the current balance is unavailable. */
 "SETTINGS_PAYMENTS_CANNOT_DEACTIVATE_PAYMENTS_NO_BALANCE" = "چىقىم قىلىشنى چەكلىيەلمەيسىز چۈنكى قالدۇقىڭىزنى ئىشلەتكىلى بولمايدۇ. تور باغلىنىشىڭىزنى تەكشۈرۈپ ئاندىن قايتا سىناڭ.";
@@ -8149,10 +8149,10 @@ Send money securely.";
 "SETTINGS_PAYMENTS_CANNOT_SEND_PAYMENT_NO_BALANCE" = "چىقىم قىلىشنى تاماملىيالمىدى چۈنكى قالدۇقىڭىزنى ئىشلەتكىلى بولمايدۇ. تور باغلىنىشىڭىزنى تەكشۈرۈپ ئاندىن قايتا سىناڭ.";
 
 /* Error message indicating that payments cannot be sent because the feature is not currently available. */
-"SETTINGS_PAYMENTS_CANNOT_SEND_PAYMENTS_KILL_SWITCH" = "‫Signal دا چىقىم ئەمدى ئىشلىمەيدۇ. سىز مەبلەغلىرىڭىزنى ئالماشتۇرۇش ئورنىغا داۋاملىق يۆتكىيەلەيسىز. ئەمما ئەمدى چىقىمنى يوللاپ ۋە تاپشۇرىۋالالمايسىز ياكى مەبلەغ قوشالمايسىز.";
+"SETTINGS_PAYMENTS_CANNOT_SEND_PAYMENTS_KILL_SWITCH" = "‫Radar دا چىقىم ئەمدى ئىشلىمەيدۇ. سىز مەبلەغلىرىڭىزنى ئالماشتۇرۇش ئورنىغا داۋاملىق يۆتكىيەلەيسىز. ئەمما ئەمدى چىقىمنى يوللاپ ۋە تاپشۇرىۋالالمايسىز ياكى مەبلەغ قوشالمايسىز.";
 
 /* Error message indicating that you cannot transfer into your payments wallet because the feature is not currently available. */
-"SETTINGS_PAYMENTS_CANNOT_TRANSFER_IN_KILL_SWITCH" = "‫Signal دا چىقىم ئەمدى ئىشلىمەيدۇ. سىز مەبلەغلىرىڭىزنى ئالماشتۇرۇش ئورنىغا داۋاملىق يۆتكىيەلەيسىز. ئەمما ئەمدى چىقىمنى يوللاپ ۋە تاپشۇرىۋالالمايسىز ياكى مەبلەغ قوشالمايسىز.";
+"SETTINGS_PAYMENTS_CANNOT_TRANSFER_IN_KILL_SWITCH" = "‫Radar دا چىقىم ئەمدى ئىشلىمەيدۇ. سىز مەبلەغلىرىڭىزنى ئالماشتۇرۇش ئورنىغا داۋاملىق يۆتكىيەلەيسىز. ئەمما ئەمدى چىقىمنى يوللاپ ۋە تاپشۇرىۋالالمايسىز ياكى مەبلەغ قوشالمايسىز.";
 
 /* Message for the 'currency conversions info' alert. */
 "SETTINGS_PAYMENTS_CURRENCY_CONVERSIONS_INFO_ALERT_MESSAGE" = "تېگىشىشلەر پەقەت مۆلچەر بولۇپ ، توغرا بولماسلىقى مۇمكىن.";
@@ -8179,10 +8179,10 @@ Send money securely.";
 "SETTINGS_PAYMENTS_DEACTIVATE_TITLE" = "چىقىمنى ئاكتىپسىزلە";
 
 /* Explanation of the 'deactivate payments with balance' process in the 'deactivate payments' settings. */
-"SETTINGS_PAYMENTS_DEACTIVATE_WITH_BALANCE_EXPLANATION" = "چىقىم قىلىشنى چەكلەشتىن ئىلگىرى پۇلىڭىزنى باشقا ھەميان ئادرېسىغا يۆتكەش تەۋسىيە قىلىنىدۇ. ئەگەر ھازىر پۇلىڭىزنى يۆتكىمەسلىكنى تاللىسىڭىز، ئەگەر چىقىمنى قايتا ئاكتىپلىسىڭىز ئۇلار Signal غا باغلانغان ھەميانىڭىزدا قالىدۇ.";
+"SETTINGS_PAYMENTS_DEACTIVATE_WITH_BALANCE_EXPLANATION" = "چىقىم قىلىشنى چەكلەشتىن ئىلگىرى پۇلىڭىزنى باشقا ھەميان ئادرېسىغا يۆتكەش تەۋسىيە قىلىنىدۇ. ئەگەر ھازىر پۇلىڭىزنى يۆتكىمەسلىكنى تاللىسىڭىز، ئەگەر چىقىمنى قايتا ئاكتىپلىسىڭىز ئۇلار Radar غا باغلانغان ھەميانىڭىزدا قالىدۇ.";
 
 /* Description for the 'deactivate payments confirmation' UI in the payment settings. */
-"SETTINGS_PAYMENTS_DEACTIVATE_WITHOUT_TRANSFER_CONFIRM_DESCRIPTION" = "ئەگەر چىقىمنى قايتا ئاكتىپلاشنى تاللىسىڭىز، قالدۇقىڭىز Signal غا باغلانغان ھەميانىڭىزدا قالىدۇ.";
+"SETTINGS_PAYMENTS_DEACTIVATE_WITHOUT_TRANSFER_CONFIRM_DESCRIPTION" = "ئەگەر چىقىمنى قايتا ئاكتىپلاشنى تاللىسىڭىز، قالدۇقىڭىز Radar غا باغلانغان ھەميانىڭىزدا قالىدۇ.";
 
 /* Title for the 'deactivate payments confirmation' UI in the payment settings. */
 "SETTINGS_PAYMENTS_DEACTIVATE_WITHOUT_TRANSFER_CONFIRM_TITLE" = "يۆتكىمەي تۇرۇپ ئاكتىپسىزلىسىنمۇ؟";
@@ -8420,7 +8420,7 @@ Send money securely.";
 "SETTINGS_PAYMENTS_PAYMENTS_LOCK_PROMPT_EXPLANATION_TOUCHID" = "Touch ID نى قوزغىتىپ تېلېفونىڭىزدا باشقىلارنىڭ فوندلىرىڭىزنى زىيارەت قىلىشىنىڭ ئالدىنى ئېلىڭ. بۇ ئىقتىدارنى «تەڭشەك» تىن ئېتەلەيسىز.";
 
 /* Button for payments outdated sheet. */
-"SETTINGS_PAYMENTS_PAYMENTS_OUTDATED_BUTTON" = "Signal نى يېڭىلا";
+"SETTINGS_PAYMENTS_PAYMENTS_OUTDATED_BUTTON" = "Radar نى يېڭىلا";
 
 /* Message for payments outdated sheet. */
 "SETTINGS_PAYMENTS_PAYMENTS_OUTDATED_MESSAGE" = "پۇل ئەۋەتىش ۋە تاپشۇرۇۋېلىش ۋە ئەڭ يېڭى قالدۇق سوممىڭىزنى كۆرۈش ئۈچۈن ئەپنى يېڭىلاش تەلەپ قىلىنىدۇ.";
@@ -8558,7 +8558,7 @@ Send money securely.";
 "SETTINGS_PAYMENTS_TITLE" = "چىقىملار";
 
 /* Error indicating that it is not valid to send yourself a payment. */
-"SETTINGS_PAYMENTS_TRANSFER_OUT_CANNOT_SEND_TO_SELF" = "ئۆزىڭىزنىڭ Signal ھەميان ئادرېسىغا يۆتكىيەلمەيسىز. ئالماشتۇرۇشنى قوللايدىغان ھېساباتىڭىزدىن ھەميان ئادرېسىنى كىرگۈزۈڭ.";
+"SETTINGS_PAYMENTS_TRANSFER_OUT_CANNOT_SEND_TO_SELF" = "ئۆزىڭىزنىڭ Radar ھەميان ئادرېسىغا يۆتكىيەلمەيسىز. ئالماشتۇرۇشنى قوللايدىغان ھېساباتىڭىزدىن ھەميان ئادرېسىنى كىرگۈزۈڭ.";
 
 /* Footer of the 'transfer currency out' view in the payment settings. */
 "SETTINGS_PAYMENTS_TRANSFER_OUT_FOOTER" = "Transfer Bitcoin by sending to the Lightning address or invoice provided by the recipient. The address is typically displayed below the QR code.";
@@ -8621,7 +8621,7 @@ Send money securely.";
 "SETTINGS_PAYMENTS_VIEW_PASSPHRASE_TITLE" = "ئەسلىگە كەلتۈرۈش ئىبارىسى";
 
 /* Header text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "بۇ 24 سۆزنى تەرتىپلىك يېزىپ بىخەتەر جايغا قويۇڭ. Cake Wallet ياكى باشقا Spark ماس كېلىدىغان خامتازالدا باھاڭىزنى ئەسلىگە كەلتۈرۈش ئۈچۈن ئۇلارنى ئىشلىتەلەيسىز.";
+"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "بۇ 12 سۆزنى تەرتىپلىك يېزىپ بىخەتەر جايغا قويۇڭ. Cake Wallet ياكى باشقا Spark ماس كېلىدىغان خامتازالدا باھاڭىزنى ئەسلىگە كەلتۈرۈش ئۈچۈن ئۇلارنى ئىشلىتەلەيسىز.";
 
 /* Footer text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
 "SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_FOOTER_2" = "بۇ جۈملىنى ھېچكىمگە ئورتاقلاشمىڭ";
@@ -8642,7 +8642,7 @@ Send money securely.";
 "SETTINGS_PHONE_NUMBER_DISCOVERABILITY_DISABLED_TOAST" = "بۇ تەڭشەكنى ئۆزگەرتىش ئۈچۈن «تېلېفون نومۇرۇمنى كۆرەلەيدىغانلار» نى «ھېچكىم» گە تەڭشەڭ.";
 
 /* The description for a sheet asking for confirmation that the user wants to set their phone number discoverability to 'nobody'. */
-"SETTINGS_PHONE_NUMBER_DISCOVERABILITY_NOBODY_CONFIRMATION_DESCRIPTION" = "«مېنى  نومۇرۇم بىلەن تاپالايدىغانلار» نى «ھېچكىم» گە تەڭشەپ قويسىڭىز،  باشقىلارنىڭ سىزنى Signal دا تېپىشى تەس بولىدۇ.";
+"SETTINGS_PHONE_NUMBER_DISCOVERABILITY_NOBODY_CONFIRMATION_DESCRIPTION" = "«مېنى  نومۇرۇم بىلەن تاپالايدىغانلار» نى «ھېچكىم» گە تەڭشەپ قويسىڭىز،  باشقىلارنىڭ سىزنى Radar دا تېپىشى تەس بولىدۇ.";
 
 /* The title for a sheet asking for confirmation that the user wants to set their phone number discoverability to 'nobody'. */
 "SETTINGS_PHONE_NUMBER_DISCOVERABILITY_NOBODY_CONFIRMATION_TITLE" = "جەزملەشتۈرەمسىز؟";
@@ -8651,7 +8651,7 @@ Send money securely.";
 "SETTINGS_PHONE_NUMBER_DISCOVERABILITY_TITLE" = "تېلېفون نومۇرۇم بىلەن مېنى تاپالايدىغانلار";
 
 /* Description label for Phone Number Privacy */
-"SETTINGS_PHONE_NUMBER_PRIVACY_DESCRIPTION_LABEL" = "تېلېفون نومۇرىڭىزنى كۆرسە بولىدىغان كىشىلەرنى ۋە تېلېفون نومۇرىڭىز ئارقىلىق سىز بىلەن Signal دا ئالاقىلاشسا بولىدىغان كىشىلەرنى تاللاڭ.";
+"SETTINGS_PHONE_NUMBER_PRIVACY_DESCRIPTION_LABEL" = "تېلېفون نومۇرىڭىزنى كۆرسە بولىدىغان كىشىلەرنى ۋە تېلېفون نومۇرىڭىز ئارقىلىق سىز بىلەن Radar دا ئالاقىلاشسا بولىدىغان كىشىلەرنى تاللاڭ.";
 
 /* The title for phone number privacy settings. */
 "SETTINGS_PHONE_NUMBER_PRIVACY_TITLE" = "تېلېفون نومۇرى";
@@ -8663,16 +8663,16 @@ Send money securely.";
 "SETTINGS_PIN_REMINDER_DISABLE_CONFIRMATION_ACTION" = "ئەسكەرتىشنى تاقا";
 
 /* The explanation for the dialog asking user to confirm their PIN to disable reminders */
-"SETTINGS_PIN_REMINDER_DISABLE_CONFIRMATION_EXPLANATION" = "سىز PIN نى ئەستە تۇتۇڭ ياكى بىخەتەر ساقلاشقا كاپالەتلىك قىلىڭ، چۈنكى ئۇنى تاپقىلى بولمايدۇ. ئەگەر PIN نى ئۇنتۇپ قالسىڭىز،  Signal ھېساباتىنى قايتا تىزىملاتقاندا بىر قىسىم سانلىق مەلۇماتنى يوقىتىشىڭىز مۇمكىن.";
+"SETTINGS_PIN_REMINDER_DISABLE_CONFIRMATION_EXPLANATION" = "سىز PIN نى ئەستە تۇتۇڭ ياكى بىخەتەر ساقلاشقا كاپالەتلىك قىلىڭ، چۈنكى ئۇنى تاپقىلى بولمايدۇ. ئەگەر PIN نى ئۇنتۇپ قالسىڭىز،  Radar ھېساباتىنى قايتا تىزىملاتقاندا بىر قىسىم سانلىق مەلۇماتنى يوقىتىشىڭىز مۇمكىن.";
 
 /* The title for the dialog asking user to confirm their PIN to disable reminders */
-"SETTINGS_PIN_REMINDER_DISABLE_CONFIRMATION_TITLE" = "Signal PIN نىڭىزنى جەزىملەڭ";
+"SETTINGS_PIN_REMINDER_DISABLE_CONFIRMATION_TITLE" = "Radar PIN نىڭىزنى جەزىملەڭ";
 
 /* Label for the 'pin reminder' switch of the privacy settings. */
 "SETTINGS_PIN_REMINDER_SWITCH_LABEL" = "PIN  ئەسكەرتكۈچ";
 
 /* Footer for the 'PINs' section of the privacy settings. */
-"SETTINGS_PINS_FOOTER" = "‫PIN شىفىرلانغان ھالەتتە Signal دا ساقلىنىدۇ ھەمدە پەقەت سىزلا زىيارەت قىلالايسىز. PIN نى ئەسلىگە كەلتۈرگىلى بولمايدۇ.سەپلىمە ھۆججەت، تەڭشەكلەر ۋە ئالاقەداشلار Signal نى قايتا ئورناتقاندا  ئەسلىگە كەلتۈرۈلىدۇ.";
+"SETTINGS_PINS_FOOTER" = "‫PIN شىفىرلانغان ھالەتتە Radar دا ساقلىنىدۇ ھەمدە پەقەت سىزلا زىيارەت قىلالايسىز. PIN نى ئەسلىگە كەلتۈرگىلى بولمايدۇ.سەپلىمە ھۆججەت، تەڭشەكلەر ۋە ئالاقەداشلار Radar نى قايتا ئورناتقاندا  ئەسلىگە كەلتۈرۈلىدۇ.";
 
 /* Label for the 'pins' item of the privacy settings when the user does have a pin. */
 "SETTINGS_PINS_ITEM" = "PIN نىڭنى ئۆزگەرت";
@@ -8681,7 +8681,7 @@ Send money securely.";
 "SETTINGS_PINS_ITEM_CREATE" = "بىر PIN قۇر";
 
 /* Title for the 'PINs' section of the privacy settings. */
-"SETTINGS_PINS_TITLE" = "Signal PIN";
+"SETTINGS_PINS_TITLE" = "Radar PIN";
 
 /* Footer for table section */
 "SETTINGS_PRIVACY_ADVANCED_FOOTER" = "تەكشۈرۈشتىن ساقلىنىش، ۋاكالەتچى، ئۇلاپ چاقىرىش ۋە پېچەتلەنگەن يوللىغۇچى تەڭشەكلىرى.";
@@ -8723,7 +8723,7 @@ Send money securely.";
 "SETTINGS_REGISTRATION_LOCK_TURN_ON_ERROR_PIN_REQUIRED" = "تىزىملاش قۇلۇپىنى ئىشلىتىش ئۈچۈن چوقۇم PIN قۇرۇشىڭىز كېرەك.";
 
 /* Body for the alert confirming that the user wants to turn on registration lock. */
-"SETTINGS_REGISTRATION_LOCK_TURN_ON_MESSAGE" = "ئەگەر Signal غا قايتا تىزىملاتقىنىڭىزدا Signal PIN نى ئۇنتۇپ قالغان بولسىڭىز، ھېساباتىڭىزنى 7 كۈن قۇلۇپلاپ سالىسىز.";
+"SETTINGS_REGISTRATION_LOCK_TURN_ON_MESSAGE" = "ئەگەر Radar غا قايتا تىزىملاتقىنىڭىزدا Radar PIN نى ئۇنتۇپ قالغان بولسىڭىز، ھېساباتىڭىزنى 7 كۈن قۇلۇپلاپ سالىسىز.";
 
 /* Title for the alert confirming that the user wants to turn on registration lock. */
 "SETTINGS_REGISTRATION_LOCK_TURN_ON_TITLE" = "تىزىملاش قۇلۇپىنى ئاچامدۇ؟";
@@ -8753,19 +8753,19 @@ Send money securely.";
 "SETTINGS_SECTION_TITLE_CALLING" = "چاقىرغاندا";
 
 /* Section footer */
-"SETTINGS_SECURITY_DETAIL" = "‫ Touch ID، چىراي ID ياكى  iOS ئۈسكۈنىدىكى ئىم ئارقىلىق Signal قۇلۇپىنى ئېچىڭ.";
+"SETTINGS_SECURITY_DETAIL" = "‫ Touch ID، چىراي ID ياكى  iOS ئۈسكۈنىدىكى ئىم ئارقىلىق Radar قۇلۇپىنى ئېچىڭ.";
 
 /* Section footer */
-"SETTINGS_SECURITY_DETAIL_FACEID" = "چىراي ID ئارقىلىق Signal قۇلۇپىنى ئېچىڭ.";
+"SETTINGS_SECURITY_DETAIL_FACEID" = "چىراي ID ئارقىلىق Radar قۇلۇپىنى ئېچىڭ.";
 
 /* Section footer */
 "SETTINGS_SECURITY_DETAIL_OPTICID" = "‫Optic ID ئارقىلىق سىگنال قۇلۇپىنى ئېچىڭ.";
 
 /* Section footer */
-"SETTINGS_SECURITY_DETAIL_PASSCODE" = "ئۈسكۈنە ئىم ئارقىلىق Signal قۇلۇپىنى ئېچىڭ.";
+"SETTINGS_SECURITY_DETAIL_PASSCODE" = "ئۈسكۈنە ئىم ئارقىلىق Radar قۇلۇپىنى ئېچىڭ.";
 
 /* Section footer */
-"SETTINGS_SECURITY_DETAIL_TOUCHID" = "‫Touch ID ئارقىلىق Signal قۇلۇپىنى ئېچىڭ.";
+"SETTINGS_SECURITY_DETAIL_TOUCHID" = "‫Touch ID ئارقىلىق Radar قۇلۇپىنى ئېچىڭ.";
 
 /* Section header */
 "SETTINGS_SECURITY_TITLE" = "ئەپ بىخەتەرلىكى";
@@ -8780,13 +8780,13 @@ Send money securely.";
 "SETTINGS_SHARING_SUGGESTIONS" = "ئالاقەداشلارنى iOS بىلەن ھەمبەھىرلەيدۇ";
 
 /* Footer for setting for enabling & disabling contact and notification sharing with iOS. */
-"SETTINGS_SHARING_SUGGESTIONS_NOTIFICATIONS_FOOTER" = "iOS نىڭ Signal ئالاقەداشلىرىنى زىيارەت قىلىش ۋە سۆھبەتلىشىشىگە يول قويۇپ تەكلىپ ھەمبەھىرلەش  ۋە ئۇقتۇرۇش ئىقتىدارىغا ئېرىشىدۇ.";
+"SETTINGS_SHARING_SUGGESTIONS_NOTIFICATIONS_FOOTER" = "iOS نىڭ Radar ئالاقەداشلىرىنى زىيارەت قىلىش ۋە سۆھبەتلىشىشىگە يول قويۇپ تەكلىپ ھەمبەھىرلەش  ۋە ئۇقتۇرۇش ئىقتىدارىغا ئېرىشىدۇ.";
 
 /* Label for the 'enable registration lock' switch of the privacy settings. */
 "SETTINGS_TWO_FACTOR_AUTH_SWITCH_LABEL" = "تىزىملىتىش قۇلۇپى";
 
 /* Footer for the 'two factor auth' section of the privacy settings when Signal PINs are available. */
-"SETTINGS_TWO_FACTOR_PINS_AUTH_FOOTER" = "تېلېفون نومۇرىڭىزنى Signal دا قايتا تىزىملىتىش ئۈچۈن Signal PIN نىڭىز لازىم.";
+"SETTINGS_TWO_FACTOR_PINS_AUTH_FOOTER" = "تېلېفون نومۇرىڭىزنى Radar دا قايتا تىزىملىتىش ئۈچۈن Radar PIN نىڭىز لازىم.";
 
 /* Label for the 'typing indicators' setting. */
 "SETTINGS_TYPING_INDICATORS" = "بېسىۋاتىدۇ كۆرسەتكۈچلىرى";
@@ -8819,7 +8819,7 @@ Send money securely.";
 "SHARE_EXTENSION_LOADING" = "قاچىلىنىۋاتىدۇ…";
 
 /* Message indicating that the share extension cannot be used until the user has registered in the main app. */
-"SHARE_EXTENSION_NOT_REGISTERED_MESSAGE" = "تىزىملىتىش ئۈچۈن Signal نى ئېچىڭ.";
+"SHARE_EXTENSION_NOT_REGISTERED_MESSAGE" = "تىزىملىتىش ئۈچۈن Radar نى ئېچىڭ.";
 
 /* Title indicating that the share extension cannot be used until the user has registered in the main app. */
 "SHARE_EXTENSION_NOT_REGISTERED_TITLE" = "تىزىملىتىلمىغان";
@@ -8837,7 +8837,7 @@ Send money securely.";
 "SHARE_EXTENSION_UNABLE_TO_BUILD_ATTACHMENT_ALERT_TITLE" = "قوشۇمچىنى تەييارلىغىلى بولمىدى";
 
 /* Title for the 'share extension' view. */
-"SHARE_EXTENSION_VIEW_TITLE" = "‫Signal غا ھەمبەھىرلە";
+"SHARE_EXTENSION_VIEW_TITLE" = "‫Radar غا ھەمبەھىرلە";
 
 /* Title of alert indicating sharing suggestions failed to deactivate */
 "SHARING_SUGGESTIONS_DISABLE_ERROR" = "ھەمبەھىر تەۋسىيەلىرىنى ئاكتىپسىزلىغىلى بولمىدى.";
@@ -8846,10 +8846,10 @@ Send money securely.";
 "SHOW_THREAD_BUTTON_TITLE" = "سۆھبەت كۆرسەت";
 
 /* Shown in the header when the user hasn't provided a custom name for a call. */
-"SIGNAL_CALL" = "‫Signal چاقىرىقى";
+"SIGNAL_CALL" = "‫Radar چاقىرىقى";
 
 /* body sent to contacts when inviting to Install Signal */
-"SMS_INVITE_BODY" = "مەن Signal نى قاچىلاشقا تەكلىپ قىلىندىم! ئۇلانمىسى بۇ يەردە:";
+"SMS_INVITE_BODY" = "مەن Radar نى قاچىلاشقا تەكلىپ قىلىندىم! ئۇلانمىسى بۇ يەردە:";
 
 /* An error message generically indicating that something went wrong. */
 "SOMETHING_WENT_WRONG_ERROR" = "خاتالىق كۆرۈلدى.";
@@ -8873,7 +8873,7 @@ Send money securely.";
 "SPAM_CAPTCHA_DISMISS_CONFIRMATION_TITLE" = "دەلىللىمەي داۋاملاشتۇرامدۇ؟";
 
 /* Body for action sheet explaining captcha requirement. */
-"SPAM_CAPTCHA_SHEET_BODY" = "Signal دا ئەخلەت ئۇچۇرلاردىن ساقلىنىشقا ياردەم قىلىش ئۈچۈن، دەلىللەشنى تاماملاڭ.\n\nدەلىللىگەندىن كېيىن، ئۇچۇر يوللاشنى داۋاملاشتۇرالايسىز. ۋاقىتلىق توختىتىلغان ئۇچۇرلار ئۆزلۈكىدىن يوللىنىدۇ.";
+"SPAM_CAPTCHA_SHEET_BODY" = "Radar دا ئەخلەت ئۇچۇرلاردىن ساقلىنىشقا ياردەم قىلىش ئۈچۈن، دەلىللەشنى تاماملاڭ.\n\nدەلىللىگەندىن كېيىن، ئۇچۇر يوللاشنى داۋاملاشتۇرالايسىز. ۋاقىتلىق توختىتىلغان ئۇچۇرلار ئۆزلۈكىدىن يوللىنىدۇ.";
 
 /* Title for action sheet explaining captcha requirement. */
 "SPAM_CAPTCHA_SHEET_TITLE" = "ئۇچۇرلىشىشنى داۋاملاشتۇرۇش ئۈچۈن دەلىللەش زۆرۈر";
@@ -8909,7 +8909,7 @@ Send money securely.";
 "STICKERS_INSTALL_BUTTON" = "ئورنات";
 
 /* Title for the 'available built-in stickers' section of the 'manage stickers' view. */
-"STICKERS_MANAGE_VIEW_AVAILABLE_BUILT_IN_PACKS_SECTION_TITLE" = "Signal ئارتىس يۈرۈشلۈكى";
+"STICKERS_MANAGE_VIEW_AVAILABLE_BUILT_IN_PACKS_SECTION_TITLE" = "Radar ئارتىس يۈرۈشلۈكى";
 
 /* Title for the 'available known stickers' section of the 'manage stickers' view. */
 "STICKERS_MANAGE_VIEW_AVAILABLE_KNOWN_PACKS_SECTION_TITLE" = "تاپشۇرۇۋالغان چىراي ئىپادىلىرى";
@@ -9191,19 +9191,19 @@ Send money securely.";
 "STORY_SETTINGS_LEARN_MORE_SHEET_FOOTER" = "ئالاقىداشلىرىڭىز ئىسمىڭىز ۋە رەسىمىڭىزنى كۆرەلەيدۇ، ۋە ئۇلارنى «ھېكايەم» نى كۆرەلمەيدىغان قىلىپ تەڭشىمىگەن بولىسڭىز، «ھېكايەم» گە يوللىغان مەزمۇنلارنىمۇ كۆرەلەيدۇ.";
 
 /* Header for the explainer sheet for signal connections */
-"STORY_SETTINGS_LEARN_MORE_SHEET_HEADER_FORMAT" = "<bold>Signal ئالاقىداشلىرى</bold> سىز تۆۋەندىكى ئۇسۇللار بىلەن ئۇلارنىڭ ئىشەنچىلىك ئىكەنلىكىنى جەزملەشتۈرگەن كىشىلەر:";
+"STORY_SETTINGS_LEARN_MORE_SHEET_HEADER_FORMAT" = "<bold>Radar ئالاقىداشلىرى</bold> سىز تۆۋەندىكى ئۇسۇللار بىلەن ئۇلارنىڭ ئىشەنچىلىك ئىكەنلىكىنى جەزملەشتۈرگەن كىشىلەر:";
 
 /* Label for the stories section of the settings view */
 "STORY_SETTINGS_TITLE" = "ھېكايىلەر";
 
 /* Section footer for the 'viewers' section on the 'story settings' view */
-"STORY_SETTINGS_WHO_CAN_VIEW_THIS_FOOTER" = "ھېكايىڭىزنى كۆرسە بولىدىغان Signal ئالاقىداشلارنى تاللاڭ. ئۆزگەرتىشلەر بۇرۇن يوللىغان ھېكايىڭىزگە تەسىر كۆرسەتمەيدۇ.";
+"STORY_SETTINGS_WHO_CAN_VIEW_THIS_FOOTER" = "ھېكايىڭىزنى كۆرسە بولىدىغان Radar ئالاقىداشلارنى تاللاڭ. ئۆزگەرتىشلەر بۇرۇن يوللىغان ھېكايىڭىزگە تەسىر كۆرسەتمەيدۇ.";
 
 /* Section header for the 'viewers' section on the 'story settings' view */
 "STORY_SETTINGS_WHO_CAN_VIEW_THIS_HEADER" = "بۇ ھېكايىنى كۆرسە بولىدىغان كىشىلەر";
 
 /* Header for the 'viewers' section on the 'story settings' bottom sheet */
-"STORY_SETTINGS_WHO_CAN_VIEW_THIS_SHEET_HEADER" = "ھېكايىڭىزنى كۆرسە بولىدىغان Signal ئالاقىداشلىرىنى تاللاڭ. بۇ تەڭشەكنى مەخپىيەتلىك تەڭشىكىدىن خالىغاندا ئ‍ۆزگەرتەلەيسىز.";
+"STORY_SETTINGS_WHO_CAN_VIEW_THIS_SHEET_HEADER" = "ھېكايىڭىزنى كۆرسە بولىدىغان Radar ئالاقىداشلىرىنى تاللاڭ. بۇ تەڭشەكنى مەخپىيەتلىك تەڭشىكىدىن خالىغاندا ئ‍ۆزگەرتەلەيسىز.";
 
 /* Tooltip text shown when the user selects a story as a destination for a long duration video that will be split into shorter segments. Embeds {{ segment duration in seconds }} */
 "STORY_VIDEO_SEGMENTATION_TOOLTIP_FORMAT" = "ھېكايىگە يوللانغان ۋىدېيولار %1$d سېكۇنتلۇق قىسقا سىنلارغا بۆلىنىپ، كۆپ ھېكايە شەكلىدە يوللىنىدۇ.";
@@ -9242,7 +9242,7 @@ Send money securely.";
 "SUPPORT_EMAIL_DEFAULT_DESCRIPTION" = "بۇ مەسىلە ھەققىدە بىرگە سۆزلەپ بېرىڭ: ";
 
 /* Message for alert dialog presented when a support email failed to send */
-"SUPPORT_EMAIL_ERROR_ALERT_DESCRIPTION" = "قوللاش ئىلتىماسىڭىزنى support@signal.orgگە ئېلخەت سېلىڭ";
+"SUPPORT_EMAIL_ERROR_ALERT_DESCRIPTION" = "قوللاش ئىلتىماسىڭىزنى support@radar.chatگە ئېلخەت سېلىڭ";
 
 /* Localized label for support request email filter string. Embeds {{filter text}}. */
 "SUPPORT_EMAIL_FILTER_LABEL_FORMAT" = "سۈزگۈچ: %1$@";
@@ -9266,7 +9266,7 @@ Send money securely.";
 "SUPPORT_EMAIL_LOG_URL_LABEL_FORMAT" = "خاتىرە URL: %1$@";
 
 /* Localized subject for support request emails */
-"SUPPORT_EMAIL_SUBJECT" = "Signal iOS قوللاش ئىلتىماسى";
+"SUPPORT_EMAIL_SUBJECT" = "Radar iOS قوللاش ئىلتىماسى";
 
 /* Header for emoji mood selection */
 "SUPPORT_EMOJI_PROMPT" = "قانداقراق ھېس قىلىۋاتىسىز؟ (تاللاشچان)";
@@ -9338,7 +9338,7 @@ Send money securely.";
 "SWITCH_ON" = "ئاچ";
 
 /* Name to display for the 'system' sender, e.g. for release notes and the onboarding story */
-"SYSTEM_ADDRESS_NAME" = "Signal ";
+"SYSTEM_ADDRESS_NAME" = "Radar ";
 
 /* Label for button to verify a user's safety number. */
 "SYSTEM_MESSAGE_ACTION_VERIFY_SAFETY_NUMBER" = "دەلىللەش";
@@ -9524,25 +9524,25 @@ Send money securely.";
 "UNKNOWN_CONTACT_BLOCK_OFFER" = "ئىشلەتكۈچى سىزنىڭ ئالاقىداشلىرىڭىز ئارىسىدا يوقكەن. بۇ ئىشلەتكۈچىنى چەكلەمسىز؟";
 
 /* Info message recorded in conversation history when local user receives an unknown message from a linked device and needs to upgrade. */
-"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_FROM_LINKED_DEVICE" = "سىزنىڭ بىر ئۈسكىنىڭىز ئەۋەتكەن ئۇچۇردا Signal نىڭ بىر يېڭى ئىقتىدارى قوللىنىلغاچقا، ئۇنى بىر تەرەپ قىلالمىدى ياكى كۆرسىتەلمىدى.";
+"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_FROM_LINKED_DEVICE" = "سىزنىڭ بىر ئۈسكىنىڭىز ئەۋەتكەن ئۇچۇردا Radar نىڭ بىر يېڭى ئىقتىدارى قوللىنىلغاچقا، ئۇنى بىر تەرەپ قىلالمىدى ياكى كۆرسىتەلمىدى.";
 
 /* Info message recorded in conversation history when local user receives an unknown message and needs to upgrade. Embeds {{user's name or phone number}}. */
-"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_WITH_NAME_FORMAT" = "%1$@ سىزگە ئەۋەتكەن ئۇچۇردا Signal نىڭ بىر يېڭى ئىقتىدارى قوللىنىلغاچقا، ئۇنى بىر تەرەپ قىلالمىدى ياكى كۆرسىتەلمىدى.";
+"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_WITH_NAME_FORMAT" = "%1$@ سىزگە ئەۋەتكەن ئۇچۇردا Radar نىڭ بىر يېڭى ئىقتىدارى قوللىنىلغاچقا، ئۇنى بىر تەرەپ قىلالمىدى ياكى كۆرسىتەلمىدى.";
 
 /* Info message recorded in conversation history when local user receives an unknown message and needs to upgrade. */
-"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_WITHOUT_NAME" = "قوبۇل قىلغان ئۇچۇرىڭىزدا Signal نىڭ بىر يېڭى ئىقتىدارى قوللىنىلغاچقا، ئۇنى بىر تەرەپ قىلالمىدى ياكى كۆرسىتەلمىدى.";
+"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_WITHOUT_NAME" = "قوبۇل قىلغان ئۇچۇرىڭىزدا Radar نىڭ بىر يېڭى ئىقتىدارى قوللىنىلغاچقا، ئۇنى بىر تەرەپ قىلالمىدى ياكى كۆرسىتەلمىدى.";
 
 /* Label for button that lets users upgrade the app. */
-"UNKNOWN_PROTOCOL_VERSION_UPGRADE_BUTTON" = "‫Signal نى ھازىرلا يېڭىلا";
+"UNKNOWN_PROTOCOL_VERSION_UPGRADE_BUTTON" = "‫Radar نى ھازىرلا يېڭىلا";
 
 /* Info message recorded in conversation history when local user has received an unknown unknown message from a linked device and has upgraded. */
-"UNKNOWN_PROTOCOL_VERSION_UPGRADE_COMPLETE_FROM_LINKED_DEVICE" = "‫ Signal نىڭ ئەڭ يېڭى نەشرىگە يېڭىلاندى. سىز ئەمدى ئۈسكىنىڭىزدە بۇ تۈردىكى ئۇچۇرلارنى قوبۇل قىلالايسىز.";
+"UNKNOWN_PROTOCOL_VERSION_UPGRADE_COMPLETE_FROM_LINKED_DEVICE" = "‫ Radar نىڭ ئەڭ يېڭى نەشرىگە يېڭىلاندى. سىز ئەمدى ئۈسكىنىڭىزدە بۇ تۈردىكى ئۇچۇرلارنى قوبۇل قىلالايسىز.";
 
 /* Info message recorded in conversation history when local user has received an unknown message and has upgraded. Embeds {{user's name or phone number}}. */
-"UNKNOWN_PROTOCOL_VERSION_UPGRADE_COMPLETE_WITH_NAME_FORMAT" = "«%1$@» دىن بۇ ئۇچۇرنى قايتا ئەۋەتىشنى سوراڭ، سىز ھازىر Signal نىڭ يېڭى نەشرىنى ئىشلىتىۋاتىسىز.";
+"UNKNOWN_PROTOCOL_VERSION_UPGRADE_COMPLETE_WITH_NAME_FORMAT" = "«%1$@» دىن بۇ ئۇچۇرنى قايتا ئەۋەتىشنى سوراڭ، سىز ھازىر Radar نىڭ يېڭى نەشرىنى ئىشلىتىۋاتىسىز.";
 
 /* Info message recorded in conversation history when local user has received an unknown message and has upgraded. */
-"UNKNOWN_PROTOCOL_VERSION_UPGRADE_COMPLETE_WITHOUT_NAME" = "يوللىغۇچىدىن بۇ ئۇچۇرنى قايتا ئەۋەتىشنى سوراڭ، سىز Signal نىڭ يېڭى نەشرىنى ئىشلىتىۋاتىسىز. ";
+"UNKNOWN_PROTOCOL_VERSION_UPGRADE_COMPLETE_WITHOUT_NAME" = "يوللىغۇچىدىن بۇ ئۇچۇرنى قايتا ئەۋەتىشنى سوراڭ، سىز Radar نىڭ يېڭى نەشرىنى ئىشلىتىۋاتىسىز. ";
 
 /* Label indicating an unknown user. */
 "UNKNOWN_USER" = "نامەلۇم";
@@ -9566,13 +9566,13 @@ Send money securely.";
 "UNLINK_CONFIRMATION_ALERT_TITLE" = "«%1$@» نى ئاجرىتامسىز؟";
 
 /* Label warning the user that they have been unlinked from their primary device. */
-"UNLINKED_WARNING" = "بۇ ئۈسكۈنە باغلانمىغان. داۋاملىق ئۇچۇرلىشىش ئۈچۈن Signal نى ئۈسكۈنىڭىز بىلەن قايتا ئۇلاڭ.";
+"UNLINKED_WARNING" = "بۇ ئۈسكۈنە باغلانمىغان. داۋاملىق ئۇچۇرلىشىش ئۈچۈن Radar نى ئۈسكۈنىڭىز بىلەن قايتا ئۇلاڭ.";
 
 /* If this device has become unlinked from their primary device, they'll see a warning. This is the call to action on that warning. */
 "UNLINKED_WARNING_ACTION_TITLE" = "ئۈسكۈنىنى قايتا ئۇلاش";
 
 /* Alert title when unlinking device fails */
-"UNLINKING_FAILED_ALERT_TITLE" = "‫Signal ئۈسكۈنىڭىزنى ئاجرىتالمىدى.";
+"UNLINKING_FAILED_ALERT_TITLE" = "‫Radar ئۈسكۈنىڭىزنى ئاجرىتالمىدى.";
 
 /* Text for a toast confirming that the mic has been unmuted for a call. */
 "UNMUTE_CONFIRMATION_TOAST_LABEL" = "مىكروفون ئوچۇق";
@@ -9593,7 +9593,7 @@ Send money securely.";
 "UNSUPPORTED_FEATURE_ERROR" = "ئۈسكۈنىڭىز بۇ ئىقتىدارنى قوللىمايدۇ.";
 
 /* Description for the unverified safety number change. Embeds {name of contact with identity change} */
-"UNVERIFIED_SAFETY_NUMBER_CHANGE_DESCRIPTION_FORMAT" = "سىز ۋە %1$@ ئارىسىدىكى بىخەتەرلىك نومۇرى ئۆزگەردى، سەۋەبى ئۇلار Signal نى قايتا قاچىلىغان ياكى ئۈسكۈنىلىرىنى ئالماشتۇرغان بولۇشى مۇمكىن. يېڭى بىخەتەرلىك نومۇرىنى جەزملەشتۈرۈش ئۈچۈن «دەلىللەش» نى چېكىڭ. بۇ ئىختىيارى مەشغۇلات.";
+"UNVERIFIED_SAFETY_NUMBER_CHANGE_DESCRIPTION_FORMAT" = "سىز ۋە %1$@ ئارىسىدىكى بىخەتەرلىك نومۇرى ئۆزگەردى، سەۋەبى ئۇلار Radar نى قايتا قاچىلىغان ياكى ئۈسكۈنىلىرىنى ئالماشتۇرغان بولۇشى مۇمكىن. يېڭى بىخەتەرلىك نومۇرىنى جەزملەشتۈرۈش ئۈچۈن «دەلىللەش» نى چېكىڭ. بۇ ئىختىيارى مەشغۇلات.";
 
 /* Action to verify a safety number after it has changed */
 "UNVERIFIED_SAFETY_NUMBER_VERIFY_ACTION" = "دەلىللەش";
@@ -9611,7 +9611,7 @@ Send money securely.";
 "USE_PROXY_BUTTON" = "ۋاكالەتچى ئىشلىتىش";
 
 /* Explanation of when you should use a signal proxy */
-"USE_PROXY_EXPLANATION" = "كۆچمە ئېقىم ياكى Wi-Fi دا Signal غا ئۇلىنالمىغان ئەھۋالدىلا ئاندىن ۋاكالەتچى ئىشلىتىڭ.";
+"USE_PROXY_EXPLANATION" = "كۆچمە ئېقىم ياكى Wi-Fi دا Radar غا ئۇلىنالمىغان ئەھۋالدىلا ئاندىن ۋاكالەتچى ئىشلىتىڭ.";
 
 /* Description of username links and QR codes on the username education sheet */
 "USERNAME_EDUCATION_LINK_DESCRIPTION" = "ئىشلەتكۈچى نامىنىڭ خاس QR ۋە ئۇلانمىسى بار بولۇپ، ئۇلارنى دوستلىرىڭىز بىلەن ئورتاقلىشىپ پاراڭلىشىشنى باشلىسىڭىز بولىدۇ.";
@@ -9704,7 +9704,7 @@ Send money securely.";
 "USERNAME_LOOKUP_LINK_NO_LONGER_VALID_MESSAGE" = "بۇ ئىشلەتكۈچى نامى ئەمدى كۈچكە ئىگە ئەمەس.";
 
 /* A message indicating that the given username is not associated with a registered Signal account. Embeds {{ a username }}. */
-"USERNAME_LOOKUP_NOT_FOUND_MESSAGE_FORMAT" = "%1$@ بولسا Signal ئىشلەتكۈچى ئەمەس. ئىشلەتكۈچى نامىنى تولۇق كىرگۈزۈڭ.";
+"USERNAME_LOOKUP_NOT_FOUND_MESSAGE_FORMAT" = "%1$@ بولسا Radar ئىشلەتكۈچى ئەمەس. ئىشلەتكۈچى نامىنى تولۇق كىرگۈزۈڭ.";
 
 /* Title for an action sheet indicating that the given username is not associated with a registered Signal account. */
 "USERNAME_LOOKUP_NOT_FOUND_TITLE" = "ئىشلەتكۈچى تېپىلمىدى";
@@ -9728,7 +9728,7 @@ Send money securely.";
 "USERNAME_ONBOARDING_TITLE" = "Your Username";
 
 /* Instructions that appear below the username QR code on a sharable exported image. */
-"USERNAME_QR_CODE_EXPORT_INSTRUCTIONS" = "Signal دا مەن بىلەن پاراڭلىشىش ئۈچۈن تېلېفونىڭىز بىلەن بۇ QR كودنى سىكاننېرلاڭ.";
+"USERNAME_QR_CODE_EXPORT_INSTRUCTIONS" = "Radar دا مەن بىلەن پاراڭلىشىش ئۈچۈن تېلېفونىڭىز بىلەن بۇ QR كودنى سىكاننېرلاڭ.";
 
 /* A message in a toast informing the user their username, link, and QR code have successfully been reset. Embeds {{ the user's new username }}. */
 "USERNAME_RESET_SUCCESSFUL_TOAST" = "QR كودىڭىز ۋە ئۇلانمىڭىز ئەسلىگە قايتۇرۇلغان بولۇپ، ئىشلەتكۈچى نامىڭىز بولسا %1$@";

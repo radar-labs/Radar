@@ -2,7 +2,7 @@
 "AB_PERMISSION_MISSING_ACTION_NOT_NOW" = "ابھی نہیں";
 
 /* Title for the 'about' help section */
-"ABOUT_SECTION_TITLE" = "Signal کے بارے میں";
+"ABOUT_SECTION_TITLE" = "Radar کے بارے میں";
 
 /* Accessibility label for attachment. */
 "ACCESSIBILITY_LABEL_ATTACHMENT" = "منسلک مواد";
@@ -32,7 +32,7 @@
 "ACCOUNT_DATA_REPORT_CONFIRM_EXPORT_CONFIRM_BUTTON" = "رپورٹ ایکسپورٹ کریں";
 
 /* Users can request a report of their account data. Before they get their account export, they are warned to only share account data with trustworthy sources. This is the message on that warning. */
-"ACCOUNT_DATA_REPORT_CONFIRM_EXPORT_MESSAGE" = "صرف اپنے قابلِ اعتماد لوگوں یا ایپس کے ساتھ اپنے Signal اکاؤنٹ کا ڈیٹا شیئر کریں۔";
+"ACCOUNT_DATA_REPORT_CONFIRM_EXPORT_MESSAGE" = "صرف اپنے قابلِ اعتماد لوگوں یا ایپس کے ساتھ اپنے Radar اکاؤنٹ کا ڈیٹا شیئر کریں۔";
 
 /* Users can request a report of their account data. If this request fails (probably because of a network connection problem), they will see an error sheet. This is the message on that error. */
 "ACCOUNT_DATA_REPORT_ERROR_MESSAGE" = "اپنا کنکشن چیک کریں اور دوبارہ کوشش کریں۔";
@@ -56,16 +56,16 @@
 "ACCOUNT_DATA_REPORT_EXPORT_REPORT_BUTTON" = "رپورٹ ایکسپورٹ کریں";
 
 /* Users can request a report of their account data. This text appears at the bottom of this screen, offering more information. */
-"ACCOUNT_DATA_REPORT_FOOTER" = "آپ کی رپورٹ محض ایکسپورٹ کے وقت تیار کی جاتی ہے اور اسے Signal کی جانب سے آپ کی ڈیوائس پر اسٹور نہیں کیا جاتا۔";
+"ACCOUNT_DATA_REPORT_FOOTER" = "آپ کی رپورٹ محض ایکسپورٹ کے وقت تیار کی جاتی ہے اور اسے Radar کی جانب سے آپ کی ڈیوائس پر اسٹور نہیں کیا جاتا۔";
 
 /* Users can request a report of their account data. This is the subtitle on the screen where they do this, giving them more information. */
-"ACCOUNT_DATA_REPORT_SUBTITLE" = "اپنے Signal اکاؤنٹ کے ڈیٹا کی رپورٹ ڈاؤن لوڈ اور ایکسپورٹ کریں۔ اس رپورٹ میں کوئی میسجز یا میڈیا شامل نہیں ہے۔";
+"ACCOUNT_DATA_REPORT_SUBTITLE" = "اپنے Radar اکاؤنٹ کے ڈیٹا کی رپورٹ ڈاؤن لوڈ اور ایکسپورٹ کریں۔ اس رپورٹ میں کوئی میسجز یا میڈیا شامل نہیں ہے۔";
 
 /* Users can request a report of their account data. This is the title on the screen where they do this. */
 "ACCOUNT_DATA_REPORT_TITLE" = "آپ کا اکاؤنٹ ڈیٹا";
 
 /* Label for 'invite' button in contact view. */
-"ACTION_INVITE" = "Signal میں مدعو کریں";
+"ACTION_INVITE" = "Radar میں مدعو کریں";
 
 /* Label for button that lets you send a message to a contact. */
 "ACTION_SEND_MESSAGE" = "پیغام بھیجئے";
@@ -83,7 +83,7 @@
 "ACTION_VIDEO_CALL" = "ویڈیو کال";
 
 /* Label for 'voice call' button in contact view. */
-"ACTION_VOICE_CALL" = "Signal  کال";
+"ACTION_VOICE_CALL" = "Radar  کال";
 
 /* The title for the 'add group members' view. */
 "ADD_GROUP_MEMBERS_VIEW_TITLE" = "ممبران شامل کریں";
@@ -203,40 +203,40 @@
 "APN_Message" = "آپ کے پاس نئے پیغامات ہو سکتے ہیں";
 
 /* Default message for the 'app launch failed' alert. */
-"APP_LAUNCH_FAILURE_ALERT_MESSAGE" = "Signal چل نہیں سکتا۔براہ کرم ڈیبگ لاگ کو support@signal.org پر بھیجیں۔تاکہ ہم اس خرابی کو دور کرسکیں۔";
+"APP_LAUNCH_FAILURE_ALERT_MESSAGE" = "Radar چل نہیں سکتا۔براہ کرم ڈیبگ لاگ کو support@radar.chat پر بھیجیں۔تاکہ ہم اس خرابی کو دور کرسکیں۔";
 
 /* Button to try launching the app even though the last launch failed */
-"APP_LAUNCH_FAILURE_CONTINUE" = "اس کے بجائے Signal کھولیں";
+"APP_LAUNCH_FAILURE_CONTINUE" = "اس کے بجائے Radar کھولیں";
 
 /* Message for an error indicating that the app couldn't launch because some unexpected error happened with the user's registration status. */
-"APP_LAUNCH_FAILURE_CORRUPT_REGISTRATION_MESSAGE" = "براہ کرم support@signal.org پر ڈی بگ لاگ بھیجیں تاکہ ہم اس مسئلے کی نقص ٹربل شوٹ کر سکیں۔";
+"APP_LAUNCH_FAILURE_CORRUPT_REGISTRATION_MESSAGE" = "براہ کرم support@radar.chat پر ڈی بگ لاگ بھیجیں تاکہ ہم اس مسئلے کی نقص ٹربل شوٹ کر سکیں۔";
 
 /* Title for an error indicating that the app couldn't launch because some unexpected error happened with the user's registration status. */
-"APP_LAUNCH_FAILURE_CORRUPT_REGISTRATION_TITLE" = "Signal کھولنے سے قاصر";
+"APP_LAUNCH_FAILURE_CORRUPT_REGISTRATION_TITLE" = "Radar کھولنے سے قاصر";
 
 /* Error indicating that the app could not launch because the database could not be loaded. */
 "APP_LAUNCH_FAILURE_COULD_NOT_LOAD_DATABASE" = "ڈیٹا بیس لوڈ نہیں ہو سکتا";
 
 /* Error indicating that the app could not launch without reverting unknown database migrations. */
-"APP_LAUNCH_FAILURE_INVALID_DATABASE_VERSION_MESSAGE" = "براہ کرم Signal کے جدید ورژن کو اپ گریڈ کریں۔";
+"APP_LAUNCH_FAILURE_INVALID_DATABASE_VERSION_MESSAGE" = "براہ کرم Radar کے جدید ورژن کو اپ گریڈ کریں۔";
 
 /* Error indicating that the app could not launch without reverting unknown database migrations. */
 "APP_LAUNCH_FAILURE_INVALID_DATABASE_VERSION_TITLE" = "نامعلوم ڈیٹا بیس ورژن۔";
 
 /* Error indicating that the app crashed during the previous launch. */
-"APP_LAUNCH_FAILURE_LAST_LAUNCH_CRASHED_MESSAGE" = "کھلنے کے دوران Signal کے ساتھ مسئلہ پیش آیا تھا۔ اس مسئلے کی نقص ازالہ کاری میں مدد کے لیے براہ کرم support@signal.org پر ڈی بگ لاگ بھیجیں۔";
+"APP_LAUNCH_FAILURE_LAST_LAUNCH_CRASHED_MESSAGE" = "کھلنے کے دوران Radar کے ساتھ مسئلہ پیش آیا تھا۔ اس مسئلے کی نقص ازالہ کاری میں مدد کے لیے براہ کرم support@radar.chat پر ڈی بگ لاگ بھیجیں۔";
 
 /* Error indicating that the app crashed during the previous launch. */
-"APP_LAUNCH_FAILURE_LAST_LAUNCH_CRASHED_TITLE" = "Signal نہیں کھول سکے";
+"APP_LAUNCH_FAILURE_LAST_LAUNCH_CRASHED_TITLE" = "Radar نہیں کھول سکے";
 
 /* Error description indicating that the app crashed because there was low storage space available on the device. */
-"APP_LAUNCH_FAILURE_LOW_STORAGE_SPACE_AVAILABLE_MESSAGE" = "Signal نہیں کھل سکا کیونکہ آپ کی ڈیوائس میں اسٹوریج کی جگہ کم ہے۔ Signal استعمال کرنے کے لیے، ترتیبات میں اپنی اسٹوریج کا نظم کرنے کے ذریعے جگہ خالی کریں۔";
+"APP_LAUNCH_FAILURE_LOW_STORAGE_SPACE_AVAILABLE_MESSAGE" = "Radar نہیں کھل سکا کیونکہ آپ کی ڈیوائس میں اسٹوریج کی جگہ کم ہے۔ Radar استعمال کرنے کے لیے، ترتیبات میں اپنی اسٹوریج کا نظم کرنے کے ذریعے جگہ خالی کریں۔";
 
 /* Error title indicating that the app crashed because there was low storage space available on the device. */
 "APP_LAUNCH_FAILURE_LOW_STORAGE_SPACE_AVAILABLE_TITLE" = "اسٹوریج کی جگہ کم ہے";
 
 /* Error indicating that the app could not restore transferred data. */
-"APP_LAUNCH_FAILURE_RESTORE_FAILED_MESSAGE" = "آپ کی پرانی ڈیوائس سے منتقل کردہ ڈیٹا کو بحال نہیں کیا جا سکا۔ براہ کرم support@signal.org پر ڈیبگ لاگ ارسال کریں تاکہ ہم اس مسئلے کا ازالہ کر سکیں۔ اگر آپ Signal کو دوبارہ انسٹال کرتے ہیں تو آپ کی مسیج ختم ہو سکتی ہے۔";
+"APP_LAUNCH_FAILURE_RESTORE_FAILED_MESSAGE" = "آپ کی پرانی ڈیوائس سے منتقل کردہ ڈیٹا کو بحال نہیں کیا جا سکا۔ براہ کرم support@radar.chat پر ڈیبگ لاگ ارسال کریں تاکہ ہم اس مسئلے کا ازالہ کر سکیں۔ اگر آپ Radar کو دوبارہ انسٹال کرتے ہیں تو آپ کی مسیج ختم ہو سکتی ہے۔";
 
 /* Error indicating that the app could not restore transferred data. */
 "APP_LAUNCH_FAILURE_RESTORE_FAILED_TITLE" = "مکمل منتقلی نہیں ہوسکی";
@@ -260,7 +260,7 @@
 "APP_UPDATE_NAG_ALERT_MESSAGE_FORMAT" = "ایپ سٹور میں اب ورژن %1$@دستیاب ہے۔";
 
 /* Title for the 'new app version available' alert. */
-"APP_UPDATE_NAG_ALERT_TITLE" = "Signal کا نیا ورژن دستیاب ہے";
+"APP_UPDATE_NAG_ALERT_TITLE" = "Radar کا نیا ورژن دستیاب ہے";
 
 /* Label for the 'update' button in the 'new app version available' alert. */
 "APP_UPDATE_NAG_ALERT_UPDATE_BUTTON" = "اَپ ڈیٹ";
@@ -410,7 +410,7 @@
 "ATTACHMENT_KEYBOARD_GIF" = "GIF";
 
 /* Text in chat attachment panel when Signal only has access to some photos/videos. This string is in a compact horizontal space, so it should be short if possible. */
-"ATTACHMENT_KEYBOARD_LIMITED_ACCESS" = "Signal کو تصاویر تک محدود رسائی حاصل ہے";
+"ATTACHMENT_KEYBOARD_LIMITED_ACCESS" = "Radar کو تصاویر تک محدود رسائی حاصل ہے";
 
 /* A button to select a location from the Attachment Keyboard */
 "ATTACHMENT_KEYBOARD_LOCATION" = "مقام";
@@ -527,7 +527,7 @@
 "BACKUP_ENABLEMENT_REMINDER_MEGAPHONE_ACTION" = "آن کر دو";
 
 /* Body for Backup enablement reminder megaphone */
-"BACKUP_ENABLEMENT_REMINDER_MEGAPHONE_BODY" = "نیا فون لینے یا Signal کو دوبارہ انسٹال کرنے کی صورت میں کسی بھی میسج سے محروم ہونے سے بچیں۔";
+"BACKUP_ENABLEMENT_REMINDER_MEGAPHONE_BODY" = "نیا فون لینے یا Radar کو دوبارہ انسٹال کرنے کی صورت میں کسی بھی میسج سے محروم ہونے سے بچیں۔";
 
 /* Title for Backup enablement reminder megaphone */
 "BACKUP_ENABLEMENT_REMINDER_MEGAPHONE_TITLE" = "انکرپٹ کردہ بیک اپس کو آن کریں";
@@ -569,7 +569,7 @@
 "BACKUP_ONBOARDING_CANCEL_SHEET_TITLE" = "بیک اپ کا سیٹ اپ بند کریں؟";
 
 /* Body for a sheet warning users to their 'Recovery Key' safe. */
-"BACKUP_ONBOARDING_CONFIRM_KEY_KEEP_KEY_SAFE_SHEET_BODY" = "اگر آپ اپنی کیی کو کھو دیتے ہیں تو Signal آپ کے بیک اپ کو بحال کرنے میں مدد نہیں کر سکے گا۔ اسے کسی انتہائی محفوظ جگہ پر اسٹور کریں، اور دوسروں کے ساتھ شئیر نہ کریں۔";
+"BACKUP_ONBOARDING_CONFIRM_KEY_KEEP_KEY_SAFE_SHEET_BODY" = "اگر آپ اپنی کیی کو کھو دیتے ہیں تو Radar آپ کے بیک اپ کو بحال کرنے میں مدد نہیں کر سکے گا۔ اسے کسی انتہائی محفوظ جگہ پر اسٹور کریں، اور دوسروں کے ساتھ شئیر نہ کریں۔";
 
 /* Title for a sheet warning users to their 'Recovery Key' safe. */
 "BACKUP_ONBOARDING_CONFIRM_KEY_KEEP_KEY_SAFE_SHEET_TITLE" = "اپنی کیی کو محفوظ رکھیں";
@@ -596,10 +596,10 @@
 "BACKUP_ONBOARDING_INTRO_NOT_NOW_TOAST" = "آپ سیٹنگز میں جا کر بیک اپس کو فعال کر سکتے ہیں۔";
 
 /* Subtitle for a view introducing Backups during an onboarding flow. */
-"BACKUP_ONBOARDING_INTRO_SUBTITLE" = "Signal کی محفوظ، آخر سے آخر تک انکرپٹ کردہ اسٹوریج سروس کو استعمال کرتے ہوئے اپنے میسیجز اور میڈیا کو بیک اپ کریں۔ نیا فون لینے یا Signal کو دوبارہ انسٹال کرنے کی صورت میں کسی بھی میسج سے محروم ہونے سے بچیں۔";
+"BACKUP_ONBOARDING_INTRO_SUBTITLE" = "Radar کی محفوظ، آخر سے آخر تک انکرپٹ کردہ اسٹوریج سروس کو استعمال کرتے ہوئے اپنے میسیجز اور میڈیا کو بیک اپ کریں۔ نیا فون لینے یا Radar کو دوبارہ انسٹال کرنے کی صورت میں کسی بھی میسج سے محروم ہونے سے بچیں۔";
 
 /* Title for a view introducing Backups during an onboarding flow. */
-"BACKUP_ONBOARDING_INTRO_TITLE" = "Signal کے محفوظ بیک اپس";
+"BACKUP_ONBOARDING_INTRO_TITLE" = "Radar کے محفوظ بیک اپس";
 
 /* Text for a bullet point in a view introducing the 'Recovery Key' during an onboarding flow. */
 "BACKUP_ONBOARDING_KEY_INTRO_BULLET_1" = "آپ کی بحالی کی کیی 64 حروف پر مشتمل ایک کوڈ ہے جو آپ کو اپنے بیک اپ کی بحالی میں درکار ہو گی۔";
@@ -617,10 +617,10 @@
 "BACKUP_ONBOARDING_KEY_INTRO_TITLE" = "ریکوری کیی";
 
 /* Body for a sheet shown when your Backup plan is downgraded. */
-"BACKUP_PLAN_DOWNGRADED_SHEET_BODY" = "آپ کی بیک اپ کی سبسکرپشن کی معیاد ختم ہو گئی ہے کیونکہ آپ کے پیمنٹ کے طریقے سے اس کی تجدید نہیں کی جا سکتی۔\n\nاپنے میڈیا کا بیک اپ جاری رکھنے کے لیے آپ دوبارہ سبسکرائب کر سکتے ہیں۔ Signal بیک اپس کے مفت پلان تک آپ کی رسائی جاری رہے گی۔";
+"BACKUP_PLAN_DOWNGRADED_SHEET_BODY" = "آپ کی بیک اپ کی سبسکرپشن کی معیاد ختم ہو گئی ہے کیونکہ آپ کے پیمنٹ کے طریقے سے اس کی تجدید نہیں کی جا سکتی۔\n\nاپنے میڈیا کا بیک اپ جاری رکھنے کے لیے آپ دوبارہ سبسکرائب کر سکتے ہیں۔ Radar بیک اپس کے مفت پلان تک آپ کی رسائی جاری رہے گی۔";
 
 /* Body for a sheet shown when your Backup plan is downgraded because you stopped using TestFlight. */
-"BACKUP_PLAN_DOWNGRADED_SHEET_BODY_TESTFLIGHT" = "آپ کی بیک اپ کی سبسکرپشن کی معیاد ختم ہو گئی ہے کیونکہ آپ اب مزید TestFlight استعمال نہیں کر رہے۔\n\nاپنے میڈیا کا بیک اپ جاری رکھنے کے لیے آپ دوبارہ سبسکرائب کر سکتے ہیں۔ Signal بیک اپس کے مفت پلان تک آپ کی رسائی جاری رہے گی۔";
+"BACKUP_PLAN_DOWNGRADED_SHEET_BODY_TESTFLIGHT" = "آپ کی بیک اپ کی سبسکرپشن کی معیاد ختم ہو گئی ہے کیونکہ آپ اب مزید TestFlight استعمال نہیں کر رہے۔\n\nاپنے میڈیا کا بیک اپ جاری رکھنے کے لیے آپ دوبارہ سبسکرائب کر سکتے ہیں۔ Radar بیک اپس کے مفت پلان تک آپ کی رسائی جاری رہے گی۔";
 
 /* Primary button for a sheet shown when your Backup plan is downgraded. */
 "BACKUP_PLAN_DOWNGRADED_SHEET_PRIMARY_BUTTON" = "بیک اپس کو منظم کریں";
@@ -650,7 +650,7 @@
 "BACKUP_RESTORE_MODAL_TITLE" = "میسجز بحال کر رہے ہیں…";
 
 /* Message describing that the Background App Refresh permission is disabled for Signal. \"Background App Refresh\" should be localized the same way it is in iOS Settings app permissions. */
-"BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_MESSAGE" = "خود کار بیک اپس غیر فعال ہیں۔ Signal کی اجازتوں کو اپ ڈیٹ کر کے خود کار بیک اپس کو فعال کریں۔";
+"BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_MESSAGE" = "خود کار بیک اپس غیر فعال ہیں۔ Radar کی اجازتوں کو اپ ڈیٹ کر کے خود کار بیک اپس کو فعال کریں۔";
 
 /* Add-on to a message describing that the Background App Refresh permission is disabled for Signal. \"Background App Refresh\" should be localized the same way it is in iOS Settings app permissions. */
 "BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_MESSAGE_UPDATE_NOW" = "ابھی اپ ڈیٹ کریں";
@@ -659,7 +659,7 @@
 "BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_SHEET_GO_TO_SETTINGS_BUTTON" = "ترتیبات پر جائیں";
 
 /* Message for a sheet warning the user about the Background App Refresh permission. \"Background App Refresh\" should be localized the same way it is in iOS Settings app permissions. */
-"BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_SHEET_MESSAGE" = "Signal کو اپنے میسجز کے خود کار بیک اپ کی اجازت دینے کے لیے، ذیل میں \"سیٹنگز پر جائیں\" پر ٹیپ کریں اور \"پس منظر میں ایپ ریفریش کریں\" کو فعال کریں";
+"BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_SHEET_MESSAGE" = "Radar کو اپنے میسجز کے خود کار بیک اپ کی اجازت دینے کے لیے، ذیل میں \"سیٹنگز پر جائیں\" پر ٹیپ کریں اور \"پس منظر میں ایپ ریفریش کریں\" کو فعال کریں";
 
 /* Title for a sheet warning the user about the Background App Refresh permission. \"Background App Refresh\" should be localized the same way it is in iOS Settings app permissions. */
 "BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_SHEET_TITLE" = "خود کار بیک اپس غیر فعال ہیں";
@@ -746,7 +746,7 @@
 "BACKUP_SETTINGS_BACKUP_PLAN_PAID_BUT_IAP_NOT_FOUND_LOCALLY_ACTION_BUTTON_TITLE" = "تجدید کریں";
 
 /* Text describing that the user's paid backup plan did not correspond to a App Store subscription on this device. */
-"BACKUP_SETTINGS_BACKUP_PLAN_PAID_BUT_IAP_NOT_FOUND_LOCALLY_DESCRIPTION" = "اس ڈیوائس پر آپ کی سبسکرپشن نہیں ملی۔ Signal بیک اپس کا استعمال کرنا جاری رکھنے کے لیے تجدید کریں۔";
+"BACKUP_SETTINGS_BACKUP_PLAN_PAID_BUT_IAP_NOT_FOUND_LOCALLY_DESCRIPTION" = "اس ڈیوائس پر آپ کی سبسکرپشن نہیں ملی۔ Radar بیک اپس کا استعمال کرنا جاری رکھنے کے لیے تجدید کریں۔";
 
 /* Header describing what the paid backup plan includes. */
 "BACKUP_SETTINGS_BACKUP_PLAN_PAID_HEADER" = "ٹیکسٹ + تمام میڈیا کا بیک اپ";
@@ -758,16 +758,16 @@
 "BACKUP_SETTINGS_BACKUP_PLAN_PAID_RENEWAL_FORMAT" = "%1$@ کی تجدید کرتا ہے";
 
 /* Footer for a menu section related to settings for when Backups are disabled. */
-"BACKUP_SETTINGS_BACKUPS_DISABLED_SECTION_FOOTER" = "بیک اپس کو آف کر دیا گیا ہے اور آپ کے ڈیٹا کو Signal کی محفوظ اسٹوریج کی سروس سے حذف کر دیا گیا ہے۔";
+"BACKUP_SETTINGS_BACKUPS_DISABLED_SECTION_FOOTER" = "بیک اپس کو آف کر دیا گیا ہے اور آپ کے ڈیٹا کو Radar کی محفوظ اسٹوریج کی سروس سے حذف کر دیا گیا ہے۔";
 
 /* Description for a progress view tracking media being downloaded in service of disabling Backups. */
-"BACKUP_SETTINGS_BACKUPS_DISABLING_DOWNLOADING_MEDIA_PROGRESS_VIEW_DESCRIPTION" = "بیک اپس بند کر دیے گئے ہیں، ایسا کوئی بھی میڈیا جو ڈیوائس میں موجود نہیں ہے اب ڈاؤن لوڈ ہو رہا ہے۔ ڈاؤن لوڈ کے بعد آپ کے ڈیٹا کو Signal کی محفوظ شدہ اسٹوریج کی سروس سے حذف کر دیا جائے گا۔";
+"BACKUP_SETTINGS_BACKUPS_DISABLING_DOWNLOADING_MEDIA_PROGRESS_VIEW_DESCRIPTION" = "بیک اپس بند کر دیے گئے ہیں، ایسا کوئی بھی میڈیا جو ڈیوائس میں موجود نہیں ہے اب ڈاؤن لوڈ ہو رہا ہے۔ ڈاؤن لوڈ کے بعد آپ کے ڈیٹا کو Radar کی محفوظ شدہ اسٹوریج کی سروس سے حذف کر دیا جائے گا۔";
 
 /* Message for a view indicating we failed to delete the user's Backup due to an unexpected error. */
 "BACKUP_SETTINGS_BACKUPS_DISABLING_GENERIC_ERROR_MESSAGE" = "ایک نقص پیش آیا۔ براہ کرم سپورٹ سے رابطہ کریں۔";
 
 /* Header for a menu section related to settings for when disabling Backups encountered an unexpected error. */
-"BACKUP_SETTINGS_BACKUPS_DISABLING_GENERIC_ERROR_SECTION_HEADER" = "Signal کی محفوظ شدہ اسٹوریج کی سروس سے آپ کا ڈیٹا حذف کرنے میں ایک خرابی واقع ہوئی۔";
+"BACKUP_SETTINGS_BACKUPS_DISABLING_GENERIC_ERROR_SECTION_HEADER" = "Radar کی محفوظ شدہ اسٹوریج کی سروس سے آپ کا ڈیٹا حذف کرنے میں ایک خرابی واقع ہوئی۔";
 
 /* Title for a view indicating we failed to delete the user's Backup due to an unexpected error. */
 "BACKUP_SETTINGS_BACKUPS_DISABLING_GENERIC_ERROR_TITLE" = "بیک اپ حذف کرنے میں ناکام ہو گئے";
@@ -776,7 +776,7 @@
 "BACKUP_SETTINGS_BACKUPS_DISABLING_PROGRESS_VIEW_DESCRIPTION" = "بیک اپ حذف ہو رہا ہے...";
 
 /* Header for a menu section related to disabling Backups. */
-"BACKUP_SETTINGS_BACKUPS_DISABLING_SECTION_HEADER" = "بیک اپس کو آف کر دیا گیا ہے اور آپ کا ڈیٹا Signal کی محفوظ شدہ اسٹوریج کی سروس سے حذف کر دیا گیا ہے۔";
+"BACKUP_SETTINGS_BACKUPS_DISABLING_SECTION_HEADER" = "بیک اپس کو آف کر دیا گیا ہے اور آپ کا ڈیٹا Radar کی محفوظ شدہ اسٹوریج کی سروس سے حذف کر دیا گیا ہے۔";
 
 /* Header for a menu section related to settings for when Backups are enabled. */
 "BACKUP_SETTINGS_BACKUPS_ENABLED_SECTION_HEADER" = "بیک اپ کی تفصیلات";
@@ -824,13 +824,13 @@
 "BACKUP_SETTINGS_DISABLING_CONFIRMATION_ACTION_SHEET_TITLE" = "بند کریں اور بیک اپس حذف کریں؟";
 
 /* Message shown in an action sheet when the user disables Backups, explaining that their media is downloading first. */
-"BACKUP_SETTINGS_DISABLING_DOWNLOADS_STARTED_ACTION_SHEET_MESSAGE" = "آپ کے بیک اپ میں وہ میڈیا موجود ہے جو اس ڈیوائس میں موجود نہیں ہے۔ آپ کے بیک اپ کو ڈاؤن لوڈ میں زیادہ وقت لگ سکتا ہے، اس لیے خلل اندازیوں سے بچنے کے لیے Signal کو کھلا رکھیں۔";
+"BACKUP_SETTINGS_DISABLING_DOWNLOADS_STARTED_ACTION_SHEET_MESSAGE" = "آپ کے بیک اپ میں وہ میڈیا موجود ہے جو اس ڈیوائس میں موجود نہیں ہے۔ آپ کے بیک اپ کو ڈاؤن لوڈ میں زیادہ وقت لگ سکتا ہے، اس لیے خلل اندازیوں سے بچنے کے لیے Radar کو کھلا رکھیں۔";
 
 /* Title shown in an action sheet when the user disables Backups, explaining that their media is downloading first. */
 "BACKUP_SETTINGS_DISABLING_DOWNLOADS_STARTED_ACTION_SHEET_TITLE" = "آپ کا بیک اپ ڈاؤن لوڈ ہو رہا ہے";
 
 /* Message shown in an action sheet indicating we failed to delete the user's Backup due to an unexpected error. */
-"BACKUP_SETTINGS_DISABLING_ERROR_GENERIC_ERROR_ACTION_SHEET_MESSAGE" = "Signal کی محفوظ شدہ اسٹوریج کی سروس سے آپ کا ڈیٹا حذف کرنے میں ایک خرابی واقع ہوئی۔";
+"BACKUP_SETTINGS_DISABLING_ERROR_GENERIC_ERROR_ACTION_SHEET_MESSAGE" = "Radar کی محفوظ شدہ اسٹوریج کی سروس سے آپ کا ڈیٹا حذف کرنے میں ایک خرابی واقع ہوئی۔";
 
 /* Title shown in an action sheet indicating we failed to delete the user's Backup due to an unexpected error. */
 "BACKUP_SETTINGS_DISABLING_ERROR_GENERIC_ERROR_ACTION_SHEET_TITLE" = "بیک اپ حذف کرنے میں ناکام ہو گئے";
@@ -842,7 +842,7 @@
 "BACKUP_SETTINGS_DISABLING_SUBSCRIPTION_CANCEL_ACTION_SHEET_MANAGE_SUBSCRIPTION_BUTTON" = "سبسکرپشن کا نظم کریں";
 
 /* Message for an action sheet shown when the user disables Backups, but is still subscribed to the paid plan. */
-"BACKUP_SETTINGS_DISABLING_SUBSCRIPTION_CANCEL_ACTION_SHEET_MESSAGE" = "اگر آپ اپنی سبسکرپشن منسوخ کرنا چاہتے ہیں تو سبسکرپشن کا نظم کریں > Signal > سبسکرپشن منسوخ کریں پر ٹیپ کریں";
+"BACKUP_SETTINGS_DISABLING_SUBSCRIPTION_CANCEL_ACTION_SHEET_MESSAGE" = "اگر آپ اپنی سبسکرپشن منسوخ کرنا چاہتے ہیں تو سبسکرپشن کا نظم کریں > Radar > سبسکرپشن منسوخ کریں پر ٹیپ کریں";
 
 /* Title for an action sheet shown when the user disables Backups, but is still subscribed to the paid plan. */
 "BACKUP_SETTINGS_DISABLING_SUBSCRIPTION_CANCEL_ACTION_SHEET_TITLE" = "آپ نے ابھی بھی ادا شدہ بیک اپ پلان کو سبسکرائب کیا ہوا ہے";
@@ -920,7 +920,7 @@
 "BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_DOWNLOAD_SHEET_LATER_ACTION" = "بعد میں ڈاؤن لوڈ کریں";
 
 /* Message for an action sheet allowing users to download their offloaded media. */
-"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_DOWNLOAD_SHEET_MESSAGE" = "آپ کے بیک اپ میں وہ میڈیا موجود ہے جو اس ڈیوائس میں موجود نہیں ہے۔ یہ ڈاؤن لوڈ کرنے میں کافی وقت لے سکتا ہے، ڈاؤن لوڈ میں خلل سے بچنے کے لیے Signal کو کھلا رکھیں۔";
+"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_DOWNLOAD_SHEET_MESSAGE" = "آپ کے بیک اپ میں وہ میڈیا موجود ہے جو اس ڈیوائس میں موجود نہیں ہے۔ یہ ڈاؤن لوڈ کرنے میں کافی وقت لے سکتا ہے، ڈاؤن لوڈ میں خلل سے بچنے کے لیے Radar کو کھلا رکھیں۔";
 
 /* Action in an action sheet allowing users to download their offloaded media now. */
 "BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_DOWNLOAD_SHEET_NOW_ACTION" = "ابھی ڈاؤن لوڈ کریں";
@@ -941,13 +941,13 @@
 "BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_TOGGLE_FOOTER_AVAILABLE_FOR_TESTERS" = "غیر استعمال شدہ میڈیا کو آف لوڈ کر دیا جائے گا، لیکن جب تک آپ TestFlight استعمال کر رہے ہیں، آپ اسے اپنے بیک اپ سے کسی بھی وقت ڈاؤن لوڈ کر سکتے ہیں۔";
 
 /* Footer for a toggle allowing users to change the Optimize Local Storage setting, if the toggle is unavailable. */
-"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_TOGGLE_FOOTER_UNAVAILABLE" = "اسٹوریج کی کارکردگی کو صرف Signal بیک اپس کے ادا شدہ درجے کے ساتھ ہی استعمال کیا جا سکتا ہے۔ اس فیچر کے استعمال کو شروع کرنے کے لیے اپنے بیک اپ پلان کو اپ گریڈ کریں۔";
+"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_TOGGLE_FOOTER_UNAVAILABLE" = "اسٹوریج کی کارکردگی کو صرف Radar بیک اپس کے ادا شدہ درجے کے ساتھ ہی استعمال کیا جا سکتا ہے۔ اس فیچر کے استعمال کو شروع کرنے کے لیے اپنے بیک اپ پلان کو اپ گریڈ کریں۔";
 
 /* Title for a toggle allowing users to change the Optimize Local Storage setting. */
 "BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_TOGGLE_TITLE" = "آن-ڈیوائس اسٹوریج کو بہتر کریں";
 
 /* Subtitle for a notification telling the user they are out of remote storage space. */
-"BACKUP_SETTINGS_OUT_OF_STORAGE_SPACE_NOTIFICATION_SUBTITLE" = "آپ اپنی بیک اپ اسٹوریج کی حد تک پہنچ گئے ہیں۔ چیٹس اور میڈیا کا بیک اپ جاری رکھنے کے لیے Signal میں جگہ خالی کریں۔";
+"BACKUP_SETTINGS_OUT_OF_STORAGE_SPACE_NOTIFICATION_SUBTITLE" = "آپ اپنی بیک اپ اسٹوریج کی حد تک پہنچ گئے ہیں۔ چیٹس اور میڈیا کا بیک اپ جاری رکھنے کے لیے Radar میں جگہ خالی کریں۔";
 
 /* Title for a notification telling the user they are out of remote storage space. */
 "BACKUP_SETTINGS_OUT_OF_STORAGE_SPACE_NOTIFICATION_TITLE" = "بیک اپ اسٹوریج فُل ہو گئی ہے";
@@ -971,7 +971,7 @@
 "BACKUP_SETTINGS_SUBSCRIPTION_ALREADY_REDEEMED_NOTICE_TITLE" = "آپ کی بیک اپس کی سبسکرپشن کو ریڈیم نہیں کیا جا سکا";
 
 /* Body for a sheet explaining that the user's Backups subscription was already redeemed. */
-"BACKUP_SETTINGS_SUBSCRIPTION_ALREADY_REDEEMED_SHEET_BODY" = "اس ماہ بہت سی ڈیوائسز پر آپ کی سبسکرپشن کو ریڈیم کرنے کی کوشش کی گئی ہے۔\n\nآپ نے ممکنہ طور پر اپنا Signal کا اکاؤنٹ بہت بار دوبارہ رجسٹر کیا ہے، یا بہت زیادہ ڈیوائسز پر ایک ہی سبسکرپشن کو استعمال کیا ہے۔";
+"BACKUP_SETTINGS_SUBSCRIPTION_ALREADY_REDEEMED_SHEET_BODY" = "اس ماہ بہت سی ڈیوائسز پر آپ کی سبسکرپشن کو ریڈیم کرنے کی کوشش کی گئی ہے۔\n\nآپ نے ممکنہ طور پر اپنا Radar کا اکاؤنٹ بہت بار دوبارہ رجسٹر کیا ہے، یا بہت زیادہ ڈیوائسز پر ایک ہی سبسکرپشن کو استعمال کیا ہے۔";
 
 /* Button for a sheet explaining that the user's Backups subscription was already redeemed. */
 "BACKUP_SETTINGS_SUBSCRIPTION_ALREADY_REDEEMED_SHEET_GOT_IT_BUTTON" = "سمجھ گیا";
@@ -992,19 +992,19 @@
 "BACKUP_SETTINGS_UPLOAD_PROGRESS_SUBTITLE_PAUSED_NEEDS_WIFI" = "میڈیا اپ لوڈ موقوف ہو گیا: Wi-Fi کا انتظار ہو رہا ہے";
 
 /* Subtitle for a progress bar tracking uploads that are paused because the user is out of remote storage space. Embeds 1:{{ total storage space provided, e.g. 100 GB }}; 2:{{ space the user needs to free up by deleting media, e.g. 1 GB }}. */
-"BACKUP_SETTINGS_UPLOAD_PROGRESS_SUBTITLE_PAUSED_OUT_OF_STORAGE_SPACE_FORMAT" = "آپ اپنے بیک اپ پلان میں شامل %1$@ اسٹوریج کی حد تک پہنچ چکے ہیں۔ نئی چیٹس اور میڈیا کے بیک اپ کے لیے، Signal میں %2$@ جگہ خالی کریں، اور پھر \"اب بیک اپ کریں\" پر ٹیپ کریں۔";
+"BACKUP_SETTINGS_UPLOAD_PROGRESS_SUBTITLE_PAUSED_OUT_OF_STORAGE_SPACE_FORMAT" = "آپ اپنے بیک اپ پلان میں شامل %1$@ اسٹوریج کی حد تک پہنچ چکے ہیں۔ نئی چیٹس اور میڈیا کے بیک اپ کے لیے، Radar میں %2$@ جگہ خالی کریں، اور پھر \"اب بیک اپ کریں\" پر ٹیپ کریں۔";
 
 /* Subtitle for a progress bar tracking active uploading. Embeds 1:{{ the amount uploaded as a file size, e.g. 100 MB }}; 2:{{ the total amount to upload as a file size, e.g. 1 GB }}; 3:{{ the percentage uploaded as a percent, e.g. 40% }}. */
 "BACKUP_SETTINGS_UPLOAD_PROGRESS_SUBTITLE_RUNNING" = "%2$@ کا %1$@ (%3$@) اپ لوڈ ہو رہا ہے";
 
 /* Message for a sheet shown after the user enables backups. */
-"BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_MESSAGE" = "آپ کے بیک اپ کے سائز پر انحصار کرتے ہوئے، یہ زیادہ وقت لے سکتا ہے۔ آپ بیک اپ کے دوران Signal کو معمول کے طور پر استعمال کر سکتے ہیں۔";
+"BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_MESSAGE" = "آپ کے بیک اپ کے سائز پر انحصار کرتے ہوئے، یہ زیادہ وقت لے سکتا ہے۔ آپ بیک اپ کے دوران Radar کو معمول کے طور پر استعمال کر سکتے ہیں۔";
 
 /* Title for a sheet shown after the user enables backups. */
-"BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_TITLE" = "Signal محفوظ بیک اپس میں خوش آمدید۔ ابھی اپنا بیک اپ شروع کریں۔";
+"BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_TITLE" = "Radar محفوظ بیک اپس میں خوش آمدید۔ ابھی اپنا بیک اپ شروع کریں۔";
 
 /* Message for a sheet shown when your Backup subscription fails to renew. */
-"BACKUP_SUBSCRIPTION_FAILED_TO_RENEW_SHEET_MESSAGE" = "یہ یقینی بنانے کے لیے چیک کریں کہ آپ کا پیمنٹ کا طریقہ اپ ٹو ڈیٹ ہے۔ سبسکرپشن کا نظم کریں > Signal > پیمنٹ کا طریقہ اپ ڈیٹ کریں پر ٹیپ کریں۔";
+"BACKUP_SUBSCRIPTION_FAILED_TO_RENEW_SHEET_MESSAGE" = "یہ یقینی بنانے کے لیے چیک کریں کہ آپ کا پیمنٹ کا طریقہ اپ ٹو ڈیٹ ہے۔ سبسکرپشن کا نظم کریں > Radar > پیمنٹ کا طریقہ اپ ڈیٹ کریں پر ٹیپ کریں۔";
 
 /* Primary button for a sheet shown when your Backup subscription fails to renew. */
 "BACKUP_SUBSCRIPTION_FAILED_TO_RENEW_SHEET_PRIMARY_BUTTON" = "سبسکرپشن کا نظم کریں";
@@ -1022,7 +1022,7 @@
 "BACKUPS_SETTINGS_TITLE" = "محفوظ بیک اپس";
 
 /* Body for system notification or megaphone when backups is enabled. Embeds {{ time backups was enabled }} */
-"BACKUPS_TURNED_ON_NOTIFICATION_BODY_FORMAT" = "اس اکاؤنٹ کے لیے Signal بیک اپس %1$@ کو فعال کیے گئے تھے. دیکھنے کے لیے ٹیپ کریں۔";
+"BACKUPS_TURNED_ON_NOTIFICATION_BODY_FORMAT" = "اس اکاؤنٹ کے لیے Radar بیک اپس %1$@ کو فعال کیے گئے تھے. دیکھنے کے لیے ٹیپ کریں۔";
 
 /* Title for system notification or megaphone when backups is enabled */
 "BACKUPS_TURNED_ON_TITLE" = "آپ نے بیک اپس فعال کر دیے ہیں";
@@ -1040,10 +1040,10 @@
 "BADGE_DETAILS_DONATE_TO_SIGNAL" = "ابھی عطیہ کریں";
 
 /* When viewing someone else's donor badge, you'll see a sheet. This is the title on that sheet. Embeds {badge owner's short name} */
-"BADGE_DETAILS_TITLE_FOR_SUPPORTER" = "%1$@ Signal کو سپورٹ کرتا ہے";
+"BADGE_DETAILS_TITLE_FOR_SUPPORTER" = "%1$@ Radar کو سپورٹ کرتا ہے";
 
 /* String explaining to the user that their boost badge has expired on the badge expiry sheet. */
-"BADGE_EXPIRED_BOOST_BODY" = "آپ کا بوسٹ بیج زائد المیعاد ہو گیا ہے، اور آپ کی پروفائل پر مزید نظر نہیں آئے گا۔\n\nآپ Signal کا استعمال جاری رکھ سکتے ہیں تاہم آپ کے لیے تیار کی گئی ٹیکنالوجی کو سپورٹ کرنے کے لیے، براہ کرم ماہانہ عطیہ گزار بننے پر غور کریں۔";
+"BADGE_EXPIRED_BOOST_BODY" = "آپ کا بوسٹ بیج زائد المیعاد ہو گیا ہے، اور آپ کی پروفائل پر مزید نظر نہیں آئے گا۔\n\nآپ Radar کا استعمال جاری رکھ سکتے ہیں تاہم آپ کے لیے تیار کی گئی ٹیکنالوجی کو سپورٹ کرنے کے لیے، براہ کرم ماہانہ عطیہ گزار بننے پر غور کریں۔";
 
 /* String explaining to the user that their boost badge has expired while they are a current subscription sustainer on the badge expiry sheet. */
 "BADGE_EXPIRED_BOOST_CURRENT_SUSTAINER_BODY" = "آپ کا بوسٹ بیج زائد المیعاد ہو گیا ہے، اور آپ کی پروفائل پر مزید نظر نہیں آئے گا۔\n\nآپ اپنے بوسٹ بیج کو ایک وقتی عطیے کے ساتھ مزید 30 دنوں کے لیے دوبارہ فعال کر سکتے ہیں۔";
@@ -1088,7 +1088,7 @@
 "BANK_DONATION_FOOTER_FIND_ACCOUNT_INFO" = "اکاؤنٹ کی معلومات تلاش کریں";
 
 /* On the bank transfer donation screen, a small amount of information text is shown. This is that text. It should (1) instruct users to enter their bank information (2) tell them that Signal does not collect or store their personal information. */
-"BANK_DONATION_SUBHEADER_TEXT" = "اپنی بینک کی تفصیلات درج کریں۔ Signal آپ کی ذاتی معلومات اکٹھی یا اسٹور نہیں کرتا۔";
+"BANK_DONATION_SUBHEADER_TEXT" = "اپنی بینک کی تفصیلات درج کریں۔ Radar آپ کی ذاتی معلومات اکٹھی یا اسٹور نہیں کرتا۔";
 
 /* Users can donate to Signal with a bank account. We are required to show them a mandate with information about bank transfers. This is a label for a button to agree to the mandate. */
 "BANK_MANDATE_AGREE" = "متفق ہوں";
@@ -1097,7 +1097,7 @@
 "BANK_MANDATE_READ_MORE" = "مزید پڑھ";
 
 /* Users can donate to Signal with a bank account. We are required to show them a mandate with information about bank transfers. This is a subtitle about the payment processor Stripe above that mandate. */
-"BANK_MANDATE_SUBTITLE" = "Signal کو کیے گئے عطیات پر Stripe کی جانب سے کارروائی کی جاتی ہے۔ Signal آپ کی ذاتی معلومات جمع یا اسٹور نہیں کرتا۔";
+"BANK_MANDATE_SUBTITLE" = "Radar کو کیے گئے عطیات پر Stripe کی جانب سے کارروائی کی جاتی ہے۔ Radar آپ کی ذاتی معلومات جمع یا اسٹور نہیں کرتا۔";
 
 /* Users can donate to Signal with a bank account. We are required to show them a mandate with information about bank transfers. This is the title above that mandate. */
 "BANK_MANDATE_TITLE" = "بینک ٹرانسفر";
@@ -1253,7 +1253,7 @@
 "CALL_AUDIO_MISSED_WEEK_NOTIFICATION_BODY_FORMAT" = "📞 %1$@ پر مسڈ وائس کال";
 
 /* Alert message when calling and permissions for microphone are missing */
-"CALL_AUDIO_PERMISSION_MESSAGE" = "Signal میں کالیں کرنے اور وائس پیغامات ریکارڈ کرنے کیلئے IOS ایپ کی ترتیبات تک رسائی پا کر مائکروفون فعال کریں۔";
+"CALL_AUDIO_PERMISSION_MESSAGE" = "Radar میں کالیں کرنے اور وائس پیغامات ریکارڈ کرنے کیلئے IOS ایپ کی ترتیبات تک رسائی پا کر مائکروفون فعال کریں۔";
 
 /* Alert title when calling and permissions for microphone are missing */
 "CALL_AUDIO_PERMISSION_TITLE" = "مائیکروفون رسائی چاہئے";
@@ -1319,7 +1319,7 @@
 "CALL_LINK_JOIN_REQUEST_PROMPT" = "شامل ہونا چاہیں گے…";
 
 /* Shown in a message bubble when you send a call link in a Signal chat */
-"CALL_LINK_LINK_PREVIEW_DESCRIPTION" = "Signal کال میں شامل ہونے کے لیے یہ لنک استعمال کریں";
+"CALL_LINK_LINK_PREVIEW_DESCRIPTION" = "Radar کال میں شامل ہونے کے لیے یہ لنک استعمال کریں";
 
 /* Text that appears on a toast in a call lobby before joining a call link informing the user what information will be shared with other call members when they have phone number sharing turned off. */
 "CALL_LINK_LOBBY_SHARING_INFO_PHONE_NUMBER_SHARING_OFF" = "جو بھی اس لنک کے ذریعے کال میں شامل ہو گا آپ کا نام اور تصویر دیکھ سکے گا۔";
@@ -1343,7 +1343,7 @@
 "CALL_LINK_REQUIRE_APPROVAL" = "ایڈمن کی منظوری درکار ہے";
 
 /* Button to open UI to share a Call Link with someone on Signal. */
-"CALL_LINK_SHARE_VIA_SIGNAL" = "بذریعہ Signal لنک شیئر کریں";
+"CALL_LINK_SHARE_VIA_SIGNAL" = "بذریعہ Radar لنک شیئر کریں";
 
 /* Button to open the system share sheet to share a Call Link. */
 "CALL_LINK_SHARE_VIA_SYSTEM" = "لنک شیئر کریں";
@@ -1451,7 +1451,7 @@
 "CALLKIT_ANONYMOUS_CONTACT_NAME" = "سگنل صارف";
 
 /* The generic name used for group calls if CallKit privacy is enabled */
-"CALLKIT_ANONYMOUS_GROUP_NAME" = "Signal گروپ \n";
+"CALLKIT_ANONYMOUS_GROUP_NAME" = "Radar گروپ \n";
 
 /* Title for the calls list view. */
 "CALLS_LIST_TITLE" = "کالز";
@@ -1625,7 +1625,7 @@
 "CARD_DONATION_EXPIRATION_DATE_PLACEHOLDER" = "MM/YY";
 
 /* Users can choose to learn more about their credit/debit card donations, which will open a sheet with additional information. This is the body text of that sheet. */
-"CARD_DONATION_READ_MORE_SHEET_BODY" = "Signal آپ کی جانب سے عطیہ کرنے پر آپ کی کوئی ذاتی معلومات جمع یا سٹور نہیں کرتا۔\n\nہم آپ کے عطیات وصول کرنے کے لیے Stripe کو اپنے ادائیگی کے پروسیسر کے طور پر استعمال کرتے ہیں۔ آپ انہیں جو معلومات فراہم کرتے ہیں ہم اس تک رسائی، اسے سٹور، یا محفوظ نہیں کرتے۔\n\nSignal آپ کے عطیے کو آپ کے Signal اکاؤنٹ کے ساتھ مربوط نہیں کرتا اور نہ کر سکتا ہے۔\n\nآپ کی سپورٹ کا شکریہ!";
+"CARD_DONATION_READ_MORE_SHEET_BODY" = "Radar آپ کی جانب سے عطیہ کرنے پر آپ کی کوئی ذاتی معلومات جمع یا سٹور نہیں کرتا۔\n\nہم آپ کے عطیات وصول کرنے کے لیے Stripe کو اپنے ادائیگی کے پروسیسر کے طور پر استعمال کرتے ہیں۔ آپ انہیں جو معلومات فراہم کرتے ہیں ہم اس تک رسائی، اسے سٹور، یا محفوظ نہیں کرتے۔\n\nSignal آپ کے عطیے کو آپ کے Radar اکاؤنٹ کے ساتھ مربوط نہیں کرتا اور نہ کر سکتا ہے۔\n\nآپ کی سپورٹ کا شکریہ!";
 
 /* Users can choose to learn more about their credit/debit card donations, which will open a sheet with additional information. This is the title of that sheet. */
 "CARD_DONATION_READ_MORE_SHEET_TITLE" = "آپ کی معلومات پرائیویٹ ہے";
@@ -1634,7 +1634,7 @@
 "CARD_DONATION_SUBHEADER_LEARN_MORE" = "اورجانیے.";
 
 /* On the credit/debit card donation screen, a small amount of information text is shown. This is that text. It should (1) instruct users to enter their credit/debit card information (2) tell them that Signal does not collect or store their personal information. */
-"CARD_DONATION_SUBHEADER_TEXT" = "اپنے کارڈ کی تفصیلات درج کریں۔ Signal آپ کی ذاتی معلومات جمع یا اسٹور نہیں کرتا۔";
+"CARD_DONATION_SUBHEADER_TEXT" = "اپنے کارڈ کی تفصیلات درج کریں۔ Radar آپ کی ذاتی معلومات جمع یا اسٹور نہیں کرتا۔";
 
 /* Title for the 'censorship circumvention country' view. */
 "CENSORSHIP_CIRCUMVENTION_COUNTRY_VIEW_TITLE" = "ملک کا انتخاب کریں";
@@ -1772,7 +1772,7 @@
 "COMPARE_SAFETY_NUMBER_ACTION" = "کلِپ بورڈ کیساتھ موازنہ کریں";
 
 /* Accessibility hint describing what you can do with the compose button */
-"COMPOSE_BUTTON_HINT" = "کسی Signal یوزر کے ساتھ چیٹ شروع کرنے کے لیے اسے منتخب کریں یا اسے تلاش کریں۔";
+"COMPOSE_BUTTON_HINT" = "کسی Radar یوزر کے ساتھ چیٹ شروع کرنے کے لیے اسے منتخب کریں یا اسے تلاش کریں۔";
 
 /* Accessibility label from compose button. */
 "COMPOSE_BUTTON_LABEL" = "تحریر کریں";
@@ -1799,13 +1799,13 @@
 "COMPOSE_SCREEN_LIMITED_CONTACTS_CTA" = "انتظام کریں";
 
 /* Multi-line label explaining why compose-screen contact picker is empty. */
-"COMPOSE_SCREEN_LIMITED_CONTACTS_PERMISSION" = "Signal آپ کے سسٹم کانٹیکٹس تک محدود رسائی رکھتا ہے";
+"COMPOSE_SCREEN_LIMITED_CONTACTS_PERMISSION" = "Radar آپ کے سسٹم کانٹیکٹس تک محدود رسائی رکھتا ہے";
 
 /* Button to open settings from an empty compose-screen contact picker. */
 "COMPOSE_SCREEN_MISSING_CONTACTS_CTA" = "سیٹنگز کھولیں";
 
 /* Multi-line label explaining why compose-screen contact picker is empty. */
-"COMPOSE_SCREEN_MISSING_CONTACTS_PERMISSION" = "آپ لے کونسے رابطے Signal صارفین ہیں ان کو دیکھنے کیلئے ایپ کی iOS ترتیبات میں رسائی کیلئے رابطوں کو فعال کریں۔";
+"COMPOSE_SCREEN_MISSING_CONTACTS_PERMISSION" = "آپ لے کونسے رابطے Radar صارفین ہیں ان کو دیکھنے کیلئے ایپ کی iOS ترتیبات میں رسائی کیلئے رابطوں کو فعال کریں۔";
 
 /* Configure reactions title text */
 "CONFIGURE_REACTIONS" = "ری ایکشنز کی تشکیل کاری کریں";
@@ -1847,10 +1847,10 @@
 "CONTACT_ABOUT_SHEET_PROFILE_NAMES_EDUCATION" = "پروفائل نیمز تصدیق شدہ نہیں ہیں";
 
 /* Message for a tooltip that appears above a parenthesized name for another user, indicating that that name is the name the other user set for themself. Embeds {{name}} */
-"CONTACT_ABOUT_SHEET_SECONDARY_NAME_TOOLTIP_MESSAGE" = "\"%1$@\" اس شخص کا پروفائل نیم ہے جس نے Signal میں اسے اپنے لیے سیٹ کیا ہے۔";
+"CONTACT_ABOUT_SHEET_SECONDARY_NAME_TOOLTIP_MESSAGE" = "\"%1$@\" اس شخص کا پروفائل نیم ہے جس نے Radar میں اسے اپنے لیے سیٹ کیا ہے۔";
 
 /* A label indicating a user is a signal connection. */
-"CONTACT_ABOUT_SHEET_SIGNAL_CONNECTION_LABEL" = "Signal کنکشن";
+"CONTACT_ABOUT_SHEET_SIGNAL_CONNECTION_LABEL" = "Radar کنکشن";
 
 /* The title for a contact 'about' sheet. */
 "CONTACT_ABOUT_SHEET_TITLE" = "کے بارے میں";
@@ -1892,7 +1892,7 @@
 "CONTACT_NOTE_TITLE" = "نوٹ";
 
 /* Body for contact permission action sheet */
-"CONTACT_PERMISSION_ACTION_SHEET_2_BODY" = "Signal پر اپنے جاننے والے لوگوں کو تلاش کرنے کے لیے:";
+"CONTACT_PERMISSION_ACTION_SHEET_2_BODY" = "Radar پر اپنے جاننے والے لوگوں کو تلاش کرنے کے لیے:";
 
 /* First step for contact permission action sheet */
 "CONTACT_PERMISSION_ACTION_SHEET_2_STEP_ONE" = "نیچے \"ترتیبات پر جائیں\" پر ٹیپ کریں";
@@ -1925,10 +1925,10 @@
 "CONTACT_PERMISSION_REMINDER_MEGAPHONE_ACTION" = "رسائی کی اجازت دیں";
 
 /* Body for contact permission reminder megaphone */
-"CONTACT_PERMISSION_REMINDER_MEGAPHONE_BODY" = "اپنے رابطوں تک رسائی کی اجازت دیں تاکہ انہیں Signal پر فوری طور پر تلاش کیا جا سکے۔";
+"CONTACT_PERMISSION_REMINDER_MEGAPHONE_BODY" = "اپنے رابطوں تک رسائی کی اجازت دیں تاکہ انہیں Radar پر فوری طور پر تلاش کیا جا سکے۔";
 
 /* Title for contact permission reminder megaphone */
-"CONTACT_PERMISSION_REMINDER_MEGAPHONE_TITLE" = "Signal پر رابطے تلاش کریں";
+"CONTACT_PERMISSION_REMINDER_MEGAPHONE_TITLE" = "Radar پر رابطے تلاش کریں";
 
 /* Label for a contact's phone number. */
 "CONTACT_PHONE" = "فون";
@@ -1952,7 +1952,7 @@
 "CONTACT_SHARE_INVALID_CONTACT" = "غلط رابطہ۔";
 
 /* Alert body when contacts disabled while trying to share a contact. */
-"CONTACT_SHARING_NO_ACCESS_BODY" = "Signal کو آپ کے رابطوں تک رسائی درکار ہے۔ iOS سیٹنگز میں جائیں اور رابطوں کو آن کریں۔ آپ کے رابطے انکرپٹ کردہ ہیں اور Signal سروس کو نظر نہیں آتے۔";
+"CONTACT_SHARING_NO_ACCESS_BODY" = "Radar کو آپ کے رابطوں تک رسائی درکار ہے۔ iOS سیٹنگز میں جائیں اور رابطوں کو آن کریں۔ آپ کے رابطے انکرپٹ کردہ ہیں اور Radar سروس کو نظر نہیں آتے۔";
 
 /* Alert title when contacts disabled while trying to share a contact. */
 "CONTACT_SHARING_NO_ACCESS_TITLE" = "رابطوں تک رسائی کی اجازت دیں";
@@ -2006,7 +2006,7 @@
 "CONTACT_SUPPORT_FILTER_SOMETHING_NOT_WORKING_SHORT" = "کچھ کام نہیں کررہا ہے";
 
 /* Alert body */
-"CONTACT_SUPPORT_PROMPT_ERROR_ALERT_BODY" = "Signal آپ کی مدد کی درخواست کو مکمل کرنے سے قاصر تھا۔";
+"CONTACT_SUPPORT_PROMPT_ERROR_ALERT_BODY" = "Radar آپ کی مدد کی درخواست کو مکمل کرنے سے قاصر تھا۔";
 
 /* button text */
 "CONTACT_SUPPORT_PROMPT_ERROR_TRY_AGAIN" = "دوبارہ کوشش کریں";
@@ -2135,7 +2135,7 @@
 "CONVERSATION_SETTINGS_ATTRIBUTES_ACCESS_SECTION_FOOTER" = "منتخب کریں کہ کون گروپ کے نام ، تصویر ، وضاحت اور غائب پیغامات کے ٹائمر میں ترمیم کرسکتا ہے۔";
 
 /* Footer string for a contact's badges in conversation settings */
-"CONVERSATION_SETTINGS_BADGES_FOOTER" = "Signal کی معاونت کرنے کے ذریعے اپنی پروفائل کے لیے بیجز حاصل کریں۔ مزید جاننے کے لیے بیج ہر ٹیپ کریں۔";
+"CONVERSATION_SETTINGS_BADGES_FOOTER" = "Radar کی معاونت کرنے کے ذریعے اپنی پروفائل کے لیے بیجز حاصل کریں۔ مزید جاننے کے لیے بیج ہر ٹیپ کریں۔";
 
 /* Header title for a contact's badges in conversation settings */
 "CONVERSATION_SETTINGS_BADGES_HEADER" = "بیجز";
@@ -2393,7 +2393,7 @@
 "DATABASE_INTEGRITY_CHECK_ACTION_RUN" = "چلائیں";
 
 /* Message for alert before running a database integrity check */
-"DATABASE_INTEGRITY_CHECK_MESSAGE" = "یہ آپ کا مسئلہ حل کرنے میں ہماری مدد ہو گی اور اسے مکمل ہونے میں کئی منٹ لگ سکتے ہیں۔ اس دوران آپ Signal بند کر سکتے ہیں، لیکن براہ کرم اپنے لاگز جمع کروانے کے لیے واپس ضرور آئیں۔";
+"DATABASE_INTEGRITY_CHECK_MESSAGE" = "یہ آپ کا مسئلہ حل کرنے میں ہماری مدد ہو گی اور اسے مکمل ہونے میں کئی منٹ لگ سکتے ہیں۔ اس دوران آپ Radar بند کر سکتے ہیں، لیکن براہ کرم اپنے لاگز جمع کروانے کے لیے واپس ضرور آئیں۔";
 
 /* Button to skip database integrity check step */
 "DATABASE_INTEGRITY_CHECK_SKIP" = "چھوڑ دو";
@@ -2417,10 +2417,10 @@
 "DATABASE_RECOVERY_MORE_STORAGE_SPACE_NEEDED_TITLE" = "زیادہ سٹوریج اسپیس درکار ہے";
 
 /* The user has tried to recover their data after it was lost due to corruption. (They have not been hacked.) This is the description on the screen where we show an error message. */
-"DATABASE_RECOVERY_RECOVERY_FAILED_DESCRIPTION" = "آپ کی میسج ہسٹری بحال نہیں کی جا سکی۔ آپ دوبارہ انسٹال کرنے کے بعد Signal استعمال کرنا جاری رکھ سکتے ہیں۔ ایک نقص ازالہ کاری کا لاگ جمع کروائیں تاکہ ہم بہتر طور پر سمجھ سکیں کہ کیا غلط ہوا۔";
+"DATABASE_RECOVERY_RECOVERY_FAILED_DESCRIPTION" = "آپ کی میسج ہسٹری بحال نہیں کی جا سکی۔ آپ دوبارہ انسٹال کرنے کے بعد Radar استعمال کرنا جاری رکھ سکتے ہیں۔ ایک نقص ازالہ کاری کا لاگ جمع کروائیں تاکہ ہم بہتر طور پر سمجھ سکیں کہ کیا غلط ہوا۔";
 
 /* The user has tried to recover their data after it was lost due to corruption. (They have not been hacked.) This button lets them delete all of their data. */
-"DATABASE_RECOVERY_RECOVERY_FAILED_RESET_APP_BUTTON" = "Signal ری سیٹ کریں";
+"DATABASE_RECOVERY_RECOVERY_FAILED_RESET_APP_BUTTON" = "Radar ری سیٹ کریں";
 
 /* The user has tried to recover their data after it was lost due to corruption. (They have not been hacked.) If they want to delete the app and restart, they will be presented with a confirmation dialog. This is the final button they will press before their data is reset. */
 "DATABASE_RECOVERY_RECOVERY_FAILED_RESET_APP_CONFIRMATION_CONFIRM" = "دوبارہ بحال کریں";
@@ -2429,7 +2429,7 @@
 "DATABASE_RECOVERY_RECOVERY_FAILED_RESET_APP_CONFIRMATION_DESCRIPTION" = "آپ کے اکاؤنٹ کی معلومات، پروفائل، اور آپ کے تمام میسجز صاف ہو جائیں گے۔ ایپ اس عمل کے مکمل ہونے کے بعد بند ہو جائے گی۔";
 
 /* The user has tried to recover their data after it was lost due to corruption. (They have not been hacked.) If they want to delete the app and restart, they will be presented with a confirmation dialog. This is the title of that dialog. */
-"DATABASE_RECOVERY_RECOVERY_FAILED_RESET_APP_CONFIRMATION_TITLE" = "Signal ری سیٹ کریں";
+"DATABASE_RECOVERY_RECOVERY_FAILED_RESET_APP_CONFIRMATION_TITLE" = "Radar ری سیٹ کریں";
 
 /* The user has tried to recover their data after it was lost due to corruption. (They have not been hacked.) They were asked to submit a debug log. This is the button that submits this log. */
 "DATABASE_RECOVERY_RECOVERY_FAILED_SUBMIT_DEBUG_LOG_BUTTON" = "ڈی بَگ لاگ پیش کریں";
@@ -2504,7 +2504,7 @@
 "DELETE_ACCOUNT_CONFIRMATION_ACTION_SHEEET_ACTION" = "اکاؤنٹ حذف کریں";
 
 /* Title for the action sheet message of the 'delete account confirmation' view controller. */
-"DELETE_ACCOUNT_CONFIRMATION_ACTION_SHEEET_MESSAGE" = "یہ آپ کا Signal اکاؤنٹ حذف کردے گا اور درخواست کو دوبارہ ترتیب دے گا۔ یہ عمل مکمل ہونے کے بعد ایپ بند ہوجائے گی۔";
+"DELETE_ACCOUNT_CONFIRMATION_ACTION_SHEEET_MESSAGE" = "یہ آپ کا Radar اکاؤنٹ حذف کردے گا اور درخواست کو دوبارہ ترتیب دے گا۔ یہ عمل مکمل ہونے کے بعد ایپ بند ہوجائے گی۔";
 
 /* Title for the action sheet confirmation title of the 'delete account confirmation' view controller. */
 "DELETE_ACCOUNT_CONFIRMATION_ACTION_SHEEET_TITLE" = "کیا آپ کو یقین ہے کہ آپ اپنا اکاؤنٹ ختم کرنا چاہتے ہیں؟";
@@ -2528,7 +2528,7 @@
 "DELETE_ACCOUNT_CONFIRMATION_PHONE_NUMBER_TITLE" = "فون نمبر";
 
 /* Section header */
-"DELETE_ACCOUNT_CONFIRMATION_SECTION_TITLE" = "اپنے Signal نمبر کی تصدیق کریں";
+"DELETE_ACCOUNT_CONFIRMATION_SECTION_TITLE" = "اپنے Radar نمبر کی تصدیق کریں";
 
 /* Title for the 'delete account' confirmation view. */
 "DELETE_ACCOUNT_CONFIRMATION_TITLE" = "اکاؤنٹ حذف کریں";
@@ -2575,7 +2575,7 @@
 
 
 /* Notification warning the user that they have been de-registered. */
-"DEREGISTRATION_NOTIFICATION" = "آپ اس ڈیوائس پر Signal سے لاگ آؤٹ ہو چکے ہیں۔";
+"DEREGISTRATION_NOTIFICATION" = "آپ اس ڈیوائس پر Radar سے لاگ آؤٹ ہو چکے ہیں۔";
 
 /* Button that lets users re-register using the same phone number. */
 "DEREGISTRATION_REREGISTER_BUTTON" = "دوبارہ رجسٹر کریں";
@@ -2584,7 +2584,7 @@
 "DEREGISTRATION_REREGISTER_PROMPT_TITLE" = "اس فون نمبر کو دوبارہ رجسٹر کریں؟";
 
 /* Label warning the user that they have been de-registered. */
-"DEREGISTRATION_WARNING" = "یہ ڈیوائس اب مزید رجسٹر شدہ نہیں ہے۔ ایسا ہو سکتا ہے کیونکہ آپ نے ایک مختلف ڈیوائس پر اپنا فون نمبر Signal میں رجسٹر کیا تھا۔";
+"DEREGISTRATION_WARNING" = "یہ ڈیوائس اب مزید رجسٹر شدہ نہیں ہے۔ ایسا ہو سکتا ہے کیونکہ آپ نے ایک مختلف ڈیوائس پر اپنا فون نمبر Radar میں رجسٹر کیا تھا۔";
 
 /* If the user has been deregistered, they'll see a warning. This is This is the call to action on that warning. */
 "DEREGISTRATION_WARNING_ACTION_TITLE" = "ڈیوائس کو دوبارہ رجسٹر کریں";
@@ -2653,7 +2653,7 @@
 "DEVICE_TRANSFER_CONTRACT_QR_CODE_BUTTON" = "چھوٹا کر کے دیکھیں";
 
 /* An error indicating that the other device closed signal mid-transfer and it could not complete */
-"DEVICE_TRANSFER_ERROR_BACKGROUNDED" = "ٹرانسفر مکمل نہیں ہو سکا۔ اس بات کو یقینی بنائیں کہ دونوں ڈیوائسز میں Signal کھلا ہے اور دوبارہ کوشش کریں۔";
+"DEVICE_TRANSFER_ERROR_BACKGROUNDED" = "ٹرانسفر مکمل نہیں ہو سکا۔ اس بات کو یقینی بنائیں کہ دونوں ڈیوائسز میں Radar کھلا ہے اور دوبارہ کوشش کریں۔";
 
 /* An error indicating that we were unable to verify the identity of the new device to complete the transfer */
 "DEVICE_TRANSFER_ERROR_CERTIFICATE_MISMATCH" = "آپ کے نئے device کی تصدیق کرنے سے قاصر ، براہ کرم دوبارہ کوشش کریں";
@@ -2671,13 +2671,13 @@
 "DEVICE_TRANSFER_ERROR_NOT_ENOUGH_SPACE" = "منتقلی مکمل کرنے کے لئے جگہ کافی نہیں ہے";
 
 /* An error indicating the user must update their device before trying to transfer. */
-"DEVICE_TRANSFER_ERROR_UNSUPPORTED_VERSION" = "Signal کے تازہ ترین ورژن میں تازہ کاری کریں اور دوبارہ کوشش کریں";
+"DEVICE_TRANSFER_ERROR_UNSUPPORTED_VERSION" = "Radar کے تازہ ترین ورژن میں تازہ کاری کریں اور دوبارہ کوشش کریں";
 
 /* Button shown to expand a QR code and view it fullscreen. */
 "DEVICE_TRANSFER_EXPAND_QR_CODE_BUTTON" = "بڑا کر کے دیکھیں";
 
 /* The explanation on the action sheet prompting the user if they want to transfer their device. */
-"DEVICE_TRANSFER_PROMPT_EXPLANATION" = "اپنے Signal اکاؤنٹ کو کسی نئے iOS device میں منتقل کریں۔ یقینی بنائیں کہ آپ کا نیا device قریب ہی ہے اور آن ہے۔";
+"DEVICE_TRANSFER_PROMPT_EXPLANATION" = "اپنے Radar اکاؤنٹ کو کسی نئے iOS device میں منتقل کریں۔ یقینی بنائیں کہ آپ کا نیا device قریب ہی ہے اور آن ہے۔";
 
 /* The title on the acttion sheet prompting the user if they want to transfer their device. */
 "DEVICE_TRANSFER_PROMPT_TITLE" = "اکاؤنٹ کی منتقلی";
@@ -2695,7 +2695,7 @@
 "DEVICE_TRANSFER_QRCODE_TITLE" = "QR کوڈ سکین کریں";
 
 /* The explanation on the view that shows receiving progress */
-"DEVICE_TRANSFER_RECEIVING_EXPLANATION" = "دونوں devices ایک دوسرے کے قریب رکھیں۔ کسی بھی device کو بند نہ کریں اور Signal کو کھلا رکھیں۔ منتقلی اختتام سے آخر تک encrypted ہوتی ہیں۔";
+"DEVICE_TRANSFER_RECEIVING_EXPLANATION" = "دونوں devices ایک دوسرے کے قریب رکھیں۔ کسی بھی device کو بند نہ کریں اور Radar کو کھلا رکھیں۔ منتقلی اختتام سے آخر تک encrypted ہوتی ہیں۔";
 
 /* The title on the view that shows receiving progress */
 "DEVICE_TRANSFER_RECEIVING_TITLE" = "ڈیٹا وصول کرنا";
@@ -2731,7 +2731,7 @@
 "DEVICE_TRANSFER_STATUS_NEW_DEVICE_TRANSFERRING" = "ٹرانسفر ہو رہا ہے";
 
 /* Description in the progress view displayed during device transfer. */
-"DEVICE_TRANSFER_STATUS_NEW_DEVICE_TRANSFERRING_DESCRIPTION" = "دونوں devices ایک دوسرے کے قریب رکھیں۔ کسی بھی device کو بند نہ کریں اور Signal کو کھلا رکھیں۔ منتقلی اختتام سے آخر تک encrypted ہوتی ہیں۔";
+"DEVICE_TRANSFER_STATUS_NEW_DEVICE_TRANSFERRING_DESCRIPTION" = "دونوں devices ایک دوسرے کے قریب رکھیں۔ کسی بھی device کو بند نہ کریں اور Radar کو کھلا رکھیں۔ منتقلی اختتام سے آخر تک encrypted ہوتی ہیں۔";
 
 /* Status message on old device when cancelling transfer. */
 "DEVICE_TRANSFER_STATUS_OLD_DEVICE_CANCELLING" = "نئے iPhone سے کنیکشن منسوخ کیا جا رہا ہے…";
@@ -2746,7 +2746,7 @@
 "DEVICE_TRANSFER_STATUS_OLD_DEVICE_STARTING" = "نئے iPhone کے ساتھ کنیکٹ ہونے کا انتظار جاری ہے…";
 
 /* The explanation on the action sheet that shows transfer progress */
-"DEVICE_TRANSFER_TRANSFERRING_EXPLANATION" = "دونوں devices ایک دوسرے کے قریب رکھیں۔ کسی بھی device کو بند نہ کریں اور Signal کو کھلا رکھیں۔";
+"DEVICE_TRANSFER_TRANSFERRING_EXPLANATION" = "دونوں devices ایک دوسرے کے قریب رکھیں۔ کسی بھی device کو بند نہ کریں اور Radar کو کھلا رکھیں۔";
 
 /* The title on the action sheet that shows transfer progress */
 "DEVICE_TRANSFER_TRANSFERRING_TITLE" = "ڈیٹا کی منتقلی";
@@ -2836,13 +2836,13 @@
 "DONATE_CHOOSE_PAYMENT_METHOD_SHEET_SUBTITLE_FOR_ONE_TIME_DONATION" = "30 دنوں کے لیے %1$@ بیج حاصل کریں";
 
 /* When users make donations on a friend's behalf, they see a sheet that lets them pick a payment method. This is the title on that sheet. Embeds {{amount of money}}, such as \"$5\". */
-"DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_DONATION_ON_BEHALF_OF_A_FRIEND" = "Signal کو %1$@ عطیہ";
+"DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_DONATION_ON_BEHALF_OF_A_FRIEND" = "Radar کو %1$@ عطیہ";
 
 /* When users make monthly donations, they see a sheet that lets them pick a payment method. This is the title on that sheet. Embeds {{amount of money per month}}, such as \"$5/month\". */
-"DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_MONTHLY_DONATION" = "Signal کو %1$@ عطیہ کریں";
+"DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_MONTHLY_DONATION" = "Radar کو %1$@ عطیہ کریں";
 
 /* When users make one-time donations, they see a sheet that lets them pick a payment method. This is the title on that sheet. Embeds {{amount of money}}, such as \"$5\". */
-"DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_ONE_TIME_DONATION" = "Signal کو %1$@ عطیہ کریں";
+"DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_ONE_TIME_DONATION" = "Radar کو %1$@ عطیہ کریں";
 
 /* Users can donate on a friend's behalf and can optionally add a message. This is tells users about that optional message. */
 "DONATE_ON_BEHALF_OF_A_FRIEND_ADDITIONAL_MESSAGE_INFO" = "وصول کنندہ کو عطیہ کے حوالے سے ایک 1 پر 1 پیغام ارسال کر کے مطلع کیا جائے گا۔ ذیل میں اپنا ذاتی پیغام شامل کریں۔";
@@ -2959,7 +2959,7 @@
 "DONATION_ON_BEHALF_OF_A_FRIEND_BADGE_REDEEMED" = "ریڈیم ہو گیا";
 
 /* Users can donate on behalf of a friend, and the friend will receive a badge. This is a short paragraph on the screen where users choose the badge their friend will receive. */
-"DONATION_ON_BEHALF_OF_A_FRIEND_CHOOSE_BADGE_DESCRIPTION" = "Signal استعمال کرنے والے دوست یا فیملی ممبر کی خاطر عطیہ کر کے Signal کو سپورٹ کریں۔ انہیں اپنی پروفائل پر سپورٹ ظاہر کرنے کا آپشن دیا جائے گا۔";
+"DONATION_ON_BEHALF_OF_A_FRIEND_CHOOSE_BADGE_DESCRIPTION" = "Radar استعمال کرنے والے دوست یا فیملی ممبر کی خاطر عطیہ کر کے Radar کو سپورٹ کریں۔ انہیں اپنی پروفائل پر سپورٹ ظاہر کرنے کا آپشن دیا جائے گا۔";
 
 /* Users can donate on behalf of a friend, and the friend will receive a badge. This is the title on the screen where users choose the badge their friend will receive. */
 "DONATION_ON_BEHALF_OF_A_FRIEND_CHOOSE_BADGE_TITLE" = "دوست کی طرف سے عطیہ کریں";
@@ -2983,7 +2983,7 @@
 "DONATION_ON_BEHALF_OF_A_FRIEND_PAYMENT_FAILED_ERROR_TITLE" = "پیمنٹ ناکام ہو گئی";
 
 /* Users can donate on a friend's behalf. If the payment was processed but the donation failed to send, this error message will be shown. */
-"DONATION_ON_BEHALF_OF_A_FRIEND_PAYMENT_SUCCEEDED_BUT_MESSAGE_FAILED_ERROR_BODY" = "آپ کی پیمنٹ پر کارروائی ہو گئی تھی تاہم Signal آپ کے عطیہ کا پیغام ارسال کرنے سے قاصر تھی۔ براہ کرم سپورٹ سے رابطہ کریں۔";
+"DONATION_ON_BEHALF_OF_A_FRIEND_PAYMENT_SUCCEEDED_BUT_MESSAGE_FAILED_ERROR_BODY" = "آپ کی پیمنٹ پر کارروائی ہو گئی تھی تاہم Radar آپ کے عطیہ کا پیغام ارسال کرنے سے قاصر تھی۔ براہ کرم سپورٹ سے رابطہ کریں۔";
 
 /* Users can donate on a friend's behalf. If the payment was processed but the donation failed to send, an error dialog will be shown. This is the title of that dialog. */
 "DONATION_ON_BEHALF_OF_A_FRIEND_PAYMENT_SUCCEEDED_BUT_MESSAGE_FAILED_ERROR_TITLE" = "عطیہ ناکام ہو گیا";
@@ -2995,7 +2995,7 @@
 "DONATION_ON_BEHALF_OF_A_FRIEND_PREVIEW_OUTGOING" = "✨ آپ نے %1$@ کی طرف سے عطیہ کیا ہے";
 
 /* You received a donation from a friend. This is the title of that message in the chat. Embeds {{short contact name}}. */
-"DONATION_ON_BEHALF_OF_A_FRIEND_RECEIVED_TITLE_FORMAT" = "%1$@ نے آپ کی جانب سے Signal کو عطیہ کیا ہے";
+"DONATION_ON_BEHALF_OF_A_FRIEND_RECEIVED_TITLE_FORMAT" = "%1$@ نے آپ کی جانب سے Radar کو عطیہ کیا ہے";
 
 /* Users can donate on a friend's behalf. This is the error message that appears if the try to do this, but the recipient is blocked. */
 "DONATION_ON_BEHALF_OF_A_FRIEND_RECIPIENT_IS_BLOCKED_ERROR_BODY" = "چونکہ آپ نے انہیں بلاک کر دیا ہے اس لیے آپ اس یوزر کے لیے عطیہ نہیں کر سکتے۔";
@@ -3019,7 +3019,7 @@
 "DONATION_ON_BEHALF_OF_A_FRIEND_SENT_TITLE_FORMAT" = "%1$@ کی جانب سے عطیہ";
 
 /* When you donate on behalf of a friend, a thank-you sheet will appear. This is the text on that sheet. Embeds {{recipient name}}. */
-"DONATION_ON_BEHALF_OF_A_FRIEND_THANKS_BODY_FORMAT" = "آپ نے %1$@ کی جانب سے Signal کو عطیہ کیا ہے۔ انہیں اپنی پروفائل پر سپورٹ ظاہر کرنے کا آپشن دیا جائے گا۔";
+"DONATION_ON_BEHALF_OF_A_FRIEND_THANKS_BODY_FORMAT" = "آپ نے %1$@ کی جانب سے Radar کو عطیہ کیا ہے۔ انہیں اپنی پروفائل پر سپورٹ ظاہر کرنے کا آپشن دیا جائے گا۔";
 
 /* When you donate on behalf of a friend, a thank-you sheet will appear. This is the title on that sheet. */
 "DONATION_ON_BEHALF_OF_A_FRIEND_THANKS_TITLE" = "آپ کی سپورٹ کا شکریہ!";
@@ -3028,19 +3028,19 @@
 "DONATION_ON_BEHALF_OF_A_FRIEND_VIEW" = "ملاحظہ کریں";
 
 /* A friend has donated on your behalf and you received a badge. This text says that you received a badge, and from whom. Embeds {{contact's short name, such as a first name}}. */
-"DONATION_ON_BEHALF_OF_A_FRIEND_YOU_RECEIVED_A_BADGE_FORMAT" = "%1$@ نے آپ کی جانب سے Signal کو عطیہ کیا ہے! اپنی پروفائل پر Signal کے لیے سپورٹ ظاہر کریں۔";
+"DONATION_ON_BEHALF_OF_A_FRIEND_YOU_RECEIVED_A_BADGE_FORMAT" = "%1$@ نے آپ کی جانب سے Radar کو عطیہ کیا ہے! اپنی پروفائل پر Radar کے لیے سپورٹ ظاہر کریں۔";
 
 /* There is a screen where users can read more about their donation to Signal. This is the 1st paragraph of that screen. */
 "DONATION_READ_MORE_SCREEN_PARAGRAPH_1" = "پرائیوٹ میسجنگ۔ کوئی اشتہارات نہیں، کوئی ٹریکرز نہیں، کوئی نگرانی نہیں۔";
 
 /* There is a screen where users can read more about their donation to Signal. This is the 2nd paragraph of that screen. */
-"DONATION_READ_MORE_SCREEN_PARAGRAPH_2" = "Signal کو عطیات سپورٹ کرتے ہیں، مطلب یہ کہ آپ کی پرائیویسی ہر اس کام کا محور ہے جو ہم انجام دیتے ہیں۔ Signal کو آپ کے ڈیٹا اور منافع کے لیے نہیں؛ بلکہ آپ کے لیے بنایا گیا ہے۔";
+"DONATION_READ_MORE_SCREEN_PARAGRAPH_2" = "Radar کو عطیات سپورٹ کرتے ہیں، مطلب یہ کہ آپ کی پرائیویسی ہر اس کام کا محور ہے جو ہم انجام دیتے ہیں۔ Radar کو آپ کے ڈیٹا اور منافع کے لیے نہیں؛ بلکہ آپ کے لیے بنایا گیا ہے۔";
 
 /* There is a screen where users can read more about their donation to Signal. This is the 3rd paragraph of that screen. */
-"DONATION_READ_MORE_SCREEN_PARAGRAPH_3" = "اگر آپ کر سکیں، تو براہ کرم Signal کو پُرتفریح، قابل اعتماد، اور ہر کسی کے لیے اس کی دستیابی ممکن بنانے کے لیے آج ہی عطیہ دیں۔";
+"DONATION_READ_MORE_SCREEN_PARAGRAPH_3" = "اگر آپ کر سکیں، تو براہ کرم Radar کو پُرتفریح، قابل اعتماد، اور ہر کسی کے لیے اس کی دستیابی ممکن بنانے کے لیے آج ہی عطیہ دیں۔";
 
 /* There is a screen where users can read more about their donation to Signal. This is the title of that screen. */
-"DONATION_READ_MORE_SCREEN_TITLE" = "Signal مختلف ہے۔";
+"DONATION_READ_MORE_SCREEN_TITLE" = "Radar مختلف ہے۔";
 
 /* Section title for donation amount on receipts */
 "DONATION_RECEIPT_AMOUNT" = "رقم";
@@ -3076,7 +3076,7 @@
 "DONATION_RECEIPTS" = "عطیے کی رسیدیں";
 
 /* Text at the bottom of the donation receipts list, telling users that receipts might not be available */
-"DONATION_RECEIPTS_MIGHT_BE_MISSING_IF_YOU_REINSTALLED" = "اگر آپ نے Signal دوبارہ انسٹال کیا ہے، تو گزشتہ عطیات کی رسیدیں دستیاب نہیں ہوں گی۔";
+"DONATION_RECEIPTS_MIGHT_BE_MISSING_IF_YOU_REINSTALLED" = "اگر آپ نے Radar دوبارہ انسٹال کیا ہے، تو گزشتہ عطیات کی رسیدیں دستیاب نہیں ہوں گی۔";
 
 /* Error message displayed if something goes wrong with 3DSecure/iDEAL payment authorization.  This will be encountered if the user cancels the webview before authrizing the payment. */
 "DONATION_REDIRECT_ERROR_CANCELLED_MESSAGE" = "پیمنٹ منسوخ کر دی گئی۔ براہ کرم دوبارہ کوشش کریں۔";
@@ -3091,7 +3091,7 @@
 "DONATION_SCREEN_DONATE_BUTTON" = "عطیہ کریں";
 
 /* On donation screens, a small amount of information text is shown. This is the subtitle for that text. */
-"DONATION_SCREENS_HEADER_DESCRIPTION" = "پرائیوٹ میسجنگ، جسے آپ فنڈ کرتے ہیں۔ کوئی اشتہارات نہیں، کوئی ٹریکنگ نہیں، کوئی سمجھوتہ نہیں۔ Signal کو سپورٹ کرنے کے لیے ابھی عطیہ کریں۔";
+"DONATION_SCREENS_HEADER_DESCRIPTION" = "پرائیوٹ میسجنگ، جسے آپ فنڈ کرتے ہیں۔ کوئی اشتہارات نہیں، کوئی ٹریکنگ نہیں، کوئی سمجھوتہ نہیں۔ Radar کو سپورٹ کرنے کے لیے ابھی عطیہ کریں۔";
 
 /* On donation screens, a small amount of information text is shown. Users can click this link to learn more information. */
 "DONATION_SCREENS_HEADER_READ_MORE" = "مزید پڑھیں";
@@ -3169,7 +3169,7 @@
 "DONATION_VIEW_DONATE_ON_BEHALF_OF_A_FRIEND" = "دوست کی طرف سے عطیہ کریں";
 
 /* Text describing to the user that they're going to pay a donation to Signal */
-"DONATION_VIEW_DONATION_TO_SIGNAL" = "Signal کے لئے عطیہ";
+"DONATION_VIEW_DONATION_TO_SIGNAL" = "Radar کے لئے عطیہ";
 
 /* Title for the 'Donor FAQ' button on the donation screen */
 "DONATION_VIEW_DONOR_FAQ" = "ڈونر کے عمومی سوال";
@@ -3181,7 +3181,7 @@
 "DONATION_VIEW_MANAGE_BADGES" = "بیجز";
 
 /* Text describing to the user that they're going to pay a monthly donation to Signal */
-"DONATION_VIEW_MONTHLY_DONATION_TO_SIGNAL" = "Signal کو ماہانہ عطیہ";
+"DONATION_VIEW_MONTHLY_DONATION_TO_SIGNAL" = "Radar کو ماہانہ عطیہ";
 
 /* Title for the 'more' section on the donation screen */
 "DONATION_VIEW_MORE_SECTION_TITLE" = "مزید";
@@ -3193,7 +3193,7 @@
 "DONATION_VIEW_OTHER_WAYS_TO_DONATE_TITLE" = "عطیہ کرنے کے دوسرے طریقے";
 
 /* Title on the 'Donate to Signal' screen */
-"DONATION_VIEW_TITLE" = "Signal کے لئے عطیہ کریں";
+"DONATION_VIEW_TITLE" = "Radar کے لئے عطیہ کریں";
 
 /* Label for the currency picker button in donation views */
 "DONATIONS_CURRENCY_PICKER_LABEL" = "کرنسی";
@@ -3214,7 +3214,7 @@
 "EDIT_GROUP_DEFAULT_TITLE" = "گروپ ترتیب دیں";
 
 /* Error message indicating the a user can't be added to a group. */
-"EDIT_GROUP_ERROR_CANNOT_ADD_MEMBER" = "اس صارف کو اس گروپ میں شامل نہیں کیا جاسکتا جب تک کہ وہ Signal کو اپ گریڈ نہ کریں۔";
+"EDIT_GROUP_ERROR_CANNOT_ADD_MEMBER" = "اس صارف کو اس گروپ میں شامل نہیں کیا جاسکتا جب تک کہ وہ Radar کو اپ گریڈ نہ کریں۔";
 
 /* Error message indicating that an avatar image is invalid and cannot be used. */
 "EDIT_GROUP_ERROR_INVALID_AVATAR" = "غلط تصویر";
@@ -3241,13 +3241,13 @@
 "EDIT_MESSAGE_SEND_MESSAGE_UNKNOWN_ERROR" = "EDIT_MESSAGE_SEND_MESSAGE_UNKNOWN_ERROR";
 
 /* body of email sent to contacts when inviting to install Signal. Embeds {{link to install Signal}} and {{link to the Signal home page}} */
-"EMAIL_INVITE_BODY" = "ہائے،\n\nحال ہی میں، میں نے اپنے iPhone پر اپنی چیٹس کو نجی رکھنے کے لیے Signal کا استعمال شروع کیا ہے۔ میں چاہوں گا کہ آپ بھی اسے انسٹال کریں، تاکہ ہمیں یقین ہو کہ صرف آپ اور میں اپنے میسجز پڑھ سکتے ہیں یا اپنی کالز سن سکتے ہیں۔\n\nAndroid ،iPhone Signal اور Desktop کے لیے دستیاب ہے۔ اسے یہاں سے حاصل کریں: %1$@\n\n Signal آپ کی موجودہ میسجنگ ایپ کی طرح ہی کام کرتا ہے۔ ہم تصویریں اور ویڈیو بھیج سکتے ہیں، کالز کر سکتے ہیں، اور گروپ چیٹس کا آغاز کر سکتے ہیں۔ بہترین بات یہ ہے، کہ کوئی اور ان میں سے کسی چیز کو نہیں دیکھ سکتا، حتیٰ کہ Signal کو بنانے والے لوگ بھی نہیں!\n\nآپ Signal کے بارے میں مزید یہاں پڑھ سکتے ہیں: %2$@";
+"EMAIL_INVITE_BODY" = "ہائے،\n\nحال ہی میں، میں نے اپنے iPhone پر اپنی چیٹس کو نجی رکھنے کے لیے Radar کا استعمال شروع کیا ہے۔ میں چاہوں گا کہ آپ بھی اسے انسٹال کریں، تاکہ ہمیں یقین ہو کہ صرف آپ اور میں اپنے میسجز پڑھ سکتے ہیں یا اپنی کالز سن سکتے ہیں۔\n\nAndroid ،iPhone Radar اور Desktop کے لیے دستیاب ہے۔ اسے یہاں سے حاصل کریں: %1$@\n\n Radar آپ کی موجودہ میسجنگ ایپ کی طرح ہی کام کرتا ہے۔ ہم تصویریں اور ویڈیو بھیج سکتے ہیں، کالز کر سکتے ہیں، اور گروپ چیٹس کا آغاز کر سکتے ہیں۔ بہترین بات یہ ہے، کہ کوئی اور ان میں سے کسی چیز کو نہیں دیکھ سکتا، حتیٰ کہ Radar کو بنانے والے لوگ بھی نہیں!\n\nآپ Radar کے بارے میں مزید یہاں پڑھ سکتے ہیں: %2$@";
 
 /* subject of email sent to contacts when inviting to install Signal */
-"EMAIL_INVITE_SUBJECT" = "Signal میں سو ئچ کریں";
+"EMAIL_INVITE_SUBJECT" = "Radar میں سو ئچ کریں";
 
 /* Description for the fallback support sheet if user cannot send email */
-"EMAIL_SIGNAL_MESSAGE" = "آپ کا آلہ ای میل بھیجنے کے لئے تشکیل نہیں کیا گیا ہے۔ مدد کی درخواست بھیجنے کے لیئے ، اپنے آلے یا ای میل پر ای میل ترتیب دیں support@signal.org";
+"EMAIL_SIGNAL_MESSAGE" = "آپ کا آلہ ای میل بھیجنے کے لئے تشکیل نہیں کیا گیا ہے۔ مدد کی درخواست بھیجنے کے لیئے ، اپنے آلے یا ای میل پر ای میل ترتیب دیں support@radar.chat";
 
 /* Title for the fallback support sheet if user cannot send email */
 "EMAIL_SIGNAL_TITLE" = "ای میل دستیاب نہیں ہے";
@@ -3349,7 +3349,7 @@
 "ERROR_DESCRIPTION_UNKNOWN_ERROR" = "کوئی نا معلوم غلطی واقع ہوئی۔";
 
 /* Error message when attempting to send message */
-"ERROR_DESCRIPTION_UNREGISTERED_RECIPIENT" = "میسج نہیں بھیجا جا سکا کیونکہ یہ شخص اب Signal استعمال نہیں کر رہا۔";
+"ERROR_DESCRIPTION_UNREGISTERED_RECIPIENT" = "میسج نہیں بھیجا جا سکا کیونکہ یہ شخص اب Radar استعمال نہیں کر رہا۔";
 
 /* Error message indicating that attachment upload(s) failed. */
 "ERROR_MESSAGE_ATTACHMENT_UPLOAD_FAILED" = "منسلک مواد اپ لوڈ کرنے سے قاصر۔";
@@ -3394,10 +3394,10 @@
 "ERROR_NETWORK_FAILURE" = "نیٹ ورک کی خرابی";
 
 /* Format string for an error alert notification message. Embeds {{ error string }} */
-"ERROR_NOTIFICATION_MESSAGE_FORMAT" = "اپنی ڈیوائس سے support@signal.org؛ %1$@ پر ڈی بگ لاگز کے ساتھ اس نقص کی رپورٹ کرنے کے ذریعے Signal کو بہتر بنانے میں ہماری مدد کریں";
+"ERROR_NOTIFICATION_MESSAGE_FORMAT" = "اپنی ڈیوائس سے support@radar.chat؛ %1$@ پر ڈی بگ لاگز کے ساتھ اس نقص کی رپورٹ کرنے کے ذریعے Radar کو بہتر بنانے میں ہماری مدد کریں";
 
 /* Format string for an error alert notification title. */
-"ERROR_NOTIFICATION_TITLE" = "Signal بی ٹا: ایک نقص پیش آیا";
+"ERROR_NOTIFICATION_TITLE" = "Radar بی ٹا: ایک نقص پیش آیا";
 
 /* Error indicating a send failure due to a delinked application. */
 "ERROR_SENDING_DELINKED" = "آپ کا آلہ اب لنک نہیں ہوا ہے۔ براہ کرم مزید پیغامات بھیجنے کے لئے دوبارہ لنک کریں۔";
@@ -3406,7 +3406,7 @@
 "ERROR_SENDING_DEREGISTERED" = "آپ کا آلہ اب رجسٹرڈ نہیں ہے۔ براہ کرم مزید پیغامات بھیجنے کے لئے دوبارہ رجسٹر ہوں۔";
 
 /* Error indicating a send failure due to an expired application. */
-"ERROR_SENDING_EXPIRED" = "آپ کے Signal ورژن کی میعاد ختم ہو چکی ہے۔ براہ کرم مزید پیغامات بھیجنے کیلئے تجدید کریں۔";
+"ERROR_SENDING_EXPIRED" = "آپ کے Radar ورژن کی میعاد ختم ہو چکی ہے۔ براہ کرم مزید پیغامات بھیجنے کیلئے تجدید کریں۔";
 
 /* Format string for 'unregistered user' error. Embeds {{the unregistered user's name or signal id}}. */
 "ERROR_UNREGISTERED_USER_FORMAT" = "ان رجسٹرڈ صارف:%1$@";
@@ -3418,19 +3418,19 @@
 "EXIT_REREGISTRATION" = "رجسٹریشن سے اخراج کریں";
 
 /* Label notifying the user that the app has expired. */
-"EXPIRATION_ERROR" = "Signal کا یہ ورژن زائد المیعاد ہو گیا ہے۔ میسجز بھیجنے اور موصول کرنے کے لیے اپ ڈیٹ کریں۔";
+"EXPIRATION_ERROR" = "Radar کا یہ ورژن زائد المیعاد ہو گیا ہے۔ میسجز بھیجنے اور موصول کرنے کے لیے اپ ڈیٹ کریں۔";
 
 /* If the user's app is too old, they'll be shown a warning asking them to upgrade. This is the text on the warning, and tapping it will open the App Store page for Signal. */
 "EXPIRATION_WARNING_ACTION_TITLE" = "اپ ڈیٹ کریں";
 
 /* Label warning the user that the app will expire soon. Embeds {{date}}. */
-"EXPIRATION_WARNING_SOON" = "Signal کا یہ ورژن %1$@ کو زائد المیعاد ہو جائے گا۔ میسجنگ جاری رکھنے کے لیے اپ ڈیٹ کریں۔";
+"EXPIRATION_WARNING_SOON" = "Radar کا یہ ورژن %1$@ کو زائد المیعاد ہو جائے گا۔ میسجنگ جاری رکھنے کے لیے اپ ڈیٹ کریں۔";
 
 /* Label warning the user that the app will expire today. */
-"EXPIRATION_WARNING_TODAY" = "Signal یہ ورژن آج زائد المیعاد ہو جائے گا۔ میسجنگ جاری رکھنے کے لیے اپ ڈیٹ کریں۔";
+"EXPIRATION_WARNING_TODAY" = "Radar یہ ورژن آج زائد المیعاد ہو جائے گا۔ میسجنگ جاری رکھنے کے لیے اپ ڈیٹ کریں۔";
 
 /* action sheet header when re-sending message which failed because of an invalid key signature */
-"FAILED_SENDING_BECAUSE_INVALID_KEY_SIGNATURE" = "میسج نہیں بھیجا جا سکا کیونکہ %1$@ کو Signal کو اپ ڈیٹ کرنے اور کھولنے کی ضرورت ہے۔";
+"FAILED_SENDING_BECAUSE_INVALID_KEY_SIGNATURE" = "میسج نہیں بھیجا جا سکا کیونکہ %1$@ کو Radar کو اپ ڈیٹ کرنے اور کھولنے کی ضرورت ہے۔";
 
 /* action sheet header when re-sending message which failed because of untrusted identity keys */
 "FAILED_SENDING_BECAUSE_UNTRUSTED_IDENTITY_KEY" = "آپ کا حفاظتی نمبر ابھی %1$@کیساتھ تبدیل ہو چکا ہے۔ یہ پیغام دوبارہ بھیجنے سے پہلے آپ تصدیق کرنا چاہتے ہیں۔";
@@ -3745,10 +3745,10 @@
 "GROUP_CALL_WILL_NOTIFY_TWO_PEOPLE_FORMAT" = "%1$@ اور %2$@ کو مطلع کر دیا جائے گا";
 
 /* Text shown before the user starts a group call if the user has enabled ringing and there is one other person in the group. Embeds {member name} */
-"GROUP_CALL_WILL_RING_ONE_PERSON_FORMAT" = "Signal %1$@ کو کال کرے گا";
+"GROUP_CALL_WILL_RING_ONE_PERSON_FORMAT" = "Radar %1$@ کو کال کرے گا";
 
 /* Text shown before the user starts a group call if the user has enabled ringing and there are two other people in the group. Embeds {{ %1$@ participant1, %2$@ participant2 }} */
-"GROUP_CALL_WILL_RING_TWO_PEOPLE_FORMAT" = "Signal %1$@ اور %2$@ کو کال کرے گا";
+"GROUP_CALL_WILL_RING_TWO_PEOPLE_FORMAT" = "Radar %1$@ اور %2$@ کو کال کرے گا";
 
 /* Text explaining that you are in the group call. */
 "GROUP_CALL_YOU_ARE_HERE" = "آپ گروپ کال میں ہیں";
@@ -3958,7 +3958,7 @@
 "GROUP_LINK_VIEW_SHARE_LINK_VIA_QR_CODE" = "QR کوڈ";
 
 /* Label for the 'share group link via Signal' button in the 'group link' view. */
-"GROUP_LINK_VIEW_SHARE_LINK_VIA_SIGNAL" = "Signal کے ذریعے شیئر کریں";
+"GROUP_LINK_VIEW_SHARE_LINK_VIA_SIGNAL" = "Radar کے ذریعے شیئر کریں";
 
 /* Message for the 'share group link' action sheet in the 'group link' view. */
 "GROUP_LINK_VIEW_SHARE_SHEET_MESSAGE" = "اس لنک کے ساتھ کوئی بھی اس گروپ کا نام اور ممبر دیکھ سکتا ہے اور شامل ہونے کی درخواست کرسکتا ہے۔ اس پر اپنے اعتماد والے لوگوں کے ساتھ اشتراک کریں۔";
@@ -4366,13 +4366,13 @@
 "HOME_VIEW_DRAFT_PREFIX" = "ڈرافٹ ";
 
 /* Format string for a label offering to start a new conversation with your contacts, if you have 1 Signal contact.  Embeds {{The name of 1 of your Signal contacts}}. */
-"HOME_VIEW_FIRST_CONVERSATION_OFFER_1_CONTACT_FORMAT" = "آپ کے کچھ رابطے پہلے سے Signal پر موجود ہیں،%1$@شامل کریں۔";
+"HOME_VIEW_FIRST_CONVERSATION_OFFER_1_CONTACT_FORMAT" = "آپ کے کچھ رابطے پہلے سے Radar پر موجود ہیں،%1$@شامل کریں۔";
 
 /* Format string for a label offering to start a new conversation with your contacts, if you have 2 Signal contacts.  Embeds {{The names of 2 of your Signal contacts}}. */
-"HOME_VIEW_FIRST_CONVERSATION_OFFER_2_CONTACTS_FORMAT" = "آپ کے کچھ رابطے پہلے سے Signal پر موجود ہیں،%1$@اور%2$@شامل کریں";
+"HOME_VIEW_FIRST_CONVERSATION_OFFER_2_CONTACTS_FORMAT" = "آپ کے کچھ رابطے پہلے سے Radar پر موجود ہیں،%1$@اور%2$@شامل کریں";
 
 /* Format string for a label offering to start a new conversation with your contacts, if you have at least 3 Signal contacts.  Embeds {{The names of 3 of your Signal contacts}}. */
-"HOME_VIEW_FIRST_CONVERSATION_OFFER_3_CONTACTS_FORMAT" = "آپ کے کچھ رابطے پہلے سے Signal پر ہیں،%1$@،%2$@اور%3$@شامل کریں";
+"HOME_VIEW_FIRST_CONVERSATION_OFFER_3_CONTACTS_FORMAT" = "آپ کے کچھ رابطے پہلے سے Radar پر ہیں،%1$@،%2$@اور%3$@شامل کریں";
 
 /* A label offering to start a new conversation with your contacts, if you have no Signal contacts. */
 "HOME_VIEW_FIRST_CONVERSATION_OFFER_NO_CONTACTS" = "اپنی پہلی چیٹ یہاں شروع کریں۔";
@@ -4468,7 +4468,7 @@
 "INACTIVE_LINKED_DEVICE_REMINDER_MEGAPHONE_TITLE" = "غیر فعال لنک کردہ ڈیوائس";
 
 /* Body for an in-app megaphone about a user's inactive primary device. */
-"INACTIVE_PRIMARY_DEVICE_REMINDER_MEGAPHONE_BODY" = "اپنے اکاؤنٹ کو فعال رکھنے کے لیے، اپنی بنیادی ڈیوائس پر Signal کھولیں۔";
+"INACTIVE_PRIMARY_DEVICE_REMINDER_MEGAPHONE_BODY" = "اپنے اکاؤنٹ کو فعال رکھنے کے لیے، اپنی بنیادی ڈیوائس پر Radar کھولیں۔";
 
 /* Title for a button in an in-app megaphone about a user's inactive primary device, temporarily dismissing the megaphone. */
 "INACTIVE_PRIMARY_DEVICE_REMINDER_MEGAPHONE_GOT_IT_BUTTON" = "سمجھ گیا";
@@ -4477,7 +4477,7 @@
 "INACTIVE_PRIMARY_DEVICE_REMINDER_MEGAPHONE_LEARN_MORE_BUTTON" = "مزید جانیں";
 
 /* Title for an in-app megaphone about a user's inactive primary device. */
-"INACTIVE_PRIMARY_DEVICE_REMINDER_MEGAPHONE_TITLE" = "اپنے فون پر Signal کھولیں";
+"INACTIVE_PRIMARY_DEVICE_REMINDER_MEGAPHONE_TITLE" = "اپنے فون پر Radar کھولیں";
 
 /* Label reminding the user that they are in archive mode, and that muted chats remain archived when they receive a new message. */
 "INBOX_VIEW_ARCHIVE_MODE_MUTED_CHATS_REMINDER" = "آرکائیو کی گئی خاموش کردہ چیٹس نیا میسج آنے پر بھی آرکائیو کردہ رہیں گی۔";
@@ -4513,10 +4513,10 @@
 "INFO_MESSAGE_BLOCKED_OTHER_USER" = "آپ نے اس فرد کو بلاک کیا۔";
 
 /* Indicates that a previously-removed recipient has been added back to the current user's contacts. */
-"INFO_MESSAGE_CONTACT_REINSTATED" = "اس فرد کو آپ کی Signal کی رابطہ فہرست میں واپس شامل کر دیا گیا تھا۔";
+"INFO_MESSAGE_CONTACT_REINSTATED" = "اس فرد کو آپ کی Radar کی رابطہ فہرست میں واپس شامل کر دیا گیا تھا۔";
 
 /* Indicates that the recipient has been removed from the current user's contacts and that messaging them will re-add them. */
-"INFO_MESSAGE_CONTACT_REMOVED" = "آپ نے اس فرد کو اپنی Signal کی رابطہ فہرست سے ہٹایا تھا، ان کو میسج کرنے سے انہیں دوبارہ شامل کر دیا جائے گا۔";
+"INFO_MESSAGE_CONTACT_REMOVED" = "آپ نے اس فرد کو اپنی Radar کی رابطہ فہرست سے ہٹایا تھا، ان کو میسج کرنے سے انہیں دوبارہ شامل کر دیا جائے گا۔";
 
 /* When you start a chat with someone and then later learn their profile name, we insert an in-chat message with this string to record the identifier you originally used to contact them. Embeds {{ the identifier, either a phone number or a username }}. */
 "INFO_MESSAGE_LEARNED_PROFILE_KEY" = "آپ نے %1$@ کے ساتھ یہ چیٹ شروع کی ہے۔";
@@ -4537,7 +4537,7 @@
 "INFO_MESSAGE_REPORTED_SPAM" = "اسپام کے طور پر رپورٹ کیا گیا";
 
 /* Body message of the alert shown when a user taps on 'learn more' via the spam info message. */
-"INFO_MESSAGE_REPORTED_SPAM_LEARN_MORE_MESSAGE" = "Signal کو مطلع کر دیا گیا ہے کہ یہ فرد ممکنہ طور پر اسپام بھیج رہا ہے۔ Signal کسی چیٹس کا مواد نہیں دیکھ سکتا۔";
+"INFO_MESSAGE_REPORTED_SPAM_LEARN_MORE_MESSAGE" = "Radar کو مطلع کر دیا گیا ہے کہ یہ فرد ممکنہ طور پر اسپام بھیج رہا ہے۔ Radar کسی چیٹس کا مواد نہیں دیکھ سکتا۔";
 
 /* Title of the alert shown when a user taps on 'learn more' via the spam info message. */
 "INFO_MESSAGE_REPORTED_SPAM_LEARN_MORE_TITLE" = "اسپام کی رپورٹ کی گئی";
@@ -4555,7 +4555,7 @@
 "INFO_MESSAGE_USER_CHANGED_PHONE_NUMBER_FORMAT" = "%1$@نے اپنا فون نمبر تبدیل کیا۔";
 
 /* Shown in inbox and conversation when a user joins Signal, embeds the new user's {{contact name}} */
-"INFO_MESSAGE_USER_JOINED_SIGNAL_BODY_FORMAT" = "%1$@Signal پر ہے!";
+"INFO_MESSAGE_USER_JOINED_SIGNAL_BODY_FORMAT" = "%1$@Radar پر ہے!";
 
 /* Label at the top of the input text when editing a message */
 "INPUT_TOOLBAR_EDIT_MESSAGE_LABEL" = "میسج میں ترمیم کریں";
@@ -4582,7 +4582,7 @@
 "INVALID_PROXY_HOST_ERROR" = "جو پراکسی ایڈریس آپ نے درج کیا ہے وہ غلط ہے، براہ کرم ایڈریس چیک کریں اور دوبارہ کوشش کریں۔";
 
 /* Alert body when contacts disabled while trying to invite contacts to signal */
-"INVITE_FLOW_REQUIRES_CONTACT_ACCESS_BODY" = "آپ اپنے دوستوں کو Signal میں شامل ہونے مدعو کرنے کیلئے iOS ترتیبات ایپ میں رسائی کرکے رابطوں کو فعال کرسکتے ہیں۔";
+"INVITE_FLOW_REQUIRES_CONTACT_ACCESS_BODY" = "آپ اپنے دوستوں کو Radar میں شامل ہونے مدعو کرنے کیلئے iOS ترتیبات ایپ میں رسائی کرکے رابطوں کو فعال کرسکتے ہیں۔";
 
 /* Alert title when contacts disabled while trying to invite contacts to signal */
 "INVITE_FLOW_REQUIRES_CONTACT_ACCESS_TITLE" = "رابطوں تک رسائی کی اجازت دیں";
@@ -4711,7 +4711,7 @@
 "LINK_DEVICE_SCANNING_INSTRUCTIONS_SHEET_TITLE" = "QR کوڈ سکین کریں";
 
 /* Body text for a sheet when a user tries to link a device informing them that they will need to authenticate their device */
-"LINK_NEW_DEVICE_AUTHENTICATION_INFO_SHEET_BODY" = "جاری رکھیں پر ٹیپ کریں اور تصدیق کے لیے اپنے فون کا لاک درج کریں۔ اپنے Signal کا پِن درج نہ کریں۔";
+"LINK_NEW_DEVICE_AUTHENTICATION_INFO_SHEET_BODY" = "جاری رکھیں پر ٹیپ کریں اور تصدیق کے لیے اپنے فون کا لاک درج کریں۔ اپنے Radar کا پِن درج نہ کریں۔";
 
 /* Title for a sheet when a user tries to link a device informing them that they will need to authenticate their device */
 "LINK_NEW_DEVICE_AUTHENTICATION_INFO_SHEET_TITLE" = "لنک کرنے سے پہلے تصدیق کریں کہ یہ آپ ہی ہیں";
@@ -4720,7 +4720,7 @@
 "LINK_NEW_DEVICE_AUTHENTICATION_REASON" = "کوئی ڈیوائس لنک کرنے کے لیے تصدیق کریں";
 
 /* Body text for a sheet when a user has started linking a device informing them to finish the process on that other device */
-"LINK_NEW_DEVICE_FINISH_ON_OTHER_DEVICE_SHEET_BODY" = "اپنی دوسری ڈیوائس پر Signal کی لنکنگ کو مکمل کریں۔";
+"LINK_NEW_DEVICE_FINISH_ON_OTHER_DEVICE_SHEET_BODY" = "اپنی دوسری ڈیوائس پر Radar کی لنکنگ کو مکمل کریں۔";
 
 /* Title for a sheet when a user has started linking a device informing them to finish the process on that other device */
 "LINK_NEW_DEVICE_FINISH_ON_OTHER_DEVICE_SHEET_TITLE" = "اپنی دوسری ڈیوائس پر لنکنگ کو مکمل کریں";
@@ -4762,10 +4762,10 @@
 "LINK_PREVIEW_UNKNOWN_DOMAIN" = "لنک کا جائزہ لیں";
 
 /* Shown in an alert when trying to edit a contact. */
-"LINKED_DEVICE_CONTACTS_NOT_ALLOWED" = "iPad پر فون کے روابط کا نظم کرنا اب مزید دستیاب نہیں ہے۔ اپنے فون کے روابط پر Signal کنیکشنز کو شامل کرنے کے لیے اپنے فون پر Signal کھولیں۔";
+"LINKED_DEVICE_CONTACTS_NOT_ALLOWED" = "iPad پر فون کے روابط کا نظم کرنا اب مزید دستیاب نہیں ہے۔ اپنے فون کے روابط پر Radar کنیکشنز کو شامل کرنے کے لیے اپنے فون پر Radar کھولیں۔";
 
 /* Shown in a banner when you tap the 'New Chat' icon at the top of the list of chats. */
-"LINKED_DEVICE_MANAGE_CONTACTS_BANNER" = "iPad پر فون کے روابط کا نظم کرنا اب مزید معاونت کردہ نہیں ہے۔ یہ ڈیوائس آپ کے فون پر آپ کی رابطہ فہرست میں Signal سے ہونے والی کسی بھی قسم کی تبدیلیوں کو سنک کرنا جاری رکھے گی۔";
+"LINKED_DEVICE_MANAGE_CONTACTS_BANNER" = "iPad پر فون کے روابط کا نظم کرنا اب مزید معاونت کردہ نہیں ہے۔ یہ ڈیوائس آپ کے فون پر آپ کی رابطہ فہرست میں Radar سے ہونے والی کسی بھی قسم کی تبدیلیوں کو سنک کرنا جاری رکھے گی۔";
 
 /* A button shown in a banner when you tap the 'New Chat' icon at the top of the list of chats. Tapping it opens a website with more details. */
 "LINKED_DEVICE_MANAGE_CONTACTS_LEARN_MORE" = "مزید جانیں";
@@ -4780,28 +4780,28 @@
 "LINKED_DEVICE_NOTIFICATION_TITLE" = "آپ نے ایک نئی ڈیوائس کو منسلک کیا";
 
 /* Message for an action sheet telling users how to link a device, when trying to open an external device-linking URL. */
-"LINKED_DEVICE_URL_OPENED_ACTION_SHEET_EXTERNAL_URL_MESSAGE" = "ڈیسک ٹاپ یا iPad کو اس Signal اکاؤنٹ کے ساتھ لنک کرنے کے لیے، لنک کردہ ڈیوائسز پر جائیں اور \"نئی ڈیوائس لنک کریں\" پر ٹیپ کریں اور QR کوڈ کو دوبارہ اسکین کریں۔ یقینی بنائیں کہ آپ صرف وہ QR کوڈز اسکین کریں جو براہ راست Signal سے آتے ہیں۔";
+"LINKED_DEVICE_URL_OPENED_ACTION_SHEET_EXTERNAL_URL_MESSAGE" = "ڈیسک ٹاپ یا iPad کو اس Radar اکاؤنٹ کے ساتھ لنک کرنے کے لیے، لنک کردہ ڈیوائسز پر جائیں اور \"نئی ڈیوائس لنک کریں\" پر ٹیپ کریں اور QR کوڈ کو دوبارہ اسکین کریں۔ یقینی بنائیں کہ آپ صرف وہ QR کوڈز اسکین کریں جو براہ راست Radar سے آتے ہیں۔";
 
 /* Message for an action sheet telling users how to link a device, when trying to open a device-linking URL from the in-app camera. */
-"LINKED_DEVICE_URL_OPENED_ACTION_SHEET_IN_APP_CAMERA_MESSAGE" = "ایسا لگتا ہے کہ آپ Signal ڈیوائس کو لنک کرنے کی کوشش کر رہے ہیں۔ جاری رکھیں پر ٹیپ کریں اور پھر \"نئی ڈیوائس لنک کریں\" پر ٹیپ کریں اور QR کوڈ کو دوبارہ اسکین کریں۔";
+"LINKED_DEVICE_URL_OPENED_ACTION_SHEET_IN_APP_CAMERA_MESSAGE" = "ایسا لگتا ہے کہ آپ Radar ڈیوائس کو لنک کرنے کی کوشش کر رہے ہیں۔ جاری رکھیں پر ٹیپ کریں اور پھر \"نئی ڈیوائس لنک کریں\" پر ٹیپ کریں اور QR کوڈ کو دوبارہ اسکین کریں۔";
 
 /* Bullet point about downloads on the linked devices education sheet. Embeds {{ %1$@ iPad download link, %2$@ desktop download link }} */
 "LINKED_DEVICES_EDUCATION_POINT_DOWNLOADS" = "اپنی دوسری ڈیوائس پر، iPad ایپ انسٹال کرنے کے لیے %1$@ یا ڈیسک ٹاپ ایپ انسٹال کرنے کے لیے %2$@ پر جائیں۔";
 
 /* Bullet point about message sync on the linked devices education sheet */
-"LINKED_DEVICES_EDUCATION_POINT_MESSAGES" = "Signal کے لنک ہونے کے بعد آپ کے موبائل فون پر Signal میسجز اس کے ساتھ ہم وقت ساز ہوتے ہیں۔";
+"LINKED_DEVICES_EDUCATION_POINT_MESSAGES" = "Radar کے لنک ہونے کے بعد آپ کے موبائل فون پر Radar میسجز اس کے ساتھ ہم وقت ساز ہوتے ہیں۔";
 
 /* Bullet point about privacy on the linked devices education sheet */
 "LINKED_DEVICES_EDUCATION_POINT_PRIVACY" = "لنک کردہ ڈیوائسز پر تمام میسجنگ نجی ہے";
 
 /* Title for the linked device education sheet */
-"LINKED_DEVICES_EDUCATION_TITLE" = "ڈیسک ٹاپ یا iPad پر Signal";
+"LINKED_DEVICES_EDUCATION_TITLE" = "ڈیسک ٹاپ یا iPad پر Radar";
 
 /* Text that appears where the linked device list would be indicating that there are no linked devices. */
 "LINKED_DEVICES_EMPTY_STATE" = "کوئی لنک کردہ ڈیوائسز نہیں";
 
 /* Description for header of the linked devices list */
-"LINKED_DEVICES_HEADER_DESCRIPTION" = "Use Signal on desktop or iPad.";
+"LINKED_DEVICES_HEADER_DESCRIPTION" = "Use Radar on desktop or iPad.";
 
 /* Footer text below the list of currently-linked devices */
 "LINKED_DEVICES_LIST_FOOTER" = "تمام ڈیوائسز پر میسجز اور چیٹس کی معلومات اینڈ ٹو اینڈ انکرپشن کے ذریعے محفوظ شدہ ہیں";
@@ -4843,10 +4843,10 @@
 "LINKING_SYNCING_TIMING_INFO" = "اس میں کچھ منٹ لگ سکتے ہیں";
 
 /* Shown to users while the app is loading, asking them not to close the app. */
-"LOADING_VIEW_CONTROLLER_DONT_CLOSE_APP" = "Signal کو بند نہ کریں۔";
+"LOADING_VIEW_CONTROLLER_DONT_CLOSE_APP" = "Radar کو بند نہ کریں۔";
 
 /* Body for local network permission action sheet */
-"LOCAL_NETWORK_PERMISSION_ACTION_SHEET_BODY" = "اپنے Signal اکاؤنٹ کو منتقل کرنے کے لیئے ، آپ کو دونوں آلات پر مقامی نیٹ ورک تک رسائی کو چالو کرنے کی ضرورت ہے۔";
+"LOCAL_NETWORK_PERMISSION_ACTION_SHEET_BODY" = "اپنے Radar اکاؤنٹ کو منتقل کرنے کے لیئے ، آپ کو دونوں آلات پر مقامی نیٹ ورک تک رسائی کو چالو کرنے کی ضرورت ہے۔";
 
 /* A button asking the user if they need further help getting their transfer working. */
 "LOCAL_NETWORK_PERMISSION_ACTION_SHEET_NEED_HELP" = "مدد چاہیے؟";
@@ -4858,7 +4858,7 @@
 "LOCAL_NETWORK_PERMISSION_ACTION_SHEET_STEP_THREE" = "\"لوکل نیٹ ورک\" کو آن کریں";
 
 /* Second step for local network permission action sheet */
-"LOCAL_NETWORK_PERMISSION_ACTION_SHEET_STEP_TWO" = "Signal پر جائیں";
+"LOCAL_NETWORK_PERMISSION_ACTION_SHEET_STEP_TWO" = "Radar پر جائیں";
 
 /* Title for local network permission action sheet */
 "LOCAL_NETWORK_PERMISSION_ACTION_SHEET_TITLE" = "مقامی نیٹ ورک تک رسائی آن کریں";
@@ -4873,7 +4873,7 @@
 "LOGGING_SECTION" = "لاگ ہو رہی ہے";
 
 /* Footer for the 'logging' help section. */
-"LOGGING_SECTION_FOOTER" = "Debug لاگس Signal کو درست کرنے والے مسائل اور کریشوں کو ٹھیک کرنے میں مدد کرسکتے ہیں۔";
+"LOGGING_SECTION_FOOTER" = "Debug لاگس Radar کو درست کرنے والے مسائل اور کریشوں کو ٹھیک کرنے میں مدد کرسکتے ہیں۔";
 
 /* Title for the 'long text message' view. */
 "LONG_TEXT_VIEW_TITLE" = "پیغام";
@@ -4975,7 +4975,7 @@
 "MESSAGE_ACTION_DELETE_FOR_EVERYONE" = "سب کے لئے حذف کریں";
 
 /* A one-time confirmation that you want to delete for everyone */
-"MESSAGE_ACTION_DELETE_FOR_EVERYONE_CONFIRMATION" = "اگر وہ Signal کے حالیہ ورژن پر ہیں تو یہ پیغام ہر ایک کے لئے چیٹ میں حذف ہو جائے گا۔ وہ یہ دیکھنے کے قابل ہوں گے کہ آپ نے کوئی پیغام حذف کر دیا ہے۔";
+"MESSAGE_ACTION_DELETE_FOR_EVERYONE_CONFIRMATION" = "اگر وہ Radar کے حالیہ ورژن پر ہیں تو یہ پیغام ہر ایک کے لئے چیٹ میں حذف ہو جائے گا۔ وہ یہ دیکھنے کے قابل ہوں گے کہ آپ نے کوئی پیغام حذف کر دیا ہے۔";
 
 /* The title for the action sheet asking who the user wants to delete the message for. */
 "MESSAGE_ACTION_DELETE_FOR_TITLE" = "آپ یہ پیغام کس کے لئے حذف کرنا چاہیں گے؟";
@@ -5020,7 +5020,7 @@
 "MESSAGE_ACTION_LINK_OPEN_LINK" = "لنک کھولیں";
 
 /* Label for button to open a signal proxy. */
-"MESSAGE_ACTION_LINK_OPEN_PROXY" = "Signal پراکسی کھولیں";
+"MESSAGE_ACTION_LINK_OPEN_PROXY" = "Radar پراکسی کھولیں";
 
 /* Label for button to open a sticker pack. */
 "MESSAGE_ACTION_LINK_OPEN_STICKER_PACK" = "اسٹیکر پیک دیکھیں";
@@ -5194,7 +5194,7 @@
 "MESSAGE_REQUEST_NAME_COLLISON_UPDATE_CONTACT_ACTION" = "رابطہ اپ ڈیٹ کریں";
 
 /* Action sheet message to confirm reporting a conversation as spam via a message request. */
-"MESSAGE_REQUEST_REPORT_CONVERSATION_MESSAGE" = "Signal کو مطلع کیا جائے گا کہ یہ فرد اسپام بھیج رہا ہو سکتا ہے۔ Signal کسی چیٹس کا مواد نہیں دیکھ سکتا۔";
+"MESSAGE_REQUEST_REPORT_CONVERSATION_MESSAGE" = "Radar کو مطلع کیا جائے گا کہ یہ فرد اسپام بھیج رہا ہو سکتا ہے۔ Radar کسی چیٹس کا مواد نہیں دیکھ سکتا۔";
 
 /* Action sheet title to confirm reporting a conversation as spam via a message request. */
 "MESSAGE_REQUEST_REPORT_CONVERSATION_TITLE" = "اسپام کو رپورٹ کریں؟";
@@ -5323,7 +5323,7 @@
 "MISSED_CALL_BLOCKED_SYSTEM_CONTACT" = "فون کی سیٹنگز میں بلاک کردہ رابطے کی طرف سے مسڈ کال";
 
 /* Action to block contact in Signal for sheet shown when the user taps a missed call from a contact blocked in iOS settings. */
-"MISSED_CALL_BLOCKED_SYSTEM_SETTINGS_SHEET_BLOCK_ACTION" = "رابطے کو Signal میں بھی بلاک کریں";
+"MISSED_CALL_BLOCKED_SYSTEM_SETTINGS_SHEET_BLOCK_ACTION" = "رابطے کو Radar میں بھی بلاک کریں";
 
 /* Message for sheet shown when the user taps a missed call from a contact blocked in iOS settings. */
 "MISSED_CALL_BLOCKED_SYSTEM_SETTINGS_SHEET_MESSAGE" = "آپ ان کی کال سے محروم رہے کیونکہ وہ آپ کے فون کی سیٹنگز میں بلاک شدہ ہیں۔ اس کا انتظام کرنے کے لیے سیٹنگز > فون پر جائیں اور بلاک شدہ روابط پر ٹیپ کریں۔";
@@ -5344,19 +5344,19 @@
 "MISSING_CAMERA_PERMISSION_MESSAGE" = "آپ iOS سیٹنگز ایپ میں کیمرے تک رسائی کو فعال کر سکتے ہیں۔";
 
 /* Alert title */
-"MISSING_CAMERA_PERMISSION_TITLE" = "Signal کو آپ کے کیمرہ تک رسائی کی ضرورت ہے۔";
+"MISSING_CAMERA_PERMISSION_TITLE" = "Radar کو آپ کے کیمرہ تک رسائی کی ضرورت ہے۔";
 
 /* Alert body indicating the user has denied location permissions */
 "MISSING_LOCATION_PERMISSION_MESSAGE" = "آپ یہ اجازت iOS ایپ ترتیبات میں فعال کرسکتے ہیں۔";
 
 /* Alert title indicating the user has denied location permissions */
-"MISSING_LOCATION_PERMISSION_TITLE" = "Signal کو  اس فیچر کیلئے مقام تک رسائی درکار ہے۔";
+"MISSING_LOCATION_PERMISSION_TITLE" = "Radar کو  اس فیچر کیلئے مقام تک رسائی درکار ہے۔";
 
 /* Alert body when user has previously denied media library access */
 "MISSING_MEDIA_LIBRARY_PERMISSION_MESSAGE" = "آپ یہ اجازت iOS ایپ ترتیبات میں فعال کرسکتے ہیں۔";
 
 /* Alert title when user has previously denied media library access */
-"MISSING_MEDIA_LIBRARY_PERMISSION_TITLE" = "Signal کو  اس فیچر کیلئے تصاویر تک رسائی درکار ہے۔";
+"MISSING_MEDIA_LIBRARY_PERMISSION_TITLE" = "Radar کو  اس فیچر کیلئے تصاویر تک رسائی درکار ہے۔";
 
 /* An error shown as the title of an alert when try to link a new device & the user is already at the limit. */
 "MULTIDEVICE_PAIRING_MAX_DESC" = "آپ مزید ڈیوائسز سے منسلک نہیں کرسکتے۔";
@@ -5377,7 +5377,7 @@
 "MY_STORIES_SETTINGS_VISIBILITY_ALL_SIGNAL_CONNECTIONS_EXCEPT_TITLE" = "تمام سوائے…";
 
 /* Title for the visibility option */
-"MY_STORIES_SETTINGS_VISIBILITY_ALL_SIGNAL_CONNECTIONS_TITLE" = "تمام Signal کنکشنز";
+"MY_STORIES_SETTINGS_VISIBILITY_ALL_SIGNAL_CONNECTIONS_TITLE" = "تمام Radar کنکشنز";
 
 /* Title for the visibility option */
 "MY_STORIES_SETTINGS_VISIBILITY_ONLY_SHARE_WITH_TITLE" = "صرف ان کے ساتھ شیئر کریں…";
@@ -5539,7 +5539,7 @@
 "NICKNAME_EDITOR_DELETE_CONFIRMATION_TITLE" = "عرفی نام حذف کریں؟";
 
 /* The description below the title on the profile nickname editor view. */
-"NICKNAME_EDITOR_DESCRIPTION" = "عرفی نام اور نوٹس Signal کے ساتھ اسٹور کیے جاتے ہیں اور کلی طور پر انکرپٹ شدہ ہوتے ہیں۔ یہ صرف آپ کو نظر آتے ہیں۔";
+"NICKNAME_EDITOR_DESCRIPTION" = "عرفی نام اور نوٹس Radar کے ساتھ اسٹور کیے جاتے ہیں اور کلی طور پر انکرپٹ شدہ ہوتے ہیں۔ یہ صرف آپ کو نظر آتے ہیں۔";
 
 /* Placeholder text it the text field for the family name in the profile nickname editor. */
 "NICKNAME_EDITOR_FAMILY_NAME_PLACEHOLDER" = "آخری نام";
@@ -5602,7 +5602,7 @@
 "NOTIFICATION_PERMISSION_REMINDER_MEGAPHONE_TITLE" = "اطلاعات آن کریں؟";
 
 /* Shown as the body of an alert when notifications can't be shown due to an error. */
-"NOTIFICATIONS_ERROR_MESSAGE" = "اگر آپ Signal اطلاعات وصول نہیں کر رہے ہیں تو اپنا %1$@ ری اسٹارٹ کریں۔";
+"NOTIFICATIONS_ERROR_MESSAGE" = "اگر آپ Radar اطلاعات وصول نہیں کر رہے ہیں تو اپنا %1$@ ری اسٹارٹ کریں۔";
 
 /* Shown as the title of an alert when notifications can't be shown due to an error. */
 "NOTIFICATIONS_ERROR_TITLE" = "اطلاعات دکھائی نہیں جا سکیں";
@@ -5662,10 +5662,10 @@
 "ONBOARDING_2FA_SKIP_PIN_ENTRY_TITLE" = "پن انٹری چھوڑ دیں؟";
 
 /* The body for the device transfer 'choice' view 'restore backup' option */
-"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_BODY" = "اپنے Radar/Signal کے بیک اپ سے اپنا اکاؤنٹ اور میسجز ری اسٹور کریں";
+"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_BODY" = "اپنے Radar/Radar کے بیک اپ سے اپنا اکاؤنٹ اور میسجز ری اسٹور کریں";
 
 /* The title for the device transfer 'choice' view 'restore backup' option */
-"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_TITLE" = "Radar/Signal محفوظ بیک اپس کو ری اسٹور کریں";
+"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_TITLE" = "Radar/Radar محفوظ بیک اپس کو ری اسٹور کریں";
 
 /* Body for a sheet warning users about skipping restore. */
 "ONBOARDING_CHOOSE_RESTORE_METHOD_CONFIRM_SKIP_RESTORE_BODY" = "اگر آپ ری اسٹور کرنے کو ابھی چھوڑ دیتے ہیں تو آپ بعد میں بھی ری اسٹور نہیں کر سکیں گے۔ اگر آپ اس ڈیوائس پر بیک اپس کو دوبارہ فعال کرتے ہیں، تو اپ کا موجودہ بیک اپ آپ کی نئی میسج ہسٹری سے تبدیل کر دیا جائے گا۔";
@@ -5677,7 +5677,7 @@
 "ONBOARDING_CHOOSE_RESTORE_METHOD_DESCRIPTION" = "منتخب کریں کہ آپ اپنی میسج ہسٹری اور اکاؤنٹ کے ڈیٹا کو کیسے ری اسٹور کرنا چاہیں گے۔";
 
 /* Message body displayed to a user during registration if there are no restore options available. */
-"ONBOARDING_CHOOSE_RESTORE_METHOD_NONE_AVAILABLE_BODY" = "جیسا کہ آپ Android سے iOS میں منتقل ہو رہے ہیں، اس لیے اپنے میسجز اور میڈیا کو منتقل کرنے کا واحد طریقہ یہ ہے کہ اپنی پرانی ڈیوائس میں Signal بیک اپس کو فعال کریں۔";
+"ONBOARDING_CHOOSE_RESTORE_METHOD_NONE_AVAILABLE_BODY" = "جیسا کہ آپ Android سے iOS میں منتقل ہو رہے ہیں، اس لیے اپنے میسجز اور میڈیا کو منتقل کرنے کا واحد طریقہ یہ ہے کہ اپنی پرانی ڈیوائس میں Radar بیک اپس کو فعال کریں۔";
 
 /* Title displayed to a user during registration if there are no restore options available. */
 "ONBOARDING_CHOOSE_RESTORE_METHOD_NONE_AVAILABLE_TITLE" = "ری اسٹور کرنے کے لیے کوئی بیک اپ نہیں ہے";
@@ -5737,7 +5737,7 @@
 "ONBOARDING_MODE_SWITCH_BUTTON_REGISTERING" = "iPhone کو لنک کریں";
 
 /* explanation to the user they're switching from linking to registering flow */
-"ONBOARDING_MODE_SWITCH_EXPLANATION_PROVISIONING" = "\"رجسٹرڈ iPad\" کو ٹیپ کرنے سے آپ کو بالکل نیا Signal اکاؤنٹ بنانے یا ایک موجودہ اکاؤنٹ کو اس iPad میں منتقل کرنے دیا جائے گا۔ اس سے اسی فون نمبر کے ساتھ فی الحال اندراج شدہ کسی بھی دوسرے device پر Signal کو غیر فعال کردے گا۔";
+"ONBOARDING_MODE_SWITCH_EXPLANATION_PROVISIONING" = "\"رجسٹرڈ iPad\" کو ٹیپ کرنے سے آپ کو بالکل نیا Radar اکاؤنٹ بنانے یا ایک موجودہ اکاؤنٹ کو اس iPad میں منتقل کرنے دیا جائے گا۔ اس سے اسی فون نمبر کے ساتھ فی الحال اندراج شدہ کسی بھی دوسرے device پر Radar کو غیر فعال کردے گا۔";
 
 /* explanation to the user they're switching from registering to linking flow */
 "ONBOARDING_MODE_SWITCH_EXPLANATION_REGISTERING" = "\"لنک iPhone\" کو ٹیپ کرنے سے آپ اپنے فون کو کسی موجودہ اکاؤنٹ سے مربوط ہوجائیں گے۔ عام طور پر آپ کے فون کو لنک کرنے کی سفارش نہیں کی جاتی ہے اور کچھ فعالیت کو محدود کردے گی ، جیسے کال کرنا۔";
@@ -5749,13 +5749,13 @@
 "ONBOARDING_MODE_SWITCH_TITLE_REGISTERING" = "اس iPhone کو لنک کریں";
 
 /* warning to the user that registering an ipad is not recommended */
-"ONBOARDING_MODE_SWITCH_WARNING_PROVISIONING" = "اس iPad کی رجسٹریشن اسی فون نمبر کے ساتھ فی الحال رجسٹرڈ کسی بھی دوسرے device پر Signal کو غیر فعال کردے گی۔";
+"ONBOARDING_MODE_SWITCH_WARNING_PROVISIONING" = "اس iPad کی رجسٹریشن اسی فون نمبر کے ساتھ فی الحال رجسٹرڈ کسی بھی دوسرے device پر Radar کو غیر فعال کردے گی۔";
 
 /* warning to the user that linking a phone is not recommended */
 "ONBOARDING_MODE_SWITCH_WARNING_REGISTERING" = "آپ کے iPhone کو جوڑنے کی سفارش نہیں کی جاتی ہے اور بنیادی فعالیت کو محدود کردے گی۔";
 
 /* Description of the 'Contacts' permission in the 'onboarding permissions' view. */
-"ONBOARDING_PERMISSIONS_CONTACTS_DESCRIPTION" = "اپنے جاننے والے لوگ تلاش کریں۔ آپ کے رابطے انکرپٹ کردہ ہیں اور Signal سروس کو نظر نہیں آتے۔";
+"ONBOARDING_PERMISSIONS_CONTACTS_DESCRIPTION" = "اپنے جاننے والے لوگ تلاش کریں۔ آپ کے رابطے انکرپٹ کردہ ہیں اور Radar سروس کو نظر نہیں آتے۔";
 
 /* Title introducing the 'Contacts' permission in the 'onboarding permissions' view. */
 "ONBOARDING_PERMISSIONS_CONTACTS_TITLE" = "رابطے";
@@ -5767,7 +5767,7 @@
 "ONBOARDING_PERMISSIONS_NOTIFICATIONS_TITLE" = "اطلاعات";
 
 /* Preamble of the 'onboarding permissions' view. */
-"ONBOARDING_PERMISSIONS_PREAMBLE" = "Signal درج ذیل اجازتوں کی درخواست کرنا چاہے گا۔";
+"ONBOARDING_PERMISSIONS_PREAMBLE" = "Radar درج ذیل اجازتوں کی درخواست کرنا چاہے گا۔";
 
 /* Description of the 'Notification Relay' permission in the 'onboarding permissions' view. */
 "ONBOARDING_PERMISSIONS_RELAY_DESCRIPTION" = "Enable Radar notification relay to ensure you get immediate background notifications in Radar. Relay is always privacy-preserving and keeps your messages end-to-end encrypted no matter what.";
@@ -5779,7 +5779,7 @@
 "ONBOARDING_PERMISSIONS_TITLE" = "اجازت کو منظور کریں";
 
 /* Explanation of the 'onboarding phone number discoverability' view. Embeds {user phone number} */
-"ONBOARDING_PHONE_NUMBER_DISCOVERABILITY_EXPLANATION_FORMAT" = "منتخب کریں کہ کون آپ کو اپنے فون نمبر سے Signal پر تلاش کرسکتا ہے%1$@";
+"ONBOARDING_PHONE_NUMBER_DISCOVERABILITY_EXPLANATION_FORMAT" = "منتخب کریں کہ کون آپ کو اپنے فون نمبر سے Radar پر تلاش کرسکتا ہے%1$@";
 
 /* Title of the 'onboarding phone number discoverability' view. */
 "ONBOARDING_PHONE_NUMBER_DISCOVERABILITY_TITLE" = "آپ کو آپ کے نمبر کے ساتھ کون مل سکتا ہے؟";
@@ -5794,7 +5794,7 @@
 "ONBOARDING_PHONE_NUMBER_VALIDATION_WARNING" = "غلط فون نمبر. برائے کرم رجسٹریشن کے لئے ایک درست فون نمبر درج کریں۔";
 
 /* Explanation of the 'onboarding pin attempts exhausted' view when reglock is disabled. */
-"ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_EXPLANATION" = "آپ کے پاس PIN کے اندازے ختم ہوچکے ہیں ، لیکن آپ پھر بھی نیا پن بنا کر اپنے Signal اکاؤنٹ تک رسائی حاصل کرسکتے ہیں۔ آپ کی رازداری اور حفاظت کے لئے آپ کا کھاتہ کسی بھی محفوظ شدہ معلومات یا ترتیبات کے بغیر بحال کیا جائے گا۔";
+"ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_EXPLANATION" = "آپ کے پاس PIN کے اندازے ختم ہوچکے ہیں ، لیکن آپ پھر بھی نیا پن بنا کر اپنے Radar اکاؤنٹ تک رسائی حاصل کرسکتے ہیں۔ آپ کی رازداری اور حفاظت کے لئے آپ کا کھاتہ کسی بھی محفوظ شدہ معلومات یا ترتیبات کے بغیر بحال کیا جائے گا۔";
 
 /* Label for the 'learn more' link when reglock is disabled in the 'onboarding pin attempts exhausted' view. */
 "ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_LEARN_MORE" = "پن ز کے بارے میں مزید پڑھیں";
@@ -5803,7 +5803,7 @@
 "ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_TITLE" = "غلط پن";
 
 /* Explanation of the 'onboarding pin attempts exhausted' view when it is unknown if reglock is enabled. */
-"ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_WITH_UNKNOWN_REGLOCK_EXPLANATION" = "آپ کے پاس پِن کے اندازے ختم ہو چکے ہیں، تاہم آپ اب بھی کوشش کر سکتے ہیں اور اپنے فون نمبر کی تصدیق کر کے اپنے Signal اکاؤنٹ تک رسائی حاصل کر سکتے ہیں۔ آپ کی پرائیویسی اور سکیورٹی کے لیے آپ کا اکاؤنٹ کسی بھی محفوظ شدہ پروفائل معلومات یا سیٹنگز کے بغیر بحال کیا جائے گا۔";
+"ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_WITH_UNKNOWN_REGLOCK_EXPLANATION" = "آپ کے پاس پِن کے اندازے ختم ہو چکے ہیں، تاہم آپ اب بھی کوشش کر سکتے ہیں اور اپنے فون نمبر کی تصدیق کر کے اپنے Radar اکاؤنٹ تک رسائی حاصل کر سکتے ہیں۔ آپ کی پرائیویسی اور سکیورٹی کے لیے آپ کا اکاؤنٹ کسی بھی محفوظ شدہ پروفائل معلومات یا سیٹنگز کے بغیر بحال کیا جائے گا۔";
 
 /* Title for the setup complete screen shown at the end of the onboarding flow. */
 "ONBOARDING_SETUP_COMPLETE_TITLE" = "ترتیب مکمل";
@@ -5830,13 +5830,13 @@
 "ONBOARDING_SIGN_UP_USE_SIGNAL_ACCOUNT_BUTTON_TITLE" = "Use my Signal account";
 
 /* Explanation of 'do not have old device' flow for the 'Restore or Transfer' prompt */
-"ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_BODY" = "یا آپ اسی ڈیوائس پر Radar/Signal کو دوبارہ انسٹال کر رہے ہیں";
+"ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_BODY" = "یا آپ اسی ڈیوائس پر Radar/Radar کو دوبارہ انسٹال کر رہے ہیں";
 
 /* Title for the 'do not have my old device' choice of the 'Restore or Transfer' prompt */
 "ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_TITLE" = "میرے پاس اپنا پرانا فون موجود نہیں ہے";
 
 /* Explanation of 'have old device' flow for the 'Restore or Transfer' prompt */
-"ONBOARDING_SPLASH_HAVE_OLD_DEVICE_BODY" = "فوری آغاز کرنے کے لیے اپنے موجودہ Radar/Signal اکاؤنٹ سے QR کوڈ کو اسکین کریں";
+"ONBOARDING_SPLASH_HAVE_OLD_DEVICE_BODY" = "فوری آغاز کرنے کے لیے اپنے موجودہ Radar/Radar اکاؤنٹ سے QR کوڈ کو اسکین کریں";
 
 /* Title for the 'have my old device' choice of the 'Restore or Transfer' prompt */
 "ONBOARDING_SPLASH_HAVE_OLD_DEVICE_TITLE" = "میرے پاس اپنا پرانا فون موجود ہے";
@@ -5897,19 +5897,19 @@ Send money securely.";
 "OPEN_SETTINGS_BUTTON" = "ترتیبات";
 
 /* Signal doesn't support old versions of iOS and shows a warning if you're on unsupported version. Some users can upgrade their device to a newer version of iOS to continue using Signal. If that's the case, they'll be shown this text. */
-"OS_EXPIRED_AND_CAN_UPGRADE_OS" = "Signal اس ڈیوائس پر اب مزید کام نہیں کرتا۔ Signal کو دوبارہ استعمال کرنے کے لیے، اپنی ڈیوائس کو iOS کے جدید ترین ورژن پر اپ ڈیٹ کریں۔";
+"OS_EXPIRED_AND_CAN_UPGRADE_OS" = "Radar اس ڈیوائس پر اب مزید کام نہیں کرتا۔ Radar کو دوبارہ استعمال کرنے کے لیے، اپنی ڈیوائس کو iOS کے جدید ترین ورژن پر اپ ڈیٹ کریں۔";
 
 /* Signal doesn't support old devices. If that's the case, they'll be shown this action, and tapping it will open information about Signal's minimum supported operating systems. */
-"OS_EXPIRED_AND_DEVICE_IS_STUCK" = "Signal اس ڈیوائس پر اب مزید کام نہیں کرتا۔ Signal کو دوبارہ استعمال کرنے کے لیے، ایک جدید ترین ڈیوائس پر سوئچ کریں۔";
+"OS_EXPIRED_AND_DEVICE_IS_STUCK" = "Radar اس ڈیوائس پر اب مزید کام نہیں کرتا۔ Radar کو دوبارہ استعمال کرنے کے لیے، ایک جدید ترین ڈیوائس پر سوئچ کریں۔";
 
 /* Signal doesn't support old versions of iOS and shows a warning if you're on an old version. Some users can upgrade their device to a newer version of iOS to continue using Signal. If that's the case, they'll be shown this action, and tapping it will open device update instructions. */
 "OS_SOON_TO_EXPIRE_ACTION_TITLE" = "ابھی اپ ڈیٹ کریں";
 
 /* Signal doesn't support old versions of iOS and shows a warning if you're an old version that will soon lose support. Some users can upgrade their device to a newer version of iOS to continue using Signal. If that's the case, they'll be shown this text. Embeds {{expiration date}}. */
-"OS_SOON_TO_EXPIRE_AND_CAN_UPGRADE_OS_FORMAT" = "Signal جلد ہی آپ کی ڈیوائس کے iOS ورژن کو مزید سپورٹ نہیں کرے گا۔ Signal کا استعمال جاری رکھنے کے لیے، اپنی ڈیوائس کو %1$@ تک iOS کے ایک جدید ترین ورژن پر اپ ڈیٹ کریں۔";
+"OS_SOON_TO_EXPIRE_AND_CAN_UPGRADE_OS_FORMAT" = "Radar جلد ہی آپ کی ڈیوائس کے iOS ورژن کو مزید سپورٹ نہیں کرے گا۔ Radar کا استعمال جاری رکھنے کے لیے، اپنی ڈیوائس کو %1$@ تک iOS کے ایک جدید ترین ورژن پر اپ ڈیٹ کریں۔";
 
 /* Signal doesn't support old versions of iOS and shows a warning if you're on an old version that will soon lose support. This is the text on that warning when users can't upgrade iOS without getting a new device. Embeds {{expiration date}}. */
-"OS_SOON_TO_EXPIRE_AND_DEVICE_WILL_BE_STUCK_FORMAT" = "Signal جلد ہی آپ کی ڈیوائس کے iOS ورژن کو مزید سپورٹ نہیں کرے گا۔ Signal کا استعمال جاری رکھنے کے لیے، %1$@ تک ایک جدید ترین ڈیوائس پر سوئچ کریں۔";
+"OS_SOON_TO_EXPIRE_AND_DEVICE_WILL_BE_STUCK_FORMAT" = "Radar جلد ہی آپ کی ڈیوائس کے iOS ورژن کو مزید سپورٹ نہیں کرے گا۔ Radar کا استعمال جاری رکھنے کے لیے، %1$@ تک ایک جدید ترین ڈیوائس پر سوئچ کریں۔";
 
 /* Info Message when another user disabled disappearing messages. Embeds {{name of other user}}. */
 "OTHER_DISABLED_DISAPPEARING_MESSAGES_CONFIGURATION" = "%1$@غائب پیغامات غیر فعال ہو رہے ہیں۔";
@@ -5924,7 +5924,7 @@ Send money securely.";
 "OUTDATED_PAYMENT_CLIENT_ACTION_TITLE" = "اپ ڈیٹ کریں";
 
 /* Label warning the user that they should update Signal to continue using payments. */
-"OUTDATED_PAYMENT_CLIENT_REMINDER_TEXT" = "پیمنٹس استعمال کرنا جاری رکھنے کے لیے Signal کو اپ ڈیٹ کریں۔ ہو سکتا ہے آپ کا بیلنس اپ ٹو ڈیٹ نہ ہو۔";
+"OUTDATED_PAYMENT_CLIENT_REMINDER_TEXT" = "پیمنٹس استعمال کرنا جاری رکھنے کے لیے Radar کو اپ ڈیٹ کریں۔ ہو سکتا ہے آپ کا بیلنس اپ ٹو ڈیٹ نہ ہو۔";
 
 /* Body of prompt notifying restore was cancelled. */
 "OUTGOING_DEVICE_REGISTRATION_CANCELLED_RESTORE_BODY" = "ری اسٹور منسوخ کر دیا گیا تھا۔ براہ کرم دوبارہ کوشش کریں۔";
@@ -5933,7 +5933,7 @@ Send money securely.";
 "OUTGOING_DEVICE_REGISTRATION_CANCELLED_RESTORE_TITLE" = "ری اسٹور منسوخ کر دیا گیا";
 
 /* Body of prompt notifying registration without restore completed on the new device. */
-"OUTGOING_DEVICE_REGISTRATION_COMPLETE_BODY" = "آپ کا Signal کا اکاؤنٹ آپ کی دوسری ڈیوائس پر فعال کر دیا گیا ہے۔ اب اس ڈیوائس پر Signal غیر فعال ہے۔";
+"OUTGOING_DEVICE_REGISTRATION_COMPLETE_BODY" = "آپ کا Radar کا اکاؤنٹ آپ کی دوسری ڈیوائس پر فعال کر دیا گیا ہے۔ اب اس ڈیوائس پر Radar غیر فعال ہے۔";
 
 /* Title of prompt notifying registration without restore completed on the new device. */
 "OUTGOING_DEVICE_REGISTRATION_COMPLETE_TITLE" = "رجسٹریشن مکمل ہو گئی";
@@ -5951,7 +5951,7 @@ Send money securely.";
 "OUTGOING_DEVICE_REGISTRATION_UNKNOWN_ERROR_TITLE" = "نامعلوم خرابی";
 
 /* Body of prompt notifying device restore started on the new device. */
-"OUTGOING_DEVICE_RESTORE_COMPLETE_BODY" = "آپ کا Signal اکاؤنٹ اور میسجز آپ کی دوسری ڈیوائس پر ٹرانسفر ہونا شروع ہو گئے ہیں۔ Signal اب اس ڈیوائس پر غیر فعال ہے۔";
+"OUTGOING_DEVICE_RESTORE_COMPLETE_BODY" = "آپ کا Radar اکاؤنٹ اور میسجز آپ کی دوسری ڈیوائس پر ٹرانسفر ہونا شروع ہو گئے ہیں۔ Radar اب اس ڈیوائس پر غیر فعال ہے۔";
 
 /* Title of prompt notifying device restore started on the new device. */
 "OUTGOING_DEVICE_RESTORE_COMPLETE_TITLE" = "بحالی مکمل";
@@ -5975,7 +5975,7 @@ Send money securely.";
 "OUTGOING_DEVICE_RESTORE_INITIAL_VIEW_TITLE" = "اکاؤنٹ کی منتقلی";
 
 /* Body of prompt notifying device transfer completed. */
-"OUTGOING_DEVICE_TRANSFER_COMPLETE_BODY" = "آپ کا Signal اکاؤنٹ اور میسجز آپ کی دوسری ڈیوائس پر ٹرانسفر ہو گئے ہیں۔ Signal اب اس ڈیوائس پر غیر فعال ہے۔";
+"OUTGOING_DEVICE_TRANSFER_COMPLETE_BODY" = "آپ کا Radar اکاؤنٹ اور میسجز آپ کی دوسری ڈیوائس پر ٹرانسفر ہو گئے ہیں۔ Radar اب اس ڈیوائس پر غیر فعال ہے۔";
 
 /* Title of prompt notifying device transfer completed. */
 "OUTGOING_DEVICE_TRANSFER_COMPLETE_TITLE" = "منتقلی مکمل";
@@ -5987,10 +5987,10 @@ Send money securely.";
 "OUTGOING_MISSED_VOICE_CALL" = "غیر جواب شدہ وائس کال";
 
 /* Button for action sheet shown when device transfer completes; quits the Signal app immediately (does not automatically relaunch, but the user may choose to relaunch). */
-"OUTGOING_TRANSFER_COMPLETE_EXIT_ACTION" = "Signal سے نکلیں";
+"OUTGOING_TRANSFER_COMPLETE_EXIT_ACTION" = "Radar سے نکلیں";
 
 /* Message for action sheet shown when device transfer completes */
-"OUTGOING_TRANSFER_COMPLETE_MESSAGE" = "Signal اب اس ڈیوائس سے نکل جائے گا";
+"OUTGOING_TRANSFER_COMPLETE_MESSAGE" = "Radar اب اس ڈیوائس سے نکل جائے گا";
 
 /* Title for action sheet shown when device transfer completes */
 "OUTGOING_TRANSFER_COMPLETE_TITLE" = "منتقلی مکمل ہو گئی!";
@@ -6168,7 +6168,7 @@ Send money securely.";
 "PAYMENTS_NEW_PAYMENT_ERROR_INVALID_TRANSACTION" = "غلط ٹرانزیکشن";
 
 /* Indicates that a payment failed due to an outdated client. */
-"PAYMENTS_NEW_PAYMENT_ERROR_OUTDATED_CLIENT" = "ادائیگیوں کے استعمال کے لئے  Signal کو اپ ڈیٹ کریں۔";
+"PAYMENTS_NEW_PAYMENT_ERROR_OUTDATED_CLIENT" = "ادائیگیوں کے استعمال کے لئے  Radar کو اپ ڈیٹ کریں۔";
 
 /* Indicates that an outgoing payment could not be verified in a timely way. */
 "PAYMENTS_NEW_PAYMENT_ERROR_OUTGOING_VERIFICATION_TAKING_TOO_LONG" = "ادائیگی ابھی تصدیق نہیں ہوئی ہے";
@@ -6432,13 +6432,13 @@ Send money securely.";
 "PHONE_NUMBER_DISCOVERABILITY_EVERYBODY" = "ہر ایک";
 
 /* A user friendly description of the 'everybody' phone number discoverability mode. */
-"PHONE_NUMBER_DISCOVERABILITY_EVERYBODY_DESCRIPTION" = "کوئی بھی ایسا شخص جس کے پاس آپ کا فون نمبر ہے وہ دیکھے گا کہ آپ Signal پر ہیں اور آپ کے ساتھ چیٹس شروع کر سکتا ہے۔";
+"PHONE_NUMBER_DISCOVERABILITY_EVERYBODY_DESCRIPTION" = "کوئی بھی ایسا شخص جس کے پاس آپ کا فون نمبر ہے وہ دیکھے گا کہ آپ Radar پر ہیں اور آپ کے ساتھ چیٹس شروع کر سکتا ہے۔";
 
 /* A user friendly name for the 'nobody' phone number discoverability mode. */
 "PHONE_NUMBER_DISCOVERABILITY_NOBODY" = "کوئی نہیں";
 
 /* A user friendly description of the 'nobody' phone number discoverability mode. */
-"PHONE_NUMBER_DISCOVERABILITY_NOBODY_DESCRIPTION" = "کوئی بھی اس وقت تک دیکھ نہیں پائے گا کہ آپ Signal پر ہیں جب تک آپ انہیں میسج نہیں کرتے یا ان کے ساتھ آپ کی کوئی پہلے سے موجود چیٹ ہو۔";
+"PHONE_NUMBER_DISCOVERABILITY_NOBODY_DESCRIPTION" = "کوئی بھی اس وقت تک دیکھ نہیں پائے گا کہ آپ Radar پر ہیں جب تک آپ انہیں میسج نہیں کرتے یا ان کے ساتھ آپ کی کوئی پہلے سے موجود چیٹ ہو۔";
 
 /* A format for a label showing an example phone number. Embeds {{the example phone number}}. */
 "PHONE_NUMBER_EXAMPLE_FORMAT" = "مثال کے طور پر:%1$@";
@@ -6540,22 +6540,22 @@ Send money securely.";
 "PIN_CREATION_DISABLE_CONFIRMATION_ACTION" = "PIN کو غیر فعال کریں";
 
 /* Message of the 'pin disable' action sheet. */
-"PIN_CREATION_DISABLE_CONFIRMATION_MESSAGE" = "اگر آپ PIN کو غیر فعال کردیتے ہیں تو ، آپ جب تک Signal کو دوبارہ رجسٹر کرتے ہیں تو آپ تمام ڈیٹا کو کھو دیں گے جب تک کہ آپ اسے کسی دوسرے iOS آلہ سے منتقل نہ کریں۔ جب PIN غیر فعال ہو تو آپ رجسٹریشن لاک آن نہیں کرسکتے ہیں۔";
+"PIN_CREATION_DISABLE_CONFIRMATION_MESSAGE" = "اگر آپ PIN کو غیر فعال کردیتے ہیں تو ، آپ جب تک Radar کو دوبارہ رجسٹر کرتے ہیں تو آپ تمام ڈیٹا کو کھو دیں گے جب تک کہ آپ اسے کسی دوسرے iOS آلہ سے منتقل نہ کریں۔ جب PIN غیر فعال ہو تو آپ رجسٹریشن لاک آن نہیں کرسکتے ہیں۔";
 
 /* Title of the 'pin disable' action sheet. */
 "PIN_CREATION_DISABLE_CONFIRMATION_TITLE" = "انتباہ";
 
 /* The explanation in the 'pin creation' view. */
-"PIN_CREATION_EXPLANATION" = "PINs Signal کے ساتھ ذخیرہ شدہ معلومات کو خفیہ شدہ رکھتا ہے لہذا صرف آپ ہی اس تک رسائی حاصل کرسکتے ہیں۔ جب آپ دوبارہ انسٹال کریں گے تو آپ کا پروفائل ، ترتیبات اور رابطے بحال ہوں گے۔ ایپ کو کھولنے کے لیئے آپ کو اپنے PIN کی ضرورت نہیں ہوگی۔";
+"PIN_CREATION_EXPLANATION" = "PINs Radar کے ساتھ ذخیرہ شدہ معلومات کو خفیہ شدہ رکھتا ہے لہذا صرف آپ ہی اس تک رسائی حاصل کرسکتے ہیں۔ جب آپ دوبارہ انسٹال کریں گے تو آپ کا پروفائل ، ترتیبات اور رابطے بحال ہوں گے۔ ایپ کو کھولنے کے لیئے آپ کو اپنے PIN کی ضرورت نہیں ہوگی۔";
 
 /* Learn more action on the pin creation view */
 "PIN_CREATION_LEARN_MORE" = "پِنز سے متعلق مزید";
 
 /* Users can create PINs to restore their account data later. They can learn more about this on a sheet. This is the text on that sheet. */
-"PIN_CREATION_LEARN_MORE_TEXT" = "پِنز آپ کی معلومات کو انکرپٹ کردہ Signal کے ساتھ اسٹور رکھتے ہیں تاکہ ان تک صرف آپ رسائی حاصل کر سکیں۔ جب آپ دوبارہ انسٹال کرتے ہیں تو آپ کی پروفائل، سیٹنگز اور رابطے بحال ہو جائیں گے۔";
+"PIN_CREATION_LEARN_MORE_TEXT" = "پِنز آپ کی معلومات کو انکرپٹ کردہ Radar کے ساتھ اسٹور رکھتے ہیں تاکہ ان تک صرف آپ رسائی حاصل کر سکیں۔ جب آپ دوبارہ انسٹال کرتے ہیں تو آپ کی پروفائل، سیٹنگز اور رابطے بحال ہو جائیں گے۔";
 
 /* Users can create PINs to restore their account data later. They can learn more about this on a sheet. This is the title on that sheet. */
-"PIN_CREATION_LEARN_MORE_TITLE" = "Signal کے پِنز سے متعلق";
+"PIN_CREATION_LEARN_MORE_TITLE" = "Radar کے پِنز سے متعلق";
 
 /* Label indicating that the attempted PIN does not match the first PIN */
 "PIN_CREATION_MISMATCH_ERROR" = "پن میچ نہیں ہوا۔ دوبارہ کوشش کریں۔";
@@ -6588,7 +6588,7 @@ Send money securely.";
 "PIN_CREATION_WEAK_ERROR" = "ایک مضبوط پن کا انتخاب کریں";
 
 /* If your attempted PIN is too weak, you'll see an error message. This is the text on the error dialog. */
-"PIN_CREATION_WEAK_ERROR_MESSAGE" = "پِنز آپ کی معلومات کو انکرپٹ کردہ Signal کے ساتھ اسٹور رکھتے ہیں تاکہ ان تک صرف آپ رسائی حاصل کر سکیں۔ اپنے اکاؤنٹ کی حفاظت کو یقینی بنانے کے لیے ایک مضبوط پِن منتخب کریں۔";
+"PIN_CREATION_WEAK_ERROR_MESSAGE" = "پِنز آپ کی معلومات کو انکرپٹ کردہ Radar کے ساتھ اسٹور رکھتے ہیں تاکہ ان تک صرف آپ رسائی حاصل کر سکیں۔ اپنے اکاؤنٹ کی حفاظت کو یقینی بنانے کے لیے ایک مضبوط پِن منتخب کریں۔";
 
 /* If the user is re-registering, they need to enter their PIN to restore all their data. In some cases, they can skip this entry and lose some data. This text is shown on a button that lets them begin to do this. */
 "PIN_ENTER_EXISTING_SKIP" = "پِن چھوڑ دیں";
@@ -6621,7 +6621,7 @@ Send money securely.";
 "PIN_REMINDER_MEGAPHONE_FEW_DAYS_TOAST" = "ہم آپ کو کچھ ہی دنوں میں ایک بار پھر یاد دلائیں گے۔";
 
 /* Title for PIN reminder megaphone */
-"PIN_REMINDER_MEGAPHONE_TITLE" = "اپنے Signal پن کی تصدیق کریں";
+"PIN_REMINDER_MEGAPHONE_TITLE" = "اپنے Radar پن کی تصدیق کریں";
 
 /* Toast indicating that we'll ask you for your PIN again tomorrow, after successfully entering it. */
 "PIN_REMINDER_MEGAPHONE_TOMORROW_SUCCESSFUL_TOAST" = "پِن درست ہے۔ ہم کل آپ کو دوبارہ یاد دلائیں گے۔";
@@ -6645,7 +6645,7 @@ Send money securely.";
 "PIN_REMINDER_MISMATCH_ERROR" = "غلط پن، دوبارہ کوشش کریں۔";
 
 /* The title for the 'pin reminder' dialog. */
-"PIN_REMINDER_TITLE" = "اپنا Signal پن داخل کریں";
+"PIN_REMINDER_TITLE" = "اپنا Radar پن داخل کریں";
 
 /* Label indicating that the attempted PIN is too short */
 "PIN_REMINDER_TOO_SHORT_ERROR" = "پن کم از کم 4 ہندسوں کا ہونا چاہیے۔";
@@ -6660,7 +6660,7 @@ Send money securely.";
 "PINS_MEGAPHONE_ACTION" = "پن بنائیں";
 
 /* Body for PIN megaphone when user doesn't have a PIN */
-"PINS_MEGAPHONE_BODY" = "اپنا Signal PIN تخلیق کرنا مکمل کریں۔";
+"PINS_MEGAPHONE_BODY" = "اپنا Radar PIN تخلیق کرنا مکمل کریں۔";
 
 /* Title for PIN megaphone when user doesn't have a PIN */
 "PINS_MEGAPHONE_TITLE" = "ایک پن بنائیں";
@@ -6768,19 +6768,19 @@ Send money securely.";
 "PRIVACY_VERIFICATION_FAILED_MISMATCHED_SAFETY_NUMBERS_IN_CLIPBOARD" = "آپ کے کلپ بورڈ میں موجود نمبر اس چیٹ کے لیے صحیح حفاظتی نمبر معلوم نہیں ہوتا۔";
 
 /* Alert body for user error */
-"PRIVACY_VERIFICATION_FAILED_NO_SAFETY_NUMBERS_IN_CLIPBOARD" = "Signal کو آپ کے کلپ بورڈ میں حفاظتی نمبر نہیں ملا۔آپ نے درست طریقے سے کاپی کیا تھا؟";
+"PRIVACY_VERIFICATION_FAILED_NO_SAFETY_NUMBERS_IN_CLIPBOARD" = "Radar کو آپ کے کلپ بورڈ میں حفاظتی نمبر نہیں ملا۔آپ نے درست طریقے سے کاپی کیا تھا؟";
 
 /* Alert body when verifying with {{contact name}} */
-"PRIVACY_VERIFICATION_FAILED_THEY_HAVE_WRONG_KEY_FOR_ME" = "ہر Signal صارفین کا جوڑا ایک واضع حفاظتی نمبر کا اشتراک کرتا ہے۔ دوبارہ چیک کریں کہ %1$@یہ جو واضع حفاظتی نمبر ظاہر ہو رہا ہے آپ کا ہے۔";
+"PRIVACY_VERIFICATION_FAILED_THEY_HAVE_WRONG_KEY_FOR_ME" = "ہر Radar صارفین کا جوڑا ایک واضع حفاظتی نمبر کا اشتراک کرتا ہے۔ دوبارہ چیک کریں کہ %1$@یہ جو واضع حفاظتی نمبر ظاہر ہو رہا ہے آپ کا ہے۔";
 
 /* alert body */
-"PRIVACY_VERIFICATION_FAILED_WITH_OLD_LOCAL_VERSION" = "آپ Signal کا پرانا ورژن چلا رہے ہیں۔ تصدیق کرنے سے پہلے آپ کو تجدید کرنے کی ضرورت ہے۔";
+"PRIVACY_VERIFICATION_FAILED_WITH_OLD_LOCAL_VERSION" = "آپ Radar کا پرانا ورژن چلا رہے ہیں۔ تصدیق کرنے سے پہلے آپ کو تجدید کرنے کی ضرورت ہے۔";
 
 /* alert body */
-"PRIVACY_VERIFICATION_FAILED_WITH_OLD_REMOTE_VERSION" = "آپ کا پارٹنر Signal کا پرانا ورژن چلا رہا ہے۔ تصدیق کرنے سے پہلےاس کو تجدید کرنے کی ضرورت ہے۔";
+"PRIVACY_VERIFICATION_FAILED_WITH_OLD_REMOTE_VERSION" = "آپ کا پارٹنر Radar کا پرانا ورژن چلا رہا ہے۔ تصدیق کرنے سے پہلےاس کو تجدید کرنے کی ضرورت ہے۔";
 
 /* alert body */
-"PRIVACY_VERIFICATION_FAILURE_INVALID_QRCODE" = "سکین کیا گیا کوڈ حفاظتی نمبر سے نہیں ملتا۔کیا آپ دونوں Signal کے اپ ٹو ڈیٹ ورژن پر ہیں؟";
+"PRIVACY_VERIFICATION_FAILURE_INVALID_QRCODE" = "سکین کیا گیا کوڈ حفاظتی نمبر سے نہیں ملتا۔کیا آپ دونوں Radar کے اپ ٹو ڈیٹ ورژن پر ہیں؟";
 
 /* Navbar title */
 "PRIVACY_VERIFICATION_TITLE" = "حفاظتی نمبر کی تصدیق کریں";
@@ -6855,7 +6855,7 @@ Send money securely.";
 "PROFILE_NAME_EDUCATION_SHEET_BULLET_3" = "ان لوگوں کے ساتھ ذاتی معلومات شیئر نہ کریں جنہیں آپ جانتے نہیں ہیں";
 
 /* Header for the explainer sheet for profile names */
-"PROFILE_NAME_EDUCATION_SHEET_HEADER_FORMAT" = "Signal پر <bold>پروفائل نیمز</bold> ان کے اکاؤنٹ ہولڈر کی جانب سے منتخب کیے جاتے ہیں۔";
+"PROFILE_NAME_EDUCATION_SHEET_HEADER_FORMAT" = "Radar پر <bold>پروفائل نیمز</bold> ان کے اکاؤنٹ ہولڈر کی جانب سے منتخب کیے جاتے ہیں۔";
 
 /* Title for the profile name view. */
 "PROFILE_NAME_VIEW_TITLE" = "تمھارا نام";
@@ -7062,7 +7062,7 @@ Send money securely.";
 "RECIPIENT_PICKER_ERROR_USER_CANNOT_BE_SELECTED" = "صارف کو منتخب نہیں کیا جاسکتا۔";
 
 /* Alert text. Shown after selecting a phone number that isn't valid. */
-"RECIPIENT_PICKER_INVALID_NUMBER_MESSAGE" = "%1$@ Signal یوزر نہیں ہے۔ درست فون نمبر کے ساتھ دوبارہ کوشش کریں۔";
+"RECIPIENT_PICKER_INVALID_NUMBER_MESSAGE" = "%1$@ Radar یوزر نہیں ہے۔ درست فون نمبر کے ساتھ دوبارہ کوشش کریں۔";
 
 /* Alert title. Shown after selecting a phone number that isn't valid. */
 "RECIPIENT_PICKER_INVALID_NUMBER_TITLE" = "غلط فون نمبر";
@@ -7071,22 +7071,22 @@ Send money securely.";
 "RECIPIENT_PICKER_INVITE_ACTION" = "مدعو کریں";
 
 /* Alert text. Shown after selecting a phone number that isn't a Signal user. */
-"RECIPIENT_PICKER_INVITE_MESSAGE" = "%1$@ Signal یوزر نہیں ہے۔ کیا آپ اس نمبر کو مدعو کرنا چاہیں گے؟";
+"RECIPIENT_PICKER_INVITE_MESSAGE" = "%1$@ Radar یوزر نہیں ہے۔ کیا آپ اس نمبر کو مدعو کرنا چاہیں گے؟";
 
 /* Alert title. Shown after selecting a phone number that isn't a Signal user. */
-"RECIPIENT_PICKER_INVITE_TITLE" = "Signal میں مدعو کریں";
+"RECIPIENT_PICKER_INVITE_TITLE" = "Radar میں مدعو کریں";
 
 /* Alert title explaining what happens if you forget your 'two-factor auth pin'. */
 "REGISTER_2FA_FORGOT_PIN_ALERT_TITLE" = "مدد چاہیے؟";
 
 /* Alert body for a forgotten SVR (V2) PIN */
-"REGISTER_2FA_FORGOT_SVR_PIN_ALERT_MESSAGE" = "آپ کی پِن آپ کی طرف سے تخلیق کردہ 4+ ہندسوں کا کوڈ ہے جو کہ عددی یا حرفی عددی ہو سکتا ہے۔ اگر آپ اپنی پِن یاد کرنے سے قاصر ہیں، تو آپ کو اپنا اکاؤنٹ دوبارہ رجسٹر کروانے کے لیے 7 دن تک انتظار کرنا ہو گا۔ اگر آپ نے Signal کے محفوظ بیک اپس کو فعال کیا ہوا ہے، تو آپ اپنی بحالی کی کیی کے ساتھ آگے بڑھ سکتے ہیں۔";
+"REGISTER_2FA_FORGOT_SVR_PIN_ALERT_MESSAGE" = "آپ کی پِن آپ کی طرف سے تخلیق کردہ 4+ ہندسوں کا کوڈ ہے جو کہ عددی یا حرفی عددی ہو سکتا ہے۔ اگر آپ اپنی پِن یاد کرنے سے قاصر ہیں، تو آپ کو اپنا اکاؤنٹ دوبارہ رجسٹر کروانے کے لیے 7 دن تک انتظار کرنا ہو گا۔ اگر آپ نے Radar کے محفوظ بیک اپس کو فعال کیا ہوا ہے، تو آپ اپنی بحالی کی کیی کے ساتھ آگے بڑھ سکتے ہیں۔";
 
 /* Alert body for a forgotten SVR (V2) PIN when the user doesn't have reglock and they cannot necessarily create a new PIN */
-"REGISTER_2FA_FORGOT_SVR_PIN_WITHOUT_REGLOCK_ALERT_MESSAGE" = "آپ کی پِن آپ کی طرف سے تخلیق کردہ 4+ ہندسوں کا کوڈ ہے جو کہ عددی یا حرفی عددی ہو سکتا ہے۔ اگر آپ اپنی پِن یاد کرنے سے قاصر ہیں، تو آپ اپنا اکاؤنٹ رجسٹر اور استعمال کر سکتے ہیں تاہم آپ اپنی کچھ محفوظ کردہ سیٹنگز جیسے پروفائل کی معلومات سے محروم ہو جائیں گے۔ اگر آپ نے Signal کے محفوظ بیک اپس کو فعال کیا ہوا ہے، تو آپ اپنی بحالی کی کیی کے ساتھ آگے بڑھ سکتے ہیں۔";
+"REGISTER_2FA_FORGOT_SVR_PIN_WITHOUT_REGLOCK_ALERT_MESSAGE" = "آپ کی پِن آپ کی طرف سے تخلیق کردہ 4+ ہندسوں کا کوڈ ہے جو کہ عددی یا حرفی عددی ہو سکتا ہے۔ اگر آپ اپنی پِن یاد کرنے سے قاصر ہیں، تو آپ اپنا اکاؤنٹ رجسٹر اور استعمال کر سکتے ہیں تاہم آپ اپنی کچھ محفوظ کردہ سیٹنگز جیسے پروفائل کی معلومات سے محروم ہو جائیں گے۔ اگر آپ نے Radar کے محفوظ بیک اپس کو فعال کیا ہوا ہے، تو آپ اپنی بحالی کی کیی کے ساتھ آگے بڑھ سکتے ہیں۔";
 
 /* Alert body for a forgotten SVR (V2) PIN when the user doesn't have reglock and they can create a new PIN */
-"REGISTER_2FA_FORGOT_SVR_PIN_WITHOUT_REGLOCK_AND_CAN_CREATE_NEW_PIN_ALERT_MESSAGE" = "آپ کی پِن آپ کی طرف سے تخلیق کردہ 4+ ہندسوں کا کوڈ ہے جو کہ عددی یا حرفی عددی ہو سکتا ہے۔ اگر آپ اپنی پِن یاد کرنے سے قاصر ہیں، تو آپ ایک نیا تخلیق کر سکتے ہیں۔ آپ اپنا اکاؤنٹ رجسٹر اور استعمال کر سکتے ہیں تاہم آپ کچھ محفوظ کردہ سیٹنگز جیسے کہ اپنی پروفائل کی معلومات سے محروم ہو جائیں گے۔ اگر آپ نے Signal کے محفوظ بیک اپس کو فعال کیا ہوا ہے، تو آپ اپنی بحالی کی کیی کے ساتھ آگے بڑھ سکتے ہیں۔";
+"REGISTER_2FA_FORGOT_SVR_PIN_WITHOUT_REGLOCK_AND_CAN_CREATE_NEW_PIN_ALERT_MESSAGE" = "آپ کی پِن آپ کی طرف سے تخلیق کردہ 4+ ہندسوں کا کوڈ ہے جو کہ عددی یا حرفی عددی ہو سکتا ہے۔ اگر آپ اپنی پِن یاد کرنے سے قاصر ہیں، تو آپ ایک نیا تخلیق کر سکتے ہیں۔ آپ اپنا اکاؤنٹ رجسٹر اور استعمال کر سکتے ہیں تاہم آپ کچھ محفوظ کردہ سیٹنگز جیسے کہ اپنی پروفائل کی معلومات سے محروم ہو جائیں گے۔ اگر آپ نے Radar کے محفوظ بیک اپس کو فعال کیا ہوا ہے، تو آپ اپنی بحالی کی کیی کے ساتھ آگے بڑھ سکتے ہیں۔";
 
 /* Alert title explaining what happens if you forget your 'two-factor auth pin'. */
 "REGISTER_2FA_INVALID_PIN_ALERT_TITLE" = "غلط پن";
@@ -7134,7 +7134,7 @@ Send money securely.";
 "REGISTRATION_BACKUP_RESTORE_ERROR_GENERIC_TITLE" = "ٹرانسفر مکمل نہیں ہو سکا";
 
 /* Body for a sheet warning users about an incorrect recovery key. */
-"REGISTRATION_BACKUP_RESTORE_ERROR_INCORRECT_KEY_BODY" = "ہو سکتا ہے آپ نے اپنی بحالی کی کیی غلط درج کی ہو، یا آپ نے اپنی پرانی ڈیوائس پر کم از کم ایک بیک اپ مکمل نہ کیا ہو۔ \n\nیقینی بنائیں کہ آپ اسی فون نمبر اور بحالی کی کیی کے ساتھ رجسٹر کر رہے ہیں جو آپ نے Signal محفوظ بیک اپس کو فعال کرتے ہوئے محفوظ کی تھی، اور تصدیق کریں کہ آپ کی پرانی ڈیوائس پر بیک اپ مکمل ہو گیا ہو۔";
+"REGISTRATION_BACKUP_RESTORE_ERROR_INCORRECT_KEY_BODY" = "ہو سکتا ہے آپ نے اپنی بحالی کی کیی غلط درج کی ہو، یا آپ نے اپنی پرانی ڈیوائس پر کم از کم ایک بیک اپ مکمل نہ کیا ہو۔ \n\nیقینی بنائیں کہ آپ اسی فون نمبر اور بحالی کی کیی کے ساتھ رجسٹر کر رہے ہیں جو آپ نے Radar محفوظ بیک اپس کو فعال کرتے ہوئے محفوظ کی تھی، اور تصدیق کریں کہ آپ کی پرانی ڈیوائس پر بیک اپ مکمل ہو گیا ہو۔";
 
 /* Body for a sheet warning users about an incorrect recovery key and having hit a rate limit on retries. */
 "REGISTRATION_BACKUP_RESTORE_ERROR_INCORRECT_KEY_RATE_LIMIT_BODY" = "آپ کی بحالی کی کیی کی کوششوں کی حد ختم ہو گئی ہے۔ آپ کی حفاظت کے لیے، آپ کی انجام دی جانے والی کوششوں کی تعداد محدود ہے۔ 1 گھنٹہ انتظار کریں اور دوبارہ کوشش کریں۔";
@@ -7167,7 +7167,7 @@ Send money securely.";
 "REGISTRATION_BACKUP_RESTORE_ERROR_UNRETRYABLE_SERVER_ERROR_TITLE" = "بیک اپ کو ری اسٹور نہیں کیا جا سکتا";
 
 /* Body for a sheet warning users about an incompatible backup version. */
-"REGISTRATION_BACKUP_RESTORE_ERROR_UNSUPPORTED_BACKUP_VERSION_BODY" = "اپنا بیک اپ بحال کرنے کے لیے، یقینی بنائیں کہ آپ Signal کا تازہ ترین ورژن استعمال کر رہے ہیں اور دوبارہ کوشش کریں۔ اگر یہ مسئلہ برقرار رہتا ہے، تو سپورٹ سے رابطہ کریں۔";
+"REGISTRATION_BACKUP_RESTORE_ERROR_UNSUPPORTED_BACKUP_VERSION_BODY" = "اپنا بیک اپ بحال کرنے کے لیے، یقینی بنائیں کہ آپ Radar کا تازہ ترین ورژن استعمال کر رہے ہیں اور دوبارہ کوشش کریں۔ اگر یہ مسئلہ برقرار رہتا ہے، تو سپورٹ سے رابطہ کریں۔";
 
 /* Title for a sheet warning users about an incompatible backup version. */
 "REGISTRATION_BACKUP_RESTORE_ERROR_UNSUPPORTED_BACKUP_VERSION_TITLE" = "اپ ڈیٹ درکار ہے";
@@ -7179,7 +7179,7 @@ Send money securely.";
 "REGISTRATION_CANNOT_CONTINUE_WITHOUT_UPDATING_APP_ACTION" = "اپ ڈیٹ کریں";
 
 /* During (re)registration, users may need to update their app to continue. They'll be presented with an alert if this is the case, prompting them to update. This is the description text on that alert. */
-"REGISTRATION_CANNOT_CONTINUE_WITHOUT_UPDATING_APP_DESCRIPTION" = "رجسٹریشن جاری رکھنے کے لیے، براہ کرم Signal کے تازہ ترین ورژن پر اپ ڈیٹ کریں۔";
+"REGISTRATION_CANNOT_CONTINUE_WITHOUT_UPDATING_APP_DESCRIPTION" = "رجسٹریشن جاری رکھنے کے لیے، براہ کرم Radar کے تازہ ترین ورژن پر اپ ڈیٹ کریں۔";
 
 /* During (re)registration, users may need to update their app to continue. They'll be presented with an alert if this is the case, prompting them to update. This is the title on that alert. */
 "REGISTRATION_CANNOT_CONTINUE_WITHOUT_UPDATING_APP_TITLE" = "اپ ڈیٹ درکار ہے";
@@ -7191,7 +7191,7 @@ Send money securely.";
 "REGISTRATION_DEFAULT_COUNTRY_NAME" = "ملک کا کوڈ";
 
 /* If a user is installing Signal on a new phone, they may be asked whether they want to transfer their account from their old device. This is a description on the screen that asks them this question. */
-"REGISTRATION_DEVICE_TRANSFER_CHOICE_EXPLANATION" = "جاری رکھنے کی صورت میں Signal دیگر ڈیوائسز پر غیر فعال ہو جائے گا جو کہ حالیہ طور پر اسی فون نمبر کے ساتھ رجسٹر کردہ ہیں۔";
+"REGISTRATION_DEVICE_TRANSFER_CHOICE_EXPLANATION" = "جاری رکھنے کی صورت میں Radar دیگر ڈیوائسز پر غیر فعال ہو جائے گا جو کہ حالیہ طور پر اسی فون نمبر کے ساتھ رجسٹر کردہ ہیں۔";
 
 /* If a user is installing Signal on a new phone, they may be asked whether they want to transfer their account from their old device. This is the title on the screen that asks them this question. */
 "REGISTRATION_DEVICE_TRANSFER_CHOICE_TITLE" = "اکاؤنٹ اور میسجز ٹرانسفر کریں";
@@ -7227,7 +7227,7 @@ Send money securely.";
 "REGISTRATION_NO_BACKUP_KEY_BUTTON_TITLE" = "کوئی ریکوری کیی نہیں ہے؟";
 
 /* Body text on a sheet with info for what to do if you don't have a recovery key */
-"REGISTRATION_NO_BACKUP_KEY_SHEET_BODY" = "بیک اپس کو ان کے 64 ہندسوں پر مشتمل ریکوری کوڈ کے بغیر بحال نہیں کیا جا سکتا۔ اگر آپ سے اپنی ریکوری کیی گم ہو گئی ہے، تو Signal آپ کے بیک اپ کو ری اسٹور کرنے میں مدد نہیں کر سکتا۔\n\nاگر آپ کے پاس اپنی پرانی ڈیوائس موجود ہے، تو آپ سیٹنگز > چیٹس > بیک اپس میں اپنی ریکوری کیی دیکھ سکتے ہیں۔ اس کے بعد ریکوری کیی دیکھیں پر ٹیپ کریں۔";
+"REGISTRATION_NO_BACKUP_KEY_SHEET_BODY" = "بیک اپس کو ان کے 64 ہندسوں پر مشتمل ریکوری کوڈ کے بغیر بحال نہیں کیا جا سکتا۔ اگر آپ سے اپنی ریکوری کیی گم ہو گئی ہے، تو Radar آپ کے بیک اپ کو ری اسٹور کرنے میں مدد نہیں کر سکتا۔\n\nاگر آپ کے پاس اپنی پرانی ڈیوائس موجود ہے، تو آپ سیٹنگز > چیٹس > بیک اپس میں اپنی ریکوری کیی دیکھ سکتے ہیں۔ اس کے بعد ریکوری کیی دیکھیں پر ٹیپ کریں۔";
 
 /* Title for sheet with info for what to do if you don't have a recovery key */
 "REGISTRATION_NO_BACKUP_KEY_SHEET_TITLE" = "کوئی ریکوری کیی نہیں ہے؟";
@@ -7290,16 +7290,16 @@ Send money securely.";
 "REGISTRATION_PROFILE_SETUP_TITLE" = "اپنی پروفائل سیٹ اپ کریں";
 
 /* Error shown if an SMS/call service provider is permanently unable to send a verification code to the provided number. */
-"REGISTRATION_PROVIDER_FAILURE_MESSAGE_PERMANENT" = "Signal SMS کوڈ نہیں بھیج سکتا کیونکہ SMS فراہم کنندہ کے ساتھ مسائل ہیں۔";
+"REGISTRATION_PROVIDER_FAILURE_MESSAGE_PERMANENT" = "Radar SMS کوڈ نہیں بھیج سکتا کیونکہ SMS فراہم کنندہ کے ساتھ مسائل ہیں۔";
 
 /* Error shown if an SMS/call service provider is temporarily unable to send a verification code to the provided number. */
-"REGISTRATION_PROVIDER_FAILURE_MESSAGE_TRANSIENT" = "Signal SMS کوڈ نہیں بھیج سکا کیونکہ SMS فراہم کنندہ کے ساتھ مسائل ہیں۔ کچھ گھنٹوں کے بعد دوبارہ کوشش کریں۔";
+"REGISTRATION_PROVIDER_FAILURE_MESSAGE_TRANSIENT" = "Radar SMS کوڈ نہیں بھیج سکا کیونکہ SMS فراہم کنندہ کے ساتھ مسائل ہیں۔ کچھ گھنٹوں کے بعد دوبارہ کوشش کریں۔";
 
 /* Third step in directions for how to make a backup */
 "REGISTRATION_RESTORE_METHOD_MAKE_BACKUP_TUTORIAL_ENABLE_BACKUPS" = "بیک اپس کو فعال کریں اور انتظار کریں جب تک آپ کا بیک اپ مکمل نہ ہو جائے";
 
 /* First step in directions for how to make a backup */
-"REGISTRATION_RESTORE_METHOD_MAKE_BACKUP_TUTORIAL_OPEN_SIGNAL" = "اپنی پرانی ڈیوائس پر Signal کھولیں";
+"REGISTRATION_RESTORE_METHOD_MAKE_BACKUP_TUTORIAL_OPEN_SIGNAL" = "اپنی پرانی ڈیوائس پر Radar کھولیں";
 
 /* Second step in directions for how to make a backup */
 "REGISTRATION_RESTORE_METHOD_MAKE_BACKUP_TUTORIAL_TAP_SETTINGS" = "سیٹنگز > بیک اپس پر ٹیپ کریں";
@@ -7317,7 +7317,7 @@ Send money securely.";
 "REGISTRATION_SCAN_QR_CODE_TITLE" = "اپنے پرانے فون سے اس کوڈ کو اسکین کریں";
 
 /* Tutorial text describing the first step to scanning the restore/transfer QR code with your old phone: opening Signal */
-"REGISTRATION_SCAN_QR_CODE_TUTORIAL_OPEN_SIGNAL" = "اپنی پرانی ڈیوائس پر Signal کھولیں";
+"REGISTRATION_SCAN_QR_CODE_TUTORIAL_OPEN_SIGNAL" = "اپنی پرانی ڈیوائس پر Radar کھولیں";
 
 /* Tutorial text describing the third step to scanning the restore/transfer QR code with your old phone: scan the code */
 "REGISTRATION_SCAN_QR_CODE_TUTORIAL_SCAN" = "اس کوڈ کو کیمرے کے ذریعے اسکین کریں";
@@ -7539,7 +7539,7 @@ Send money securely.";
 "SAFETY_TIPS_FAKE_BUSINESS_TITLE" = "جعلی کاروبار اور ادارے";
 
 /* Message contents for the fake names safety tip. */
-"SAFETY_TIPS_FAKE_NAMES_BODY" = "Signal آپ سے آپ کے رجسٹریشن کوڈ یا پِن کے لیے کبھی رابطہ نہیں کرے گا۔ ان درخواستوں سے محتاط رہیں جو دوسروں کی نقالی کرتی ہیں۔ پروفائل نیمز ان کے اکاؤنٹ ہولڈر کی جانب سے منتخب کیے جاتے ہیں اور تصدیق شدہ نہیں ہوتے۔";
+"SAFETY_TIPS_FAKE_NAMES_BODY" = "Radar آپ سے آپ کے رجسٹریشن کوڈ یا پِن کے لیے کبھی رابطہ نہیں کرے گا۔ ان درخواستوں سے محتاط رہیں جو دوسروں کی نقالی کرتی ہیں۔ پروفائل نیمز ان کے اکاؤنٹ ہولڈر کی جانب سے منتخب کیے جاتے ہیں اور تصدیق شدہ نہیں ہوتے۔";
 
 /* Message title describing the fake names safety tip. */
 "SAFETY_TIPS_FAKE_NAMES_TITLE" = "جعلی نام اور اکاؤنٹس";
@@ -7599,13 +7599,13 @@ Send money securely.";
 "SCREEN_LOCK_ERROR_LOCAL_AUTHENTICATION_PASSCODE_NOT_SET" = "آپ کو سکرین لاک استعمال کرنے کیلئے iOS ترتیبات میں پاس کوڈ فعال کرنا ہوگا۔";
 
 /* Description of how and why Signal iOS uses Touch ID/Face ID/Phone Passcode to unlock 'screen lock'. */
-"SCREEN_LOCK_REASON_UNLOCK_SCREEN_LOCK" = "Signal کھولنے کیلئے توثیق کریں۔";
+"SCREEN_LOCK_REASON_UNLOCK_SCREEN_LOCK" = "Radar کھولنے کیلئے توثیق کریں۔";
 
 /* Title for alert indicating that screen lock could not be unlocked. */
 "SCREEN_LOCK_UNLOCK_FAILED" = "توثیق میں ناکامی۔";
 
 /* Label for button on lock screen that lets users unlock Signal. */
-"SCREEN_LOCK_UNLOCK_SIGNAL" = "Signal ان لاک کریں";
+"SCREEN_LOCK_UNLOCK_SIGNAL" = "Radar ان لاک کریں";
 
 /* Placeholder text indicating the user can search for contacts by name, username, or phone number. */
 "SEARCH_BY_NAME_OR_USERNAME_OR_NUMBER_PLACEHOLDER_TEXT" = "نام، یوزر نیم ، یا نمبر";
@@ -7638,13 +7638,13 @@ Send money securely.";
 "SECONDARY_LINKING_ERROR_DIFFERENT_ACCOUNT_TITLE" = "اکاؤنٹ مماثل نہیں ہے";
 
 /* Message for error alert indicating that a linked device must be upgraded before it can be linked. */
-"SECONDARY_LINKING_ERROR_OBSOLETE_LINKED_DEVICE_MESSAGE" = "اس فون پر Signal کو جوڑنے کیلئے اس آلہ پر Signal کو اپ ڈیٹ کریں۔";
+"SECONDARY_LINKING_ERROR_OBSOLETE_LINKED_DEVICE_MESSAGE" = "اس فون پر Radar کو جوڑنے کیلئے اس آلہ پر Radar کو اپ ڈیٹ کریں۔";
 
 /* Title for error alert indicating that a linked device must be upgraded before it can be linked. */
 "SECONDARY_LINKING_ERROR_OBSOLETE_LINKED_DEVICE_TITLE" = "غیر تعاون شدہ ورژن";
 
 /* alert message for outdated linking device */
-"SECONDARY_LINKING_ERROR_OLD_VERSION_MESSAGE" = "آپ کے دوسرے device میں Signal کا میراثی ورژن چل رہا ہے جو رکن کیو آر کوڈز کو اسکین کرنے میں مدد نہیں کرتا ہے۔ براہ کرم تازہ ترین Signal کی رہائی انسٹال کریں اور دوبارہ کوشش کریں۔";
+"SECONDARY_LINKING_ERROR_OLD_VERSION_MESSAGE" = "آپ کے دوسرے device میں Radar کا میراثی ورژن چل رہا ہے جو رکن کیو آر کوڈز کو اسکین کرنے میں مدد نہیں کرتا ہے۔ براہ کرم تازہ ترین Radar کی رہائی انسٹال کریں اور دوبارہ کوشش کریں۔";
 
 /* alert title for outdated linking device */
 "SECONDARY_LINKING_ERROR_OLD_VERSION_TITLE" = "اسکیننگ device کو اپ ڈیٹ کریں";
@@ -7665,7 +7665,7 @@ Send money securely.";
 "SECONDARY_LINKING_SYNCING_UPDATE_REQUIRED_CHECK_FOR_UPDATE_BUTTON" = "اپ ڈیٹس چیک کریں";
 
 /* Message for action sheet when the secondary device fails to sync messages due to an app update being required. */
-"SECONDARY_LINKING_SYNCING_UPDATE_REQUIRED_ERROR_MESSAGE" = "اپنے میسجز کی سنکنگ مکمل کرنے کے لیے، اب Signal کو اپ ڈیٹ کریں۔";
+"SECONDARY_LINKING_SYNCING_UPDATE_REQUIRED_ERROR_MESSAGE" = "اپنے میسجز کی سنکنگ مکمل کرنے کے لیے، اب Radar کو اپ ڈیٹ کریں۔";
 
 /* Title for action sheet when the secondary device fails to sync messages due to an app update being required. */
 "SECONDARY_LINKING_SYNCING_UPDATE_REQUIRED_ERROR_TITLE" = "اپ ڈیٹ درکار ہے";
@@ -7674,19 +7674,19 @@ Send money securely.";
 "SECONDARY_ONBOARDING_CHOOSE_DEVICE_NAME_PLACEHOLDER" = "نام منتخب کریں";
 
 /* header text before the user can link this device */
-"SECONDARY_ONBOARDING_GET_STARTED_BY_OPENING_PRIMARY" = "اس iPad کو اپنے اکاؤنٹ سے لنک کرنے کے لئے اپنے فون پر Signal لانچ کریں";
+"SECONDARY_ONBOARDING_GET_STARTED_BY_OPENING_PRIMARY" = "اس iPad کو اپنے اکاؤنٹ سے لنک کرنے کے لئے اپنے فون پر Radar لانچ کریں";
 
 /* Link explaining what to do when trying to link a device before having a primary device. */
-"SECONDARY_ONBOARDING_GET_STARTED_DO_NOT_HAVE_PRIMARY" = "میرے پاس اپنے فون پر Signal نہیں ہے…";
+"SECONDARY_ONBOARDING_GET_STARTED_DO_NOT_HAVE_PRIMARY" = "میرے پاس اپنے فون پر Radar نہیں ہے…";
 
 /* alert body */
-"SECONDARY_ONBOARDING_INSTALL_PRIMARY_FIRST_BODY" = "اپنے فون پر ایپ اسٹور پر جائیں ، Signal انسٹال کریں ، رجسٹریشن کا عمل مکمل کریں ، اور پھر آپ اپنے iPad کو اسی اکاؤنٹ سے لنک کرسکتے ہیں۔";
+"SECONDARY_ONBOARDING_INSTALL_PRIMARY_FIRST_BODY" = "اپنے فون پر ایپ اسٹور پر جائیں ، Radar انسٹال کریں ، رجسٹریشن کا عمل مکمل کریں ، اور پھر آپ اپنے iPad کو اسی اکاؤنٹ سے لنک کرسکتے ہیں۔";
 
 /* alert title */
-"SECONDARY_ONBOARDING_INSTALL_PRIMARY_FIRST_TITLE" = "اپنے فون پر Signal انسٹال کریں";
+"SECONDARY_ONBOARDING_INSTALL_PRIMARY_FIRST_TITLE" = "اپنے فون پر Radar انسٹال کریں";
 
 /* body text while displaying a QR code which, when scanned, will link this device. */
-"SECONDARY_ONBOARDING_SCAN_CODE_BODY" = "اپنے فون پر Signal کی ترتیبات کھولنے کے لئے اپنی پروفائل تصویر پر ٹیپ کریں۔ پھر اس کوڈ کو اپنے فون سے اسکین کرنے کے لئے \"Linked Devices\" اور \"Link New Device\":";
+"SECONDARY_ONBOARDING_SCAN_CODE_BODY" = "اپنے فون پر Radar کی ترتیبات کھولنے کے لئے اپنی پروفائل تصویر پر ٹیپ کریں۔ پھر اس کوڈ کو اپنے فون سے اسکین کرنے کے لئے \"Linked Devices\" اور \"Link New Device\":";
 
 /* Link text for page with troubleshooting info shown on the QR scanning screen */
 "SECONDARY_ONBOARDING_SCAN_CODE_HELP_TEXT" = "اپنے iPad کو یہاں سے جوڑنے میں مدد حاصل کریں";
@@ -7698,7 +7698,7 @@ Send money securely.";
 "SECONDARY_ONBOARDING_SCAN_CODE_TITLE" = "اپنے فون سے کیو آر کوڈ اسکین کریں";
 
 /* header text before the user can transfer to this device */
-"SECONDARY_TRANSFER_GET_STARTED_BY_OPENING_IPAD" = "اپنے اکاؤنٹ کو منتقل کرنے کے لئے اپنے پرانے iPad پر Signal لانچ کریں";
+"SECONDARY_TRANSFER_GET_STARTED_BY_OPENING_IPAD" = "اپنے اکاؤنٹ کو منتقل کرنے کے لئے اپنے پرانے iPad پر Radar لانچ کریں";
 
 /* No comment provided by engineer. */
 "SECURE_SESSION_RESET" = "محفوظ سیشن ترتیب دیں۔";
@@ -7788,7 +7788,7 @@ Send money securely.";
 "SEPA_DONATION_NAME_PLACEHOLDER" = "بینک اکاؤنٹ پر نام";
 
 /* Description for the session refresh alert */
-"SESSION_REFRESH_ALERT_MESSAGE" = "Signal میں اینڈ ٹو اینڈ مرموز کاری کا استعمال ہوتا ہے اور اسے بعض اوقات آپ کے چیٹ سیشن کو ری فریش کرنے کی ضرورت پڑ سکتی ہے۔ اس سے آپ کے چیٹ کی سکیورٹی متاثر نہیں ہوتی ہے لیکن ہو سکتا ہے کہ آپ نے اس رابطے سے کوئی پیغام مس کیا ہو اور آپ ان سے اسے دوبارہ بھیجنے کے لئے کہہ سکتے ہیں۔";
+"SESSION_REFRESH_ALERT_MESSAGE" = "Radar میں اینڈ ٹو اینڈ مرموز کاری کا استعمال ہوتا ہے اور اسے بعض اوقات آپ کے چیٹ سیشن کو ری فریش کرنے کی ضرورت پڑ سکتی ہے۔ اس سے آپ کے چیٹ کی سکیورٹی متاثر نہیں ہوتی ہے لیکن ہو سکتا ہے کہ آپ نے اس رابطے سے کوئی پیغام مس کیا ہو اور آپ ان سے اسے دوبارہ بھیجنے کے لئے کہہ سکتے ہیں۔";
 
 /* Title for the session refresh alert */
 "SESSION_REFRESH_ALERT_TITLE" = "چیٹ سیشن ری فریش ہو گیا";
@@ -7830,7 +7830,7 @@ Send money securely.";
 "SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_COUNTRY" = "مقام";
 
 /* Table footer for the 'censorship circumvention' section when censorship circumvention can be manually enabled. */
-"SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_FOOTER" = "اگر فعال کریں،Signal بائی پاس سنسرشپ کی کوشش کے گا۔ اس خصوصیت کو تب تک فعال نہ کریں جب تک آپ ایک لوکیشن میں ہیں جہاں Signal سنسر ہے۔";
+"SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_FOOTER" = "اگر فعال کریں،Radar بائی پاس سنسرشپ کی کوشش کے گا۔ اس خصوصیت کو تب تک فعال نہ کریں جب تک آپ ایک لوکیشن میں ہیں جہاں Radar سنسر ہے۔";
 
 /* Table footer for the 'censorship circumvention' section shown when censorship circumvention has been auto-enabled based on local phone number. */
 "SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_FOOTER_AUTO_ENABLED" = "بائی پاس سنسرشپ آپ کے اکاؤنٹ فون نمبر کی بنا پر چالو کر دیا گیا ہے۔";
@@ -7842,7 +7842,7 @@ Send money securely.";
 "SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_FOOTER_NO_CONNECTION" = "بائی پاس سنسرشپ صرف اس وقت محرک ہوں گی جب انٹرنیٹ کیساتھ منسلک ہوں گے۔";
 
 /* Table footer for the 'censorship circumvention' section shown when the app is connected to the Signal service. */
-"SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_FOOTER_WEBSOCKET_CONNECTED" = "بائی پاس سنسرشپ ضروری نہیں ہے؛آپ پہلے سے Signal سروس کیساتھ رابطے میں ہیں۔";
+"SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_FOOTER_WEBSOCKET_CONNECTED" = "بائی پاس سنسرشپ ضروری نہیں ہے؛آپ پہلے سے Radar سروس کیساتھ رابطے میں ہیں۔";
 
 /* Label for the 'advanced pin settings' button. */
 "SETTINGS_ADVANCED_PIN_SETTINGS" = "اعلی درجے کی پن کی ترتیبات";
@@ -7869,13 +7869,13 @@ Send money securely.";
 "SETTINGS_ADVANCED_VIEW_ERROR_LOG" = "لاگز میں غلطی";
 
 /* Information on sheet about changing the app icon - first line */
-"SETTINGS_APP_ICON_EDUCATION_APP_NAME" = "\"Signal\" نامی ایپ ہوم اسکرین پر، اطلاعات اور ایپ لائبریری میں ظاہر ہو گی۔";
+"SETTINGS_APP_ICON_EDUCATION_APP_NAME" = "\"Radar\" نامی ایپ ہوم اسکرین پر، اطلاعات اور ایپ لائبریری میں ظاہر ہو گی۔";
 
 /* Information on sheet about changing the app icon - second line */
-"SETTINGS_APP_ICON_EDUCATION_HOME_SCREEN_DOCK" = "آپ ایپ کو ہوم اسکرین کے نیچے واقع ڈوک میں منتقل کر کے، ہوم اسکرین سے \"Signal\" نامی ایپ کو چھپا سکتے ہیں۔";
+"SETTINGS_APP_ICON_EDUCATION_HOME_SCREEN_DOCK" = "آپ ایپ کو ہوم اسکرین کے نیچے واقع ڈوک میں منتقل کر کے، ہوم اسکرین سے \"Radar\" نامی ایپ کو چھپا سکتے ہیں۔";
 
 /* The footer for the app icon selection settings page. */
-"SETTINGS_APP_ICON_FOOTER" = "\"Signal\" نامی ایپ ہوم اسکرین پر، اطلاعات اور ایپ لائبریری میں ظاہر ہو گی۔";
+"SETTINGS_APP_ICON_FOOTER" = "\"Radar\" نامی ایپ ہوم اسکرین پر، اطلاعات اور ایپ لائبریری میں ظاہر ہو گی۔";
 
 /* The title for the app icon selection settings page. */
 "SETTINGS_APP_ICON_TITLE" = "ایپ آئیکن";
@@ -7905,7 +7905,7 @@ Send money securely.";
 "SETTINGS_BLOCK_LIST_ADD_BUTTON" = "بلاک کردہ یوزر شامل کریں";
 
 /* A label that indicates the user has no Signal contacts that they haven't blocked. */
-"SETTINGS_BLOCK_LIST_NO_CONTACTS" = "آپ Signal پر کوئی رابطہ نہیں رکھتے۔";
+"SETTINGS_BLOCK_LIST_NO_CONTACTS" = "آپ Radar پر کوئی رابطہ نہیں رکھتے۔";
 
 /* A label that indicates the user's search has no matching results. */
 "SETTINGS_BLOCK_LIST_NO_SEARCH_RESULTS" = "کوئی نتیجہ تلاش نہیں ہوا";
@@ -7917,7 +7917,7 @@ Send money securely.";
 "SETTINGS_CALLING_HIDES_IP_ADDRESS_PREFERENCE_TITLE" = "ہمیشہ کالیں نشر کریں";
 
 /* User settings section footer, a detailed explanation */
-"SETTINGS_CALLING_HIDES_IP_ADDRESS_PREFERENCE_TITLE_DETAIL" = "اپنے رابطوں پر اپنا IP ایڈریس ظاہر کرنے سے بچنے کیلئے Signal سرور کے ذریعے تمام کالوں کو ریلے کریں۔ فعال کرنے سے کال کا معیار کم ہوجائے گا۔";
+"SETTINGS_CALLING_HIDES_IP_ADDRESS_PREFERENCE_TITLE_DETAIL" = "اپنے رابطوں پر اپنا IP ایڈریس ظاہر کرنے سے بچنے کیلئے Radar سرور کے ذریعے تمام کالوں کو ریلے کریں۔ فعال کرنے سے کال کا معیار کم ہوجائے گا۔";
 
 /* Label for the 'edit phone number' button in the 'change phone number' views. */
 "SETTINGS_CHANGE_PHONE_NUMBER_BACK_TO_EDIT_BUTTON" = "نمبر ترتیب کرے";
@@ -7962,7 +7962,7 @@ Send money securely.";
 "SETTINGS_CLEAR_HISTORY" = "چیٹ ہسٹری صاف کریں";
 
 /* Footer for the 'about' help section */
-"SETTINGS_COPYRIGHT" = "کاپی رائٹ Signal میسنجر\nAGPLv3 کے تحت لائسنس یافتہ";
+"SETTINGS_COPYRIGHT" = "کاپی رائٹ Radar میسنجر\nAGPLv3 کے تحت لائسنس یافتہ";
 
 /* Label for the 'data' section of the app settings. */
 "SETTINGS_DATA" = "ڈیٹا کا استعمال";
@@ -8034,7 +8034,7 @@ Send money securely.";
 "SETTINGS_DISAPPEARING_MESSAGES_FOOTER" = "اپنی جانب سے شروع کردہ تمام نئی چیٹس کے لیے ڈیفالٹ مدتی میسج ٹائمر سیٹ کریں۔";
 
 /* Title for the 'donate to signal' link in settings. */
-"SETTINGS_DONATE" = "Signal کے لئے عطیہ کریں";
+"SETTINGS_DONATE" = "Radar کے لئے عطیہ کریں";
 
 /* Title for help button and help pages in app settings. */
 "SETTINGS_HELP" = "مدد کریں";
@@ -8103,7 +8103,7 @@ Send money securely.";
 "SETTINGS_NOTIFICATION_CONTENT_TITLE" = "اطلاعات کا مواد";
 
 /* When the local device discovers a contact has recently installed signal, the app can generates a message encouraging the local user to say hello. Turning this switch off disables that feature. */
-"SETTINGS_NOTIFICATION_EVENTS_CONTACT_JOINED_SIGNAL" = "رابطہ Signal میں شامل ہوتا ہے";
+"SETTINGS_NOTIFICATION_EVENTS_CONTACT_JOINED_SIGNAL" = "رابطہ Radar میں شامل ہوتا ہے";
 
 /* table section header */
 "SETTINGS_NOTIFICATION_NOTIFY_WHEN_TITLE" = "مطلع کریں جب…";
@@ -8140,7 +8140,7 @@ Send money securely.";
 "SETTINGS_PAYMENTS_BITCOIN_UNIT" = "بٹ کوائن یونٹ";
 
 /* Error message indicating that payments could not be activated because the feature is not currently available. */
-"SETTINGS_PAYMENTS_CANNOT_ACTIVATE_PAYMENTS_KILL_SWITCH" = "Signal میں ادائیگی اب دستیاب نہیں ہے۔ آپ اب بھی ایکسچینج میں فنڈز کی منتقلی کرسکتے ہیں لیکن آپ اب ادائیگی بھیجنے اور وصول کرنے یا فنڈز شامل نہیں کرسکتے ہیں۔";
+"SETTINGS_PAYMENTS_CANNOT_ACTIVATE_PAYMENTS_KILL_SWITCH" = "Radar میں ادائیگی اب دستیاب نہیں ہے۔ آپ اب بھی ایکسچینج میں فنڈز کی منتقلی کرسکتے ہیں لیکن آپ اب ادائیگی بھیجنے اور وصول کرنے یا فنڈز شامل نہیں کرسکتے ہیں۔";
 
 /* Error message indicating that payments could not be deactivated because the current balance is unavailable. */
 "SETTINGS_PAYMENTS_CANNOT_DEACTIVATE_PAYMENTS_NO_BALANCE" = "ادائیگیوں کو غیر فعال نہیں کرسکتے ہیں کیونکہ آپ کا بیلنس دستیاب نہیں ہے۔ اپنا کنکشن چیک کریں اور دوبارہ کوشش کریں۔";
@@ -8149,10 +8149,10 @@ Send money securely.";
 "SETTINGS_PAYMENTS_CANNOT_SEND_PAYMENT_NO_BALANCE" = "ادائیگی مکمل نہیں کرسکا کیونکہ آپ کا بیلنس دستیاب نہیں ہے۔ اپنا کنکشن چیک کریں اور دوبارہ کوشش کریں۔";
 
 /* Error message indicating that payments cannot be sent because the feature is not currently available. */
-"SETTINGS_PAYMENTS_CANNOT_SEND_PAYMENTS_KILL_SWITCH" = "Signal میں ادائیگی اب دستیاب نہیں ہے۔ آپ اب بھی ایکسچینج میں فنڈز کی منتقلی کرسکتے ہیں لیکن آپ اب ادائیگی بھیجنے اور وصول کرنے یا فنڈز شامل نہیں کرسکتے ہیں۔";
+"SETTINGS_PAYMENTS_CANNOT_SEND_PAYMENTS_KILL_SWITCH" = "Radar میں ادائیگی اب دستیاب نہیں ہے۔ آپ اب بھی ایکسچینج میں فنڈز کی منتقلی کرسکتے ہیں لیکن آپ اب ادائیگی بھیجنے اور وصول کرنے یا فنڈز شامل نہیں کرسکتے ہیں۔";
 
 /* Error message indicating that you cannot transfer into your payments wallet because the feature is not currently available. */
-"SETTINGS_PAYMENTS_CANNOT_TRANSFER_IN_KILL_SWITCH" = "Signal میں ادائیگی اب دستیاب نہیں ہے۔ آپ اب بھی ایکسچینج میں فنڈز کی منتقلی کرسکتے ہیں لیکن آپ اب ادائیگی بھیجنے اور وصول کرنے یا فنڈز شامل نہیں کرسکتے ہیں۔";
+"SETTINGS_PAYMENTS_CANNOT_TRANSFER_IN_KILL_SWITCH" = "Radar میں ادائیگی اب دستیاب نہیں ہے۔ آپ اب بھی ایکسچینج میں فنڈز کی منتقلی کرسکتے ہیں لیکن آپ اب ادائیگی بھیجنے اور وصول کرنے یا فنڈز شامل نہیں کرسکتے ہیں۔";
 
 /* Message for the 'currency conversions info' alert. */
 "SETTINGS_PAYMENTS_CURRENCY_CONVERSIONS_INFO_ALERT_MESSAGE" = "تبادلوں کا صرف اندازہ ہے اور ہوسکتا ہے کہ یہ درست نہ ہوں۔";
@@ -8179,10 +8179,10 @@ Send money securely.";
 "SETTINGS_PAYMENTS_DEACTIVATE_TITLE" = "ادائیگیوں کو غیر فعال کریں";
 
 /* Explanation of the 'deactivate payments with balance' process in the 'deactivate payments' settings. */
-"SETTINGS_PAYMENTS_DEACTIVATE_WITH_BALANCE_EXPLANATION" = "یہ تجویز پیش کی جاتی ہے کہ پیمنٹس کو غیر فعال کرنے سے قبل آپ اپنے فنڈز کو کسی دوسرے والیٹ ایڈریس پر ٹرانسفر کریں۔ اگر آپ ابھی اپنے فنڈز کو ٹرانسفر کرنے کا انتخاب نہیں کرنا چاہتے، تو آپ کی جانب سے پیمنٹس کو دوبارہ فعال کرنے کی صورت میں یہ Signal سے لنک کردہ آپ کے والیٹ میں موجود رہیں گے۔";
+"SETTINGS_PAYMENTS_DEACTIVATE_WITH_BALANCE_EXPLANATION" = "یہ تجویز پیش کی جاتی ہے کہ پیمنٹس کو غیر فعال کرنے سے قبل آپ اپنے فنڈز کو کسی دوسرے والیٹ ایڈریس پر ٹرانسفر کریں۔ اگر آپ ابھی اپنے فنڈز کو ٹرانسفر کرنے کا انتخاب نہیں کرنا چاہتے، تو آپ کی جانب سے پیمنٹس کو دوبارہ فعال کرنے کی صورت میں یہ Radar سے لنک کردہ آپ کے والیٹ میں موجود رہیں گے۔";
 
 /* Description for the 'deactivate payments confirmation' UI in the payment settings. */
-"SETTINGS_PAYMENTS_DEACTIVATE_WITHOUT_TRANSFER_CONFIRM_DESCRIPTION" = "اگر آپ پیمنٹس کو دوبارہ فعال کرنے کا انتخاب کرتے ہیں تو آپ کا بیلنس Signal سے لنک کردہ آپ کے والیٹ میں موجود رہے گا۔";
+"SETTINGS_PAYMENTS_DEACTIVATE_WITHOUT_TRANSFER_CONFIRM_DESCRIPTION" = "اگر آپ پیمنٹس کو دوبارہ فعال کرنے کا انتخاب کرتے ہیں تو آپ کا بیلنس Radar سے لنک کردہ آپ کے والیٹ میں موجود رہے گا۔";
 
 /* Title for the 'deactivate payments confirmation' UI in the payment settings. */
 "SETTINGS_PAYMENTS_DEACTIVATE_WITHOUT_TRANSFER_CONFIRM_TITLE" = "منتقلی کے بغیر غیر فعال کریں؟";
@@ -8420,7 +8420,7 @@ Send money securely.";
 "SETTINGS_PAYMENTS_PAYMENTS_LOCK_PROMPT_EXPLANATION_TOUCHID" = "ٹچ ID فعال کر کے اس فرد کو اپنے فنڈز تک رسائی سے روکنے میں مدد کریں جس کے پاس آپ کا فون ہے۔ آپ اس آپشن کو سیٹنگز میں غیر فعال کر سکتے ہیں۔";
 
 /* Button for payments outdated sheet. */
-"SETTINGS_PAYMENTS_PAYMENTS_OUTDATED_BUTTON" = "Signal اپ ڈیٹ کریں";
+"SETTINGS_PAYMENTS_PAYMENTS_OUTDATED_BUTTON" = "Radar اپ ڈیٹ کریں";
 
 /* Message for payments outdated sheet. */
 "SETTINGS_PAYMENTS_PAYMENTS_OUTDATED_MESSAGE" = "پیمنٹس بھیجنا اور وصول کرنا جاری رکھنے کے لیے، اور اپنا اپ ٹو ڈیٹ پیمنٹ بیلنس دیکھنے کے لیے اپ ڈیٹ درکار ہوتی ہے۔";
@@ -8558,7 +8558,7 @@ Send money securely.";
 "SETTINGS_PAYMENTS_TITLE" = "ادائیگی";
 
 /* Error indicating that it is not valid to send yourself a payment. */
-"SETTINGS_PAYMENTS_TRANSFER_OUT_CANNOT_SEND_TO_SELF" = "آپ اپنے Signal Wallet ایڈریس پر منتقل نہیں کرسکتے ہیں۔ معاون تبادلے میں اپنے اکاؤنٹ سے Wallet کا پتہ درج کریں۔";
+"SETTINGS_PAYMENTS_TRANSFER_OUT_CANNOT_SEND_TO_SELF" = "آپ اپنے Radar Wallet ایڈریس پر منتقل نہیں کرسکتے ہیں۔ معاون تبادلے میں اپنے اکاؤنٹ سے Wallet کا پتہ درج کریں۔";
 
 /* Footer of the 'transfer currency out' view in the payment settings. */
 "SETTINGS_PAYMENTS_TRANSFER_OUT_FOOTER" = "Transfer Bitcoin by sending to the Lightning address or invoice provided by the recipient. The address is typically displayed below the QR code.";
@@ -8621,7 +8621,7 @@ Send money securely.";
 "SETTINGS_PAYMENTS_VIEW_PASSPHRASE_TITLE" = "بازیابی کی عبارت";
 
 /* Header text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "یہ 24 الفاظ ترتیب سے لکھیں اور محفوظ جگہ پر رکھیں۔ آپ انہیں Cake Wallet یا دیگر Spark-مطابق والیٹس میں اپنا بیلنس بحال کرنے کے لیے استعمال کر سکتے ہیں۔";
+"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "یہ 12 الفاظ ترتیب سے لکھیں اور محفوظ جگہ پر رکھیں۔ آپ انہیں Cake Wallet یا دیگر Spark-مطابق والیٹس میں اپنا بیلنس بحال کرنے کے لیے استعمال کر سکتے ہیں۔";
 
 /* Footer text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
 "SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_FOOTER_2" = "یہ فریز کسی کے ساتھ شیئر نہ کریں";
@@ -8642,7 +8642,7 @@ Send money securely.";
 "SETTINGS_PHONE_NUMBER_DISCOVERABILITY_DISABLED_TOAST" = "اس سیٹنگ کو تبدیل کرنے کے لیے، \"کون میرا نمبر دیکھ سکتا ہے\" کو \"کوئی بھی نہیں\" پر سیٹ کر دیں۔";
 
 /* The description for a sheet asking for confirmation that the user wants to set their phone number discoverability to 'nobody'. */
-"SETTINGS_PHONE_NUMBER_DISCOVERABILITY_NOBODY_CONFIRMATION_DESCRIPTION" = "\"مجھے  نمبر سے کون تلاش کر سکتا ہے\" کو \"کوئی نہیں\" پر سیٹ کرنے سے لوگوں کے لیے آپ کو Signal پر تلاش کرنا زیادہ مشکل ہو جائے گا۔";
+"SETTINGS_PHONE_NUMBER_DISCOVERABILITY_NOBODY_CONFIRMATION_DESCRIPTION" = "\"مجھے  نمبر سے کون تلاش کر سکتا ہے\" کو \"کوئی نہیں\" پر سیٹ کرنے سے لوگوں کے لیے آپ کو Radar پر تلاش کرنا زیادہ مشکل ہو جائے گا۔";
 
 /* The title for a sheet asking for confirmation that the user wants to set their phone number discoverability to 'nobody'. */
 "SETTINGS_PHONE_NUMBER_DISCOVERABILITY_NOBODY_CONFIRMATION_TITLE" = "کیا واقعی ایسا چاہتے ہیں؟";
@@ -8651,7 +8651,7 @@ Send money securely.";
 "SETTINGS_PHONE_NUMBER_DISCOVERABILITY_TITLE" = "کون مجھے میرے نمبر کے ذریعے تلاش کر سکتا ہے";
 
 /* Description label for Phone Number Privacy */
-"SETTINGS_PHONE_NUMBER_PRIVACY_DESCRIPTION_LABEL" = "منتخب کریں کہ کون آپ کا فون نمبر دیکھ سکتا ہے اور کون اس کے ذریعے Signal پر آپ سے رابطہ کر سکتا ہے۔";
+"SETTINGS_PHONE_NUMBER_PRIVACY_DESCRIPTION_LABEL" = "منتخب کریں کہ کون آپ کا فون نمبر دیکھ سکتا ہے اور کون اس کے ذریعے Radar پر آپ سے رابطہ کر سکتا ہے۔";
 
 /* The title for phone number privacy settings. */
 "SETTINGS_PHONE_NUMBER_PRIVACY_TITLE" = "فون نمبر";
@@ -8663,16 +8663,16 @@ Send money securely.";
 "SETTINGS_PIN_REMINDER_DISABLE_CONFIRMATION_ACTION" = "یاد دہانی بند کردیں";
 
 /* The explanation for the dialog asking user to confirm their PIN to disable reminders */
-"SETTINGS_PIN_REMINDER_DISABLE_CONFIRMATION_EXPLANATION" = "اس بات کو یقینی بنائیں کہ آپ اپنے پن کو حفظ یا محفوظ طریقے سے محفوظ کریں کیونکہ اسے بازیافت نہیں کیا جاسکتا ہے۔ اگر آپ اپنا پن بھول جاتے ہیں تو ، اپنے Signal اکاؤنٹ کی دوبارہ رجسٹریشن کرتے وقت آپ ڈیٹا کھو سکتے ہیں۔";
+"SETTINGS_PIN_REMINDER_DISABLE_CONFIRMATION_EXPLANATION" = "اس بات کو یقینی بنائیں کہ آپ اپنے پن کو حفظ یا محفوظ طریقے سے محفوظ کریں کیونکہ اسے بازیافت نہیں کیا جاسکتا ہے۔ اگر آپ اپنا پن بھول جاتے ہیں تو ، اپنے Radar اکاؤنٹ کی دوبارہ رجسٹریشن کرتے وقت آپ ڈیٹا کھو سکتے ہیں۔";
 
 /* The title for the dialog asking user to confirm their PIN to disable reminders */
-"SETTINGS_PIN_REMINDER_DISABLE_CONFIRMATION_TITLE" = "اپنے Signal پن کی تصدیق کریں";
+"SETTINGS_PIN_REMINDER_DISABLE_CONFIRMATION_TITLE" = "اپنے Radar پن کی تصدیق کریں";
 
 /* Label for the 'pin reminder' switch of the privacy settings. */
 "SETTINGS_PIN_REMINDER_SWITCH_LABEL" = "پن کی یاد دہانی";
 
 /* Footer for the 'PINs' section of the privacy settings. */
-"SETTINGS_PINS_FOOTER" = "PINs Signal کے ساتھ ذخیرہ شدہ معلومات کو خفیہ شدہ رکھتا ہے لہذا صرف آپ ہی اس تک رسائی حاصل کرسکتے ہیں۔ آپ کا پن بازیافت نہیں ہوسکتا ہے۔ جب آپ Signal کو دوبارہ انسٹال کرتے ہیں تو آپ کا پروفائل ، ترتیبات اور رابطے بحال ہوجائیں گے۔";
+"SETTINGS_PINS_FOOTER" = "PINs Radar کے ساتھ ذخیرہ شدہ معلومات کو خفیہ شدہ رکھتا ہے لہذا صرف آپ ہی اس تک رسائی حاصل کرسکتے ہیں۔ آپ کا پن بازیافت نہیں ہوسکتا ہے۔ جب آپ Radar کو دوبارہ انسٹال کرتے ہیں تو آپ کا پروفائل ، ترتیبات اور رابطے بحال ہوجائیں گے۔";
 
 /* Label for the 'pins' item of the privacy settings when the user does have a pin. */
 "SETTINGS_PINS_ITEM" = "اپنا پن تبدیل کریں";
@@ -8681,7 +8681,7 @@ Send money securely.";
 "SETTINGS_PINS_ITEM_CREATE" = "ایک پن بنائیں";
 
 /* Title for the 'PINs' section of the privacy settings. */
-"SETTINGS_PINS_TITLE" = "Signal پن";
+"SETTINGS_PINS_TITLE" = "Radar پن";
 
 /* Footer for table section */
 "SETTINGS_PRIVACY_ADVANCED_FOOTER" = "سنسرشپ کا دائرہ، پراکسی، ریلے کالز، اور مہر بند یوزر کی سیٹنگز۔";
@@ -8723,7 +8723,7 @@ Send money securely.";
 "SETTINGS_REGISTRATION_LOCK_TURN_ON_ERROR_PIN_REQUIRED" = "رجسٹریشن لاک استعمال کرنے کے لیے آپ کو ایک پِن تخلیق کرنا ہو گا۔";
 
 /* Body for the alert confirming that the user wants to turn on registration lock. */
-"SETTINGS_REGISTRATION_LOCK_TURN_ON_MESSAGE" = "اگر آپ دوبارہ Signal کے ساتھ اندراج کرتے وقت اپنا Signal پن بھول جاتے ہیں تو ، آپ کو 7 دن کے لئے اپنے اکاؤنٹ سے بند کر دیا جائے گا۔";
+"SETTINGS_REGISTRATION_LOCK_TURN_ON_MESSAGE" = "اگر آپ دوبارہ Radar کے ساتھ اندراج کرتے وقت اپنا Radar پن بھول جاتے ہیں تو ، آپ کو 7 دن کے لئے اپنے اکاؤنٹ سے بند کر دیا جائے گا۔";
 
 /* Title for the alert confirming that the user wants to turn on registration lock. */
 "SETTINGS_REGISTRATION_LOCK_TURN_ON_TITLE" = "رجسٹریشن لاک آن کریں؟";
@@ -8753,19 +8753,19 @@ Send money securely.";
 "SETTINGS_SECTION_TITLE_CALLING" = "کال ہو رہی ہے";
 
 /* Section footer */
-"SETTINGS_SECURITY_DETAIL" = "Signal کو غیر مقفل کرنے کیلئے ٹچ ID ، چہرہ ID ، یا اپنے iOS آلہ پاس کوڈ کا استعمال کریں۔";
+"SETTINGS_SECURITY_DETAIL" = "Radar کو غیر مقفل کرنے کیلئے ٹچ ID ، چہرہ ID ، یا اپنے iOS آلہ پاس کوڈ کا استعمال کریں۔";
 
 /* Section footer */
-"SETTINGS_SECURITY_DETAIL_FACEID" = "Signal کو غیر مقفل کرنے کیلئے فیس آئی ڈی استعمال کریں۔";
+"SETTINGS_SECURITY_DETAIL_FACEID" = "Radar کو غیر مقفل کرنے کیلئے فیس آئی ڈی استعمال کریں۔";
 
 /* Section footer */
-"SETTINGS_SECURITY_DETAIL_OPTICID" = "Signal کو ان لاک کرنے کے لیے آپٹک ID استعمال کریں۔";
+"SETTINGS_SECURITY_DETAIL_OPTICID" = "Radar کو ان لاک کرنے کے لیے آپٹک ID استعمال کریں۔";
 
 /* Section footer */
-"SETTINGS_SECURITY_DETAIL_PASSCODE" = "Signal کو غیر مقفل کرنے کیلئے اپنے آلے کا پاس کوڈ استعمال کریں۔";
+"SETTINGS_SECURITY_DETAIL_PASSCODE" = "Radar کو غیر مقفل کرنے کیلئے اپنے آلے کا پاس کوڈ استعمال کریں۔";
 
 /* Section footer */
-"SETTINGS_SECURITY_DETAIL_TOUCHID" = "Signal کو غیر مقفل کرنے کیلئے ٹچ ID استعمال کریں۔";
+"SETTINGS_SECURITY_DETAIL_TOUCHID" = "Radar کو غیر مقفل کرنے کیلئے ٹچ ID استعمال کریں۔";
 
 /* Section header */
 "SETTINGS_SECURITY_TITLE" = "ایپ سیکیورٹی";
@@ -8780,13 +8780,13 @@ Send money securely.";
 "SETTINGS_SHARING_SUGGESTIONS" = "iOS کے ساتھ روابط شیئر کریں";
 
 /* Footer for setting for enabling & disabling contact and notification sharing with iOS. */
-"SETTINGS_SHARING_SUGGESTIONS_NOTIFICATIONS_FOOTER" = "تجاویز اور اطلاعات کو شیئر کرنے جیسے فیچرز کے لیے iOS کو Signal کے رابطوں اور چیٹس تک رسائی کی اجازت دیں۔";
+"SETTINGS_SHARING_SUGGESTIONS_NOTIFICATIONS_FOOTER" = "تجاویز اور اطلاعات کو شیئر کرنے جیسے فیچرز کے لیے iOS کو Radar کے رابطوں اور چیٹس تک رسائی کی اجازت دیں۔";
 
 /* Label for the 'enable registration lock' switch of the privacy settings. */
 "SETTINGS_TWO_FACTOR_AUTH_SWITCH_LABEL" = "رجسٹریشن لاک";
 
 /* Footer for the 'two factor auth' section of the privacy settings when Signal PINs are available. */
-"SETTINGS_TWO_FACTOR_PINS_AUTH_FOOTER" = "اپنے فون نمبر کو دوبارہ Signal کے ساتھ رجسٹر کرنے کیلئے اپنے Signal پن کی ضرورت ہے۔";
+"SETTINGS_TWO_FACTOR_PINS_AUTH_FOOTER" = "اپنے فون نمبر کو دوبارہ Radar کے ساتھ رجسٹر کرنے کیلئے اپنے Radar پن کی ضرورت ہے۔";
 
 /* Label for the 'typing indicators' setting. */
 "SETTINGS_TYPING_INDICATORS" = "ٹائپنگ انڈیکیٹرز";
@@ -8819,7 +8819,7 @@ Send money securely.";
 "SHARE_EXTENSION_LOADING" = "لوڈ ہو رہا ہے۔۔۔";
 
 /* Message indicating that the share extension cannot be used until the user has registered in the main app. */
-"SHARE_EXTENSION_NOT_REGISTERED_MESSAGE" = "Signal ایپ کو رجسٹر کرنے کیلئے لاؤنچ کریں۔";
+"SHARE_EXTENSION_NOT_REGISTERED_MESSAGE" = "Radar ایپ کو رجسٹر کرنے کیلئے لاؤنچ کریں۔";
 
 /* Title indicating that the share extension cannot be used until the user has registered in the main app. */
 "SHARE_EXTENSION_NOT_REGISTERED_TITLE" = "رجسٹرڈنہیں";
@@ -8837,7 +8837,7 @@ Send money securely.";
 "SHARE_EXTENSION_UNABLE_TO_BUILD_ATTACHMENT_ALERT_TITLE" = "اٹیچمنٹ تیار کرنے قابل نہیں";
 
 /* Title for the 'share extension' view. */
-"SHARE_EXTENSION_VIEW_TITLE" = "Signal کا اشتراک کریں";
+"SHARE_EXTENSION_VIEW_TITLE" = "Radar کا اشتراک کریں";
 
 /* Title of alert indicating sharing suggestions failed to deactivate */
 "SHARING_SUGGESTIONS_DISABLE_ERROR" = "اشتراک کی تجاویز کو ناکام کرنے میں ناکام۔";
@@ -8846,10 +8846,10 @@ Send money securely.";
 "SHOW_THREAD_BUTTON_TITLE" = "چیٹ دکھائیں";
 
 /* Shown in the header when the user hasn't provided a custom name for a call. */
-"SIGNAL_CALL" = "Signal  کال";
+"SIGNAL_CALL" = "Radar  کال";
 
 /* body sent to contacts when inviting to Install Signal */
-"SMS_INVITE_BODY" = "میں آپ کو Signal نصب کرنے کیلئے مدعو کر رہا ہوں!  لنک یہاں ہے:";
+"SMS_INVITE_BODY" = "میں آپ کو Radar نصب کرنے کیلئے مدعو کر رہا ہوں!  لنک یہاں ہے:";
 
 /* An error message generically indicating that something went wrong. */
 "SOMETHING_WENT_WRONG_ERROR" = "کچھ غلط ہو گیا۔";
@@ -8873,7 +8873,7 @@ Send money securely.";
 "SPAM_CAPTCHA_DISMISS_CONFIRMATION_TITLE" = "تصدیق کیے بغیر جاری رکھیں؟";
 
 /* Body for action sheet explaining captcha requirement. */
-"SPAM_CAPTCHA_SHEET_BODY" = "Signal پر اسپام کو روکنے میں مدد کے لئے ، براہ کرم تصدیق کی تصدیق کریں۔\n\nتصدیق کرنے کے بعد ، آپ پیغام رسانی جاری رکھ سکتے ہیں۔ کوئی موقوف پیغامات خودبخود بھیجے جائیں گے۔";
+"SPAM_CAPTCHA_SHEET_BODY" = "Radar پر اسپام کو روکنے میں مدد کے لئے ، براہ کرم تصدیق کی تصدیق کریں۔\n\nتصدیق کرنے کے بعد ، آپ پیغام رسانی جاری رکھ سکتے ہیں۔ کوئی موقوف پیغامات خودبخود بھیجے جائیں گے۔";
 
 /* Title for action sheet explaining captcha requirement. */
 "SPAM_CAPTCHA_SHEET_TITLE" = "پیغام رسانی جاری رکھنے کے لئے توثیق کریں";
@@ -8909,7 +8909,7 @@ Send money securely.";
 "STICKERS_INSTALL_BUTTON" = "انسٹال";
 
 /* Title for the 'available built-in stickers' section of the 'manage stickers' view. */
-"STICKERS_MANAGE_VIEW_AVAILABLE_BUILT_IN_PACKS_SECTION_TITLE" = "Signal آرٹسٹ سیریز";
+"STICKERS_MANAGE_VIEW_AVAILABLE_BUILT_IN_PACKS_SECTION_TITLE" = "Radar آرٹسٹ سیریز";
 
 /* Title for the 'available known stickers' section of the 'manage stickers' view. */
 "STICKERS_MANAGE_VIEW_AVAILABLE_KNOWN_PACKS_SECTION_TITLE" = "اسٹیکرز جو آپ کو ملے ہیں";
@@ -9191,19 +9191,19 @@ Send money securely.";
 "STORY_SETTINGS_LEARN_MORE_SHEET_FOOTER" = "آپ کے کنکشنز آپ کا نام اور تصویر، اور یہ دیکھ سکتے ہیں جو آپ \"میری سٹوری\" پر بھیجتے ہیں تاوقتیکہ آپ اسے ان سے مخفی کریں۔";
 
 /* Header for the explainer sheet for signal connections */
-"STORY_SETTINGS_LEARN_MORE_SHEET_HEADER_FORMAT" = "<bold>Signal کنکشنز</bold> وہ لوگ ہیں جن پر آپ نے اعتماد کیا ہے، یا تو بذریعہ:";
+"STORY_SETTINGS_LEARN_MORE_SHEET_HEADER_FORMAT" = "<bold>Radar کنکشنز</bold> وہ لوگ ہیں جن پر آپ نے اعتماد کیا ہے، یا تو بذریعہ:";
 
 /* Label for the stories section of the settings view */
 "STORY_SETTINGS_TITLE" = "سٹوریز";
 
 /* Section footer for the 'viewers' section on the 'story settings' view */
-"STORY_SETTINGS_WHO_CAN_VIEW_THIS_FOOTER" = "منتخب کریں کہ کون سے Signal کنکشنز آپ کی سٹوری دیکھ سکتے ہیں۔ تبدیلیاں ان سٹوریز کو متاثر نہیں کریں گی جو آپ پہلے ہی بھیج چکے ہیں۔";
+"STORY_SETTINGS_WHO_CAN_VIEW_THIS_FOOTER" = "منتخب کریں کہ کون سے Radar کنکشنز آپ کی سٹوری دیکھ سکتے ہیں۔ تبدیلیاں ان سٹوریز کو متاثر نہیں کریں گی جو آپ پہلے ہی بھیج چکے ہیں۔";
 
 /* Section header for the 'viewers' section on the 'story settings' view */
 "STORY_SETTINGS_WHO_CAN_VIEW_THIS_HEADER" = "کون یہ سٹوری دیکھ سکتا ہے";
 
 /* Header for the 'viewers' section on the 'story settings' bottom sheet */
-"STORY_SETTINGS_WHO_CAN_VIEW_THIS_SHEET_HEADER" = "منتخب کریں کہ کون سے Signal کنکشنز آپ کی سٹوری دیکھ سکتے ہیں۔ آپ اسے کسی بھی وقت پرائیویسی سیٹنگز میں تبدیل کر سکتے ہیں۔";
+"STORY_SETTINGS_WHO_CAN_VIEW_THIS_SHEET_HEADER" = "منتخب کریں کہ کون سے Radar کنکشنز آپ کی سٹوری دیکھ سکتے ہیں۔ آپ اسے کسی بھی وقت پرائیویسی سیٹنگز میں تبدیل کر سکتے ہیں۔";
 
 /* Tooltip text shown when the user selects a story as a destination for a long duration video that will be split into shorter segments. Embeds {{ segment duration in seconds }} */
 "STORY_VIDEO_SEGMENTATION_TOOLTIP_FORMAT" = "سٹوریز پر بھیجی جانے والی ویڈیوز %1$dسیکنڈ کے کلپس میں کاٹ کر متعدد سٹوریز کے طور پر بھیجی جائیں گی۔";
@@ -9242,7 +9242,7 @@ Send money securely.";
 "SUPPORT_EMAIL_DEFAULT_DESCRIPTION" = "اس مسئلے کے بارے میں ہمیں بتائیں: ";
 
 /* Message for alert dialog presented when a support email failed to send */
-"SUPPORT_EMAIL_ERROR_ALERT_DESCRIPTION" = "برائے مہربانی اپنی مدد کی درخواست کو ای میل کریںsupport@signal.org";
+"SUPPORT_EMAIL_ERROR_ALERT_DESCRIPTION" = "برائے مہربانی اپنی مدد کی درخواست کو ای میل کریںsupport@radar.chat";
 
 /* Localized label for support request email filter string. Embeds {{filter text}}. */
 "SUPPORT_EMAIL_FILTER_LABEL_FORMAT" = "فلٹر:%1$@";
@@ -9266,7 +9266,7 @@ Send money securely.";
 "SUPPORT_EMAIL_LOG_URL_LABEL_FORMAT" = "Log URL: %1$@";
 
 /* Localized subject for support request emails */
-"SUPPORT_EMAIL_SUBJECT" = "Signal iOS کی مدد کی درخواست";
+"SUPPORT_EMAIL_SUBJECT" = "Radar iOS کی مدد کی درخواست";
 
 /* Header for emoji mood selection */
 "SUPPORT_EMOJI_PROMPT" = "اپ کیسا محسوس کر رہے ہیں؟ (اختیاری)";
@@ -9338,7 +9338,7 @@ Send money securely.";
 "SWITCH_ON" = "چلائیں";
 
 /* Name to display for the 'system' sender, e.g. for release notes and the onboarding story */
-"SYSTEM_ADDRESS_NAME" = "Signal";
+"SYSTEM_ADDRESS_NAME" = "Radar";
 
 /* Label for button to verify a user's safety number. */
 "SYSTEM_MESSAGE_ACTION_VERIFY_SAFETY_NUMBER" = "تصدیق کریں";
@@ -9497,16 +9497,16 @@ Send money securely.";
 "TIME_AMOUNT_WEEKS_SHORT_FORMAT" = "%1$@ڈبلیو";
 
 /* Button for bottom sheet shown when device transfer completes on the receiving device. Tapping will terminate the Signal app and trigger a notification to relaunch. */
-"TRANSFER_COMPLETE_SHEET_BUTTON" = "Signal کو بند کریں";
+"TRANSFER_COMPLETE_SHEET_BUTTON" = "Radar کو بند کریں";
 
 /* Subtitle for bottom sheet shown when device transfer completes on the receiving device. */
-"TRANSFER_COMPLETE_SHEET_SUBTITLE" = "اس ڈیوائس پر اپنے اکاؤنٹ کا استعمال شروع کرنے کے لیے، Signal کو بند کریں اور اسے دوبارہ کھولیں۔";
+"TRANSFER_COMPLETE_SHEET_SUBTITLE" = "اس ڈیوائس پر اپنے اکاؤنٹ کا استعمال شروع کرنے کے لیے، Radar کو بند کریں اور اسے دوبارہ کھولیں۔";
 
 /* Title for bottom sheet shown when device transfer completes on the receiving device. */
 "TRANSFER_COMPLETE_SHEET_TITLE" = "منتقلی مکمل";
 
 /* Notification prompting the user to relaunch Signal after a device transfer completed. */
-"TRANSFER_RELAUNCH_NOTIFICATION" = "میسجنگ شروع کرنے کے لیے Signal کھولیں";
+"TRANSFER_RELAUNCH_NOTIFICATION" = "میسجنگ شروع کرنے کے لیے Radar کھولیں";
 
 /* Label for the cancel button in an alert or action sheet. */
 "TXT_CANCEL_TITLE" = "منسوخ کریں";
@@ -9524,25 +9524,25 @@ Send money securely.";
 "UNKNOWN_CONTACT_BLOCK_OFFER" = "یوزر آپ کے رابطوں میں موجود نہیں ہے۔ کیا آپ اس یوزر کو بلاک کرنا چاہتے ہیں؟";
 
 /* Info message recorded in conversation history when local user receives an unknown message from a linked device and needs to upgrade. */
-"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_FROM_LINKED_DEVICE" = "آپ کی ڈیوائس میں سے ایک نے ایک پیغام بھیجا جس پر کارروائی یا اس کو ظاہر نہیں کر سکتے کیونکہ یہ ایک نئی Signal کی خصوصیت استعمال کرتی ہے۔";
+"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_FROM_LINKED_DEVICE" = "آپ کی ڈیوائس میں سے ایک نے ایک پیغام بھیجا جس پر کارروائی یا اس کو ظاہر نہیں کر سکتے کیونکہ یہ ایک نئی Radar کی خصوصیت استعمال کرتی ہے۔";
 
 /* Info message recorded in conversation history when local user receives an unknown message and needs to upgrade. Embeds {{user's name or phone number}}. */
-"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_WITH_NAME_FORMAT" = "%1$@  نے آپ کو ایک پیغام بھیجا جس پر کارروائی نہیں ہوسکتی ہے یا ظاہر نہیں ہوسکتی ہے کیونکہ یہ ایک نئی Signal کی خصوصیت استعمال کرتی ہے۔";
+"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_WITH_NAME_FORMAT" = "%1$@  نے آپ کو ایک پیغام بھیجا جس پر کارروائی نہیں ہوسکتی ہے یا ظاہر نہیں ہوسکتی ہے کیونکہ یہ ایک نئی Radar کی خصوصیت استعمال کرتی ہے۔";
 
 /* Info message recorded in conversation history when local user receives an unknown message and needs to upgrade. */
-"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_WITHOUT_NAME" = "آپ کو جو پیغام وصول ہوا ہے وہ بہتر یا ڈسپلیڈ نہیں ہوسکتا کیونکہ یہ نیا Signal فیچر استعمال کرتا ہے۔";
+"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_WITHOUT_NAME" = "آپ کو جو پیغام وصول ہوا ہے وہ بہتر یا ڈسپلیڈ نہیں ہوسکتا کیونکہ یہ نیا Radar فیچر استعمال کرتا ہے۔";
 
 /* Label for button that lets users upgrade the app. */
-"UNKNOWN_PROTOCOL_VERSION_UPGRADE_BUTTON" = "اب Signal کی توثیق کریں";
+"UNKNOWN_PROTOCOL_VERSION_UPGRADE_BUTTON" = "اب Radar کی توثیق کریں";
 
 /* Info message recorded in conversation history when local user has received an unknown unknown message from a linked device and has upgraded. */
-"UNKNOWN_PROTOCOL_VERSION_UPGRADE_COMPLETE_FROM_LINKED_DEVICE" = "Signal کے جدید ورژن کی تجدید کریں۔اب آپ اس قسم کے پیغامات اس ڈیوائس پر وصول کر سکتے ہیں۔";
+"UNKNOWN_PROTOCOL_VERSION_UPGRADE_COMPLETE_FROM_LINKED_DEVICE" = "Radar کے جدید ورژن کی تجدید کریں۔اب آپ اس قسم کے پیغامات اس ڈیوائس پر وصول کر سکتے ہیں۔";
 
 /* Info message recorded in conversation history when local user has received an unknown message and has upgraded. Embeds {{user's name or phone number}}. */
-"UNKNOWN_PROTOCOL_VERSION_UPGRADE_COMPLETE_WITH_NAME_FORMAT" = "آپ Signal کا اپ ٹو ڈیٹ ورژن استعمال کر رہے ہو تو آپ %1$@کو دوبارہ بھیجنے کا کہ سکتے ہیں۔";
+"UNKNOWN_PROTOCOL_VERSION_UPGRADE_COMPLETE_WITH_NAME_FORMAT" = "آپ Radar کا اپ ٹو ڈیٹ ورژن استعمال کر رہے ہو تو آپ %1$@کو دوبارہ بھیجنے کا کہ سکتے ہیں۔";
 
 /* Info message recorded in conversation history when local user has received an unknown message and has upgraded. */
-"UNKNOWN_PROTOCOL_VERSION_UPGRADE_COMPLETE_WITHOUT_NAME" = "اگر آپ Signal کا اپ ٹو ڈیٹ ورژن استعمال کر رہے ہو تو آپ بھیجنے والے سے یہ پیغام دوبارہ بھیجنے کا کہ سکتے ہیں۔";
+"UNKNOWN_PROTOCOL_VERSION_UPGRADE_COMPLETE_WITHOUT_NAME" = "اگر آپ Radar کا اپ ٹو ڈیٹ ورژن استعمال کر رہے ہو تو آپ بھیجنے والے سے یہ پیغام دوبارہ بھیجنے کا کہ سکتے ہیں۔";
 
 /* Label indicating an unknown user. */
 "UNKNOWN_USER" = "نامعلوم";
@@ -9566,13 +9566,13 @@ Send money securely.";
 "UNLINK_CONFIRMATION_ALERT_TITLE" = "غیر منسلک\"%1$@\"؟";
 
 /* Label warning the user that they have been unlinked from their primary device. */
-"UNLINKED_WARNING" = "یہ ڈیوائس مزید لنک کردہ نہیں ہے۔ میسجنگ جاری رکھنے کے لیے Signal کو اپنے فون کے ساتھ دوبارہ لنک کریں۔";
+"UNLINKED_WARNING" = "یہ ڈیوائس مزید لنک کردہ نہیں ہے۔ میسجنگ جاری رکھنے کے لیے Radar کو اپنے فون کے ساتھ دوبارہ لنک کریں۔";
 
 /* If this device has become unlinked from their primary device, they'll see a warning. This is the call to action on that warning. */
 "UNLINKED_WARNING_ACTION_TITLE" = "ڈیوائس کو دوبارہ لنک کریں";
 
 /* Alert title when unlinking device fails */
-"UNLINKING_FAILED_ALERT_TITLE" = "Signal آپ کی ڈیوائس کو غیر منسلک کرنے کے قابل نہیں تھا۔";
+"UNLINKING_FAILED_ALERT_TITLE" = "Radar آپ کی ڈیوائس کو غیر منسلک کرنے کے قابل نہیں تھا۔";
 
 /* Text for a toast confirming that the mic has been unmuted for a call. */
 "UNMUTE_CONFIRMATION_TOAST_LABEL" = "مائیک آن";
@@ -9593,7 +9593,7 @@ Send money securely.";
 "UNSUPPORTED_FEATURE_ERROR" = "آپ کی ڈیوائس اس خصوصیت کو سپورٹ نہیں کر رہی۔";
 
 /* Description for the unverified safety number change. Embeds {name of contact with identity change} */
-"UNVERIFIED_SAFETY_NUMBER_CHANGE_DESCRIPTION_FORMAT" = "%1$@ کے ساتھ آپ کا حفاظتی نمبر ممکنہ طور پر تبدیل ہوا کیونکہ انہوں نے Signal کو دوبارہ انسٹال کیا یا آلات تبدیل کردیئے۔ نئے حفاظتی نمبر کی تصدیق کے لئے تصدیق کریں پر ٹیپ کریں۔ یہ اختیاری ہے۔";
+"UNVERIFIED_SAFETY_NUMBER_CHANGE_DESCRIPTION_FORMAT" = "%1$@ کے ساتھ آپ کا حفاظتی نمبر ممکنہ طور پر تبدیل ہوا کیونکہ انہوں نے Radar کو دوبارہ انسٹال کیا یا آلات تبدیل کردیئے۔ نئے حفاظتی نمبر کی تصدیق کے لئے تصدیق کریں پر ٹیپ کریں۔ یہ اختیاری ہے۔";
 
 /* Action to verify a safety number after it has changed */
 "UNVERIFIED_SAFETY_NUMBER_VERIFY_ACTION" = "تصدیق کریں";
@@ -9611,7 +9611,7 @@ Send money securely.";
 "USE_PROXY_BUTTON" = "پروکسی استعمال کرو";
 
 /* Explanation of when you should use a signal proxy */
-"USE_PROXY_EXPLANATION" = "صرف اس صورت میں پراکسی استعمال کریں جب آپ موبائل ڈیٹا یا Wi-Fi پر Signal سے مربوط نہیں ہو سکتے۔";
+"USE_PROXY_EXPLANATION" = "صرف اس صورت میں پراکسی استعمال کریں جب آپ موبائل ڈیٹا یا Wi-Fi پر Radar سے مربوط نہیں ہو سکتے۔";
 
 /* Description of username links and QR codes on the username education sheet */
 "USERNAME_EDUCATION_LINK_DESCRIPTION" = "یوزر نیمز کا ایک منفرد QR کوڈ اور لنک ہوتا ہے جسے آپ اپنے دوستوں کے ساتھ شیئر کر سکتے ہیں تاکہ وہ آپ کے ساتھ فوراً چیٹ شروع کر سکیں۔";
@@ -9704,7 +9704,7 @@ Send money securely.";
 "USERNAME_LOOKUP_LINK_NO_LONGER_VALID_MESSAGE" = "اس یوزر نیم کا لنک مزید مؤثر نہیں ہے۔";
 
 /* A message indicating that the given username is not associated with a registered Signal account. Embeds {{ a username }}. */
-"USERNAME_LOOKUP_NOT_FOUND_MESSAGE_FORMAT" = "%1$@Signal یوزر نہیں ہے۔ یقینی بنائیں کہ یوزر نیم مکمل داخل کیا ہے۔";
+"USERNAME_LOOKUP_NOT_FOUND_MESSAGE_FORMAT" = "%1$@Radar یوزر نہیں ہے۔ یقینی بنائیں کہ یوزر نیم مکمل داخل کیا ہے۔";
 
 /* Title for an action sheet indicating that the given username is not associated with a registered Signal account. */
 "USERNAME_LOOKUP_NOT_FOUND_TITLE" = "صارف نہیں ملا";
@@ -9728,7 +9728,7 @@ Send money securely.";
 "USERNAME_ONBOARDING_TITLE" = "Your Username";
 
 /* Instructions that appear below the username QR code on a sharable exported image. */
-"USERNAME_QR_CODE_EXPORT_INSTRUCTIONS" = "میرے ساتھ Signal پر چیٹ کرنے کے لیے اس QR کوڈ کو اپنے فون سے اسکین کریں۔";
+"USERNAME_QR_CODE_EXPORT_INSTRUCTIONS" = "میرے ساتھ Radar پر چیٹ کرنے کے لیے اس QR کوڈ کو اپنے فون سے اسکین کریں۔";
 
 /* A message in a toast informing the user their username, link, and QR code have successfully been reset. Embeds {{ the user's new username }}. */
 "USERNAME_RESET_SUCCESSFUL_TOAST" = "آپ کا QR کوڈ اور لنک ری سیٹ کر دیا گیا ہے اور آپ کا یوزر نیم %1$@ ہے";

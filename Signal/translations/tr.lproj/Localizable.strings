@@ -2,7 +2,7 @@
 "AB_PERMISSION_MISSING_ACTION_NOT_NOW" = "Şimdi Değil";
 
 /* Title for the 'about' help section */
-"ABOUT_SECTION_TITLE" = "Signal Hakkında";
+"ABOUT_SECTION_TITLE" = "Radar Hakkında";
 
 /* Accessibility label for attachment. */
 "ACCESSIBILITY_LABEL_ATTACHMENT" = "Eklenti";
@@ -32,7 +32,7 @@
 "ACCOUNT_DATA_REPORT_CONFIRM_EXPORT_CONFIRM_BUTTON" = "Raporu dışa aktar";
 
 /* Users can request a report of their account data. Before they get their account export, they are warned to only share account data with trustworthy sources. This is the message on that warning. */
-"ACCOUNT_DATA_REPORT_CONFIRM_EXPORT_MESSAGE" = "Signal hesap verilerini yalnızca güvendiğin kişilerle veya uygulamalarla paylaş.";
+"ACCOUNT_DATA_REPORT_CONFIRM_EXPORT_MESSAGE" = "Radar hesap verilerini yalnızca güvendiğin kişilerle veya uygulamalarla paylaş.";
 
 /* Users can request a report of their account data. If this request fails (probably because of a network connection problem), they will see an error sheet. This is the message on that error. */
 "ACCOUNT_DATA_REPORT_ERROR_MESSAGE" = "Bağlantını kontrol edip tekrar dene.";
@@ -56,16 +56,16 @@
 "ACCOUNT_DATA_REPORT_EXPORT_REPORT_BUTTON" = "Raporu dışa aktar";
 
 /* Users can request a report of their account data. This text appears at the bottom of this screen, offering more information. */
-"ACCOUNT_DATA_REPORT_FOOTER" = "Raporun yalnızca dışa aktarım sırasında oluşturulur ve Signal tarafından cihazında saklanmaz.";
+"ACCOUNT_DATA_REPORT_FOOTER" = "Raporun yalnızca dışa aktarım sırasında oluşturulur ve Radar tarafından cihazında saklanmaz.";
 
 /* Users can request a report of their account data. This is the subtitle on the screen where they do this, giving them more information. */
-"ACCOUNT_DATA_REPORT_SUBTITLE" = "Signal hesap verilerinin bir raporunu indir ve dışa aktar. Bu rapor herhangi bir mesaj veya medya içermemektedir.";
+"ACCOUNT_DATA_REPORT_SUBTITLE" = "Radar hesap verilerinin bir raporunu indir ve dışa aktar. Bu rapor herhangi bir mesaj veya medya içermemektedir.";
 
 /* Users can request a report of their account data. This is the title on the screen where they do this. */
 "ACCOUNT_DATA_REPORT_TITLE" = "Hesap Verilerin";
 
 /* Label for 'invite' button in contact view. */
-"ACTION_INVITE" = "Signal'e davet et";
+"ACTION_INVITE" = "Radar'e davet et";
 
 /* Label for button that lets you send a message to a contact. */
 "ACTION_SEND_MESSAGE" = "İleti Gönder";
@@ -83,7 +83,7 @@
 "ACTION_VIDEO_CALL" = "Görüntülü Arama";
 
 /* Label for 'voice call' button in contact view. */
-"ACTION_VOICE_CALL" = "Signal Araması";
+"ACTION_VOICE_CALL" = "Radar Araması";
 
 /* The title for the 'add group members' view. */
 "ADD_GROUP_MEMBERS_VIEW_TITLE" = "Üye Ekle";
@@ -203,40 +203,40 @@
 "APN_Message" = "Yeni iletileriniz olabilir";
 
 /* Default message for the 'app launch failed' alert. */
-"APP_LAUNCH_FAILURE_ALERT_MESSAGE" = "Signal başlatılamıyor. Lütfen bu sorunu çözmemiz için hata ayıklama günlüğünüzü support@signal.org adresine gönderin.";
+"APP_LAUNCH_FAILURE_ALERT_MESSAGE" = "Radar başlatılamıyor. Lütfen bu sorunu çözmemiz için hata ayıklama günlüğünüzü support@radar.chat adresine gönderin.";
 
 /* Button to try launching the app even though the last launch failed */
-"APP_LAUNCH_FAILURE_CONTINUE" = "Bunun yerine Signal'i açın";
+"APP_LAUNCH_FAILURE_CONTINUE" = "Bunun yerine Radar'i açın";
 
 /* Message for an error indicating that the app couldn't launch because some unexpected error happened with the user's registration status. */
-"APP_LAUNCH_FAILURE_CORRUPT_REGISTRATION_MESSAGE" = "Lütfen bu sorunu çözmemiz için hata ayıklama günlüğünü support@signal.org adresine gönder.";
+"APP_LAUNCH_FAILURE_CORRUPT_REGISTRATION_MESSAGE" = "Lütfen bu sorunu çözmemiz için hata ayıklama günlüğünü support@radar.chat adresine gönder.";
 
 /* Title for an error indicating that the app couldn't launch because some unexpected error happened with the user's registration status. */
-"APP_LAUNCH_FAILURE_CORRUPT_REGISTRATION_TITLE" = "Signal Açılamadı";
+"APP_LAUNCH_FAILURE_CORRUPT_REGISTRATION_TITLE" = "Radar Açılamadı";
 
 /* Error indicating that the app could not launch because the database could not be loaded. */
 "APP_LAUNCH_FAILURE_COULD_NOT_LOAD_DATABASE" = "Veritabanı Yüklenemedi";
 
 /* Error indicating that the app could not launch without reverting unknown database migrations. */
-"APP_LAUNCH_FAILURE_INVALID_DATABASE_VERSION_MESSAGE" = "Lütfen Signal'in son sürümüne yükseltin.";
+"APP_LAUNCH_FAILURE_INVALID_DATABASE_VERSION_MESSAGE" = "Lütfen Radar'in son sürümüne yükseltin.";
 
 /* Error indicating that the app could not launch without reverting unknown database migrations. */
 "APP_LAUNCH_FAILURE_INVALID_DATABASE_VERSION_TITLE" = "Bilinmeyen Veritabanı Sürümü";
 
 /* Error indicating that the app crashed during the previous launch. */
-"APP_LAUNCH_FAILURE_LAST_LAUNCH_CRASHED_MESSAGE" = "Signal açılmaya çalışırken bir sorun yaşadı. Bu sorunu gidermeye yardımcı olması için lütfen support@signal.org'e bir hata ayıklama günlüğü gönderin.";
+"APP_LAUNCH_FAILURE_LAST_LAUNCH_CRASHED_MESSAGE" = "Radar açılmaya çalışırken bir sorun yaşadı. Bu sorunu gidermeye yardımcı olması için lütfen support@radar.chat'e bir hata ayıklama günlüğü gönderin.";
 
 /* Error indicating that the app crashed during the previous launch. */
-"APP_LAUNCH_FAILURE_LAST_LAUNCH_CRASHED_TITLE" = "Signal Açılamadı";
+"APP_LAUNCH_FAILURE_LAST_LAUNCH_CRASHED_TITLE" = "Radar Açılamadı";
 
 /* Error description indicating that the app crashed because there was low storage space available on the device. */
-"APP_LAUNCH_FAILURE_LOW_STORAGE_SPACE_AVAILABLE_MESSAGE" = "Cihazında depolama alanı düşük olduğundan Signal açılamadı. Signal'ı kullanmak için Ayarlar'da depolama alanını yönet ve yer aç.\n ";
+"APP_LAUNCH_FAILURE_LOW_STORAGE_SPACE_AVAILABLE_MESSAGE" = "Cihazında depolama alanı düşük olduğundan Radar açılamadı. Radar'ı kullanmak için Ayarlar'da depolama alanını yönet ve yer aç.\n ";
 
 /* Error title indicating that the app crashed because there was low storage space available on the device. */
 "APP_LAUNCH_FAILURE_LOW_STORAGE_SPACE_AVAILABLE_TITLE" = "Depolama Alanı Düşük";
 
 /* Error indicating that the app could not restore transferred data. */
-"APP_LAUNCH_FAILURE_RESTORE_FAILED_MESSAGE" = "Eski cihazından aktarılan veri geri yüklenemiyor. Lütfen bu sorunu çözmemiz için support@signal.org adresine hata günlüğünü gönder. Eğer Signal'ı geri yüklersen, ileti geçmişin kaybolabilir.";
+"APP_LAUNCH_FAILURE_RESTORE_FAILED_MESSAGE" = "Eski cihazından aktarılan veri geri yüklenemiyor. Lütfen bu sorunu çözmemiz için support@radar.chat adresine hata günlüğünü gönder. Eğer Radar'ı geri yüklersen, ileti geçmişin kaybolabilir.";
 
 /* Error indicating that the app could not restore transferred data. */
 "APP_LAUNCH_FAILURE_RESTORE_FAILED_TITLE" = "Aktarım Tamamlanamadı";
@@ -260,7 +260,7 @@
 "APP_UPDATE_NAG_ALERT_MESSAGE_FORMAT" = "Sürüm %1$@ şimdi App Store'dan edinilebilir.";
 
 /* Title for the 'new app version available' alert. */
-"APP_UPDATE_NAG_ALERT_TITLE" = "Signal'in Yeni Bir Sürümü Mevcut";
+"APP_UPDATE_NAG_ALERT_TITLE" = "Radar'in Yeni Bir Sürümü Mevcut";
 
 /* Label for the 'update' button in the 'new app version available' alert. */
 "APP_UPDATE_NAG_ALERT_UPDATE_BUTTON" = "Güncelle";
@@ -410,7 +410,7 @@
 "ATTACHMENT_KEYBOARD_GIF" = "GIF";
 
 /* Text in chat attachment panel when Signal only has access to some photos/videos. This string is in a compact horizontal space, so it should be short if possible. */
-"ATTACHMENT_KEYBOARD_LIMITED_ACCESS" = "Signal'in fotoğraflara erişimi sınırlıdır";
+"ATTACHMENT_KEYBOARD_LIMITED_ACCESS" = "Radar'in fotoğraflara erişimi sınırlıdır";
 
 /* A button to select a location from the Attachment Keyboard */
 "ATTACHMENT_KEYBOARD_LOCATION" = "Konum";
@@ -422,7 +422,7 @@
 "ATTACHMENT_KEYBOARD_NO_MEDIA_TITLE" = "Fotoğraf veya video yok";
 
 /* Text in chat attachment panel explaining that user needs to give Signal permission to access photos. */
-"ATTACHMENT_KEYBOARD_NO_PHOTO_ACCESS" = "Signal'in fotoğraflarına veya videolarına erişimi yok. Erişimi etkinleştirmek için Ayarlar'ı aç ve Fotoğraflar'a dokun";
+"ATTACHMENT_KEYBOARD_NO_PHOTO_ACCESS" = "Radar'in fotoğraflarına veya videolarına erişimi yok. Erişimi etkinleştirmek için Ayarlar'ı aç ve Fotoğraflar'a dokun";
 
 /* Button in chat attachment panel to let user open Settings app and give Signal persmission to access photos. */
 "ATTACHMENT_KEYBOARD_OPEN_SETTINGS" = "Ayarları aç";
@@ -527,7 +527,7 @@
 "BACKUP_ENABLEMENT_REMINDER_MEGAPHONE_ACTION" = "Aç";
 
 /* Body for Backup enablement reminder megaphone */
-"BACKUP_ENABLEMENT_REMINDER_MEGAPHONE_BODY" = "Yeni bir telefon aldığında veya Signal'ı yeniden yüklediğinde asla mesaj kaybetme.";
+"BACKUP_ENABLEMENT_REMINDER_MEGAPHONE_BODY" = "Yeni bir telefon aldığında veya Radar'ı yeniden yüklediğinde asla mesaj kaybetme.";
 
 /* Title for Backup enablement reminder megaphone */
 "BACKUP_ENABLEMENT_REMINDER_MEGAPHONE_TITLE" = "Şifreli yedeklemeleri aç";
@@ -569,7 +569,7 @@
 "BACKUP_ONBOARDING_CANCEL_SHEET_TITLE" = "Yedekleme Kurulumundan Çıkılsın mı?";
 
 /* Body for a sheet warning users to their 'Recovery Key' safe. */
-"BACKUP_ONBOARDING_CONFIRM_KEY_KEEP_KEY_SAFE_SHEET_BODY" = "Anahtarını kaybedersen Signal yedeklemeni geri yüklemene yardımcı olamaz. Güvenli ve emniyetli bir yerde sakla ve başkalarıyla paylaşma.";
+"BACKUP_ONBOARDING_CONFIRM_KEY_KEEP_KEY_SAFE_SHEET_BODY" = "Anahtarını kaybedersen Radar yedeklemeni geri yüklemene yardımcı olamaz. Güvenli ve emniyetli bir yerde sakla ve başkalarıyla paylaşma.";
 
 /* Title for a sheet warning users to their 'Recovery Key' safe. */
 "BACKUP_ONBOARDING_CONFIRM_KEY_KEEP_KEY_SAFE_SHEET_TITLE" = "Anahtarını güvende tut";
@@ -596,10 +596,10 @@
 "BACKUP_ONBOARDING_INTRO_NOT_NOW_TOAST" = "Yedeklemeleri Ayarlar'dan etkinleştirebilirsin.";
 
 /* Subtitle for a view introducing Backups during an onboarding flow. */
-"BACKUP_ONBOARDING_INTRO_SUBTITLE" = "Signal'ın güvenli, uçtan uca şifreli depolama hizmetini kullanarak mesajlarını ve medyanı yedekle. Yeni bir telefon aldığında veya Signal'ı yeniden yüklediğinde asla mesaj kaybetme.";
+"BACKUP_ONBOARDING_INTRO_SUBTITLE" = "Radar'ın güvenli, uçtan uca şifreli depolama hizmetini kullanarak mesajlarını ve medyanı yedekle. Yeni bir telefon aldığında veya Radar'ı yeniden yüklediğinde asla mesaj kaybetme.";
 
 /* Title for a view introducing Backups during an onboarding flow. */
-"BACKUP_ONBOARDING_INTRO_TITLE" = "Signal Güvenli Yedeklemeler";
+"BACKUP_ONBOARDING_INTRO_TITLE" = "Radar Güvenli Yedeklemeler";
 
 /* Text for a bullet point in a view introducing the 'Recovery Key' during an onboarding flow. */
 "BACKUP_ONBOARDING_KEY_INTRO_BULLET_1" = "Kurtarma anahtarın, yedeklemeni geri yüklemek için ihtiyaç duyacağın 64 karakterlik bir koddur.";
@@ -617,10 +617,10 @@
 "BACKUP_ONBOARDING_KEY_INTRO_TITLE" = "Kurtarma Anahtarı";
 
 /* Body for a sheet shown when your Backup plan is downgraded. */
-"BACKUP_PLAN_DOWNGRADED_SHEET_BODY" = "Ödeme yönteminle yenilenemediği için yedekleme aboneliğinin süresi doldu.\n\nMedya yedeklemeye devam etmek için yeniden abone olabilirsin. Ücretsiz Signal Yedeklemeleri planına erişmeye devam edeceksin.";
+"BACKUP_PLAN_DOWNGRADED_SHEET_BODY" = "Ödeme yönteminle yenilenemediği için yedekleme aboneliğinin süresi doldu.\n\nMedya yedeklemeye devam etmek için yeniden abone olabilirsin. Ücretsiz Radar Yedeklemeleri planına erişmeye devam edeceksin.";
 
 /* Body for a sheet shown when your Backup plan is downgraded because you stopped using TestFlight. */
-"BACKUP_PLAN_DOWNGRADED_SHEET_BODY_TESTFLIGHT" = "Artık TestFlight kullanmadığın için yedekleme aboneliğinin süresi doldu.\n\nMedya yedeklemeye devam etmek için yeniden abone olabilirsin. Ücretsiz Signal Yedeklemeleri planına erişmeye devam edeceksin.";
+"BACKUP_PLAN_DOWNGRADED_SHEET_BODY_TESTFLIGHT" = "Artık TestFlight kullanmadığın için yedekleme aboneliğinin süresi doldu.\n\nMedya yedeklemeye devam etmek için yeniden abone olabilirsin. Ücretsiz Radar Yedeklemeleri planına erişmeye devam edeceksin.";
 
 /* Primary button for a sheet shown when your Backup plan is downgraded. */
 "BACKUP_PLAN_DOWNGRADED_SHEET_PRIMARY_BUTTON" = "Yedeklemeleri Yönet";
@@ -650,7 +650,7 @@
 "BACKUP_RESTORE_MODAL_TITLE" = "Mesajlar Geri Yükleniyor…";
 
 /* Message describing that the Background App Refresh permission is disabled for Signal. \"Background App Refresh\" should be localized the same way it is in iOS Settings app permissions. */
-"BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_MESSAGE" = "Otomatik yedeklemeler devre dışı bırakılır. Signal'ın izinlerini güncelleyerek otomatik yedeklemeleri etkinleştir.";
+"BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_MESSAGE" = "Otomatik yedeklemeler devre dışı bırakılır. Radar'ın izinlerini güncelleyerek otomatik yedeklemeleri etkinleştir.";
 
 /* Add-on to a message describing that the Background App Refresh permission is disabled for Signal. \"Background App Refresh\" should be localized the same way it is in iOS Settings app permissions. */
 "BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_MESSAGE_UPDATE_NOW" = "Şimdi Güncelle";
@@ -659,7 +659,7 @@
 "BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_SHEET_GO_TO_SETTINGS_BUTTON" = "Ayarlara Git";
 
 /* Message for a sheet warning the user about the Background App Refresh permission. \"Background App Refresh\" should be localized the same way it is in iOS Settings app permissions. */
-"BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_SHEET_MESSAGE" = "Signal'ın, mesajlarını otomatik olarak yedeklemesine izin vermek için aşağıda \"Ayarlara Git\"e dokun ve \"Arka Plan Uygulama Yenileme\"yi etkinleştir";
+"BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_SHEET_MESSAGE" = "Radar'ın, mesajlarını otomatik olarak yedeklemesine izin vermek için aşağıda \"Ayarlara Git\"e dokun ve \"Arka Plan Uygulama Yenileme\"yi etkinleştir";
 
 /* Title for a sheet warning the user about the Background App Refresh permission. \"Background App Refresh\" should be localized the same way it is in iOS Settings app permissions. */
 "BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_SHEET_TITLE" = "Otomatik Yedeklemeler Devre Dışı";
@@ -746,7 +746,7 @@
 "BACKUP_SETTINGS_BACKUP_PLAN_PAID_BUT_IAP_NOT_FOUND_LOCALLY_ACTION_BUTTON_TITLE" = "Yenile";
 
 /* Text describing that the user's paid backup plan did not correspond to a App Store subscription on this device. */
-"BACKUP_SETTINGS_BACKUP_PLAN_PAID_BUT_IAP_NOT_FOUND_LOCALLY_DESCRIPTION" = "Bu cihazda aboneliğin bulunamadı. Signal Yedeklemelerini kullanmaya devam etmek için yenile.";
+"BACKUP_SETTINGS_BACKUP_PLAN_PAID_BUT_IAP_NOT_FOUND_LOCALLY_DESCRIPTION" = "Bu cihazda aboneliğin bulunamadı. Radar Yedeklemelerini kullanmaya devam etmek için yenile.";
 
 /* Header describing what the paid backup plan includes. */
 "BACKUP_SETTINGS_BACKUP_PLAN_PAID_HEADER" = "Metin + tam medya yedeklemesi";
@@ -758,16 +758,16 @@
 "BACKUP_SETTINGS_BACKUP_PLAN_PAID_RENEWAL_FORMAT" = "%1$@ tarihinde yenilenir";
 
 /* Footer for a menu section related to settings for when Backups are disabled. */
-"BACKUP_SETTINGS_BACKUPS_DISABLED_SECTION_FOOTER" = "Yedeklemeler kapatıldı ve verilerin Signal'ın güvenli depolama hizmetinden silindi.";
+"BACKUP_SETTINGS_BACKUPS_DISABLED_SECTION_FOOTER" = "Yedeklemeler kapatıldı ve verilerin Radar'ın güvenli depolama hizmetinden silindi.";
 
 /* Description for a progress view tracking media being downloaded in service of disabling Backups. */
-"BACKUP_SETTINGS_BACKUPS_DISABLING_DOWNLOADING_MEDIA_PROGRESS_VIEW_DESCRIPTION" = "Yedeklemeler kapatıldı, cihazda bulunmayan medya dosyaları indiriliyor. Verilerin indirildikten sonra Signal'ın güvenli depolama hizmetinden silinecektir.";
+"BACKUP_SETTINGS_BACKUPS_DISABLING_DOWNLOADING_MEDIA_PROGRESS_VIEW_DESCRIPTION" = "Yedeklemeler kapatıldı, cihazda bulunmayan medya dosyaları indiriliyor. Verilerin indirildikten sonra Radar'ın güvenli depolama hizmetinden silinecektir.";
 
 /* Message for a view indicating we failed to delete the user's Backup due to an unexpected error. */
 "BACKUP_SETTINGS_BACKUPS_DISABLING_GENERIC_ERROR_MESSAGE" = "Bir hata oluştu. Lütfen destek ekibiyle iletişime geç.";
 
 /* Header for a menu section related to settings for when disabling Backups encountered an unexpected error. */
-"BACKUP_SETTINGS_BACKUPS_DISABLING_GENERIC_ERROR_SECTION_HEADER" = "Verilerin Signal'ın güvenli depolama hizmetinden silinirken bir hata oluştu.";
+"BACKUP_SETTINGS_BACKUPS_DISABLING_GENERIC_ERROR_SECTION_HEADER" = "Verilerin Radar'ın güvenli depolama hizmetinden silinirken bir hata oluştu.";
 
 /* Title for a view indicating we failed to delete the user's Backup due to an unexpected error. */
 "BACKUP_SETTINGS_BACKUPS_DISABLING_GENERIC_ERROR_TITLE" = "Yedekleme Silinemedi";
@@ -776,7 +776,7 @@
 "BACKUP_SETTINGS_BACKUPS_DISABLING_PROGRESS_VIEW_DESCRIPTION" = "Yedekleme Siliniyor...";
 
 /* Header for a menu section related to disabling Backups. */
-"BACKUP_SETTINGS_BACKUPS_DISABLING_SECTION_HEADER" = "Yedeklemeler kapatıldı ve verilerin Signal'ın güvenli depolama hizmetinden silinecek.";
+"BACKUP_SETTINGS_BACKUPS_DISABLING_SECTION_HEADER" = "Yedeklemeler kapatıldı ve verilerin Radar'ın güvenli depolama hizmetinden silinecek.";
 
 /* Header for a menu section related to settings for when Backups are enabled. */
 "BACKUP_SETTINGS_BACKUPS_ENABLED_SECTION_HEADER" = "Yedekleme detayları";
@@ -824,13 +824,13 @@
 "BACKUP_SETTINGS_DISABLING_CONFIRMATION_ACTION_SHEET_TITLE" = "Yedeklemeler kapatılıp silinsin mi?";
 
 /* Message shown in an action sheet when the user disables Backups, explaining that their media is downloading first. */
-"BACKUP_SETTINGS_DISABLING_DOWNLOADS_STARTED_ACTION_SHEET_MESSAGE" = "Yedeklemende bu cihazda olmayan medya var. Yedeklemenin indirilmesi uzun sürebilir, kesintiye uğramasını önlemek için Signal'ı açık tut.";
+"BACKUP_SETTINGS_DISABLING_DOWNLOADS_STARTED_ACTION_SHEET_MESSAGE" = "Yedeklemende bu cihazda olmayan medya var. Yedeklemenin indirilmesi uzun sürebilir, kesintiye uğramasını önlemek için Radar'ı açık tut.";
 
 /* Title shown in an action sheet when the user disables Backups, explaining that their media is downloading first. */
 "BACKUP_SETTINGS_DISABLING_DOWNLOADS_STARTED_ACTION_SHEET_TITLE" = "Yedeklemen indiriliyor";
 
 /* Message shown in an action sheet indicating we failed to delete the user's Backup due to an unexpected error. */
-"BACKUP_SETTINGS_DISABLING_ERROR_GENERIC_ERROR_ACTION_SHEET_MESSAGE" = "Verilerin Signal'ın güvenli depolama hizmetinden silinirken bir hata oluştu.";
+"BACKUP_SETTINGS_DISABLING_ERROR_GENERIC_ERROR_ACTION_SHEET_MESSAGE" = "Verilerin Radar'ın güvenli depolama hizmetinden silinirken bir hata oluştu.";
 
 /* Title shown in an action sheet indicating we failed to delete the user's Backup due to an unexpected error. */
 "BACKUP_SETTINGS_DISABLING_ERROR_GENERIC_ERROR_ACTION_SHEET_TITLE" = "Yedekleme Silinemedi";
@@ -842,7 +842,7 @@
 "BACKUP_SETTINGS_DISABLING_SUBSCRIPTION_CANCEL_ACTION_SHEET_MANAGE_SUBSCRIPTION_BUTTON" = "Aboneliği Yönet";
 
 /* Message for an action sheet shown when the user disables Backups, but is still subscribed to the paid plan. */
-"BACKUP_SETTINGS_DISABLING_SUBSCRIPTION_CANCEL_ACTION_SHEET_MESSAGE" = "Aboneliğini iptal etmek istersen, sırasıyla Aboneliği Yönet > Signal > Aboneliği İptal Et seçeneklerine dokun";
+"BACKUP_SETTINGS_DISABLING_SUBSCRIPTION_CANCEL_ACTION_SHEET_MESSAGE" = "Aboneliğini iptal etmek istersen, sırasıyla Aboneliği Yönet > Radar > Aboneliği İptal Et seçeneklerine dokun";
 
 /* Title for an action sheet shown when the user disables Backups, but is still subscribed to the paid plan. */
 "BACKUP_SETTINGS_DISABLING_SUBSCRIPTION_CANCEL_ACTION_SHEET_TITLE" = "Halen ücretli bir yedekleme planına üyesin";
@@ -920,7 +920,7 @@
 "BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_DOWNLOAD_SHEET_LATER_ACTION" = "Daha sonra indir";
 
 /* Message for an action sheet allowing users to download their offloaded media. */
-"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_DOWNLOAD_SHEET_MESSAGE" = "Yedeklemende bu cihazda olmayan medya var. Bunun indirilmesi uzun sürebilir, indirmenin kesintiye uğramasını önlemek için Signal'i açık tut.";
+"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_DOWNLOAD_SHEET_MESSAGE" = "Yedeklemende bu cihazda olmayan medya var. Bunun indirilmesi uzun sürebilir, indirmenin kesintiye uğramasını önlemek için Radar'i açık tut.";
 
 /* Action in an action sheet allowing users to download their offloaded media now. */
 "BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_DOWNLOAD_SHEET_NOW_ACTION" = "Şimdi İndir";
@@ -941,13 +941,13 @@
 "BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_TOGGLE_FOOTER_AVAILABLE_FOR_TESTERS" = "Kullanılmayan medya boşaltılır. Ancak TestFlight kullandığın sürece, yedeklemenden istediğin zaman indirebilirsin.";
 
 /* Footer for a toggle allowing users to change the Optimize Local Storage setting, if the toggle is unavailable. */
-"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_TOGGLE_FOOTER_UNAVAILABLE" = "Depolama optimizasyonu yalnızca Signal Yedeklemelerin ücretli katmanı ile kullanılabilir. Bu özelliği kullanmaya başlamak için yedekleme planını yükselt.";
+"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_TOGGLE_FOOTER_UNAVAILABLE" = "Depolama optimizasyonu yalnızca Radar Yedeklemelerin ücretli katmanı ile kullanılabilir. Bu özelliği kullanmaya başlamak için yedekleme planını yükselt.";
 
 /* Title for a toggle allowing users to change the Optimize Local Storage setting. */
 "BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_TOGGLE_TITLE" = "Cihazda depolamayı optimize et";
 
 /* Subtitle for a notification telling the user they are out of remote storage space. */
-"BACKUP_SETTINGS_OUT_OF_STORAGE_SPACE_NOTIFICATION_SUBTITLE" = "Yedekleme depolama sınırına ulaştın. Sohbetleri ve medyayı yedeklemeye devam etmek için Signal'da yer aç.";
+"BACKUP_SETTINGS_OUT_OF_STORAGE_SPACE_NOTIFICATION_SUBTITLE" = "Yedekleme depolama sınırına ulaştın. Sohbetleri ve medyayı yedeklemeye devam etmek için Radar'da yer aç.";
 
 /* Title for a notification telling the user they are out of remote storage space. */
 "BACKUP_SETTINGS_OUT_OF_STORAGE_SPACE_NOTIFICATION_TITLE" = "Yedekleme Depolama Dolu";
@@ -992,19 +992,19 @@
 "BACKUP_SETTINGS_UPLOAD_PROGRESS_SUBTITLE_PAUSED_NEEDS_WIFI" = "Medya yükleme duraklatıldı: Wi-Fi bekleniyor";
 
 /* Subtitle for a progress bar tracking uploads that are paused because the user is out of remote storage space. Embeds 1:{{ total storage space provided, e.g. 100 GB }}; 2:{{ space the user needs to free up by deleting media, e.g. 1 GB }}. */
-"BACKUP_SETTINGS_UPLOAD_PROGRESS_SUBTITLE_PAUSED_OUT_OF_STORAGE_SPACE_FORMAT" = "Yedekleme planına dahil olan %1$@ depolama sınırına ulaştın. Yeni sohbetleri ve medyayı yedeklemek için Signal'da %2$@ alan boşalt ve ardından \"Şimdi Yedekle\"ye dokun.";
+"BACKUP_SETTINGS_UPLOAD_PROGRESS_SUBTITLE_PAUSED_OUT_OF_STORAGE_SPACE_FORMAT" = "Yedekleme planına dahil olan %1$@ depolama sınırına ulaştın. Yeni sohbetleri ve medyayı yedeklemek için Radar'da %2$@ alan boşalt ve ardından \"Şimdi Yedekle\"ye dokun.";
 
 /* Subtitle for a progress bar tracking active uploading. Embeds 1:{{ the amount uploaded as a file size, e.g. 100 MB }}; 2:{{ the total amount to upload as a file size, e.g. 1 GB }}; 3:{{ the percentage uploaded as a percent, e.g. 40% }}. */
 "BACKUP_SETTINGS_UPLOAD_PROGRESS_SUBTITLE_RUNNING" = "%1$@/%2$@ yükleniyor (%3$@)";
 
 /* Message for a sheet shown after the user enables backups. */
-"BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_MESSAGE" = "Yedeklemenin büyüklüğüne bağlı olarak bu işlem uzun sürebilir. Yedekleme gerçekleşirken Signal'ı normal şekilde kullanabilirsin.";
+"BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_MESSAGE" = "Yedeklemenin büyüklüğüne bağlı olarak bu işlem uzun sürebilir. Yedekleme gerçekleşirken Radar'ı normal şekilde kullanabilirsin.";
 
 /* Title for a sheet shown after the user enables backups. */
-"BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_TITLE" = "Signal Güvenli Yedeklemelere hoş geldin. Yedeklemeni şimdi başlat.";
+"BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_TITLE" = "Radar Güvenli Yedeklemelere hoş geldin. Yedeklemeni şimdi başlat.";
 
 /* Message for a sheet shown when your Backup subscription fails to renew. */
-"BACKUP_SUBSCRIPTION_FAILED_TO_RENEW_SHEET_MESSAGE" = "Ödeme yönteminin güncel olduğundan emin olmak için kontrol et. Aboneliği Yönet > Signal > Ödeme Yöntemini Güncelle seçeneklerine dokun.";
+"BACKUP_SUBSCRIPTION_FAILED_TO_RENEW_SHEET_MESSAGE" = "Ödeme yönteminin güncel olduğundan emin olmak için kontrol et. Aboneliği Yönet > Radar > Ödeme Yöntemini Güncelle seçeneklerine dokun.";
 
 /* Primary button for a sheet shown when your Backup subscription fails to renew. */
 "BACKUP_SUBSCRIPTION_FAILED_TO_RENEW_SHEET_PRIMARY_BUTTON" = "Aboneliği Yönet";
@@ -1022,7 +1022,7 @@
 "BACKUPS_SETTINGS_TITLE" = "Güvenli Yedeklemeler";
 
 /* Body for system notification or megaphone when backups is enabled. Embeds {{ time backups was enabled }} */
-"BACKUPS_TURNED_ON_NOTIFICATION_BODY_FORMAT" = "Bu hesap için Signal Yedeklemeleri %1$@ saatinde açıldı. Görüntülemek için dokun.";
+"BACKUPS_TURNED_ON_NOTIFICATION_BODY_FORMAT" = "Bu hesap için Radar Yedeklemeleri %1$@ saatinde açıldı. Görüntülemek için dokun.";
 
 /* Title for system notification or megaphone when backups is enabled */
 "BACKUPS_TURNED_ON_TITLE" = "Yedeklemeleri Açtın";
@@ -1040,7 +1040,7 @@
 "BADGE_DETAILS_DONATE_TO_SIGNAL" = "Şimdi bağış yap";
 
 /* When viewing someone else's donor badge, you'll see a sheet. This is the title on that sheet. Embeds {badge owner's short name} */
-"BADGE_DETAILS_TITLE_FOR_SUPPORTER" = "%1$@ Signal'i destekliyor";
+"BADGE_DETAILS_TITLE_FOR_SUPPORTER" = "%1$@ Radar'i destekliyor";
 
 /* String explaining to the user that their boost badge has expired on the badge expiry sheet. */
 "BADGE_EXPIRED_BOOST_BODY" = "Boost rozetinin süresi doldu ve artık profilinde görünmüyor.\n\nSignal'i kullanmaya devam edebilirsin ancak senin için geliştirilen teknolojiyi desteklemek için lütfen aylık bağışçı olmayı düşün.";
@@ -1088,7 +1088,7 @@
 "BANK_DONATION_FOOTER_FIND_ACCOUNT_INFO" = "Hesap bilgileri bul";
 
 /* On the bank transfer donation screen, a small amount of information text is shown. This is that text. It should (1) instruct users to enter their bank information (2) tell them that Signal does not collect or store their personal information. */
-"BANK_DONATION_SUBHEADER_TEXT" = "Banka bilgilerini gir. Signal, kişisel bilgilerini toplamaz veya saklamaz.";
+"BANK_DONATION_SUBHEADER_TEXT" = "Banka bilgilerini gir. Radar, kişisel bilgilerini toplamaz veya saklamaz.";
 
 /* Users can donate to Signal with a bank account. We are required to show them a mandate with information about bank transfers. This is a label for a button to agree to the mandate. */
 "BANK_MANDATE_AGREE" = "Kabul et";
@@ -1097,7 +1097,7 @@
 "BANK_MANDATE_READ_MORE" = "Devamını Oku";
 
 /* Users can donate to Signal with a bank account. We are required to show them a mandate with information about bank transfers. This is a subtitle about the payment processor Stripe above that mandate. */
-"BANK_MANDATE_SUBTITLE" = "Stripe, Signal'e yapılan bağışları işler. Signal, kişisel bilgilerini toplamaz veya saklamaz.";
+"BANK_MANDATE_SUBTITLE" = "Stripe, Radar'e yapılan bağışları işler. Radar, kişisel bilgilerini toplamaz veya saklamaz.";
 
 /* Users can donate to Signal with a bank account. We are required to show them a mandate with information about bank transfers. This is the title above that mandate. */
 "BANK_MANDATE_TITLE" = "Banka Transferi";
@@ -1253,7 +1253,7 @@
 "CALL_AUDIO_MISSED_WEEK_NOTIFICATION_BODY_FORMAT" = "📞 %1$@ gününde cevapsız sesli arama";
 
 /* Alert message when calling and permissions for microphone are missing */
-"CALL_AUDIO_PERMISSION_MESSAGE" = "Signal'de sesli iletiler kaydetmek ve aramalar yapmak için iOS Ayarlar uygulamasından mikrofon erişimini etkinleştirebilirsiniz.";
+"CALL_AUDIO_PERMISSION_MESSAGE" = "Radar'de sesli iletiler kaydetmek ve aramalar yapmak için iOS Ayarlar uygulamasından mikrofon erişimini etkinleştirebilirsiniz.";
 
 /* Alert title when calling and permissions for microphone are missing */
 "CALL_AUDIO_PERMISSION_TITLE" = "Mikrofon Erişimi Gerekiyor";
@@ -1319,7 +1319,7 @@
 "CALL_LINK_JOIN_REQUEST_PROMPT" = "Katılmak istiyor…";
 
 /* Shown in a message bubble when you send a call link in a Signal chat */
-"CALL_LINK_LINK_PREVIEW_DESCRIPTION" = "Bir Signal Aramasına katılmak için bu bağlantıyı kullan";
+"CALL_LINK_LINK_PREVIEW_DESCRIPTION" = "Bir Radar Aramasına katılmak için bu bağlantıyı kullan";
 
 /* Text that appears on a toast in a call lobby before joining a call link informing the user what information will be shared with other call members when they have phone number sharing turned off. */
 "CALL_LINK_LOBBY_SHARING_INFO_PHONE_NUMBER_SHARING_OFF" = "Bağlantı üzerinden bu aramaya katılan herkes adını ve fotoğrafını görecektir.";
@@ -1343,7 +1343,7 @@
 "CALL_LINK_REQUIRE_APPROVAL" = "Yönetici Onayı İste";
 
 /* Button to open UI to share a Call Link with someone on Signal. */
-"CALL_LINK_SHARE_VIA_SIGNAL" = "Bağlantıyı Signal ile paylaş";
+"CALL_LINK_SHARE_VIA_SIGNAL" = "Bağlantıyı Radar ile paylaş";
 
 /* Button to open the system share sheet to share a Call Link. */
 "CALL_LINK_SHARE_VIA_SYSTEM" = "Bağlantıyı Paylaş";
@@ -1448,10 +1448,10 @@
 "CALLING_MEMBER_VIEW_YOUR_CAMERA_IS_OFF" = "Kameranız kapalı";
 
 /* The generic name used for calls if CallKit privacy is enabled */
-"CALLKIT_ANONYMOUS_CONTACT_NAME" = "Signal Kullanıcısı";
+"CALLKIT_ANONYMOUS_CONTACT_NAME" = "Radar Kullanıcısı";
 
 /* The generic name used for group calls if CallKit privacy is enabled */
-"CALLKIT_ANONYMOUS_GROUP_NAME" = "Signal Grubu";
+"CALLKIT_ANONYMOUS_GROUP_NAME" = "Radar Grubu";
 
 /* Title for the calls list view. */
 "CALLS_LIST_TITLE" = "Aramalar";
@@ -1625,7 +1625,7 @@
 "CARD_DONATION_EXPIRATION_DATE_PLACEHOLDER" = "AA/YY";
 
 /* Users can choose to learn more about their credit/debit card donations, which will open a sheet with additional information. This is the body text of that sheet. */
-"CARD_DONATION_READ_MORE_SHEET_BODY" = "Bağış yaptığında Signal kişisel bilgilerini toplamaz veya saklamaz.\n\nBağışlarını almak için ödeme işlemcimiz olarak Stripe'ı kullanıyoruz. Onlara sağladığın bilgilerin hiçbirine erişmiyoruz. Bilgilerini saklamıyor veya kaydetmiyoruz.\n\nSignal, yaptığın bağışı ve buna dair bilgileri Signal hesabın ile bağlamaz, bağlayamaz.\n\nDesteğin için teşekkürler!";
+"CARD_DONATION_READ_MORE_SHEET_BODY" = "Bağış yaptığında Radar kişisel bilgilerini toplamaz veya saklamaz.\n\nBağışlarını almak için ödeme işlemcimiz olarak Stripe'ı kullanıyoruz. Onlara sağladığın bilgilerin hiçbirine erişmiyoruz. Bilgilerini saklamıyor veya kaydetmiyoruz.\n\nSignal, yaptığın bağışı ve buna dair bilgileri Radar hesabın ile bağlamaz, bağlayamaz.\n\nDesteğin için teşekkürler!";
 
 /* Users can choose to learn more about their credit/debit card donations, which will open a sheet with additional information. This is the title of that sheet. */
 "CARD_DONATION_READ_MORE_SHEET_TITLE" = "Bilgilerin gizlidir";
@@ -1634,7 +1634,7 @@
 "CARD_DONATION_SUBHEADER_LEARN_MORE" = "Dahasını öğrenin";
 
 /* On the credit/debit card donation screen, a small amount of information text is shown. This is that text. It should (1) instruct users to enter their credit/debit card information (2) tell them that Signal does not collect or store their personal information. */
-"CARD_DONATION_SUBHEADER_TEXT" = "Kart bilgilerini gir. Signal, kişisel bilgilerini toplamaz veya saklamaz.";
+"CARD_DONATION_SUBHEADER_TEXT" = "Kart bilgilerini gir. Radar, kişisel bilgilerini toplamaz veya saklamaz.";
 
 /* Title for the 'censorship circumvention country' view. */
 "CENSORSHIP_CIRCUMVENTION_COUNTRY_VIEW_TITLE" = "Ülke Seçin";
@@ -1772,7 +1772,7 @@
 "COMPARE_SAFETY_NUMBER_ACTION" = "Panodaki ile Karşılaştır";
 
 /* Accessibility hint describing what you can do with the compose button */
-"COMPOSE_BUTTON_HINT" = "Sohbet başlatmak için bir Signal kullanıcısı seç veya ara.";
+"COMPOSE_BUTTON_HINT" = "Sohbet başlatmak için bir Radar kullanıcısı seç veya ara.";
 
 /* Accessibility label from compose button. */
 "COMPOSE_BUTTON_LABEL" = "İleti oluştur";
@@ -1799,13 +1799,13 @@
 "COMPOSE_SCREEN_LIMITED_CONTACTS_CTA" = "Yönet";
 
 /* Multi-line label explaining why compose-screen contact picker is empty. */
-"COMPOSE_SCREEN_LIMITED_CONTACTS_PERMISSION" = "Signal'in sistem kişilerine sınırlı erişimi bulunmaktadır";
+"COMPOSE_SCREEN_LIMITED_CONTACTS_PERMISSION" = "Radar'in sistem kişilerine sınırlı erişimi bulunmaktadır";
 
 /* Button to open settings from an empty compose-screen contact picker. */
 "COMPOSE_SCREEN_MISSING_CONTACTS_CTA" = "Ayarları aç";
 
 /* Multi-line label explaining why compose-screen contact picker is empty. */
-"COMPOSE_SCREEN_MISSING_CONTACTS_PERMISSION" = "Hangi kişilerinizin Signal kullandığını görmek için iOS Ayarlar uygulamasından kişiler erişimini etkinleştirebilirsiniz.";
+"COMPOSE_SCREEN_MISSING_CONTACTS_PERMISSION" = "Hangi kişilerinizin Radar kullandığını görmek için iOS Ayarlar uygulamasından kişiler erişimini etkinleştirebilirsiniz.";
 
 /* Configure reactions title text */
 "CONFIGURE_REACTIONS" = "Tepkileri Yapılandır";
@@ -1847,10 +1847,10 @@
 "CONTACT_ABOUT_SHEET_PROFILE_NAMES_EDUCATION" = "Profil adları doğrulanmaz";
 
 /* Message for a tooltip that appears above a parenthesized name for another user, indicating that that name is the name the other user set for themself. Embeds {{name}} */
-"CONTACT_ABOUT_SHEET_SECONDARY_NAME_TOOLTIP_MESSAGE" = "\"%1$@\" bu kişinin Signal'de kendisi için belirlediği profil adıdır.";
+"CONTACT_ABOUT_SHEET_SECONDARY_NAME_TOOLTIP_MESSAGE" = "\"%1$@\" bu kişinin Radar'de kendisi için belirlediği profil adıdır.";
 
 /* A label indicating a user is a signal connection. */
-"CONTACT_ABOUT_SHEET_SIGNAL_CONNECTION_LABEL" = "Signal Kişisi";
+"CONTACT_ABOUT_SHEET_SIGNAL_CONNECTION_LABEL" = "Radar Kişisi";
 
 /* The title for a contact 'about' sheet. */
 "CONTACT_ABOUT_SHEET_TITLE" = "Hakkında";
@@ -1892,7 +1892,7 @@
 "CONTACT_NOTE_TITLE" = "Not";
 
 /* Body for contact permission action sheet */
-"CONTACT_PERMISSION_ACTION_SHEET_2_BODY" = "Signal'de tanıdığın kişileri bulmak için:";
+"CONTACT_PERMISSION_ACTION_SHEET_2_BODY" = "Radar'de tanıdığın kişileri bulmak için:";
 
 /* First step for contact permission action sheet */
 "CONTACT_PERMISSION_ACTION_SHEET_2_STEP_ONE" = "Aşağıdan \"Ayarlara git\" seçeneğine dokunun";
@@ -1925,10 +1925,10 @@
 "CONTACT_PERMISSION_REMINDER_MEGAPHONE_ACTION" = "Erişimine İzin Ver";
 
 /* Body for contact permission reminder megaphone */
-"CONTACT_PERMISSION_REMINDER_MEGAPHONE_BODY" = "Kişilerini Signal'de hızlıca bulmak için onlara erişim izni ver.";
+"CONTACT_PERMISSION_REMINDER_MEGAPHONE_BODY" = "Kişilerini Radar'de hızlıca bulmak için onlara erişim izni ver.";
 
 /* Title for contact permission reminder megaphone */
-"CONTACT_PERMISSION_REMINDER_MEGAPHONE_TITLE" = "Signal'de kişileri bul";
+"CONTACT_PERMISSION_REMINDER_MEGAPHONE_TITLE" = "Radar'de kişileri bul";
 
 /* Label for a contact's phone number. */
 "CONTACT_PHONE" = "Telefon";
@@ -1952,7 +1952,7 @@
 "CONTACT_SHARE_INVALID_CONTACT" = "Geçersiz kişi.";
 
 /* Alert body when contacts disabled while trying to share a contact. */
-"CONTACT_SHARING_NO_ACCESS_BODY" = "Signal'in kişilerine erişmesi gerekiyor. iOS Ayarları'na git ve kişileri aç. Kişilerin şifrelendi ve Signal hizmetinde görünmüyor.";
+"CONTACT_SHARING_NO_ACCESS_BODY" = "Radar'in kişilerine erişmesi gerekiyor. iOS Ayarları'na git ve kişileri aç. Kişilerin şifrelendi ve Radar hizmetinde görünmüyor.";
 
 /* Alert title when contacts disabled while trying to share a contact. */
 "CONTACT_SHARING_NO_ACCESS_TITLE" = "Kişi Erişimine İzin Ver";
@@ -2006,7 +2006,7 @@
 "CONTACT_SUPPORT_FILTER_SOMETHING_NOT_WORKING_SHORT" = "Bir Şey Çalışmıyor";
 
 /* Alert body */
-"CONTACT_SUPPORT_PROMPT_ERROR_ALERT_BODY" = "Signal destek isteğinizi tamamlayamadı.";
+"CONTACT_SUPPORT_PROMPT_ERROR_ALERT_BODY" = "Radar destek isteğinizi tamamlayamadı.";
 
 /* button text */
 "CONTACT_SUPPORT_PROMPT_ERROR_TRY_AGAIN" = "Yeniden Dene";
@@ -2135,7 +2135,7 @@
 "CONVERSATION_SETTINGS_ATTRIBUTES_ACCESS_SECTION_FOOTER" = "Grup adını, fotoğrafını, açıklamasını ve kaybolan ileti zamanlayıcısını kimlerin düzenleyebileceğini seçin.";
 
 /* Footer string for a contact's badges in conversation settings */
-"CONVERSATION_SETTINGS_BADGES_FOOTER" = "Signal'ı destekleyerek profilin için rozet kazan. Daha fazlasını öğrenmek için bir rozete dokun.";
+"CONVERSATION_SETTINGS_BADGES_FOOTER" = "Radar'ı destekleyerek profilin için rozet kazan. Daha fazlasını öğrenmek için bir rozete dokun.";
 
 /* Header title for a contact's badges in conversation settings */
 "CONVERSATION_SETTINGS_BADGES_HEADER" = "Rozetler";
@@ -2393,7 +2393,7 @@
 "DATABASE_INTEGRITY_CHECK_ACTION_RUN" = "Çalıştır";
 
 /* Message for alert before running a database integrity check */
-"DATABASE_INTEGRITY_CHECK_MESSAGE" = "Bu işlem, sorunu çözmemize yardımcı oluyor ve işlemin tamamlanması birkaç dakika sürebilir. Bu kontrol işlemi yapılırken Signal'i kapatabilirsin, fakat lütfen geçmiş bilgilerini girmek için burayı yeniden ziyaret et.";
+"DATABASE_INTEGRITY_CHECK_MESSAGE" = "Bu işlem, sorunu çözmemize yardımcı oluyor ve işlemin tamamlanması birkaç dakika sürebilir. Bu kontrol işlemi yapılırken Radar'i kapatabilirsin, fakat lütfen geçmiş bilgilerini girmek için burayı yeniden ziyaret et.";
 
 /* Button to skip database integrity check step */
 "DATABASE_INTEGRITY_CHECK_SKIP" = "Atla";
@@ -2417,10 +2417,10 @@
 "DATABASE_RECOVERY_MORE_STORAGE_SPACE_NEEDED_TITLE" = "Daha Fazla Depolama Alanı Gerekiyor";
 
 /* The user has tried to recover their data after it was lost due to corruption. (They have not been hacked.) This is the description on the screen where we show an error message. */
-"DATABASE_RECOVERY_RECOVERY_FAILED_DESCRIPTION" = "Mesaj geçmişin kurtarılamadı. Yeniden yükleme yaptıktan sonra Signal'ı kullanmaya devam edebilirsin. Problemi daha iyi anlayabilmemiz için bize bir hata günlüğü gönder.";
+"DATABASE_RECOVERY_RECOVERY_FAILED_DESCRIPTION" = "Mesaj geçmişin kurtarılamadı. Yeniden yükleme yaptıktan sonra Radar'ı kullanmaya devam edebilirsin. Problemi daha iyi anlayabilmemiz için bize bir hata günlüğü gönder.";
 
 /* The user has tried to recover their data after it was lost due to corruption. (They have not been hacked.) This button lets them delete all of their data. */
-"DATABASE_RECOVERY_RECOVERY_FAILED_RESET_APP_BUTTON" = "Signal'ı Sıfırla";
+"DATABASE_RECOVERY_RECOVERY_FAILED_RESET_APP_BUTTON" = "Radar'ı Sıfırla";
 
 /* The user has tried to recover their data after it was lost due to corruption. (They have not been hacked.) If they want to delete the app and restart, they will be presented with a confirmation dialog. This is the final button they will press before their data is reset. */
 "DATABASE_RECOVERY_RECOVERY_FAILED_RESET_APP_CONFIRMATION_CONFIRM" = "Sıfırla";
@@ -2429,7 +2429,7 @@
 "DATABASE_RECOVERY_RECOVERY_FAILED_RESET_APP_CONFIRMATION_DESCRIPTION" = "Hesap bilgilerin, profilin ve tüm mesajların silinecek. Bu işlem tamamlandıktan sonra uygulama kapanacaktır.";
 
 /* The user has tried to recover their data after it was lost due to corruption. (They have not been hacked.) If they want to delete the app and restart, they will be presented with a confirmation dialog. This is the title of that dialog. */
-"DATABASE_RECOVERY_RECOVERY_FAILED_RESET_APP_CONFIRMATION_TITLE" = "Signal'ı Sıfırla";
+"DATABASE_RECOVERY_RECOVERY_FAILED_RESET_APP_CONFIRMATION_TITLE" = "Radar'ı Sıfırla";
 
 /* The user has tried to recover their data after it was lost due to corruption. (They have not been hacked.) They were asked to submit a debug log. This is the button that submits this log. */
 "DATABASE_RECOVERY_RECOVERY_FAILED_SUBMIT_DEBUG_LOG_BUTTON" = "Hata Ayıklama Günlüğünü gönder";
@@ -2504,7 +2504,7 @@
 "DELETE_ACCOUNT_CONFIRMATION_ACTION_SHEEET_ACTION" = "Hesabı Sil";
 
 /* Title for the action sheet message of the 'delete account confirmation' view controller. */
-"DELETE_ACCOUNT_CONFIRMATION_ACTION_SHEEET_MESSAGE" = "Bu işlem Signal hesabını silecek ve uygulamayı sıfırlayacaktır. Bu işlem tamamlandıktan sonra uygulama kapanır.";
+"DELETE_ACCOUNT_CONFIRMATION_ACTION_SHEEET_MESSAGE" = "Bu işlem Radar hesabını silecek ve uygulamayı sıfırlayacaktır. Bu işlem tamamlandıktan sonra uygulama kapanır.";
 
 /* Title for the action sheet confirmation title of the 'delete account confirmation' view controller. */
 "DELETE_ACCOUNT_CONFIRMATION_ACTION_SHEEET_TITLE" = "Hesabını silmek istediğinden emin misin?";
@@ -2528,7 +2528,7 @@
 "DELETE_ACCOUNT_CONFIRMATION_PHONE_NUMBER_TITLE" = "Telefon Numarası";
 
 /* Section header */
-"DELETE_ACCOUNT_CONFIRMATION_SECTION_TITLE" = "Signal Numaranızı Doğrulayın";
+"DELETE_ACCOUNT_CONFIRMATION_SECTION_TITLE" = "Radar Numaranızı Doğrulayın";
 
 /* Title for the 'delete account' confirmation view. */
 "DELETE_ACCOUNT_CONFIRMATION_TITLE" = "Hesabı Sil";
@@ -2575,7 +2575,7 @@
 
 
 /* Notification warning the user that they have been de-registered. */
-"DEREGISTRATION_NOTIFICATION" = "Bu cihazdaki Signal oturumun kapatıldı.";
+"DEREGISTRATION_NOTIFICATION" = "Bu cihazdaki Radar oturumun kapatıldı.";
 
 /* Button that lets users re-register using the same phone number. */
 "DEREGISTRATION_REREGISTER_BUTTON" = "Tekrar kaydet";
@@ -2584,7 +2584,7 @@
 "DEREGISTRATION_REREGISTER_PROMPT_TITLE" = "Bu telefon numarası yeniden kaydedilsin mi?";
 
 /* Label warning the user that they have been de-registered. */
-"DEREGISTRATION_WARNING" = "Bu cihaz artık kayıtlı değil. Bunun nedeni büyük olasılıkla telefon numaranın farklı bir cihazda Signal'e kaydedilmiş olmasıdır.";
+"DEREGISTRATION_WARNING" = "Bu cihaz artık kayıtlı değil. Bunun nedeni büyük olasılıkla telefon numaranın farklı bir cihazda Radar'e kaydedilmiş olmasıdır.";
 
 /* If the user has been deregistered, they'll see a warning. This is This is the call to action on that warning. */
 "DEREGISTRATION_WARNING_ACTION_TITLE" = "Cihazı Tekrar Kaydet";
@@ -2653,7 +2653,7 @@
 "DEVICE_TRANSFER_CONTRACT_QR_CODE_BUTTON" = "Daha küçük görüntüle";
 
 /* An error indicating that the other device closed signal mid-transfer and it could not complete */
-"DEVICE_TRANSFER_ERROR_BACKGROUNDED" = "Aktarım tamamlanamadı. Her iki cihazda da Signal'in açık olduğundan emin ol ve tekrar dene.";
+"DEVICE_TRANSFER_ERROR_BACKGROUNDED" = "Aktarım tamamlanamadı. Her iki cihazda da Radar'in açık olduğundan emin ol ve tekrar dene.";
 
 /* An error indicating that we were unable to verify the identity of the new device to complete the transfer */
 "DEVICE_TRANSFER_ERROR_CERTIFICATE_MISMATCH" = "Yeni cihazınız doğrulanamadı, lütfen tekrar deneyin";
@@ -2671,13 +2671,13 @@
 "DEVICE_TRANSFER_ERROR_NOT_ENOUGH_SPACE" = "Aktarımı tamamlamak için depolama alanı yetersiz";
 
 /* An error indicating the user must update their device before trying to transfer. */
-"DEVICE_TRANSFER_ERROR_UNSUPPORTED_VERSION" = "Signal'in son sürümüne güncelleyin ve tekrar deneyin";
+"DEVICE_TRANSFER_ERROR_UNSUPPORTED_VERSION" = "Radar'in son sürümüne güncelleyin ve tekrar deneyin";
 
 /* Button shown to expand a QR code and view it fullscreen. */
 "DEVICE_TRANSFER_EXPAND_QR_CODE_BUTTON" = "Daha büyük görüntüle";
 
 /* The explanation on the action sheet prompting the user if they want to transfer their device. */
-"DEVICE_TRANSFER_PROMPT_EXPLANATION" = "Signal hesabınızı yeni bir iOS cihazına aktarın. Yeni cihazınızın yanınızda ve açık olduğundan emin olun.";
+"DEVICE_TRANSFER_PROMPT_EXPLANATION" = "Radar hesabınızı yeni bir iOS cihazına aktarın. Yeni cihazınızın yanınızda ve açık olduğundan emin olun.";
 
 /* The title on the acttion sheet prompting the user if they want to transfer their device. */
 "DEVICE_TRANSFER_PROMPT_TITLE" = "Hesabı Aktar";
@@ -2695,7 +2695,7 @@
 "DEVICE_TRANSFER_QRCODE_TITLE" = "Karekodu Tara";
 
 /* The explanation on the view that shows receiving progress */
-"DEVICE_TRANSFER_RECEIVING_EXPLANATION" = "İki cihazı da yakında bulundurun. Cihazları veya Signal'i kapatmayın. Aktarımlar uçtan uca şifrelidir.";
+"DEVICE_TRANSFER_RECEIVING_EXPLANATION" = "İki cihazı da yakında bulundurun. Cihazları veya Radar'i kapatmayın. Aktarımlar uçtan uca şifrelidir.";
 
 /* The title on the view that shows receiving progress */
 "DEVICE_TRANSFER_RECEIVING_TITLE" = "Veri Alınıyor";
@@ -2731,7 +2731,7 @@
 "DEVICE_TRANSFER_STATUS_NEW_DEVICE_TRANSFERRING" = "Aktarıyor";
 
 /* Description in the progress view displayed during device transfer. */
-"DEVICE_TRANSFER_STATUS_NEW_DEVICE_TRANSFERRING_DESCRIPTION" = "İki cihazı da yakında bulundur. Her iki cihazı da kapatma ve Signal'ı açık tut. Aktarımlar uçtan uca şifrelidir.";
+"DEVICE_TRANSFER_STATUS_NEW_DEVICE_TRANSFERRING_DESCRIPTION" = "İki cihazı da yakında bulundur. Her iki cihazı da kapatma ve Radar'ı açık tut. Aktarımlar uçtan uca şifrelidir.";
 
 /* Status message on old device when cancelling transfer. */
 "DEVICE_TRANSFER_STATUS_OLD_DEVICE_CANCELLING" = "Yeni iPhone ile bağlantı iptal ediliyor…";
@@ -2746,7 +2746,7 @@
 "DEVICE_TRANSFER_STATUS_OLD_DEVICE_STARTING" = "Yeni iPhone'a bağlanmak için bekliyor…";
 
 /* The explanation on the action sheet that shows transfer progress */
-"DEVICE_TRANSFER_TRANSFERRING_EXPLANATION" = "İki cihazı da birbirlerinin yakınında bulundurun. Cihazları veya Signal'i kapatmayın.";
+"DEVICE_TRANSFER_TRANSFERRING_EXPLANATION" = "İki cihazı da birbirlerinin yakınında bulundurun. Cihazları veya Radar'i kapatmayın.";
 
 /* The title on the action sheet that shows transfer progress */
 "DEVICE_TRANSFER_TRANSFERRING_TITLE" = "Veri Aktarılıyor";
@@ -2836,13 +2836,13 @@
 "DONATE_CHOOSE_PAYMENT_METHOD_SHEET_SUBTITLE_FOR_ONE_TIME_DONATION" = "30 gün boyunca %1$@ rozetini kazan";
 
 /* When users make donations on a friend's behalf, they see a sheet that lets them pick a payment method. This is the title on that sheet. Embeds {{amount of money}}, such as \"$5\". */
-"DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_DONATION_ON_BEHALF_OF_A_FRIEND" = "Signal'a %1$@ Bağış";
+"DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_DONATION_ON_BEHALF_OF_A_FRIEND" = "Radar'a %1$@ Bağış";
 
 /* When users make monthly donations, they see a sheet that lets them pick a payment method. This is the title on that sheet. Embeds {{amount of money per month}}, such as \"$5/month\". */
-"DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_MONTHLY_DONATION" = "Signal'e %1$@ bağış yap";
+"DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_MONTHLY_DONATION" = "Radar'e %1$@ bağış yap";
 
 /* When users make one-time donations, they see a sheet that lets them pick a payment method. This is the title on that sheet. Embeds {{amount of money}}, such as \"$5\". */
-"DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_ONE_TIME_DONATION" = "Signal'e %1$@ bağış yap";
+"DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_ONE_TIME_DONATION" = "Radar'e %1$@ bağış yap";
 
 /* Users can donate on a friend's behalf and can optionally add a message. This is tells users about that optional message. */
 "DONATE_ON_BEHALF_OF_A_FRIEND_ADDITIONAL_MESSAGE_INFO" = "Alıcı, bağıştan mesajla haberdar edilecektir. Kendi mesajını aşağıya ekle.";
@@ -2959,7 +2959,7 @@
 "DONATION_ON_BEHALF_OF_A_FRIEND_BADGE_REDEEMED" = "Kullanıldı";
 
 /* Users can donate on behalf of a friend, and the friend will receive a badge. This is a short paragraph on the screen where users choose the badge their friend will receive. */
-"DONATION_ON_BEHALF_OF_A_FRIEND_CHOOSE_BADGE_DESCRIPTION" = "Signal kullanan bir arkadaşın veya aile üyesi için bağış yaparak Signal'ı destekle. Böylece Signal'a olan desteklerini profillerinde gösterebilecekler.";
+"DONATION_ON_BEHALF_OF_A_FRIEND_CHOOSE_BADGE_DESCRIPTION" = "Radar kullanan bir arkadaşın veya aile üyesi için bağış yaparak Radar'ı destekle. Böylece Radar'a olan desteklerini profillerinde gösterebilecekler.";
 
 /* Users can donate on behalf of a friend, and the friend will receive a badge. This is the title on the screen where users choose the badge their friend will receive. */
 "DONATION_ON_BEHALF_OF_A_FRIEND_CHOOSE_BADGE_TITLE" = "Arkadaşın için bağış yap";
@@ -2983,7 +2983,7 @@
 "DONATION_ON_BEHALF_OF_A_FRIEND_PAYMENT_FAILED_ERROR_TITLE" = "Ödeme Başarısız";
 
 /* Users can donate on a friend's behalf. If the payment was processed but the donation failed to send, this error message will be shown. */
-"DONATION_ON_BEHALF_OF_A_FRIEND_PAYMENT_SUCCEEDED_BUT_MESSAGE_FAILED_ERROR_BODY" = "Ödemen işleme alındı fakat Signal bağış mesajını gönderemedi. Lütfen destek ekibiyle iletişime geç.";
+"DONATION_ON_BEHALF_OF_A_FRIEND_PAYMENT_SUCCEEDED_BUT_MESSAGE_FAILED_ERROR_BODY" = "Ödemen işleme alındı fakat Radar bağış mesajını gönderemedi. Lütfen destek ekibiyle iletişime geç.";
 
 /* Users can donate on a friend's behalf. If the payment was processed but the donation failed to send, an error dialog will be shown. This is the title of that dialog. */
 "DONATION_ON_BEHALF_OF_A_FRIEND_PAYMENT_SUCCEEDED_BUT_MESSAGE_FAILED_ERROR_TITLE" = "Bağış Başarısız Oldu";
@@ -2995,7 +2995,7 @@
 "DONATION_ON_BEHALF_OF_A_FRIEND_PREVIEW_OUTGOING" = "✨ %1$@ için bağış yaptın";
 
 /* You received a donation from a friend. This is the title of that message in the chat. Embeds {{short contact name}}. */
-"DONATION_ON_BEHALF_OF_A_FRIEND_RECEIVED_TITLE_FORMAT" = "%1$@ senin adına Signal'e bağış yaptı";
+"DONATION_ON_BEHALF_OF_A_FRIEND_RECEIVED_TITLE_FORMAT" = "%1$@ senin adına Radar'e bağış yaptı";
 
 /* Users can donate on a friend's behalf. This is the error message that appears if the try to do this, but the recipient is blocked. */
 "DONATION_ON_BEHALF_OF_A_FRIEND_RECIPIENT_IS_BLOCKED_ERROR_BODY" = "Bu kullanıcıyı engellediğin için onun adına bağış yapamazsın.";
@@ -3019,7 +3019,7 @@
 "DONATION_ON_BEHALF_OF_A_FRIEND_SENT_TITLE_FORMAT" = "%1$@ adına bağış";
 
 /* When you donate on behalf of a friend, a thank-you sheet will appear. This is the text on that sheet. Embeds {{recipient name}}. */
-"DONATION_ON_BEHALF_OF_A_FRIEND_THANKS_BODY_FORMAT" = "%1$@ adına Signal'a bağışta bulundun. Böylece Signal'a olan desteklerini profillerinde gösterebilecekler.";
+"DONATION_ON_BEHALF_OF_A_FRIEND_THANKS_BODY_FORMAT" = "%1$@ adına Radar'a bağışta bulundun. Böylece Radar'a olan desteklerini profillerinde gösterebilecekler.";
 
 /* When you donate on behalf of a friend, a thank-you sheet will appear. This is the title on that sheet. */
 "DONATION_ON_BEHALF_OF_A_FRIEND_THANKS_TITLE" = "Desteğin için teşekkürler!";
@@ -3028,19 +3028,19 @@
 "DONATION_ON_BEHALF_OF_A_FRIEND_VIEW" = "Görüntüle";
 
 /* A friend has donated on your behalf and you received a badge. This text says that you received a badge, and from whom. Embeds {{contact's short name, such as a first name}}. */
-"DONATION_ON_BEHALF_OF_A_FRIEND_YOU_RECEIVED_A_BADGE_FORMAT" = "%1$@ senin adına Signal'a bağış yaptı! Signal'a desteğini profilinde göster.";
+"DONATION_ON_BEHALF_OF_A_FRIEND_YOU_RECEIVED_A_BADGE_FORMAT" = "%1$@ senin adına Radar'a bağış yaptı! Radar'a desteğini profilinde göster.";
 
 /* There is a screen where users can read more about their donation to Signal. This is the 1st paragraph of that screen. */
 "DONATION_READ_MORE_SCREEN_PARAGRAPH_1" = "Gizli mesajlaşma. Reklam yok, takip yok, gözetleme yok.";
 
 /* There is a screen where users can read more about their donation to Signal. This is the 2nd paragraph of that screen. */
-"DONATION_READ_MORE_SCREEN_PARAGRAPH_2" = "Signal bağışlarla destekleniyor, yani gizliliğin yaptığımız her şeyin merkezinde. Sinyal senin için üretildi; kişisel bilgilerini kullanmak ve kâr etmek için değil.";
+"DONATION_READ_MORE_SCREEN_PARAGRAPH_2" = "Radar bağışlarla destekleniyor, yani gizliliğin yaptığımız her şeyin merkezinde. Sinyal senin için üretildi; kişisel bilgilerini kullanmak ve kâr etmek için değil.";
 
 /* There is a screen where users can read more about their donation to Signal. This is the 3rd paragraph of that screen. */
-"DONATION_READ_MORE_SCREEN_PARAGRAPH_3" = "Mümkünse, lütfen Signal'ı eğlenceli, güvenilir ve herkes için erişilebilir hâle getirmek için bugün bağış yap.";
+"DONATION_READ_MORE_SCREEN_PARAGRAPH_3" = "Mümkünse, lütfen Radar'ı eğlenceli, güvenilir ve herkes için erişilebilir hâle getirmek için bugün bağış yap.";
 
 /* There is a screen where users can read more about their donation to Signal. This is the title of that screen. */
-"DONATION_READ_MORE_SCREEN_TITLE" = "Signal diğer uygulamalardan farklıdır.";
+"DONATION_READ_MORE_SCREEN_TITLE" = "Radar diğer uygulamalardan farklıdır.";
 
 /* Section title for donation amount on receipts */
 "DONATION_RECEIPT_AMOUNT" = "Tutar";
@@ -3076,7 +3076,7 @@
 "DONATION_RECEIPTS" = "Bağış Makbuzları";
 
 /* Text at the bottom of the donation receipts list, telling users that receipts might not be available */
-"DONATION_RECEIPTS_MIGHT_BE_MISSING_IF_YOU_REINSTALLED" = "Signal'i yeniden yüklediyseniz, önceki bağışların makbuzları mevcut olmayacaktır.";
+"DONATION_RECEIPTS_MIGHT_BE_MISSING_IF_YOU_REINSTALLED" = "Radar'i yeniden yüklediyseniz, önceki bağışların makbuzları mevcut olmayacaktır.";
 
 /* Error message displayed if something goes wrong with 3DSecure/iDEAL payment authorization.  This will be encountered if the user cancels the webview before authrizing the payment. */
 "DONATION_REDIRECT_ERROR_CANCELLED_MESSAGE" = "Ödeme iptal edildi. Lütfen tekrar dene.";
@@ -3091,7 +3091,7 @@
 "DONATION_SCREEN_DONATE_BUTTON" = "Bağış yap";
 
 /* On donation screens, a small amount of information text is shown. This is the subtitle for that text. */
-"DONATION_SCREENS_HEADER_DESCRIPTION" = "Senin tarafından desteklenen, gizli mesajlaşma. Reklam yok, takip yok, taviz yok. Signal'ı desteklemek için şimdi bağış yap.";
+"DONATION_SCREENS_HEADER_DESCRIPTION" = "Senin tarafından desteklenen, gizli mesajlaşma. Reklam yok, takip yok, taviz yok. Radar'ı desteklemek için şimdi bağış yap.";
 
 /* On donation screens, a small amount of information text is shown. Users can click this link to learn more information. */
 "DONATION_SCREENS_HEADER_READ_MORE" = "Devamını oku";
@@ -3169,7 +3169,7 @@
 "DONATION_VIEW_DONATE_ON_BEHALF_OF_A_FRIEND" = "Arkadaşın için bağış yap";
 
 /* Text describing to the user that they're going to pay a donation to Signal */
-"DONATION_VIEW_DONATION_TO_SIGNAL" = "Signal'e Bağış";
+"DONATION_VIEW_DONATION_TO_SIGNAL" = "Radar'e Bağış";
 
 /* Title for the 'Donor FAQ' button on the donation screen */
 "DONATION_VIEW_DONOR_FAQ" = "Bağışçılar için SSS";
@@ -3181,7 +3181,7 @@
 "DONATION_VIEW_MANAGE_BADGES" = "Rozetler";
 
 /* Text describing to the user that they're going to pay a monthly donation to Signal */
-"DONATION_VIEW_MONTHLY_DONATION_TO_SIGNAL" = "Signal'a Aylık Bağış";
+"DONATION_VIEW_MONTHLY_DONATION_TO_SIGNAL" = "Radar'a Aylık Bağış";
 
 /* Title for the 'more' section on the donation screen */
 "DONATION_VIEW_MORE_SECTION_TITLE" = "Daha fazla";
@@ -3193,7 +3193,7 @@
 "DONATION_VIEW_OTHER_WAYS_TO_DONATE_TITLE" = "Diğer Bağış Yapma Yöntemleri";
 
 /* Title on the 'Donate to Signal' screen */
-"DONATION_VIEW_TITLE" = "Signal'e Bağış Yap";
+"DONATION_VIEW_TITLE" = "Radar'e Bağış Yap";
 
 /* Label for the currency picker button in donation views */
 "DONATIONS_CURRENCY_PICKER_LABEL" = "Para birimi";
@@ -3208,13 +3208,13 @@
 "EDIT_CONTACT_WITHOUT_CONTACTS_PERMISSION_ALERT_BODY" = "iOS Ayarlar uygulamasından erişimini etkinleştirebilirsiniz.";
 
 /* Alert title for when the user has just tried to edit a contacts after declining to give Signal contacts permissions */
-"EDIT_CONTACT_WITHOUT_CONTACTS_PERMISSION_ALERT_TITLE" = "Signal Kişi Bilgilerini Düzenlemek İçin Kişi Erişimine İhtiyacı Var";
+"EDIT_CONTACT_WITHOUT_CONTACTS_PERMISSION_ALERT_TITLE" = "Radar Kişi Bilgilerini Düzenlemek İçin Kişi Erişimine İhtiyacı Var";
 
 /* The navbar title for the 'update group' view. */
 "EDIT_GROUP_DEFAULT_TITLE" = "Grubu düzenle";
 
 /* Error message indicating the a user can't be added to a group. */
-"EDIT_GROUP_ERROR_CANNOT_ADD_MEMBER" = "Bu kullanıcı Signal'i güncelleyene kadar gruba eklenemez.";
+"EDIT_GROUP_ERROR_CANNOT_ADD_MEMBER" = "Bu kullanıcı Radar'i güncelleyene kadar gruba eklenemez.";
 
 /* Error message indicating that an avatar image is invalid and cannot be used. */
 "EDIT_GROUP_ERROR_INVALID_AVATAR" = "Geçersiz fotoğraf.";
@@ -3241,13 +3241,13 @@
 "EDIT_MESSAGE_SEND_MESSAGE_UNKNOWN_ERROR" = "EDIT_MESSAGE_SEND_MESSAGE_UNKNOWN_ERROR";
 
 /* body of email sent to contacts when inviting to install Signal. Embeds {{link to install Signal}} and {{link to the Signal home page}} */
-"EMAIL_INVITE_BODY" = "Merhaba,\n\nSon zamanlarda iPhone'umdaki sohbetlerimi gizli tutmak için Signal kullanıyorum. Senin de Signal kullanmanı isterim böylece mesajlarımızın ve aramalarımızın sadece aramızda kaldığından emin olabiliriz.\n\nSignal iPhone, Android ve Desktop için kullanılabilir. Uygulamayı bu adresten indirebilirsin: %1$@\n\nSignal mevcut mesajlaşma uygulaman gibi çalışır. Görüntü ve video gönderebilir, arama yapabilir ve grup sohbetlerine başlayabiliriz. En iyi yanı ise Signal'i yaratanlar dahil hiç kimsenin ne yazdığımızı göremeyecek olması!\n\nSignal hakkında daha fazla bilgi için burayı ziyaret edebilirsin: %2$@";
+"EMAIL_INVITE_BODY" = "Merhaba,\n\nSon zamanlarda iPhone'umdaki sohbetlerimi gizli tutmak için Radar kullanıyorum. Senin de Radar kullanmanı isterim böylece mesajlarımızın ve aramalarımızın sadece aramızda kaldığından emin olabiliriz.\n\nSignal iPhone, Android ve Desktop için kullanılabilir. Uygulamayı bu adresten indirebilirsin: %1$@\n\nSignal mevcut mesajlaşma uygulaman gibi çalışır. Görüntü ve video gönderebilir, arama yapabilir ve grup sohbetlerine başlayabiliriz. En iyi yanı ise Radar'i yaratanlar dahil hiç kimsenin ne yazdığımızı göremeyecek olması!\n\nSignal hakkında daha fazla bilgi için burayı ziyaret edebilirsin: %2$@";
 
 /* subject of email sent to contacts when inviting to install Signal */
-"EMAIL_INVITE_SUBJECT" = "Haydi Signal'e geçelim";
+"EMAIL_INVITE_SUBJECT" = "Haydi Radar'e geçelim";
 
 /* Description for the fallback support sheet if user cannot send email */
-"EMAIL_SIGNAL_MESSAGE" = "Cihazınız eposta gönderebilecek şekilde yapılandırılmamış. Yardım talep etmek için support@signal.org adresine e-posta gönderebilir veya cihazınıza eposta kurabilirsiniz.";
+"EMAIL_SIGNAL_MESSAGE" = "Cihazınız eposta gönderebilecek şekilde yapılandırılmamış. Yardım talep etmek için support@radar.chat adresine e-posta gönderebilir veya cihazınıza eposta kurabilirsiniz.";
 
 /* Title for the fallback support sheet if user cannot send email */
 "EMAIL_SIGNAL_TITLE" = "E-posta kullanılamıyor";
@@ -3283,7 +3283,7 @@
 "EMOJI_CATEGORY_TRAVEL_NAME" = "Seyahat & Mekanlar";
 
 /* Full width label displayed when attempting to compose message */
-"EMPTY_CONTACTS_LABEL_LINE1" = "Kişilerinizin hiçbirinde Signal yok.";
+"EMPTY_CONTACTS_LABEL_LINE1" = "Kişilerinizin hiçbirinde Radar yok.";
 
 /* Full width label displayed when attempting to compose message */
 "EMPTY_CONTACTS_LABEL_LINE2" = "Neden birisini davet etmiyorsunuz?";
@@ -3349,7 +3349,7 @@
 "ERROR_DESCRIPTION_UNKNOWN_ERROR" = "Bilinmeyen bir hata oluştu.";
 
 /* Error message when attempting to send message */
-"ERROR_DESCRIPTION_UNREGISTERED_RECIPIENT" = "Bu kişi artık Signal kullanmadığı için mesaj gönderilemedi.";
+"ERROR_DESCRIPTION_UNREGISTERED_RECIPIENT" = "Bu kişi artık Radar kullanmadığı için mesaj gönderilemedi.";
 
 /* Error message indicating that attachment upload(s) failed. */
 "ERROR_MESSAGE_ATTACHMENT_UPLOAD_FAILED" = "Eklenti yükleme başarısız oldu.";
@@ -3394,10 +3394,10 @@
 "ERROR_NETWORK_FAILURE" = "Ağ Hatası";
 
 /* Format string for an error alert notification message. Embeds {{ error string }} */
-"ERROR_NOTIFICATION_MESSAGE_FORMAT" = "Lütfen bu hatayı cihazınızdaki hata ayıklama günlükleriyle birlikte support@signal.org adresine bildirerek Signal'i iyileştirmemize yardımcı olun; %1$@";
+"ERROR_NOTIFICATION_MESSAGE_FORMAT" = "Lütfen bu hatayı cihazınızdaki hata ayıklama günlükleriyle birlikte support@radar.chat adresine bildirerek Radar'i iyileştirmemize yardımcı olun; %1$@";
 
 /* Format string for an error alert notification title. */
-"ERROR_NOTIFICATION_TITLE" = "Signal Beta: Bir hata oluştu";
+"ERROR_NOTIFICATION_TITLE" = "Radar Beta: Bir hata oluştu";
 
 /* Error indicating a send failure due to a delinked application. */
 "ERROR_SENDING_DELINKED" = "Cihazınız artık bağlı değil. Lütfen ileti göndermek için tekrar bağlayın.";
@@ -3406,7 +3406,7 @@
 "ERROR_SENDING_DEREGISTERED" = "Cihazınız artık kayıtlı değil. Lütfen ileti göndermek için tekrar kaydedin.";
 
 /* Error indicating a send failure due to an expired application. */
-"ERROR_SENDING_EXPIRED" = "Signal sürümünüz kullanım dışı kaldı. Lütfen ileti gönderebilmek için güncelleyin.";
+"ERROR_SENDING_EXPIRED" = "Radar sürümünüz kullanım dışı kaldı. Lütfen ileti gönderebilmek için güncelleyin.";
 
 /* Format string for 'unregistered user' error. Embeds {{the unregistered user's name or signal id}}. */
 "ERROR_UNREGISTERED_USER_FORMAT" = "Kayıtlı Olmayan Kullanıcı: %1$@";
@@ -3418,19 +3418,19 @@
 "EXIT_REREGISTRATION" = "Kayıttan Çık";
 
 /* Label notifying the user that the app has expired. */
-"EXPIRATION_ERROR" = "Signal'in bu sürümü kullanım dışı kaldı. Mesaj gönderip alabilmek için güncelle.";
+"EXPIRATION_ERROR" = "Radar'in bu sürümü kullanım dışı kaldı. Mesaj gönderip alabilmek için güncelle.";
 
 /* If the user's app is too old, they'll be shown a warning asking them to upgrade. This is the text on the warning, and tapping it will open the App Store page for Signal. */
 "EXPIRATION_WARNING_ACTION_TITLE" = "Şimdi Güncelle";
 
 /* Label warning the user that the app will expire soon. Embeds {{date}}. */
-"EXPIRATION_WARNING_SOON" = "Signal'in bu sürümü %1$@ tarihinde kullanım dışı kalacak. Mesajlaşmaya devam etmek için güncelle.";
+"EXPIRATION_WARNING_SOON" = "Radar'in bu sürümü %1$@ tarihinde kullanım dışı kalacak. Mesajlaşmaya devam etmek için güncelle.";
 
 /* Label warning the user that the app will expire today. */
-"EXPIRATION_WARNING_TODAY" = "Signal'in bu sürümü bugün kullanım dışı kalacak. Mesajlaşmaya devam etmek için güncelle.";
+"EXPIRATION_WARNING_TODAY" = "Radar'in bu sürümü bugün kullanım dışı kalacak. Mesajlaşmaya devam etmek için güncelle.";
 
 /* action sheet header when re-sending message which failed because of an invalid key signature */
-"FAILED_SENDING_BECAUSE_INVALID_KEY_SIGNATURE" = "%1$@ Signal'i güncelleyip açması gerektiğinden mesaj gönderilemedi.";
+"FAILED_SENDING_BECAUSE_INVALID_KEY_SIGNATURE" = "%1$@ Radar'i güncelleyip açması gerektiğinden mesaj gönderilemedi.";
 
 /* action sheet header when re-sending message which failed because of untrusted identity keys */
 "FAILED_SENDING_BECAUSE_UNTRUSTED_IDENTITY_KEY" = "%1$@ ile olan güvenlik numaranız yakın zamanda değişti. Bu iletiyi tekrar göndermeden önce doğrulamak isteyebilirsiniz.";
@@ -3745,10 +3745,10 @@
 "GROUP_CALL_WILL_NOTIFY_TWO_PEOPLE_FORMAT" = "%1$@ ve %2$@ bildirim alacak";
 
 /* Text shown before the user starts a group call if the user has enabled ringing and there is one other person in the group. Embeds {member name} */
-"GROUP_CALL_WILL_RING_ONE_PERSON_FORMAT" = "%1$@ Signal tarafından aranacak";
+"GROUP_CALL_WILL_RING_ONE_PERSON_FORMAT" = "%1$@ Radar tarafından aranacak";
 
 /* Text shown before the user starts a group call if the user has enabled ringing and there are two other people in the group. Embeds {{ %1$@ participant1, %2$@ participant2 }} */
-"GROUP_CALL_WILL_RING_TWO_PEOPLE_FORMAT" = "%1$@ ve %2$@ Signal tarafından aranacak";
+"GROUP_CALL_WILL_RING_TWO_PEOPLE_FORMAT" = "%1$@ ve %2$@ Radar tarafından aranacak";
 
 /* Text explaining that you are in the group call. */
 "GROUP_CALL_YOU_ARE_HERE" = "Grup görüşmesindesiniz";
@@ -3958,7 +3958,7 @@
 "GROUP_LINK_VIEW_SHARE_LINK_VIA_QR_CODE" = "Karekod";
 
 /* Label for the 'share group link via Signal' button in the 'group link' view. */
-"GROUP_LINK_VIEW_SHARE_LINK_VIA_SIGNAL" = "Signal ile Paylaş";
+"GROUP_LINK_VIEW_SHARE_LINK_VIA_SIGNAL" = "Radar ile Paylaş";
 
 /* Message for the 'share group link' action sheet in the 'group link' view. */
 "GROUP_LINK_VIEW_SHARE_SHEET_MESSAGE" = "Bu bağlantıya sahip olan herkes grubun adını ve üyelerini görebilir ve katılma isteğinde bulunabilir. Güvendiğiniz insanlarla paylaşın.";
@@ -4366,13 +4366,13 @@
 "HOME_VIEW_DRAFT_PREFIX" = "Taslak: ";
 
 /* Format string for a label offering to start a new conversation with your contacts, if you have 1 Signal contact.  Embeds {{The name of 1 of your Signal contacts}}. */
-"HOME_VIEW_FIRST_CONVERSATION_OFFER_1_CONTACT_FORMAT" = "Bazı kişileriniz zaten Signal kullanıyor, örneğin %1$@.";
+"HOME_VIEW_FIRST_CONVERSATION_OFFER_1_CONTACT_FORMAT" = "Bazı kişileriniz zaten Radar kullanıyor, örneğin %1$@.";
 
 /* Format string for a label offering to start a new conversation with your contacts, if you have 2 Signal contacts.  Embeds {{The names of 2 of your Signal contacts}}. */
-"HOME_VIEW_FIRST_CONVERSATION_OFFER_2_CONTACTS_FORMAT" = "Bazı kişileriniz zaten Signal kullanıyor, örneğin %1$@ ve %2$@";
+"HOME_VIEW_FIRST_CONVERSATION_OFFER_2_CONTACTS_FORMAT" = "Bazı kişileriniz zaten Radar kullanıyor, örneğin %1$@ ve %2$@";
 
 /* Format string for a label offering to start a new conversation with your contacts, if you have at least 3 Signal contacts.  Embeds {{The names of 3 of your Signal contacts}}. */
-"HOME_VIEW_FIRST_CONVERSATION_OFFER_3_CONTACTS_FORMAT" = "Bazı kişileriniz zaten Signal kullanıyor, örneğin %1$@, %2$@ ve %3$@";
+"HOME_VIEW_FIRST_CONVERSATION_OFFER_3_CONTACTS_FORMAT" = "Bazı kişileriniz zaten Radar kullanıyor, örneğin %1$@, %2$@ ve %3$@";
 
 /* A label offering to start a new conversation with your contacts, if you have no Signal contacts. */
 "HOME_VIEW_FIRST_CONVERSATION_OFFER_NO_CONTACTS" = "İlk sohbetini buradan başlat.";
@@ -4468,7 +4468,7 @@
 "INACTIVE_LINKED_DEVICE_REMINDER_MEGAPHONE_TITLE" = "Etkin olmayan bağlı cihaz";
 
 /* Body for an in-app megaphone about a user's inactive primary device. */
-"INACTIVE_PRIMARY_DEVICE_REMINDER_MEGAPHONE_BODY" = "Hesabını aktif tutmak için, ana cihazında Signal'i aç.";
+"INACTIVE_PRIMARY_DEVICE_REMINDER_MEGAPHONE_BODY" = "Hesabını aktif tutmak için, ana cihazında Radar'i aç.";
 
 /* Title for a button in an in-app megaphone about a user's inactive primary device, temporarily dismissing the megaphone. */
 "INACTIVE_PRIMARY_DEVICE_REMINDER_MEGAPHONE_GOT_IT_BUTTON" = "Anladım";
@@ -4477,7 +4477,7 @@
 "INACTIVE_PRIMARY_DEVICE_REMINDER_MEGAPHONE_LEARN_MORE_BUTTON" = "Daha fazlasını öğren";
 
 /* Title for an in-app megaphone about a user's inactive primary device. */
-"INACTIVE_PRIMARY_DEVICE_REMINDER_MEGAPHONE_TITLE" = "Signal'ı telefonunda aç";
+"INACTIVE_PRIMARY_DEVICE_REMINDER_MEGAPHONE_TITLE" = "Radar'ı telefonunda aç";
 
 /* Label reminding the user that they are in archive mode, and that muted chats remain archived when they receive a new message. */
 "INBOX_VIEW_ARCHIVE_MODE_MUTED_CHATS_REMINDER" = "Arşivlenen sessize alınmış sohbetler, yeni bir mesaj geldiğinde arşivlenmiş olarak kalmaya devam eder.";
@@ -4513,10 +4513,10 @@
 "INFO_MESSAGE_BLOCKED_OTHER_USER" = "Bu kişiyi engelledin.";
 
 /* Indicates that a previously-removed recipient has been added back to the current user's contacts. */
-"INFO_MESSAGE_CONTACT_REINSTATED" = "Bu kişi, Signal kişiler listene tekrar eklendi.";
+"INFO_MESSAGE_CONTACT_REINSTATED" = "Bu kişi, Radar kişiler listene tekrar eklendi.";
 
 /* Indicates that the recipient has been removed from the current user's contacts and that messaging them will re-add them. */
-"INFO_MESSAGE_CONTACT_REMOVED" = "Bu kişiyi Signal kişiler listesinden kaldırdın, mesaj gönderirsen tekrar kişiler listesine eklenir.";
+"INFO_MESSAGE_CONTACT_REMOVED" = "Bu kişiyi Radar kişiler listesinden kaldırdın, mesaj gönderirsen tekrar kişiler listesine eklenir.";
 
 /* When you start a chat with someone and then later learn their profile name, we insert an in-chat message with this string to record the identifier you originally used to contact them. Embeds {{ the identifier, either a phone number or a username }}. */
 "INFO_MESSAGE_LEARNED_PROFILE_KEY" = "Bu sohbete %1$@ ile başladın.";
@@ -4537,7 +4537,7 @@
 "INFO_MESSAGE_REPORTED_SPAM" = "Spam olarak bildirildi";
 
 /* Body message of the alert shown when a user taps on 'learn more' via the spam info message. */
-"INFO_MESSAGE_REPORTED_SPAM_LEARN_MORE_MESSAGE" = "Signal, bu kişinin spam gönderiyor olabileceği konusunda bilgilendirildi. Signal hiçbir sohbetin içeriğini göremez.";
+"INFO_MESSAGE_REPORTED_SPAM_LEARN_MORE_MESSAGE" = "Radar, bu kişinin spam gönderiyor olabileceği konusunda bilgilendirildi. Radar hiçbir sohbetin içeriğini göremez.";
 
 /* Title of the alert shown when a user taps on 'learn more' via the spam info message. */
 "INFO_MESSAGE_REPORTED_SPAM_LEARN_MORE_TITLE" = "Spam bildirildi";
@@ -4555,7 +4555,7 @@
 "INFO_MESSAGE_USER_CHANGED_PHONE_NUMBER_FORMAT" = "%1$@ telefon numarasını değiştirdi.";
 
 /* Shown in inbox and conversation when a user joins Signal, embeds the new user's {{contact name}} */
-"INFO_MESSAGE_USER_JOINED_SIGNAL_BODY_FORMAT" = "%1$@ Signal'e katıldı!";
+"INFO_MESSAGE_USER_JOINED_SIGNAL_BODY_FORMAT" = "%1$@ Radar'e katıldı!";
 
 /* Label at the top of the input text when editing a message */
 "INPUT_TOOLBAR_EDIT_MESSAGE_LABEL" = "Mesajı düzenle";
@@ -4582,13 +4582,13 @@
 "INVALID_PROXY_HOST_ERROR" = "Girdiğin proxy adresi geçersiz, lütfen adresi kontrol edip tekrar dene.";
 
 /* Alert body when contacts disabled while trying to invite contacts to signal */
-"INVITE_FLOW_REQUIRES_CONTACT_ACCESS_BODY" = "Arkadaşlarınızı Signal'e davet etmek için iOS Ayarlar uygulamasından kişiler erişimini etkinleştirebilirsiniz.";
+"INVITE_FLOW_REQUIRES_CONTACT_ACCESS_BODY" = "Arkadaşlarınızı Radar'e davet etmek için iOS Ayarlar uygulamasından kişiler erişimini etkinleştirebilirsiniz.";
 
 /* Alert title when contacts disabled while trying to invite contacts to signal */
 "INVITE_FLOW_REQUIRES_CONTACT_ACCESS_TITLE" = "Kişi Erişimine İzin Ver";
 
 /* Label for the cell that presents the 'invite contacts' workflow. */
-"INVITE_FRIENDS_CONTACT_TABLE_BUTTON" = "Arkadaşlarınızı Signal'e Davet Edin";
+"INVITE_FRIENDS_CONTACT_TABLE_BUTTON" = "Arkadaşlarınızı Radar'e Davet Edin";
 
 /* Header label above a section for more options for adding contacts */
 "INVITE_FRIENDS_CONTACT_TABLE_HEADER" = "Daha fazla";
@@ -4711,7 +4711,7 @@
 "LINK_DEVICE_SCANNING_INSTRUCTIONS_SHEET_TITLE" = "Karekodu Tara";
 
 /* Body text for a sheet when a user tries to link a device informing them that they will need to authenticate their device */
-"LINK_NEW_DEVICE_AUTHENTICATION_INFO_SHEET_BODY" = "Devam et düğmesine dokun ve onaylamak için telefonunun şifresini gir. Signal PIN'ini girme.";
+"LINK_NEW_DEVICE_AUTHENTICATION_INFO_SHEET_BODY" = "Devam et düğmesine dokun ve onaylamak için telefonunun şifresini gir. Radar PIN'ini girme.";
 
 /* Title for a sheet when a user tries to link a device informing them that they will need to authenticate their device */
 "LINK_NEW_DEVICE_AUTHENTICATION_INFO_SHEET_TITLE" = "Bağlamadan önce, sen olduğunu onayla";
@@ -4720,7 +4720,7 @@
 "LINK_NEW_DEVICE_AUTHENTICATION_REASON" = "Bir cihazı bağlamak için kimlik doğrula";
 
 /* Body text for a sheet when a user has started linking a device informing them to finish the process on that other device */
-"LINK_NEW_DEVICE_FINISH_ON_OTHER_DEVICE_SHEET_BODY" = "Diğer cihazındaki Signal bağlantısını tamamla.";
+"LINK_NEW_DEVICE_FINISH_ON_OTHER_DEVICE_SHEET_BODY" = "Diğer cihazındaki Radar bağlantısını tamamla.";
 
 /* Title for a sheet when a user has started linking a device informing them to finish the process on that other device */
 "LINK_NEW_DEVICE_FINISH_ON_OTHER_DEVICE_SHEET_TITLE" = "Diğer cihazında bağlantıyı tamamla";
@@ -4762,10 +4762,10 @@
 "LINK_PREVIEW_UNKNOWN_DOMAIN" = "Bağlantı Ön İzlemesi";
 
 /* Shown in an alert when trying to edit a contact. */
-"LINKED_DEVICE_CONTACTS_NOT_ALLOWED" = "Telefon rehberi yönetimi artık iPad'de kullanılamıyor. Signal bağlantılarını telefon rehberine eklemek için telefonunda Signal'i aç.";
+"LINKED_DEVICE_CONTACTS_NOT_ALLOWED" = "Telefon rehberi yönetimi artık iPad'de kullanılamıyor. Radar bağlantılarını telefon rehberine eklemek için telefonunda Radar'i aç.";
 
 /* Shown in a banner when you tap the 'New Chat' icon at the top of the list of chats. */
-"LINKED_DEVICE_MANAGE_CONTACTS_BANNER" = "Telefon rehberi yönetimi artık iPad'de desteklenmiyor. Bu cihaz, telefonundaki Signal'den kişi listendeki değişiklikleri senkronize etmeye devam edecektir.";
+"LINKED_DEVICE_MANAGE_CONTACTS_BANNER" = "Telefon rehberi yönetimi artık iPad'de desteklenmiyor. Bu cihaz, telefonundaki Radar'den kişi listendeki değişiklikleri senkronize etmeye devam edecektir.";
 
 /* A button shown in a banner when you tap the 'New Chat' icon at the top of the list of chats. Tapping it opens a website with more details. */
 "LINKED_DEVICE_MANAGE_CONTACTS_LEARN_MORE" = "Daha fazlasını öğren";
@@ -4780,28 +4780,28 @@
 "LINKED_DEVICE_NOTIFICATION_TITLE" = "Yeni bir cihaz bağladın";
 
 /* Message for an action sheet telling users how to link a device, when trying to open an external device-linking URL. */
-"LINKED_DEVICE_URL_OPENED_ACTION_SHEET_EXTERNAL_URL_MESSAGE" = "Bu Signal hesabına bir masaüstü veya iPad bağlamak için Bağlı Cihazlar'a git ve \"Yeni Bir Cihaz Bağla\"ya dokunup kare kodu tekrar tara. Yalnızca doğrudan Signal'den gelen kare kodları taradığından emin ol.";
+"LINKED_DEVICE_URL_OPENED_ACTION_SHEET_EXTERNAL_URL_MESSAGE" = "Bu Radar hesabına bir masaüstü veya iPad bağlamak için Bağlı Cihazlar'a git ve \"Yeni Bir Cihaz Bağla\"ya dokunup kare kodu tekrar tara. Yalnızca doğrudan Radar'den gelen kare kodları taradığından emin ol.";
 
 /* Message for an action sheet telling users how to link a device, when trying to open a device-linking URL from the in-app camera. */
-"LINKED_DEVICE_URL_OPENED_ACTION_SHEET_IN_APP_CAMERA_MESSAGE" = "Signal cihazını bağlamaya çalışıyorsun gibi görünüyor. Devam et'e dokun ve ardından \"Yeni Bir Cihaz Bağla\"ya dokun ve kare kodu tekrar tara.";
+"LINKED_DEVICE_URL_OPENED_ACTION_SHEET_IN_APP_CAMERA_MESSAGE" = "Radar cihazını bağlamaya çalışıyorsun gibi görünüyor. Devam et'e dokun ve ardından \"Yeni Bir Cihaz Bağla\"ya dokun ve kare kodu tekrar tara.";
 
 /* Bullet point about downloads on the linked devices education sheet. Embeds {{ %1$@ iPad download link, %2$@ desktop download link }} */
 "LINKED_DEVICES_EDUCATION_POINT_DOWNLOADS" = "Diğer cihazına iPad uygulamasını yüklemek için %1$@ adresini ya da masaüstü uygulamasını yüklemek için %2$@ adresini ziyaret et.";
 
 /* Bullet point about message sync on the linked devices education sheet */
-"LINKED_DEVICES_EDUCATION_POINT_MESSAGES" = "Signal mesajları, bağlandıktan sonra cep telefonundaki Signal uygulamasıyla senkronize edilir.";
+"LINKED_DEVICES_EDUCATION_POINT_MESSAGES" = "Radar mesajları, bağlandıktan sonra cep telefonundaki Radar uygulamasıyla senkronize edilir.";
 
 /* Bullet point about privacy on the linked devices education sheet */
 "LINKED_DEVICES_EDUCATION_POINT_PRIVACY" = "Bağlı cihazlardaki tüm mesajlaşmalar özeldir";
 
 /* Title for the linked device education sheet */
-"LINKED_DEVICES_EDUCATION_TITLE" = "Desktop veya iPad'de Signal";
+"LINKED_DEVICES_EDUCATION_TITLE" = "Desktop veya iPad'de Radar";
 
 /* Text that appears where the linked device list would be indicating that there are no linked devices. */
 "LINKED_DEVICES_EMPTY_STATE" = "Bağlı cihaz yok";
 
 /* Description for header of the linked devices list */
-"LINKED_DEVICES_HEADER_DESCRIPTION" = "Use Signal on desktop or iPad.";
+"LINKED_DEVICES_HEADER_DESCRIPTION" = "Use Radar on desktop or iPad.";
 
 /* Footer text below the list of currently-linked devices */
 "LINKED_DEVICES_LIST_FOOTER" = "Mesajlar ve sohbet bilgileri tüm cihazlarda uçtan uca şifreleme ile korunmaktadır";
@@ -4843,10 +4843,10 @@
 "LINKING_SYNCING_TIMING_INFO" = "Bu işlem birkaç dakika sürebilir";
 
 /* Shown to users while the app is loading, asking them not to close the app. */
-"LOADING_VIEW_CONTROLLER_DONT_CLOSE_APP" = "Signal'i kapatmayın.";
+"LOADING_VIEW_CONTROLLER_DONT_CLOSE_APP" = "Radar'i kapatmayın.";
 
 /* Body for local network permission action sheet */
-"LOCAL_NETWORK_PERMISSION_ACTION_SHEET_BODY" = "Signal hesabınızı aktarabilmek için, her iki aygıtta da yerel ağ erişimini etkinleştirmeniz gerekiyor.";
+"LOCAL_NETWORK_PERMISSION_ACTION_SHEET_BODY" = "Radar hesabınızı aktarabilmek için, her iki aygıtta da yerel ağ erişimini etkinleştirmeniz gerekiyor.";
 
 /* A button asking the user if they need further help getting their transfer working. */
 "LOCAL_NETWORK_PERMISSION_ACTION_SHEET_NEED_HELP" = "Yardıma mı ihtiyacınız var?";
@@ -4858,7 +4858,7 @@
 "LOCAL_NETWORK_PERMISSION_ACTION_SHEET_STEP_THREE" = "\"Yerel Ağ\" seçeneğini seçin";
 
 /* Second step for local network permission action sheet */
-"LOCAL_NETWORK_PERMISSION_ACTION_SHEET_STEP_TWO" = "Signal'e gidin";
+"LOCAL_NETWORK_PERMISSION_ACTION_SHEET_STEP_TWO" = "Radar'e gidin";
 
 /* Title for local network permission action sheet */
 "LOCAL_NETWORK_PERMISSION_ACTION_SHEET_TITLE" = "Yerel Ağ Erişimini açın";
@@ -4873,7 +4873,7 @@
 "LOGGING_SECTION" = "Günlük";
 
 /* Footer for the 'logging' help section. */
-"LOGGING_SECTION_FOOTER" = "Hata günlükleri Signal'in sorunları ve göçmeleri çözmesine yardımcı olur.";
+"LOGGING_SECTION_FOOTER" = "Hata günlükleri Radar'in sorunları ve göçmeleri çözmesine yardımcı olur.";
 
 /* Title for the 'long text message' view. */
 "LONG_TEXT_VIEW_TITLE" = "İleti";
@@ -4975,7 +4975,7 @@
 "MESSAGE_ACTION_DELETE_FOR_EVERYONE" = "Herkesten Sil";
 
 /* A one-time confirmation that you want to delete for everyone */
-"MESSAGE_ACTION_DELETE_FOR_EVERYONE_CONFIRMATION" = "Bu mesaj sohbette güncel bir Signal sürümü kullanan herkesten silinecektir. Üyeler bir ileti sildiğinizi göreceklerdir.";
+"MESSAGE_ACTION_DELETE_FOR_EVERYONE_CONFIRMATION" = "Bu mesaj sohbette güncel bir Radar sürümü kullanan herkesten silinecektir. Üyeler bir ileti sildiğinizi göreceklerdir.";
 
 /* The title for the action sheet asking who the user wants to delete the message for. */
 "MESSAGE_ACTION_DELETE_FOR_TITLE" = "Bu iletiyi kimin cihazından silmek istiyorsun?";
@@ -5020,7 +5020,7 @@
 "MESSAGE_ACTION_LINK_OPEN_LINK" = "Bağlantı Aç";
 
 /* Label for button to open a signal proxy. */
-"MESSAGE_ACTION_LINK_OPEN_PROXY" = "Signal Proxy Sunucusunu Aç";
+"MESSAGE_ACTION_LINK_OPEN_PROXY" = "Radar Proxy Sunucusunu Aç";
 
 /* Label for button to open a sticker pack. */
 "MESSAGE_ACTION_LINK_OPEN_STICKER_PACK" = "Çıkartma Paketini Görüntüle";
@@ -5194,7 +5194,7 @@
 "MESSAGE_REQUEST_NAME_COLLISON_UPDATE_CONTACT_ACTION" = "Kişiyi güncelle";
 
 /* Action sheet message to confirm reporting a conversation as spam via a message request. */
-"MESSAGE_REQUEST_REPORT_CONVERSATION_MESSAGE" = "Signal, bu kişinin spam gönderiyor olabileceği konusunda bilgilendirilecektir. Signal hiçbir sohbetin içeriğini göremiyor.";
+"MESSAGE_REQUEST_REPORT_CONVERSATION_MESSAGE" = "Radar, bu kişinin spam gönderiyor olabileceği konusunda bilgilendirilecektir. Radar hiçbir sohbetin içeriğini göremiyor.";
 
 /* Action sheet title to confirm reporting a conversation as spam via a message request. */
 "MESSAGE_REQUEST_REPORT_CONVERSATION_TITLE" = "Spam bildirilsin mi?";
@@ -5323,7 +5323,7 @@
 "MISSED_CALL_BLOCKED_SYSTEM_CONTACT" = "Telefon ayarlarında engellenen kişiden gelen arama yanıtlanamadı";
 
 /* Action to block contact in Signal for sheet shown when the user taps a missed call from a contact blocked in iOS settings. */
-"MISSED_CALL_BLOCKED_SYSTEM_SETTINGS_SHEET_BLOCK_ACTION" = "Kişiyi Signal'de de Engelle";
+"MISSED_CALL_BLOCKED_SYSTEM_SETTINGS_SHEET_BLOCK_ACTION" = "Kişiyi Radar'de de Engelle";
 
 /* Message for sheet shown when the user taps a missed call from a contact blocked in iOS settings. */
 "MISSED_CALL_BLOCKED_SYSTEM_SETTINGS_SHEET_MESSAGE" = "Telefon ayarlarında bu kişiyi engellediğin için gelen aramayı cevaplayamadın. Bu durumu yönetmek için Ayarlar > Telefon menüsüne git ve Engellenen Kişiler seçeneğine dokun.";
@@ -5344,19 +5344,19 @@
 "MISSING_CAMERA_PERMISSION_MESSAGE" = "iOS Ayarları uygulamasından kamera erişimini etkinleştirebilirsin.";
 
 /* Alert title */
-"MISSING_CAMERA_PERMISSION_TITLE" = "Signal'in kamera erişimine ihtiyacı var.";
+"MISSING_CAMERA_PERMISSION_TITLE" = "Radar'in kamera erişimine ihtiyacı var.";
 
 /* Alert body indicating the user has denied location permissions */
 "MISSING_LOCATION_PERMISSION_MESSAGE" = "Bu izni Ayarlar uygulamasından etkinleştirebilirsiniz.";
 
 /* Alert title indicating the user has denied location permissions */
-"MISSING_LOCATION_PERMISSION_TITLE" = "Signal bu özellik için konumunuza erişim gerektirir.";
+"MISSING_LOCATION_PERMISSION_TITLE" = "Radar bu özellik için konumunuza erişim gerektirir.";
 
 /* Alert body when user has previously denied media library access */
 "MISSING_MEDIA_LIBRARY_PERMISSION_MESSAGE" = "Bu izni Ayarlar uygulamasından etkinleştirebilirsiniz.";
 
 /* Alert title when user has previously denied media library access */
-"MISSING_MEDIA_LIBRARY_PERMISSION_TITLE" = "Bu özellik için Signal'in fotoğraflarınıza erişmeye ihtiyacı var.";
+"MISSING_MEDIA_LIBRARY_PERMISSION_TITLE" = "Bu özellik için Radar'in fotoğraflarınıza erişmeye ihtiyacı var.";
 
 /* An error shown as the title of an alert when try to link a new device & the user is already at the limit. */
 "MULTIDEVICE_PAIRING_MAX_DESC" = "Daha fazla cihaz bağlayamazsınız.";
@@ -5377,7 +5377,7 @@
 "MY_STORIES_SETTINGS_VISIBILITY_ALL_SIGNAL_CONNECTIONS_EXCEPT_TITLE" = "…Hariç Herkes";
 
 /* Title for the visibility option */
-"MY_STORIES_SETTINGS_VISIBILITY_ALL_SIGNAL_CONNECTIONS_TITLE" = "Tüm Signal Kişileri";
+"MY_STORIES_SETTINGS_VISIBILITY_ALL_SIGNAL_CONNECTIONS_TITLE" = "Tüm Radar Kişileri";
 
 /* Title for the visibility option */
 "MY_STORIES_SETTINGS_VISIBILITY_ONLY_SHARE_WITH_TITLE" = "Sadece Bu Kişilerle Paylaş…";
@@ -5539,7 +5539,7 @@
 "NICKNAME_EDITOR_DELETE_CONFIRMATION_TITLE" = "Takma ad silinsin mi?";
 
 /* The description below the title on the profile nickname editor view. */
-"NICKNAME_EDITOR_DESCRIPTION" = "Takma adlar ve notlar, Signal ile saklanır ve uçtan uca şifrelenir. Bunlar yalnızca senin tarafından görülebilir.";
+"NICKNAME_EDITOR_DESCRIPTION" = "Takma adlar ve notlar, Radar ile saklanır ve uçtan uca şifrelenir. Bunlar yalnızca senin tarafından görülebilir.";
 
 /* Placeholder text it the text field for the family name in the profile nickname editor. */
 "NICKNAME_EDITOR_FAMILY_NAME_PLACEHOLDER" = "Soyad";
@@ -5602,7 +5602,7 @@
 "NOTIFICATION_PERMISSION_REMINDER_MEGAPHONE_TITLE" = "Bildirimler açılsın mı?";
 
 /* Shown as the body of an alert when notifications can't be shown due to an error. */
-"NOTIFICATIONS_ERROR_MESSAGE" = "Signal bildirimlerini almıyorsan, %1$@ cihazını yeniden başlat.";
+"NOTIFICATIONS_ERROR_MESSAGE" = "Radar bildirimlerini almıyorsan, %1$@ cihazını yeniden başlat.";
 
 /* Shown as the title of an alert when notifications can't be shown due to an error. */
 "NOTIFICATIONS_ERROR_TITLE" = "Bildirimler Gösterilemedi";
@@ -5662,10 +5662,10 @@
 "ONBOARDING_2FA_SKIP_PIN_ENTRY_TITLE" = "PIN Girişini Atla?";
 
 /* The body for the device transfer 'choice' view 'restore backup' option */
-"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_BODY" = "Hesabını ve mesajlarını Radar/Signal Yedeklemenden geri yükle";
+"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_BODY" = "Hesabını ve mesajlarını Radar/Radar Yedeklemenden geri yükle";
 
 /* The title for the device transfer 'choice' view 'restore backup' option */
-"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_TITLE" = "Radar/Signal Güvenli Yedeklemeleri Geri Yükle";
+"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_TITLE" = "Radar/Radar Güvenli Yedeklemeleri Geri Yükle";
 
 /* Body for a sheet warning users about skipping restore. */
 "ONBOARDING_CHOOSE_RESTORE_METHOD_CONFIRM_SKIP_RESTORE_BODY" = "Şimdi geri yüklemeyi atlarsan, sonradan geri yükleme yapamazsın. Bu cihazda yedeklemeleri yeniden etkinleştirirsen, mevcut yedeklemen yeni mesajlaşma geçmişinle değiştirilir.";
@@ -5677,7 +5677,7 @@
 "ONBOARDING_CHOOSE_RESTORE_METHOD_DESCRIPTION" = "Mesaj geçmişini ve hesap verilerini nasıl geri yüklemek istediğini seç.";
 
 /* Message body displayed to a user during registration if there are no restore options available. */
-"ONBOARDING_CHOOSE_RESTORE_METHOD_NONE_AVAILABLE_BODY" = "Android'den iOS'a geçtiğin için mesajlarını ve medyanı aktarmanın tek yolu, eski cihazındaki Signal Yedeklemelerini etkinleştirmektir.";
+"ONBOARDING_CHOOSE_RESTORE_METHOD_NONE_AVAILABLE_BODY" = "Android'den iOS'a geçtiğin için mesajlarını ve medyanı aktarmanın tek yolu, eski cihazındaki Radar Yedeklemelerini etkinleştirmektir.";
 
 /* Title displayed to a user during registration if there are no restore options available. */
 "ONBOARDING_CHOOSE_RESTORE_METHOD_NONE_AVAILABLE_TITLE" = "Geri Yüklenecek Yedekleme Yok";
@@ -5737,7 +5737,7 @@
 "ONBOARDING_MODE_SWITCH_BUTTON_REGISTERING" = "iPhone'u bağla";
 
 /* explanation to the user they're switching from linking to registering flow */
-"ONBOARDING_MODE_SWITCH_EXPLANATION_PROVISIONING" = "\"iPad'i kaydet\" tuşuna basarak yeni bir Signal hesabı açabilir veya mevcut hesabınızı bu iPad'e aktarabilirsiniz. Bu işlem diğer cihazlarda aynı telefon numarası ile kaydedilmiş Signal'i devre dışı bırakacaktır.";
+"ONBOARDING_MODE_SWITCH_EXPLANATION_PROVISIONING" = "\"iPad'i kaydet\" tuşuna basarak yeni bir Radar hesabı açabilir veya mevcut hesabınızı bu iPad'e aktarabilirsiniz. Bu işlem diğer cihazlarda aynı telefon numarası ile kaydedilmiş Radar'i devre dışı bırakacaktır.";
 
 /* explanation to the user they're switching from registering to linking flow */
 "ONBOARDING_MODE_SWITCH_EXPLANATION_REGISTERING" = "\"iPhone'u bağla\" tuşuna basarak telefonunuzu mevcut bir hesaba bağlayabilirsiniz. Telefonunuzu bağlamanız genellikle önerilmez, aynı zamanda, arama gibi bazı özellikleri sınırlayacaktır.";
@@ -5749,13 +5749,13 @@
 "ONBOARDING_MODE_SWITCH_TITLE_REGISTERING" = "Bu iPhone'u bağla";
 
 /* warning to the user that registering an ipad is not recommended */
-"ONBOARDING_MODE_SWITCH_WARNING_PROVISIONING" = "Bu iPad'i kaydetmek diğer cihazlarda aynı telefon numarası ile kaydedilmiş Signal'i devre dışı bırakacaktır.";
+"ONBOARDING_MODE_SWITCH_WARNING_PROVISIONING" = "Bu iPad'i kaydetmek diğer cihazlarda aynı telefon numarası ile kaydedilmiş Radar'i devre dışı bırakacaktır.";
 
 /* warning to the user that linking a phone is not recommended */
 "ONBOARDING_MODE_SWITCH_WARNING_REGISTERING" = "iPhone'unuzu bağlamak önerilmez ve bazı temel fonksiyonları sınırlar.";
 
 /* Description of the 'Contacts' permission in the 'onboarding permissions' view. */
-"ONBOARDING_PERMISSIONS_CONTACTS_DESCRIPTION" = "Tanıdığın kişileri bul. Kişilerin şifrelendi ve Signal hizmetinde görünmüyor.";
+"ONBOARDING_PERMISSIONS_CONTACTS_DESCRIPTION" = "Tanıdığın kişileri bul. Kişilerin şifrelendi ve Radar hizmetinde görünmüyor.";
 
 /* Title introducing the 'Contacts' permission in the 'onboarding permissions' view. */
 "ONBOARDING_PERMISSIONS_CONTACTS_TITLE" = "Kişiler";
@@ -5767,7 +5767,7 @@
 "ONBOARDING_PERMISSIONS_NOTIFICATIONS_TITLE" = "Bildirimler";
 
 /* Preamble of the 'onboarding permissions' view. */
-"ONBOARDING_PERMISSIONS_PREAMBLE" = "Signal aşağıdaki izinleri talep etmektedir.";
+"ONBOARDING_PERMISSIONS_PREAMBLE" = "Radar aşağıdaki izinleri talep etmektedir.";
 
 /* Description of the 'Notification Relay' permission in the 'onboarding permissions' view. */
 "ONBOARDING_PERMISSIONS_RELAY_DESCRIPTION" = "Enable Radar notification relay to ensure you get immediate background notifications in Radar. Relay is always privacy-preserving and keeps your messages end-to-end encrypted no matter what.";
@@ -5779,7 +5779,7 @@
 "ONBOARDING_PERMISSIONS_TITLE" = "İzinleri Etkinleştir";
 
 /* Explanation of the 'onboarding phone number discoverability' view. Embeds {user phone number} */
-"ONBOARDING_PHONE_NUMBER_DISCOVERABILITY_EXPLANATION_FORMAT" = "Telefon numaranızla sizi Signal'de kimin bulabileceğini seçin %1$@";
+"ONBOARDING_PHONE_NUMBER_DISCOVERABILITY_EXPLANATION_FORMAT" = "Telefon numaranızla sizi Radar'de kimin bulabileceğini seçin %1$@";
 
 /* Title of the 'onboarding phone number discoverability' view. */
 "ONBOARDING_PHONE_NUMBER_DISCOVERABILITY_TITLE" = "Telefon numaranızla sizi kimler bulabilir?";
@@ -5794,7 +5794,7 @@
 "ONBOARDING_PHONE_NUMBER_VALIDATION_WARNING" = "Geçersiz telefon numarası. Kaydolmak için lütfen geçerli bir telefon numarası girin.";
 
 /* Explanation of the 'onboarding pin attempts exhausted' view when reglock is disabled. */
-"ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_EXPLANATION" = "PIN tahminleriniz bitti, ancak yeni bir PIN oluşturarak Signal hesabınıza erişebilirsiniz. Gizliliğiniz ve güvenliğiniz için hesabınız kaydedilmiş Profil bilgileri ve ayarları olmadan geri yüklenecektir.";
+"ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_EXPLANATION" = "PIN tahminleriniz bitti, ancak yeni bir PIN oluşturarak Radar hesabınıza erişebilirsiniz. Gizliliğiniz ve güvenliğiniz için hesabınız kaydedilmiş Profil bilgileri ve ayarları olmadan geri yüklenecektir.";
 
 /* Label for the 'learn more' link when reglock is disabled in the 'onboarding pin attempts exhausted' view. */
 "ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_LEARN_MORE" = "PIN'ler hakkında dahasını öğrenin";
@@ -5803,7 +5803,7 @@
 "ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_TITLE" = "Yanlış PIN";
 
 /* Explanation of the 'onboarding pin attempts exhausted' view when it is unknown if reglock is enabled. */
-"ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_WITH_UNKNOWN_REGLOCK_EXPLANATION" = "PIN tahminlerin tükendi ancak yine de telefon numaranı doğrulayarak Signal hesabına erişmeyi deneyebilirsin. Gizliliğin ve güvenliğin için hesabın kayıtlı profil bilgileri veya ayar olmadan geri yüklenecektir.";
+"ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_WITH_UNKNOWN_REGLOCK_EXPLANATION" = "PIN tahminlerin tükendi ancak yine de telefon numaranı doğrulayarak Radar hesabına erişmeyi deneyebilirsin. Gizliliğin ve güvenliğin için hesabın kayıtlı profil bilgileri veya ayar olmadan geri yüklenecektir.";
 
 /* Title for the setup complete screen shown at the end of the onboarding flow. */
 "ONBOARDING_SETUP_COMPLETE_TITLE" = "Kurulum Tamamlandı";
@@ -5830,13 +5830,13 @@
 "ONBOARDING_SIGN_UP_USE_SIGNAL_ACCOUNT_BUTTON_TITLE" = "Use my Signal account";
 
 /* Explanation of 'do not have old device' flow for the 'Restore or Transfer' prompt */
-"ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_BODY" = "Ya da Radar/Signal'i aynı cihaza yeniden yüklüyorsun";
+"ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_BODY" = "Ya da Radar/Radar'i aynı cihaza yeniden yüklüyorsun";
 
 /* Title for the 'do not have my old device' choice of the 'Restore or Transfer' prompt */
 "ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_TITLE" = "Eski telefonum yanımda değil";
 
 /* Explanation of 'have old device' flow for the 'Restore or Transfer' prompt */
-"ONBOARDING_SPLASH_HAVE_OLD_DEVICE_BODY" = "Hızla başlamak için mevcut Radar/Signal hesabından bir kare kod tara";
+"ONBOARDING_SPLASH_HAVE_OLD_DEVICE_BODY" = "Hızla başlamak için mevcut Radar/Radar hesabından bir kare kod tara";
 
 /* Title for the 'have my old device' choice of the 'Restore or Transfer' prompt */
 "ONBOARDING_SPLASH_HAVE_OLD_DEVICE_TITLE" = "Eski telefonum var";
@@ -5897,19 +5897,19 @@ Send money securely.";
 "OPEN_SETTINGS_BUTTON" = "Ayarlar";
 
 /* Signal doesn't support old versions of iOS and shows a warning if you're on unsupported version. Some users can upgrade their device to a newer version of iOS to continue using Signal. If that's the case, they'll be shown this text. */
-"OS_EXPIRED_AND_CAN_UPGRADE_OS" = "Signal artık bu cihazda çalışmıyor. Signal'i tekrar kullanmak için cihazını daha yeni bir iOS sürümüne güncelle.";
+"OS_EXPIRED_AND_CAN_UPGRADE_OS" = "Radar artık bu cihazda çalışmıyor. Radar'i tekrar kullanmak için cihazını daha yeni bir iOS sürümüne güncelle.";
 
 /* Signal doesn't support old devices. If that's the case, they'll be shown this action, and tapping it will open information about Signal's minimum supported operating systems. */
-"OS_EXPIRED_AND_DEVICE_IS_STUCK" = "Signal artık bu cihazda çalışmıyor. Signal'i tekrar kullanmak için daha yeni bir cihaza geç.";
+"OS_EXPIRED_AND_DEVICE_IS_STUCK" = "Radar artık bu cihazda çalışmıyor. Radar'i tekrar kullanmak için daha yeni bir cihaza geç.";
 
 /* Signal doesn't support old versions of iOS and shows a warning if you're on an old version. Some users can upgrade their device to a newer version of iOS to continue using Signal. If that's the case, they'll be shown this action, and tapping it will open device update instructions. */
 "OS_SOON_TO_EXPIRE_ACTION_TITLE" = "Şimdi Güncelle";
 
 /* Signal doesn't support old versions of iOS and shows a warning if you're an old version that will soon lose support. Some users can upgrade their device to a newer version of iOS to continue using Signal. If that's the case, they'll be shown this text. Embeds {{expiration date}}. */
-"OS_SOON_TO_EXPIRE_AND_CAN_UPGRADE_OS_FORMAT" = "Signal yakında cihazının iOS sürümünü desteklemeyecek. Signal'i kullanmaya devam etmek için cihazını %1$@ tarihine kadar daha yeni bir iOS sürümüne güncelle.";
+"OS_SOON_TO_EXPIRE_AND_CAN_UPGRADE_OS_FORMAT" = "Radar yakında cihazının iOS sürümünü desteklemeyecek. Radar'i kullanmaya devam etmek için cihazını %1$@ tarihine kadar daha yeni bir iOS sürümüne güncelle.";
 
 /* Signal doesn't support old versions of iOS and shows a warning if you're on an old version that will soon lose support. This is the text on that warning when users can't upgrade iOS without getting a new device. Embeds {{expiration date}}. */
-"OS_SOON_TO_EXPIRE_AND_DEVICE_WILL_BE_STUCK_FORMAT" = "Signal yakında cihazının iOS sürümünü desteklemeyecek. Signal'i kullanmaya devam etmek için %1$@ tarihine kadar daha yeni bir cihaza geç.";
+"OS_SOON_TO_EXPIRE_AND_DEVICE_WILL_BE_STUCK_FORMAT" = "Radar yakında cihazının iOS sürümünü desteklemeyecek. Radar'i kullanmaya devam etmek için %1$@ tarihine kadar daha yeni bir cihaza geç.";
 
 /* Info Message when another user disabled disappearing messages. Embeds {{name of other user}}. */
 "OTHER_DISABLED_DISAPPEARING_MESSAGES_CONFIGURATION" = "%1$@ kaybolan iletileri devre dışı bıraktı.";
@@ -5918,13 +5918,13 @@ Send money securely.";
 "OTHER_UPDATED_DISAPPEARING_MESSAGES_CONFIGURATION" = "%1$@ kaybolan ileti süresini %2$@ olarak ayarladı.";
 
 /* Label warning the user that the Signal service may be down. */
-"OUTAGE_WARNING" = "Signal teknik sorunlar yaşıyor. Hizmeti olabildiğince çabuk düzeltmek için sıkı çalışıyoruz.";
+"OUTAGE_WARNING" = "Radar teknik sorunlar yaşıyor. Hizmeti olabildiğince çabuk düzeltmek için sıkı çalışıyoruz.";
 
 /* Label for action link when the user has an outdated payment client */
 "OUTDATED_PAYMENT_CLIENT_ACTION_TITLE" = "Şimdi Güncelle";
 
 /* Label warning the user that they should update Signal to continue using payments. */
-"OUTDATED_PAYMENT_CLIENT_REMINDER_TEXT" = "Ödemeleri kullanmaya devam etmek için Signal'ı güncelle. Bakiyen güncel olmayabilir.";
+"OUTDATED_PAYMENT_CLIENT_REMINDER_TEXT" = "Ödemeleri kullanmaya devam etmek için Radar'ı güncelle. Bakiyen güncel olmayabilir.";
 
 /* Body of prompt notifying restore was cancelled. */
 "OUTGOING_DEVICE_REGISTRATION_CANCELLED_RESTORE_BODY" = "Geri yükleme iptal edilmiştir. Lütfen tekrar dene.";
@@ -5933,7 +5933,7 @@ Send money securely.";
 "OUTGOING_DEVICE_REGISTRATION_CANCELLED_RESTORE_TITLE" = "Geri yükleme iptal edildi";
 
 /* Body of prompt notifying registration without restore completed on the new device. */
-"OUTGOING_DEVICE_REGISTRATION_COMPLETE_BODY" = "Signal hesabın, diğer cihazında etkinleştirildi. Signal artık bu cihazda etkin değil.";
+"OUTGOING_DEVICE_REGISTRATION_COMPLETE_BODY" = "Radar hesabın, diğer cihazında etkinleştirildi. Radar artık bu cihazda etkin değil.";
 
 /* Title of prompt notifying registration without restore completed on the new device. */
 "OUTGOING_DEVICE_REGISTRATION_COMPLETE_TITLE" = "Kayıt tamamlandı";
@@ -5951,7 +5951,7 @@ Send money securely.";
 "OUTGOING_DEVICE_REGISTRATION_UNKNOWN_ERROR_TITLE" = "Bilinmeyen hata";
 
 /* Body of prompt notifying device restore started on the new device. */
-"OUTGOING_DEVICE_RESTORE_COMPLETE_BODY" = "Signal hesabın ve mesajların diğer cihazına aktarılmaya başlandı. Signal artık bu cihazda etkin değil.";
+"OUTGOING_DEVICE_RESTORE_COMPLETE_BODY" = "Radar hesabın ve mesajların diğer cihazına aktarılmaya başlandı. Radar artık bu cihazda etkin değil.";
 
 /* Title of prompt notifying device restore started on the new device. */
 "OUTGOING_DEVICE_RESTORE_COMPLETE_TITLE" = "Geri yükleme tamamlandı";
@@ -5975,7 +5975,7 @@ Send money securely.";
 "OUTGOING_DEVICE_RESTORE_INITIAL_VIEW_TITLE" = "Hesabı Aktar";
 
 /* Body of prompt notifying device transfer completed. */
-"OUTGOING_DEVICE_TRANSFER_COMPLETE_BODY" = "Signal hesabın ve mesajların diğer cihazına aktarıldı. Signal artık bu cihazda etkin değil.";
+"OUTGOING_DEVICE_TRANSFER_COMPLETE_BODY" = "Radar hesabın ve mesajların diğer cihazına aktarıldı. Radar artık bu cihazda etkin değil.";
 
 /* Title of prompt notifying device transfer completed. */
 "OUTGOING_DEVICE_TRANSFER_COMPLETE_TITLE" = "Aktarım tamamlandı";
@@ -5987,10 +5987,10 @@ Send money securely.";
 "OUTGOING_MISSED_VOICE_CALL" = "Cevapsız sesli arama";
 
 /* Button for action sheet shown when device transfer completes; quits the Signal app immediately (does not automatically relaunch, but the user may choose to relaunch). */
-"OUTGOING_TRANSFER_COMPLETE_EXIT_ACTION" = "Signal'den Çık";
+"OUTGOING_TRANSFER_COMPLETE_EXIT_ACTION" = "Radar'den Çık";
 
 /* Message for action sheet shown when device transfer completes */
-"OUTGOING_TRANSFER_COMPLETE_MESSAGE" = "Bu cihazdaki Signal uygulamasından çıkış yapılacak";
+"OUTGOING_TRANSFER_COMPLETE_MESSAGE" = "Bu cihazdaki Radar uygulamasından çıkış yapılacak";
 
 /* Title for action sheet shown when device transfer completes */
 "OUTGOING_TRANSFER_COMPLETE_TITLE" = "Aktarım tamamlandı!";
@@ -6168,7 +6168,7 @@ Send money securely.";
 "PAYMENTS_NEW_PAYMENT_ERROR_INVALID_TRANSACTION" = "Geçersiz hareket";
 
 /* Indicates that a payment failed due to an outdated client. */
-"PAYMENTS_NEW_PAYMENT_ERROR_OUTDATED_CLIENT" = "Ödemeleri kullanmak için Signal'i güncelleyin.";
+"PAYMENTS_NEW_PAYMENT_ERROR_OUTDATED_CLIENT" = "Ödemeleri kullanmak için Radar'i güncelleyin.";
 
 /* Indicates that an outgoing payment could not be verified in a timely way. */
 "PAYMENTS_NEW_PAYMENT_ERROR_OUTGOING_VERIFICATION_TAKING_TOO_LONG" = "Ödeme henüz doğrulanmadı";
@@ -6432,13 +6432,13 @@ Send money securely.";
 "PHONE_NUMBER_DISCOVERABILITY_EVERYBODY" = "Herkes";
 
 /* A user friendly description of the 'everybody' phone number discoverability mode. */
-"PHONE_NUMBER_DISCOVERABILITY_EVERYBODY_DESCRIPTION" = "Telefon numaranı bilen herkes Signal'de olduğunu görecek ve seninle sohbet başlatabilecektir.";
+"PHONE_NUMBER_DISCOVERABILITY_EVERYBODY_DESCRIPTION" = "Telefon numaranı bilen herkes Radar'de olduğunu görecek ve seninle sohbet başlatabilecektir.";
 
 /* A user friendly name for the 'nobody' phone number discoverability mode. */
 "PHONE_NUMBER_DISCOVERABILITY_NOBODY" = "Hiç kimse";
 
 /* A user friendly description of the 'nobody' phone number discoverability mode. */
-"PHONE_NUMBER_DISCOVERABILITY_NOBODY_DESCRIPTION" = "Ona mesaj göndermediğin veya mevcut bir sohbetin olmadığı sürece kimse Signal'de olduğunu göremez.";
+"PHONE_NUMBER_DISCOVERABILITY_NOBODY_DESCRIPTION" = "Ona mesaj göndermediğin veya mevcut bir sohbetin olmadığı sürece kimse Radar'de olduğunu göremez.";
 
 /* A format for a label showing an example phone number. Embeds {{the example phone number}}. */
 "PHONE_NUMBER_EXAMPLE_FORMAT" = "Örneğin: %1$@";
@@ -6540,22 +6540,22 @@ Send money securely.";
 "PIN_CREATION_DISABLE_CONFIRMATION_ACTION" = "PIN'i devre dışı bırak";
 
 /* Message of the 'pin disable' action sheet. */
-"PIN_CREATION_DISABLE_CONFIRMATION_MESSAGE" = "PIN'i devre dışı bırakırsanız, başka bir iOS cihazından aktarmadığınız sürece Signal'i yeniden kaydettiğinizde tüm verileri kaybedersiniz. PIN devre dışı iken Kayıt Kilidini açamazsınız.";
+"PIN_CREATION_DISABLE_CONFIRMATION_MESSAGE" = "PIN'i devre dışı bırakırsanız, başka bir iOS cihazından aktarmadığınız sürece Radar'i yeniden kaydettiğinizde tüm verileri kaybedersiniz. PIN devre dışı iken Kayıt Kilidini açamazsınız.";
 
 /* Title of the 'pin disable' action sheet. */
 "PIN_CREATION_DISABLE_CONFIRMATION_TITLE" = "Uyarı";
 
 /* The explanation in the 'pin creation' view. */
-"PIN_CREATION_EXPLANATION" = "PIN'ler Signal'de depolanan verileri şifreli olarak tutar böylelikle yalnızca siz erişebilirsiniz. Profiliniz, ayarlarınız ve kişileriniz Signal'i yeniden yüklediğinizde geri yüklenecektir. Uygulamayı açmak için PIN'inize ihtiyacınız yoktur.";
+"PIN_CREATION_EXPLANATION" = "PIN'ler Radar'de depolanan verileri şifreli olarak tutar böylelikle yalnızca siz erişebilirsiniz. Profiliniz, ayarlarınız ve kişileriniz Radar'i yeniden yüklediğinizde geri yüklenecektir. Uygulamayı açmak için PIN'inize ihtiyacınız yoktur.";
 
 /* Learn more action on the pin creation view */
 "PIN_CREATION_LEARN_MORE" = "PIN'ler Hakkında Daha Fazla Bilgi";
 
 /* Users can create PINs to restore their account data later. They can learn more about this on a sheet. This is the text on that sheet. */
-"PIN_CREATION_LEARN_MORE_TEXT" = "PIN'ler, yalnızca senin erişebilmen için bilgilerini Signal ile şifrelenmiş olarak saklar. Yeniden yüklediğinde profilin, ayarların ve kişilerin geri yüklenir.";
+"PIN_CREATION_LEARN_MORE_TEXT" = "PIN'ler, yalnızca senin erişebilmen için bilgilerini Radar ile şifrelenmiş olarak saklar. Yeniden yüklediğinde profilin, ayarların ve kişilerin geri yüklenir.";
 
 /* Users can create PINs to restore their account data later. They can learn more about this on a sheet. This is the title on that sheet. */
-"PIN_CREATION_LEARN_MORE_TITLE" = "Signal PIN'leri Hakkında";
+"PIN_CREATION_LEARN_MORE_TITLE" = "Radar PIN'leri Hakkında";
 
 /* Label indicating that the attempted PIN does not match the first PIN */
 "PIN_CREATION_MISMATCH_ERROR" = "PIN'ler eşleşmiyor. Tekrar deneyin.";
@@ -6588,7 +6588,7 @@ Send money securely.";
 "PIN_CREATION_WEAK_ERROR" = "Daha güçlü bir PIN seçin";
 
 /* If your attempted PIN is too weak, you'll see an error message. This is the text on the error dialog. */
-"PIN_CREATION_WEAK_ERROR_MESSAGE" = "PIN'ler, yalnızca senin erişebilmen için bilgilerini Signal ile şifrelenmiş olarak saklar. Hesabını korumak için daha güçlü bir PIN seç.";
+"PIN_CREATION_WEAK_ERROR_MESSAGE" = "PIN'ler, yalnızca senin erişebilmen için bilgilerini Radar ile şifrelenmiş olarak saklar. Hesabını korumak için daha güçlü bir PIN seç.";
 
 /* If the user is re-registering, they need to enter their PIN to restore all their data. In some cases, they can skip this entry and lose some data. This text is shown on a button that lets them begin to do this. */
 "PIN_ENTER_EXISTING_SKIP" = "PIN'i atla";
@@ -6621,7 +6621,7 @@ Send money securely.";
 "PIN_REMINDER_MEGAPHONE_FEW_DAYS_TOAST" = "Size birkaç gün içinde hatırlatacağız.";
 
 /* Title for PIN reminder megaphone */
-"PIN_REMINDER_MEGAPHONE_TITLE" = "Signal PIN'inizi doğrulayın";
+"PIN_REMINDER_MEGAPHONE_TITLE" = "Radar PIN'inizi doğrulayın";
 
 /* Toast indicating that we'll ask you for your PIN again tomorrow, after successfully entering it. */
 "PIN_REMINDER_MEGAPHONE_TOMORROW_SUCCESSFUL_TOAST" = "PIN doğru. Sana yarın hatırlatacağız.";
@@ -6645,7 +6645,7 @@ Send money securely.";
 "PIN_REMINDER_MISMATCH_ERROR" = "Geçersiz PIN, tekrar deneyin.";
 
 /* The title for the 'pin reminder' dialog. */
-"PIN_REMINDER_TITLE" = "Signal PIN'inizi girin";
+"PIN_REMINDER_TITLE" = "Radar PIN'inizi girin";
 
 /* Label indicating that the attempted PIN is too short */
 "PIN_REMINDER_TOO_SHORT_ERROR" = "PIN en az 4 haneli olmalı";
@@ -6660,7 +6660,7 @@ Send money securely.";
 "PINS_MEGAPHONE_ACTION" = "PIN oluştur";
 
 /* Body for PIN megaphone when user doesn't have a PIN */
-"PINS_MEGAPHONE_BODY" = "Signal PIN'inizi oluşturmayı tamamlayın.";
+"PINS_MEGAPHONE_BODY" = "Radar PIN'inizi oluşturmayı tamamlayın.";
 
 /* Title for PIN megaphone when user doesn't have a PIN */
 "PINS_MEGAPHONE_TITLE" = "PIN oluştur";
@@ -6768,19 +6768,19 @@ Send money securely.";
 "PRIVACY_VERIFICATION_FAILED_MISMATCHED_SAFETY_NUMBERS_IN_CLIPBOARD" = "Panondaki sayı, bu sohbetin doğru güvenlik numarasına benzemiyor.";
 
 /* Alert body for user error */
-"PRIVACY_VERIFICATION_FAILED_NO_SAFETY_NUMBERS_IN_CLIPBOARD" = "Signal, panonuzda herhangi bir güvenlik numarası bulamadı. Doğru şekilde kopyaladınız mı?";
+"PRIVACY_VERIFICATION_FAILED_NO_SAFETY_NUMBERS_IN_CLIPBOARD" = "Radar, panonuzda herhangi bir güvenlik numarası bulamadı. Doğru şekilde kopyaladınız mı?";
 
 /* Alert body when verifying with {{contact name}} */
-"PRIVACY_VERIFICATION_FAILED_THEY_HAVE_WRONG_KEY_FOR_ME" = "Signal kullanıcılarının her çifti ayrı bir güvenlik numarası paylaşır. %1$@ *size* özel olan güvenlik numarasını görüntülüyor olduğunu kontrol edin.";
+"PRIVACY_VERIFICATION_FAILED_THEY_HAVE_WRONG_KEY_FOR_ME" = "Radar kullanıcılarının her çifti ayrı bir güvenlik numarası paylaşır. %1$@ *size* özel olan güvenlik numarasını görüntülüyor olduğunu kontrol edin.";
 
 /* alert body */
-"PRIVACY_VERIFICATION_FAILED_WITH_OLD_LOCAL_VERSION" = "Signal'in eski bir sürümünü kullanıyorsunuz. Doğrulamadan önce güncellemeniz gerekiyor.";
+"PRIVACY_VERIFICATION_FAILED_WITH_OLD_LOCAL_VERSION" = "Radar'in eski bir sürümünü kullanıyorsunuz. Doğrulamadan önce güncellemeniz gerekiyor.";
 
 /* alert body */
-"PRIVACY_VERIFICATION_FAILED_WITH_OLD_REMOTE_VERSION" = "Karşıdaki kişi Signal'in eski bir sürümünü kullanıyor. Doğrulamadan önce güncelleme yapmaları gerekiyor.";
+"PRIVACY_VERIFICATION_FAILED_WITH_OLD_REMOTE_VERSION" = "Karşıdaki kişi Radar'in eski bir sürümünü kullanıyor. Doğrulamadan önce güncelleme yapmaları gerekiyor.";
 
 /* alert body */
-"PRIVACY_VERIFICATION_FAILURE_INVALID_QRCODE" = "Taranan kod güvenlik numarası gibi gözükmüyor. Signal'in güncel sürümünde olduğunuzdan emin misiniz?";
+"PRIVACY_VERIFICATION_FAILURE_INVALID_QRCODE" = "Taranan kod güvenlik numarası gibi gözükmüyor. Radar'in güncel sürümünde olduğunuzdan emin misiniz?";
 
 /* Navbar title */
 "PRIVACY_VERIFICATION_TITLE" = "Güvenlik Numarasını Doğrula";
@@ -7062,7 +7062,7 @@ Send money securely.";
 "RECIPIENT_PICKER_ERROR_USER_CANNOT_BE_SELECTED" = "Kullanıcı seçilemiyor.";
 
 /* Alert text. Shown after selecting a phone number that isn't valid. */
-"RECIPIENT_PICKER_INVALID_NUMBER_MESSAGE" = "%1$@ bir Signal kullanıcısı değil. Geçerli bir telefon numarasıyla tekrar dene.";
+"RECIPIENT_PICKER_INVALID_NUMBER_MESSAGE" = "%1$@ bir Radar kullanıcısı değil. Geçerli bir telefon numarasıyla tekrar dene.";
 
 /* Alert title. Shown after selecting a phone number that isn't valid. */
 "RECIPIENT_PICKER_INVALID_NUMBER_TITLE" = "Geçersiz Telefon Numarası";
@@ -7071,22 +7071,22 @@ Send money securely.";
 "RECIPIENT_PICKER_INVITE_ACTION" = "Davet et";
 
 /* Alert text. Shown after selecting a phone number that isn't a Signal user. */
-"RECIPIENT_PICKER_INVITE_MESSAGE" = "%1$@ bir Signal kullanıcısı değil. Bu numarayı davet etmek ister misin?";
+"RECIPIENT_PICKER_INVITE_MESSAGE" = "%1$@ bir Radar kullanıcısı değil. Bu numarayı davet etmek ister misin?";
 
 /* Alert title. Shown after selecting a phone number that isn't a Signal user. */
-"RECIPIENT_PICKER_INVITE_TITLE" = "Signal'e davet et";
+"RECIPIENT_PICKER_INVITE_TITLE" = "Radar'e davet et";
 
 /* Alert title explaining what happens if you forget your 'two-factor auth pin'. */
 "REGISTER_2FA_FORGOT_PIN_ALERT_TITLE" = "Yardıma mı ihtiyacınız var?";
 
 /* Alert body for a forgotten SVR (V2) PIN */
-"REGISTER_2FA_FORGOT_SVR_PIN_ALERT_MESSAGE" = "PIN'in, sayısal veya alfanümerik karakterler kullanarak oluşturduğun 4+ haneli bir koddur. PIN kodunu hatırlayamıyorsan, hesabını yeniden kaydetmek için 7 gün beklemen gerekir. Signal Güvenli Yedeklemeleri etkinleştirdiysen, Kurtarma Anahtarın ile devam edebilirsin.";
+"REGISTER_2FA_FORGOT_SVR_PIN_ALERT_MESSAGE" = "PIN'in, sayısal veya alfanümerik karakterler kullanarak oluşturduğun 4+ haneli bir koddur. PIN kodunu hatırlayamıyorsan, hesabını yeniden kaydetmek için 7 gün beklemen gerekir. Radar Güvenli Yedeklemeleri etkinleştirdiysen, Kurtarma Anahtarın ile devam edebilirsin.";
 
 /* Alert body for a forgotten SVR (V2) PIN when the user doesn't have reglock and they cannot necessarily create a new PIN */
-"REGISTER_2FA_FORGOT_SVR_PIN_WITHOUT_REGLOCK_ALERT_MESSAGE" = "PIN'in, sayısal veya alfanümerik karakterler kullanarak oluşturduğun 4+ haneli bir koddur. PIN'ini hatırlamıyorsan, kaydolabilir ve hesabını kullanabilirsin ancak profil bilgilerin gibi bazı kaydedilmiş ayarları kaybedersin. Signal Güvenli Yedeklemeleri etkinleştirdiysen, Kurtarma Anahtarın ile devam edebilirsin.";
+"REGISTER_2FA_FORGOT_SVR_PIN_WITHOUT_REGLOCK_ALERT_MESSAGE" = "PIN'in, sayısal veya alfanümerik karakterler kullanarak oluşturduğun 4+ haneli bir koddur. PIN'ini hatırlamıyorsan, kaydolabilir ve hesabını kullanabilirsin ancak profil bilgilerin gibi bazı kaydedilmiş ayarları kaybedersin. Radar Güvenli Yedeklemeleri etkinleştirdiysen, Kurtarma Anahtarın ile devam edebilirsin.";
 
 /* Alert body for a forgotten SVR (V2) PIN when the user doesn't have reglock and they can create a new PIN */
-"REGISTER_2FA_FORGOT_SVR_PIN_WITHOUT_REGLOCK_AND_CAN_CREATE_NEW_PIN_ALERT_MESSAGE" = "PIN'in, sayısal veya alfanümerik karakterler kullanarak oluşturduğun 4+ haneli bir koddur. PIN'ini hatırlayamıyorsan yeni bir tane oluşturabilirsin. Hesabını kaydedebilir ve kullanabilirsin ancak profil bilgilerin gibi kaydedilmiş bazı ayarları kaybedersin. Signal Güvenli Yedeklemeleri etkinleştirdiysen, Kurtarma Anahtarın ile devam edebilirsin.";
+"REGISTER_2FA_FORGOT_SVR_PIN_WITHOUT_REGLOCK_AND_CAN_CREATE_NEW_PIN_ALERT_MESSAGE" = "PIN'in, sayısal veya alfanümerik karakterler kullanarak oluşturduğun 4+ haneli bir koddur. PIN'ini hatırlayamıyorsan yeni bir tane oluşturabilirsin. Hesabını kaydedebilir ve kullanabilirsin ancak profil bilgilerin gibi kaydedilmiş bazı ayarları kaybedersin. Radar Güvenli Yedeklemeleri etkinleştirdiysen, Kurtarma Anahtarın ile devam edebilirsin.";
 
 /* Alert title explaining what happens if you forget your 'two-factor auth pin'. */
 "REGISTER_2FA_INVALID_PIN_ALERT_TITLE" = "Yanlış PIN";
@@ -7167,7 +7167,7 @@ Send money securely.";
 "REGISTRATION_BACKUP_RESTORE_ERROR_UNRETRYABLE_SERVER_ERROR_TITLE" = "Yedekleme Geri Yüklenemiyor";
 
 /* Body for a sheet warning users about an incompatible backup version. */
-"REGISTRATION_BACKUP_RESTORE_ERROR_UNSUPPORTED_BACKUP_VERSION_BODY" = "Yedeklemeni geri yüklemek için Signal'ın en son sürümünü kullandığından emin ol ve tekrar dene. Sorun devam ederse, destekle iletişime geç.";
+"REGISTRATION_BACKUP_RESTORE_ERROR_UNSUPPORTED_BACKUP_VERSION_BODY" = "Yedeklemeni geri yüklemek için Radar'ın en son sürümünü kullandığından emin ol ve tekrar dene. Sorun devam ederse, destekle iletişime geç.";
 
 /* Title for a sheet warning users about an incompatible backup version. */
 "REGISTRATION_BACKUP_RESTORE_ERROR_UNSUPPORTED_BACKUP_VERSION_TITLE" = "Güncelleme Gerekli";
@@ -7179,7 +7179,7 @@ Send money securely.";
 "REGISTRATION_CANNOT_CONTINUE_WITHOUT_UPDATING_APP_ACTION" = "Güncelle";
 
 /* During (re)registration, users may need to update their app to continue. They'll be presented with an alert if this is the case, prompting them to update. This is the description text on that alert. */
-"REGISTRATION_CANNOT_CONTINUE_WITHOUT_UPDATING_APP_DESCRIPTION" = "Kayda devam etmek için lütfen Signal'in en son sürümüne güncelle.";
+"REGISTRATION_CANNOT_CONTINUE_WITHOUT_UPDATING_APP_DESCRIPTION" = "Kayda devam etmek için lütfen Radar'in en son sürümüne güncelle.";
 
 /* During (re)registration, users may need to update their app to continue. They'll be presented with an alert if this is the case, prompting them to update. This is the title on that alert. */
 "REGISTRATION_CANNOT_CONTINUE_WITHOUT_UPDATING_APP_TITLE" = "Güncelleme Gerekli";
@@ -7191,7 +7191,7 @@ Send money securely.";
 "REGISTRATION_DEFAULT_COUNTRY_NAME" = "Ülke Kodu";
 
 /* If a user is installing Signal on a new phone, they may be asked whether they want to transfer their account from their old device. This is a description on the screen that asks them this question. */
-"REGISTRATION_DEVICE_TRANSFER_CHOICE_EXPLANATION" = "Devam etmek aynı telefon numarası ile kaydolmuş diğer cihazlardaki Signal'i devre dışı bırakacaktır.";
+"REGISTRATION_DEVICE_TRANSFER_CHOICE_EXPLANATION" = "Devam etmek aynı telefon numarası ile kaydolmuş diğer cihazlardaki Radar'i devre dışı bırakacaktır.";
 
 /* If a user is installing Signal on a new phone, they may be asked whether they want to transfer their account from their old device. This is the title on the screen that asks them this question. */
 "REGISTRATION_DEVICE_TRANSFER_CHOICE_TITLE" = "Hesap ve İletileri Aktar";
@@ -7227,7 +7227,7 @@ Send money securely.";
 "REGISTRATION_NO_BACKUP_KEY_BUTTON_TITLE" = "Kurtarma Anahtarın mı yok?";
 
 /* Body text on a sheet with info for what to do if you don't have a recovery key */
-"REGISTRATION_NO_BACKUP_KEY_SHEET_BODY" = "Yedeklemeler 64 karakterli kurtarma kodu olmadan kurtarılamaz. Kurtarma anahtarını kaybettiysen, Signal yedeklemeni geri yüklemene yardımcı olamaz.\n\nEski cihazın varsa, kurtarma anahtarını Ayarlar > Sohbetler > Yedeklemeler bölümünden görüntüleyebilirsin. Ardından Kurtarma Anahtarını Görüntüle tuşuna dokun.";
+"REGISTRATION_NO_BACKUP_KEY_SHEET_BODY" = "Yedeklemeler 64 karakterli kurtarma kodu olmadan kurtarılamaz. Kurtarma anahtarını kaybettiysen, Radar yedeklemeni geri yüklemene yardımcı olamaz.\n\nEski cihazın varsa, kurtarma anahtarını Ayarlar > Sohbetler > Yedeklemeler bölümünden görüntüleyebilirsin. Ardından Kurtarma Anahtarını Görüntüle tuşuna dokun.";
 
 /* Title for sheet with info for what to do if you don't have a recovery key */
 "REGISTRATION_NO_BACKUP_KEY_SHEET_TITLE" = "Kurtarma Anahtarın mı yok?";
@@ -7290,16 +7290,16 @@ Send money securely.";
 "REGISTRATION_PROFILE_SETUP_TITLE" = "Profilini ayarla";
 
 /* Error shown if an SMS/call service provider is permanently unable to send a verification code to the provided number. */
-"REGISTRATION_PROVIDER_FAILURE_MESSAGE_PERMANENT" = "Signal, SMS sağlayıcısıyla ilgili sorunlar nedeniyle SMS kodu gönderemiyor.";
+"REGISTRATION_PROVIDER_FAILURE_MESSAGE_PERMANENT" = "Radar, SMS sağlayıcısıyla ilgili sorunlar nedeniyle SMS kodu gönderemiyor.";
 
 /* Error shown if an SMS/call service provider is temporarily unable to send a verification code to the provided number. */
-"REGISTRATION_PROVIDER_FAILURE_MESSAGE_TRANSIENT" = "Signal, SMS sağlayıcısıyla ilgili sorunlar nedeniyle SMS kodu gönderemedi. Birkaç saat sonra tekrar dene.";
+"REGISTRATION_PROVIDER_FAILURE_MESSAGE_TRANSIENT" = "Radar, SMS sağlayıcısıyla ilgili sorunlar nedeniyle SMS kodu gönderemedi. Birkaç saat sonra tekrar dene.";
 
 /* Third step in directions for how to make a backup */
 "REGISTRATION_RESTORE_METHOD_MAKE_BACKUP_TUTORIAL_ENABLE_BACKUPS" = "Yedeklemeleri etkinleştir ve yedeklemen tamamlanana kadar bekle";
 
 /* First step in directions for how to make a backup */
-"REGISTRATION_RESTORE_METHOD_MAKE_BACKUP_TUTORIAL_OPEN_SIGNAL" = "Signal'ı eski cihazında aç";
+"REGISTRATION_RESTORE_METHOD_MAKE_BACKUP_TUTORIAL_OPEN_SIGNAL" = "Radar'ı eski cihazında aç";
 
 /* Second step in directions for how to make a backup */
 "REGISTRATION_RESTORE_METHOD_MAKE_BACKUP_TUTORIAL_TAP_SETTINGS" = "Ayarlar > Yedeklemeler Ögesine Dokun";
@@ -7317,7 +7317,7 @@ Send money securely.";
 "REGISTRATION_SCAN_QR_CODE_TITLE" = "Bu kodu eski telefonunla tara";
 
 /* Tutorial text describing the first step to scanning the restore/transfer QR code with your old phone: opening Signal */
-"REGISTRATION_SCAN_QR_CODE_TUTORIAL_OPEN_SIGNAL" = "Signal'i eski cihazında aç";
+"REGISTRATION_SCAN_QR_CODE_TUTORIAL_OPEN_SIGNAL" = "Radar'i eski cihazında aç";
 
 /* Tutorial text describing the third step to scanning the restore/transfer QR code with your old phone: scan the code */
 "REGISTRATION_SCAN_QR_CODE_TUTORIAL_SCAN" = "Bu kodu kamera ile tara";
@@ -7521,7 +7521,7 @@ Send money securely.";
 "SAFETY_NUMBER_CONFIRMATION_VIEW_ACTION" = "Görüntüle";
 
 /* Snippet to share {{safety number}} with a friend. sent e.g. via SMS */
-"SAFETY_NUMBER_SHARE_FORMAT" = "Signal Güvenlik Numaramız:\n%1$@";
+"SAFETY_NUMBER_SHARE_FORMAT" = "Radar Güvenlik Numaramız:\n%1$@";
 
 /* Title for Safety Tips button in thread details. */
 "SAFETY_TIPS_BUTTON_ACTION_TITLE" = "Güvenlik İpuçları";
@@ -7539,7 +7539,7 @@ Send money securely.";
 "SAFETY_TIPS_FAKE_BUSINESS_TITLE" = "Sahte işletmeler ve kurumlar";
 
 /* Message contents for the fake names safety tip. */
-"SAFETY_TIPS_FAKE_NAMES_BODY" = "Signal hiçbir zaman kayıt kodun veya PIN kodun için seninle iletişime geçmez. Başkalarını taklit eden isteklere karşı dikkatli ol. Profil adları, hesap sahibi tarafından seçilir ve doğrulanmaz.";
+"SAFETY_TIPS_FAKE_NAMES_BODY" = "Radar hiçbir zaman kayıt kodun veya PIN kodun için seninle iletişime geçmez. Başkalarını taklit eden isteklere karşı dikkatli ol. Profil adları, hesap sahibi tarafından seçilir ve doğrulanmaz.";
 
 /* Message title describing the fake names safety tip. */
 "SAFETY_TIPS_FAKE_NAMES_TITLE" = "Sahte isimler ve hesaplar";
@@ -7599,13 +7599,13 @@ Send money securely.";
 "SCREEN_LOCK_ERROR_LOCAL_AUTHENTICATION_PASSCODE_NOT_SET" = "Ekran Kilidini kullanmak için iOS ayarlarınızdan bir şifre belirlemelisiniz.";
 
 /* Description of how and why Signal iOS uses Touch ID/Face ID/Phone Passcode to unlock 'screen lock'. */
-"SCREEN_LOCK_REASON_UNLOCK_SCREEN_LOCK" = "Signal'i açmak için kimlik doğrulaması yapın.";
+"SCREEN_LOCK_REASON_UNLOCK_SCREEN_LOCK" = "Radar'i açmak için kimlik doğrulaması yapın.";
 
 /* Title for alert indicating that screen lock could not be unlocked. */
 "SCREEN_LOCK_UNLOCK_FAILED" = "Kimlik doğrulama başarısız oldu.";
 
 /* Label for button on lock screen that lets users unlock Signal. */
-"SCREEN_LOCK_UNLOCK_SIGNAL" = "Signal'in Kilidini Aç";
+"SCREEN_LOCK_UNLOCK_SIGNAL" = "Radar'in Kilidini Aç";
 
 /* Placeholder text indicating the user can search for contacts by name, username, or phone number. */
 "SEARCH_BY_NAME_OR_USERNAME_OR_NUMBER_PLACEHOLDER_TEXT" = "İsim, kullanıcı adı veya numara";
@@ -7638,13 +7638,13 @@ Send money securely.";
 "SECONDARY_LINKING_ERROR_DIFFERENT_ACCOUNT_TITLE" = "Hesap Uyuşmuyor";
 
 /* Message for error alert indicating that a linked device must be upgraded before it can be linked. */
-"SECONDARY_LINKING_ERROR_OBSOLETE_LINKED_DEVICE_MESSAGE" = "Bu cihazı telefonunuza bağlamak için bu cihazdaki Signal'i güncelleyin.";
+"SECONDARY_LINKING_ERROR_OBSOLETE_LINKED_DEVICE_MESSAGE" = "Bu cihazı telefonunuza bağlamak için bu cihazdaki Radar'i güncelleyin.";
 
 /* Title for error alert indicating that a linked device must be upgraded before it can be linked. */
 "SECONDARY_LINKING_ERROR_OBSOLETE_LINKED_DEVICE_TITLE" = "Desteklenmeyen Sürüm";
 
 /* alert message for outdated linking device */
-"SECONDARY_LINKING_ERROR_OLD_VERSION_MESSAGE" = "Diğer cihazınız iPad kare kodlarını taramayı desteklemeyen eski bir Signal sürümü kullanıyor. Lütfen Signal'in son sürümünü yükleyin ve tekrar deneyin.";
+"SECONDARY_LINKING_ERROR_OLD_VERSION_MESSAGE" = "Diğer cihazınız iPad kare kodlarını taramayı desteklemeyen eski bir Radar sürümü kullanıyor. Lütfen Radar'in son sürümünü yükleyin ve tekrar deneyin.";
 
 /* alert title for outdated linking device */
 "SECONDARY_LINKING_ERROR_OLD_VERSION_TITLE" = "Tarayıcı Cihazı Güncelle";
@@ -7665,7 +7665,7 @@ Send money securely.";
 "SECONDARY_LINKING_SYNCING_UPDATE_REQUIRED_CHECK_FOR_UPDATE_BUTTON" = "Güncelleme ara";
 
 /* Message for action sheet when the secondary device fails to sync messages due to an app update being required. */
-"SECONDARY_LINKING_SYNCING_UPDATE_REQUIRED_ERROR_MESSAGE" = "Mesajlarını senkronize etme işlemini tamamlamak için Signal'i şimdi güncelle.";
+"SECONDARY_LINKING_SYNCING_UPDATE_REQUIRED_ERROR_MESSAGE" = "Mesajlarını senkronize etme işlemini tamamlamak için Radar'i şimdi güncelle.";
 
 /* Title for action sheet when the secondary device fails to sync messages due to an app update being required. */
 "SECONDARY_LINKING_SYNCING_UPDATE_REQUIRED_ERROR_TITLE" = "Güncelleme gerekli";
@@ -7674,19 +7674,19 @@ Send money securely.";
 "SECONDARY_ONBOARDING_CHOOSE_DEVICE_NAME_PLACEHOLDER" = "İsim seçin";
 
 /* header text before the user can link this device */
-"SECONDARY_ONBOARDING_GET_STARTED_BY_OPENING_PRIMARY" = "Bu iPad'i hesabınıza bağlamak için telefonunuzdan Signal'i açın";
+"SECONDARY_ONBOARDING_GET_STARTED_BY_OPENING_PRIMARY" = "Bu iPad'i hesabınıza bağlamak için telefonunuzdan Radar'i açın";
 
 /* Link explaining what to do when trying to link a device before having a primary device. */
-"SECONDARY_ONBOARDING_GET_STARTED_DO_NOT_HAVE_PRIMARY" = "Telefonumda Signal uygulaması yok…";
+"SECONDARY_ONBOARDING_GET_STARTED_DO_NOT_HAVE_PRIMARY" = "Telefonumda Radar uygulaması yok…";
 
 /* alert body */
-"SECONDARY_ONBOARDING_INSTALL_PRIMARY_FIRST_BODY" = "Telefonunuzdan Uygulama Mağazasına girin, Signal'i yükleyin, kaydolma işlemini tamamlayın, ve daha sonrasında iPad'inizi aynı hesaba bağlayabilirsiniz.";
+"SECONDARY_ONBOARDING_INSTALL_PRIMARY_FIRST_BODY" = "Telefonunuzdan Uygulama Mağazasına girin, Radar'i yükleyin, kaydolma işlemini tamamlayın, ve daha sonrasında iPad'inizi aynı hesaba bağlayabilirsiniz.";
 
 /* alert title */
-"SECONDARY_ONBOARDING_INSTALL_PRIMARY_FIRST_TITLE" = "Telefonunuza Signal Yükleyin";
+"SECONDARY_ONBOARDING_INSTALL_PRIMARY_FIRST_TITLE" = "Telefonunuza Radar Yükleyin";
 
 /* body text while displaying a QR code which, when scanned, will link this device. */
-"SECONDARY_ONBOARDING_SCAN_CODE_BODY" = "Telefonunuzda Signal Ayarlarını açmak için profil resminize dokunun. Sonrasında,  \"Bağlı Cihazlar\" > \"Yeni Cihaz Bağla\" yolunu izleyerek bu kodu telefonunuzla tarayın:";
+"SECONDARY_ONBOARDING_SCAN_CODE_BODY" = "Telefonunuzda Radar Ayarlarını açmak için profil resminize dokunun. Sonrasında,  \"Bağlı Cihazlar\" > \"Yeni Cihaz Bağla\" yolunu izleyerek bu kodu telefonunuzla tarayın:";
 
 /* Link text for page with troubleshooting info shown on the QR scanning screen */
 "SECONDARY_ONBOARDING_SCAN_CODE_HELP_TEXT" = "iPad'inizi bağlamayla ilgili yardımı buradan alabilirsiniz";
@@ -7698,7 +7698,7 @@ Send money securely.";
 "SECONDARY_ONBOARDING_SCAN_CODE_TITLE" = "Telefonunuzla kare kodu tarayın";
 
 /* header text before the user can transfer to this device */
-"SECONDARY_TRANSFER_GET_STARTED_BY_OPENING_IPAD" = "Hesabınızı aktarmak için eski iPad'inizde Signal'i açın";
+"SECONDARY_TRANSFER_GET_STARTED_BY_OPENING_IPAD" = "Hesabınızı aktarmak için eski iPad'inizde Radar'i açın";
 
 /* No comment provided by engineer. */
 "SECURE_SESSION_RESET" = "Güvenli oturum sıfırlandı.";
@@ -7788,7 +7788,7 @@ Send money securely.";
 "SEPA_DONATION_NAME_PLACEHOLDER" = "Banka hesabındaki isim";
 
 /* Description for the session refresh alert */
-"SESSION_REFRESH_ALERT_MESSAGE" = "Signal uçtan uca şifreleme kullanır ve bazen sohbet oturumunu yenilemesi gerekebilir. Bu, konuşmanın güvenliğini etkilemez ancak bu kişiden gelen bir mesajı kaçırmış olabilirsin ve ondan tekrar göndermesini isteyebilirsin.";
+"SESSION_REFRESH_ALERT_MESSAGE" = "Radar uçtan uca şifreleme kullanır ve bazen sohbet oturumunu yenilemesi gerekebilir. Bu, konuşmanın güvenliğini etkilemez ancak bu kişiden gelen bir mesajı kaçırmış olabilirsin ve ondan tekrar göndermesini isteyebilirsin.";
 
 /* Title for the session refresh alert */
 "SESSION_REFRESH_ALERT_TITLE" = "Sohbet oturumu yenilendi";
@@ -7830,7 +7830,7 @@ Send money securely.";
 "SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_COUNTRY" = "Konum";
 
 /* Table footer for the 'censorship circumvention' section when censorship circumvention can be manually enabled. */
-"SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_FOOTER" = "Etkinleştirildiğinde, Signal sansürü atlatmaya çalışacaktır. Signal'in sansürlendiği bir konumda olmadığınız sürece bu özelliği etkinleştirmeyin.";
+"SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_FOOTER" = "Etkinleştirildiğinde, Radar sansürü atlatmaya çalışacaktır. Radar'in sansürlendiği bir konumda olmadığınız sürece bu özelliği etkinleştirmeyin.";
 
 /* Table footer for the 'censorship circumvention' section shown when censorship circumvention has been auto-enabled based on local phone number. */
 "SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_FOOTER_AUTO_ENABLED" = "Sansür atlatma hesabınızın telefon numarasına bağlı olarak etkinleştirildi.";
@@ -7842,7 +7842,7 @@ Send money securely.";
 "SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_FOOTER_NO_CONNECTION" = "Sansür atlatma sadece internete bağlıyken etkinleştirilebilir.";
 
 /* Table footer for the 'censorship circumvention' section shown when the app is connected to the Signal service. */
-"SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_FOOTER_WEBSOCKET_CONNECTED" = "Sansür atlatma gerekli değil; zaten Signal hizmetine bağlandınız.";
+"SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_FOOTER_WEBSOCKET_CONNECTED" = "Sansür atlatma gerekli değil; zaten Radar hizmetine bağlandınız.";
 
 /* Label for the 'advanced pin settings' button. */
 "SETTINGS_ADVANCED_PIN_SETTINGS" = "Gelişmiş PIN Ayarları";
@@ -7869,13 +7869,13 @@ Send money securely.";
 "SETTINGS_ADVANCED_VIEW_ERROR_LOG" = "Hata Kayıtları";
 
 /* Information on sheet about changing the app icon - first line */
-"SETTINGS_APP_ICON_EDUCATION_APP_NAME" = "\"Signal\" uygulama adı; Ana Ekran'da, bildirimlerde ve Uygulama Kitaplığı'nda görünecektir.";
+"SETTINGS_APP_ICON_EDUCATION_APP_NAME" = "\"Radar\" uygulama adı; Ana Ekran'da, bildirimlerde ve Uygulama Kitaplığı'nda görünecektir.";
 
 /* Information on sheet about changing the app icon - second line */
-"SETTINGS_APP_ICON_EDUCATION_HOME_SCREEN_DOCK" = "Uygulamayı ana ekranın altındaki yuvaya taşıyarak ana ekranda \"Signal\" uygulama adını gizleyebilirsin.";
+"SETTINGS_APP_ICON_EDUCATION_HOME_SCREEN_DOCK" = "Uygulamayı ana ekranın altındaki yuvaya taşıyarak ana ekranda \"Radar\" uygulama adını gizleyebilirsin.";
 
 /* The footer for the app icon selection settings page. */
-"SETTINGS_APP_ICON_FOOTER" = "\"Signal\" uygulama adı; Ana Ekran'da, bildirimlerde ve Uygulama Kitaplığı'nda görünecektir.";
+"SETTINGS_APP_ICON_FOOTER" = "\"Radar\" uygulama adı; Ana Ekran'da, bildirimlerde ve Uygulama Kitaplığı'nda görünecektir.";
 
 /* The title for the app icon selection settings page. */
 "SETTINGS_APP_ICON_TITLE" = "Uygulama Simgesi";
@@ -7905,7 +7905,7 @@ Send money securely.";
 "SETTINGS_BLOCK_LIST_ADD_BUTTON" = "Engelli Kullanıcı Ekle";
 
 /* A label that indicates the user has no Signal contacts that they haven't blocked. */
-"SETTINGS_BLOCK_LIST_NO_CONTACTS" = "Signal'de kişiniz yok.";
+"SETTINGS_BLOCK_LIST_NO_CONTACTS" = "Radar'de kişiniz yok.";
 
 /* A label that indicates the user's search has no matching results. */
 "SETTINGS_BLOCK_LIST_NO_SEARCH_RESULTS" = "Arama Sonucu Yok";
@@ -7917,7 +7917,7 @@ Send money securely.";
 "SETTINGS_CALLING_HIDES_IP_ADDRESS_PREFERENCE_TITLE" = "Aramaları Daima Aktar";
 
 /* User settings section footer, a detailed explanation */
-"SETTINGS_CALLING_HIDES_IP_ADDRESS_PREFERENCE_TITLE_DETAIL" = "IP adresinizi kişinize göstermekten kaçınmak için tüm aramaları Signal sunucusundan aktarın. Etkinleştirildiğinde arama kalitesi düşecektir.";
+"SETTINGS_CALLING_HIDES_IP_ADDRESS_PREFERENCE_TITLE_DETAIL" = "IP adresinizi kişinize göstermekten kaçınmak için tüm aramaları Radar sunucusundan aktarın. Etkinleştirildiğinde arama kalitesi düşecektir.";
 
 /* Label for the 'edit phone number' button in the 'change phone number' views. */
 "SETTINGS_CHANGE_PHONE_NUMBER_BACK_TO_EDIT_BUTTON" = "Numarayı Düzenle";
@@ -7962,7 +7962,7 @@ Send money securely.";
 "SETTINGS_CLEAR_HISTORY" = "Sohbet Geçmişini Temizle";
 
 /* Footer for the 'about' help section */
-"SETTINGS_COPYRIGHT" = "Telif Hakkı Signal Messenger\n AGPLv3 altında lisanslanmıştır";
+"SETTINGS_COPYRIGHT" = "Telif Hakkı Radar Messenger\n AGPLv3 altında lisanslanmıştır";
 
 /* Label for the 'data' section of the app settings. */
 "SETTINGS_DATA" = "Veri kullanımı";
@@ -8034,7 +8034,7 @@ Send money securely.";
 "SETTINGS_DISAPPEARING_MESSAGES_FOOTER" = "Tarafınca başlatılan tüm yeni sohbetler için varsayılan kaybolan mesaj zamanlayıcısı ayarla.";
 
 /* Title for the 'donate to signal' link in settings. */
-"SETTINGS_DONATE" = "Signal'e Bağış Yap";
+"SETTINGS_DONATE" = "Radar'e Bağış Yap";
 
 /* Title for help button and help pages in app settings. */
 "SETTINGS_HELP" = "Yardım";
@@ -8103,7 +8103,7 @@ Send money securely.";
 "SETTINGS_NOTIFICATION_CONTENT_TITLE" = "Bildirim İçeriği";
 
 /* When the local device discovers a contact has recently installed signal, the app can generates a message encouraging the local user to say hello. Turning this switch off disables that feature. */
-"SETTINGS_NOTIFICATION_EVENTS_CONTACT_JOINED_SIGNAL" = "Kişinin Signal'e Katılması";
+"SETTINGS_NOTIFICATION_EVENTS_CONTACT_JOINED_SIGNAL" = "Kişinin Radar'e Katılması";
 
 /* table section header */
 "SETTINGS_NOTIFICATION_NOTIFY_WHEN_TITLE" = "Şu durumlarda bildir…";
@@ -8140,7 +8140,7 @@ Send money securely.";
 "SETTINGS_PAYMENTS_BITCOIN_UNIT" = "Bitcoin Birimi";
 
 /* Error message indicating that payments could not be activated because the feature is not currently available. */
-"SETTINGS_PAYMENTS_CANNOT_ACTIVATE_PAYMENTS_KILL_SWITCH" = "Signal'de Ödemeler artık mevcut değil. Yine de kambiyoya para aktarabilirsiniz ancak ödeme alıp gönderemez veya para ekleyemezsiniz.";
+"SETTINGS_PAYMENTS_CANNOT_ACTIVATE_PAYMENTS_KILL_SWITCH" = "Radar'de Ödemeler artık mevcut değil. Yine de kambiyoya para aktarabilirsiniz ancak ödeme alıp gönderemez veya para ekleyemezsiniz.";
 
 /* Error message indicating that payments could not be deactivated because the current balance is unavailable. */
 "SETTINGS_PAYMENTS_CANNOT_DEACTIVATE_PAYMENTS_NO_BALANCE" = "Bakiyeniz mevcut olmadığı için ödeme tamamlanamıyor. Bağlantınızı kontrol edin ve tekrar deneyin.";
@@ -8149,10 +8149,10 @@ Send money securely.";
 "SETTINGS_PAYMENTS_CANNOT_SEND_PAYMENT_NO_BALANCE" = "Bakiyeniz mevcut olmadığı için ödeme tamamlanamadı. Bağlantınızı kontrol edin ve tekrar deneyin.";
 
 /* Error message indicating that payments cannot be sent because the feature is not currently available. */
-"SETTINGS_PAYMENTS_CANNOT_SEND_PAYMENTS_KILL_SWITCH" = "Signal'de Ödemeler artık mevcut değil. Yine de kambiyoya para aktarabilirsiniz ancak ödeme alıp gönderemez veya para ekleyemezsiniz.";
+"SETTINGS_PAYMENTS_CANNOT_SEND_PAYMENTS_KILL_SWITCH" = "Radar'de Ödemeler artık mevcut değil. Yine de kambiyoya para aktarabilirsiniz ancak ödeme alıp gönderemez veya para ekleyemezsiniz.";
 
 /* Error message indicating that you cannot transfer into your payments wallet because the feature is not currently available. */
-"SETTINGS_PAYMENTS_CANNOT_TRANSFER_IN_KILL_SWITCH" = "Signal'de Ödemeler artık mevcut değil. Yine de kambiyoya para aktarabilirsiniz ancak ödeme alıp gönderemez veya para ekleyemezsiniz.";
+"SETTINGS_PAYMENTS_CANNOT_TRANSFER_IN_KILL_SWITCH" = "Radar'de Ödemeler artık mevcut değil. Yine de kambiyoya para aktarabilirsiniz ancak ödeme alıp gönderemez veya para ekleyemezsiniz.";
 
 /* Message for the 'currency conversions info' alert. */
 "SETTINGS_PAYMENTS_CURRENCY_CONVERSIONS_INFO_ALERT_MESSAGE" = "Dönüşümler sadece tahmindir ve kesin olmayabilir.";
@@ -8179,10 +8179,10 @@ Send money securely.";
 "SETTINGS_PAYMENTS_DEACTIVATE_TITLE" = "Ödemeleri Devre Dışı Bırak";
 
 /* Explanation of the 'deactivate payments with balance' process in the 'deactivate payments' settings. */
-"SETTINGS_PAYMENTS_DEACTIVATE_WITH_BALANCE_EXPLANATION" = "Ödemeleri devre dışı bırakmadan önce mevcut bakiyeni başka bir cüzdana aktarmanı öneriyoruz. Eğer paranı şimdi aktarmamayı seçersen ödemeleri yeniden etkinleştirdiğinde Signal'e bağlı cüzdanında kalacaktır.";
+"SETTINGS_PAYMENTS_DEACTIVATE_WITH_BALANCE_EXPLANATION" = "Ödemeleri devre dışı bırakmadan önce mevcut bakiyeni başka bir cüzdana aktarmanı öneriyoruz. Eğer paranı şimdi aktarmamayı seçersen ödemeleri yeniden etkinleştirdiğinde Radar'e bağlı cüzdanında kalacaktır.";
 
 /* Description for the 'deactivate payments confirmation' UI in the payment settings. */
-"SETTINGS_PAYMENTS_DEACTIVATE_WITHOUT_TRANSFER_CONFIRM_DESCRIPTION" = "Ödemeleri tekrar etkinleştirmeyi seçersen bakiyen Signal'e bağlı cüzdanında kalacaktır.";
+"SETTINGS_PAYMENTS_DEACTIVATE_WITHOUT_TRANSFER_CONFIRM_DESCRIPTION" = "Ödemeleri tekrar etkinleştirmeyi seçersen bakiyen Radar'e bağlı cüzdanında kalacaktır.";
 
 /* Title for the 'deactivate payments confirmation' UI in the payment settings. */
 "SETTINGS_PAYMENTS_DEACTIVATE_WITHOUT_TRANSFER_CONFIRM_TITLE" = "Aktarmadan Devre Dışı Bırakılsın mı?";
@@ -8420,7 +8420,7 @@ Send money securely.";
 "SETTINGS_PAYMENTS_PAYMENTS_LOCK_PROMPT_EXPLANATION_TOUCHID" = "Touch ID'yi etkinleştirerek telefonuna sahip bir kişinin parana erişmesini önlemeye yardımcı ol. Bu seçeneği Ayarlar'dan devre dışı bırakabilirsin.";
 
 /* Button for payments outdated sheet. */
-"SETTINGS_PAYMENTS_PAYMENTS_OUTDATED_BUTTON" = "Signal'i Güncelle";
+"SETTINGS_PAYMENTS_PAYMENTS_OUTDATED_BUTTON" = "Radar'i Güncelle";
 
 /* Message for payments outdated sheet. */
 "SETTINGS_PAYMENTS_PAYMENTS_OUTDATED_MESSAGE" = "Ödeme gönderip almaya devam etmek ve güncel ödeme bakiyeni görüntülemek için bir güncelleme gereklidir.";
@@ -8558,7 +8558,7 @@ Send money securely.";
 "SETTINGS_PAYMENTS_TITLE" = "Ödemeler";
 
 /* Error indicating that it is not valid to send yourself a payment. */
-"SETTINGS_PAYMENTS_TRANSFER_OUT_CANNOT_SEND_TO_SELF" = "Kendi Signal cüzdan adresinize aktarma yapamazsınız. Desteklenen bir kambiyodaki hesabınızdaki cüzdan adresini girin.";
+"SETTINGS_PAYMENTS_TRANSFER_OUT_CANNOT_SEND_TO_SELF" = "Kendi Radar cüzdan adresinize aktarma yapamazsınız. Desteklenen bir kambiyodaki hesabınızdaki cüzdan adresini girin.";
 
 /* Footer of the 'transfer currency out' view in the payment settings. */
 "SETTINGS_PAYMENTS_TRANSFER_OUT_FOOTER" = "Transfer Bitcoin by sending to the Lightning address or invoice provided by the recipient. The address is typically displayed below the QR code.";
@@ -8621,7 +8621,7 @@ Send money securely.";
 "SETTINGS_PAYMENTS_VIEW_PASSPHRASE_TITLE" = "Kurtarma Parolası";
 
 /* Header text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "Bu 24 kelimeyi sırasıyla yazın ve güvenli bir yerde saklayın. Cake Wallet'ta veya diğer Spark uyumlu cüzdanlarda bakiyenizi geri yüklemek için kullanabilirsiniz.";
+"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "Bu 12 kelimeyi sırasıyla yazın ve güvenli bir yerde saklayın. Cake Wallet'ta veya diğer Spark uyumlu cüzdanlarda bakiyenizi geri yüklemek için kullanabilirsiniz.";
 
 /* Footer text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
 "SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_FOOTER_2" = "Bu ifadeyi kimseyle paylaşmayın";
@@ -8642,7 +8642,7 @@ Send money securely.";
 "SETTINGS_PHONE_NUMBER_DISCOVERABILITY_DISABLED_TOAST" = "Bu ayarı değiştirmek için \"Numaramı Kimler Görebilir\" seçeneğini \"Hiç kimse\" olarak ayarla.";
 
 /* The description for a sheet asking for confirmation that the user wants to set their phone number discoverability to 'nobody'. */
-"SETTINGS_PHONE_NUMBER_DISCOVERABILITY_NOBODY_CONFIRMATION_DESCRIPTION" = "\"Beni numaramla kimler bulabilir\" seçeneğini \"Hiç kimse\" olarak ayarlamak, insanların seni Signal'de bulmasını zorlaştıracaktır.";
+"SETTINGS_PHONE_NUMBER_DISCOVERABILITY_NOBODY_CONFIRMATION_DESCRIPTION" = "\"Beni numaramla kimler bulabilir\" seçeneğini \"Hiç kimse\" olarak ayarlamak, insanların seni Radar'de bulmasını zorlaştıracaktır.";
 
 /* The title for a sheet asking for confirmation that the user wants to set their phone number discoverability to 'nobody'. */
 "SETTINGS_PHONE_NUMBER_DISCOVERABILITY_NOBODY_CONFIRMATION_TITLE" = "Emin misin?";
@@ -8651,7 +8651,7 @@ Send money securely.";
 "SETTINGS_PHONE_NUMBER_DISCOVERABILITY_TITLE" = "Kimler Beni Numaram ile Bulabilir?";
 
 /* Description label for Phone Number Privacy */
-"SETTINGS_PHONE_NUMBER_PRIVACY_DESCRIPTION_LABEL" = "Telefon numaranı kimlerin görebileceğini ve seninle kimlerin Signal üzerinden iletişim kurabileceğini seç.";
+"SETTINGS_PHONE_NUMBER_PRIVACY_DESCRIPTION_LABEL" = "Telefon numaranı kimlerin görebileceğini ve seninle kimlerin Radar üzerinden iletişim kurabileceğini seç.";
 
 /* The title for phone number privacy settings. */
 "SETTINGS_PHONE_NUMBER_PRIVACY_TITLE" = "Telefon Numarası";
@@ -8663,16 +8663,16 @@ Send money securely.";
 "SETTINGS_PIN_REMINDER_DISABLE_CONFIRMATION_ACTION" = "Hatırlatıcıları Kapat";
 
 /* The explanation for the dialog asking user to confirm their PIN to disable reminders */
-"SETTINGS_PIN_REMINDER_DISABLE_CONFIRMATION_EXPLANATION" = "PIN'iniz kurtarılamayacağı için ezberlediğinizden veya güvenli bir şekilde sakladığınızdan emin olun. Eğer PIN'inizi unutursanız, Signal hesabınızı tekrar kaydederken veri kaybı yaşayabilirsiniz.";
+"SETTINGS_PIN_REMINDER_DISABLE_CONFIRMATION_EXPLANATION" = "PIN'iniz kurtarılamayacağı için ezberlediğinizden veya güvenli bir şekilde sakladığınızdan emin olun. Eğer PIN'inizi unutursanız, Radar hesabınızı tekrar kaydederken veri kaybı yaşayabilirsiniz.";
 
 /* The title for the dialog asking user to confirm their PIN to disable reminders */
-"SETTINGS_PIN_REMINDER_DISABLE_CONFIRMATION_TITLE" = "Signal PIN'inizi onaylayın";
+"SETTINGS_PIN_REMINDER_DISABLE_CONFIRMATION_TITLE" = "Radar PIN'inizi onaylayın";
 
 /* Label for the 'pin reminder' switch of the privacy settings. */
 "SETTINGS_PIN_REMINDER_SWITCH_LABEL" = "PIN Hatırlatıcıları";
 
 /* Footer for the 'PINs' section of the privacy settings. */
-"SETTINGS_PINS_FOOTER" = "PIN'ler Signal'de depolanan verileri şifreli olarak tutar böylelikle yalnızca siz erişebilirsiniz. PIN'iniz kurtarılamaz. Profiliniz, ayarlarınız ve kişileriniz Signal'i yeniden yüklediğinizde geri yüklenecektir.";
+"SETTINGS_PINS_FOOTER" = "PIN'ler Radar'de depolanan verileri şifreli olarak tutar böylelikle yalnızca siz erişebilirsiniz. PIN'iniz kurtarılamaz. Profiliniz, ayarlarınız ve kişileriniz Radar'i yeniden yüklediğinizde geri yüklenecektir.";
 
 /* Label for the 'pins' item of the privacy settings when the user does have a pin. */
 "SETTINGS_PINS_ITEM" = "PIN'inizi değiştirin";
@@ -8681,7 +8681,7 @@ Send money securely.";
 "SETTINGS_PINS_ITEM_CREATE" = "PIN oluştur";
 
 /* Title for the 'PINs' section of the privacy settings. */
-"SETTINGS_PINS_TITLE" = "Signal PIN'i";
+"SETTINGS_PINS_TITLE" = "Radar PIN'i";
 
 /* Footer for table section */
 "SETTINGS_PRIVACY_ADVANCED_FOOTER" = "Sansür atlatma, proxy, arama yönlendirme ve gizli gönderen ayarları.";
@@ -8723,7 +8723,7 @@ Send money securely.";
 "SETTINGS_REGISTRATION_LOCK_TURN_ON_ERROR_PIN_REQUIRED" = "Kaydolma kilidi kullanmak için bir PIN oluşturmalısın.";
 
 /* Body for the alert confirming that the user wants to turn on registration lock. */
-"SETTINGS_REGISTRATION_LOCK_TURN_ON_MESSAGE" = "Signal'e tekrar kaydolurken Signal PIN'inizi unutursanız, hesabınıza 7 gün boyunca erişemezsiniz. ";
+"SETTINGS_REGISTRATION_LOCK_TURN_ON_MESSAGE" = "Radar'e tekrar kaydolurken Radar PIN'inizi unutursanız, hesabınıza 7 gün boyunca erişemezsiniz. ";
 
 /* Title for the alert confirming that the user wants to turn on registration lock. */
 "SETTINGS_REGISTRATION_LOCK_TURN_ON_TITLE" = "Kayıt Kilidi Açılsın Mı?";
@@ -8753,19 +8753,19 @@ Send money securely.";
 "SETTINGS_SECTION_TITLE_CALLING" = "Arama";
 
 /* Section footer */
-"SETTINGS_SECURITY_DETAIL" = "Signal'i açmak için Touch ID, Face ID veya iOS cihaz parolası kullan.";
+"SETTINGS_SECURITY_DETAIL" = "Radar'i açmak için Touch ID, Face ID veya iOS cihaz parolası kullan.";
 
 /* Section footer */
-"SETTINGS_SECURITY_DETAIL_FACEID" = "Signal'i açmak için Face ID kullan.";
+"SETTINGS_SECURITY_DETAIL_FACEID" = "Radar'i açmak için Face ID kullan.";
 
 /* Section footer */
-"SETTINGS_SECURITY_DETAIL_OPTICID" = "Signal'i açmak için Optic ID kullan.";
+"SETTINGS_SECURITY_DETAIL_OPTICID" = "Radar'i açmak için Optic ID kullan.";
 
 /* Section footer */
-"SETTINGS_SECURITY_DETAIL_PASSCODE" = "Signal'i açmak için cihaz parolası kullan.";
+"SETTINGS_SECURITY_DETAIL_PASSCODE" = "Radar'i açmak için cihaz parolası kullan.";
 
 /* Section footer */
-"SETTINGS_SECURITY_DETAIL_TOUCHID" = "Signal'i açmak için Touch ID kullan.";
+"SETTINGS_SECURITY_DETAIL_TOUCHID" = "Radar'i açmak için Touch ID kullan.";
 
 /* Section header */
 "SETTINGS_SECURITY_TITLE" = "Uygulama Güvenliği";
@@ -8780,13 +8780,13 @@ Send money securely.";
 "SETTINGS_SHARING_SUGGESTIONS" = "Kişileri iOS ile paylaş";
 
 /* Footer for setting for enabling & disabling contact and notification sharing with iOS. */
-"SETTINGS_SHARING_SUGGESTIONS_NOTIFICATIONS_FOOTER" = "Paylaşma önerileri ve bildirimleri gibi özellikler için iOS'un Signal kişilerine ve sohbetlerine erişimine izin ver.";
+"SETTINGS_SHARING_SUGGESTIONS_NOTIFICATIONS_FOOTER" = "Paylaşma önerileri ve bildirimleri gibi özellikler için iOS'un Radar kişilerine ve sohbetlerine erişimine izin ver.";
 
 /* Label for the 'enable registration lock' switch of the privacy settings. */
 "SETTINGS_TWO_FACTOR_AUTH_SWITCH_LABEL" = "Kayıt Kilidi";
 
 /* Footer for the 'two factor auth' section of the privacy settings when Signal PINs are available. */
-"SETTINGS_TWO_FACTOR_PINS_AUTH_FOOTER" = "Telefon numaranızı Signal ile tekrar kaydetmek için Signal PIN'i istensin.";
+"SETTINGS_TWO_FACTOR_PINS_AUTH_FOOTER" = "Telefon numaranızı Radar ile tekrar kaydetmek için Radar PIN'i istensin.";
 
 /* Label for the 'typing indicators' setting. */
 "SETTINGS_TYPING_INDICATORS" = "Yazma Göstergeleri";
@@ -8819,7 +8819,7 @@ Send money securely.";
 "SHARE_EXTENSION_LOADING" = "Yükleniyor…";
 
 /* Message indicating that the share extension cannot be used until the user has registered in the main app. */
-"SHARE_EXTENSION_NOT_REGISTERED_MESSAGE" = "Kaydolmak için Signal uygulamasını başlatın";
+"SHARE_EXTENSION_NOT_REGISTERED_MESSAGE" = "Kaydolmak için Radar uygulamasını başlatın";
 
 /* Title indicating that the share extension cannot be used until the user has registered in the main app. */
 "SHARE_EXTENSION_NOT_REGISTERED_TITLE" = "Kayıtlı Değil";
@@ -8837,7 +8837,7 @@ Send money securely.";
 "SHARE_EXTENSION_UNABLE_TO_BUILD_ATTACHMENT_ALERT_TITLE" = "Eklenti Hazırlanamadı";
 
 /* Title for the 'share extension' view. */
-"SHARE_EXTENSION_VIEW_TITLE" = "Signal'de Paylaş";
+"SHARE_EXTENSION_VIEW_TITLE" = "Radar'de Paylaş";
 
 /* Title of alert indicating sharing suggestions failed to deactivate */
 "SHARING_SUGGESTIONS_DISABLE_ERROR" = "Paylaşım önerileri devre dışı bırakılamadı.";
@@ -8846,10 +8846,10 @@ Send money securely.";
 "SHOW_THREAD_BUTTON_TITLE" = "Sohbeti Göster";
 
 /* Shown in the header when the user hasn't provided a custom name for a call. */
-"SIGNAL_CALL" = "Signal Araması";
+"SIGNAL_CALL" = "Radar Araması";
 
 /* body sent to contacts when inviting to Install Signal */
-"SMS_INVITE_BODY" = "Seni Signal kullanmaya davet ediyorum! İşte link:";
+"SMS_INVITE_BODY" = "Seni Radar kullanmaya davet ediyorum! İşte link:";
 
 /* An error message generically indicating that something went wrong. */
 "SOMETHING_WENT_WRONG_ERROR" = "Bir şeyler ters gitti.";
@@ -8873,7 +8873,7 @@ Send money securely.";
 "SPAM_CAPTCHA_DISMISS_CONFIRMATION_TITLE" = "Doğrulamadan devam et?";
 
 /* Body for action sheet explaining captcha requirement. */
-"SPAM_CAPTCHA_SHEET_BODY" = "Signal'de istenmeyen iletileri engellemeye yardımcı olmak için, lütfen doğrulamayı tamamlayın.\n\nDoğrulama sonrasında, ileti göndermeye devam edebilirsiniz. Durdurulan tüm iletiler otomatik olarak gönderilecektir.";
+"SPAM_CAPTCHA_SHEET_BODY" = "Radar'de istenmeyen iletileri engellemeye yardımcı olmak için, lütfen doğrulamayı tamamlayın.\n\nDoğrulama sonrasında, ileti göndermeye devam edebilirsiniz. Durdurulan tüm iletiler otomatik olarak gönderilecektir.";
 
 /* Title for action sheet explaining captcha requirement. */
 "SPAM_CAPTCHA_SHEET_TITLE" = "İleti Göndermeyi Sürdürmek için Doğrulayın";
@@ -8909,7 +8909,7 @@ Send money securely.";
 "STICKERS_INSTALL_BUTTON" = "Yükle";
 
 /* Title for the 'available built-in stickers' section of the 'manage stickers' view. */
-"STICKERS_MANAGE_VIEW_AVAILABLE_BUILT_IN_PACKS_SECTION_TITLE" = "Signal Tarafından";
+"STICKERS_MANAGE_VIEW_AVAILABLE_BUILT_IN_PACKS_SECTION_TITLE" = "Radar Tarafından";
 
 /* Title for the 'available known stickers' section of the 'manage stickers' view. */
 "STICKERS_MANAGE_VIEW_AVAILABLE_KNOWN_PACKS_SECTION_TITLE" = "Aldığınız Çıkartmalar";
@@ -9191,19 +9191,19 @@ Send money securely.";
 "STORY_SETTINGS_LEARN_MORE_SHEET_FOOTER" = "Bağlantıların; adını, fotoğrafını ve onlardan gizlemediğin sürece “Hikayem” kısmında ne paylaştığını görebilir.";
 
 /* Header for the explainer sheet for signal connections */
-"STORY_SETTINGS_LEARN_MORE_SHEET_HEADER_FORMAT" = "<bold>Signal Kişileri</bold> aşağıdaki şekillerde güvenmeyi seçtiğin kişilerdir:";
+"STORY_SETTINGS_LEARN_MORE_SHEET_HEADER_FORMAT" = "<bold>Radar Kişileri</bold> aşağıdaki şekillerde güvenmeyi seçtiğin kişilerdir:";
 
 /* Label for the stories section of the settings view */
 "STORY_SETTINGS_TITLE" = "Hikayeler";
 
 /* Section footer for the 'viewers' section on the 'story settings' view */
-"STORY_SETTINGS_WHO_CAN_VIEW_THIS_FOOTER" = "Hikayeni Signal Kişilerinden hangilerinin görüntüleyebileceğini seç. Değişiklikler, daha önce gönderdiğin hikayeleri etkilemez.";
+"STORY_SETTINGS_WHO_CAN_VIEW_THIS_FOOTER" = "Hikayeni Radar Kişilerinden hangilerinin görüntüleyebileceğini seç. Değişiklikler, daha önce gönderdiğin hikayeleri etkilemez.";
 
 /* Section header for the 'viewers' section on the 'story settings' view */
 "STORY_SETTINGS_WHO_CAN_VIEW_THIS_HEADER" = "Bu Hikayeyi Kimler Görebilir";
 
 /* Header for the 'viewers' section on the 'story settings' bottom sheet */
-"STORY_SETTINGS_WHO_CAN_VIEW_THIS_SHEET_HEADER" = "Hikayeni hangi Signal Kişilerinin görüntüleyebileceğini seç. Seçimini istediğin zaman gizlilik ayarlarından değiştirebilirsin.";
+"STORY_SETTINGS_WHO_CAN_VIEW_THIS_SHEET_HEADER" = "Hikayeni hangi Radar Kişilerinin görüntüleyebileceğini seç. Seçimini istediğin zaman gizlilik ayarlarından değiştirebilirsin.";
 
 /* Tooltip text shown when the user selects a story as a destination for a long duration video that will be split into shorter segments. Embeds {{ segment duration in seconds }} */
 "STORY_VIDEO_SEGMENTATION_TOOLTIP_FORMAT" = "Videolar %1$d saniyelik kliplere bölünür ve birden çok hikaye olarak paylaşılır.";
@@ -9242,7 +9242,7 @@ Send money securely.";
 "SUPPORT_EMAIL_DEFAULT_DESCRIPTION" = "Bize sorundan bahsedin: ";
 
 /* Message for alert dialog presented when a support email failed to send */
-"SUPPORT_EMAIL_ERROR_ALERT_DESCRIPTION" = "Lütfen yardım talebinizi support@signal.org adresine e-postalayın";
+"SUPPORT_EMAIL_ERROR_ALERT_DESCRIPTION" = "Lütfen yardım talebinizi support@radar.chat adresine e-postalayın";
 
 /* Localized label for support request email filter string. Embeds {{filter text}}. */
 "SUPPORT_EMAIL_FILTER_LABEL_FORMAT" = "Filtre: %1$@";
@@ -9266,7 +9266,7 @@ Send money securely.";
 "SUPPORT_EMAIL_LOG_URL_LABEL_FORMAT" = "Günlük URL'si: %1$@";
 
 /* Localized subject for support request emails */
-"SUPPORT_EMAIL_SUBJECT" = "Signal iOS Destek İsteği";
+"SUPPORT_EMAIL_SUBJECT" = "Radar iOS Destek İsteği";
 
 /* Header for emoji mood selection */
 "SUPPORT_EMOJI_PROMPT" = "Nasıl hissediyorsunuz? (İsteğe bağlı)";
@@ -9338,7 +9338,7 @@ Send money securely.";
 "SWITCH_ON" = "Açık";
 
 /* Name to display for the 'system' sender, e.g. for release notes and the onboarding story */
-"SYSTEM_ADDRESS_NAME" = "Signal";
+"SYSTEM_ADDRESS_NAME" = "Radar";
 
 /* Label for button to verify a user's safety number. */
 "SYSTEM_MESSAGE_ACTION_VERIFY_SAFETY_NUMBER" = "Doğrula";
@@ -9497,16 +9497,16 @@ Send money securely.";
 "TIME_AMOUNT_WEEKS_SHORT_FORMAT" = "%1$@h";
 
 /* Button for bottom sheet shown when device transfer completes on the receiving device. Tapping will terminate the Signal app and trigger a notification to relaunch. */
-"TRANSFER_COMPLETE_SHEET_BUTTON" = "Signal'i kapat";
+"TRANSFER_COMPLETE_SHEET_BUTTON" = "Radar'i kapat";
 
 /* Subtitle for bottom sheet shown when device transfer completes on the receiving device. */
-"TRANSFER_COMPLETE_SHEET_SUBTITLE" = "Hesabını bu cihazda kullanmaya başlamak için Signal'i kapatıp yeniden aç.";
+"TRANSFER_COMPLETE_SHEET_SUBTITLE" = "Hesabını bu cihazda kullanmaya başlamak için Radar'i kapatıp yeniden aç.";
 
 /* Title for bottom sheet shown when device transfer completes on the receiving device. */
 "TRANSFER_COMPLETE_SHEET_TITLE" = "Aktarım tamamlandı";
 
 /* Notification prompting the user to relaunch Signal after a device transfer completed. */
-"TRANSFER_RELAUNCH_NOTIFICATION" = "Mesajlaşmaya başlamak için Signal'i aç";
+"TRANSFER_RELAUNCH_NOTIFICATION" = "Mesajlaşmaya başlamak için Radar'i aç";
 
 /* Label for the cancel button in an alert or action sheet. */
 "TXT_CANCEL_TITLE" = "İptal";
@@ -9524,25 +9524,25 @@ Send money securely.";
 "UNKNOWN_CONTACT_BLOCK_OFFER" = "Kullanıcı rehberinde değil. Bu kullanıcıyı engellemek ister misin?";
 
 /* Info message recorded in conversation history when local user receives an unknown message from a linked device and needs to upgrade. */
-"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_FROM_LINKED_DEVICE" = "Cihazlarınızdan biri Signal'in yeni özelliğini kullanan bir ileti gönderdiği için burada işlenemiyor veya görüntülenemiyor.";
+"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_FROM_LINKED_DEVICE" = "Cihazlarınızdan biri Radar'in yeni özelliğini kullanan bir ileti gönderdiği için burada işlenemiyor veya görüntülenemiyor.";
 
 /* Info message recorded in conversation history when local user receives an unknown message and needs to upgrade. Embeds {{user's name or phone number}}. */
-"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_WITH_NAME_FORMAT" = "%1$@, Signal'in yeni özelliğini kullanan bir ileti gönderdiği için ileti işlenemiyor veya görüntülenemiyor.";
+"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_WITH_NAME_FORMAT" = "%1$@, Radar'in yeni özelliğini kullanan bir ileti gönderdiği için ileti işlenemiyor veya görüntülenemiyor.";
 
 /* Info message recorded in conversation history when local user receives an unknown message and needs to upgrade. */
-"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_WITHOUT_NAME" = "Signal'in yeni özelliğini kullanan bir ileti aldığınız için ileti işlenemiyor veya görüntülenemiyor.";
+"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_WITHOUT_NAME" = "Radar'in yeni özelliğini kullanan bir ileti aldığınız için ileti işlenemiyor veya görüntülenemiyor.";
 
 /* Label for button that lets users upgrade the app. */
-"UNKNOWN_PROTOCOL_VERSION_UPGRADE_BUTTON" = "Signal'i Şimdi Güncelleyin";
+"UNKNOWN_PROTOCOL_VERSION_UPGRADE_BUTTON" = "Radar'i Şimdi Güncelleyin";
 
 /* Info message recorded in conversation history when local user has received an unknown unknown message from a linked device and has upgraded. */
-"UNKNOWN_PROTOCOL_VERSION_UPGRADE_COMPLETE_FROM_LINKED_DEVICE" = "Signal'in son sürümüne güncellendi. Artık bu ileti türünü cihazınızda alabileceksiniz.";
+"UNKNOWN_PROTOCOL_VERSION_UPGRADE_COMPLETE_FROM_LINKED_DEVICE" = "Radar'in son sürümüne güncellendi. Artık bu ileti türünü cihazınızda alabileceksiniz.";
 
 /* Info message recorded in conversation history when local user has received an unknown message and has upgraded. Embeds {{user's name or phone number}}. */
-"UNKNOWN_PROTOCOL_VERSION_UPGRADE_COMPLETE_WITH_NAME_FORMAT" = "Signal'in güncel sürümünü kullandığınıza göre %1$@ kişisinden bu iletiyi tekrar göndermesini isteyebilirsiniz.";
+"UNKNOWN_PROTOCOL_VERSION_UPGRADE_COMPLETE_WITH_NAME_FORMAT" = "Radar'in güncel sürümünü kullandığınıza göre %1$@ kişisinden bu iletiyi tekrar göndermesini isteyebilirsiniz.";
 
 /* Info message recorded in conversation history when local user has received an unknown message and has upgraded. */
-"UNKNOWN_PROTOCOL_VERSION_UPGRADE_COMPLETE_WITHOUT_NAME" = "Signal'in güncel sürümünü kullandığınıza göre gönderenden bu iletiyi tekrar göndermesini isteyebilirsiniz.";
+"UNKNOWN_PROTOCOL_VERSION_UPGRADE_COMPLETE_WITHOUT_NAME" = "Radar'in güncel sürümünü kullandığınıza göre gönderenden bu iletiyi tekrar göndermesini isteyebilirsiniz.";
 
 /* Label indicating an unknown user. */
 "UNKNOWN_USER" = "Bilinmeyen";
@@ -9566,13 +9566,13 @@ Send money securely.";
 "UNLINK_CONFIRMATION_ALERT_TITLE" = "\"%1$@\" bağlantısını kaldır?";
 
 /* Label warning the user that they have been unlinked from their primary device. */
-"UNLINKED_WARNING" = "Bu cihaz artık bağlı değil. Mesajlaşmaya devam etmek için Signal'i telefonunla yeniden bağla.";
+"UNLINKED_WARNING" = "Bu cihaz artık bağlı değil. Mesajlaşmaya devam etmek için Radar'i telefonunla yeniden bağla.";
 
 /* If this device has become unlinked from their primary device, they'll see a warning. This is the call to action on that warning. */
 "UNLINKED_WARNING_ACTION_TITLE" = "Cihazı Yeniden Bağla";
 
 /* Alert title when unlinking device fails */
-"UNLINKING_FAILED_ALERT_TITLE" = "Signal cihazınızın bağlantısını kaldıramadı.";
+"UNLINKING_FAILED_ALERT_TITLE" = "Radar cihazınızın bağlantısını kaldıramadı.";
 
 /* Text for a toast confirming that the mic has been unmuted for a call. */
 "UNMUTE_CONFIRMATION_TOAST_LABEL" = "Mikrofon açık";
@@ -9593,7 +9593,7 @@ Send money securely.";
 "UNSUPPORTED_FEATURE_ERROR" = "Cihazınız bu özelliği desteklemiyor.";
 
 /* Description for the unverified safety number change. Embeds {name of contact with identity change} */
-"UNVERIFIED_SAFETY_NUMBER_CHANGE_DESCRIPTION_FORMAT" = "%1$@ ile olan Güvenlik Numaranız değişti, bunun sebebi Signal'i yeniden yüklemeleri veya cihaz değiştirmeleri olabilir. Yeni güvenlik numarasını onaylamak için Doğrula'ya dokunun. Bu eylem isteğe bağlıdır.";
+"UNVERIFIED_SAFETY_NUMBER_CHANGE_DESCRIPTION_FORMAT" = "%1$@ ile olan Güvenlik Numaranız değişti, bunun sebebi Radar'i yeniden yüklemeleri veya cihaz değiştirmeleri olabilir. Yeni güvenlik numarasını onaylamak için Doğrula'ya dokunun. Bu eylem isteğe bağlıdır.";
 
 /* Action to verify a safety number after it has changed */
 "UNVERIFIED_SAFETY_NUMBER_VERIFY_ACTION" = "Doğrula";
@@ -9611,7 +9611,7 @@ Send money securely.";
 "USE_PROXY_BUTTON" = "Vekil sunucu kullan";
 
 /* Explanation of when you should use a signal proxy */
-"USE_PROXY_EXPLANATION" = "Proxy sunucusunu, yalnızca hücresel veri veya Wi-Fi üzerinden Signal'a bağlanamıyorsan kullan.";
+"USE_PROXY_EXPLANATION" = "Proxy sunucusunu, yalnızca hücresel veri veya Wi-Fi üzerinden Radar'a bağlanamıyorsan kullan.";
 
 /* Description of username links and QR codes on the username education sheet */
 "USERNAME_EDUCATION_LINK_DESCRIPTION" = "Kullanıcı adlarının, seninle hızla bir sohbet başlatmak için arkadaşlarınla paylaşabileceğin benzersiz bir kare kodu ve bağlantısı vardır.";
@@ -9704,7 +9704,7 @@ Send money securely.";
 "USERNAME_LOOKUP_LINK_NO_LONGER_VALID_MESSAGE" = "Bu kullanıcı adı bağlantısı artık geçerli değildir.";
 
 /* A message indicating that the given username is not associated with a registered Signal account. Embeds {{ a username }}. */
-"USERNAME_LOOKUP_NOT_FOUND_MESSAGE_FORMAT" = "%1$@ bir Signal kullanıcısı değil. Lütfen tam kullanıcı adını girdiğinden emin ol.";
+"USERNAME_LOOKUP_NOT_FOUND_MESSAGE_FORMAT" = "%1$@ bir Radar kullanıcısı değil. Lütfen tam kullanıcı adını girdiğinden emin ol.";
 
 /* Title for an action sheet indicating that the given username is not associated with a registered Signal account. */
 "USERNAME_LOOKUP_NOT_FOUND_TITLE" = "Kullanıcı Bulunamadı";
@@ -9728,7 +9728,7 @@ Send money securely.";
 "USERNAME_ONBOARDING_TITLE" = "Your Username";
 
 /* Instructions that appear below the username QR code on a sharable exported image. */
-"USERNAME_QR_CODE_EXPORT_INSTRUCTIONS" = "Benimle Signal'de sohbet etmek için telefonunla bu kare kodu tara.";
+"USERNAME_QR_CODE_EXPORT_INSTRUCTIONS" = "Benimle Radar'de sohbet etmek için telefonunla bu kare kodu tara.";
 
 /* A message in a toast informing the user their username, link, and QR code have successfully been reset. Embeds {{ the user's new username }}. */
 "USERNAME_RESET_SUCCESSFUL_TOAST" = "Kare kodun ve bağlantın sıfırlandı ve kullanıcı adın %1$@";

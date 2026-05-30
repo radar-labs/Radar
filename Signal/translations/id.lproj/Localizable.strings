@@ -2,7 +2,7 @@
 "AB_PERMISSION_MISSING_ACTION_NOT_NOW" = "Jangan sekarang";
 
 /* Title for the 'about' help section */
-"ABOUT_SECTION_TITLE" = "Tentang Signal";
+"ABOUT_SECTION_TITLE" = "Tentang Radar";
 
 /* Accessibility label for attachment. */
 "ACCESSIBILITY_LABEL_ATTACHMENT" = "Lampiran";
@@ -32,7 +32,7 @@
 "ACCOUNT_DATA_REPORT_CONFIRM_EXPORT_CONFIRM_BUTTON" = "Ekspor Laporan";
 
 /* Users can request a report of their account data. Before they get their account export, they are warned to only share account data with trustworthy sources. This is the message on that warning. */
-"ACCOUNT_DATA_REPORT_CONFIRM_EXPORT_MESSAGE" = "Hanya bagikan data akun Signal Anda dengan orang atau aplikasi yang Anda percayai.";
+"ACCOUNT_DATA_REPORT_CONFIRM_EXPORT_MESSAGE" = "Hanya bagikan data akun Radar Anda dengan orang atau aplikasi yang Anda percayai.";
 
 /* Users can request a report of their account data. If this request fails (probably because of a network connection problem), they will see an error sheet. This is the message on that error. */
 "ACCOUNT_DATA_REPORT_ERROR_MESSAGE" = "Periksa koneksi Anda dan coba lagi.";
@@ -56,16 +56,16 @@
 "ACCOUNT_DATA_REPORT_EXPORT_REPORT_BUTTON" = "Ekspor Laporan";
 
 /* Users can request a report of their account data. This text appears at the bottom of this screen, offering more information. */
-"ACCOUNT_DATA_REPORT_FOOTER" = "Laporan Anda dibuat hanya pada saat proses ekspor dan tidak disimpan oleh Signal di perangkat Anda.";
+"ACCOUNT_DATA_REPORT_FOOTER" = "Laporan Anda dibuat hanya pada saat proses ekspor dan tidak disimpan oleh Radar di perangkat Anda.";
 
 /* Users can request a report of their account data. This is the subtitle on the screen where they do this, giving them more information. */
-"ACCOUNT_DATA_REPORT_SUBTITLE" = "Unduh dan ekspor laporan data akun Signal Anda. Laporan ini tidak menyertakan pesan atau media apa pun.";
+"ACCOUNT_DATA_REPORT_SUBTITLE" = "Unduh dan ekspor laporan data akun Radar Anda. Laporan ini tidak menyertakan pesan atau media apa pun.";
 
 /* Users can request a report of their account data. This is the title on the screen where they do this. */
 "ACCOUNT_DATA_REPORT_TITLE" = "Data Akun Anda";
 
 /* Label for 'invite' button in contact view. */
-"ACTION_INVITE" = "Undang gabung ke Signal";
+"ACTION_INVITE" = "Undang gabung ke Radar";
 
 /* Label for button that lets you send a message to a contact. */
 "ACTION_SEND_MESSAGE" = "Kirim pesan";
@@ -83,7 +83,7 @@
 "ACTION_VIDEO_CALL" = "Panggilan video";
 
 /* Label for 'voice call' button in contact view. */
-"ACTION_VOICE_CALL" = "Panggilan Signal";
+"ACTION_VOICE_CALL" = "Panggilan Radar";
 
 /* The title for the 'add group members' view. */
 "ADD_GROUP_MEMBERS_VIEW_TITLE" = "Tambahkan anggota";
@@ -203,40 +203,40 @@
 "APN_Message" = "Anda mungkin memiliki pesan baru";
 
 /* Default message for the 'app launch failed' alert. */
-"APP_LAUNCH_FAILURE_ALERT_MESSAGE" = "Signal tidak dapat dibuka. Mohon kirimkan log debug ke support@signal.org agar kami bisa mengatasi masalah ini.";
+"APP_LAUNCH_FAILURE_ALERT_MESSAGE" = "Radar tidak dapat dibuka. Mohon kirimkan log debug ke support@radar.chat agar kami bisa mengatasi masalah ini.";
 
 /* Button to try launching the app even though the last launch failed */
-"APP_LAUNCH_FAILURE_CONTINUE" = "Buka Signal";
+"APP_LAUNCH_FAILURE_CONTINUE" = "Buka Radar";
 
 /* Message for an error indicating that the app couldn't launch because some unexpected error happened with the user's registration status. */
-"APP_LAUNCH_FAILURE_CORRUPT_REGISTRATION_MESSAGE" = "Mohon kirimkan catatan awakutu ke support@signal.org sehingga kami bisa memecahkan masalah ini.";
+"APP_LAUNCH_FAILURE_CORRUPT_REGISTRATION_MESSAGE" = "Mohon kirimkan catatan awakutu ke support@radar.chat sehingga kami bisa memecahkan masalah ini.";
 
 /* Title for an error indicating that the app couldn't launch because some unexpected error happened with the user's registration status. */
-"APP_LAUNCH_FAILURE_CORRUPT_REGISTRATION_TITLE" = "Tidak Dapat Membuka Signal";
+"APP_LAUNCH_FAILURE_CORRUPT_REGISTRATION_TITLE" = "Tidak Dapat Membuka Radar";
 
 /* Error indicating that the app could not launch because the database could not be loaded. */
 "APP_LAUNCH_FAILURE_COULD_NOT_LOAD_DATABASE" = "Tidak dapat memuat database";
 
 /* Error indicating that the app could not launch without reverting unknown database migrations. */
-"APP_LAUNCH_FAILURE_INVALID_DATABASE_VERSION_MESSAGE" = "Mohon upgrade Signal ke versi terbaru.";
+"APP_LAUNCH_FAILURE_INVALID_DATABASE_VERSION_MESSAGE" = "Mohon upgrade Radar ke versi terbaru.";
 
 /* Error indicating that the app could not launch without reverting unknown database migrations. */
 "APP_LAUNCH_FAILURE_INVALID_DATABASE_VERSION_TITLE" = "Versi database tidak diketahui";
 
 /* Error indicating that the app crashed during the previous launch. */
-"APP_LAUNCH_FAILURE_LAST_LAUNCH_CRASHED_MESSAGE" = "Terjadi kesalahan saat membuka Signal. Mohon kirimkan log debug ke support@signal.org untuk mengatasi masalah ini.";
+"APP_LAUNCH_FAILURE_LAST_LAUNCH_CRASHED_MESSAGE" = "Terjadi kesalahan saat membuka Radar. Mohon kirimkan log debug ke support@radar.chat untuk mengatasi masalah ini.";
 
 /* Error indicating that the app crashed during the previous launch. */
-"APP_LAUNCH_FAILURE_LAST_LAUNCH_CRASHED_TITLE" = "Tidak dapat membuka Signal";
+"APP_LAUNCH_FAILURE_LAST_LAUNCH_CRASHED_TITLE" = "Tidak dapat membuka Radar";
 
 /* Error description indicating that the app crashed because there was low storage space available on the device. */
-"APP_LAUNCH_FAILURE_LOW_STORAGE_SPACE_AVAILABLE_MESSAGE" = "Signal tidak bisa dibuka karena penyimpanan Anda hampir penuh. Buka pengaturan perangkat lalu kosongkan dan kelola penyimpanan Anda.";
+"APP_LAUNCH_FAILURE_LOW_STORAGE_SPACE_AVAILABLE_MESSAGE" = "Radar tidak bisa dibuka karena penyimpanan Anda hampir penuh. Buka pengaturan perangkat lalu kosongkan dan kelola penyimpanan Anda.";
 
 /* Error title indicating that the app crashed because there was low storage space available on the device. */
 "APP_LAUNCH_FAILURE_LOW_STORAGE_SPACE_AVAILABLE_TITLE" = "Penyimpanan hampir penuh";
 
 /* Error indicating that the app could not restore transferred data. */
-"APP_LAUNCH_FAILURE_RESTORE_FAILED_MESSAGE" = "Data yang ditransfer dari perangkat lama tidak dapat dipulihkan. Mohon kirimkan log debug ke support@signal.org sehingga kami dapat menyelesaikan masalah ini. Jika Anda menginstal ulang Signal, riwayat pesan mungkin hilang.";
+"APP_LAUNCH_FAILURE_RESTORE_FAILED_MESSAGE" = "Data yang ditransfer dari perangkat lama tidak dapat dipulihkan. Mohon kirimkan log debug ke support@radar.chat sehingga kami dapat menyelesaikan masalah ini. Jika Anda menginstal ulang Radar, riwayat pesan mungkin hilang.";
 
 /* Error indicating that the app could not restore transferred data. */
 "APP_LAUNCH_FAILURE_RESTORE_FAILED_TITLE" = "Tidak dapat menyelesaikan transfer";
@@ -260,7 +260,7 @@
 "APP_UPDATE_NAG_ALERT_MESSAGE_FORMAT" = "Versi %1$@ telah tersedia di App Store.";
 
 /* Title for the 'new app version available' alert. */
-"APP_UPDATE_NAG_ALERT_TITLE" = "Signal versi terbaru sudah tersedia";
+"APP_UPDATE_NAG_ALERT_TITLE" = "Radar versi terbaru sudah tersedia";
 
 /* Label for the 'update' button in the 'new app version available' alert. */
 "APP_UPDATE_NAG_ALERT_UPDATE_BUTTON" = "Pembaruan";
@@ -410,7 +410,7 @@
 "ATTACHMENT_KEYBOARD_GIF" = "GIF";
 
 /* Text in chat attachment panel when Signal only has access to some photos/videos. This string is in a compact horizontal space, so it should be short if possible. */
-"ATTACHMENT_KEYBOARD_LIMITED_ACCESS" = "Akses Signal ke foto terbatas";
+"ATTACHMENT_KEYBOARD_LIMITED_ACCESS" = "Akses Radar ke foto terbatas";
 
 /* A button to select a location from the Attachment Keyboard */
 "ATTACHMENT_KEYBOARD_LOCATION" = "Lokasi";
@@ -422,7 +422,7 @@
 "ATTACHMENT_KEYBOARD_NO_MEDIA_TITLE" = "Tidak Ada Foto atau Video";
 
 /* Text in chat attachment panel explaining that user needs to give Signal permission to access photos. */
-"ATTACHMENT_KEYBOARD_NO_PHOTO_ACCESS" = "Signal tidak memiliki akses ke foto atau video Anda. Untuk mengaktifkan akses, buka Pengaturan dan ketuk Foto";
+"ATTACHMENT_KEYBOARD_NO_PHOTO_ACCESS" = "Radar tidak memiliki akses ke foto atau video Anda. Untuk mengaktifkan akses, buka Pengaturan dan ketuk Foto";
 
 /* Button in chat attachment panel to let user open Settings app and give Signal persmission to access photos. */
 "ATTACHMENT_KEYBOARD_OPEN_SETTINGS" = "Buka pengaturan";
@@ -527,7 +527,7 @@
 "BACKUP_ENABLEMENT_REMINDER_MEGAPHONE_ACTION" = "Aktifkan";
 
 /* Body for Backup enablement reminder megaphone */
-"BACKUP_ENABLEMENT_REMINDER_MEGAPHONE_BODY" = "Pesan tak bakal ada yang hilang saat Anda berganti ponsel atau menginstal ulang Signal.";
+"BACKUP_ENABLEMENT_REMINDER_MEGAPHONE_BODY" = "Pesan tak bakal ada yang hilang saat Anda berganti ponsel atau menginstal ulang Radar.";
 
 /* Title for Backup enablement reminder megaphone */
 "BACKUP_ENABLEMENT_REMINDER_MEGAPHONE_TITLE" = "Aktifkan pencadangan terenkripsi";
@@ -569,7 +569,7 @@
 "BACKUP_ONBOARDING_CANCEL_SHEET_TITLE" = "Keluar penyiapan pencadangan?";
 
 /* Body for a sheet warning users to their 'Recovery Key' safe. */
-"BACKUP_ONBOARDING_CONFIRM_KEY_KEEP_KEY_SAFE_SHEET_BODY" = "Signal tidak dapat membantu proses pemulihan data cadangan jika Anda kehilangan kunci. Simpan di tempat yang aman dan jangan bagikan dengan orang lain.";
+"BACKUP_ONBOARDING_CONFIRM_KEY_KEEP_KEY_SAFE_SHEET_BODY" = "Radar tidak dapat membantu proses pemulihan data cadangan jika Anda kehilangan kunci. Simpan di tempat yang aman dan jangan bagikan dengan orang lain.";
 
 /* Title for a sheet warning users to their 'Recovery Key' safe. */
 "BACKUP_ONBOARDING_CONFIRM_KEY_KEEP_KEY_SAFE_SHEET_TITLE" = "Pastikan Kunci Anda Aman";
@@ -596,10 +596,10 @@
 "BACKUP_ONBOARDING_INTRO_NOT_NOW_TOAST" = "Anda dapat mengaktifkan pencadangan di Pengaturan.";
 
 /* Subtitle for a view introducing Backups during an onboarding flow. */
-"BACKUP_ONBOARDING_INTRO_SUBTITLE" = "Cadangkan pesan dan media Anda menggunakan layanan penyimpanan Signal yang aman dan terenkripsi secara menyeluruh. Anda tidak akan kehilangan pesan saat berganti ponsel atau menginstal ulang Signal.";
+"BACKUP_ONBOARDING_INTRO_SUBTITLE" = "Cadangkan pesan dan media Anda menggunakan layanan penyimpanan Radar yang aman dan terenkripsi secara menyeluruh. Anda tidak akan kehilangan pesan saat berganti ponsel atau menginstal ulang Radar.";
 
 /* Title for a view introducing Backups during an onboarding flow. */
-"BACKUP_ONBOARDING_INTRO_TITLE" = "Signal Secure Backups";
+"BACKUP_ONBOARDING_INTRO_TITLE" = "Radar Secure Backups";
 
 /* Text for a bullet point in a view introducing the 'Recovery Key' during an onboarding flow. */
 "BACKUP_ONBOARDING_KEY_INTRO_BULLET_1" = "Kunci pemulihan adalah kode 64 karakter yang diperlukan untuk memulihkan data cadangan.";
@@ -617,10 +617,10 @@
 "BACKUP_ONBOARDING_KEY_INTRO_TITLE" = "Kunci Pemulihan";
 
 /* Body for a sheet shown when your Backup plan is downgraded. */
-"BACKUP_PLAN_DOWNGRADED_SHEET_BODY" = "Langganan pencadangan Anda kedaluwarsa karena tidak dapat diperpanjang dengan metode pembayaran yang dipilih.\n\nSilakan berlangganan ulang agar bisa lanjut mencadangkan media. Anda masih dapat menggunakan paket Signal Backups versi gratis.";
+"BACKUP_PLAN_DOWNGRADED_SHEET_BODY" = "Langganan pencadangan Anda kedaluwarsa karena tidak dapat diperpanjang dengan metode pembayaran yang dipilih.\n\nSilakan berlangganan ulang agar bisa lanjut mencadangkan media. Anda masih dapat menggunakan paket Radar Backups versi gratis.";
 
 /* Body for a sheet shown when your Backup plan is downgraded because you stopped using TestFlight. */
-"BACKUP_PLAN_DOWNGRADED_SHEET_BODY_TESTFLIGHT" = "Langganan pencadangan kedaluwarsa karena Anda tidak lagi menggunakan TestFlight.\n\nSilakan berlangganan ulang agar bisa lanjut mencadangkan media. Anda masih dapat menggunakan paket Signal Backups versi gratis.";
+"BACKUP_PLAN_DOWNGRADED_SHEET_BODY_TESTFLIGHT" = "Langganan pencadangan kedaluwarsa karena Anda tidak lagi menggunakan TestFlight.\n\nSilakan berlangganan ulang agar bisa lanjut mencadangkan media. Anda masih dapat menggunakan paket Radar Backups versi gratis.";
 
 /* Primary button for a sheet shown when your Backup plan is downgraded. */
 "BACKUP_PLAN_DOWNGRADED_SHEET_PRIMARY_BUTTON" = "Kelola Pencadangan";
@@ -650,7 +650,7 @@
 "BACKUP_RESTORE_MODAL_TITLE" = "Memulihkan Pesan …";
 
 /* Message describing that the Background App Refresh permission is disabled for Signal. \"Background App Refresh\" should be localized the same way it is in iOS Settings app permissions. */
-"BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_MESSAGE" = "Pencadangan otomatis dinonaktifkan. Aktifkan pencadangan otomatis dengan memperbarui izin Signal.";
+"BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_MESSAGE" = "Pencadangan otomatis dinonaktifkan. Aktifkan pencadangan otomatis dengan memperbarui izin Radar.";
 
 /* Add-on to a message describing that the Background App Refresh permission is disabled for Signal. \"Background App Refresh\" should be localized the same way it is in iOS Settings app permissions. */
 "BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_MESSAGE_UPDATE_NOW" = "Perbarui Sekarang";
@@ -659,7 +659,7 @@
 "BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_SHEET_GO_TO_SETTINGS_BUTTON" = "Buka Pengaturan";
 
 /* Message for a sheet warning the user about the Background App Refresh permission. \"Background App Refresh\" should be localized the same way it is in iOS Settings app permissions. */
-"BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_SHEET_MESSAGE" = "Agar Signal dapat mencadangkan pesan secara otomatis, ketuk \"Buka Pengaturan\" di bawah dan aktifkan \"Penyegaran Aplikasi Latar Belakang\"";
+"BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_SHEET_MESSAGE" = "Agar Radar dapat mencadangkan pesan secara otomatis, ketuk \"Buka Pengaturan\" di bawah dan aktifkan \"Penyegaran Aplikasi Latar Belakang\"";
 
 /* Title for a sheet warning the user about the Background App Refresh permission. \"Background App Refresh\" should be localized the same way it is in iOS Settings app permissions. */
 "BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_SHEET_TITLE" = "Pencadangan Otomatis Dinonaktifkan";
@@ -746,7 +746,7 @@
 "BACKUP_SETTINGS_BACKUP_PLAN_PAID_BUT_IAP_NOT_FOUND_LOCALLY_ACTION_BUTTON_TITLE" = "Perbarui";
 
 /* Text describing that the user's paid backup plan did not correspond to a App Store subscription on this device. */
-"BACKUP_SETTINGS_BACKUP_PLAN_PAID_BUT_IAP_NOT_FOUND_LOCALLY_DESCRIPTION" = "Langganan Anda tidak ditemukan di perangkat ini. Perbarui langganan agar bisa terus menggunakan Signal Backups.";
+"BACKUP_SETTINGS_BACKUP_PLAN_PAID_BUT_IAP_NOT_FOUND_LOCALLY_DESCRIPTION" = "Langganan Anda tidak ditemukan di perangkat ini. Perbarui langganan agar bisa terus menggunakan Radar Backups.";
 
 /* Header describing what the paid backup plan includes. */
 "BACKUP_SETTINGS_BACKUP_PLAN_PAID_HEADER" = "Pencadangan pesan + semua media";
@@ -758,16 +758,16 @@
 "BACKUP_SETTINGS_BACKUP_PLAN_PAID_RENEWAL_FORMAT" = "Diperpanjang %1$@";
 
 /* Footer for a menu section related to settings for when Backups are disabled. */
-"BACKUP_SETTINGS_BACKUPS_DISABLED_SECTION_FOOTER" = "Pencadangan telah dinonaktifkan dan data Anda telah dihapus dari layanan penyimpanan aman Signal.";
+"BACKUP_SETTINGS_BACKUPS_DISABLED_SECTION_FOOTER" = "Pencadangan telah dinonaktifkan dan data Anda telah dihapus dari layanan penyimpanan aman Radar.";
 
 /* Description for a progress view tracking media being downloaded in service of disabling Backups. */
-"BACKUP_SETTINGS_BACKUPS_DISABLING_DOWNLOADING_MEDIA_PROGRESS_VIEW_DESCRIPTION" = "Signal Backups telah dinonaktifkan, media apa pun yang belum ada di perangkat ini akan diunduh sekarang. Setelah diunduh, data Anda akan dihapus dari layanan penyimpanan aman Signal.";
+"BACKUP_SETTINGS_BACKUPS_DISABLING_DOWNLOADING_MEDIA_PROGRESS_VIEW_DESCRIPTION" = "Radar Backups telah dinonaktifkan, media apa pun yang belum ada di perangkat ini akan diunduh sekarang. Setelah diunduh, data Anda akan dihapus dari layanan penyimpanan aman Radar.";
 
 /* Message for a view indicating we failed to delete the user's Backup due to an unexpected error. */
 "BACKUP_SETTINGS_BACKUPS_DISABLING_GENERIC_ERROR_MESSAGE" = "Terjadi kesalahan. Silakan hubungi tim dukungan.";
 
 /* Header for a menu section related to settings for when disabling Backups encountered an unexpected error. */
-"BACKUP_SETTINGS_BACKUPS_DISABLING_GENERIC_ERROR_SECTION_HEADER" = "Terjadi kesalahan saat menghapus data dari layanan penyimpanan aman Signal.";
+"BACKUP_SETTINGS_BACKUPS_DISABLING_GENERIC_ERROR_SECTION_HEADER" = "Terjadi kesalahan saat menghapus data dari layanan penyimpanan aman Radar.";
 
 /* Title for a view indicating we failed to delete the user's Backup due to an unexpected error. */
 "BACKUP_SETTINGS_BACKUPS_DISABLING_GENERIC_ERROR_TITLE" = "Gagal Menghapus Cadangan";
@@ -776,7 +776,7 @@
 "BACKUP_SETTINGS_BACKUPS_DISABLING_PROGRESS_VIEW_DESCRIPTION" = "Menghapus Cadangan …";
 
 /* Header for a menu section related to disabling Backups. */
-"BACKUP_SETTINGS_BACKUPS_DISABLING_SECTION_HEADER" = "Signal Backups telah dinonaktifkan dan data Anda akan dihapus dari layanan penyimpanan aman Signal.";
+"BACKUP_SETTINGS_BACKUPS_DISABLING_SECTION_HEADER" = "Radar Backups telah dinonaktifkan dan data Anda akan dihapus dari layanan penyimpanan aman Radar.";
 
 /* Header for a menu section related to settings for when Backups are enabled. */
 "BACKUP_SETTINGS_BACKUPS_ENABLED_SECTION_HEADER" = "Detail Pencadangan";
@@ -824,25 +824,25 @@
 "BACKUP_SETTINGS_DISABLING_CONFIRMATION_ACTION_SHEET_TITLE" = "Nonaktifkan dan Hapus Cadangan?";
 
 /* Message shown in an action sheet when the user disables Backups, explaining that their media is downloading first. */
-"BACKUP_SETTINGS_DISABLING_DOWNLOADS_STARTED_ACTION_SHEET_MESSAGE" = "Ada media di data cadangan Anda yang belum tersimpan di perangkat ini. Data cadangan Anda mungkin butuh waktu lama untuk diunduh, pastikan Signal tetap terbuka agar tidak terjadi interupsi.";
+"BACKUP_SETTINGS_DISABLING_DOWNLOADS_STARTED_ACTION_SHEET_MESSAGE" = "Ada media di data cadangan Anda yang belum tersimpan di perangkat ini. Data cadangan Anda mungkin butuh waktu lama untuk diunduh, pastikan Radar tetap terbuka agar tidak terjadi interupsi.";
 
 /* Title shown in an action sheet when the user disables Backups, explaining that their media is downloading first. */
 "BACKUP_SETTINGS_DISABLING_DOWNLOADS_STARTED_ACTION_SHEET_TITLE" = "Mengunduh Cadangan";
 
 /* Message shown in an action sheet indicating we failed to delete the user's Backup due to an unexpected error. */
-"BACKUP_SETTINGS_DISABLING_ERROR_GENERIC_ERROR_ACTION_SHEET_MESSAGE" = "Terjadi kesalahan saat menghapus data dari layanan penyimpanan aman Signal.";
+"BACKUP_SETTINGS_DISABLING_ERROR_GENERIC_ERROR_ACTION_SHEET_MESSAGE" = "Terjadi kesalahan saat menghapus data dari layanan penyimpanan aman Radar.";
 
 /* Title shown in an action sheet indicating we failed to delete the user's Backup due to an unexpected error. */
 "BACKUP_SETTINGS_DISABLING_ERROR_GENERIC_ERROR_ACTION_SHEET_TITLE" = "Gagal Menghapus Cadangan";
 
 /* Message shown in an action sheet when the user tries to disable Backups, but is not registered. */
-"BACKUP_SETTINGS_DISABLING_ERROR_NOT_REGISTERED" = "Anda harus terdaftar untuk bisa menonaktifkan Signal Backups.";
+"BACKUP_SETTINGS_DISABLING_ERROR_NOT_REGISTERED" = "Anda harus terdaftar untuk bisa menonaktifkan Radar Backups.";
 
 /* Button for an action sheet shown when the user disables Backups, letting them manage their subscription. */
 "BACKUP_SETTINGS_DISABLING_SUBSCRIPTION_CANCEL_ACTION_SHEET_MANAGE_SUBSCRIPTION_BUTTON" = "Kelola Langganan";
 
 /* Message for an action sheet shown when the user disables Backups, but is still subscribed to the paid plan. */
-"BACKUP_SETTINGS_DISABLING_SUBSCRIPTION_CANCEL_ACTION_SHEET_MESSAGE" = "Jika ingin membatalkan langganan, ketuk Kelola Langganan > Signal > Batalkan Langganan";
+"BACKUP_SETTINGS_DISABLING_SUBSCRIPTION_CANCEL_ACTION_SHEET_MESSAGE" = "Jika ingin membatalkan langganan, ketuk Kelola Langganan > Radar > Batalkan Langganan";
 
 /* Title for an action sheet shown when the user disables Backups, but is still subscribed to the paid plan. */
 "BACKUP_SETTINGS_DISABLING_SUBSCRIPTION_CANCEL_ACTION_SHEET_TITLE" = "Anda masih berlangganan paket pencadangan berbayar";
@@ -920,7 +920,7 @@
 "BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_DOWNLOAD_SHEET_LATER_ACTION" = "Unduh Nanti";
 
 /* Message for an action sheet allowing users to download their offloaded media. */
-"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_DOWNLOAD_SHEET_MESSAGE" = "Ada media di data cadangan Anda yang belum tersimpan di perangkat ini. Proses pengunduhan mungkin perlu waktu cukup lama, pastikan aplikasi Signal tetap terbuka agar tidak ada interupsi selama proses tersebut.";
+"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_DOWNLOAD_SHEET_MESSAGE" = "Ada media di data cadangan Anda yang belum tersimpan di perangkat ini. Proses pengunduhan mungkin perlu waktu cukup lama, pastikan aplikasi Radar tetap terbuka agar tidak ada interupsi selama proses tersebut.";
 
 /* Action in an action sheet allowing users to download their offloaded media now. */
 "BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_DOWNLOAD_SHEET_NOW_ACTION" = "Unduh Sekarang";
@@ -941,13 +941,13 @@
 "BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_TOGGLE_FOOTER_AVAILABLE_FOR_TESTERS" = "Media yang tidak digunakan akan di-offload, tetapi dapat diunduh dari cadangan Anda kapan saja selagi Anda masih menggunakan TestFlight.";
 
 /* Footer for a toggle allowing users to change the Optimize Local Storage setting, if the toggle is unavailable. */
-"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_TOGGLE_FOOTER_UNAVAILABLE" = "Pengoptimalan penyimpanan hanya dapat digunakan dengan Signal Backups berbayar. Upgrade paket pencadangan Anda untuk mulai menggunakan fitur ini.";
+"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_TOGGLE_FOOTER_UNAVAILABLE" = "Pengoptimalan penyimpanan hanya dapat digunakan dengan Radar Backups berbayar. Upgrade paket pencadangan Anda untuk mulai menggunakan fitur ini.";
 
 /* Title for a toggle allowing users to change the Optimize Local Storage setting. */
 "BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_TOGGLE_TITLE" = "Optimalkan Penyimpanan di Perangkat";
 
 /* Subtitle for a notification telling the user they are out of remote storage space. */
-"BACKUP_SETTINGS_OUT_OF_STORAGE_SPACE_NOTIFICATION_SUBTITLE" = "Anda telah mencapai batas penyimpanan cadangan. Hapus beberapa file untuk mengosongkan ruang penyimpanan di Signal agar dapat terus mencadangkan chat dan media.";
+"BACKUP_SETTINGS_OUT_OF_STORAGE_SPACE_NOTIFICATION_SUBTITLE" = "Anda telah mencapai batas penyimpanan cadangan. Hapus beberapa file untuk mengosongkan ruang penyimpanan di Radar agar dapat terus mencadangkan chat dan media.";
 
 /* Title for a notification telling the user they are out of remote storage space. */
 "BACKUP_SETTINGS_OUT_OF_STORAGE_SPACE_NOTIFICATION_TITLE" = "Kapasitas Cadangan Penuh";
@@ -971,7 +971,7 @@
 "BACKUP_SETTINGS_SUBSCRIPTION_ALREADY_REDEEMED_NOTICE_TITLE" = "Tidak bisa mengklaim langganan pencadangan";
 
 /* Body for a sheet explaining that the user's Backups subscription was already redeemed. */
-"BACKUP_SETTINGS_SUBSCRIPTION_ALREADY_REDEEMED_SHEET_BODY" = "Terlalu banyak perangkat yang mencoba mengklaim langganan Anda bulan ini.\n\nAnda mungkin terlalu sering mendaftarkan ulang akun Signal atau terlalu banyak perangkat dengan langganan yang sama.";
+"BACKUP_SETTINGS_SUBSCRIPTION_ALREADY_REDEEMED_SHEET_BODY" = "Terlalu banyak perangkat yang mencoba mengklaim langganan Anda bulan ini.\n\nAnda mungkin terlalu sering mendaftarkan ulang akun Radar atau terlalu banyak perangkat dengan langganan yang sama.";
 
 /* Button for a sheet explaining that the user's Backups subscription was already redeemed. */
 "BACKUP_SETTINGS_SUBSCRIPTION_ALREADY_REDEEMED_SHEET_GOT_IT_BUTTON" = "Mengerti";
@@ -992,19 +992,19 @@
 "BACKUP_SETTINGS_UPLOAD_PROGRESS_SUBTITLE_PAUSED_NEEDS_WIFI" = "Pengunggahan media dijeda: menunggu Wi-Fi";
 
 /* Subtitle for a progress bar tracking uploads that are paused because the user is out of remote storage space. Embeds 1:{{ total storage space provided, e.g. 100 GB }}; 2:{{ space the user needs to free up by deleting media, e.g. 1 GB }}. */
-"BACKUP_SETTINGS_UPLOAD_PROGRESS_SUBTITLE_PAUSED_OUT_OF_STORAGE_SPACE_FORMAT" = "Batas penyimpanan sebesar %1$@ yang disertakan dalam paket pencadangan Anda telah dicapai. Untuk mencadangkan chat dan media yang baru, kosongkan ruang sebesar %2$@ di Signal, lalu ketuk “Cadangkan Sekarang”.";
+"BACKUP_SETTINGS_UPLOAD_PROGRESS_SUBTITLE_PAUSED_OUT_OF_STORAGE_SPACE_FORMAT" = "Batas penyimpanan sebesar %1$@ yang disertakan dalam paket pencadangan Anda telah dicapai. Untuk mencadangkan chat dan media yang baru, kosongkan ruang sebesar %2$@ di Radar, lalu ketuk “Cadangkan Sekarang”.";
 
 /* Subtitle for a progress bar tracking active uploading. Embeds 1:{{ the amount uploaded as a file size, e.g. 100 MB }}; 2:{{ the total amount to upload as a file size, e.g. 1 GB }}; 3:{{ the percentage uploaded as a percent, e.g. 40% }}. */
 "BACKUP_SETTINGS_UPLOAD_PROGRESS_SUBTITLE_RUNNING" = "Mengunggah %1$@ dari %2$@ (%3$@)";
 
 /* Message for a sheet shown after the user enables backups. */
-"BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_MESSAGE" = "Apabila volume data cadangan cukup besar, proses ini bisa jadi berlangsung cukup lama. Signal dapat digunakan seperti biasa saat pencadangan berlangsung.";
+"BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_MESSAGE" = "Apabila volume data cadangan cukup besar, proses ini bisa jadi berlangsung cukup lama. Radar dapat digunakan seperti biasa saat pencadangan berlangsung.";
 
 /* Title for a sheet shown after the user enables backups. */
-"BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_TITLE" = "Selamat datang di Signal Secure Backups. Mulai pencadangan data Anda sekarang.";
+"BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_TITLE" = "Selamat datang di Radar Secure Backups. Mulai pencadangan data Anda sekarang.";
 
 /* Message for a sheet shown when your Backup subscription fails to renew. */
-"BACKUP_SUBSCRIPTION_FAILED_TO_RENEW_SHEET_MESSAGE" = "Cek dan pastikan metode pembayaran Anda sudah yang terbaru. Ketuk Kelola Langganan > Signal > Perbarui Metode Pembayaran.";
+"BACKUP_SUBSCRIPTION_FAILED_TO_RENEW_SHEET_MESSAGE" = "Cek dan pastikan metode pembayaran Anda sudah yang terbaru. Ketuk Kelola Langganan > Radar > Perbarui Metode Pembayaran.";
 
 /* Primary button for a sheet shown when your Backup subscription fails to renew. */
 "BACKUP_SUBSCRIPTION_FAILED_TO_RENEW_SHEET_PRIMARY_BUTTON" = "Kelola Langganan";
@@ -1022,7 +1022,7 @@
 "BACKUPS_SETTINGS_TITLE" = "Secure Backups";
 
 /* Body for system notification or megaphone when backups is enabled. Embeds {{ time backups was enabled }} */
-"BACKUPS_TURNED_ON_NOTIFICATION_BODY_FORMAT" = "Signal Backups diaktifkan untuk akun ini pada %1$@. Ketuk untuk melihat.";
+"BACKUPS_TURNED_ON_NOTIFICATION_BODY_FORMAT" = "Radar Backups diaktifkan untuk akun ini pada %1$@. Ketuk untuk melihat.";
 
 /* Title for system notification or megaphone when backups is enabled */
 "BACKUPS_TURNED_ON_TITLE" = "Anda Mengaktifkan Backups";
@@ -1040,10 +1040,10 @@
 "BADGE_DETAILS_DONATE_TO_SIGNAL" = "Donasi Sekarang";
 
 /* When viewing someone else's donor badge, you'll see a sheet. This is the title on that sheet. Embeds {badge owner's short name} */
-"BADGE_DETAILS_TITLE_FOR_SUPPORTER" = "%1$@ mendukung Signal";
+"BADGE_DETAILS_TITLE_FOR_SUPPORTER" = "%1$@ mendukung Radar";
 
 /* String explaining to the user that their boost badge has expired on the badge expiry sheet. */
-"BADGE_EXPIRED_BOOST_BODY" = "Lencana Boost Anda telah kedaluwarsa dan tidak terlihat lagi di profil Anda.\n\nAnda dapat terus menggunakan Signal, tetapi untuk mendukung teknologi yang dikembangkan untuk Anda, mohon pertimbangkan untuk menjadi donatur bulanan.";
+"BADGE_EXPIRED_BOOST_BODY" = "Lencana Boost Anda telah kedaluwarsa dan tidak terlihat lagi di profil Anda.\n\nAnda dapat terus menggunakan Radar, tetapi untuk mendukung teknologi yang dikembangkan untuk Anda, mohon pertimbangkan untuk menjadi donatur bulanan.";
 
 /* String explaining to the user that their boost badge has expired while they are a current subscription sustainer on the badge expiry sheet. */
 "BADGE_EXPIRED_BOOST_CURRENT_SUSTAINER_BODY" = "Lencana Boost Anda telah kedaluwarsa dan tidak terlihat lagi di profil Anda.\n\nAnda dapat mengaktifkan kembali lencana Boost untuk 30 hari lagi dengan donasi satu-kali.";
@@ -1088,7 +1088,7 @@
 "BANK_DONATION_FOOTER_FIND_ACCOUNT_INFO" = "Temukan informasi rekening";
 
 /* On the bank transfer donation screen, a small amount of information text is shown. This is that text. It should (1) instruct users to enter their bank information (2) tell them that Signal does not collect or store their personal information. */
-"BANK_DONATION_SUBHEADER_TEXT" = "Masukkan detail bank Anda. Signal tidak mengumpulkan atau menyimpan informasi pribadi Anda.";
+"BANK_DONATION_SUBHEADER_TEXT" = "Masukkan detail bank Anda. Radar tidak mengumpulkan atau menyimpan informasi pribadi Anda.";
 
 /* Users can donate to Signal with a bank account. We are required to show them a mandate with information about bank transfers. This is a label for a button to agree to the mandate. */
 "BANK_MANDATE_AGREE" = "Setuju";
@@ -1097,7 +1097,7 @@
 "BANK_MANDATE_READ_MORE" = "Baca Lebih Lanjut";
 
 /* Users can donate to Signal with a bank account. We are required to show them a mandate with information about bank transfers. This is a subtitle about the payment processor Stripe above that mandate. */
-"BANK_MANDATE_SUBTITLE" = "Stripe memproses donasi yang diberikan ke Signal. Signal tidak mengumpulkan atau menyimpan informasi pribadi Anda.";
+"BANK_MANDATE_SUBTITLE" = "Stripe memproses donasi yang diberikan ke Radar. Radar tidak mengumpulkan atau menyimpan informasi pribadi Anda.";
 
 /* Users can donate to Signal with a bank account. We are required to show them a mandate with information about bank transfers. This is the title above that mandate. */
 "BANK_MANDATE_TITLE" = "Transfer Bank";
@@ -1253,7 +1253,7 @@
 "CALL_AUDIO_MISSED_WEEK_NOTIFICATION_BODY_FORMAT" = "📞 Panggilan suara tak terjawab pada %1$@";
 
 /* Alert message when calling and permissions for microphone are missing */
-"CALL_AUDIO_PERMISSION_MESSAGE" = "Anda dapat memberikan Signal akses ke mikrofon melalui bagian pengaturan iOS untuk menelepon atau merekam pesan suara di Signal.";
+"CALL_AUDIO_PERMISSION_MESSAGE" = "Anda dapat memberikan Radar akses ke mikrofon melalui bagian pengaturan iOS untuk menelepon atau merekam pesan suara di Radar.";
 
 /* Alert title when calling and permissions for microphone are missing */
 "CALL_AUDIO_PERMISSION_TITLE" = "Perlu akses ke mikrofon";
@@ -1319,7 +1319,7 @@
 "CALL_LINK_JOIN_REQUEST_PROMPT" = "Ingin bergabung …";
 
 /* Shown in a message bubble when you send a call link in a Signal chat */
-"CALL_LINK_LINK_PREVIEW_DESCRIPTION" = "Gunakan tautan ini untuk gabung ke panggilan Signal";
+"CALL_LINK_LINK_PREVIEW_DESCRIPTION" = "Gunakan tautan ini untuk gabung ke panggilan Radar";
 
 /* Text that appears on a toast in a call lobby before joining a call link informing the user what information will be shared with other call members when they have phone number sharing turned off. */
 "CALL_LINK_LOBBY_SHARING_INFO_PHONE_NUMBER_SHARING_OFF" = "Siapa pun yang bergabung ke panggilan ini via tautan akan melihat nama dan foto Anda.";
@@ -1343,7 +1343,7 @@
 "CALL_LINK_REQUIRE_APPROVAL" = "Perlu Persetujuan Admin";
 
 /* Button to open UI to share a Call Link with someone on Signal. */
-"CALL_LINK_SHARE_VIA_SIGNAL" = "Bagikan Tautan via Signal";
+"CALL_LINK_SHARE_VIA_SIGNAL" = "Bagikan Tautan via Radar";
 
 /* Button to open the system share sheet to share a Call Link. */
 "CALL_LINK_SHARE_VIA_SYSTEM" = "Bagikan Tautan";
@@ -1448,10 +1448,10 @@
 "CALLING_MEMBER_VIEW_YOUR_CAMERA_IS_OFF" = "Kamera mati";
 
 /* The generic name used for calls if CallKit privacy is enabled */
-"CALLKIT_ANONYMOUS_CONTACT_NAME" = "Penguna Signal";
+"CALLKIT_ANONYMOUS_CONTACT_NAME" = "Penguna Radar";
 
 /* The generic name used for group calls if CallKit privacy is enabled */
-"CALLKIT_ANONYMOUS_GROUP_NAME" = "Grup Signal";
+"CALLKIT_ANONYMOUS_GROUP_NAME" = "Grup Radar";
 
 /* Title for the calls list view. */
 "CALLS_LIST_TITLE" = "Panggilan";
@@ -1625,7 +1625,7 @@
 "CARD_DONATION_EXPIRATION_DATE_PLACEHOLDER" = "MM/YY";
 
 /* Users can choose to learn more about their credit/debit card donations, which will open a sheet with additional information. This is the body text of that sheet. */
-"CARD_DONATION_READ_MORE_SHEET_BODY" = "Signal tidak mengumpulkan atau menyimpan informasi pribadi saat Anda memberikan donasi.\n\nKami menggunakan Stripe sebagai pemroses pembayaran donasi Anda. Kami tidak mengakses, menahan, atau menyimpan informasi apa pun yang Anda berikan kepada mereka.\n\nSignal tidak dan tidak dapat menghubungkan donasi Anda ke akun Signal Anda.\n\nTerima kasih atas dukungan Anda!";
+"CARD_DONATION_READ_MORE_SHEET_BODY" = "Radar tidak mengumpulkan atau menyimpan informasi pribadi saat Anda memberikan donasi.\n\nKami menggunakan Stripe sebagai pemroses pembayaran donasi Anda. Kami tidak mengakses, menahan, atau menyimpan informasi apa pun yang Anda berikan kepada mereka.\n\nSignal tidak dan tidak dapat menghubungkan donasi Anda ke akun Radar Anda.\n\nTerima kasih atas dukungan Anda!";
 
 /* Users can choose to learn more about their credit/debit card donations, which will open a sheet with additional information. This is the title of that sheet. */
 "CARD_DONATION_READ_MORE_SHEET_TITLE" = "Informasi Anda bersifat pribadi";
@@ -1634,7 +1634,7 @@
 "CARD_DONATION_SUBHEADER_LEARN_MORE" = "Pelajari lebih lanjut.";
 
 /* On the credit/debit card donation screen, a small amount of information text is shown. This is that text. It should (1) instruct users to enter their credit/debit card information (2) tell them that Signal does not collect or store their personal information. */
-"CARD_DONATION_SUBHEADER_TEXT" = "Masukkan detail kartu Anda. Signal tidak mengumpulkan atau menyimpan informasi pribadi Anda.";
+"CARD_DONATION_SUBHEADER_TEXT" = "Masukkan detail kartu Anda. Radar tidak mengumpulkan atau menyimpan informasi pribadi Anda.";
 
 /* Title for the 'censorship circumvention country' view. */
 "CENSORSHIP_CIRCUMVENTION_COUNTRY_VIEW_TITLE" = "Pilih negara";
@@ -1715,7 +1715,7 @@
 "CHOOSE_BACKUP_PLAN_BULLET_STORAGE_AMOUNT" = "Penyimpanan %1$@";
 
 /* Message shown in an action sheet when the user tries to confirm a plan selection, but is not registered. */
-"CHOOSE_BACKUP_PLAN_CONFIRMATION_ERROR_NOT_REGISTERED" = "Anda harus terdaftar untuk bisa mengaktifkan Signal Backups.";
+"CHOOSE_BACKUP_PLAN_CONFIRMATION_ERROR_NOT_REGISTERED" = "Anda harus terdaftar untuk bisa mengaktifkan Radar Backups.";
 
 /* Message shown in an action sheet when the user tries to confirm selecting the paid plan, but encountered an error from Apple while purchasing. */
 "CHOOSE_BACKUP_PLAN_CONFIRMATION_ERROR_PURCHASE" = "Terjadi kesalahan. Silakan coba lagi.";
@@ -1772,7 +1772,7 @@
 "COMPARE_SAFETY_NUMBER_ACTION" = "Bandingkan dengan clipboard";
 
 /* Accessibility hint describing what you can do with the compose button */
-"COMPOSE_BUTTON_HINT" = "Pilih atau cari pengguna Signal untuk mulai diajak ngobrol.";
+"COMPOSE_BUTTON_HINT" = "Pilih atau cari pengguna Radar untuk mulai diajak ngobrol.";
 
 /* Accessibility label from compose button. */
 "COMPOSE_BUTTON_LABEL" = "Buat pesan";
@@ -1799,13 +1799,13 @@
 "COMPOSE_SCREEN_LIMITED_CONTACTS_CTA" = "Kelola";
 
 /* Multi-line label explaining why compose-screen contact picker is empty. */
-"COMPOSE_SCREEN_LIMITED_CONTACTS_PERMISSION" = "Signal memiliki akses terbatas ke kontak sistem Anda";
+"COMPOSE_SCREEN_LIMITED_CONTACTS_PERMISSION" = "Radar memiliki akses terbatas ke kontak sistem Anda";
 
 /* Button to open settings from an empty compose-screen contact picker. */
 "COMPOSE_SCREEN_MISSING_CONTACTS_CTA" = "Buka pengaturan";
 
 /* Multi-line label explaining why compose-screen contact picker is empty. */
-"COMPOSE_SCREEN_MISSING_CONTACTS_PERMISSION" = "Anda dapat memberikan Signal akses ke kontak melalui pengaturan iOS untuk melihat siapa saja orang yang menggunakan Signal di kontak Anda.";
+"COMPOSE_SCREEN_MISSING_CONTACTS_PERMISSION" = "Anda dapat memberikan Radar akses ke kontak melalui pengaturan iOS untuk melihat siapa saja orang yang menggunakan Radar di kontak Anda.";
 
 /* Configure reactions title text */
 "CONFIGURE_REACTIONS" = "Konfigurasikan Tanggapan";
@@ -1847,10 +1847,10 @@
 "CONTACT_ABOUT_SHEET_PROFILE_NAMES_EDUCATION" = "Nama profil belum diverifikasi";
 
 /* Message for a tooltip that appears above a parenthesized name for another user, indicating that that name is the name the other user set for themself. Embeds {{name}} */
-"CONTACT_ABOUT_SHEET_SECONDARY_NAME_TOOLTIP_MESSAGE" = "“%1$@” adalah nama profil yang ditetapkan pengguna ini untuk dirinya sendiri di Signal.";
+"CONTACT_ABOUT_SHEET_SECONDARY_NAME_TOOLTIP_MESSAGE" = "“%1$@” adalah nama profil yang ditetapkan pengguna ini untuk dirinya sendiri di Radar.";
 
 /* A label indicating a user is a signal connection. */
-"CONTACT_ABOUT_SHEET_SIGNAL_CONNECTION_LABEL" = "Koneksi Signal";
+"CONTACT_ABOUT_SHEET_SIGNAL_CONNECTION_LABEL" = "Koneksi Radar";
 
 /* The title for a contact 'about' sheet. */
 "CONTACT_ABOUT_SHEET_TITLE" = "Tentang";
@@ -1892,7 +1892,7 @@
 "CONTACT_NOTE_TITLE" = "Catatan";
 
 /* Body for contact permission action sheet */
-"CONTACT_PERMISSION_ACTION_SHEET_2_BODY" = "Untuk menemukan orang yang Anda kenal di Signal:";
+"CONTACT_PERMISSION_ACTION_SHEET_2_BODY" = "Untuk menemukan orang yang Anda kenal di Radar:";
 
 /* First step for contact permission action sheet */
 "CONTACT_PERMISSION_ACTION_SHEET_2_STEP_ONE" = "Ketuk “Buka Pengaturan” di bawah";
@@ -1925,10 +1925,10 @@
 "CONTACT_PERMISSION_REMINDER_MEGAPHONE_ACTION" = "Izinkan Akses";
 
 /* Body for contact permission reminder megaphone */
-"CONTACT_PERMISSION_REMINDER_MEGAPHONE_BODY" = "Izinkan akses ke daftar kontak Anda agar bisa cepat menemukan mereka di Signal.";
+"CONTACT_PERMISSION_REMINDER_MEGAPHONE_BODY" = "Izinkan akses ke daftar kontak Anda agar bisa cepat menemukan mereka di Radar.";
 
 /* Title for contact permission reminder megaphone */
-"CONTACT_PERMISSION_REMINDER_MEGAPHONE_TITLE" = "Temukan kontak di Signal";
+"CONTACT_PERMISSION_REMINDER_MEGAPHONE_TITLE" = "Temukan kontak di Radar";
 
 /* Label for a contact's phone number. */
 "CONTACT_PHONE" = "Telepon";
@@ -1952,7 +1952,7 @@
 "CONTACT_SHARE_INVALID_CONTACT" = "Kontak tidak valid.";
 
 /* Alert body when contacts disabled while trying to share a contact. */
-"CONTACT_SHARING_NO_ACCESS_BODY" = "Signal butuh akses ke kontak Anda. Buka Pengaturan iOS dan aktifkan kontak. Kontak Anda dienkripsi dan tidak terlihat oleh layanan Signal.";
+"CONTACT_SHARING_NO_ACCESS_BODY" = "Radar butuh akses ke kontak Anda. Buka Pengaturan iOS dan aktifkan kontak. Kontak Anda dienkripsi dan tidak terlihat oleh layanan Radar.";
 
 /* Alert title when contacts disabled while trying to share a contact. */
 "CONTACT_SHARING_NO_ACCESS_TITLE" = "Perbolehkan Akses Kontak";
@@ -2006,7 +2006,7 @@
 "CONTACT_SUPPORT_FILTER_SOMETHING_NOT_WORKING_SHORT" = "Sepertinya terjadi kesalahan";
 
 /* Alert body */
-"CONTACT_SUPPORT_PROMPT_ERROR_ALERT_BODY" = "Signal tidak dapat menyelesaikan permintaan dukungan Anda.";
+"CONTACT_SUPPORT_PROMPT_ERROR_ALERT_BODY" = "Radar tidak dapat menyelesaikan permintaan dukungan Anda.";
 
 /* button text */
 "CONTACT_SUPPORT_PROMPT_ERROR_TRY_AGAIN" = "Coba lagi";
@@ -2135,7 +2135,7 @@
 "CONVERSATION_SETTINGS_ATTRIBUTES_ACCESS_SECTION_FOOTER" = "Pilih siapa yang dapat mengedit nama grup, foto, deskripsi, dan timer penghilangan pesan.";
 
 /* Footer string for a contact's badges in conversation settings */
-"CONVERSATION_SETTINGS_BADGES_FOOTER" = "Dapatkan lencana khusus di profil Anda dengan mendukung Signal. Ketuk lencana untuk informasi selengkapnya.";
+"CONVERSATION_SETTINGS_BADGES_FOOTER" = "Dapatkan lencana khusus di profil Anda dengan mendukung Radar. Ketuk lencana untuk informasi selengkapnya.";
 
 /* Header title for a contact's badges in conversation settings */
 "CONVERSATION_SETTINGS_BADGES_HEADER" = "Lencana";
@@ -2393,7 +2393,7 @@
 "DATABASE_INTEGRITY_CHECK_ACTION_RUN" = "Jalankan";
 
 /* Message for alert before running a database integrity check */
-"DATABASE_INTEGRITY_CHECK_MESSAGE" = "Kami perlu beberapa menit untuk mengatasi masalah ini. Anda dapat menutup Signal selama pemeriksaan ini berjalan, tetapi harap kembali untuk mengirim log Anda.";
+"DATABASE_INTEGRITY_CHECK_MESSAGE" = "Kami perlu beberapa menit untuk mengatasi masalah ini. Anda dapat menutup Radar selama pemeriksaan ini berjalan, tetapi harap kembali untuk mengirim log Anda.";
 
 /* Button to skip database integrity check step */
 "DATABASE_INTEGRITY_CHECK_SKIP" = "Lewati";
@@ -2417,10 +2417,10 @@
 "DATABASE_RECOVERY_MORE_STORAGE_SPACE_NEEDED_TITLE" = "Diperlukan Ruang Penyimpanan Lebih";
 
 /* The user has tried to recover their data after it was lost due to corruption. (They have not been hacked.) This is the description on the screen where we show an error message. */
-"DATABASE_RECOVERY_RECOVERY_FAILED_DESCRIPTION" = "Riwayat pesan Anda tidak dapat dipulihkan. Anda dapat terus menggunakan Signal setelah menginstal ulang. Kirim log debug agar kami bisa lebih memahami masalahnya.";
+"DATABASE_RECOVERY_RECOVERY_FAILED_DESCRIPTION" = "Riwayat pesan Anda tidak dapat dipulihkan. Anda dapat terus menggunakan Radar setelah menginstal ulang. Kirim log debug agar kami bisa lebih memahami masalahnya.";
 
 /* The user has tried to recover their data after it was lost due to corruption. (They have not been hacked.) This button lets them delete all of their data. */
-"DATABASE_RECOVERY_RECOVERY_FAILED_RESET_APP_BUTTON" = "Reset Signal";
+"DATABASE_RECOVERY_RECOVERY_FAILED_RESET_APP_BUTTON" = "Reset Radar";
 
 /* The user has tried to recover their data after it was lost due to corruption. (They have not been hacked.) If they want to delete the app and restart, they will be presented with a confirmation dialog. This is the final button they will press before their data is reset. */
 "DATABASE_RECOVERY_RECOVERY_FAILED_RESET_APP_CONFIRMATION_CONFIRM" = "Atur ulang";
@@ -2429,7 +2429,7 @@
 "DATABASE_RECOVERY_RECOVERY_FAILED_RESET_APP_CONFIRMATION_DESCRIPTION" = "Info akun, profil, dan semua pesan Anda akan dihapus. Aplikasi akan tertutup setelah proses ini selesai.";
 
 /* The user has tried to recover their data after it was lost due to corruption. (They have not been hacked.) If they want to delete the app and restart, they will be presented with a confirmation dialog. This is the title of that dialog. */
-"DATABASE_RECOVERY_RECOVERY_FAILED_RESET_APP_CONFIRMATION_TITLE" = "Reset Signal";
+"DATABASE_RECOVERY_RECOVERY_FAILED_RESET_APP_CONFIRMATION_TITLE" = "Reset Radar";
 
 /* The user has tried to recover their data after it was lost due to corruption. (They have not been hacked.) They were asked to submit a debug log. This is the button that submits this log. */
 "DATABASE_RECOVERY_RECOVERY_FAILED_SUBMIT_DEBUG_LOG_BUTTON" = "Mengajukan Catatan Debug";
@@ -2504,7 +2504,7 @@
 "DELETE_ACCOUNT_CONFIRMATION_ACTION_SHEEET_ACTION" = "Hapus Akun";
 
 /* Title for the action sheet message of the 'delete account confirmation' view controller. */
-"DELETE_ACCOUNT_CONFIRMATION_ACTION_SHEEET_MESSAGE" = "Tindakan ini akan menghapus akun Signal Anda dan mereset aplikasi. Aplikasi akan ditutup setelah proses ini selesai.";
+"DELETE_ACCOUNT_CONFIRMATION_ACTION_SHEEET_MESSAGE" = "Tindakan ini akan menghapus akun Radar Anda dan mereset aplikasi. Aplikasi akan ditutup setelah proses ini selesai.";
 
 /* Title for the action sheet confirmation title of the 'delete account confirmation' view controller. */
 "DELETE_ACCOUNT_CONFIRMATION_ACTION_SHEEET_TITLE" = "Anda yakin ingin menghapus akun Anda?";
@@ -2528,7 +2528,7 @@
 "DELETE_ACCOUNT_CONFIRMATION_PHONE_NUMBER_TITLE" = "Nomor Telepon";
 
 /* Section header */
-"DELETE_ACCOUNT_CONFIRMATION_SECTION_TITLE" = "Konfirmasi Nomor Signal Anda";
+"DELETE_ACCOUNT_CONFIRMATION_SECTION_TITLE" = "Konfirmasi Nomor Radar Anda";
 
 /* Title for the 'delete account' confirmation view. */
 "DELETE_ACCOUNT_CONFIRMATION_TITLE" = "Hapus Akun";
@@ -2575,7 +2575,7 @@
 
 
 /* Notification warning the user that they have been de-registered. */
-"DEREGISTRATION_NOTIFICATION" = "Anda telah keluar dari Signal di perangkat ini.";
+"DEREGISTRATION_NOTIFICATION" = "Anda telah keluar dari Radar di perangkat ini.";
 
 /* Button that lets users re-register using the same phone number. */
 "DEREGISTRATION_REREGISTER_BUTTON" = "Daftar ulang";
@@ -2584,7 +2584,7 @@
 "DEREGISTRATION_REREGISTER_PROMPT_TITLE" = "Daftarkan ulang nomor telepon ini?";
 
 /* Label warning the user that they have been de-registered. */
-"DEREGISTRATION_WARNING" = "Perangkat ini sudah tidak terdaftar. Hal ini mungkin karena Anda telah mendaftarkan nomor telepon Anda untuk Signal pada perangkat yang berbeda.";
+"DEREGISTRATION_WARNING" = "Perangkat ini sudah tidak terdaftar. Hal ini mungkin karena Anda telah mendaftarkan nomor telepon Anda untuk Radar pada perangkat yang berbeda.";
 
 /* If the user has been deregistered, they'll see a warning. This is This is the call to action on that warning. */
 "DEREGISTRATION_WARNING_ACTION_TITLE" = "Daftarkan Ulang Perangkat";
@@ -2653,7 +2653,7 @@
 "DEVICE_TRANSFER_CONTRACT_QR_CODE_BUTTON" = "Lihat lebih kecil";
 
 /* An error indicating that the other device closed signal mid-transfer and it could not complete */
-"DEVICE_TRANSFER_ERROR_BACKGROUNDED" = "Transfer tidak dapat dapat diselesaikan. Pastikan Anda membuka aplikasi Signal di kedua perangkat dan coba lagi.";
+"DEVICE_TRANSFER_ERROR_BACKGROUNDED" = "Transfer tidak dapat dapat diselesaikan. Pastikan Anda membuka aplikasi Radar di kedua perangkat dan coba lagi.";
 
 /* An error indicating that we were unable to verify the identity of the new device to complete the transfer */
 "DEVICE_TRANSFER_ERROR_CERTIFICATE_MISMATCH" = "Tidak dapat memverifikasi perangkat baru Anda. Mohon coba lagi";
@@ -2671,13 +2671,13 @@
 "DEVICE_TRANSFER_ERROR_NOT_ENOUGH_SPACE" = "Tidak dapat menyelesaikan transfer karena penyimpanan hampir penuh";
 
 /* An error indicating the user must update their device before trying to transfer. */
-"DEVICE_TRANSFER_ERROR_UNSUPPORTED_VERSION" = "Perbarui Signal ke versi terbaru dan coba lagi";
+"DEVICE_TRANSFER_ERROR_UNSUPPORTED_VERSION" = "Perbarui Radar ke versi terbaru dan coba lagi";
 
 /* Button shown to expand a QR code and view it fullscreen. */
 "DEVICE_TRANSFER_EXPAND_QR_CODE_BUTTON" = "Lihat lebih besar";
 
 /* The explanation on the action sheet prompting the user if they want to transfer their device. */
-"DEVICE_TRANSFER_PROMPT_EXPLANATION" = "Transfer akun Signal ke perangkat iOS baru. Pastikan perangkat baru Anda aktif dan dalam jangkauan.";
+"DEVICE_TRANSFER_PROMPT_EXPLANATION" = "Transfer akun Radar ke perangkat iOS baru. Pastikan perangkat baru Anda aktif dan dalam jangkauan.";
 
 /* The title on the acttion sheet prompting the user if they want to transfer their device. */
 "DEVICE_TRANSFER_PROMPT_TITLE" = "Transfer Akun";
@@ -2695,7 +2695,7 @@
 "DEVICE_TRANSFER_QRCODE_TITLE" = "Pindai kode QR";
 
 /* The explanation on the view that shows receiving progress */
-"DEVICE_TRANSFER_RECEIVING_EXPLANATION" = "Dekatkan kedua perangkat, jangan dimatikan, dan pastikan Signal tetap terbuka. Proses transfer ini dienkripsi secara menyeluruh.";
+"DEVICE_TRANSFER_RECEIVING_EXPLANATION" = "Dekatkan kedua perangkat, jangan dimatikan, dan pastikan Radar tetap terbuka. Proses transfer ini dienkripsi secara menyeluruh.";
 
 /* The title on the view that shows receiving progress */
 "DEVICE_TRANSFER_RECEIVING_TITLE" = "Menerima Data";
@@ -2731,7 +2731,7 @@
 "DEVICE_TRANSFER_STATUS_NEW_DEVICE_TRANSFERRING" = "Mentransfer";
 
 /* Description in the progress view displayed during device transfer. */
-"DEVICE_TRANSFER_STATUS_NEW_DEVICE_TRANSFERRING_DESCRIPTION" = "Dekatkan kedua perangkat, jangan dimatikan, dan pastikan aplikasi Signal tetap terbuka. Proses transfer ini dienkripsi secara menyeluruh.";
+"DEVICE_TRANSFER_STATUS_NEW_DEVICE_TRANSFERRING_DESCRIPTION" = "Dekatkan kedua perangkat, jangan dimatikan, dan pastikan aplikasi Radar tetap terbuka. Proses transfer ini dienkripsi secara menyeluruh.";
 
 /* Status message on old device when cancelling transfer. */
 "DEVICE_TRANSFER_STATUS_OLD_DEVICE_CANCELLING" = "Membatalkan hubungan ke iPhone baru …";
@@ -2746,7 +2746,7 @@
 "DEVICE_TRANSFER_STATUS_OLD_DEVICE_STARTING" = "Menunggu terhubung ke iPhone baru …";
 
 /* The explanation on the action sheet that shows transfer progress */
-"DEVICE_TRANSFER_TRANSFERRING_EXPLANATION" = "Dekatkan kedua perangkat, jangan dimatikan, dan pastikan Signal tetap terbuka.";
+"DEVICE_TRANSFER_TRANSFERRING_EXPLANATION" = "Dekatkan kedua perangkat, jangan dimatikan, dan pastikan Radar tetap terbuka.";
 
 /* The title on the action sheet that shows transfer progress */
 "DEVICE_TRANSFER_TRANSFERRING_TITLE" = "Mentransfer Data";
@@ -2836,13 +2836,13 @@
 "DONATE_CHOOSE_PAYMENT_METHOD_SHEET_SUBTITLE_FOR_ONE_TIME_DONATION" = "Dapatkan lencana %1$@ selama 30 hari";
 
 /* When users make donations on a friend's behalf, they see a sheet that lets them pick a payment method. This is the title on that sheet. Embeds {{amount of money}}, such as \"$5\". */
-"DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_DONATION_ON_BEHALF_OF_A_FRIEND" = "Donasi %1$@ ke Signal";
+"DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_DONATION_ON_BEHALF_OF_A_FRIEND" = "Donasi %1$@ ke Radar";
 
 /* When users make monthly donations, they see a sheet that lets them pick a payment method. This is the title on that sheet. Embeds {{amount of money per month}}, such as \"$5/month\". */
-"DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_MONTHLY_DONATION" = "Donasi %1$@ ke Signal";
+"DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_MONTHLY_DONATION" = "Donasi %1$@ ke Radar";
 
 /* When users make one-time donations, they see a sheet that lets them pick a payment method. This is the title on that sheet. Embeds {{amount of money}}, such as \"$5\". */
-"DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_ONE_TIME_DONATION" = "Donasi %1$@ ke Signal";
+"DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_ONE_TIME_DONATION" = "Donasi %1$@ ke Radar";
 
 /* Users can donate on a friend's behalf and can optionally add a message. This is tells users about that optional message. */
 "DONATE_ON_BEHALF_OF_A_FRIEND_ADDITIONAL_MESSAGE_INFO" = "Penerima akan diberi tahu tentang donasi dengan pesan 1:1. Tambahkan pesan Anda sendiri di bawah ini.";
@@ -2959,7 +2959,7 @@
 "DONATION_ON_BEHALF_OF_A_FRIEND_BADGE_REDEEMED" = "Ditebus";
 
 /* Users can donate on behalf of a friend, and the friend will receive a badge. This is a short paragraph on the screen where users choose the badge their friend will receive. */
-"DONATION_ON_BEHALF_OF_A_FRIEND_CHOOSE_BADGE_DESCRIPTION" = "Dukung Signal dengan memberikan donasi untuk teman atau anggota keluarga yang menggunakan Signal. Dia akan memiliki opsi untuk menunjukkan dukungan di profilnya.";
+"DONATION_ON_BEHALF_OF_A_FRIEND_CHOOSE_BADGE_DESCRIPTION" = "Dukung Radar dengan memberikan donasi untuk teman atau anggota keluarga yang menggunakan Radar. Dia akan memiliki opsi untuk menunjukkan dukungan di profilnya.";
 
 /* Users can donate on behalf of a friend, and the friend will receive a badge. This is the title on the screen where users choose the badge their friend will receive. */
 "DONATION_ON_BEHALF_OF_A_FRIEND_CHOOSE_BADGE_TITLE" = "Donasi untuk Teman";
@@ -2983,7 +2983,7 @@
 "DONATION_ON_BEHALF_OF_A_FRIEND_PAYMENT_FAILED_ERROR_TITLE" = "Pembayaran Gagal";
 
 /* Users can donate on a friend's behalf. If the payment was processed but the donation failed to send, this error message will be shown. */
-"DONATION_ON_BEHALF_OF_A_FRIEND_PAYMENT_SUCCEEDED_BUT_MESSAGE_FAILED_ERROR_BODY" = "Pembayaran telah diproses, tetapi Signal tidak dapat mengirimkan pesan donasi Anda. Mohon hubungi bantuan.";
+"DONATION_ON_BEHALF_OF_A_FRIEND_PAYMENT_SUCCEEDED_BUT_MESSAGE_FAILED_ERROR_BODY" = "Pembayaran telah diproses, tetapi Radar tidak dapat mengirimkan pesan donasi Anda. Mohon hubungi bantuan.";
 
 /* Users can donate on a friend's behalf. If the payment was processed but the donation failed to send, an error dialog will be shown. This is the title of that dialog. */
 "DONATION_ON_BEHALF_OF_A_FRIEND_PAYMENT_SUCCEEDED_BUT_MESSAGE_FAILED_ERROR_TITLE" = "Donasi Gagal";
@@ -2995,7 +2995,7 @@
 "DONATION_ON_BEHALF_OF_A_FRIEND_PREVIEW_OUTGOING" = "✨ Anda berdonasi untuk %1$@";
 
 /* You received a donation from a friend. This is the title of that message in the chat. Embeds {{short contact name}}. */
-"DONATION_ON_BEHALF_OF_A_FRIEND_RECEIVED_TITLE_FORMAT" = "%1$@ berdonasi ke Signal atas nama Anda";
+"DONATION_ON_BEHALF_OF_A_FRIEND_RECEIVED_TITLE_FORMAT" = "%1$@ berdonasi ke Radar atas nama Anda";
 
 /* Users can donate on a friend's behalf. This is the error message that appears if the try to do this, but the recipient is blocked. */
 "DONATION_ON_BEHALF_OF_A_FRIEND_RECIPIENT_IS_BLOCKED_ERROR_BODY" = "Anda tidak dapat berdonasi untuk pengguna ini karena Anda memblokirnya.";
@@ -3019,7 +3019,7 @@
 "DONATION_ON_BEHALF_OF_A_FRIEND_SENT_TITLE_FORMAT" = "Donasi atas nama %1$@";
 
 /* When you donate on behalf of a friend, a thank-you sheet will appear. This is the text on that sheet. Embeds {{recipient name}}. */
-"DONATION_ON_BEHALF_OF_A_FRIEND_THANKS_BODY_FORMAT" = "Anda memberikan donasi ke Signal atas nama %1$@ . Dia akan diberi opsi untuk menunjukkan dukungan di profilnya.";
+"DONATION_ON_BEHALF_OF_A_FRIEND_THANKS_BODY_FORMAT" = "Anda memberikan donasi ke Radar atas nama %1$@ . Dia akan diberi opsi untuk menunjukkan dukungan di profilnya.";
 
 /* When you donate on behalf of a friend, a thank-you sheet will appear. This is the title on that sheet. */
 "DONATION_ON_BEHALF_OF_A_FRIEND_THANKS_TITLE" = "Terima kasih atas dukungan Anda!";
@@ -3028,19 +3028,19 @@
 "DONATION_ON_BEHALF_OF_A_FRIEND_VIEW" = "Lihat";
 
 /* A friend has donated on your behalf and you received a badge. This text says that you received a badge, and from whom. Embeds {{contact's short name, such as a first name}}. */
-"DONATION_ON_BEHALF_OF_A_FRIEND_YOU_RECEIVED_A_BADGE_FORMAT" = "%1$@ memberikan donasi ke Signal atas nama Anda! Tunjukkan dukungan untuk Signal di profil Anda.";
+"DONATION_ON_BEHALF_OF_A_FRIEND_YOU_RECEIVED_A_BADGE_FORMAT" = "%1$@ memberikan donasi ke Radar atas nama Anda! Tunjukkan dukungan untuk Radar di profil Anda.";
 
 /* There is a screen where users can read more about their donation to Signal. This is the 1st paragraph of that screen. */
 "DONATION_READ_MORE_SCREEN_PARAGRAPH_1" = "Perpesanan privat. Tanpa iklan, tanpa pelacak, tanpa pengawasan.";
 
 /* There is a screen where users can read more about their donation to Signal. This is the 2nd paragraph of that screen. */
-"DONATION_READ_MORE_SCREEN_PARAGRAPH_2" = "Signal didukung oleh donasi, yang berarti bahwa privasi Anda merupakan inti dari semua yang kami lakukan. Signal dibuat untuk Anda; bukan untuk data Anda dan bukan pula demi keuntungan.";
+"DONATION_READ_MORE_SCREEN_PARAGRAPH_2" = "Radar didukung oleh donasi, yang berarti bahwa privasi Anda merupakan inti dari semua yang kami lakukan. Radar dibuat untuk Anda; bukan untuk data Anda dan bukan pula demi keuntungan.";
 
 /* There is a screen where users can read more about their donation to Signal. This is the 3rd paragraph of that screen. */
-"DONATION_READ_MORE_SCREEN_PARAGRAPH_3" = "Jika bisa, silakan berdonasi hari ini agar Signal tetap menyenangkan, dapat diandalkan, dan tersedia untuk semua orang.";
+"DONATION_READ_MORE_SCREEN_PARAGRAPH_3" = "Jika bisa, silakan berdonasi hari ini agar Radar tetap menyenangkan, dapat diandalkan, dan tersedia untuk semua orang.";
 
 /* There is a screen where users can read more about their donation to Signal. This is the title of that screen. */
-"DONATION_READ_MORE_SCREEN_TITLE" = "Signal itu berbeda.";
+"DONATION_READ_MORE_SCREEN_TITLE" = "Radar itu berbeda.";
 
 /* Section title for donation amount on receipts */
 "DONATION_RECEIPT_AMOUNT" = "Jumlah";
@@ -3076,7 +3076,7 @@
 "DONATION_RECEIPTS" = "Kuitansi Donasi";
 
 /* Text at the bottom of the donation receipts list, telling users that receipts might not be available */
-"DONATION_RECEIPTS_MIGHT_BE_MISSING_IF_YOU_REINSTALLED" = "Kuitansi dari donasi sebelumnya tidak akan tersedia jika Anda menginstal ulang Signal.";
+"DONATION_RECEIPTS_MIGHT_BE_MISSING_IF_YOU_REINSTALLED" = "Kuitansi dari donasi sebelumnya tidak akan tersedia jika Anda menginstal ulang Radar.";
 
 /* Error message displayed if something goes wrong with 3DSecure/iDEAL payment authorization.  This will be encountered if the user cancels the webview before authrizing the payment. */
 "DONATION_REDIRECT_ERROR_CANCELLED_MESSAGE" = "Pembayaran dibatalkan. Silakan coba lagi.";
@@ -3091,7 +3091,7 @@
 "DONATION_SCREEN_DONATE_BUTTON" = "Donasi";
 
 /* On donation screens, a small amount of information text is shown. This is the subtitle for that text. */
-"DONATION_SCREENS_HEADER_DESCRIPTION" = "Perpesanan privat, didanai oleh Anda. Tanpa iklan, tanpa pelacak, tanpa kompromi. Donasi sekarang untuk mendukung Signal.";
+"DONATION_SCREENS_HEADER_DESCRIPTION" = "Perpesanan privat, didanai oleh Anda. Tanpa iklan, tanpa pelacak, tanpa kompromi. Donasi sekarang untuk mendukung Radar.";
 
 /* On donation screens, a small amount of information text is shown. Users can click this link to learn more information. */
 "DONATION_SCREENS_HEADER_READ_MORE" = "Baca lebih lanjut";
@@ -3169,7 +3169,7 @@
 "DONATION_VIEW_DONATE_ON_BEHALF_OF_A_FRIEND" = "Donasi untuk Teman";
 
 /* Text describing to the user that they're going to pay a donation to Signal */
-"DONATION_VIEW_DONATION_TO_SIGNAL" = "Donasi ke Signal";
+"DONATION_VIEW_DONATION_TO_SIGNAL" = "Donasi ke Radar";
 
 /* Title for the 'Donor FAQ' button on the donation screen */
 "DONATION_VIEW_DONOR_FAQ" = "Pertanyaan Umum tentang Donatur";
@@ -3181,7 +3181,7 @@
 "DONATION_VIEW_MANAGE_BADGES" = "Lencana";
 
 /* Text describing to the user that they're going to pay a monthly donation to Signal */
-"DONATION_VIEW_MONTHLY_DONATION_TO_SIGNAL" = "Donasi Bulanan ke Signal";
+"DONATION_VIEW_MONTHLY_DONATION_TO_SIGNAL" = "Donasi Bulanan ke Radar";
 
 /* Title for the 'more' section on the donation screen */
 "DONATION_VIEW_MORE_SECTION_TITLE" = "Selengkapnya";
@@ -3193,7 +3193,7 @@
 "DONATION_VIEW_OTHER_WAYS_TO_DONATE_TITLE" = "Cara Lain untuk Berdonasi";
 
 /* Title on the 'Donate to Signal' screen */
-"DONATION_VIEW_TITLE" = "Donasi ke Signal";
+"DONATION_VIEW_TITLE" = "Donasi ke Radar";
 
 /* Label for the currency picker button in donation views */
 "DONATIONS_CURRENCY_PICKER_LABEL" = "Mata uang";
@@ -3208,13 +3208,13 @@
 "EDIT_CONTACT_WITHOUT_CONTACTS_PERMISSION_ALERT_BODY" = "Anda dapat mengaktifkan akses di pengaturan iOS.";
 
 /* Alert title for when the user has just tried to edit a contacts after declining to give Signal contacts permissions */
-"EDIT_CONTACT_WITHOUT_CONTACTS_PERMISSION_ALERT_TITLE" = "Signal Perlu Akses Kontak untuk Mengubah Informasi Kontak";
+"EDIT_CONTACT_WITHOUT_CONTACTS_PERMISSION_ALERT_TITLE" = "Radar Perlu Akses Kontak untuk Mengubah Informasi Kontak";
 
 /* The navbar title for the 'update group' view. */
 "EDIT_GROUP_DEFAULT_TITLE" = "Edit Grup";
 
 /* Error message indicating the a user can't be added to a group. */
-"EDIT_GROUP_ERROR_CANNOT_ADD_MEMBER" = "Pengguna ini tidak dapat ditambahkan ke grup sampai dia meng-upgrade Signal.";
+"EDIT_GROUP_ERROR_CANNOT_ADD_MEMBER" = "Pengguna ini tidak dapat ditambahkan ke grup sampai dia meng-upgrade Radar.";
 
 /* Error message indicating that an avatar image is invalid and cannot be used. */
 "EDIT_GROUP_ERROR_INVALID_AVATAR" = "Foto tidak valid.";
@@ -3241,13 +3241,13 @@
 "EDIT_MESSAGE_SEND_MESSAGE_UNKNOWN_ERROR" = "EDIT_MESSAGE_SEND_MESSAGE_UNKNOWN_ERROR";
 
 /* body of email sent to contacts when inviting to install Signal. Embeds {{link to install Signal}} and {{link to the Signal home page}} */
-"EMAIL_INVITE_BODY" = "Hai,\n\nBelakangan ini saya menggunakan Signal untuk memastikan chat di iPhone saya tetap privat. Saya ingin Anda menginstalnya juga agar tidak ada orang lain yang bisa melihat pesan atau mendengarkan panggilan kita.\n\nSignal bisa dipakai di iPhone, Android, dan Desktop. Unduh di sini: %1$@\n\nSignal berfungsi seperti aplikasi perpesanan yang saat ini Anda gunakan. Kita bisa mengirim gambar dan video, melakukan panggilan, dan membuat grup chat. Yang terpenting, orang lain tidak akan bisa melihatnya, termasuk developer Signal sekalipun!\n\nBaca selengkapnya tentang Signal di sini: %2$@";
+"EMAIL_INVITE_BODY" = "Hai,\n\nBelakangan ini saya menggunakan Radar untuk memastikan chat di iPhone saya tetap privat. Saya ingin Anda menginstalnya juga agar tidak ada orang lain yang bisa melihat pesan atau mendengarkan panggilan kita.\n\nSignal bisa dipakai di iPhone, Android, dan Desktop. Unduh di sini: %1$@\n\nSignal berfungsi seperti aplikasi perpesanan yang saat ini Anda gunakan. Kita bisa mengirim gambar dan video, melakukan panggilan, dan membuat grup chat. Yang terpenting, orang lain tidak akan bisa melihatnya, termasuk developer Radar sekalipun!\n\nBaca selengkapnya tentang Radar di sini: %2$@";
 
 /* subject of email sent to contacts when inviting to install Signal */
-"EMAIL_INVITE_SUBJECT" = "Pindah ke Signal";
+"EMAIL_INVITE_SUBJECT" = "Pindah ke Radar";
 
 /* Description for the fallback support sheet if user cannot send email */
-"EMAIL_SIGNAL_MESSAGE" = "Perangkat Anda tidak dikonfigurasikan untuk mengirim email. Tambahkan email di perangkat atau kirim email ke support@signal.org untuk meminta dukungan.";
+"EMAIL_SIGNAL_MESSAGE" = "Perangkat Anda tidak dikonfigurasikan untuk mengirim email. Tambahkan email di perangkat atau kirim email ke support@radar.chat untuk meminta dukungan.";
 
 /* Title for the fallback support sheet if user cannot send email */
 "EMAIL_SIGNAL_TITLE" = "Email tidak tersedia";
@@ -3283,7 +3283,7 @@
 "EMOJI_CATEGORY_TRAVEL_NAME" = "Perjalanan & Destinasi";
 
 /* Full width label displayed when attempting to compose message */
-"EMPTY_CONTACTS_LABEL_LINE1" = "Kontak Anda tidak ada yang menggunakan Signal.";
+"EMPTY_CONTACTS_LABEL_LINE1" = "Kontak Anda tidak ada yang menggunakan Radar.";
 
 /* Full width label displayed when attempting to compose message */
 "EMPTY_CONTACTS_LABEL_LINE2" = "Undang teman?";
@@ -3349,7 +3349,7 @@
 "ERROR_DESCRIPTION_UNKNOWN_ERROR" = "Muncul masalah tak dikenal.";
 
 /* Error message when attempting to send message */
-"ERROR_DESCRIPTION_UNREGISTERED_RECIPIENT" = "Tidak dapat mengirim pesan karena orang ini sudah tidak menggunakan Signal.";
+"ERROR_DESCRIPTION_UNREGISTERED_RECIPIENT" = "Tidak dapat mengirim pesan karena orang ini sudah tidak menggunakan Radar.";
 
 /* Error message indicating that attachment upload(s) failed. */
 "ERROR_MESSAGE_ATTACHMENT_UPLOAD_FAILED" = "Gagal mengunggah lampiran.";
@@ -3394,10 +3394,10 @@
 "ERROR_NETWORK_FAILURE" = "Jaringan Gagal";
 
 /* Format string for an error alert notification message. Embeds {{ error string }} */
-"ERROR_NOTIFICATION_MESSAGE_FORMAT" = "Bantu kami meningkatkan Signal dengan melaporkan kesalahan ini beserta log debug dari perangkat Anda ke support@signal.org; %1$@";
+"ERROR_NOTIFICATION_MESSAGE_FORMAT" = "Bantu kami meningkatkan Radar dengan melaporkan kesalahan ini beserta log debug dari perangkat Anda ke support@radar.chat; %1$@";
 
 /* Format string for an error alert notification title. */
-"ERROR_NOTIFICATION_TITLE" = "Signal Beta: Terjadi masalah";
+"ERROR_NOTIFICATION_TITLE" = "Radar Beta: Terjadi masalah";
 
 /* Error indicating a send failure due to a delinked application. */
 "ERROR_SENDING_DELINKED" = "Perangkat anda tidak lagi terhubung. Harap hubungkan kembali untuk dapat mengirim pesan selanjutnya.";
@@ -3406,7 +3406,7 @@
 "ERROR_SENDING_DEREGISTERED" = "Perangkat anda tidak lagi terdaftar. Harap daftarkan kembali untuk dapat mengirim pesan selanjutnya.";
 
 /* Error indicating a send failure due to an expired application. */
-"ERROR_SENDING_EXPIRED" = "Versi Signal Anda sudah kedaluwarsa. Mohon perbarui untuk dapat mengirimkan pesan.";
+"ERROR_SENDING_EXPIRED" = "Versi Radar Anda sudah kedaluwarsa. Mohon perbarui untuk dapat mengirimkan pesan.";
 
 /* Format string for 'unregistered user' error. Embeds {{the unregistered user's name or signal id}}. */
 "ERROR_UNREGISTERED_USER_FORMAT" = "Pengguna tidak terdaftar: %1$@";
@@ -3418,19 +3418,19 @@
 "EXIT_REREGISTRATION" = "Keluar dari Pendaftaran";
 
 /* Label notifying the user that the app has expired. */
-"EXPIRATION_ERROR" = "Versi Signal ini sudah kedaluwarsa. Perbarui untuk mengirim dan menerima pesan.";
+"EXPIRATION_ERROR" = "Versi Radar ini sudah kedaluwarsa. Perbarui untuk mengirim dan menerima pesan.";
 
 /* If the user's app is too old, they'll be shown a warning asking them to upgrade. This is the text on the warning, and tapping it will open the App Store page for Signal. */
 "EXPIRATION_WARNING_ACTION_TITLE" = "Perbarui Sekarang";
 
 /* Label warning the user that the app will expire soon. Embeds {{date}}. */
-"EXPIRATION_WARNING_SOON" = "Versi Signal ini akan kedaluwarsa dalam %1$@. Perbarui untuk terus berkirim pesan.";
+"EXPIRATION_WARNING_SOON" = "Versi Radar ini akan kedaluwarsa dalam %1$@. Perbarui untuk terus berkirim pesan.";
 
 /* Label warning the user that the app will expire today. */
-"EXPIRATION_WARNING_TODAY" = "Versi Signal ini akan kedaluwarsa hari ini. Perbarui untuk terus berkirim pesan.";
+"EXPIRATION_WARNING_TODAY" = "Versi Radar ini akan kedaluwarsa hari ini. Perbarui untuk terus berkirim pesan.";
 
 /* action sheet header when re-sending message which failed because of an invalid key signature */
-"FAILED_SENDING_BECAUSE_INVALID_KEY_SIGNATURE" = "Tidak dapat mengirim pesan karena %1$@ perlu memperbarui dan membuka Signal.";
+"FAILED_SENDING_BECAUSE_INVALID_KEY_SIGNATURE" = "Tidak dapat mengirim pesan karena %1$@ perlu memperbarui dan membuka Radar.";
 
 /* action sheet header when re-sending message which failed because of untrusted identity keys */
 "FAILED_SENDING_BECAUSE_UNTRUSTED_IDENTITY_KEY" = "Nomor keamanan Anda dengan %1$@ telah berubah. Anda mungkin ingin memverifikasinya sebelum mengirimkan pesan kembali.";
@@ -3745,10 +3745,10 @@
 "GROUP_CALL_WILL_NOTIFY_TWO_PEOPLE_FORMAT" = "%1$@ dan %2$@ akan mendapat notifikasi";
 
 /* Text shown before the user starts a group call if the user has enabled ringing and there is one other person in the group. Embeds {member name} */
-"GROUP_CALL_WILL_RING_ONE_PERSON_FORMAT" = "Signal akan berdering untuk %1$@";
+"GROUP_CALL_WILL_RING_ONE_PERSON_FORMAT" = "Radar akan berdering untuk %1$@";
 
 /* Text shown before the user starts a group call if the user has enabled ringing and there are two other people in the group. Embeds {{ %1$@ participant1, %2$@ participant2 }} */
-"GROUP_CALL_WILL_RING_TWO_PEOPLE_FORMAT" = "Signal akan berdering untuk %1$@ dan %2$@";
+"GROUP_CALL_WILL_RING_TWO_PEOPLE_FORMAT" = "Radar akan berdering untuk %1$@ dan %2$@";
 
 /* Text explaining that you are in the group call. */
 "GROUP_CALL_YOU_ARE_HERE" = "Anda berada dalam panggilan grup";
@@ -3958,7 +3958,7 @@
 "GROUP_LINK_VIEW_SHARE_LINK_VIA_QR_CODE" = "Kode QR";
 
 /* Label for the 'share group link via Signal' button in the 'group link' view. */
-"GROUP_LINK_VIEW_SHARE_LINK_VIA_SIGNAL" = "Bagikan melalui Signal";
+"GROUP_LINK_VIEW_SHARE_LINK_VIA_SIGNAL" = "Bagikan melalui Radar";
 
 /* Message for the 'share group link' action sheet in the 'group link' view. */
 "GROUP_LINK_VIEW_SHARE_SHEET_MESSAGE" = "Siapapun dengan tautan ini dapat melihat nama dan anggota grup ini dan dapat meminta untuk bergabung. Bagikan dengan orang yang Anda percaya.";
@@ -4366,13 +4366,13 @@
 "HOME_VIEW_DRAFT_PREFIX" = "Draf: ";
 
 /* Format string for a label offering to start a new conversation with your contacts, if you have 1 Signal contact.  Embeds {{The name of 1 of your Signal contacts}}. */
-"HOME_VIEW_FIRST_CONVERSATION_OFFER_1_CONTACT_FORMAT" = "Beberapa kontak Anda telah ada di Signal, termasuk %1$@.";
+"HOME_VIEW_FIRST_CONVERSATION_OFFER_1_CONTACT_FORMAT" = "Beberapa kontak Anda telah ada di Radar, termasuk %1$@.";
 
 /* Format string for a label offering to start a new conversation with your contacts, if you have 2 Signal contacts.  Embeds {{The names of 2 of your Signal contacts}}. */
-"HOME_VIEW_FIRST_CONVERSATION_OFFER_2_CONTACTS_FORMAT" = "Beberapa kontak Anda telah ada di Signal, termasuk %1$@ dan %2$@";
+"HOME_VIEW_FIRST_CONVERSATION_OFFER_2_CONTACTS_FORMAT" = "Beberapa kontak Anda telah ada di Radar, termasuk %1$@ dan %2$@";
 
 /* Format string for a label offering to start a new conversation with your contacts, if you have at least 3 Signal contacts.  Embeds {{The names of 3 of your Signal contacts}}. */
-"HOME_VIEW_FIRST_CONVERSATION_OFFER_3_CONTACTS_FORMAT" = "Beberapa kontak Anda telah ada di Signal, termasuk %1$@,%2$@ dan %3$@";
+"HOME_VIEW_FIRST_CONVERSATION_OFFER_3_CONTACTS_FORMAT" = "Beberapa kontak Anda telah ada di Radar, termasuk %1$@,%2$@ dan %3$@";
 
 /* A label offering to start a new conversation with your contacts, if you have no Signal contacts. */
 "HOME_VIEW_FIRST_CONVERSATION_OFFER_NO_CONTACTS" = "Mulai obrolan pertama Anda di sini.";
@@ -4468,7 +4468,7 @@
 "INACTIVE_LINKED_DEVICE_REMINDER_MEGAPHONE_TITLE" = "Perangkat Terhubung Tidak Aktif";
 
 /* Body for an in-app megaphone about a user's inactive primary device. */
-"INACTIVE_PRIMARY_DEVICE_REMINDER_MEGAPHONE_BODY" = "Agar akun tetap aktif, buka Signal di perangkat utama Anda.";
+"INACTIVE_PRIMARY_DEVICE_REMINDER_MEGAPHONE_BODY" = "Agar akun tetap aktif, buka Radar di perangkat utama Anda.";
 
 /* Title for a button in an in-app megaphone about a user's inactive primary device, temporarily dismissing the megaphone. */
 "INACTIVE_PRIMARY_DEVICE_REMINDER_MEGAPHONE_GOT_IT_BUTTON" = "Mengerti";
@@ -4477,7 +4477,7 @@
 "INACTIVE_PRIMARY_DEVICE_REMINDER_MEGAPHONE_LEARN_MORE_BUTTON" = "Selengkapnya";
 
 /* Title for an in-app megaphone about a user's inactive primary device. */
-"INACTIVE_PRIMARY_DEVICE_REMINDER_MEGAPHONE_TITLE" = "Buka Signal di ponsel Anda";
+"INACTIVE_PRIMARY_DEVICE_REMINDER_MEGAPHONE_TITLE" = "Buka Radar di ponsel Anda";
 
 /* Label reminding the user that they are in archive mode, and that muted chats remain archived when they receive a new message. */
 "INBOX_VIEW_ARCHIVE_MODE_MUTED_CHATS_REMINDER" = "Obrolan dibisukan yang diarsipkan akan tetap diarsipkan saat ada pesan baru yang masuk.";
@@ -4513,10 +4513,10 @@
 "INFO_MESSAGE_BLOCKED_OTHER_USER" = "Anda memblokir orang ini.";
 
 /* Indicates that a previously-removed recipient has been added back to the current user's contacts. */
-"INFO_MESSAGE_CONTACT_REINSTATED" = "Orang ini telah ditambahkan kembali ke daftar kontak Signal.";
+"INFO_MESSAGE_CONTACT_REINSTATED" = "Orang ini telah ditambahkan kembali ke daftar kontak Radar.";
 
 /* Indicates that the recipient has been removed from the current user's contacts and that messaging them will re-add them. */
-"INFO_MESSAGE_CONTACT_REMOVED" = "Anda telah menghapus orang ini dari daftar kontak Signal. Jika Anda mengiriminya pesan, orang ini akan ditambahkan kembali ke daftar kontak.";
+"INFO_MESSAGE_CONTACT_REMOVED" = "Anda telah menghapus orang ini dari daftar kontak Radar. Jika Anda mengiriminya pesan, orang ini akan ditambahkan kembali ke daftar kontak.";
 
 /* When you start a chat with someone and then later learn their profile name, we insert an in-chat message with this string to record the identifier you originally used to contact them. Embeds {{ the identifier, either a phone number or a username }}. */
 "INFO_MESSAGE_LEARNED_PROFILE_KEY" = "Anda memulai obrolan ini dengan %1$@.";
@@ -4537,7 +4537,7 @@
 "INFO_MESSAGE_REPORTED_SPAM" = "Dilaporkan sebagai spam";
 
 /* Body message of the alert shown when a user taps on 'learn more' via the spam info message. */
-"INFO_MESSAGE_REPORTED_SPAM_LEARN_MORE_MESSAGE" = "Signal telah diberi tahu bahwa orang ini mungkin mengirim spam. Signal tidak dapat melihat isi obrolan apa pun.";
+"INFO_MESSAGE_REPORTED_SPAM_LEARN_MORE_MESSAGE" = "Radar telah diberi tahu bahwa orang ini mungkin mengirim spam. Radar tidak dapat melihat isi obrolan apa pun.";
 
 /* Title of the alert shown when a user taps on 'learn more' via the spam info message. */
 "INFO_MESSAGE_REPORTED_SPAM_LEARN_MORE_TITLE" = "Spam dilaporkan";
@@ -4555,7 +4555,7 @@
 "INFO_MESSAGE_USER_CHANGED_PHONE_NUMBER_FORMAT" = "%1$@ mengganti nomor teleponnya.";
 
 /* Shown in inbox and conversation when a user joins Signal, embeds the new user's {{contact name}} */
-"INFO_MESSAGE_USER_JOINED_SIGNAL_BODY_FORMAT" = "%1$@ ada di Signal!";
+"INFO_MESSAGE_USER_JOINED_SIGNAL_BODY_FORMAT" = "%1$@ ada di Radar!";
 
 /* Label at the top of the input text when editing a message */
 "INPUT_TOOLBAR_EDIT_MESSAGE_LABEL" = "Edit pesan";
@@ -4582,13 +4582,13 @@
 "INVALID_PROXY_HOST_ERROR" = "Alamat proksi yang Anda masukkan tidak valid, periksa alamat dan coba lagi.";
 
 /* Alert body when contacts disabled while trying to invite contacts to signal */
-"INVITE_FLOW_REQUIRES_CONTACT_ACCESS_BODY" = "Anda dapat mengaktifkan akses kontak pada Pengaturan iOS untuk mengundang teman-teman Anda bergabung menggunakan Signal.";
+"INVITE_FLOW_REQUIRES_CONTACT_ACCESS_BODY" = "Anda dapat mengaktifkan akses kontak pada Pengaturan iOS untuk mengundang teman-teman Anda bergabung menggunakan Radar.";
 
 /* Alert title when contacts disabled while trying to invite contacts to signal */
 "INVITE_FLOW_REQUIRES_CONTACT_ACCESS_TITLE" = "Perbolehkan Akses Kontak";
 
 /* Label for the cell that presents the 'invite contacts' workflow. */
-"INVITE_FRIENDS_CONTACT_TABLE_BUTTON" = "Undang Kawan ke Signal";
+"INVITE_FRIENDS_CONTACT_TABLE_BUTTON" = "Undang Kawan ke Radar";
 
 /* Header label above a section for more options for adding contacts */
 "INVITE_FRIENDS_CONTACT_TABLE_HEADER" = "Selanjutnya";
@@ -4711,7 +4711,7 @@
 "LINK_DEVICE_SCANNING_INSTRUCTIONS_SHEET_TITLE" = "Pindai kode QR";
 
 /* Body text for a sheet when a user tries to link a device informing them that they will need to authenticate their device */
-"LINK_NEW_DEVICE_AUTHENTICATION_INFO_SHEET_BODY" = "Ketuk lanjutkan dan masukkan kunci ponsel Anda untuk mengonfirmasi. Jangan masukkan PIN Signal Anda.";
+"LINK_NEW_DEVICE_AUTHENTICATION_INFO_SHEET_BODY" = "Ketuk lanjutkan dan masukkan kunci ponsel Anda untuk mengonfirmasi. Jangan masukkan PIN Radar Anda.";
 
 /* Title for a sheet when a user tries to link a device informing them that they will need to authenticate their device */
 "LINK_NEW_DEVICE_AUTHENTICATION_INFO_SHEET_TITLE" = "Sebelum menautkan, konfirmasi diri Anda";
@@ -4720,7 +4720,7 @@
 "LINK_NEW_DEVICE_AUTHENTICATION_REASON" = "Autentikasi untuk menautkan perangkat";
 
 /* Body text for a sheet when a user has started linking a device informing them to finish the process on that other device */
-"LINK_NEW_DEVICE_FINISH_ON_OTHER_DEVICE_SHEET_BODY" = "Selesaikan penautan Signal di perangkat Anda yang lain.";
+"LINK_NEW_DEVICE_FINISH_ON_OTHER_DEVICE_SHEET_BODY" = "Selesaikan penautan Radar di perangkat Anda yang lain.";
 
 /* Title for a sheet when a user has started linking a device informing them to finish the process on that other device */
 "LINK_NEW_DEVICE_FINISH_ON_OTHER_DEVICE_SHEET_TITLE" = "Selesaikan penautan di perangkat Anda yang lain";
@@ -4762,10 +4762,10 @@
 "LINK_PREVIEW_UNKNOWN_DOMAIN" = "Pratinjau Tautan";
 
 /* Shown in an alert when trying to edit a contact. */
-"LINKED_DEVICE_CONTACTS_NOT_ALLOWED" = "Pengelolaan kontak ponsel sudah tidak tersedia di iPad. Untuk menambahkan koneksi Signal ke kontak ponsel, buka Signal di ponsel Anda.";
+"LINKED_DEVICE_CONTACTS_NOT_ALLOWED" = "Pengelolaan kontak ponsel sudah tidak tersedia di iPad. Untuk menambahkan koneksi Radar ke kontak ponsel, buka Radar di ponsel Anda.";
 
 /* Shown in a banner when you tap the 'New Chat' icon at the top of the list of chats. */
-"LINKED_DEVICE_MANAGE_CONTACTS_BANNER" = "Pengelolaan kontak ponsel sudah tidak didukung di iPad. Perangkat ini akan terus menyinkronkan setiap perubahan daftar kontak dari Signal di ponsel Anda.";
+"LINKED_DEVICE_MANAGE_CONTACTS_BANNER" = "Pengelolaan kontak ponsel sudah tidak didukung di iPad. Perangkat ini akan terus menyinkronkan setiap perubahan daftar kontak dari Radar di ponsel Anda.";
 
 /* A button shown in a banner when you tap the 'New Chat' icon at the top of the list of chats. Tapping it opens a website with more details. */
 "LINKED_DEVICE_MANAGE_CONTACTS_LEARN_MORE" = "Selengkapnya";
@@ -4780,28 +4780,28 @@
 "LINKED_DEVICE_NOTIFICATION_TITLE" = "Anda Menghubungkan Perangkat Baru";
 
 /* Message for an action sheet telling users how to link a device, when trying to open an external device-linking URL. */
-"LINKED_DEVICE_URL_OPENED_ACTION_SHEET_EXTERNAL_URL_MESSAGE" = "Untuk menghubungkan desktop atau iPad ke akun Signal ini, buka Perangkat Terhubung lalu ketuk \"Hubungkan Perangkat Baru\", dan pindai kode QR lagi. Pastikan Anda hanya memindai kode QR yang diperoleh langsung dari Signal.";
+"LINKED_DEVICE_URL_OPENED_ACTION_SHEET_EXTERNAL_URL_MESSAGE" = "Untuk menghubungkan desktop atau iPad ke akun Radar ini, buka Perangkat Terhubung lalu ketuk \"Hubungkan Perangkat Baru\", dan pindai kode QR lagi. Pastikan Anda hanya memindai kode QR yang diperoleh langsung dari Radar.";
 
 /* Message for an action sheet telling users how to link a device, when trying to open a device-linking URL from the in-app camera. */
-"LINKED_DEVICE_URL_OPENED_ACTION_SHEET_IN_APP_CAMERA_MESSAGE" = "Sepertinya Anda sedang mencoba menghubungkan perangkat Signal. Ketuk lanjutkan, lalu ketuk \"Hubungkan Perangkat Baru\" dan pindai kode QR lagi.";
+"LINKED_DEVICE_URL_OPENED_ACTION_SHEET_IN_APP_CAMERA_MESSAGE" = "Sepertinya Anda sedang mencoba menghubungkan perangkat Radar. Ketuk lanjutkan, lalu ketuk \"Hubungkan Perangkat Baru\" dan pindai kode QR lagi.";
 
 /* Bullet point about downloads on the linked devices education sheet. Embeds {{ %1$@ iPad download link, %2$@ desktop download link }} */
-"LINKED_DEVICES_EDUCATION_POINT_DOWNLOADS" = "Di perangkat satunya, buka %1$@ untuk menginstal aplikasi Signal di iPad atau %2$@ untuk menginstal di desktop.";
+"LINKED_DEVICES_EDUCATION_POINT_DOWNLOADS" = "Di perangkat satunya, buka %1$@ untuk menginstal aplikasi Radar di iPad atau %2$@ untuk menginstal di desktop.";
 
 /* Bullet point about message sync on the linked devices education sheet */
-"LINKED_DEVICES_EDUCATION_POINT_MESSAGES" = "Pesan Signal akan disinkronkan di ponsel Anda setelah perangkat terhubung.";
+"LINKED_DEVICES_EDUCATION_POINT_MESSAGES" = "Pesan Radar akan disinkronkan di ponsel Anda setelah perangkat terhubung.";
 
 /* Bullet point about privacy on the linked devices education sheet */
 "LINKED_DEVICES_EDUCATION_POINT_PRIVACY" = "Semua pesan di perangkat terhubung bersifat privat";
 
 /* Title for the linked device education sheet */
-"LINKED_DEVICES_EDUCATION_TITLE" = "Signal di Desktop atau iPad";
+"LINKED_DEVICES_EDUCATION_TITLE" = "Radar di Desktop atau iPad";
 
 /* Text that appears where the linked device list would be indicating that there are no linked devices. */
 "LINKED_DEVICES_EMPTY_STATE" = "Tidak ada perangkat terhubung";
 
 /* Description for header of the linked devices list */
-"LINKED_DEVICES_HEADER_DESCRIPTION" = "Use Signal on desktop or iPad.";
+"LINKED_DEVICES_HEADER_DESCRIPTION" = "Use Radar on desktop or iPad.";
 
 /* Footer text below the list of currently-linked devices */
 "LINKED_DEVICES_LIST_FOOTER" = "Pesan dan info obrolan dilindungi enkripsi menyeluruh di semua perangkat";
@@ -4846,7 +4846,7 @@
 "LOADING_VIEW_CONTROLLER_DONT_CLOSE_APP" = "Jangan menutup aplikasi.";
 
 /* Body for local network permission action sheet */
-"LOCAL_NETWORK_PERMISSION_ACTION_SHEET_BODY" = "Untuk memindahkan akun Signal Anda, Anda perlu mengaktfikan akses ke jaringan lokal pada kedua perangkat.";
+"LOCAL_NETWORK_PERMISSION_ACTION_SHEET_BODY" = "Untuk memindahkan akun Radar Anda, Anda perlu mengaktfikan akses ke jaringan lokal pada kedua perangkat.";
 
 /* A button asking the user if they need further help getting their transfer working. */
 "LOCAL_NETWORK_PERMISSION_ACTION_SHEET_NEED_HELP" = "Butuh Bantuan?";
@@ -4858,7 +4858,7 @@
 "LOCAL_NETWORK_PERMISSION_ACTION_SHEET_STEP_THREE" = "Nyalakan \"Jaringan Lokal\"";
 
 /* Second step for local network permission action sheet */
-"LOCAL_NETWORK_PERMISSION_ACTION_SHEET_STEP_TWO" = "Arahkan ke Signal";
+"LOCAL_NETWORK_PERMISSION_ACTION_SHEET_STEP_TWO" = "Arahkan ke Radar";
 
 /* Title for local network permission action sheet */
 "LOCAL_NETWORK_PERMISSION_ACTION_SHEET_TITLE" = "Nyalakan Akses Jaringan Lokal";
@@ -4873,7 +4873,7 @@
 "LOGGING_SECTION" = "Masuk";
 
 /* Footer for the 'logging' help section. */
-"LOGGING_SECTION_FOOTER" = "Catatan awakutu dapat membantu Signal memperbaiki masalah dan kerusakan.";
+"LOGGING_SECTION_FOOTER" = "Catatan awakutu dapat membantu Radar memperbaiki masalah dan kerusakan.";
 
 /* Title for the 'long text message' view. */
 "LONG_TEXT_VIEW_TITLE" = "Pesan";
@@ -4975,7 +4975,7 @@
 "MESSAGE_ACTION_DELETE_FOR_EVERYONE" = "Hapus untuk Semua Orang";
 
 /* A one-time confirmation that you want to delete for everyone */
-"MESSAGE_ACTION_DELETE_FOR_EVERYONE_CONFIRMATION" = "Pesan ini akan dihapus untuk semua orang yang ada dalam obrolan jika mereka menggunakan versi terbaru Signal. Mereka akan bisa melihat bahwa Anda telah menghapus sebuah pesan.";
+"MESSAGE_ACTION_DELETE_FOR_EVERYONE_CONFIRMATION" = "Pesan ini akan dihapus untuk semua orang yang ada dalam obrolan jika mereka menggunakan versi terbaru Radar. Mereka akan bisa melihat bahwa Anda telah menghapus sebuah pesan.";
 
 /* The title for the action sheet asking who the user wants to delete the message for. */
 "MESSAGE_ACTION_DELETE_FOR_TITLE" = "Untuk siapa Anda ingin menghapus pesan ini?";
@@ -5020,7 +5020,7 @@
 "MESSAGE_ACTION_LINK_OPEN_LINK" = "Buka Tautan";
 
 /* Label for button to open a signal proxy. */
-"MESSAGE_ACTION_LINK_OPEN_PROXY" = "Buka Proksi Signal";
+"MESSAGE_ACTION_LINK_OPEN_PROXY" = "Buka Proksi Radar";
 
 /* Label for button to open a sticker pack. */
 "MESSAGE_ACTION_LINK_OPEN_STICKER_PACK" = "Lihat Paket Stiker";
@@ -5194,7 +5194,7 @@
 "MESSAGE_REQUEST_NAME_COLLISON_UPDATE_CONTACT_ACTION" = "Perbarui kontak";
 
 /* Action sheet message to confirm reporting a conversation as spam via a message request. */
-"MESSAGE_REQUEST_REPORT_CONVERSATION_MESSAGE" = "Signal akan diberi tahu bahwa orang ini mungkin mengirim spam. Signal tidak dapat melihat isi obrolan apa pun.";
+"MESSAGE_REQUEST_REPORT_CONVERSATION_MESSAGE" = "Radar akan diberi tahu bahwa orang ini mungkin mengirim spam. Radar tidak dapat melihat isi obrolan apa pun.";
 
 /* Action sheet title to confirm reporting a conversation as spam via a message request. */
 "MESSAGE_REQUEST_REPORT_CONVERSATION_TITLE" = "Laporkan spam?";
@@ -5323,7 +5323,7 @@
 "MISSED_CALL_BLOCKED_SYSTEM_CONTACT" = "Panggilan tak terjawab dari kontak yang diblokir di pengaturan telepon";
 
 /* Action to block contact in Signal for sheet shown when the user taps a missed call from a contact blocked in iOS settings. */
-"MISSED_CALL_BLOCKED_SYSTEM_SETTINGS_SHEET_BLOCK_ACTION" = "Blokir Kontak di Signal Juga";
+"MISSED_CALL_BLOCKED_SYSTEM_SETTINGS_SHEET_BLOCK_ACTION" = "Blokir Kontak di Radar Juga";
 
 /* Message for sheet shown when the user taps a missed call from a contact blocked in iOS settings. */
 "MISSED_CALL_BLOCKED_SYSTEM_SETTINGS_SHEET_MESSAGE" = "Anda melewatkan panggilan orang ini karena nomornya diblokir di pengaturan telepon. Buka Pengaturan > Telepon dan ketuk Kontak Diblokir untuk mengelolanya.";
@@ -5344,19 +5344,19 @@
 "MISSING_CAMERA_PERMISSION_MESSAGE" = "Anda bisa mengaktifkan akses kamera di aplikasi pengaturan perangkat iOS.";
 
 /* Alert title */
-"MISSING_CAMERA_PERMISSION_TITLE" = "Signal butuh akses ke kamera Anda.";
+"MISSING_CAMERA_PERMISSION_TITLE" = "Radar butuh akses ke kamera Anda.";
 
 /* Alert body indicating the user has denied location permissions */
 "MISSING_LOCATION_PERMISSION_MESSAGE" = "Anda dapat mengaktifkan izin ini pada Pengaturan iOS.";
 
 /* Alert title indicating the user has denied location permissions */
-"MISSING_LOCATION_PERMISSION_TITLE" = "Signal membutuhkan akses ke lokasi Anda untuk fitur ini.";
+"MISSING_LOCATION_PERMISSION_TITLE" = "Radar membutuhkan akses ke lokasi Anda untuk fitur ini.";
 
 /* Alert body when user has previously denied media library access */
 "MISSING_MEDIA_LIBRARY_PERMISSION_MESSAGE" = "Anda dapat mengaktifkan izin ini pada Pengaturan iOS.";
 
 /* Alert title when user has previously denied media library access */
-"MISSING_MEDIA_LIBRARY_PERMISSION_TITLE" = "Signal membutuhkan akses ke foto Anda untuk fitur ini.";
+"MISSING_MEDIA_LIBRARY_PERMISSION_TITLE" = "Radar membutuhkan akses ke foto Anda untuk fitur ini.";
 
 /* An error shown as the title of an alert when try to link a new device & the user is already at the limit. */
 "MULTIDEVICE_PAIRING_MAX_DESC" = "Anda tidak dapat menghubungkan perangkat lain lagi.";
@@ -5377,7 +5377,7 @@
 "MY_STORIES_SETTINGS_VISIBILITY_ALL_SIGNAL_CONNECTIONS_EXCEPT_TITLE" = "Semua Kecuali…";
 
 /* Title for the visibility option */
-"MY_STORIES_SETTINGS_VISIBILITY_ALL_SIGNAL_CONNECTIONS_TITLE" = "Semua Koneksi Signal";
+"MY_STORIES_SETTINGS_VISIBILITY_ALL_SIGNAL_CONNECTIONS_TITLE" = "Semua Koneksi Radar";
 
 /* Title for the visibility option */
 "MY_STORIES_SETTINGS_VISIBILITY_ONLY_SHARE_WITH_TITLE" = "Hanya Bagikan Dengan…";
@@ -5539,7 +5539,7 @@
 "NICKNAME_EDITOR_DELETE_CONFIRMATION_TITLE" = "Hapus Nama Panggilan?";
 
 /* The description below the title on the profile nickname editor view. */
-"NICKNAME_EDITOR_DESCRIPTION" = "Nama panggilan & catatan disimpan di Signal dan terenkripsi ujung-ke-ujung. Hanya Anda yang bisa melihatnya.";
+"NICKNAME_EDITOR_DESCRIPTION" = "Nama panggilan & catatan disimpan di Radar dan terenkripsi ujung-ke-ujung. Hanya Anda yang bisa melihatnya.";
 
 /* Placeholder text it the text field for the family name in the profile nickname editor. */
 "NICKNAME_EDITOR_FAMILY_NAME_PLACEHOLDER" = "Nama Belakang";
@@ -5602,7 +5602,7 @@
 "NOTIFICATION_PERMISSION_REMINDER_MEGAPHONE_TITLE" = "Nyalakan Pemberitahuan?";
 
 /* Shown as the body of an alert when notifications can't be shown due to an error. */
-"NOTIFICATIONS_ERROR_MESSAGE" = "Mulai ulang %1$@ jika Anda tidak menerima notifikasi Signal.";
+"NOTIFICATIONS_ERROR_MESSAGE" = "Mulai ulang %1$@ jika Anda tidak menerima notifikasi Radar.";
 
 /* Shown as the title of an alert when notifications can't be shown due to an error. */
 "NOTIFICATIONS_ERROR_TITLE" = "Tidak Dapat Menampilkan Notifikasi";
@@ -5662,10 +5662,10 @@
 "ONBOARDING_2FA_SKIP_PIN_ENTRY_TITLE" = "Lewati Entri PIN?";
 
 /* The body for the device transfer 'choice' view 'restore backup' option */
-"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_BODY" = "Pulihkan akun dan pesan dari Radar/Signal Backup";
+"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_BODY" = "Pulihkan akun dan pesan dari Radar/Radar Backup";
 
 /* The title for the device transfer 'choice' view 'restore backup' option */
-"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_TITLE" = "Pulihkan Radar/Signal Secure Backups";
+"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_TITLE" = "Pulihkan Radar/Radar Secure Backups";
 
 /* Body for a sheet warning users about skipping restore. */
 "ONBOARDING_CHOOSE_RESTORE_METHOD_CONFIRM_SKIP_RESTORE_BODY" = "Jika pemulihan dilewati, nanti data cadangan tidak bisa dipulihkan sama sekali. Jika pencadangan data diaktifkan kembali di perangkat ini, data cadangan Anda saat ini akan digantikan dengan riwayat pesan baru.";
@@ -5677,7 +5677,7 @@
 "ONBOARDING_CHOOSE_RESTORE_METHOD_DESCRIPTION" = "Pilih cara Anda ingin memulihkan riwayat pesan dan data akun.";
 
 /* Message body displayed to a user during registration if there are no restore options available. */
-"ONBOARDING_CHOOSE_RESTORE_METHOD_NONE_AVAILABLE_BODY" = "Karena Anda beralih dari Android ke iOS, satu-satunya cara untuk mentransfer pesan dan media adalah dengan mengaktifkan Signal Backups di perangkat lama Anda.";
+"ONBOARDING_CHOOSE_RESTORE_METHOD_NONE_AVAILABLE_BODY" = "Karena Anda beralih dari Android ke iOS, satu-satunya cara untuk mentransfer pesan dan media adalah dengan mengaktifkan Radar Backups di perangkat lama Anda.";
 
 /* Title displayed to a user during registration if there are no restore options available. */
 "ONBOARDING_CHOOSE_RESTORE_METHOD_NONE_AVAILABLE_TITLE" = "Tidak Ada Cadangan untuk Dipulihkan";
@@ -5737,10 +5737,10 @@
 "ONBOARDING_MODE_SWITCH_BUTTON_REGISTERING" = "Hubungkan iPhone";
 
 /* explanation to the user they're switching from linking to registering flow */
-"ONBOARDING_MODE_SWITCH_EXPLANATION_PROVISIONING" = "Pilih \"Daftarkan iPad\" untuk membuat akun baru dan memindahkan akun sebelumnya ke iPad ini. Hal ini akan menon-aktifkan Signal di perangkat lain yang terdaftar dengan nomor seluler yang sama.";
+"ONBOARDING_MODE_SWITCH_EXPLANATION_PROVISIONING" = "Pilih \"Daftarkan iPad\" untuk membuat akun baru dan memindahkan akun sebelumnya ke iPad ini. Hal ini akan menon-aktifkan Radar di perangkat lain yang terdaftar dengan nomor seluler yang sama.";
 
 /* explanation to the user they're switching from registering to linking flow */
-"ONBOARDING_MODE_SWITCH_EXPLANATION_REGISTERING" = "Pilih \"Tautkan iPhone\" untuk menghubungkan iPhone Anda dengan akun Signal. Menautkan iPhone Anda tidak dianjurkan dan akan membatasi beberapa fungsi, contohnya membuat panggilan.";
+"ONBOARDING_MODE_SWITCH_EXPLANATION_REGISTERING" = "Pilih \"Tautkan iPhone\" untuk menghubungkan iPhone Anda dengan akun Radar. Menautkan iPhone Anda tidak dianjurkan dan akan membatasi beberapa fungsi, contohnya membuat panggilan.";
 
 /* header text indicating to the user they're switching from linking to registering flow */
 "ONBOARDING_MODE_SWITCH_TITLE_PROVISIONING" = "Daftarkan iPad ini";
@@ -5749,13 +5749,13 @@
 "ONBOARDING_MODE_SWITCH_TITLE_REGISTERING" = "Hubungkan iPhone ini";
 
 /* warning to the user that registering an ipad is not recommended */
-"ONBOARDING_MODE_SWITCH_WARNING_PROVISIONING" = "Menautkan Signal dengan iPad akan menon-aktifkan Signal pada semua perangkat lain yang terdaftar dengan nomor seluler yang sama.";
+"ONBOARDING_MODE_SWITCH_WARNING_PROVISIONING" = "Menautkan Radar dengan iPad akan menon-aktifkan Radar pada semua perangkat lain yang terdaftar dengan nomor seluler yang sama.";
 
 /* warning to the user that linking a phone is not recommended */
-"ONBOARDING_MODE_SWITCH_WARNING_REGISTERING" = "Menautkan iPhone tidak dianjurkan dan akan membatasi fungsi-fungsi Signal.";
+"ONBOARDING_MODE_SWITCH_WARNING_REGISTERING" = "Menautkan iPhone tidak dianjurkan dan akan membatasi fungsi-fungsi Radar.";
 
 /* Description of the 'Contacts' permission in the 'onboarding permissions' view. */
-"ONBOARDING_PERMISSIONS_CONTACTS_DESCRIPTION" = "Temukan orang yang Anda kenal. Kontak Anda dienkripsi dan tidak terlihat oleh layanan Signal.";
+"ONBOARDING_PERMISSIONS_CONTACTS_DESCRIPTION" = "Temukan orang yang Anda kenal. Kontak Anda dienkripsi dan tidak terlihat oleh layanan Radar.";
 
 /* Title introducing the 'Contacts' permission in the 'onboarding permissions' view. */
 "ONBOARDING_PERMISSIONS_CONTACTS_TITLE" = "Kontak";
@@ -5767,7 +5767,7 @@
 "ONBOARDING_PERMISSIONS_NOTIFICATIONS_TITLE" = "Notifikasi";
 
 /* Preamble of the 'onboarding permissions' view. */
-"ONBOARDING_PERMISSIONS_PREAMBLE" = "Signal ingin meminta izin berikut.";
+"ONBOARDING_PERMISSIONS_PREAMBLE" = "Radar ingin meminta izin berikut.";
 
 /* Description of the 'Notification Relay' permission in the 'onboarding permissions' view. */
 "ONBOARDING_PERMISSIONS_RELAY_DESCRIPTION" = "Enable Radar notification relay to ensure you get immediate background notifications in Radar. Relay is always privacy-preserving and keeps your messages end-to-end encrypted no matter what.";
@@ -5779,7 +5779,7 @@
 "ONBOARDING_PERMISSIONS_TITLE" = "Berikan Perizinan";
 
 /* Explanation of the 'onboarding phone number discoverability' view. Embeds {user phone number} */
-"ONBOARDING_PHONE_NUMBER_DISCOVERABILITY_EXPLANATION_FORMAT" = "Pilih siapa yang dapat mencari Anda di Signal dengan nomor telepon %1$@";
+"ONBOARDING_PHONE_NUMBER_DISCOVERABILITY_EXPLANATION_FORMAT" = "Pilih siapa yang dapat mencari Anda di Radar dengan nomor telepon %1$@";
 
 /* Title of the 'onboarding phone number discoverability' view. */
 "ONBOARDING_PHONE_NUMBER_DISCOVERABILITY_TITLE" = "Siapa yang dapat mencari Anda dengan nomor telepon?";
@@ -5794,7 +5794,7 @@
 "ONBOARDING_PHONE_NUMBER_VALIDATION_WARNING" = "Nomor telepon salah. Mohon masukkan nomor telepon yang benar untuk mendaftar.";
 
 /* Explanation of the 'onboarding pin attempts exhausted' view when reglock is disabled. */
-"ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_EXPLANATION" = "Anda telah kehabisan percobaan PIN, namun Anda tetap dapat mengakses akun Signal Anda dengan membuat PIN baru. Untuk privasi dan keamanan akun Anda akan dipulihkan tanpa informasi profil atau pengaturan.";
+"ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_EXPLANATION" = "Anda telah kehabisan percobaan PIN, namun Anda tetap dapat mengakses akun Radar Anda dengan membuat PIN baru. Untuk privasi dan keamanan akun Anda akan dipulihkan tanpa informasi profil atau pengaturan.";
 
 /* Label for the 'learn more' link when reglock is disabled in the 'onboarding pin attempts exhausted' view. */
 "ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_LEARN_MORE" = "Pelajari lebih lanjut tentang PIN";
@@ -5803,7 +5803,7 @@
 "ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_TITLE" = "PIN Salah";
 
 /* Explanation of the 'onboarding pin attempts exhausted' view when it is unknown if reglock is enabled. */
-"ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_WITH_UNKNOWN_REGLOCK_EXPLANATION" = "Kesempatan mencoba PIN sudah habis, tetapi Anda tetap dapat mencoba dan mengakses akun Signal Anda dengan memverifikasi nomor telepon. Untuk privasi dan keamanan, akun Anda akan dipulihkan tanpa informasi profil atau pengaturan tersimpan.";
+"ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_WITH_UNKNOWN_REGLOCK_EXPLANATION" = "Kesempatan mencoba PIN sudah habis, tetapi Anda tetap dapat mencoba dan mengakses akun Radar Anda dengan memverifikasi nomor telepon. Untuk privasi dan keamanan, akun Anda akan dipulihkan tanpa informasi profil atau pengaturan tersimpan.";
 
 /* Title for the setup complete screen shown at the end of the onboarding flow. */
 "ONBOARDING_SETUP_COMPLETE_TITLE" = "Pengaturan Selesai";
@@ -5830,13 +5830,13 @@
 "ONBOARDING_SIGN_UP_USE_SIGNAL_ACCOUNT_BUTTON_TITLE" = "Use my Signal account";
 
 /* Explanation of 'do not have old device' flow for the 'Restore or Transfer' prompt */
-"ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_BODY" = "Atau Anda menginstal ulang Radar/Signal di perangkat yang sama";
+"ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_BODY" = "Atau Anda menginstal ulang Radar/Radar di perangkat yang sama";
 
 /* Title for the 'do not have my old device' choice of the 'Restore or Transfer' prompt */
 "ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_TITLE" = "Ponsel lama saya sudah tidak ada";
 
 /* Explanation of 'have old device' flow for the 'Restore or Transfer' prompt */
-"ONBOARDING_SPLASH_HAVE_OLD_DEVICE_BODY" = "Pindai kode QR dari akun Radar/Signal Anda saat ini untuk memulai dengan cepat";
+"ONBOARDING_SPLASH_HAVE_OLD_DEVICE_BODY" = "Pindai kode QR dari akun Radar/Radar Anda saat ini untuk memulai dengan cepat";
 
 /* Title for the 'have my old device' choice of the 'Restore or Transfer' prompt */
 "ONBOARDING_SPLASH_HAVE_OLD_DEVICE_TITLE" = "Ponsel lama saya masih ada";
@@ -5897,19 +5897,19 @@ Send money securely.";
 "OPEN_SETTINGS_BUTTON" = "Pengaturan";
 
 /* Signal doesn't support old versions of iOS and shows a warning if you're on unsupported version. Some users can upgrade their device to a newer version of iOS to continue using Signal. If that's the case, they'll be shown this text. */
-"OS_EXPIRED_AND_CAN_UPGRADE_OS" = "Signal sudah tidak berfungsi di perangkat ini. Untuk menggunakan Signal lagi, perbarui perangkat Anda ke versi iOS yang lebih baru.";
+"OS_EXPIRED_AND_CAN_UPGRADE_OS" = "Radar sudah tidak berfungsi di perangkat ini. Untuk menggunakan Radar lagi, perbarui perangkat Anda ke versi iOS yang lebih baru.";
 
 /* Signal doesn't support old devices. If that's the case, they'll be shown this action, and tapping it will open information about Signal's minimum supported operating systems. */
-"OS_EXPIRED_AND_DEVICE_IS_STUCK" = "Signal sudah tidak berfungsi di perangkat ini. Untuk menggunakan Signal lagi, ganti ke perangkat yang lebih baru.";
+"OS_EXPIRED_AND_DEVICE_IS_STUCK" = "Radar sudah tidak berfungsi di perangkat ini. Untuk menggunakan Radar lagi, ganti ke perangkat yang lebih baru.";
 
 /* Signal doesn't support old versions of iOS and shows a warning if you're on an old version. Some users can upgrade their device to a newer version of iOS to continue using Signal. If that's the case, they'll be shown this action, and tapping it will open device update instructions. */
 "OS_SOON_TO_EXPIRE_ACTION_TITLE" = "Perbarui Sekarang";
 
 /* Signal doesn't support old versions of iOS and shows a warning if you're an old version that will soon lose support. Some users can upgrade their device to a newer version of iOS to continue using Signal. If that's the case, they'll be shown this text. Embeds {{expiration date}}. */
-"OS_SOON_TO_EXPIRE_AND_CAN_UPGRADE_OS_FORMAT" = "Signal akan menghentikan dukungan untuk versi iOS perangkat Anda dalam waktu dekat. Untuk bisa tetap menggunakan Signal, perbarui perangkat ke versi iOS yang lebih baru paling lambat %1$@.";
+"OS_SOON_TO_EXPIRE_AND_CAN_UPGRADE_OS_FORMAT" = "Radar akan menghentikan dukungan untuk versi iOS perangkat Anda dalam waktu dekat. Untuk bisa tetap menggunakan Radar, perbarui perangkat ke versi iOS yang lebih baru paling lambat %1$@.";
 
 /* Signal doesn't support old versions of iOS and shows a warning if you're on an old version that will soon lose support. This is the text on that warning when users can't upgrade iOS without getting a new device. Embeds {{expiration date}}. */
-"OS_SOON_TO_EXPIRE_AND_DEVICE_WILL_BE_STUCK_FORMAT" = "Signal akan menghentikan dukungan untuk versi iOS perangkat Anda dalam waktu dekat. Untuk bisa tetap menggunakan Signal, ganti ke perangkat yang lebih baru paling lambat %1$@.";
+"OS_SOON_TO_EXPIRE_AND_DEVICE_WILL_BE_STUCK_FORMAT" = "Radar akan menghentikan dukungan untuk versi iOS perangkat Anda dalam waktu dekat. Untuk bisa tetap menggunakan Radar, ganti ke perangkat yang lebih baru paling lambat %1$@.";
 
 /* Info Message when another user disabled disappearing messages. Embeds {{name of other user}}. */
 "OTHER_DISABLED_DISAPPEARING_MESSAGES_CONFIGURATION" = "%1$@menonaktifkan pesan tersembunyi";
@@ -5918,13 +5918,13 @@ Send money securely.";
 "OTHER_UPDATED_DISAPPEARING_MESSAGES_CONFIGURATION" = "%1$@mengatur waktu penghilangan pesan menjadi %2$@";
 
 /* Label warning the user that the Signal service may be down. */
-"OUTAGE_WARNING" = "Signal sedang mengalami kesulitan teknis. Kami bekerja keras untuk memulihkan layanan secepat mungkin.";
+"OUTAGE_WARNING" = "Radar sedang mengalami kesulitan teknis. Kami bekerja keras untuk memulihkan layanan secepat mungkin.";
 
 /* Label for action link when the user has an outdated payment client */
 "OUTDATED_PAYMENT_CLIENT_ACTION_TITLE" = "Perbarui sekarang";
 
 /* Label warning the user that they should update Signal to continue using payments. */
-"OUTDATED_PAYMENT_CLIENT_REMINDER_TEXT" = "Perbarui Signal untuk terus menggunakan pembayaran. Saldo Anda mungkin belum diperbarui.";
+"OUTDATED_PAYMENT_CLIENT_REMINDER_TEXT" = "Perbarui Radar untuk terus menggunakan pembayaran. Saldo Anda mungkin belum diperbarui.";
 
 /* Body of prompt notifying restore was cancelled. */
 "OUTGOING_DEVICE_REGISTRATION_CANCELLED_RESTORE_BODY" = "Pemulihan dibatalkan. Silakan coba lagi.";
@@ -5933,7 +5933,7 @@ Send money securely.";
 "OUTGOING_DEVICE_REGISTRATION_CANCELLED_RESTORE_TITLE" = "Pemulihan dibatalkan";
 
 /* Body of prompt notifying registration without restore completed on the new device. */
-"OUTGOING_DEVICE_REGISTRATION_COMPLETE_BODY" = "Akun Signal telah diaktifkan di perangkat Anda yang lain. Sekarang, Signal sudah tidak aktif di perangkat ini.";
+"OUTGOING_DEVICE_REGISTRATION_COMPLETE_BODY" = "Akun Radar telah diaktifkan di perangkat Anda yang lain. Sekarang, Radar sudah tidak aktif di perangkat ini.";
 
 /* Title of prompt notifying registration without restore completed on the new device. */
 "OUTGOING_DEVICE_REGISTRATION_COMPLETE_TITLE" = "Pendaftaran selesai";
@@ -5951,7 +5951,7 @@ Send money securely.";
 "OUTGOING_DEVICE_REGISTRATION_UNKNOWN_ERROR_TITLE" = "Kesalahan tidak diketahui";
 
 /* Body of prompt notifying device restore started on the new device. */
-"OUTGOING_DEVICE_RESTORE_COMPLETE_BODY" = "Akun dan pesan Signal Anda sudah mulai ditransfer ke perangkat Anda yang lain. Sekarang, Signal sudah tidak aktif di perangkat ini.";
+"OUTGOING_DEVICE_RESTORE_COMPLETE_BODY" = "Akun dan pesan Radar Anda sudah mulai ditransfer ke perangkat Anda yang lain. Sekarang, Radar sudah tidak aktif di perangkat ini.";
 
 /* Title of prompt notifying device restore started on the new device. */
 "OUTGOING_DEVICE_RESTORE_COMPLETE_TITLE" = "Pemulihan selesai";
@@ -5975,7 +5975,7 @@ Send money securely.";
 "OUTGOING_DEVICE_RESTORE_INITIAL_VIEW_TITLE" = "Transfer Akun";
 
 /* Body of prompt notifying device transfer completed. */
-"OUTGOING_DEVICE_TRANSFER_COMPLETE_BODY" = "Akun dan pesan Signal Anda telah ditransfer ke perangkat Anda yang lain. Sekarang, Signal sudah tidak aktif di perangkat ini.";
+"OUTGOING_DEVICE_TRANSFER_COMPLETE_BODY" = "Akun dan pesan Radar Anda telah ditransfer ke perangkat Anda yang lain. Sekarang, Radar sudah tidak aktif di perangkat ini.";
 
 /* Title of prompt notifying device transfer completed. */
 "OUTGOING_DEVICE_TRANSFER_COMPLETE_TITLE" = "Transfer selesai";
@@ -5987,10 +5987,10 @@ Send money securely.";
 "OUTGOING_MISSED_VOICE_CALL" = "Panggilan suara tidak terjawab";
 
 /* Button for action sheet shown when device transfer completes; quits the Signal app immediately (does not automatically relaunch, but the user may choose to relaunch). */
-"OUTGOING_TRANSFER_COMPLETE_EXIT_ACTION" = "Keluar Signal";
+"OUTGOING_TRANSFER_COMPLETE_EXIT_ACTION" = "Keluar Radar";
 
 /* Message for action sheet shown when device transfer completes */
-"OUTGOING_TRANSFER_COMPLETE_MESSAGE" = "Sekarang Signal akan ditutup di perangkat ini";
+"OUTGOING_TRANSFER_COMPLETE_MESSAGE" = "Sekarang Radar akan ditutup di perangkat ini";
 
 /* Title for action sheet shown when device transfer completes */
 "OUTGOING_TRANSFER_COMPLETE_TITLE" = "Transfer selesai!";
@@ -6168,7 +6168,7 @@ Send money securely.";
 "PAYMENTS_NEW_PAYMENT_ERROR_INVALID_TRANSACTION" = "Transaksi tidak valid";
 
 /* Indicates that a payment failed due to an outdated client. */
-"PAYMENTS_NEW_PAYMENT_ERROR_OUTDATED_CLIENT" = "Perbarui Signal untuk menggunakan pembayaran.";
+"PAYMENTS_NEW_PAYMENT_ERROR_OUTDATED_CLIENT" = "Perbarui Radar untuk menggunakan pembayaran.";
 
 /* Indicates that an outgoing payment could not be verified in a timely way. */
 "PAYMENTS_NEW_PAYMENT_ERROR_OUTGOING_VERIFICATION_TAKING_TOO_LONG" = "Pembayaran belum diverifikasi";
@@ -6432,13 +6432,13 @@ Send money securely.";
 "PHONE_NUMBER_DISCOVERABILITY_EVERYBODY" = "Siapa Saja";
 
 /* A user friendly description of the 'everybody' phone number discoverability mode. */
-"PHONE_NUMBER_DISCOVERABILITY_EVERYBODY_DESCRIPTION" = "Siapa pun yang punya nomor telepon Anda akan melihat Anda ada di Signal dan dapat memulai obrolan.";
+"PHONE_NUMBER_DISCOVERABILITY_EVERYBODY_DESCRIPTION" = "Siapa pun yang punya nomor telepon Anda akan melihat Anda ada di Radar dan dapat memulai obrolan.";
 
 /* A user friendly name for the 'nobody' phone number discoverability mode. */
 "PHONE_NUMBER_DISCOVERABILITY_NOBODY" = "Tak seorangpun";
 
 /* A user friendly description of the 'nobody' phone number discoverability mode. */
-"PHONE_NUMBER_DISCOVERABILITY_NOBODY_DESCRIPTION" = "Tidak seorang pun bisa melihat Anda di Signal kecuali Anda mengirimi mereka pesan atau sudah pernah mengobrol dengan mereka.";
+"PHONE_NUMBER_DISCOVERABILITY_NOBODY_DESCRIPTION" = "Tidak seorang pun bisa melihat Anda di Radar kecuali Anda mengirimi mereka pesan atau sudah pernah mengobrol dengan mereka.";
 
 /* A format for a label showing an example phone number. Embeds {{the example phone number}}. */
 "PHONE_NUMBER_EXAMPLE_FORMAT" = "Misalnya: %1$@";
@@ -6540,22 +6540,22 @@ Send money securely.";
 "PIN_CREATION_DISABLE_CONFIRMATION_ACTION" = "Nonaktifkan PIN";
 
 /* Message of the 'pin disable' action sheet. */
-"PIN_CREATION_DISABLE_CONFIRMATION_MESSAGE" = "Jika Anda menonaktifkan PIN, Anda akan kehilangan data saat Anda mendaftar ulang Signal kecuali Anda mentransfernya dari perangkat iOS lain. Anda tidak dapat menyalakan Kunci Pendaftaran saat PIN dinonaktifkan.";
+"PIN_CREATION_DISABLE_CONFIRMATION_MESSAGE" = "Jika Anda menonaktifkan PIN, Anda akan kehilangan data saat Anda mendaftar ulang Radar kecuali Anda mentransfernya dari perangkat iOS lain. Anda tidak dapat menyalakan Kunci Pendaftaran saat PIN dinonaktifkan.";
 
 /* Title of the 'pin disable' action sheet. */
 "PIN_CREATION_DISABLE_CONFIRMATION_TITLE" = "Peringatan";
 
 /* The explanation in the 'pin creation' view. */
-"PIN_CREATION_EXPLANATION" = "PIN menjaga informasi yang disimpan dengan Signal terenkripsi sehingga hanya Anda yang dapat mengaksesnya. Profil Anda, pengaturan, dan kontak-kontak akan dipulihkan saat Anda memasang ulang aplikasi. Anda tidak memerlukan PIN untuk membuka aplikasinya.";
+"PIN_CREATION_EXPLANATION" = "PIN menjaga informasi yang disimpan dengan Radar terenkripsi sehingga hanya Anda yang dapat mengaksesnya. Profil Anda, pengaturan, dan kontak-kontak akan dipulihkan saat Anda memasang ulang aplikasi. Anda tidak memerlukan PIN untuk membuka aplikasinya.";
 
 /* Learn more action on the pin creation view */
 "PIN_CREATION_LEARN_MORE" = "Selengkapnya Tentang PIN";
 
 /* Users can create PINs to restore their account data later. They can learn more about this on a sheet. This is the text on that sheet. */
-"PIN_CREATION_LEARN_MORE_TEXT" = "PIN memastikan informasi Anda yang simpan di Signal terenkripsi sehingga hanya Anda yang dapat mengaksesnya. Profil, pengaturan, dan kontak akan dipulihkan saat Anda menginstal ulang Signal.";
+"PIN_CREATION_LEARN_MORE_TEXT" = "PIN memastikan informasi Anda yang simpan di Radar terenkripsi sehingga hanya Anda yang dapat mengaksesnya. Profil, pengaturan, dan kontak akan dipulihkan saat Anda menginstal ulang Radar.";
 
 /* Users can create PINs to restore their account data later. They can learn more about this on a sheet. This is the title on that sheet. */
-"PIN_CREATION_LEARN_MORE_TITLE" = "Tentang PIN Signal";
+"PIN_CREATION_LEARN_MORE_TITLE" = "Tentang PIN Radar";
 
 /* Label indicating that the attempted PIN does not match the first PIN */
 "PIN_CREATION_MISMATCH_ERROR" = "PIN tidak cocok. Coba lagi.";
@@ -6588,7 +6588,7 @@ Send money securely.";
 "PIN_CREATION_WEAK_ERROR" = "Buat PIN yang lebih kuat";
 
 /* If your attempted PIN is too weak, you'll see an error message. This is the text on the error dialog. */
-"PIN_CREATION_WEAK_ERROR_MESSAGE" = "PIN memastikan informasi Anda yang simpan di Signal terenkripsi, jadi hanya Anda yang dapat mengaksesnya. Pilih PIN yang lebih kuat untuk melindungi akun Anda.";
+"PIN_CREATION_WEAK_ERROR_MESSAGE" = "PIN memastikan informasi Anda yang simpan di Radar terenkripsi, jadi hanya Anda yang dapat mengaksesnya. Pilih PIN yang lebih kuat untuk melindungi akun Anda.";
 
 /* If the user is re-registering, they need to enter their PIN to restore all their data. In some cases, they can skip this entry and lose some data. This text is shown on a button that lets them begin to do this. */
 "PIN_ENTER_EXISTING_SKIP" = "Lewati PIN";
@@ -6612,40 +6612,40 @@ Send money securely.";
 "PIN_REMINDER_MEGAPHONE_ACTION" = "Verifikasi PIN";
 
 /* Body for PIN reminder megaphone */
-"PIN_REMINDER_MEGAPHONE_BODY" = "Signal akan mengonfirmasi PIN secara berkala agar Anda tetap ingat.";
+"PIN_REMINDER_MEGAPHONE_BODY" = "Radar akan mengonfirmasi PIN secara berkala agar Anda tetap ingat.";
 
 /* Toast indicating that we'll ask you for your PIN again tomorrow, after successfully entering it. */
-"PIN_REMINDER_MEGAPHONE_FEW_DAYS_SUCCESSFUL_TOAST" = "PIN benar. Signal akan menanyakan lagi PIN Anda dalam beberapa hari.";
+"PIN_REMINDER_MEGAPHONE_FEW_DAYS_SUCCESSFUL_TOAST" = "PIN benar. Radar akan menanyakan lagi PIN Anda dalam beberapa hari.";
 
 /* Toast indicating that we'll ask you for your PIN again in 3 days. */
-"PIN_REMINDER_MEGAPHONE_FEW_DAYS_TOAST" = "Signal akan mengonfirmasi PIN kembali dalam beberapa hari.";
+"PIN_REMINDER_MEGAPHONE_FEW_DAYS_TOAST" = "Radar akan mengonfirmasi PIN kembali dalam beberapa hari.";
 
 /* Title for PIN reminder megaphone */
-"PIN_REMINDER_MEGAPHONE_TITLE" = "Verifikasi PIN Signal Anda";
+"PIN_REMINDER_MEGAPHONE_TITLE" = "Verifikasi PIN Radar Anda";
 
 /* Toast indicating that we'll ask you for your PIN again tomorrow, after successfully entering it. */
-"PIN_REMINDER_MEGAPHONE_TOMORROW_SUCCESSFUL_TOAST" = "PIN benar. Signal akan menanyakan lagi PIN Anda besok.";
+"PIN_REMINDER_MEGAPHONE_TOMORROW_SUCCESSFUL_TOAST" = "PIN benar. Radar akan menanyakan lagi PIN Anda besok.";
 
 /* Toast indicating that we'll ask you for your PIN again tomorrow. */
-"PIN_REMINDER_MEGAPHONE_TOMORROW_TOAST" = "Signal akan mengonfirmasi PIN lagi besok.";
+"PIN_REMINDER_MEGAPHONE_TOMORROW_TOAST" = "Radar akan mengonfirmasi PIN lagi besok.";
 
 /* Toast indicating that we'll ask you for your PIN again in 2 weeks, after successfully entering it. */
-"PIN_REMINDER_MEGAPHONE_TWO_WEEK_SUCCESSFUL_TOAST" = "PIN benar. Signal akan menanyakan lagi PIN Anda dalam 2 minggu.";
+"PIN_REMINDER_MEGAPHONE_TWO_WEEK_SUCCESSFUL_TOAST" = "PIN benar. Radar akan menanyakan lagi PIN Anda dalam 2 minggu.";
 
 /* Toast indicating that we'll ask you for your PIN again tomorrow. */
 "PIN_REMINDER_MEGAPHONE_TWO_WEEK_TOAST" = "Kami akan mengingatkan Anda dalam beberapa minggu lagi.";
 
 /* Toast indicating that we'll ask you for your PIN again tomorrow, after successfully entering it. */
-"PIN_REMINDER_MEGAPHONE_WEEK_SUCCESSFUL_TOAST" = "PIN benar. Signal akan menanyakan lagi PIN Anda dalam seminggu.";
+"PIN_REMINDER_MEGAPHONE_WEEK_SUCCESSFUL_TOAST" = "PIN benar. Radar akan menanyakan lagi PIN Anda dalam seminggu.";
 
 /* Toast indicating that we'll ask you for your PIN again in a week. */
-"PIN_REMINDER_MEGAPHONE_WEEK_TOAST" = "Signal akan mengonfirmasi PIN dalam sepekan.";
+"PIN_REMINDER_MEGAPHONE_WEEK_TOAST" = "Radar akan mengonfirmasi PIN dalam sepekan.";
 
 /* Label indicating that the attempted PIN does not match the user's PIN */
 "PIN_REMINDER_MISMATCH_ERROR" = "PIN tidak valid, coba lagi.";
 
 /* The title for the 'pin reminder' dialog. */
-"PIN_REMINDER_TITLE" = "Masukkan PIN Signal Anda";
+"PIN_REMINDER_TITLE" = "Masukkan PIN Radar Anda";
 
 /* Label indicating that the attempted PIN is too short */
 "PIN_REMINDER_TOO_SHORT_ERROR" = "PIN harus berisi minimal 4 digit.";
@@ -6660,7 +6660,7 @@ Send money securely.";
 "PINS_MEGAPHONE_ACTION" = "Buat PIN";
 
 /* Body for PIN megaphone when user doesn't have a PIN */
-"PINS_MEGAPHONE_BODY" = "Selesai membuat PIN Signal Anda.";
+"PINS_MEGAPHONE_BODY" = "Selesai membuat PIN Radar Anda.";
 
 /* Title for PIN megaphone when user doesn't have a PIN */
 "PINS_MEGAPHONE_TITLE" = "Buat PIN";
@@ -6768,19 +6768,19 @@ Send money securely.";
 "PRIVACY_VERIFICATION_FAILED_MISMATCHED_SAFETY_NUMBERS_IN_CLIPBOARD" = "Nomor di papan klip Anda terlihat seperti bukan nomor keamanan yang benar untuk obrolan ini.";
 
 /* Alert body for user error */
-"PRIVACY_VERIFICATION_FAILED_NO_SAFETY_NUMBERS_IN_CLIPBOARD" = "Signal tak dapat menemukan sejumlah nomor keamanan di dalam papan klip Anda. Apakah Anda sudah menyalin dengan benar?";
+"PRIVACY_VERIFICATION_FAILED_NO_SAFETY_NUMBERS_IN_CLIPBOARD" = "Radar tak dapat menemukan sejumlah nomor keamanan di dalam papan klip Anda. Apakah Anda sudah menyalin dengan benar?";
 
 /* Alert body when verifying with {{contact name}} */
-"PRIVACY_VERIFICATION_FAILED_THEY_HAVE_WRONG_KEY_FOR_ME" = "Tiap pasangan pengguna Signal berbagi nomor keamanan yang berbeda. Periksa kembali bahwa%1$@menampilkan nomor keamanan Anda secara jelas.";
+"PRIVACY_VERIFICATION_FAILED_THEY_HAVE_WRONG_KEY_FOR_ME" = "Tiap pasangan pengguna Radar berbagi nomor keamanan yang berbeda. Periksa kembali bahwa%1$@menampilkan nomor keamanan Anda secara jelas.";
 
 /* alert body */
-"PRIVACY_VERIFICATION_FAILED_WITH_OLD_LOCAL_VERSION" = "Anda sedang menjalankan versi lama Signal. Anda perlu pembaruan sebelum Anda memverifikasi.";
+"PRIVACY_VERIFICATION_FAILED_WITH_OLD_LOCAL_VERSION" = "Anda sedang menjalankan versi lama Radar. Anda perlu pembaruan sebelum Anda memverifikasi.";
 
 /* alert body */
-"PRIVACY_VERIFICATION_FAILED_WITH_OLD_REMOTE_VERSION" = "Teman Anda masih menggunakan Signal versi lama. Mereka perlu pembaruan sebelum Anda memverifikasi.";
+"PRIVACY_VERIFICATION_FAILED_WITH_OLD_REMOTE_VERSION" = "Teman Anda masih menggunakan Radar versi lama. Mereka perlu pembaruan sebelum Anda memverifikasi.";
 
 /* alert body */
-"PRIVACY_VERIFICATION_FAILURE_INVALID_QRCODE" = "Kode yang dipindai tidak terlihat seperti nomor keamanan. Apakah Anda berdua menggunakan versi Signal yang terbaru?";
+"PRIVACY_VERIFICATION_FAILURE_INVALID_QRCODE" = "Kode yang dipindai tidak terlihat seperti nomor keamanan. Apakah Anda berdua menggunakan versi Radar yang terbaru?";
 
 /* Navbar title */
 "PRIVACY_VERIFICATION_TITLE" = "Verifikasi Nomor Keamanan";
@@ -6855,7 +6855,7 @@ Send money securely.";
 "PROFILE_NAME_EDUCATION_SHEET_BULLET_3" = "Jangan bagikan info pribadi dengan orang yang tidak dikenal";
 
 /* Header for the explainer sheet for profile names */
-"PROFILE_NAME_EDUCATION_SHEET_HEADER_FORMAT" = "<bold>Nama profil</bold> di Signal dipilih oleh pemilik akun.";
+"PROFILE_NAME_EDUCATION_SHEET_HEADER_FORMAT" = "<bold>Nama profil</bold> di Radar dipilih oleh pemilik akun.";
 
 /* Title for the profile name view. */
 "PROFILE_NAME_VIEW_TITLE" = "Nama Anda";
@@ -7062,7 +7062,7 @@ Send money securely.";
 "RECIPIENT_PICKER_ERROR_USER_CANNOT_BE_SELECTED" = "Pengguna tidak dapat dipilih.";
 
 /* Alert text. Shown after selecting a phone number that isn't valid. */
-"RECIPIENT_PICKER_INVALID_NUMBER_MESSAGE" = "%1$@ bukan pengguna Signal. Coba lagi dengan nomor telepon yang valid.";
+"RECIPIENT_PICKER_INVALID_NUMBER_MESSAGE" = "%1$@ bukan pengguna Radar. Coba lagi dengan nomor telepon yang valid.";
 
 /* Alert title. Shown after selecting a phone number that isn't valid. */
 "RECIPIENT_PICKER_INVALID_NUMBER_TITLE" = "Nomor Telepon Tidak Valid";
@@ -7071,22 +7071,22 @@ Send money securely.";
 "RECIPIENT_PICKER_INVITE_ACTION" = "Undang";
 
 /* Alert text. Shown after selecting a phone number that isn't a Signal user. */
-"RECIPIENT_PICKER_INVITE_MESSAGE" = "%1$@ bukan pengguna Signal. Apakah Anda ingin mengundang nomor ini?";
+"RECIPIENT_PICKER_INVITE_MESSAGE" = "%1$@ bukan pengguna Radar. Apakah Anda ingin mengundang nomor ini?";
 
 /* Alert title. Shown after selecting a phone number that isn't a Signal user. */
-"RECIPIENT_PICKER_INVITE_TITLE" = "Undang gabung ke Signal";
+"RECIPIENT_PICKER_INVITE_TITLE" = "Undang gabung ke Radar";
 
 /* Alert title explaining what happens if you forget your 'two-factor auth pin'. */
 "REGISTER_2FA_FORGOT_PIN_ALERT_TITLE" = "Butuh Bantuan?";
 
 /* Alert body for a forgotten SVR (V2) PIN */
-"REGISTER_2FA_FORGOT_SVR_PIN_ALERT_MESSAGE" = "PIN Anda adalah kode 4+ digit yang telah dibuat, bisa berupa numerik atau alfanumerik. Jika Anda lupa PIN, mohon tunggu 7 hari sebelum mendaftarkan ulang akun Anda. Jika Anda telah mengaktifkan Signal Secure Backups, silakan pakai Kunci Pemulihan.";
+"REGISTER_2FA_FORGOT_SVR_PIN_ALERT_MESSAGE" = "PIN Anda adalah kode 4+ digit yang telah dibuat, bisa berupa numerik atau alfanumerik. Jika Anda lupa PIN, mohon tunggu 7 hari sebelum mendaftarkan ulang akun Anda. Jika Anda telah mengaktifkan Radar Secure Backups, silakan pakai Kunci Pemulihan.";
 
 /* Alert body for a forgotten SVR (V2) PIN when the user doesn't have reglock and they cannot necessarily create a new PIN */
-"REGISTER_2FA_FORGOT_SVR_PIN_WITHOUT_REGLOCK_ALERT_MESSAGE" = "PIN Anda adalah kode 4+ digit yang telah dibuat, bisa berupa numerik atau alfanumerik. Jika Anda lupa PIN, Anda dapat mendaftar dan menggunakan akun, akan tetapi beberapa pengaturan tersimpan, seperti informasi profil, akan hilang. Jika Anda telah mengaktifkan Signal Secure Backups, silakan pakai Kunci Pemulihan.";
+"REGISTER_2FA_FORGOT_SVR_PIN_WITHOUT_REGLOCK_ALERT_MESSAGE" = "PIN Anda adalah kode 4+ digit yang telah dibuat, bisa berupa numerik atau alfanumerik. Jika Anda lupa PIN, Anda dapat mendaftar dan menggunakan akun, akan tetapi beberapa pengaturan tersimpan, seperti informasi profil, akan hilang. Jika Anda telah mengaktifkan Radar Secure Backups, silakan pakai Kunci Pemulihan.";
 
 /* Alert body for a forgotten SVR (V2) PIN when the user doesn't have reglock and they can create a new PIN */
-"REGISTER_2FA_FORGOT_SVR_PIN_WITHOUT_REGLOCK_AND_CAN_CREATE_NEW_PIN_ALERT_MESSAGE" = "PIN Anda adalah kode 4+ digit yang telah dibuat, bisa berupa numerik atau alfanumerik. Jika Anda tidak ingat PIN, silakan buat baru. Anda bisa mendaftar dan menggunakan akun, akan tetapi beberapa pengaturan tersimpan seperti informasi profil akan hilang. Jika telah mengaktifkan Signal Secure Backups, silakan pakai Kunci Pemulihan.";
+"REGISTER_2FA_FORGOT_SVR_PIN_WITHOUT_REGLOCK_AND_CAN_CREATE_NEW_PIN_ALERT_MESSAGE" = "PIN Anda adalah kode 4+ digit yang telah dibuat, bisa berupa numerik atau alfanumerik. Jika Anda tidak ingat PIN, silakan buat baru. Anda bisa mendaftar dan menggunakan akun, akan tetapi beberapa pengaturan tersimpan seperti informasi profil akan hilang. Jika telah mengaktifkan Radar Secure Backups, silakan pakai Kunci Pemulihan.";
 
 /* Alert title explaining what happens if you forget your 'two-factor auth pin'. */
 "REGISTER_2FA_INVALID_PIN_ALERT_TITLE" = "PIN Salah";
@@ -7134,7 +7134,7 @@ Send money securely.";
 "REGISTRATION_BACKUP_RESTORE_ERROR_GENERIC_TITLE" = "Tidak Dapat Menyelesaikan Transfer";
 
 /* Body for a sheet warning users about an incorrect recovery key. */
-"REGISTRATION_BACKUP_RESTORE_ERROR_INCORRECT_KEY_BODY" = "Anda mungkin memasukkan kunci pemulihan yang salah atau Anda belum menyelesaikan setidaknya satu proses pencadangan di perangkat lama. \n\nPastikan Anda mendaftar dengan nomor telepon yang sama dan kunci pemulihan yang Anda simpan saat mengaktifkan Signal Secure Backups, dan pastikan Anda telah menyelesaikan pencadangan di perangkat lama.";
+"REGISTRATION_BACKUP_RESTORE_ERROR_INCORRECT_KEY_BODY" = "Anda mungkin memasukkan kunci pemulihan yang salah atau Anda belum menyelesaikan setidaknya satu proses pencadangan di perangkat lama. \n\nPastikan Anda mendaftar dengan nomor telepon yang sama dan kunci pemulihan yang Anda simpan saat mengaktifkan Radar Secure Backups, dan pastikan Anda telah menyelesaikan pencadangan di perangkat lama.";
 
 /* Body for a sheet warning users about an incorrect recovery key and having hit a rate limit on retries. */
 "REGISTRATION_BACKUP_RESTORE_ERROR_INCORRECT_KEY_RATE_LIMIT_BODY" = "Kesempatan untuk mencoba kunci pemulihan telah habis. Kami membatasi jumlah percobaan demi keamanan. Mohon tunggu satu jam dan coba lagi.";
@@ -7167,7 +7167,7 @@ Send money securely.";
 "REGISTRATION_BACKUP_RESTORE_ERROR_UNRETRYABLE_SERVER_ERROR_TITLE" = "Tidak Dapat Memulihkan Cadangan";
 
 /* Body for a sheet warning users about an incompatible backup version. */
-"REGISTRATION_BACKUP_RESTORE_ERROR_UNSUPPORTED_BACKUP_VERSION_BODY" = "Untuk memulihkan data cadangan, pastikan Anda menggunakan Signal versi terbaru, lalu coba lagi. Jika masalah ini berlanjut, hubungi tim dukungan.";
+"REGISTRATION_BACKUP_RESTORE_ERROR_UNSUPPORTED_BACKUP_VERSION_BODY" = "Untuk memulihkan data cadangan, pastikan Anda menggunakan Radar versi terbaru, lalu coba lagi. Jika masalah ini berlanjut, hubungi tim dukungan.";
 
 /* Title for a sheet warning users about an incompatible backup version. */
 "REGISTRATION_BACKUP_RESTORE_ERROR_UNSUPPORTED_BACKUP_VERSION_TITLE" = "Diperlukan pembaruan";
@@ -7179,7 +7179,7 @@ Send money securely.";
 "REGISTRATION_CANNOT_CONTINUE_WITHOUT_UPDATING_APP_ACTION" = "Perbarui";
 
 /* During (re)registration, users may need to update their app to continue. They'll be presented with an alert if this is the case, prompting them to update. This is the description text on that alert. */
-"REGISTRATION_CANNOT_CONTINUE_WITHOUT_UPDATING_APP_DESCRIPTION" = "Untuk melanjutkan pendaftaran, perbarui Signal ke versi terbaru.";
+"REGISTRATION_CANNOT_CONTINUE_WITHOUT_UPDATING_APP_DESCRIPTION" = "Untuk melanjutkan pendaftaran, perbarui Radar ke versi terbaru.";
 
 /* During (re)registration, users may need to update their app to continue. They'll be presented with an alert if this is the case, prompting them to update. This is the title on that alert. */
 "REGISTRATION_CANNOT_CONTINUE_WITHOUT_UPDATING_APP_TITLE" = "Diperlukan Pembaruan";
@@ -7191,7 +7191,7 @@ Send money securely.";
 "REGISTRATION_DEFAULT_COUNTRY_NAME" = "Kode Negeri";
 
 /* If a user is installing Signal on a new phone, they may be asked whether they want to transfer their account from their old device. This is a description on the screen that asks them this question. */
-"REGISTRATION_DEVICE_TRANSFER_CHOICE_EXPLANATION" = "Melanjutkan ini akan menonaktifkan Signal di perangkat lain yang saat ini terdaftar dengan nomor telepon yang sama.";
+"REGISTRATION_DEVICE_TRANSFER_CHOICE_EXPLANATION" = "Melanjutkan ini akan menonaktifkan Radar di perangkat lain yang saat ini terdaftar dengan nomor telepon yang sama.";
 
 /* If a user is installing Signal on a new phone, they may be asked whether they want to transfer their account from their old device. This is the title on the screen that asks them this question. */
 "REGISTRATION_DEVICE_TRANSFER_CHOICE_TITLE" = "Transfer Akun & Pesan";
@@ -7227,7 +7227,7 @@ Send money securely.";
 "REGISTRATION_NO_BACKUP_KEY_BUTTON_TITLE" = "Tidak Punya Kunci Pemulihan?";
 
 /* Body text on a sheet with info for what to do if you don't have a recovery key */
-"REGISTRATION_NO_BACKUP_KEY_SHEET_BODY" = "Cadangan tidak dapat dipulihkan tanpa kode pemulihan 64 karakter. Jika kunci pemulihan hilang, Signal tidak dapat membantu proses pemulihan cadangan Anda.\n\nJika perangkat lama Anda masih ada, kunci pemulihan dapat dilihat di Pengaturan > Chat > Cadangan. Lalu ketuk Lihat Kunci Pemulihan.";
+"REGISTRATION_NO_BACKUP_KEY_SHEET_BODY" = "Cadangan tidak dapat dipulihkan tanpa kode pemulihan 64 karakter. Jika kunci pemulihan hilang, Radar tidak dapat membantu proses pemulihan cadangan Anda.\n\nJika perangkat lama Anda masih ada, kunci pemulihan dapat dilihat di Pengaturan > Chat > Cadangan. Lalu ketuk Lihat Kunci Pemulihan.";
 
 /* Title for sheet with info for what to do if you don't have a recovery key */
 "REGISTRATION_NO_BACKUP_KEY_SHEET_TITLE" = "Tidak Punya Kunci Pemulihan?";
@@ -7290,16 +7290,16 @@ Send money securely.";
 "REGISTRATION_PROFILE_SETUP_TITLE" = "Siapkan profil Anda";
 
 /* Error shown if an SMS/call service provider is permanently unable to send a verification code to the provided number. */
-"REGISTRATION_PROVIDER_FAILURE_MESSAGE_PERMANENT" = "Signal tidak dapat mengirim kode SMS karena ada masalah dengan penyedia SMS.";
+"REGISTRATION_PROVIDER_FAILURE_MESSAGE_PERMANENT" = "Radar tidak dapat mengirim kode SMS karena ada masalah dengan penyedia SMS.";
 
 /* Error shown if an SMS/call service provider is temporarily unable to send a verification code to the provided number. */
-"REGISTRATION_PROVIDER_FAILURE_MESSAGE_TRANSIENT" = "Signal tidak dapat mengirim kode SMS karena ada masalah dengan penyedia SMS. Coba lagi dalam beberapa jam.";
+"REGISTRATION_PROVIDER_FAILURE_MESSAGE_TRANSIENT" = "Radar tidak dapat mengirim kode SMS karena ada masalah dengan penyedia SMS. Coba lagi dalam beberapa jam.";
 
 /* Third step in directions for how to make a backup */
 "REGISTRATION_RESTORE_METHOD_MAKE_BACKUP_TUTORIAL_ENABLE_BACKUPS" = "Aktifkan pencadangan dan tunggu hingga prosesnya selesai";
 
 /* First step in directions for how to make a backup */
-"REGISTRATION_RESTORE_METHOD_MAKE_BACKUP_TUTORIAL_OPEN_SIGNAL" = "Buka Signal di perangkat lama Anda";
+"REGISTRATION_RESTORE_METHOD_MAKE_BACKUP_TUTORIAL_OPEN_SIGNAL" = "Buka Radar di perangkat lama Anda";
 
 /* Second step in directions for how to make a backup */
 "REGISTRATION_RESTORE_METHOD_MAKE_BACKUP_TUTORIAL_TAP_SETTINGS" = "Ketuk Pengaturan > Pencadangan";
@@ -7317,7 +7317,7 @@ Send money securely.";
 "REGISTRATION_SCAN_QR_CODE_TITLE" = "Pindai kode ini dengan ponsel lama Anda";
 
 /* Tutorial text describing the first step to scanning the restore/transfer QR code with your old phone: opening Signal */
-"REGISTRATION_SCAN_QR_CODE_TUTORIAL_OPEN_SIGNAL" = "Buka Signal di perangkat lama Anda";
+"REGISTRATION_SCAN_QR_CODE_TUTORIAL_OPEN_SIGNAL" = "Buka Radar di perangkat lama Anda";
 
 /* Tutorial text describing the third step to scanning the restore/transfer QR code with your old phone: scan the code */
 "REGISTRATION_SCAN_QR_CODE_TUTORIAL_SCAN" = "Pindai kode ini dengan kamera";
@@ -7521,7 +7521,7 @@ Send money securely.";
 "SAFETY_NUMBER_CONFIRMATION_VIEW_ACTION" = "Lihat";
 
 /* Snippet to share {{safety number}} with a friend. sent e.g. via SMS */
-"SAFETY_NUMBER_SHARE_FORMAT" = "Nomor aman Signal kami \n%1$@";
+"SAFETY_NUMBER_SHARE_FORMAT" = "Nomor aman Radar kami \n%1$@";
 
 /* Title for Safety Tips button in thread details. */
 "SAFETY_TIPS_BUTTON_ACTION_TITLE" = "Tips Keamanan";
@@ -7539,7 +7539,7 @@ Send money securely.";
 "SAFETY_TIPS_FAKE_BUSINESS_TITLE" = "Bisnis dan institusi palsu";
 
 /* Message contents for the fake names safety tip. */
-"SAFETY_TIPS_FAKE_NAMES_BODY" = "Signal tidak akan pernah menghubungi Anda untuk meminta kode registrasi atau PIN. Harap berhati-hati bila ada permintaan dari akun yang tidak jelas. Nama profil dipilih oleh pemilik akun dan belum diverifikasi.";
+"SAFETY_TIPS_FAKE_NAMES_BODY" = "Radar tidak akan pernah menghubungi Anda untuk meminta kode registrasi atau PIN. Harap berhati-hati bila ada permintaan dari akun yang tidak jelas. Nama profil dipilih oleh pemilik akun dan belum diverifikasi.";
 
 /* Message title describing the fake names safety tip. */
 "SAFETY_TIPS_FAKE_NAMES_TITLE" = "Nama dan akun palsu";
@@ -7599,13 +7599,13 @@ Send money securely.";
 "SCREEN_LOCK_ERROR_LOCAL_AUTHENTICATION_PASSCODE_NOT_SET" = "Anda harus mengaktifkan kode sandi dalam Pengaturan iOS untuk menggunakan Kunci Layar.";
 
 /* Description of how and why Signal iOS uses Touch ID/Face ID/Phone Passcode to unlock 'screen lock'. */
-"SCREEN_LOCK_REASON_UNLOCK_SCREEN_LOCK" = "Autentikasi untuk membuka Signal.";
+"SCREEN_LOCK_REASON_UNLOCK_SCREEN_LOCK" = "Autentikasi untuk membuka Radar.";
 
 /* Title for alert indicating that screen lock could not be unlocked. */
 "SCREEN_LOCK_UNLOCK_FAILED" = "Autentikasi gagal.";
 
 /* Label for button on lock screen that lets users unlock Signal. */
-"SCREEN_LOCK_UNLOCK_SIGNAL" = "Buka kunci Signal";
+"SCREEN_LOCK_UNLOCK_SIGNAL" = "Buka kunci Radar";
 
 /* Placeholder text indicating the user can search for contacts by name, username, or phone number. */
 "SEARCH_BY_NAME_OR_USERNAME_OR_NUMBER_PLACEHOLDER_TEXT" = "Nama, nama pengguna, atau nomor";
@@ -7638,13 +7638,13 @@ Send money securely.";
 "SECONDARY_LINKING_ERROR_DIFFERENT_ACCOUNT_TITLE" = "Akun Tidak Cocok";
 
 /* Message for error alert indicating that a linked device must be upgraded before it can be linked. */
-"SECONDARY_LINKING_ERROR_OBSOLETE_LINKED_DEVICE_MESSAGE" = "Perbarui Signal pada perangkat ini untuk menyambungkannya dengan ponsel Anda.";
+"SECONDARY_LINKING_ERROR_OBSOLETE_LINKED_DEVICE_MESSAGE" = "Perbarui Radar pada perangkat ini untuk menyambungkannya dengan ponsel Anda.";
 
 /* Title for error alert indicating that a linked device must be upgraded before it can be linked. */
 "SECONDARY_LINKING_ERROR_OBSOLETE_LINKED_DEVICE_TITLE" = "Versi Tidak Didukung";
 
 /* alert message for outdated linking device */
-"SECONDARY_LINKING_ERROR_OLD_VERSION_MESSAGE" = "Perangkat Anda yang lain menggunakan versi Signal yang lama dan belum mendukung kode QR iPad. Silahkan install Signal versi terbaru dan coba lagi.";
+"SECONDARY_LINKING_ERROR_OLD_VERSION_MESSAGE" = "Perangkat Anda yang lain menggunakan versi Radar yang lama dan belum mendukung kode QR iPad. Silahkan install Radar versi terbaru dan coba lagi.";
 
 /* alert title for outdated linking device */
 "SECONDARY_LINKING_ERROR_OLD_VERSION_TITLE" = "Perbarui Perangkat Pindai";
@@ -7665,7 +7665,7 @@ Send money securely.";
 "SECONDARY_LINKING_SYNCING_UPDATE_REQUIRED_CHECK_FOR_UPDATE_BUTTON" = "Periksa Pembaruan";
 
 /* Message for action sheet when the secondary device fails to sync messages due to an app update being required. */
-"SECONDARY_LINKING_SYNCING_UPDATE_REQUIRED_ERROR_MESSAGE" = "Untuk menyelesaikan sinkronisasi pesan, perbarui Signal sekarang.";
+"SECONDARY_LINKING_SYNCING_UPDATE_REQUIRED_ERROR_MESSAGE" = "Untuk menyelesaikan sinkronisasi pesan, perbarui Radar sekarang.";
 
 /* Title for action sheet when the secondary device fails to sync messages due to an app update being required. */
 "SECONDARY_LINKING_SYNCING_UPDATE_REQUIRED_ERROR_TITLE" = "Perlu Pembaruan";
@@ -7674,19 +7674,19 @@ Send money securely.";
 "SECONDARY_ONBOARDING_CHOOSE_DEVICE_NAME_PLACEHOLDER" = "Pilih nama";
 
 /* header text before the user can link this device */
-"SECONDARY_ONBOARDING_GET_STARTED_BY_OPENING_PRIMARY" = "Buka Signal di ponsel Anda untuk menghubungkan iPad ini dengan akun Anda";
+"SECONDARY_ONBOARDING_GET_STARTED_BY_OPENING_PRIMARY" = "Buka Radar di ponsel Anda untuk menghubungkan iPad ini dengan akun Anda";
 
 /* Link explaining what to do when trying to link a device before having a primary device. */
-"SECONDARY_ONBOARDING_GET_STARTED_DO_NOT_HAVE_PRIMARY" = "Saya tidak punya Signal di ponsel saya…";
+"SECONDARY_ONBOARDING_GET_STARTED_DO_NOT_HAVE_PRIMARY" = "Saya tidak punya Radar di ponsel saya…";
 
 /* alert body */
-"SECONDARY_ONBOARDING_INSTALL_PRIMARY_FIRST_BODY" = "Buka App Store di ponsel Anda, pasang Signal, lengkapi proses pendaftaran, kemudian Anda dapat menghubungkan iPad anda ke akun yang sama.";
+"SECONDARY_ONBOARDING_INSTALL_PRIMARY_FIRST_BODY" = "Buka App Store di ponsel Anda, pasang Radar, lengkapi proses pendaftaran, kemudian Anda dapat menghubungkan iPad anda ke akun yang sama.";
 
 /* alert title */
-"SECONDARY_ONBOARDING_INSTALL_PRIMARY_FIRST_TITLE" = "Pasang Signal di Telepon Anda";
+"SECONDARY_ONBOARDING_INSTALL_PRIMARY_FIRST_TITLE" = "Pasang Radar di Telepon Anda";
 
 /* body text while displaying a QR code which, when scanned, will link this device. */
-"SECONDARY_ONBOARDING_SCAN_CODE_BODY" = "Ketuk gambar profil Anda untuk membuka setelan Signal di ponsel Anda, pilih \"Perangkat Terhubung\" kemudian \"Hubungkan Perangkat Baru\" untuk memindai kode ini dengan ponsel Anda:";
+"SECONDARY_ONBOARDING_SCAN_CODE_BODY" = "Ketuk gambar profil Anda untuk membuka setelan Radar di ponsel Anda, pilih \"Perangkat Terhubung\" kemudian \"Hubungkan Perangkat Baru\" untuk memindai kode ini dengan ponsel Anda:";
 
 /* Link text for page with troubleshooting info shown on the QR scanning screen */
 "SECONDARY_ONBOARDING_SCAN_CODE_HELP_TEXT" = "Dapatkan bantuan untuk menghubungkan iPad";
@@ -7698,7 +7698,7 @@ Send money securely.";
 "SECONDARY_ONBOARDING_SCAN_CODE_TITLE" = "Pindai kode QR dengan telepon Anda";
 
 /* header text before the user can transfer to this device */
-"SECONDARY_TRANSFER_GET_STARTED_BY_OPENING_IPAD" = "Buka Signal pada iPad lama Anda untuk mentransfer akun Anda";
+"SECONDARY_TRANSFER_GET_STARTED_BY_OPENING_IPAD" = "Buka Radar pada iPad lama Anda untuk mentransfer akun Anda";
 
 /* No comment provided by engineer. */
 "SECURE_SESSION_RESET" = "Sesi aman telah di ulang.";
@@ -7788,7 +7788,7 @@ Send money securely.";
 "SEPA_DONATION_NAME_PLACEHOLDER" = "Nama di Rekening Bank";
 
 /* Description for the session refresh alert */
-"SESSION_REFRESH_ALERT_MESSAGE" = "Signal menggunakan enkripsi end-to-end dan mungkin ada kalanya perlu menyegarkan sesi obrolan Anda. Ini tidak akan berdampak pada keamanan obrolan, tetapi bisa saja ada pesan yang gagal diterima dari kontak ini, dan untuk itu Anda bisa memintanya mengirim ulang.";
+"SESSION_REFRESH_ALERT_MESSAGE" = "Radar menggunakan enkripsi end-to-end dan mungkin ada kalanya perlu menyegarkan sesi obrolan Anda. Ini tidak akan berdampak pada keamanan obrolan, tetapi bisa saja ada pesan yang gagal diterima dari kontak ini, dan untuk itu Anda bisa memintanya mengirim ulang.";
 
 /* Title for the session refresh alert */
 "SESSION_REFRESH_ALERT_TITLE" = "Sesi obrolan disegarkan";
@@ -7830,7 +7830,7 @@ Send money securely.";
 "SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_COUNTRY" = "Lokasi";
 
 /* Table footer for the 'censorship circumvention' section when censorship circumvention can be manually enabled. */
-"SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_FOOTER" = "Jika diaktifkan, Signal akan menggagalkan penyensoran. Jangan nonaktifkan fitur ini kecuali Anda berada di lokasi di mana Signal disensor.";
+"SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_FOOTER" = "Jika diaktifkan, Radar akan menggagalkan penyensoran. Jangan nonaktifkan fitur ini kecuali Anda berada di lokasi di mana Radar disensor.";
 
 /* Table footer for the 'censorship circumvention' section shown when censorship circumvention has been auto-enabled based on local phone number. */
 "SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_FOOTER_AUTO_ENABLED" = "Pengelabuan Penyensoran telah diaktifkan berdasarkan nomor telepon Anda.";
@@ -7842,7 +7842,7 @@ Send money securely.";
 "SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_FOOTER_NO_CONNECTION" = "Penghindar penyensoran hanya dapat diaktifkan ketika terkoneksi dengan internet";
 
 /* Table footer for the 'censorship circumvention' section shown when the app is connected to the Signal service. */
-"SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_FOOTER_WEBSOCKET_CONNECTED" = "Pengelabuan penyensoran tidak diperlukan; Anda telah terhubung dengan layanan Signal.";
+"SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_FOOTER_WEBSOCKET_CONNECTED" = "Pengelabuan penyensoran tidak diperlukan; Anda telah terhubung dengan layanan Radar.";
 
 /* Label for the 'advanced pin settings' button. */
 "SETTINGS_ADVANCED_PIN_SETTINGS" = "Pengaturan PIN Lanjutan";
@@ -7869,13 +7869,13 @@ Send money securely.";
 "SETTINGS_ADVANCED_VIEW_ERROR_LOG" = "Catatan Kesalahan";
 
 /* Information on sheet about changing the app icon - first line */
-"SETTINGS_APP_ICON_EDUCATION_APP_NAME" = "Nama aplikasi “Signal” akan terlihat di Layar Utama, notifikasi, dan Perpustakaan Aplikasi.";
+"SETTINGS_APP_ICON_EDUCATION_APP_NAME" = "Nama aplikasi “Radar” akan terlihat di Layar Utama, notifikasi, dan Perpustakaan Aplikasi.";
 
 /* Information on sheet about changing the app icon - second line */
-"SETTINGS_APP_ICON_EDUCATION_HOME_SCREEN_DOCK" = "Anda dapat menyembunyikan nama aplikasi “Signal” dari layar utama dengan memindahkan aplikasi ke dok di bagian bawah layar utama.";
+"SETTINGS_APP_ICON_EDUCATION_HOME_SCREEN_DOCK" = "Anda dapat menyembunyikan nama aplikasi “Radar” dari layar utama dengan memindahkan aplikasi ke dok di bagian bawah layar utama.";
 
 /* The footer for the app icon selection settings page. */
-"SETTINGS_APP_ICON_FOOTER" = "Nama aplikasi “Signal” akan terlihat di Layar Utama, notifikasi, dan Perpustakaan Aplikasi.";
+"SETTINGS_APP_ICON_FOOTER" = "Nama aplikasi “Radar” akan terlihat di Layar Utama, notifikasi, dan Perpustakaan Aplikasi.";
 
 /* The title for the app icon selection settings page. */
 "SETTINGS_APP_ICON_TITLE" = "Ikon Aplikasi";
@@ -7905,7 +7905,7 @@ Send money securely.";
 "SETTINGS_BLOCK_LIST_ADD_BUTTON" = "Tambahkan Pengguna yang Diblokir";
 
 /* A label that indicates the user has no Signal contacts that they haven't blocked. */
-"SETTINGS_BLOCK_LIST_NO_CONTACTS" = "Anda tidak mempunyai kontak di Signal.";
+"SETTINGS_BLOCK_LIST_NO_CONTACTS" = "Anda tidak mempunyai kontak di Radar.";
 
 /* A label that indicates the user's search has no matching results. */
 "SETTINGS_BLOCK_LIST_NO_SEARCH_RESULTS" = "Tidak ada hasil pencarian";
@@ -7917,7 +7917,7 @@ Send money securely.";
 "SETTINGS_CALLING_HIDES_IP_ADDRESS_PREFERENCE_TITLE" = "Selalu relay panggilan";
 
 /* User settings section footer, a detailed explanation */
-"SETTINGS_CALLING_HIDES_IP_ADDRESS_PREFERENCE_TITLE_DETAIL" = "Sampaikan semua panggilan melalui peladen Signal untuk menghindari pengungkapan alamat IP Anda oleh kontak Anda. Mengaktifkannya akan mengurangi kualitas panggilan.";
+"SETTINGS_CALLING_HIDES_IP_ADDRESS_PREFERENCE_TITLE_DETAIL" = "Sampaikan semua panggilan melalui peladen Radar untuk menghindari pengungkapan alamat IP Anda oleh kontak Anda. Mengaktifkannya akan mengurangi kualitas panggilan.";
 
 /* Label for the 'edit phone number' button in the 'change phone number' views. */
 "SETTINGS_CHANGE_PHONE_NUMBER_BACK_TO_EDIT_BUTTON" = "Sunting Nomor";
@@ -7962,7 +7962,7 @@ Send money securely.";
 "SETTINGS_CLEAR_HISTORY" = "Hapus Riwayat Obrolan";
 
 /* Footer for the 'about' help section */
-"SETTINGS_COPYRIGHT" = "Hak Cipta Signal Messenger\nBerlisensi di bawah AGPLv3";
+"SETTINGS_COPYRIGHT" = "Hak Cipta Radar Messenger\nBerlisensi di bawah AGPLv3";
 
 /* Label for the 'data' section of the app settings. */
 "SETTINGS_DATA" = "Penggunaan Data";
@@ -8034,7 +8034,7 @@ Send money securely.";
 "SETTINGS_DISAPPEARING_MESSAGES_FOOTER" = "Atur waktu default pesan terhapus otomatis untuk semua obrolan yang Anda mulai.";
 
 /* Title for the 'donate to signal' link in settings. */
-"SETTINGS_DONATE" = "Donasi ke Signal";
+"SETTINGS_DONATE" = "Donasi ke Radar";
 
 /* Title for help button and help pages in app settings. */
 "SETTINGS_HELP" = "Bantuan";
@@ -8103,7 +8103,7 @@ Send money securely.";
 "SETTINGS_NOTIFICATION_CONTENT_TITLE" = "Isi Pemberitahuan";
 
 /* When the local device discovers a contact has recently installed signal, the app can generates a message encouraging the local user to say hello. Turning this switch off disables that feature. */
-"SETTINGS_NOTIFICATION_EVENTS_CONTACT_JOINED_SIGNAL" = "Kontak Bergabung di Signal";
+"SETTINGS_NOTIFICATION_EVENTS_CONTACT_JOINED_SIGNAL" = "Kontak Bergabung di Radar";
 
 /* table section header */
 "SETTINGS_NOTIFICATION_NOTIFY_WHEN_TITLE" = "Beri tahu ketika…";
@@ -8140,7 +8140,7 @@ Send money securely.";
 "SETTINGS_PAYMENTS_BITCOIN_UNIT" = "Unit Bitcoin";
 
 /* Error message indicating that payments could not be activated because the feature is not currently available. */
-"SETTINGS_PAYMENTS_CANNOT_ACTIVATE_PAYMENTS_KILL_SWITCH" = "Pembayaran di Signal tidak lagi tersedia. Anda dapat memindahkan dana ke sebuah exchange namun Anda tidak lagi dapat mengirim dan menerima pembayaran atau menambahkan dana.";
+"SETTINGS_PAYMENTS_CANNOT_ACTIVATE_PAYMENTS_KILL_SWITCH" = "Pembayaran di Radar tidak lagi tersedia. Anda dapat memindahkan dana ke sebuah exchange namun Anda tidak lagi dapat mengirim dan menerima pembayaran atau menambahkan dana.";
 
 /* Error message indicating that payments could not be deactivated because the current balance is unavailable. */
 "SETTINGS_PAYMENTS_CANNOT_DEACTIVATE_PAYMENTS_NO_BALANCE" = "Tidak dapat menonaktifkan pembayaran karena tidak ada saldo tersedia. Periksa koneksi Anda dan coba lagi.";
@@ -8149,10 +8149,10 @@ Send money securely.";
 "SETTINGS_PAYMENTS_CANNOT_SEND_PAYMENT_NO_BALANCE" = "Tidak dapat menyelesaikan pembayaran karena tidak ada saldo tersedia. Perika koneksi Anda dan coba lagi.";
 
 /* Error message indicating that payments cannot be sent because the feature is not currently available. */
-"SETTINGS_PAYMENTS_CANNOT_SEND_PAYMENTS_KILL_SWITCH" = "Pembayaran di Signal tidak lagi tersedia. Anda dapat memindahkan dana ke sebuah exchange namun Anda tidak lagi dapat mengirim dan menerima pembayaran atau menambahkan dana.";
+"SETTINGS_PAYMENTS_CANNOT_SEND_PAYMENTS_KILL_SWITCH" = "Pembayaran di Radar tidak lagi tersedia. Anda dapat memindahkan dana ke sebuah exchange namun Anda tidak lagi dapat mengirim dan menerima pembayaran atau menambahkan dana.";
 
 /* Error message indicating that you cannot transfer into your payments wallet because the feature is not currently available. */
-"SETTINGS_PAYMENTS_CANNOT_TRANSFER_IN_KILL_SWITCH" = "Pembayaran di Signal tidak lagi tersedia. Anda dapat memindahkan dana ke sebuah exchange namun Anda tidak lagi dapat mengirim dan menerima pembayaran atau menambahkan dana.";
+"SETTINGS_PAYMENTS_CANNOT_TRANSFER_IN_KILL_SWITCH" = "Pembayaran di Radar tidak lagi tersedia. Anda dapat memindahkan dana ke sebuah exchange namun Anda tidak lagi dapat mengirim dan menerima pembayaran atau menambahkan dana.";
 
 /* Message for the 'currency conversions info' alert. */
 "SETTINGS_PAYMENTS_CURRENCY_CONVERSIONS_INFO_ALERT_MESSAGE" = "Konversi hanyalah perkiraan dan mungkin tidak akurat.";
@@ -8179,10 +8179,10 @@ Send money securely.";
 "SETTINGS_PAYMENTS_DEACTIVATE_TITLE" = "Nonaktifkan Pembayaran";
 
 /* Explanation of the 'deactivate payments with balance' process in the 'deactivate payments' settings. */
-"SETTINGS_PAYMENTS_DEACTIVATE_WITH_BALANCE_EXPLANATION" = "Disarankan untuk mentransfer dana Anda ke alamat dompet lain sebelum menonaktifkan pembayaran. Jika Anda memilih untuk tidak mentransfernya sekarang, dana Anda akan tetap ada di dompet yang terhubung dengan Signal jika Anda mengaktifkan kembali pembayaran.";
+"SETTINGS_PAYMENTS_DEACTIVATE_WITH_BALANCE_EXPLANATION" = "Disarankan untuk mentransfer dana Anda ke alamat dompet lain sebelum menonaktifkan pembayaran. Jika Anda memilih untuk tidak mentransfernya sekarang, dana Anda akan tetap ada di dompet yang terhubung dengan Radar jika Anda mengaktifkan kembali pembayaran.";
 
 /* Description for the 'deactivate payments confirmation' UI in the payment settings. */
-"SETTINGS_PAYMENTS_DEACTIVATE_WITHOUT_TRANSFER_CONFIRM_DESCRIPTION" = "Saldo Anda akan tetap ada di dompet yang terhubung dengan Signal jika Anda memilih untuk mengaktifkan kembali pembayaran.";
+"SETTINGS_PAYMENTS_DEACTIVATE_WITHOUT_TRANSFER_CONFIRM_DESCRIPTION" = "Saldo Anda akan tetap ada di dompet yang terhubung dengan Radar jika Anda memilih untuk mengaktifkan kembali pembayaran.";
 
 /* Title for the 'deactivate payments confirmation' UI in the payment settings. */
 "SETTINGS_PAYMENTS_DEACTIVATE_WITHOUT_TRANSFER_CONFIRM_TITLE" = "Nonaktifkan Tanpa Transfer?";
@@ -8420,7 +8420,7 @@ Send money securely.";
 "SETTINGS_PAYMENTS_PAYMENTS_LOCK_PROMPT_EXPLANATION_TOUCHID" = "Cegah seseorang yang memegang ponsel Anda mengakses dana Anda dengan mengaktifkan Touch ID. Anda dapat menonaktifkan opsi ini di Pengaturan.";
 
 /* Button for payments outdated sheet. */
-"SETTINGS_PAYMENTS_PAYMENTS_OUTDATED_BUTTON" = "Perbarui Signal";
+"SETTINGS_PAYMENTS_PAYMENTS_OUTDATED_BUTTON" = "Perbarui Radar";
 
 /* Message for payments outdated sheet. */
 "SETTINGS_PAYMENTS_PAYMENTS_OUTDATED_MESSAGE" = "Diperlukan pembaruan aplikasi agar dapat terus mengirim dan menerima pembayaran, serta melihat saldo pembayaran Anda yang terkini.";
@@ -8558,7 +8558,7 @@ Send money securely.";
 "SETTINGS_PAYMENTS_TITLE" = "Pembayaran";
 
 /* Error indicating that it is not valid to send yourself a payment. */
-"SETTINGS_PAYMENTS_TRANSFER_OUT_CANNOT_SEND_TO_SELF" = "Anda tidak dapat mentransfer ke alamat wallet Signal Anda sendiri. Masukkan alamat wallet dari akun Anda di sebuah exchange yang didukung.";
+"SETTINGS_PAYMENTS_TRANSFER_OUT_CANNOT_SEND_TO_SELF" = "Anda tidak dapat mentransfer ke alamat wallet Radar Anda sendiri. Masukkan alamat wallet dari akun Anda di sebuah exchange yang didukung.";
 
 /* Footer of the 'transfer currency out' view in the payment settings. */
 "SETTINGS_PAYMENTS_TRANSFER_OUT_FOOTER" = "Transfer Bitcoin by sending to the Lightning address or invoice provided by the recipient. The address is typically displayed below the QR code.";
@@ -8621,7 +8621,7 @@ Send money securely.";
 "SETTINGS_PAYMENTS_VIEW_PASSPHRASE_TITLE" = "Frasa Pemulihan";
 
 /* Header text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "Tuliskan 24 kata ini secara berurutan dan simpan di tempat yang aman. Anda dapat menggunakannya untuk memulihkan saldo di Cake Wallet atau dompet lain yang kompatibel dengan Spark.";
+"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "Tuliskan 12 kata ini secara berurutan dan simpan di tempat yang aman. Anda dapat menggunakannya untuk memulihkan saldo di Cake Wallet atau dompet lain yang kompatibel dengan Spark.";
 
 /* Footer text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
 "SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_FOOTER_2" = "Jangan bagikan frasa ini kepada siapa pun";
@@ -8642,7 +8642,7 @@ Send money securely.";
 "SETTINGS_PHONE_NUMBER_DISCOVERABILITY_DISABLED_TOAST" = "Untuk mengubahnya, tetapkan pengaturan \"Siapa Bisa Melihat Nomor Saya\" ke opsi \"Tidak Ada\".";
 
 /* The description for a sheet asking for confirmation that the user wants to set their phone number discoverability to 'nobody'. */
-"SETTINGS_PHONE_NUMBER_DISCOVERABILITY_NOBODY_CONFIRMATION_DESCRIPTION" = "Jika opsi “Siapa bisa menemukan saya dengan nomor telepon” diatur jadi “Tidak ada”, orang akan lebih sulit menemukan Anda di Signal.";
+"SETTINGS_PHONE_NUMBER_DISCOVERABILITY_NOBODY_CONFIRMATION_DESCRIPTION" = "Jika opsi “Siapa bisa menemukan saya dengan nomor telepon” diatur jadi “Tidak ada”, orang akan lebih sulit menemukan Anda di Radar.";
 
 /* The title for a sheet asking for confirmation that the user wants to set their phone number discoverability to 'nobody'. */
 "SETTINGS_PHONE_NUMBER_DISCOVERABILITY_NOBODY_CONFIRMATION_TITLE" = "Anda yakin?";
@@ -8651,7 +8651,7 @@ Send money securely.";
 "SETTINGS_PHONE_NUMBER_DISCOVERABILITY_TITLE" = "Siapa Bisa Menemukan Saya dengan Nomor";
 
 /* Description label for Phone Number Privacy */
-"SETTINGS_PHONE_NUMBER_PRIVACY_DESCRIPTION_LABEL" = "Pilih siapa yang bisa melihat nomor telepon Anda dan siapa yang bisa menghubungi Anda di Signal dengan nomor tersebut.";
+"SETTINGS_PHONE_NUMBER_PRIVACY_DESCRIPTION_LABEL" = "Pilih siapa yang bisa melihat nomor telepon Anda dan siapa yang bisa menghubungi Anda di Radar dengan nomor tersebut.";
 
 /* The title for phone number privacy settings. */
 "SETTINGS_PHONE_NUMBER_PRIVACY_TITLE" = "Nomor Telepon";
@@ -8663,16 +8663,16 @@ Send money securely.";
 "SETTINGS_PIN_REMINDER_DISABLE_CONFIRMATION_ACTION" = "Matikan Pengingat";
 
 /* The explanation for the dialog asking user to confirm their PIN to disable reminders */
-"SETTINGS_PIN_REMINDER_DISABLE_CONFIRMATION_EXPLANATION" = "Pastikan Anda mengingat atau menyimpan secara aman PIN Anda karena PIN tidak dapat dipulihkan. Jika Anda lupa PIN, Anda mungkin kehilangan data saat mendaftarkan ulang akun Signal Anda.";
+"SETTINGS_PIN_REMINDER_DISABLE_CONFIRMATION_EXPLANATION" = "Pastikan Anda mengingat atau menyimpan secara aman PIN Anda karena PIN tidak dapat dipulihkan. Jika Anda lupa PIN, Anda mungkin kehilangan data saat mendaftarkan ulang akun Radar Anda.";
 
 /* The title for the dialog asking user to confirm their PIN to disable reminders */
-"SETTINGS_PIN_REMINDER_DISABLE_CONFIRMATION_TITLE" = "Konfirmasi PIN Signal Anda";
+"SETTINGS_PIN_REMINDER_DISABLE_CONFIRMATION_TITLE" = "Konfirmasi PIN Radar Anda";
 
 /* Label for the 'pin reminder' switch of the privacy settings. */
 "SETTINGS_PIN_REMINDER_SWITCH_LABEL" = "Pengingat PIN";
 
 /* Footer for the 'PINs' section of the privacy settings. */
-"SETTINGS_PINS_FOOTER" = "PIN menjaga informasi yang disimpan di Signal terenkripsi sehingga hanya Anda yang dapat mengaksesnya. Profil, pengaturan, dan kontak akan dipulihkan saat Anda memasang ulang Signal.";
+"SETTINGS_PINS_FOOTER" = "PIN menjaga informasi yang disimpan di Radar terenkripsi sehingga hanya Anda yang dapat mengaksesnya. Profil, pengaturan, dan kontak akan dipulihkan saat Anda memasang ulang Radar.";
 
 /* Label for the 'pins' item of the privacy settings when the user does have a pin. */
 "SETTINGS_PINS_ITEM" = "Ganti PIN Anda";
@@ -8681,7 +8681,7 @@ Send money securely.";
 "SETTINGS_PINS_ITEM_CREATE" = "Buat PIN";
 
 /* Title for the 'PINs' section of the privacy settings. */
-"SETTINGS_PINS_TITLE" = "PIN Signal";
+"SETTINGS_PINS_TITLE" = "PIN Radar";
 
 /* Footer for table section */
 "SETTINGS_PRIVACY_ADVANCED_FOOTER" = "Pengaturan pengelakan sensor, proksi, relay panggilan, dan pengirim tersembunyi.";
@@ -8723,7 +8723,7 @@ Send money securely.";
 "SETTINGS_REGISTRATION_LOCK_TURN_ON_ERROR_PIN_REQUIRED" = "Buat PIN dulu agar kunci registrasi dapat digunakan.";
 
 /* Body for the alert confirming that the user wants to turn on registration lock. */
-"SETTINGS_REGISTRATION_LOCK_TURN_ON_MESSAGE" = "Jika Anda lupa PIN Signal saat mendaftar ke Signal  lagi, akun Anda akan terkunci selama 7 hari.";
+"SETTINGS_REGISTRATION_LOCK_TURN_ON_MESSAGE" = "Jika Anda lupa PIN Radar saat mendaftar ke Radar  lagi, akun Anda akan terkunci selama 7 hari.";
 
 /* Title for the alert confirming that the user wants to turn on registration lock. */
 "SETTINGS_REGISTRATION_LOCK_TURN_ON_TITLE" = "Nyalakan Kunci Pendaftaran?";
@@ -8753,19 +8753,19 @@ Send money securely.";
 "SETTINGS_SECTION_TITLE_CALLING" = "Panggilan";
 
 /* Section footer */
-"SETTINGS_SECURITY_DETAIL" = "Gunakan Touch ID, Face ID, atau kode sandi perangkat iOS Anda untuk membuka kunci Signal.";
+"SETTINGS_SECURITY_DETAIL" = "Gunakan Touch ID, Face ID, atau kode sandi perangkat iOS Anda untuk membuka kunci Radar.";
 
 /* Section footer */
-"SETTINGS_SECURITY_DETAIL_FACEID" = "Gunakan Face ID untuk membuka kunci Signal.";
+"SETTINGS_SECURITY_DETAIL_FACEID" = "Gunakan Face ID untuk membuka kunci Radar.";
 
 /* Section footer */
-"SETTINGS_SECURITY_DETAIL_OPTICID" = "Gunakan Optic ID untuk membuka kunci Signal.";
+"SETTINGS_SECURITY_DETAIL_OPTICID" = "Gunakan Optic ID untuk membuka kunci Radar.";
 
 /* Section footer */
-"SETTINGS_SECURITY_DETAIL_PASSCODE" = "Gunakan kode sandi perangkat Anda untuk membuka kunci Signal.";
+"SETTINGS_SECURITY_DETAIL_PASSCODE" = "Gunakan kode sandi perangkat Anda untuk membuka kunci Radar.";
 
 /* Section footer */
-"SETTINGS_SECURITY_DETAIL_TOUCHID" = "Gunakan Touch ID untuk membuka kunci Signal.";
+"SETTINGS_SECURITY_DETAIL_TOUCHID" = "Gunakan Touch ID untuk membuka kunci Radar.";
 
 /* Section header */
 "SETTINGS_SECURITY_TITLE" = "Keamanan Aplikasi";
@@ -8780,13 +8780,13 @@ Send money securely.";
 "SETTINGS_SHARING_SUGGESTIONS" = "Bagikan Kontak dengan iOS";
 
 /* Footer for setting for enabling & disabling contact and notification sharing with iOS. */
-"SETTINGS_SHARING_SUGGESTIONS_NOTIFICATIONS_FOOTER" = "Beri iOS akses ke kontak dan obrolan Signal untuk fitur-fitur seperti saran berbagi dan notifikasi.";
+"SETTINGS_SHARING_SUGGESTIONS_NOTIFICATIONS_FOOTER" = "Beri iOS akses ke kontak dan obrolan Radar untuk fitur-fitur seperti saran berbagi dan notifikasi.";
 
 /* Label for the 'enable registration lock' switch of the privacy settings. */
 "SETTINGS_TWO_FACTOR_AUTH_SWITCH_LABEL" = "Kunci Pendaftaran";
 
 /* Footer for the 'two factor auth' section of the privacy settings when Signal PINs are available. */
-"SETTINGS_TWO_FACTOR_PINS_AUTH_FOOTER" = "Memerlukan PIN Signal Anda untuk mendaftarkan nomor telepon Anda lagi di Signal.";
+"SETTINGS_TWO_FACTOR_PINS_AUTH_FOOTER" = "Memerlukan PIN Radar Anda untuk mendaftarkan nomor telepon Anda lagi di Radar.";
 
 /* Label for the 'typing indicators' setting. */
 "SETTINGS_TYPING_INDICATORS" = "Indikator Pengetikan";
@@ -8819,7 +8819,7 @@ Send money securely.";
 "SHARE_EXTENSION_LOADING" = "Memuat…";
 
 /* Message indicating that the share extension cannot be used until the user has registered in the main app. */
-"SHARE_EXTENSION_NOT_REGISTERED_MESSAGE" = "Luncurkan Signal untuk mendaftar.";
+"SHARE_EXTENSION_NOT_REGISTERED_MESSAGE" = "Luncurkan Radar untuk mendaftar.";
 
 /* Title indicating that the share extension cannot be used until the user has registered in the main app. */
 "SHARE_EXTENSION_NOT_REGISTERED_TITLE" = "Tidak Terdaftar";
@@ -8837,7 +8837,7 @@ Send money securely.";
 "SHARE_EXTENSION_UNABLE_TO_BUILD_ATTACHMENT_ALERT_TITLE" = "Tidak Dapat Menyiapkan Lampiran";
 
 /* Title for the 'share extension' view. */
-"SHARE_EXTENSION_VIEW_TITLE" = "Bagikan ke Signal";
+"SHARE_EXTENSION_VIEW_TITLE" = "Bagikan ke Radar";
 
 /* Title of alert indicating sharing suggestions failed to deactivate */
 "SHARING_SUGGESTIONS_DISABLE_ERROR" = "Gagal menonaktifkan saran berbagi.";
@@ -8846,10 +8846,10 @@ Send money securely.";
 "SHOW_THREAD_BUTTON_TITLE" = "Tampilkan Obrolan";
 
 /* Shown in the header when the user hasn't provided a custom name for a call. */
-"SIGNAL_CALL" = "Panggilan Signal";
+"SIGNAL_CALL" = "Panggilan Radar";
 
 /* body sent to contacts when inviting to Install Signal */
-"SMS_INVITE_BODY" = "Saya mengundang Anda untuk memasang Signal! Tautan tersedia di sini:";
+"SMS_INVITE_BODY" = "Saya mengundang Anda untuk memasang Radar! Tautan tersedia di sini:";
 
 /* An error message generically indicating that something went wrong. */
 "SOMETHING_WENT_WRONG_ERROR" = "Terjadi kesalahan.";
@@ -8873,7 +8873,7 @@ Send money securely.";
 "SPAM_CAPTCHA_DISMISS_CONFIRMATION_TITLE" = "Lanjutkan Tanpa Verifikasi?";
 
 /* Body for action sheet explaining captcha requirement. */
-"SPAM_CAPTCHA_SHEET_BODY" = "Untuk membantu mencegah spam di Signal, mohon selesaikan verifikasi.\n\nSetelah memverifikasi, Anda dapat melanjutkan bertukar pesan. Semua pesan tertunda akan dikirim secara otomatis.";
+"SPAM_CAPTCHA_SHEET_BODY" = "Untuk membantu mencegah spam di Radar, mohon selesaikan verifikasi.\n\nSetelah memverifikasi, Anda dapat melanjutkan bertukar pesan. Semua pesan tertunda akan dikirim secara otomatis.";
 
 /* Title for action sheet explaining captcha requirement. */
 "SPAM_CAPTCHA_SHEET_TITLE" = "Verifikasi untuk Melanjutkan Bertukar Pesan";
@@ -8909,7 +8909,7 @@ Send money securely.";
 "STICKERS_INSTALL_BUTTON" = "Pasang";
 
 /* Title for the 'available built-in stickers' section of the 'manage stickers' view. */
-"STICKERS_MANAGE_VIEW_AVAILABLE_BUILT_IN_PACKS_SECTION_TITLE" = "Seri Seniman Signal";
+"STICKERS_MANAGE_VIEW_AVAILABLE_BUILT_IN_PACKS_SECTION_TITLE" = "Seri Seniman Radar";
 
 /* Title for the 'available known stickers' section of the 'manage stickers' view. */
 "STICKERS_MANAGE_VIEW_AVAILABLE_KNOWN_PACKS_SECTION_TITLE" = "Stiker Yang Anda Terima";
@@ -9191,19 +9191,19 @@ Send money securely.";
 "STORY_SETTINGS_LEARN_MORE_SHEET_FOOTER" = "Koneksi Anda bisa melihat nama dan foto Anda, dan konten yang Anda kirim ke “Cerita Saya” kecuali Anda sembunyikan dari mereka.";
 
 /* Header for the explainer sheet for signal connections */
-"STORY_SETTINGS_LEARN_MORE_SHEET_HEADER_FORMAT" = "<strong>Koneksi Signal</strong> adalah orang-orang terpilih yang Anda percayai, dengan:";
+"STORY_SETTINGS_LEARN_MORE_SHEET_HEADER_FORMAT" = "<strong>Koneksi Radar</strong> adalah orang-orang terpilih yang Anda percayai, dengan:";
 
 /* Label for the stories section of the settings view */
 "STORY_SETTINGS_TITLE" = "Cerita";
 
 /* Section footer for the 'viewers' section on the 'story settings' view */
-"STORY_SETTINGS_WHO_CAN_VIEW_THIS_FOOTER" = "Pilih Koneksi Signal yang bisa melihat cerita Anda. Perubahan tidak akan memengaruhi cerita yang telah terkirim.";
+"STORY_SETTINGS_WHO_CAN_VIEW_THIS_FOOTER" = "Pilih Koneksi Radar yang bisa melihat cerita Anda. Perubahan tidak akan memengaruhi cerita yang telah terkirim.";
 
 /* Section header for the 'viewers' section on the 'story settings' view */
 "STORY_SETTINGS_WHO_CAN_VIEW_THIS_HEADER" = "Siapa yang Dapat Melihat Cerita Ini";
 
 /* Header for the 'viewers' section on the 'story settings' bottom sheet */
-"STORY_SETTINGS_WHO_CAN_VIEW_THIS_SHEET_HEADER" = "Pilih siapa saja Koneksi Signal yang bisa melihat cerita Anda. Anda bisa mengubah ini kapan saja di pengaturan privasi.";
+"STORY_SETTINGS_WHO_CAN_VIEW_THIS_SHEET_HEADER" = "Pilih siapa saja Koneksi Radar yang bisa melihat cerita Anda. Anda bisa mengubah ini kapan saja di pengaturan privasi.";
 
 /* Tooltip text shown when the user selects a story as a destination for a long duration video that will be split into shorter segments. Embeds {{ segment duration in seconds }} */
 "STORY_VIDEO_SEGMENTATION_TOOLTIP_FORMAT" = "Video yang dikirim ke Cerita akan dipangkas menjadi klip %1$d dtk dan terbagi menjadi beberapa Cerita.";
@@ -9242,7 +9242,7 @@ Send money securely.";
 "SUPPORT_EMAIL_DEFAULT_DESCRIPTION" = "Beritahu kami tentang masalahnya: ";
 
 /* Message for alert dialog presented when a support email failed to send */
-"SUPPORT_EMAIL_ERROR_ALERT_DESCRIPTION" = "Mohon kirimkan surel permintaan dukungan Anda ke support@signal.org";
+"SUPPORT_EMAIL_ERROR_ALERT_DESCRIPTION" = "Mohon kirimkan surel permintaan dukungan Anda ke support@radar.chat";
 
 /* Localized label for support request email filter string. Embeds {{filter text}}. */
 "SUPPORT_EMAIL_FILTER_LABEL_FORMAT" = "Filter: %1$@";
@@ -9266,7 +9266,7 @@ Send money securely.";
 "SUPPORT_EMAIL_LOG_URL_LABEL_FORMAT" = "URL Panjang: %1$@";
 
 /* Localized subject for support request emails */
-"SUPPORT_EMAIL_SUBJECT" = "Permintaan Dukungan Signal iOS";
+"SUPPORT_EMAIL_SUBJECT" = "Permintaan Dukungan Radar iOS";
 
 /* Header for emoji mood selection */
 "SUPPORT_EMOJI_PROMPT" = "Saran dan kesan (opsional)";
@@ -9338,7 +9338,7 @@ Send money securely.";
 "SWITCH_ON" = "Aktif";
 
 /* Name to display for the 'system' sender, e.g. for release notes and the onboarding story */
-"SYSTEM_ADDRESS_NAME" = "Signal";
+"SYSTEM_ADDRESS_NAME" = "Radar";
 
 /* Label for button to verify a user's safety number. */
 "SYSTEM_MESSAGE_ACTION_VERIFY_SAFETY_NUMBER" = "Memeriksa";
@@ -9497,16 +9497,16 @@ Send money securely.";
 "TIME_AMOUNT_WEEKS_SHORT_FORMAT" = "%1$@w";
 
 /* Button for bottom sheet shown when device transfer completes on the receiving device. Tapping will terminate the Signal app and trigger a notification to relaunch. */
-"TRANSFER_COMPLETE_SHEET_BUTTON" = "Tutup Signal";
+"TRANSFER_COMPLETE_SHEET_BUTTON" = "Tutup Radar";
 
 /* Subtitle for bottom sheet shown when device transfer completes on the receiving device. */
-"TRANSFER_COMPLETE_SHEET_SUBTITLE" = "Untuk mulai menggunakan akun Anda di perangkat ini, tutup Signal dan buka kembali.";
+"TRANSFER_COMPLETE_SHEET_SUBTITLE" = "Untuk mulai menggunakan akun Anda di perangkat ini, tutup Radar dan buka kembali.";
 
 /* Title for bottom sheet shown when device transfer completes on the receiving device. */
 "TRANSFER_COMPLETE_SHEET_TITLE" = "Transfer selesai";
 
 /* Notification prompting the user to relaunch Signal after a device transfer completed. */
-"TRANSFER_RELAUNCH_NOTIFICATION" = "Buka Signal untuk mulai mengirim pesan";
+"TRANSFER_RELAUNCH_NOTIFICATION" = "Buka Radar untuk mulai mengirim pesan";
 
 /* Label for the cancel button in an alert or action sheet. */
 "TXT_CANCEL_TITLE" = "Batal";
@@ -9524,25 +9524,25 @@ Send money securely.";
 "UNKNOWN_CONTACT_BLOCK_OFFER" = "Pengguna tidak terdapat di dalam kontak. Apakah Anda ingin memblokir pengguna ini?";
 
 /* Info message recorded in conversation history when local user receives an unknown message from a linked device and needs to upgrade. */
-"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_FROM_LINKED_DEVICE" = "Salah satu dari perangkat Anda mengirimkan sebuah pesan yang tidak dapat diproses atau ditampilkan di sini karena menggunakan fitur baru Signal.";
+"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_FROM_LINKED_DEVICE" = "Salah satu dari perangkat Anda mengirimkan sebuah pesan yang tidak dapat diproses atau ditampilkan di sini karena menggunakan fitur baru Radar.";
 
 /* Info message recorded in conversation history when local user receives an unknown message and needs to upgrade. Embeds {{user's name or phone number}}. */
-"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_WITH_NAME_FORMAT" = "%1$@ mengirimkan Anda pesan yang tidak dapat diproses atau ditampilkan karena menggunakan fitur baru Signal.";
+"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_WITH_NAME_FORMAT" = "%1$@ mengirimkan Anda pesan yang tidak dapat diproses atau ditampilkan karena menggunakan fitur baru Radar.";
 
 /* Info message recorded in conversation history when local user receives an unknown message and needs to upgrade. */
-"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_WITHOUT_NAME" = "Anda menerima sebuah pesan yang tidak dapat diproses atau ditampilkan karena menggunakan fitur baru Signal.";
+"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_WITHOUT_NAME" = "Anda menerima sebuah pesan yang tidak dapat diproses atau ditampilkan karena menggunakan fitur baru Radar.";
 
 /* Label for button that lets users upgrade the app. */
-"UNKNOWN_PROTOCOL_VERSION_UPGRADE_BUTTON" = "Perbarui Signal Sekarang";
+"UNKNOWN_PROTOCOL_VERSION_UPGRADE_BUTTON" = "Perbarui Radar Sekarang";
 
 /* Info message recorded in conversation history when local user has received an unknown unknown message from a linked device and has upgraded. */
-"UNKNOWN_PROTOCOL_VERSION_UPGRADE_COMPLETE_FROM_LINKED_DEVICE" = "Signal telah diperbarui ke versi terkini. Anda sekarang dapat menerima pesan tipe ini pada perangkat Anda.";
+"UNKNOWN_PROTOCOL_VERSION_UPGRADE_COMPLETE_FROM_LINKED_DEVICE" = "Radar telah diperbarui ke versi terkini. Anda sekarang dapat menerima pesan tipe ini pada perangkat Anda.";
 
 /* Info message recorded in conversation history when local user has received an unknown message and has upgraded. Embeds {{user's name or phone number}}. */
-"UNKNOWN_PROTOCOL_VERSION_UPGRADE_COMPLETE_WITH_NAME_FORMAT" = "Anda dapat meminta %1$@ untuk mengirim ulang pesan ini saat Anda menggunakan versi Signal terbaru.";
+"UNKNOWN_PROTOCOL_VERSION_UPGRADE_COMPLETE_WITH_NAME_FORMAT" = "Anda dapat meminta %1$@ untuk mengirim ulang pesan ini saat Anda menggunakan versi Radar terbaru.";
 
 /* Info message recorded in conversation history when local user has received an unknown message and has upgraded. */
-"UNKNOWN_PROTOCOL_VERSION_UPGRADE_COMPLETE_WITHOUT_NAME" = "Anda dapat meminta pengirim untuk mengirim ulang pesan ini saat Anda menggunakan versi Signal terbaru.";
+"UNKNOWN_PROTOCOL_VERSION_UPGRADE_COMPLETE_WITHOUT_NAME" = "Anda dapat meminta pengirim untuk mengirim ulang pesan ini saat Anda menggunakan versi Radar terbaru.";
 
 /* Label indicating an unknown user. */
 "UNKNOWN_USER" = "Tidak Dikenal";
@@ -9566,13 +9566,13 @@ Send money securely.";
 "UNLINK_CONFIRMATION_ALERT_TITLE" = "Buang kaitan %1$@'?";
 
 /* Label warning the user that they have been unlinked from their primary device. */
-"UNLINKED_WARNING" = "Perangkat ini sudah tidak terhubung. Hubungkan Ulang Signal dengan ponsel Anda untuk terus berkirim pesan.";
+"UNLINKED_WARNING" = "Perangkat ini sudah tidak terhubung. Hubungkan Ulang Radar dengan ponsel Anda untuk terus berkirim pesan.";
 
 /* If this device has become unlinked from their primary device, they'll see a warning. This is the call to action on that warning. */
 "UNLINKED_WARNING_ACTION_TITLE" = "Hubungkan Ulang Perangkat";
 
 /* Alert title when unlinking device fails */
-"UNLINKING_FAILED_ALERT_TITLE" = "Signal tidak dapat menautkan perangkat anda";
+"UNLINKING_FAILED_ALERT_TITLE" = "Radar tidak dapat menautkan perangkat anda";
 
 /* Text for a toast confirming that the mic has been unmuted for a call. */
 "UNMUTE_CONFIRMATION_TOAST_LABEL" = "Mik nyala";
@@ -9593,7 +9593,7 @@ Send money securely.";
 "UNSUPPORTED_FEATURE_ERROR" = "Perangkat Anda tidak mendukung fitur ini.";
 
 /* Description for the unverified safety number change. Embeds {name of contact with identity change} */
-"UNVERIFIED_SAFETY_NUMBER_CHANGE_DESCRIPTION_FORMAT" = "Nomor keamanan Anda dengan %1$@ berubah mungkin karena mereka memasang ulang Signal atau mengganti perangkat. Ketuk Verifikasi untuk mengonfirmasi nomor keamanan barunya. Ini bersifat opsional.";
+"UNVERIFIED_SAFETY_NUMBER_CHANGE_DESCRIPTION_FORMAT" = "Nomor keamanan Anda dengan %1$@ berubah mungkin karena mereka memasang ulang Radar atau mengganti perangkat. Ketuk Verifikasi untuk mengonfirmasi nomor keamanan barunya. Ini bersifat opsional.";
 
 /* Action to verify a safety number after it has changed */
 "UNVERIFIED_SAFETY_NUMBER_VERIFY_ACTION" = "Memeriksa";
@@ -9611,7 +9611,7 @@ Send money securely.";
 "USE_PROXY_BUTTON" = "Gunakan proksi";
 
 /* Explanation of when you should use a signal proxy */
-"USE_PROXY_EXPLANATION" = "Gunakan proksi hanya ketika Anda tidak dapat tersambung ke Signal menggunakan data seluler atau Wi-Fi.";
+"USE_PROXY_EXPLANATION" = "Gunakan proksi hanya ketika Anda tidak dapat tersambung ke Radar menggunakan data seluler atau Wi-Fi.";
 
 /* Description of username links and QR codes on the username education sheet */
 "USERNAME_EDUCATION_LINK_DESCRIPTION" = "Nama pengguna punya kode QR dan tautan unik yang bisa dibagikan kepada teman untuk memulai obrolan dengan Anda secara cepat.";
@@ -9704,7 +9704,7 @@ Send money securely.";
 "USERNAME_LOOKUP_LINK_NO_LONGER_VALID_MESSAGE" = "Tautan nama pengguna ini sudah tidak valid.";
 
 /* A message indicating that the given username is not associated with a registered Signal account. Embeds {{ a username }}. */
-"USERNAME_LOOKUP_NOT_FOUND_MESSAGE_FORMAT" = "%1$@ bukan pengguna Signal. Pastikan Anda telah memasukkan nama pengguna yang lengkap.";
+"USERNAME_LOOKUP_NOT_FOUND_MESSAGE_FORMAT" = "%1$@ bukan pengguna Radar. Pastikan Anda telah memasukkan nama pengguna yang lengkap.";
 
 /* Title for an action sheet indicating that the given username is not associated with a registered Signal account. */
 "USERNAME_LOOKUP_NOT_FOUND_TITLE" = "Pengguna Tidak Ditemukan";
@@ -9728,7 +9728,7 @@ Send money securely.";
 "USERNAME_ONBOARDING_TITLE" = "Your Username";
 
 /* Instructions that appear below the username QR code on a sharable exported image. */
-"USERNAME_QR_CODE_EXPORT_INSTRUCTIONS" = "Pindai kode QR ini dengan ponsel untuk mengobrol dengan saya di Signal.";
+"USERNAME_QR_CODE_EXPORT_INSTRUCTIONS" = "Pindai kode QR ini dengan ponsel untuk mengobrol dengan saya di Radar.";
 
 /* A message in a toast informing the user their username, link, and QR code have successfully been reset. Embeds {{ the user's new username }}. */
 "USERNAME_RESET_SUCCESSFUL_TOAST" = "Kode QR dan tautan Anda telah direset dan nama pengguna Anda adalah %1$@";

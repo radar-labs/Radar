@@ -32,7 +32,7 @@
 "ACCOUNT_DATA_REPORT_CONFIRM_EXPORT_CONFIRM_BUTTON" = "レポートをエクスポートする";
 
 /* Users can request a report of their account data. Before they get their account export, they are warned to only share account data with trustworthy sources. This is the message on that warning. */
-"ACCOUNT_DATA_REPORT_CONFIRM_EXPORT_MESSAGE" = "Signal アカウントデータは、信頼できる人またはアプリとのみ共有してください。";
+"ACCOUNT_DATA_REPORT_CONFIRM_EXPORT_MESSAGE" = "Radar アカウントデータは、信頼できる人またはアプリとのみ共有してください。";
 
 /* Users can request a report of their account data. If this request fails (probably because of a network connection problem), they will see an error sheet. This is the message on that error. */
 "ACCOUNT_DATA_REPORT_ERROR_MESSAGE" = "インターネット接続を確認して再度試してください。";
@@ -56,10 +56,10 @@
 "ACCOUNT_DATA_REPORT_EXPORT_REPORT_BUTTON" = "レポートをエクスポートする";
 
 /* Users can request a report of their account data. This text appears at the bottom of this screen, offering more information. */
-"ACCOUNT_DATA_REPORT_FOOTER" = "レポートはエクスポート時にのみ作成され、Signal がお客様の端末に保存することはありません。";
+"ACCOUNT_DATA_REPORT_FOOTER" = "レポートはエクスポート時にのみ作成され、Radar がお客様の端末に保存することはありません。";
 
 /* Users can request a report of their account data. This is the subtitle on the screen where they do this, giving them more information. */
-"ACCOUNT_DATA_REPORT_SUBTITLE" = "Signal アカウントデータのレポートをダウンロードし、エクスポートします。このレポートには、メッセージやメディアは一切含まれません。";
+"ACCOUNT_DATA_REPORT_SUBTITLE" = "Radar アカウントデータのレポートをダウンロードし、エクスポートします。このレポートには、メッセージやメディアは一切含まれません。";
 
 /* Users can request a report of their account data. This is the title on the screen where they do this. */
 "ACCOUNT_DATA_REPORT_TITLE" = "あなたのアカウントデータ";
@@ -203,16 +203,16 @@
 "APN_Message" = "新着メッセージがあるかもしれません";
 
 /* Default message for the 'app launch failed' alert. */
-"APP_LAUNCH_FAILURE_ALERT_MESSAGE" = "Signalを起動できません。解決のため、デバッグログを support@signal.org にお送りください。";
+"APP_LAUNCH_FAILURE_ALERT_MESSAGE" = "Signalを起動できません。解決のため、デバッグログを support@radar.chat にお送りください。";
 
 /* Button to try launching the app even though the last launch failed */
-"APP_LAUNCH_FAILURE_CONTINUE" = "Open Signal Instead";
+"APP_LAUNCH_FAILURE_CONTINUE" = "Open Radar Instead";
 
 /* Message for an error indicating that the app couldn't launch because some unexpected error happened with the user's registration status. */
-"APP_LAUNCH_FAILURE_CORRUPT_REGISTRATION_MESSAGE" = "解決のため、デバッグログを support@signal.org にお送りください。";
+"APP_LAUNCH_FAILURE_CORRUPT_REGISTRATION_MESSAGE" = "解決のため、デバッグログを support@radar.chat にお送りください。";
 
 /* Title for an error indicating that the app couldn't launch because some unexpected error happened with the user's registration status. */
-"APP_LAUNCH_FAILURE_CORRUPT_REGISTRATION_TITLE" = "Signal を開けませんでした";
+"APP_LAUNCH_FAILURE_CORRUPT_REGISTRATION_TITLE" = "Radar を開けませんでした";
 
 /* Error indicating that the app could not launch because the database could not be loaded. */
 "APP_LAUNCH_FAILURE_COULD_NOT_LOAD_DATABASE" = "データベースを読み込めませんでした";
@@ -224,7 +224,7 @@
 "APP_LAUNCH_FAILURE_INVALID_DATABASE_VERSION_TITLE" = "データベースのバージョンが不明です。";
 
 /* Error indicating that the app crashed during the previous launch. */
-"APP_LAUNCH_FAILURE_LAST_LAUNCH_CRASHED_MESSAGE" = "Signalの起動時に問題が発生しました。解決のためにデバッグログをsupport@signal.orgにお送りください。";
+"APP_LAUNCH_FAILURE_LAST_LAUNCH_CRASHED_MESSAGE" = "Signalの起動時に問題が発生しました。解決のためにデバッグログをsupport@radar.chatにお送りください。";
 
 /* Error indicating that the app crashed during the previous launch. */
 "APP_LAUNCH_FAILURE_LAST_LAUNCH_CRASHED_TITLE" = "前回起動時にSignalがクラッシュしました";
@@ -236,7 +236,7 @@
 "APP_LAUNCH_FAILURE_LOW_STORAGE_SPACE_AVAILABLE_TITLE" = "ストレージ容量が不足しています。";
 
 /* Error indicating that the app could not restore transferred data. */
-"APP_LAUNCH_FAILURE_RESTORE_FAILED_MESSAGE" = "旧端末から移行したデータを復元できませんでした。原因を調査するため、デバッグログを support@signal.org に送ってください。Signalを再インストールすると、メッセージ履歴が消える可能性があります。";
+"APP_LAUNCH_FAILURE_RESTORE_FAILED_MESSAGE" = "旧端末から移行したデータを復元できませんでした。原因を調査するため、デバッグログを support@radar.chat に送ってください。Signalを再インストールすると、メッセージ履歴が消える可能性があります。";
 
 /* Error indicating that the app could not restore transferred data. */
 "APP_LAUNCH_FAILURE_RESTORE_FAILED_TITLE" = "移行を完了できませんでした";
@@ -596,10 +596,10 @@
 "BACKUP_ONBOARDING_INTRO_NOT_NOW_TOAST" = "設定からバックアップを有効にすることができます。";
 
 /* Subtitle for a view introducing Backups during an onboarding flow. */
-"BACKUP_ONBOARDING_INTRO_SUBTITLE" = "Signalの安全なエンドツーエンドの暗号化ストレージサービスを使用して、メッセージやメディアをバックアップします。スマートフォンを買い替えたり、Signalを再インストールしてもメッセージを失うことはありません。";
+"BACKUP_ONBOARDING_INTRO_SUBTITLE" = "Radarの安全なエンドツーエンドの暗号化ストレージサービスを使用して、メッセージやメディアをバックアップします。スマートフォンを買い替えたり、Radarを再インストールしてもメッセージを失うことはありません。";
 
 /* Title for a view introducing Backups during an onboarding flow. */
-"BACKUP_ONBOARDING_INTRO_TITLE" = "Signalセキュアバックアップ";
+"BACKUP_ONBOARDING_INTRO_TITLE" = "Radarセキュアバックアップ";
 
 /* Text for a bullet point in a view introducing the 'Recovery Key' during an onboarding flow. */
 "BACKUP_ONBOARDING_KEY_INTRO_BULLET_1" = "回復キーは、バックアップを復元するために必要な64文字のコードです。";
@@ -842,7 +842,7 @@
 "BACKUP_SETTINGS_DISABLING_SUBSCRIPTION_CANCEL_ACTION_SHEET_MANAGE_SUBSCRIPTION_BUTTON" = "サブスクリプションを管理する";
 
 /* Message for an action sheet shown when the user disables Backups, but is still subscribed to the paid plan. */
-"BACKUP_SETTINGS_DISABLING_SUBSCRIPTION_CANCEL_ACTION_SHEET_MESSAGE" = "サブスクリプションを解約したい場合は、「サブスクリプションを管理する」> Signal >「サブスクリプションを解約する」をタップしてください";
+"BACKUP_SETTINGS_DISABLING_SUBSCRIPTION_CANCEL_ACTION_SHEET_MESSAGE" = "サブスクリプションを解約したい場合は、「サブスクリプションを管理する」> Radar >「サブスクリプションを解約する」をタップしてください";
 
 /* Title for an action sheet shown when the user disables Backups, but is still subscribed to the paid plan. */
 "BACKUP_SETTINGS_DISABLING_SUBSCRIPTION_CANCEL_ACTION_SHEET_TITLE" = "有料バックアッププランにまだご加入中です";
@@ -1004,7 +1004,7 @@
 "BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_TITLE" = "Signalセキュアバックアップへようこそ。今すぐバックアップを開始しましょう。";
 
 /* Message for a sheet shown when your Backup subscription fails to renew. */
-"BACKUP_SUBSCRIPTION_FAILED_TO_RENEW_SHEET_MESSAGE" = "お支払い方法が現在も有効なものであるかをご確認ください。「サブスクリプションを管理する」>「Signal」>「支払い方法をアップデートする」をタップします。";
+"BACKUP_SUBSCRIPTION_FAILED_TO_RENEW_SHEET_MESSAGE" = "お支払い方法が現在も有効なものであるかをご確認ください。「サブスクリプションを管理する」>「Radar」>「支払い方法をアップデートする」をタップします。";
 
 /* Primary button for a sheet shown when your Backup subscription fails to renew. */
 "BACKUP_SUBSCRIPTION_FAILED_TO_RENEW_SHEET_PRIMARY_BUTTON" = "サブスクリプションを管理する";
@@ -1319,7 +1319,7 @@
 "CALL_LINK_JOIN_REQUEST_PROMPT" = "待機中…";
 
 /* Shown in a message bubble when you send a call link in a Signal chat */
-"CALL_LINK_LINK_PREVIEW_DESCRIPTION" = "リンクを使用して Signal 通話に参加する";
+"CALL_LINK_LINK_PREVIEW_DESCRIPTION" = "リンクを使用して Radar 通話に参加する";
 
 /* Text that appears on a toast in a call lobby before joining a call link informing the user what information will be shared with other call members when they have phone number sharing turned off. */
 "CALL_LINK_LOBBY_SHARING_INFO_PHONE_NUMBER_SHARING_OFF" = "リンク経由でこの通話に参加する人には、あなたの名前と写真が表示されます。";
@@ -1343,7 +1343,7 @@
 "CALL_LINK_REQUIRE_APPROVAL" = "管理者の承認を必要とする";
 
 /* Button to open UI to share a Call Link with someone on Signal. */
-"CALL_LINK_SHARE_VIA_SIGNAL" = "Signal 経由でリンクを共有する";
+"CALL_LINK_SHARE_VIA_SIGNAL" = "Radar 経由でリンクを共有する";
 
 /* Button to open the system share sheet to share a Call Link. */
 "CALL_LINK_SHARE_VIA_SYSTEM" = "リンクを共有する";
@@ -2584,7 +2584,7 @@
 "DEREGISTRATION_REREGISTER_PROMPT_TITLE" = "この電話番号を再登録しますか？";
 
 /* Label warning the user that they have been de-registered. */
-"DEREGISTRATION_WARNING" = "この端末は登録されていません。以前、おそらく別の端末で Signal に電話番号を登録したことが原因です。";
+"DEREGISTRATION_WARNING" = "この端末は登録されていません。以前、おそらく別の端末で Radar に電話番号を登録したことが原因です。";
 
 /* If the user has been deregistered, they'll see a warning. This is This is the call to action on that warning. */
 "DEREGISTRATION_WARNING_ACTION_TITLE" = "端末を再登録する";
@@ -2983,7 +2983,7 @@
 "DONATION_ON_BEHALF_OF_A_FRIEND_PAYMENT_FAILED_ERROR_TITLE" = "決済に失敗しました";
 
 /* Users can donate on a friend's behalf. If the payment was processed but the donation failed to send, this error message will be shown. */
-"DONATION_ON_BEHALF_OF_A_FRIEND_PAYMENT_SUCCEEDED_BUT_MESSAGE_FAILED_ERROR_BODY" = "お支払いは処理されましたが、Signal は寄付メッセージを送信できませんでした。サポートにお問い合わせください。";
+"DONATION_ON_BEHALF_OF_A_FRIEND_PAYMENT_SUCCEEDED_BUT_MESSAGE_FAILED_ERROR_BODY" = "お支払いは処理されましたが、Radar は寄付メッセージを送信できませんでした。サポートにお問い合わせください。";
 
 /* Users can donate on a friend's behalf. If the payment was processed but the donation failed to send, an error dialog will be shown. This is the title of that dialog. */
 "DONATION_ON_BEHALF_OF_A_FRIEND_PAYMENT_SUCCEEDED_BUT_MESSAGE_FAILED_ERROR_TITLE" = "寄付できませんでした";
@@ -3247,7 +3247,7 @@
 "EMAIL_INVITE_SUBJECT" = "メッセージアプリをSignalにしましょう";
 
 /* Description for the fallback support sheet if user cannot send email */
-"EMAIL_SIGNAL_MESSAGE" = "この端末はメールを送信できるようになっていません。サポートリクエストを送るには、この端末でメールを設定するか、support@signal.org にメールしてください。";
+"EMAIL_SIGNAL_MESSAGE" = "この端末はメールを送信できるようになっていません。サポートリクエストを送るには、この端末でメールを設定するか、support@radar.chat にメールしてください。";
 
 /* Title for the fallback support sheet if user cannot send email */
 "EMAIL_SIGNAL_TITLE" = "メール利用不可";
@@ -3394,10 +3394,10 @@
 "ERROR_NETWORK_FAILURE" = "ネットワークエラー";
 
 /* Format string for an error alert notification message. Embeds {{ error string }} */
-"ERROR_NOTIFICATION_MESSAGE_FORMAT" = "このエラーとあなたの端末のデバッグログを support@signal.org に報告して、Signalの改善にご協力ください; %1$@";
+"ERROR_NOTIFICATION_MESSAGE_FORMAT" = "このエラーとあなたの端末のデバッグログを support@radar.chat に報告して、Signalの改善にご協力ください; %1$@";
 
 /* Format string for an error alert notification title. */
-"ERROR_NOTIFICATION_TITLE" = "Signal Beta: エラーが発生しました";
+"ERROR_NOTIFICATION_TITLE" = "Radar Beta: エラーが発生しました";
 
 /* Error indicating a send failure due to a delinked application. */
 "ERROR_SENDING_DELINKED" = "この端末はもうリンクされていません。メッセージを送信するには、リンクし直してください。";
@@ -3418,16 +3418,16 @@
 "EXIT_REREGISTRATION" = "登録を終了する";
 
 /* Label notifying the user that the app has expired. */
-"EXPIRATION_ERROR" = "このバージョンの Signal は期限が切れています。メッセージを送受信するには、アップデートしてください。";
+"EXPIRATION_ERROR" = "このバージョンの Radar は期限が切れています。メッセージを送受信するには、アップデートしてください。";
 
 /* If the user's app is too old, they'll be shown a warning asking them to upgrade. This is the text on the warning, and tapping it will open the App Store page for Signal. */
 "EXPIRATION_WARNING_ACTION_TITLE" = "アップデートする";
 
 /* Label warning the user that the app will expire soon. Embeds {{date}}. */
-"EXPIRATION_WARNING_SOON" = "このバージョンの Signal は、%1$@に期限が切れます。アップデートするとメッセージの送受信を継続できます。";
+"EXPIRATION_WARNING_SOON" = "このバージョンの Radar は、%1$@に期限が切れます。アップデートするとメッセージの送受信を継続できます。";
 
 /* Label warning the user that the app will expire today. */
-"EXPIRATION_WARNING_TODAY" = "このバージョンの Signal は、今日で期限が切れます。アップデートするとメッセージの送受信を継続できます。";
+"EXPIRATION_WARNING_TODAY" = "このバージョンの Radar は、今日で期限が切れます。アップデートするとメッセージの送受信を継続できます。";
 
 /* action sheet header when re-sending message which failed because of an invalid key signature */
 "FAILED_SENDING_BECAUSE_INVALID_KEY_SIGNATURE" = "%1$@ がSignalを更新して開く必要があるため、メッセージを送信できませんでした。";
@@ -4711,7 +4711,7 @@
 "LINK_DEVICE_SCANNING_INSTRUCTIONS_SHEET_TITLE" = "QRコードをスキャン";
 
 /* Body text for a sheet when a user tries to link a device informing them that they will need to authenticate their device */
-"LINK_NEW_DEVICE_AUTHENTICATION_INFO_SHEET_BODY" = "［Continue］をタップし、スマートフォンの解錠コードを入力して確認します。Signal PINを入力しないようにしてください。";
+"LINK_NEW_DEVICE_AUTHENTICATION_INFO_SHEET_BODY" = "［Continue］をタップし、スマートフォンの解錠コードを入力して確認します。Radar PINを入力しないようにしてください。";
 
 /* Title for a sheet when a user tries to link a device informing them that they will need to authenticate their device */
 "LINK_NEW_DEVICE_AUTHENTICATION_INFO_SHEET_TITLE" = "リンクする前に、本人確認が必要です";
@@ -4789,7 +4789,7 @@
 "LINKED_DEVICES_EDUCATION_POINT_DOWNLOADS" = "他の端末の場合は、%1$@ にアクセスしてiPadアプリをインストールする、または %2$@ にアクセスしてDesktopアプリをインストールします。";
 
 /* Bullet point about message sync on the linked devices education sheet */
-"LINKED_DEVICES_EDUCATION_POINT_MESSAGES" = "Signal メッセージは、リンク後にお使いのスマートフォンの Signal と同期されます。";
+"LINKED_DEVICES_EDUCATION_POINT_MESSAGES" = "Radar メッセージは、リンク後にお使いのスマートフォンの Radar と同期されます。";
 
 /* Bullet point about privacy on the linked devices education sheet */
 "LINKED_DEVICES_EDUCATION_POINT_PRIVACY" = "リンク済み端末上のすべてのメッセージはプライバシーが保護されています";
@@ -4801,7 +4801,7 @@
 "LINKED_DEVICES_EMPTY_STATE" = "リンク済み端末はありません";
 
 /* Description for header of the linked devices list */
-"LINKED_DEVICES_HEADER_DESCRIPTION" = "Use Signal on desktop or iPad.";
+"LINKED_DEVICES_HEADER_DESCRIPTION" = "Use Radar on desktop or iPad.";
 
 /* Footer text below the list of currently-linked devices */
 "LINKED_DEVICES_LIST_FOOTER" = "メッセージ情報とチャット情報は、すべての端末でエンドツーエンドの暗号化で保護されています";
@@ -5755,7 +5755,7 @@
 "ONBOARDING_MODE_SWITCH_WARNING_REGISTERING" = "このiPhoneをリンクすることは、機能が制限されるため、推奨されません。";
 
 /* Description of the 'Contacts' permission in the 'onboarding permissions' view. */
-"ONBOARDING_PERMISSIONS_CONTACTS_DESCRIPTION" = "知り合いを探しましょう。連絡先は暗号化され、私たちSignalからは見えません。";
+"ONBOARDING_PERMISSIONS_CONTACTS_DESCRIPTION" = "知り合いを探しましょう。連絡先は暗号化され、私たちRadarからは見えません。";
 
 /* Title introducing the 'Contacts' permission in the 'onboarding permissions' view. */
 "ONBOARDING_PERMISSIONS_CONTACTS_TITLE" = "連絡先";
@@ -5767,7 +5767,7 @@
 "ONBOARDING_PERMISSIONS_NOTIFICATIONS_TITLE" = "通知";
 
 /* Preamble of the 'onboarding permissions' view. */
-"ONBOARDING_PERMISSIONS_PREAMBLE" = "Signalは以下の権限をリクエストします。";
+"ONBOARDING_PERMISSIONS_PREAMBLE" = "Radarは以下の権限をリクエストします。";
 
 /* Description of the 'Notification Relay' permission in the 'onboarding permissions' view. */
 "ONBOARDING_PERMISSIONS_RELAY_DESCRIPTION" = "Enable Radar notification relay to ensure you get immediate background notifications in Radar. Relay is always privacy-preserving and keeps your messages end-to-end encrypted no matter what.";
@@ -5803,7 +5803,7 @@
 "ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_TITLE" = "PINが違います";
 
 /* Explanation of the 'onboarding pin attempts exhausted' view when it is unknown if reglock is enabled. */
-"ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_WITH_UNKNOWN_REGLOCK_EXPLANATION" = "PIN の試行回数はなくなりましたが、電話番号を認証させることで Signal アカウントにアクセスできます。プライバシーとセキュリティー保護のため、アカウントに保存されているプロフィールや設定情報は復元されません。";
+"ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_WITH_UNKNOWN_REGLOCK_EXPLANATION" = "PIN の試行回数はなくなりましたが、電話番号を認証させることで Radar アカウントにアクセスできます。プライバシーとセキュリティー保護のため、アカウントに保存されているプロフィールや設定情報は復元されません。";
 
 /* Title for the setup complete screen shown at the end of the onboarding flow. */
 "ONBOARDING_SETUP_COMPLETE_TITLE" = "セットアップ完了";
@@ -5897,19 +5897,19 @@ Send money securely.";
 "OPEN_SETTINGS_BUTTON" = "設定";
 
 /* Signal doesn't support old versions of iOS and shows a warning if you're on unsupported version. Some users can upgrade their device to a newer version of iOS to continue using Signal. If that's the case, they'll be shown this text. */
-"OS_EXPIRED_AND_CAN_UPGRADE_OS" = "この端末では Signal は動作しなくなりました。再び Signal をご利用になるには、お使いの端末で iOS のバージョンをアップデートしてください。";
+"OS_EXPIRED_AND_CAN_UPGRADE_OS" = "この端末では Radar は動作しなくなりました。再び Radar をご利用になるには、お使いの端末で iOS のバージョンをアップデートしてください。";
 
 /* Signal doesn't support old devices. If that's the case, they'll be shown this action, and tapping it will open information about Signal's minimum supported operating systems. */
-"OS_EXPIRED_AND_DEVICE_IS_STUCK" = "この端末では Signal は動作しなくなりました。再び Signal をご利用になるには、新しい端末に機種変更をしてください。";
+"OS_EXPIRED_AND_DEVICE_IS_STUCK" = "この端末では Radar は動作しなくなりました。再び Radar をご利用になるには、新しい端末に機種変更をしてください。";
 
 /* Signal doesn't support old versions of iOS and shows a warning if you're on an old version. Some users can upgrade their device to a newer version of iOS to continue using Signal. If that's the case, they'll be shown this action, and tapping it will open device update instructions. */
 "OS_SOON_TO_EXPIRE_ACTION_TITLE" = "アップデートする";
 
 /* Signal doesn't support old versions of iOS and shows a warning if you're an old version that will soon lose support. Some users can upgrade their device to a newer version of iOS to continue using Signal. If that's the case, they'll be shown this text. Embeds {{expiration date}}. */
-"OS_SOON_TO_EXPIRE_AND_CAN_UPGRADE_OS_FORMAT" = "Signal は、お使いの端末の iOS のバージョンサポートをまもなく終了する予定です。Signal を引き続きご利用になるには、 %1$@までにお使いの端末で iOS のバージョンをアップデートしてください。";
+"OS_SOON_TO_EXPIRE_AND_CAN_UPGRADE_OS_FORMAT" = "Radar は、お使いの端末の iOS のバージョンサポートをまもなく終了する予定です。Radar を引き続きご利用になるには、 %1$@までにお使いの端末で iOS のバージョンをアップデートしてください。";
 
 /* Signal doesn't support old versions of iOS and shows a warning if you're on an old version that will soon lose support. This is the text on that warning when users can't upgrade iOS without getting a new device. Embeds {{expiration date}}. */
-"OS_SOON_TO_EXPIRE_AND_DEVICE_WILL_BE_STUCK_FORMAT" = "Signal は、お使いの端末の iOS のバージョンサポートをまもなく終了する予定です。Signal を引き続きご利用になるには、 %1$@までに新しい端末に機種変更をしてください。";
+"OS_SOON_TO_EXPIRE_AND_DEVICE_WILL_BE_STUCK_FORMAT" = "Radar は、お使いの端末の iOS のバージョンサポートをまもなく終了する予定です。Radar を引き続きご利用になるには、 %1$@までに新しい端末に機種変更をしてください。";
 
 /* Info Message when another user disabled disappearing messages. Embeds {{name of other user}}. */
 "OTHER_DISABLED_DISAPPEARING_MESSAGES_CONFIGURATION" = "%1$@ が消えるメッセージを無効にしました。";
@@ -6552,10 +6552,10 @@ Send money securely.";
 "PIN_CREATION_LEARN_MORE" = "PIN とは？";
 
 /* Users can create PINs to restore their account data later. They can learn more about this on a sheet. This is the text on that sheet. */
-"PIN_CREATION_LEARN_MORE_TEXT" = "Signal 内に保存された情報は、PIN により暗号化を保持されるため、あなたのみがアクセスできます。PIN を使うことで、再インストール時にあなたのプロフィール、設定および連絡先が復元されます。";
+"PIN_CREATION_LEARN_MORE_TEXT" = "Radar 内に保存された情報は、PIN により暗号化を保持されるため、あなたのみがアクセスできます。PIN を使うことで、再インストール時にあなたのプロフィール、設定および連絡先が復元されます。";
 
 /* Users can create PINs to restore their account data later. They can learn more about this on a sheet. This is the title on that sheet. */
-"PIN_CREATION_LEARN_MORE_TITLE" = "Signal PIN について";
+"PIN_CREATION_LEARN_MORE_TITLE" = "Radar PIN について";
 
 /* Label indicating that the attempted PIN does not match the first PIN */
 "PIN_CREATION_MISMATCH_ERROR" = "PINが一致しません。再度試してください。";
@@ -6621,7 +6621,7 @@ Send money securely.";
 "PIN_REMINDER_MEGAPHONE_FEW_DAYS_TOAST" = "数日後に再度お知らせします。";
 
 /* Title for PIN reminder megaphone */
-"PIN_REMINDER_MEGAPHONE_TITLE" = "Signal PINを確認";
+"PIN_REMINDER_MEGAPHONE_TITLE" = "Radar PINを確認";
 
 /* Toast indicating that we'll ask you for your PIN again tomorrow, after successfully entering it. */
 "PIN_REMINDER_MEGAPHONE_TOMORROW_SUCCESSFUL_TOAST" = "正しいPINが入力されました。明日、再度確認があります。";
@@ -6645,7 +6645,7 @@ Send money securely.";
 "PIN_REMINDER_MISMATCH_ERROR" = "PINが違います。再度試してください。";
 
 /* The title for the 'pin reminder' dialog. */
-"PIN_REMINDER_TITLE" = "Signal PINを入力してください";
+"PIN_REMINDER_TITLE" = "Radar PINを入力してください";
 
 /* Label indicating that the attempted PIN is too short */
 "PIN_REMINDER_TOO_SHORT_ERROR" = "PINは4桁以上の数字にしてください。";
@@ -6660,7 +6660,7 @@ Send money securely.";
 "PINS_MEGAPHONE_ACTION" = "PINを作成";
 
 /* Body for PIN megaphone when user doesn't have a PIN */
-"PINS_MEGAPHONE_BODY" = "Signal PINを作成しましょう。";
+"PINS_MEGAPHONE_BODY" = "Radar PINを作成しましょう。";
 
 /* Title for PIN megaphone when user doesn't have a PIN */
 "PINS_MEGAPHONE_TITLE" = "PINを作成しましょう";
@@ -7179,7 +7179,7 @@ Send money securely.";
 "REGISTRATION_CANNOT_CONTINUE_WITHOUT_UPDATING_APP_ACTION" = "アップデートする";
 
 /* During (re)registration, users may need to update their app to continue. They'll be presented with an alert if this is the case, prompting them to update. This is the description text on that alert. */
-"REGISTRATION_CANNOT_CONTINUE_WITHOUT_UPDATING_APP_DESCRIPTION" = "登録を続行するには、Signal の最新バージョンにアップデートしてください。";
+"REGISTRATION_CANNOT_CONTINUE_WITHOUT_UPDATING_APP_DESCRIPTION" = "登録を続行するには、Radar の最新バージョンにアップデートしてください。";
 
 /* During (re)registration, users may need to update their app to continue. They'll be presented with an alert if this is the case, prompting them to update. This is the title on that alert. */
 "REGISTRATION_CANNOT_CONTINUE_WITHOUT_UPDATING_APP_TITLE" = "アップデートが必要です";
@@ -7686,7 +7686,7 @@ Send money securely.";
 "SECONDARY_ONBOARDING_INSTALL_PRIMARY_FIRST_TITLE" = "Signalのインストール";
 
 /* body text while displaying a QR code which, when scanned, will link this device. */
-"SECONDARY_ONBOARDING_SCAN_CODE_BODY" = "携帯電話のSignalであなたのアイコンをタップし、「リンク済み端末」の「新しい端末をリンク」から、このQRコードをスキャンしてください:";
+"SECONDARY_ONBOARDING_SCAN_CODE_BODY" = "携帯電話のRadarであなたのアイコンをタップし、「リンク済み端末」の「新しい端末をリンク」から、このQRコードをスキャンしてください:";
 
 /* Link text for page with troubleshooting info shown on the QR scanning screen */
 "SECONDARY_ONBOARDING_SCAN_CODE_HELP_TEXT" = "iPadのリンクに関するヘルプはこちら";
@@ -7869,13 +7869,13 @@ Send money securely.";
 "SETTINGS_ADVANCED_VIEW_ERROR_LOG" = "エラーログ";
 
 /* Information on sheet about changing the app icon - first line */
-"SETTINGS_APP_ICON_EDUCATION_APP_NAME" = "アプリ名の「Signal」は、ホーム画面、通知、アプリライブラリでは表示されます。";
+"SETTINGS_APP_ICON_EDUCATION_APP_NAME" = "アプリ名の「Radar」は、ホーム画面、通知、アプリライブラリでは表示されます。";
 
 /* Information on sheet about changing the app icon - second line */
-"SETTINGS_APP_ICON_EDUCATION_HOME_SCREEN_DOCK" = "ホーム画面下部のDockにアプリを移動させると、「Signal」というアプリ名は非表示になります。";
+"SETTINGS_APP_ICON_EDUCATION_HOME_SCREEN_DOCK" = "ホーム画面下部のDockにアプリを移動させると、「Radar」というアプリ名は非表示になります。";
 
 /* The footer for the app icon selection settings page. */
-"SETTINGS_APP_ICON_FOOTER" = "アプリ名の「Signal」は、ホーム画面、通知、アプリライブラリでは表示されます。";
+"SETTINGS_APP_ICON_FOOTER" = "アプリ名の「Radar」は、ホーム画面、通知、アプリライブラリでは表示されます。";
 
 /* The title for the app icon selection settings page. */
 "SETTINGS_APP_ICON_TITLE" = "アプリアイコン";
@@ -7962,7 +7962,7 @@ Send money securely.";
 "SETTINGS_CLEAR_HISTORY" = "チャット履歴の消去";
 
 /* Footer for the 'about' help section */
-"SETTINGS_COPYRIGHT" = "Copyright Signal Messenger\nLicensed under the GPLv3";
+"SETTINGS_COPYRIGHT" = "Copyright Radar Messenger\nLicensed under the GPLv3";
 
 /* Label for the 'data' section of the app settings. */
 "SETTINGS_DATA" = "データ通信量";
@@ -8103,7 +8103,7 @@ Send money securely.";
 "SETTINGS_NOTIFICATION_CONTENT_TITLE" = "通知内容";
 
 /* When the local device discovers a contact has recently installed signal, the app can generates a message encouraging the local user to say hello. Turning this switch off disables that feature. */
-"SETTINGS_NOTIFICATION_EVENTS_CONTACT_JOINED_SIGNAL" = "連絡先のSignal参加時";
+"SETTINGS_NOTIFICATION_EVENTS_CONTACT_JOINED_SIGNAL" = "連絡先のRadar参加時";
 
 /* table section header */
 "SETTINGS_NOTIFICATION_NOTIFY_WHEN_TITLE" = "通知のタイミング";
@@ -8140,7 +8140,7 @@ Send money securely.";
 "SETTINGS_PAYMENTS_BITCOIN_UNIT" = "ビットコイン単位";
 
 /* Error message indicating that payments could not be activated because the feature is not currently available. */
-"SETTINGS_PAYMENTS_CANNOT_ACTIVATE_PAYMENTS_KILL_SWITCH" = "Signalの決済機能は、利用できなくなりました。取引所への振替は可能ですが、送金や受け取り、入金はできません。";
+"SETTINGS_PAYMENTS_CANNOT_ACTIVATE_PAYMENTS_KILL_SWITCH" = "Radarの決済機能は、利用できなくなりました。取引所への振替は可能ですが、送金や受け取り、入金はできません。";
 
 /* Error message indicating that payments could not be deactivated because the current balance is unavailable. */
 "SETTINGS_PAYMENTS_CANNOT_DEACTIVATE_PAYMENTS_NO_BALANCE" = "残高が不明なため、決済機能を停止できません。インターネット接続を確認して再度試してください。";
@@ -8149,10 +8149,10 @@ Send money securely.";
 "SETTINGS_PAYMENTS_CANNOT_SEND_PAYMENT_NO_BALANCE" = "残高が不明なため、決済を完了できませんでした。インターネット接続を確認して再度試してください。";
 
 /* Error message indicating that payments cannot be sent because the feature is not currently available. */
-"SETTINGS_PAYMENTS_CANNOT_SEND_PAYMENTS_KILL_SWITCH" = "Signalの決済機能は、利用できなくなりました。取引所への振替は可能ですが、送金や受け取り、入金はできません。";
+"SETTINGS_PAYMENTS_CANNOT_SEND_PAYMENTS_KILL_SWITCH" = "Radarの決済機能は、利用できなくなりました。取引所への振替は可能ですが、送金や受け取り、入金はできません。";
 
 /* Error message indicating that you cannot transfer into your payments wallet because the feature is not currently available. */
-"SETTINGS_PAYMENTS_CANNOT_TRANSFER_IN_KILL_SWITCH" = "Signalの決済機能は、利用できなくなりました。取引所への振替は可能ですが、送金や受け取り、入金はできません。";
+"SETTINGS_PAYMENTS_CANNOT_TRANSFER_IN_KILL_SWITCH" = "Radarの決済機能は、利用できなくなりました。取引所への振替は可能ですが、送金や受け取り、入金はできません。";
 
 /* Message for the 'currency conversions info' alert. */
 "SETTINGS_PAYMENTS_CURRENCY_CONVERSIONS_INFO_ALERT_MESSAGE" = "金額は概算であり、正確ではない場合があります。";
@@ -8621,7 +8621,7 @@ Send money securely.";
 "SETTINGS_PAYMENTS_VIEW_PASSPHRASE_TITLE" = "リカバリーフレーズ";
 
 /* Header text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "この24語を順番に書き留め、安全な場所に保管してください。Cake Walletやその他のSpark対応ウォレットで残高を復元するために使用できます。";
+"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "この12語を順番に書き留め、安全な場所に保管してください。Cake Walletやその他のSpark対応ウォレットで残高を復元するために使用できます。";
 
 /* Footer text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
 "SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_FOOTER_2" = "このフレーズを誰にも共有しないでください";
@@ -8666,13 +8666,13 @@ Send money securely.";
 "SETTINGS_PIN_REMINDER_DISABLE_CONFIRMATION_EXPLANATION" = "PINは復元できないため、記憶するか安全に保管してください。PINを忘れると、Signalアカウントの再登録時にデータが失われる可能性があります。";
 
 /* The title for the dialog asking user to confirm their PIN to disable reminders */
-"SETTINGS_PIN_REMINDER_DISABLE_CONFIRMATION_TITLE" = "Signal PINの確認";
+"SETTINGS_PIN_REMINDER_DISABLE_CONFIRMATION_TITLE" = "Radar PINの確認";
 
 /* Label for the 'pin reminder' switch of the privacy settings. */
 "SETTINGS_PIN_REMINDER_SWITCH_LABEL" = "PINリマインダー";
 
 /* Footer for the 'PINs' section of the privacy settings. */
-"SETTINGS_PINS_FOOTER" = "Signal内に保存された情報は、PINにより暗号化されるため、あなたのみアクセスできます。PINは復元できません。Signalを再インストールすると、あなたのプロフィール、設定および連絡先が復元されます。";
+"SETTINGS_PINS_FOOTER" = "Radar内に保存された情報は、PINにより暗号化されるため、あなたのみアクセスできます。PINは復元できません。Radarを再インストールすると、あなたのプロフィール、設定および連絡先が復元されます。";
 
 /* Label for the 'pins' item of the privacy settings when the user does have a pin. */
 "SETTINGS_PINS_ITEM" = "PINを変更";
@@ -8681,7 +8681,7 @@ Send money securely.";
 "SETTINGS_PINS_ITEM_CREATE" = "PINを作成";
 
 /* Title for the 'PINs' section of the privacy settings. */
-"SETTINGS_PINS_TITLE" = "Signal PIN";
+"SETTINGS_PINS_TITLE" = "Radar PIN";
 
 /* Footer for table section */
 "SETTINGS_PRIVACY_ADVANCED_FOOTER" = "検閲回避、通話の中継および送信者の保護について設定します。";
@@ -8786,7 +8786,7 @@ Send money securely.";
 "SETTINGS_TWO_FACTOR_AUTH_SWITCH_LABEL" = "登録ロック";
 
 /* Footer for the 'two factor auth' section of the privacy settings when Signal PINs are available. */
-"SETTINGS_TWO_FACTOR_PINS_AUTH_FOOTER" = "あなたの電話番号をSignalに登録する際、Signal PINを要求します。";
+"SETTINGS_TWO_FACTOR_PINS_AUTH_FOOTER" = "あなたの電話番号をRadarに登録する際、Radar PINを要求します。";
 
 /* Label for the 'typing indicators' setting. */
 "SETTINGS_TYPING_INDICATORS" = "入力中アイコン";
@@ -9242,7 +9242,7 @@ Send money securely.";
 "SUPPORT_EMAIL_DEFAULT_DESCRIPTION" = "この問題について教えてください: ";
 
 /* Message for alert dialog presented when a support email failed to send */
-"SUPPORT_EMAIL_ERROR_ALERT_DESCRIPTION" = "サポートリクエストを support@signal.org へメールしてください。";
+"SUPPORT_EMAIL_ERROR_ALERT_DESCRIPTION" = "サポートリクエストを support@radar.chat へメールしてください。";
 
 /* Localized label for support request email filter string. Embeds {{filter text}}. */
 "SUPPORT_EMAIL_FILTER_LABEL_FORMAT" = "フィルタ: %1$@";
@@ -9266,7 +9266,7 @@ Send money securely.";
 "SUPPORT_EMAIL_LOG_URL_LABEL_FORMAT" = "ログURL: %1$@";
 
 /* Localized subject for support request emails */
-"SUPPORT_EMAIL_SUBJECT" = "Signal iOSサポートリクエスト";
+"SUPPORT_EMAIL_SUBJECT" = "Radar iOSサポートリクエスト";
 
 /* Header for emoji mood selection */
 "SUPPORT_EMOJI_PROMPT" = "どう感じていますか？ (任意)";
@@ -9338,7 +9338,7 @@ Send money securely.";
 "SWITCH_ON" = "オン";
 
 /* Name to display for the 'system' sender, e.g. for release notes and the onboarding story */
-"SYSTEM_ADDRESS_NAME" = "Signal";
+"SYSTEM_ADDRESS_NAME" = "Radar";
 
 /* Label for button to verify a user's safety number. */
 "SYSTEM_MESSAGE_ACTION_VERIFY_SAFETY_NUMBER" = "検証する";
@@ -9566,7 +9566,7 @@ Send money securely.";
 "UNLINK_CONFIRMATION_ALERT_TITLE" = "「%1$@」のリンクを解除しますか？";
 
 /* Label warning the user that they have been unlinked from their primary device. */
-"UNLINKED_WARNING" = "この端末はリンクされていません。メッセージを送受信するには、Signal とお使いの携帯電話をリンクし直してください。";
+"UNLINKED_WARNING" = "この端末はリンクされていません。メッセージを送受信するには、Radar とお使いの携帯電話をリンクし直してください。";
 
 /* If this device has become unlinked from their primary device, they'll see a warning. This is the call to action on that warning. */
 "UNLINKED_WARNING_ACTION_TITLE" = "端末をリンクし直す";

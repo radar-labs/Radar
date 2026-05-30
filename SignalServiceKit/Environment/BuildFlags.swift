@@ -91,6 +91,10 @@ public enum BuildFlags {
     }
 
     public static let useNewAttachmentLimits = false
+
+    /// Gates the donations feature (the "Donate" entry in app settings and the
+    /// flows it leads to). Disabled.
+    public static let donations = false
 }
 
 // MARK: -

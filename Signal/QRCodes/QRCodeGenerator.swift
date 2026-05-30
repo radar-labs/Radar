@@ -156,7 +156,7 @@ private struct QRCodeStyler {
             ))
 
             // Draw the logo inside the circle in the deadzone.
-            let logo = UIImage(named: "signal-logo-40")!
+            let logo = UIImage(named: "radar-logo")!
             let logoRect = circleRect.scaled(toPercentage: Constants.deadzoneLogoSizePercentage)
             styledQRCodeContext.draw(logo.cgImage!, in: logoRect)
         }

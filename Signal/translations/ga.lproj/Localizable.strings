@@ -2,7 +2,7 @@
 "AB_PERMISSION_MISSING_ACTION_NOT_NOW" = "Ná bac leis anois";
 
 /* Title for the 'about' help section */
-"ABOUT_SECTION_TITLE" = "Maidir le Signal";
+"ABOUT_SECTION_TITLE" = "Maidir le Radar";
 
 /* Accessibility label for attachment. */
 "ACCESSIBILITY_LABEL_ATTACHMENT" = "Ceangaltán";
@@ -32,7 +32,7 @@
 "ACCOUNT_DATA_REPORT_CONFIRM_EXPORT_CONFIRM_BUTTON" = "Easpórtáil an Tuairisc";
 
 /* Users can request a report of their account data. Before they get their account export, they are warned to only share account data with trustworthy sources. This is the message on that warning. */
-"ACCOUNT_DATA_REPORT_CONFIRM_EXPORT_MESSAGE" = "Ná comhroinn sonraí do chuntas Signal ach le daoine nó aipeanna a bhfuil muinín agat iontu.";
+"ACCOUNT_DATA_REPORT_CONFIRM_EXPORT_MESSAGE" = "Ná comhroinn sonraí do chuntas Radar ach le daoine nó aipeanna a bhfuil muinín agat iontu.";
 
 /* Users can request a report of their account data. If this request fails (probably because of a network connection problem), they will see an error sheet. This is the message on that error. */
 "ACCOUNT_DATA_REPORT_ERROR_MESSAGE" = "Seiceáil do nasc agus triail arís.";
@@ -56,16 +56,16 @@
 "ACCOUNT_DATA_REPORT_EXPORT_REPORT_BUTTON" = "Easpórtáil an Tuairisc";
 
 /* Users can request a report of their account data. This text appears at the bottom of this screen, offering more information. */
-"ACCOUNT_DATA_REPORT_FOOTER" = "Ní ghintear do thuairisc ach ag am na heaspórtála agus ní dhéanann Signal í a stóráil ar do ghléas.";
+"ACCOUNT_DATA_REPORT_FOOTER" = "Ní ghintear do thuairisc ach ag am na heaspórtála agus ní dhéanann Radar í a stóráil ar do ghléas.";
 
 /* Users can request a report of their account data. This is the subtitle on the screen where they do this, giving them more information. */
-"ACCOUNT_DATA_REPORT_SUBTITLE" = "Íoslódáil agus easpórtáil tuairisc ar shonraí do chuntas Signal. Níl aon teachtaireachtaí ná meáin sa tuairisc seo.";
+"ACCOUNT_DATA_REPORT_SUBTITLE" = "Íoslódáil agus easpórtáil tuairisc ar shonraí do chuntas Radar. Níl aon teachtaireachtaí ná meáin sa tuairisc seo.";
 
 /* Users can request a report of their account data. This is the title on the screen where they do this. */
 "ACCOUNT_DATA_REPORT_TITLE" = "Sonraí do Chuntais";
 
 /* Label for 'invite' button in contact view. */
-"ACTION_INVITE" = "Tabhair cuireadh chuig Signal";
+"ACTION_INVITE" = "Tabhair cuireadh chuig Radar";
 
 /* Label for button that lets you send a message to a contact. */
 "ACTION_SEND_MESSAGE" = "Seol Teachtaireacht";
@@ -83,7 +83,7 @@
 "ACTION_VIDEO_CALL" = "Físghlao";
 
 /* Label for 'voice call' button in contact view. */
-"ACTION_VOICE_CALL" = "Glao Signal";
+"ACTION_VOICE_CALL" = "Glao Radar";
 
 /* The title for the 'add group members' view. */
 "ADD_GROUP_MEMBERS_VIEW_TITLE" = "Baill Nua";
@@ -203,40 +203,40 @@
 "APN_Message" = "B'fhéidir go bhfuil teachtaireachtaí nua agat";
 
 /* Default message for the 'app launch failed' alert. */
-"APP_LAUNCH_FAILURE_ALERT_MESSAGE" = "Theip ar thosú Signal. Seol an logchomhad dífhabhtaithe chuig support@signal.org sa chaoi go mbeimis in ann an fhadhb seo a réiteach.";
+"APP_LAUNCH_FAILURE_ALERT_MESSAGE" = "Theip ar thosú Radar. Seol an logchomhad dífhabhtaithe chuig support@radar.chat sa chaoi go mbeimis in ann an fhadhb seo a réiteach.";
 
 /* Button to try launching the app even though the last launch failed */
-"APP_LAUNCH_FAILURE_CONTINUE" = "Open Signal Instead";
+"APP_LAUNCH_FAILURE_CONTINUE" = "Open Radar Instead";
 
 /* Message for an error indicating that the app couldn't launch because some unexpected error happened with the user's registration status. */
-"APP_LAUNCH_FAILURE_CORRUPT_REGISTRATION_MESSAGE" = "Seol loga dífhabhtaithe chuig support@signal.org le gur féidir linn an fhadhb a fhabhtcheartú.";
+"APP_LAUNCH_FAILURE_CORRUPT_REGISTRATION_MESSAGE" = "Seol loga dífhabhtaithe chuig support@radar.chat le gur féidir linn an fhadhb a fhabhtcheartú.";
 
 /* Title for an error indicating that the app couldn't launch because some unexpected error happened with the user's registration status. */
-"APP_LAUNCH_FAILURE_CORRUPT_REGISTRATION_TITLE" = "Níorbh fhéidir Signal a oscailt";
+"APP_LAUNCH_FAILURE_CORRUPT_REGISTRATION_TITLE" = "Níorbh fhéidir Radar a oscailt";
 
 /* Error indicating that the app could not launch because the database could not be loaded. */
 "APP_LAUNCH_FAILURE_COULD_NOT_LOAD_DATABASE" = "Níorbh fhéidir an bunachar sonraí a lódáil";
 
 /* Error indicating that the app could not launch without reverting unknown database migrations. */
-"APP_LAUNCH_FAILURE_INVALID_DATABASE_VERSION_MESSAGE" = "Ní mór duit an leagan is déanaí de Signal a shuiteáil.";
+"APP_LAUNCH_FAILURE_INVALID_DATABASE_VERSION_MESSAGE" = "Ní mór duit an leagan is déanaí de Radar a shuiteáil.";
 
 /* Error indicating that the app could not launch without reverting unknown database migrations. */
 "APP_LAUNCH_FAILURE_INVALID_DATABASE_VERSION_TITLE" = "Leagan Anaithnid den Bhunachar Sonraí.";
 
 /* Error indicating that the app crashed during the previous launch. */
-"APP_LAUNCH_FAILURE_LAST_LAUNCH_CRASHED_MESSAGE" = "Signal had a problem while trying to open. Please send a debug log to support@signal.org to help troubleshoot this issue.";
+"APP_LAUNCH_FAILURE_LAST_LAUNCH_CRASHED_MESSAGE" = "Radar had a problem while trying to open. Please send a debug log to support@radar.chat to help troubleshoot this issue.";
 
 /* Error indicating that the app crashed during the previous launch. */
-"APP_LAUNCH_FAILURE_LAST_LAUNCH_CRASHED_TITLE" = "Couldn’t Open Signal";
+"APP_LAUNCH_FAILURE_LAST_LAUNCH_CRASHED_TITLE" = "Couldn’t Open Radar";
 
 /* Error description indicating that the app crashed because there was low storage space available on the device. */
-"APP_LAUNCH_FAILURE_LOW_STORAGE_SPACE_AVAILABLE_MESSAGE" = "Signal couldn’t open because your device is low on storage space. To use Signal, free up space by managing your storage in Settings.";
+"APP_LAUNCH_FAILURE_LOW_STORAGE_SPACE_AVAILABLE_MESSAGE" = "Radar couldn’t open because your device is low on storage space. To use Radar, free up space by managing your storage in Settings.";
 
 /* Error title indicating that the app crashed because there was low storage space available on the device. */
 "APP_LAUNCH_FAILURE_LOW_STORAGE_SPACE_AVAILABLE_TITLE" = "Storage Space Low";
 
 /* Error indicating that the app could not restore transferred data. */
-"APP_LAUNCH_FAILURE_RESTORE_FAILED_MESSAGE" = "Níorbh fhéidir na sonraí ó do sheanghléas a aischur. Seol an loga dífhabhtaithe chuig support@signal.org sa chaoi go mbeimis in ann an fhadhb seo a réiteach. Má athshuiteálann tú Signal, is féidir go gcaillfidh tú do stair teachtaireachtaí.";
+"APP_LAUNCH_FAILURE_RESTORE_FAILED_MESSAGE" = "Níorbh fhéidir na sonraí ó do sheanghléas a aischur. Seol an loga dífhabhtaithe chuig support@radar.chat sa chaoi go mbeimis in ann an fhadhb seo a réiteach. Má athshuiteálann tú Radar, is féidir go gcaillfidh tú do stair teachtaireachtaí.";
 
 /* Error indicating that the app could not restore transferred data. */
 "APP_LAUNCH_FAILURE_RESTORE_FAILED_TITLE" = "Níorbh fhéidir an t-aistriú a chur i gcrích";
@@ -260,7 +260,7 @@
 "APP_UPDATE_NAG_ALERT_MESSAGE_FORMAT" = "Tá leagan %1$@ ar fáil san App Store anois.";
 
 /* Title for the 'new app version available' alert. */
-"APP_UPDATE_NAG_ALERT_TITLE" = "Tá leagan nua de Signal ar fáil";
+"APP_UPDATE_NAG_ALERT_TITLE" = "Tá leagan nua de Radar ar fáil";
 
 /* Label for the 'update' button in the 'new app version available' alert. */
 "APP_UPDATE_NAG_ALERT_UPDATE_BUTTON" = "Nuashonraigh";
@@ -410,7 +410,7 @@
 "ATTACHMENT_KEYBOARD_GIF" = "GIF";
 
 /* Text in chat attachment panel when Signal only has access to some photos/videos. This string is in a compact horizontal space, so it should be short if possible. */
-"ATTACHMENT_KEYBOARD_LIMITED_ACCESS" = "Tá rochtain theoranta ag Signal ar ghrianghraif";
+"ATTACHMENT_KEYBOARD_LIMITED_ACCESS" = "Tá rochtain theoranta ag Radar ar ghrianghraif";
 
 /* A button to select a location from the Attachment Keyboard */
 "ATTACHMENT_KEYBOARD_LOCATION" = "Suíomh";
@@ -422,7 +422,7 @@
 "ATTACHMENT_KEYBOARD_NO_MEDIA_TITLE" = "Níl Grianghraif ná Físeáin ann";
 
 /* Text in chat attachment panel explaining that user needs to give Signal permission to access photos. */
-"ATTACHMENT_KEYBOARD_NO_PHOTO_ACCESS" = "Níl rochtain ag Signal ar do ghrianghraif ná ar d'fhíseáin. Chun rochtain a chumasú, oscail Socruithe agus tapáil Grianghraif";
+"ATTACHMENT_KEYBOARD_NO_PHOTO_ACCESS" = "Níl rochtain ag Radar ar do ghrianghraif ná ar d'fhíseáin. Chun rochtain a chumasú, oscail Socruithe agus tapáil Grianghraif";
 
 /* Button in chat attachment panel to let user open Settings app and give Signal persmission to access photos. */
 "ATTACHMENT_KEYBOARD_OPEN_SETTINGS" = "Oscail socruithe";
@@ -527,7 +527,7 @@
 "BACKUP_ENABLEMENT_REMINDER_MEGAPHONE_ACTION" = "Cuir ar siúl";
 
 /* Body for Backup enablement reminder megaphone */
-"BACKUP_ENABLEMENT_REMINDER_MEGAPHONE_BODY" = "Ná caill teachtaireacht choíche nuair a fhaigheann tú guthán nua nó nuair a athshuiteálann tú Signal.";
+"BACKUP_ENABLEMENT_REMINDER_MEGAPHONE_BODY" = "Ná caill teachtaireacht choíche nuair a fhaigheann tú guthán nua nó nuair a athshuiteálann tú Radar.";
 
 /* Title for Backup enablement reminder megaphone */
 "BACKUP_ENABLEMENT_REMINDER_MEGAPHONE_TITLE" = "Cas air cúltacaí criptithe";
@@ -569,7 +569,7 @@
 "BACKUP_ONBOARDING_CANCEL_SHEET_TITLE" = "Scoir socrú cúltacaí?";
 
 /* Body for a sheet warning users to their 'Recovery Key' safe. */
-"BACKUP_ONBOARDING_CONFIRM_KEY_KEEP_KEY_SAFE_SHEET_BODY" = "Ní bheidh Signal in ann cabhrú leat do chúltaca a aischur má chailleann tú d'eochair. Stóráil in áit shlán shábháilte í, agus ná chomhroinn le daoine eile í.";
+"BACKUP_ONBOARDING_CONFIRM_KEY_KEEP_KEY_SAFE_SHEET_BODY" = "Ní bheidh Radar in ann cabhrú leat do chúltaca a aischur má chailleann tú d'eochair. Stóráil in áit shlán shábháilte í, agus ná chomhroinn le daoine eile í.";
 
 /* Title for a sheet warning users to their 'Recovery Key' safe. */
 "BACKUP_ONBOARDING_CONFIRM_KEY_KEEP_KEY_SAFE_SHEET_TITLE" = "Coinnigh d'eochair sábháilte";
@@ -596,10 +596,10 @@
 "BACKUP_ONBOARDING_INTRO_NOT_NOW_TOAST" = "Is féidir leat cúltacaí a chumasú i Socruithe.";
 
 /* Subtitle for a view introducing Backups during an onboarding flow. */
-"BACKUP_ONBOARDING_INTRO_SUBTITLE" = "Cúltacaigh do theachtaireachtaí agus do mheáin le seirbhís stórála chriptithe ó cheann ceann Signal. Ná caill teachtaireacht choíche nuair a fhaigheann tú guthán nua nó nuair a athshuiteálann tú Signal.";
+"BACKUP_ONBOARDING_INTRO_SUBTITLE" = "Cúltacaigh do theachtaireachtaí agus do mheáin le seirbhís stórála chriptithe ó cheann ceann Radar. Ná caill teachtaireacht choíche nuair a fhaigheann tú guthán nua nó nuair a athshuiteálann tú Radar.";
 
 /* Title for a view introducing Backups during an onboarding flow. */
-"BACKUP_ONBOARDING_INTRO_TITLE" = "Cúltacaí Slána Signal";
+"BACKUP_ONBOARDING_INTRO_TITLE" = "Cúltacaí Slána Radar";
 
 /* Text for a bullet point in a view introducing the 'Recovery Key' during an onboarding flow. */
 "BACKUP_ONBOARDING_KEY_INTRO_BULLET_1" = "Cód 64 digit is ea d'eochair athshlánaithe a bheith de dhíth ort chun do chúltaca a aischur.";
@@ -617,10 +617,10 @@
 "BACKUP_ONBOARDING_KEY_INTRO_TITLE" = "Eochair athshlánaithe";
 
 /* Body for a sheet shown when your Backup plan is downgraded. */
-"BACKUP_PLAN_DOWNGRADED_SHEET_BODY" = "Chuaigh do shíntiús cúltacaí as feidhm toisc nach féidir é a athnuachan le do mhodh íocaíochta.\n\nIs féidir leat síntiús a ghlacadh athuair le leanúint le cúltacú meán. Beidh rochtain agat fós ar phlean saor in aisce Chúltacaí Signal.";
+"BACKUP_PLAN_DOWNGRADED_SHEET_BODY" = "Chuaigh do shíntiús cúltacaí as feidhm toisc nach féidir é a athnuachan le do mhodh íocaíochta.\n\nIs féidir leat síntiús a ghlacadh athuair le leanúint le cúltacú meán. Beidh rochtain agat fós ar phlean saor in aisce Chúltacaí Radar.";
 
 /* Body for a sheet shown when your Backup plan is downgraded because you stopped using TestFlight. */
-"BACKUP_PLAN_DOWNGRADED_SHEET_BODY_TESTFLIGHT" = "Chuaigh do shíntiús cúltacaí as feidhm toisc nach bhfuil TestFlight in úsáid agat a thuilleadh.\n\nIs féidir leat síntiús a ghlacadh athuair le leanúint le cúltacú meán. Beidh rochtain agat fós ar phlean saor in aisce Chúltacaí Signal.";
+"BACKUP_PLAN_DOWNGRADED_SHEET_BODY_TESTFLIGHT" = "Chuaigh do shíntiús cúltacaí as feidhm toisc nach bhfuil TestFlight in úsáid agat a thuilleadh.\n\nIs féidir leat síntiús a ghlacadh athuair le leanúint le cúltacú meán. Beidh rochtain agat fós ar phlean saor in aisce Chúltacaí Radar.";
 
 /* Primary button for a sheet shown when your Backup plan is downgraded. */
 "BACKUP_PLAN_DOWNGRADED_SHEET_PRIMARY_BUTTON" = "Bainistigh cúltacaí";
@@ -650,7 +650,7 @@
 "BACKUP_RESTORE_MODAL_TITLE" = "Teachtaireachtaí á gcur ar ais…";
 
 /* Message describing that the Background App Refresh permission is disabled for Signal. \"Background App Refresh\" should be localized the same way it is in iOS Settings app permissions. */
-"BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_MESSAGE" = "Tá cúltacaí uathoibríocha díchumasaithe. Cumasaigh cúltacaí uathoibríocha trí cheadanna Signal a nuashonrú.";
+"BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_MESSAGE" = "Tá cúltacaí uathoibríocha díchumasaithe. Cumasaigh cúltacaí uathoibríocha trí cheadanna Radar a nuashonrú.";
 
 /* Add-on to a message describing that the Background App Refresh permission is disabled for Signal. \"Background App Refresh\" should be localized the same way it is in iOS Settings app permissions. */
 "BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_MESSAGE_UPDATE_NOW" = "Nuashonraigh anois";
@@ -659,7 +659,7 @@
 "BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_SHEET_GO_TO_SETTINGS_BUTTON" = "Socruithe";
 
 /* Message for a sheet warning the user about the Background App Refresh permission. \"Background App Refresh\" should be localized the same way it is in iOS Settings app permissions. */
-"BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_SHEET_MESSAGE" = "Chun ceadú do Signal do theachtaireachtaí a chúltacú go huathoibríoch, tapáil \"Téigh chuig Socruithe\" thíos agus cumasaigh \"Athnuachan Aipe sa Chúlra\"";
+"BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_SHEET_MESSAGE" = "Chun ceadú do Radar do theachtaireachtaí a chúltacú go huathoibríoch, tapáil \"Téigh chuig Socruithe\" thíos agus cumasaigh \"Athnuachan Aipe sa Chúlra\"";
 
 /* Title for a sheet warning the user about the Background App Refresh permission. \"Background App Refresh\" should be localized the same way it is in iOS Settings app permissions. */
 "BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_SHEET_TITLE" = "Cúltacaí Uathoibríocha Díchumasaithe";
@@ -746,7 +746,7 @@
 "BACKUP_SETTINGS_BACKUP_PLAN_PAID_BUT_IAP_NOT_FOUND_LOCALLY_ACTION_BUTTON_TITLE" = "Athnuaigh";
 
 /* Text describing that the user's paid backup plan did not correspond to a App Store subscription on this device. */
-"BACKUP_SETTINGS_BACKUP_PLAN_PAID_BUT_IAP_NOT_FOUND_LOCALLY_DESCRIPTION" = "Ní bhfuarthas do shíntiús ar an ngléas seo. Athnuaigh le leanúint le Cúltacaí Signal a úsáid.";
+"BACKUP_SETTINGS_BACKUP_PLAN_PAID_BUT_IAP_NOT_FOUND_LOCALLY_DESCRIPTION" = "Ní bhfuarthas do shíntiús ar an ngléas seo. Athnuaigh le leanúint le Cúltacaí Radar a úsáid.";
 
 /* Header describing what the paid backup plan includes. */
 "BACKUP_SETTINGS_BACKUP_PLAN_PAID_HEADER" = "Cúltaca téacs + gach meáin";
@@ -758,16 +758,16 @@
 "BACKUP_SETTINGS_BACKUP_PLAN_PAID_RENEWAL_FORMAT" = "Athnuachan: %1$@";
 
 /* Footer for a menu section related to settings for when Backups are disabled. */
-"BACKUP_SETTINGS_BACKUPS_DISABLED_SECTION_FOOTER" = "Tá cúltacaí casta as agus scriosadh do shonraí ó sheirbhís stórála shlán Signal.";
+"BACKUP_SETTINGS_BACKUPS_DISABLED_SECTION_FOOTER" = "Tá cúltacaí casta as agus scriosadh do shonraí ó sheirbhís stórála shlán Radar.";
 
 /* Description for a progress view tracking media being downloaded in service of disabling Backups. */
-"BACKUP_SETTINGS_BACKUPS_DISABLING_DOWNLOADING_MEDIA_PROGRESS_VIEW_DESCRIPTION" = "Tá cúltacaí casta as, tá aon mheáin nach bhfuil ar an ngléas á n-íoslódáil anois. Agus iad íoslódáilte, scriosfar do shonraí ó sheirbhís stórála shlán Signal.";
+"BACKUP_SETTINGS_BACKUPS_DISABLING_DOWNLOADING_MEDIA_PROGRESS_VIEW_DESCRIPTION" = "Tá cúltacaí casta as, tá aon mheáin nach bhfuil ar an ngléas á n-íoslódáil anois. Agus iad íoslódáilte, scriosfar do shonraí ó sheirbhís stórála shlán Radar.";
 
 /* Message for a view indicating we failed to delete the user's Backup due to an unexpected error. */
 "BACKUP_SETTINGS_BACKUPS_DISABLING_GENERIC_ERROR_MESSAGE" = "Tharla earráid. Déan teagmháil leis an bhfoireann tacaíochta.";
 
 /* Header for a menu section related to settings for when disabling Backups encountered an unexpected error. */
-"BACKUP_SETTINGS_BACKUPS_DISABLING_GENERIC_ERROR_SECTION_HEADER" = "Tharla earráid agus do shonraí á scriosadh ó sheirbhís stórála sláine Signal.";
+"BACKUP_SETTINGS_BACKUPS_DISABLING_GENERIC_ERROR_SECTION_HEADER" = "Tharla earráid agus do shonraí á scriosadh ó sheirbhís stórála sláine Radar.";
 
 /* Title for a view indicating we failed to delete the user's Backup due to an unexpected error. */
 "BACKUP_SETTINGS_BACKUPS_DISABLING_GENERIC_ERROR_TITLE" = "Theip ar Scriosadh Cúltaca";
@@ -776,7 +776,7 @@
 "BACKUP_SETTINGS_BACKUPS_DISABLING_PROGRESS_VIEW_DESCRIPTION" = "Cúltaca á Scriosadh...";
 
 /* Header for a menu section related to disabling Backups. */
-"BACKUP_SETTINGS_BACKUPS_DISABLING_SECTION_HEADER" = "Tá cúltacaí casta as agus scriosfar do shonraí ó sheirbhís stórála sláine Signal.";
+"BACKUP_SETTINGS_BACKUPS_DISABLING_SECTION_HEADER" = "Tá cúltacaí casta as agus scriosfar do shonraí ó sheirbhís stórála sláine Radar.";
 
 /* Header for a menu section related to settings for when Backups are enabled. */
 "BACKUP_SETTINGS_BACKUPS_ENABLED_SECTION_HEADER" = "Sonraí Cúltaca";
@@ -824,13 +824,13 @@
 "BACKUP_SETTINGS_DISABLING_CONFIRMATION_ACTION_SHEET_TITLE" = "Cas as agus scrios cúltacaí?";
 
 /* Message shown in an action sheet when the user disables Backups, explaining that their media is downloading first. */
-"BACKUP_SETTINGS_DISABLING_DOWNLOADS_STARTED_ACTION_SHEET_MESSAGE" = "Tá meáin i do chúltacú nach bhfuil ar an ngléas seo. D'fhéadfadh sé tamall fada a ghlacadh lena n-íoslódáil, coinnigh Signal oscailte le cur isteach ar an íoslódáil a sheachaint.";
+"BACKUP_SETTINGS_DISABLING_DOWNLOADS_STARTED_ACTION_SHEET_MESSAGE" = "Tá meáin i do chúltacú nach bhfuil ar an ngléas seo. D'fhéadfadh sé tamall fada a ghlacadh lena n-íoslódáil, coinnigh Radar oscailte le cur isteach ar an íoslódáil a sheachaint.";
 
 /* Title shown in an action sheet when the user disables Backups, explaining that their media is downloading first. */
 "BACKUP_SETTINGS_DISABLING_DOWNLOADS_STARTED_ACTION_SHEET_TITLE" = "Do chúltaca á íoslódáil";
 
 /* Message shown in an action sheet indicating we failed to delete the user's Backup due to an unexpected error. */
-"BACKUP_SETTINGS_DISABLING_ERROR_GENERIC_ERROR_ACTION_SHEET_MESSAGE" = "Tharla earráid agus do shonraí á scriosadh ó sheirbhís stórála sláine Signal.";
+"BACKUP_SETTINGS_DISABLING_ERROR_GENERIC_ERROR_ACTION_SHEET_MESSAGE" = "Tharla earráid agus do shonraí á scriosadh ó sheirbhís stórála sláine Radar.";
 
 /* Title shown in an action sheet indicating we failed to delete the user's Backup due to an unexpected error. */
 "BACKUP_SETTINGS_DISABLING_ERROR_GENERIC_ERROR_ACTION_SHEET_TITLE" = "Theip ar Scriosadh Cúltaca";
@@ -842,7 +842,7 @@
 "BACKUP_SETTINGS_DISABLING_SUBSCRIPTION_CANCEL_ACTION_SHEET_MANAGE_SUBSCRIPTION_BUTTON" = "Bainistigh an síntiús";
 
 /* Message for an action sheet shown when the user disables Backups, but is still subscribed to the paid plan. */
-"BACKUP_SETTINGS_DISABLING_SUBSCRIPTION_CANCEL_ACTION_SHEET_MESSAGE" = "Más maith leat do shíntiús a chur ar ceal, tapáil Bainistigh síntiús > Signal > Cuir an síntiús ar ceal";
+"BACKUP_SETTINGS_DISABLING_SUBSCRIPTION_CANCEL_ACTION_SHEET_MESSAGE" = "Más maith leat do shíntiús a chur ar ceal, tapáil Bainistigh síntiús > Radar > Cuir an síntiús ar ceal";
 
 /* Title for an action sheet shown when the user disables Backups, but is still subscribed to the paid plan. */
 "BACKUP_SETTINGS_DISABLING_SUBSCRIPTION_CANCEL_ACTION_SHEET_TITLE" = "Tá síntiús agat fós le plean cúltacaí íoctha";
@@ -920,7 +920,7 @@
 "BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_DOWNLOAD_SHEET_LATER_ACTION" = "Íoslódáil níos déanaí";
 
 /* Message for an action sheet allowing users to download their offloaded media. */
-"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_DOWNLOAD_SHEET_MESSAGE" = "Tá meáin i do chúltacú nach bhfuil ar an ngléas seo. D'fhéadfadh sé tamall fada a ghlacadh lena n-íoslódáil, coinnigh Signal oscailte le cur isteach ar an íoslódáil a sheachaint.";
+"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_DOWNLOAD_SHEET_MESSAGE" = "Tá meáin i do chúltacú nach bhfuil ar an ngléas seo. D'fhéadfadh sé tamall fada a ghlacadh lena n-íoslódáil, coinnigh Radar oscailte le cur isteach ar an íoslódáil a sheachaint.";
 
 /* Action in an action sheet allowing users to download their offloaded media now. */
 "BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_DOWNLOAD_SHEET_NOW_ACTION" = "Íoslódáil anois";
@@ -941,13 +941,13 @@
 "BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_TOGGLE_FOOTER_AVAILABLE_FOR_TESTERS" = "Bainfear meáin neamhúsáidte, ach is féidir iad a íoslódáil ó do chúltaca am ar bith le linn duit TestFlight a úsáid.";
 
 /* Footer for a toggle allowing users to change the Optimize Local Storage setting, if the toggle is unavailable. */
-"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_TOGGLE_FOOTER_UNAVAILABLE" = "Ní féidir optamú stórais a úsáid ach leis an leibhéal íoctha de Chúltacaí Signal. Uasghrádaigh do phlean cúltacaithe le tosú ar úsáid na gné sin.";
+"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_TOGGLE_FOOTER_UNAVAILABLE" = "Ní féidir optamú stórais a úsáid ach leis an leibhéal íoctha de Chúltacaí Radar. Uasghrádaigh do phlean cúltacaithe le tosú ar úsáid na gné sin.";
 
 /* Title for a toggle allowing users to change the Optimize Local Storage setting. */
 "BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_TOGGLE_TITLE" = "Optamaigh stóras ar an ngléas";
 
 /* Subtitle for a notification telling the user they are out of remote storage space. */
-"BACKUP_SETTINGS_OUT_OF_STORAGE_SPACE_NOTIFICATION_SUBTITLE" = "Tá do theorainn maidir le stóras cúltaca bainte amach agat. Saor spás in Signal le leanúint le comhráite agus le meáin a chúltacú.";
+"BACKUP_SETTINGS_OUT_OF_STORAGE_SPACE_NOTIFICATION_SUBTITLE" = "Tá do theorainn maidir le stóras cúltaca bainte amach agat. Saor spás in Radar le leanúint le comhráite agus le meáin a chúltacú.";
 
 /* Title for a notification telling the user they are out of remote storage space. */
 "BACKUP_SETTINGS_OUT_OF_STORAGE_SPACE_NOTIFICATION_TITLE" = "Stóras cúltaca lán";
@@ -971,7 +971,7 @@
 "BACKUP_SETTINGS_SUBSCRIPTION_ALREADY_REDEEMED_NOTICE_TITLE" = "Níorbh fhéidir do shíntiús cúltacaí a fhuascailt";
 
 /* Body for a sheet explaining that the user's Backups subscription was already redeemed. */
-"BACKUP_SETTINGS_SUBSCRIPTION_ALREADY_REDEEMED_SHEET_BODY" = "Rinne an iomarca gléasanna iarracht do shíntiús a fhuascailt an mhí seo.\n\nIs féidir go ndearna tú do chuntas Signal a athchlárú an iomarca uaireanta, nó go bhfuil an iomarca gléasanna ag úsáid an tsíntiúis chéanna.";
+"BACKUP_SETTINGS_SUBSCRIPTION_ALREADY_REDEEMED_SHEET_BODY" = "Rinne an iomarca gléasanna iarracht do shíntiús a fhuascailt an mhí seo.\n\nIs féidir go ndearna tú do chuntas Radar a athchlárú an iomarca uaireanta, nó go bhfuil an iomarca gléasanna ag úsáid an tsíntiúis chéanna.";
 
 /* Button for a sheet explaining that the user's Backups subscription was already redeemed. */
 "BACKUP_SETTINGS_SUBSCRIPTION_ALREADY_REDEEMED_SHEET_GOT_IT_BUTTON" = "Tuigim";
@@ -992,19 +992,19 @@
 "BACKUP_SETTINGS_UPLOAD_PROGRESS_SUBTITLE_PAUSED_NEEDS_WIFI" = "Uaslódáil meán curtha ar sos: ag feitheamh le Wi-Fi";
 
 /* Subtitle for a progress bar tracking uploads that are paused because the user is out of remote storage space. Embeds 1:{{ total storage space provided, e.g. 100 GB }}; 2:{{ space the user needs to free up by deleting media, e.g. 1 GB }}. */
-"BACKUP_SETTINGS_UPLOAD_PROGRESS_SUBTITLE_PAUSED_OUT_OF_STORAGE_SPACE_FORMAT" = "Tá an teorainn stórála %1$@ atá i do phlean cúltaca bainte amach agat. Chun comhráite agus meáin nua a chúltacú, saor %2$@ in Signal, ansin tapáil \"Cúltacaigh Anois\".";
+"BACKUP_SETTINGS_UPLOAD_PROGRESS_SUBTITLE_PAUSED_OUT_OF_STORAGE_SPACE_FORMAT" = "Tá an teorainn stórála %1$@ atá i do phlean cúltaca bainte amach agat. Chun comhráite agus meáin nua a chúltacú, saor %2$@ in Radar, ansin tapáil \"Cúltacaigh Anois\".";
 
 /* Subtitle for a progress bar tracking active uploading. Embeds 1:{{ the amount uploaded as a file size, e.g. 100 MB }}; 2:{{ the total amount to upload as a file size, e.g. 1 GB }}; 3:{{ the percentage uploaded as a percent, e.g. 40% }}. */
 "BACKUP_SETTINGS_UPLOAD_PROGRESS_SUBTITLE_RUNNING" = "Uaslódáil: %1$@ as %2$@ (%3$@)";
 
 /* Message for a sheet shown after the user enables backups. */
-"BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_MESSAGE" = "Ag brath ar mhéid do chúltaca, d'fhéadfadh sé sin go leor ama a thógáil. Is féidir leat Signal a úsáid mar is gnáth le linn an chúltacaithe.";
+"BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_MESSAGE" = "Ag brath ar mhéid do chúltaca, d'fhéadfadh sé sin go leor ama a thógáil. Is féidir leat Radar a úsáid mar is gnáth le linn an chúltacaithe.";
 
 /* Title for a sheet shown after the user enables backups. */
-"BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_TITLE" = "Fáilte go Cúltacaí Slána Signal. Tosaigh ar do chúltaca anois.";
+"BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_TITLE" = "Fáilte go Cúltacaí Slána Radar. Tosaigh ar do chúltaca anois.";
 
 /* Message for a sheet shown when your Backup subscription fails to renew. */
-"BACKUP_SUBSCRIPTION_FAILED_TO_RENEW_SHEET_MESSAGE" = "Seiceáil go bhfuil do mhodh íocaíochta suas chun dáta. Tapáil Bainistigh Síntiús > Signal > Nuashonraigh Modh Íocaíochta.";
+"BACKUP_SUBSCRIPTION_FAILED_TO_RENEW_SHEET_MESSAGE" = "Seiceáil go bhfuil do mhodh íocaíochta suas chun dáta. Tapáil Bainistigh Síntiús > Radar > Nuashonraigh Modh Íocaíochta.";
 
 /* Primary button for a sheet shown when your Backup subscription fails to renew. */
 "BACKUP_SUBSCRIPTION_FAILED_TO_RENEW_SHEET_PRIMARY_BUTTON" = "Bainistigh an síntiús";
@@ -1022,7 +1022,7 @@
 "BACKUPS_SETTINGS_TITLE" = "Cúltacaí Slána";
 
 /* Body for system notification or megaphone when backups is enabled. Embeds {{ time backups was enabled }} */
-"BACKUPS_TURNED_ON_NOTIFICATION_BODY_FORMAT" = "Casadh air Cúltacaí Signal don chuntas seo ag %1$@. Tapáil chun féachaint air.";
+"BACKUPS_TURNED_ON_NOTIFICATION_BODY_FORMAT" = "Casadh air Cúltacaí Radar don chuntas seo ag %1$@. Tapáil chun féachaint air.";
 
 /* Title for system notification or megaphone when backups is enabled */
 "BACKUPS_TURNED_ON_TITLE" = "Chas tú Cúltacaí air";
@@ -1040,10 +1040,10 @@
 "BADGE_DETAILS_DONATE_TO_SIGNAL" = "Tabhair Airgead Anois";
 
 /* When viewing someone else's donor badge, you'll see a sheet. This is the title on that sheet. Embeds {badge owner's short name} */
-"BADGE_DETAILS_TITLE_FOR_SUPPORTER" = "Tacaíonn %1$@ le Signal";
+"BADGE_DETAILS_TITLE_FOR_SUPPORTER" = "Tacaíonn %1$@ le Radar";
 
 /* String explaining to the user that their boost badge has expired on the badge expiry sheet. */
-"BADGE_EXPIRED_BOOST_BODY" = "Tá do shuaitheantas Spreagtha imithe as feidhm agus níl sé infheicthe ar do phróifíl a thuilleadh.\n\nIs féidir leat leanúint le húsáid Signal ach chun tacú leis an teicneolaíocht atá á tógáil duitse, smaoinigh faoi thabhartas uair sa mhí mar dheontóir.";
+"BADGE_EXPIRED_BOOST_BODY" = "Tá do shuaitheantas Spreagtha imithe as feidhm agus níl sé infheicthe ar do phróifíl a thuilleadh.\n\nIs féidir leat leanúint le húsáid Radar ach chun tacú leis an teicneolaíocht atá á tógáil duitse, smaoinigh faoi thabhartas uair sa mhí mar dheontóir.";
 
 /* String explaining to the user that their boost badge has expired while they are a current subscription sustainer on the badge expiry sheet. */
 "BADGE_EXPIRED_BOOST_CURRENT_SUSTAINER_BODY" = "Tá do shuaitheantas Spreagtha imithe as feidhm agus níl sé infheicthe ar do phróifíl a thuilleadh.\n\nIs féidir leat do shuaitheantas Spreagtha a athghníomhachtú ar feadh 30 lá eile le tabhartas aonuaire.";
@@ -1088,7 +1088,7 @@
 "BANK_DONATION_FOOTER_FIND_ACCOUNT_INFO" = "Aimsigh faisnéis an chuntais";
 
 /* On the bank transfer donation screen, a small amount of information text is shown. This is that text. It should (1) instruct users to enter their bank information (2) tell them that Signal does not collect or store their personal information. */
-"BANK_DONATION_SUBHEADER_TEXT" = "Cuir isteach do shonraí bainc. Ní dhéanann Signal d'fhaisnéis phearsanta a bhailiú ná a stóráil.";
+"BANK_DONATION_SUBHEADER_TEXT" = "Cuir isteach do shonraí bainc. Ní dhéanann Radar d'fhaisnéis phearsanta a bhailiú ná a stóráil.";
 
 /* Users can donate to Signal with a bank account. We are required to show them a mandate with information about bank transfers. This is a label for a button to agree to the mandate. */
 "BANK_MANDATE_AGREE" = "Aontaigh";
@@ -1097,7 +1097,7 @@
 "BANK_MANDATE_READ_MORE" = "Tuilleadh Eolais";
 
 /* Users can donate to Signal with a bank account. We are required to show them a mandate with information about bank transfers. This is a subtitle about the payment processor Stripe above that mandate. */
-"BANK_MANDATE_SUBTITLE" = "Déanann Stripe na tabhartais a thugtar do Signal a phróiseáil. Ní dhéanann Signal d'fhaisnéis phearsanta a bhailiú ná a stóráil.";
+"BANK_MANDATE_SUBTITLE" = "Déanann Stripe na tabhartais a thugtar do Radar a phróiseáil. Ní dhéanann Radar d'fhaisnéis phearsanta a bhailiú ná a stóráil.";
 
 /* Users can donate to Signal with a bank account. We are required to show them a mandate with information about bank transfers. This is the title above that mandate. */
 "BANK_MANDATE_TITLE" = "Aistriú Bainc";
@@ -1253,7 +1253,7 @@
 "CALL_AUDIO_MISSED_WEEK_NOTIFICATION_BODY_FORMAT" = "📞 Guthghlao caillte ar %1$@";
 
 /* Alert message when calling and permissions for microphone are missing */
-"CALL_AUDIO_PERMISSION_MESSAGE" = "Is féidir leat rochtain ar an micreafón a chumasú i Socruithe iOS, chun glaonna a chur agus glórphoist a thaifeadadh in Signal.";
+"CALL_AUDIO_PERMISSION_MESSAGE" = "Is féidir leat rochtain ar an micreafón a chumasú i Socruithe iOS, chun glaonna a chur agus glórphoist a thaifeadadh in Radar.";
 
 /* Alert title when calling and permissions for microphone are missing */
 "CALL_AUDIO_PERMISSION_TITLE" = "Rochtain ar an Micreafón ag Teastáil";
@@ -1319,7 +1319,7 @@
 "CALL_LINK_JOIN_REQUEST_PROMPT" = "Ag iarraidh dul isteach ann…";
 
 /* Shown in a message bubble when you send a call link in a Signal chat */
-"CALL_LINK_LINK_PREVIEW_DESCRIPTION" = "Úsáid an nasc seo le dul isteach i nglao Signal";
+"CALL_LINK_LINK_PREVIEW_DESCRIPTION" = "Úsáid an nasc seo le dul isteach i nglao Radar";
 
 /* Text that appears on a toast in a call lobby before joining a call link informing the user what information will be shared with other call members when they have phone number sharing turned off. */
 "CALL_LINK_LOBBY_SHARING_INFO_PHONE_NUMBER_SHARING_OFF" = "Aon duine a théann isteach sa ghlao seo tríd an nasc, feicfidh an duine sin d'ainm agus do ghrianghraf.";
@@ -1343,7 +1343,7 @@
 "CALL_LINK_REQUIRE_APPROVAL" = "Éiligh Faomhadh Riarthóra";
 
 /* Button to open UI to share a Call Link with someone on Signal. */
-"CALL_LINK_SHARE_VIA_SIGNAL" = "Comhroinn Nasc Trí Signal";
+"CALL_LINK_SHARE_VIA_SIGNAL" = "Comhroinn Nasc Trí Radar";
 
 /* Button to open the system share sheet to share a Call Link. */
 "CALL_LINK_SHARE_VIA_SYSTEM" = "Comhroinn Nasc";
@@ -1448,10 +1448,10 @@
 "CALLING_MEMBER_VIEW_YOUR_CAMERA_IS_OFF" = "Your camera is off";
 
 /* The generic name used for calls if CallKit privacy is enabled */
-"CALLKIT_ANONYMOUS_CONTACT_NAME" = "Úsáideoir Signal";
+"CALLKIT_ANONYMOUS_CONTACT_NAME" = "Úsáideoir Radar";
 
 /* The generic name used for group calls if CallKit privacy is enabled */
-"CALLKIT_ANONYMOUS_GROUP_NAME" = "Grúpa Signal";
+"CALLKIT_ANONYMOUS_GROUP_NAME" = "Grúpa Radar";
 
 /* Title for the calls list view. */
 "CALLS_LIST_TITLE" = "Glaonna";
@@ -1625,7 +1625,7 @@
 "CARD_DONATION_EXPIRATION_DATE_PLACEHOLDER" = "MM/BB";
 
 /* Users can choose to learn more about their credit/debit card donations, which will open a sheet with additional information. This is the body text of that sheet. */
-"CARD_DONATION_READ_MORE_SHEET_BODY" = "Ní dhéanann Signal d'fhaisnéis phearsanta a bhailiú ná a stóráil nuair a thugann tú tabhartas.\n\nÚsáidimid Stripe mar ár bpróiseálaí íocaíochtaí chun do thabhartais a fháil. Ní dhéanaimid aon fhaisnéis a thugann tú dóibh a rochtain, a stóráil ná a shábháil.\n\nNí dhéanann Signal agus ní féidir leis do thabhartas a nascadh le do chuntas Signal.\n\nGo raibh maith agat as do thacaíocht!";
+"CARD_DONATION_READ_MORE_SHEET_BODY" = "Ní dhéanann Radar d'fhaisnéis phearsanta a bhailiú ná a stóráil nuair a thugann tú tabhartas.\n\nÚsáidimid Stripe mar ár bpróiseálaí íocaíochtaí chun do thabhartais a fháil. Ní dhéanaimid aon fhaisnéis a thugann tú dóibh a rochtain, a stóráil ná a shábháil.\n\nNí dhéanann Radar agus ní féidir leis do thabhartas a nascadh le do chuntas Radar.\n\nGo raibh maith agat as do thacaíocht!";
 
 /* Users can choose to learn more about their credit/debit card donations, which will open a sheet with additional information. This is the title of that sheet. */
 "CARD_DONATION_READ_MORE_SHEET_TITLE" = "Tá d'fhaisnéis príobháideach";
@@ -1634,7 +1634,7 @@
 "CARD_DONATION_SUBHEADER_LEARN_MORE" = "Learn more.";
 
 /* On the credit/debit card donation screen, a small amount of information text is shown. This is that text. It should (1) instruct users to enter their credit/debit card information (2) tell them that Signal does not collect or store their personal information. */
-"CARD_DONATION_SUBHEADER_TEXT" = "Cuir isteach sonraí do chárta. Ní dhéanann Signal d'fhaisnéis phearsanta a bhailiú ná a stóráil.";
+"CARD_DONATION_SUBHEADER_TEXT" = "Cuir isteach sonraí do chárta. Ní dhéanann Radar d'fhaisnéis phearsanta a bhailiú ná a stóráil.";
 
 /* Title for the 'censorship circumvention country' view. */
 "CENSORSHIP_CIRCUMVENTION_COUNTRY_VIEW_TITLE" = "Roghnaigh Tír";
@@ -1772,7 +1772,7 @@
 "COMPARE_SAFETY_NUMBER_ACTION" = "Cuir i gComparáid leis an nGearrthaisce";
 
 /* Accessibility hint describing what you can do with the compose button */
-"COMPOSE_BUTTON_HINT" = "Roghnaigh nó cuardaigh úsáideoir Signal le tosú ar chomhrá.";
+"COMPOSE_BUTTON_HINT" = "Roghnaigh nó cuardaigh úsáideoir Radar le tosú ar chomhrá.";
 
 /* Accessibility label from compose button. */
 "COMPOSE_BUTTON_LABEL" = "Cum";
@@ -1799,13 +1799,13 @@
 "COMPOSE_SCREEN_LIMITED_CONTACTS_CTA" = "Bainistigh";
 
 /* Multi-line label explaining why compose-screen contact picker is empty. */
-"COMPOSE_SCREEN_LIMITED_CONTACTS_PERMISSION" = "Tá rochtain theoranta ag Signal ar do theagmhálaithe córais";
+"COMPOSE_SCREEN_LIMITED_CONTACTS_PERMISSION" = "Tá rochtain theoranta ag Radar ar do theagmhálaithe córais";
 
 /* Button to open settings from an empty compose-screen contact picker. */
 "COMPOSE_SCREEN_MISSING_CONTACTS_CTA" = "Oscail socruithe";
 
 /* Multi-line label explaining why compose-screen contact picker is empty. */
-"COMPOSE_SCREEN_MISSING_CONTACTS_PERMISSION" = "Is féidir leat rochtain ar do chuid teagmhálaithe a thabhairt do Signal sna Socruithe iOS le fáil amach cé acu atá ag úsáid Signal.";
+"COMPOSE_SCREEN_MISSING_CONTACTS_PERMISSION" = "Is féidir leat rochtain ar do chuid teagmhálaithe a thabhairt do Radar sna Socruithe iOS le fáil amach cé acu atá ag úsáid Radar.";
 
 /* Configure reactions title text */
 "CONFIGURE_REACTIONS" = "Cumraigh Freagairtí";
@@ -1847,10 +1847,10 @@
 "CONTACT_ABOUT_SHEET_PROFILE_NAMES_EDUCATION" = "Níl ainmneacha próifíle fíoraithe";
 
 /* Message for a tooltip that appears above a parenthesized name for another user, indicating that that name is the name the other user set for themself. Embeds {{name}} */
-"CONTACT_ABOUT_SHEET_SECONDARY_NAME_TOOLTIP_MESSAGE" = "Is é \"%1$@\" an t-ainm próifíle a shocraigh an duine seo in Signal.";
+"CONTACT_ABOUT_SHEET_SECONDARY_NAME_TOOLTIP_MESSAGE" = "Is é \"%1$@\" an t-ainm próifíle a shocraigh an duine seo in Radar.";
 
 /* A label indicating a user is a signal connection. */
-"CONTACT_ABOUT_SHEET_SIGNAL_CONNECTION_LABEL" = "Teagmhálaí Signal";
+"CONTACT_ABOUT_SHEET_SIGNAL_CONNECTION_LABEL" = "Teagmhálaí Radar";
 
 /* The title for a contact 'about' sheet. */
 "CONTACT_ABOUT_SHEET_TITLE" = "Maidir leis";
@@ -1892,7 +1892,7 @@
 "CONTACT_NOTE_TITLE" = "Nóta";
 
 /* Body for contact permission action sheet */
-"CONTACT_PERMISSION_ACTION_SHEET_2_BODY" = "Chun daoine a bhfuil aithne agat orthu a aimsiú ar Signal:";
+"CONTACT_PERMISSION_ACTION_SHEET_2_BODY" = "Chun daoine a bhfuil aithne agat orthu a aimsiú ar Radar:";
 
 /* First step for contact permission action sheet */
 "CONTACT_PERMISSION_ACTION_SHEET_2_STEP_ONE" = "Tapáil \"Socruithe\" thíos";
@@ -1925,10 +1925,10 @@
 "CONTACT_PERMISSION_REMINDER_MEGAPHONE_ACTION" = "Ceadaigh Rochtain";
 
 /* Body for contact permission reminder megaphone */
-"CONTACT_PERMISSION_REMINDER_MEGAPHONE_BODY" = "Ceadaigh rochtain ar do theagmhálaithe lena n-aimsiú go gasta ar Signal.";
+"CONTACT_PERMISSION_REMINDER_MEGAPHONE_BODY" = "Ceadaigh rochtain ar do theagmhálaithe lena n-aimsiú go gasta ar Radar.";
 
 /* Title for contact permission reminder megaphone */
-"CONTACT_PERMISSION_REMINDER_MEGAPHONE_TITLE" = "Aimsigh teagmhálaithe ar Signal";
+"CONTACT_PERMISSION_REMINDER_MEGAPHONE_TITLE" = "Aimsigh teagmhálaithe ar Radar";
 
 /* Label for a contact's phone number. */
 "CONTACT_PHONE" = "Guthán";
@@ -1952,13 +1952,13 @@
 "CONTACT_SHARE_INVALID_CONTACT" = "Teagmhálaí Neamhbhailí";
 
 /* Alert body when contacts disabled while trying to share a contact. */
-"CONTACT_SHARING_NO_ACCESS_BODY" = "Teastaíonn rochtain ar do chuid teagmhálaithe ó Signal. Téigh chuig Socruithe iOS agus cas air Teagmhálaithe. Tá do theagmhálaithe criptithe agus dofheicthe ag seirbhís Signal.";
+"CONTACT_SHARING_NO_ACCESS_BODY" = "Teastaíonn rochtain ar do chuid teagmhálaithe ó Radar. Téigh chuig Socruithe iOS agus cas air Teagmhálaithe. Tá do theagmhálaithe criptithe agus dofheicthe ag seirbhís Radar.";
 
 /* Alert title when contacts disabled while trying to share a contact. */
 "CONTACT_SHARING_NO_ACCESS_TITLE" = "Rochtain ar Theagmhálaithe ag Teastáil";
 
 /* Button text to initiate an email to signal support staff */
-"CONTACT_SUPPORT" = "Déan Teagmháil le Foireann Tacaíochta Signal";
+"CONTACT_SUPPORT" = "Déan Teagmháil le Foireann Tacaíochta Radar";
 
 /* The localized representation of the 'Donations & Badges' support filter. */
 "CONTACT_SUPPORT_FILTER_DONATIONS_AND_BADGES" = "Donations & Badges";
@@ -2006,7 +2006,7 @@
 "CONTACT_SUPPORT_FILTER_SOMETHING_NOT_WORKING_SHORT" = "Something Not Working";
 
 /* Alert body */
-"CONTACT_SUPPORT_PROMPT_ERROR_ALERT_BODY" = "Níorbh fhéidir le Signal d'iarratas ar thacaíocht a chur i gcrích.";
+"CONTACT_SUPPORT_PROMPT_ERROR_ALERT_BODY" = "Níorbh fhéidir le Radar d'iarratas ar thacaíocht a chur i gcrích.";
 
 /* button text */
 "CONTACT_SUPPORT_PROMPT_ERROR_TRY_AGAIN" = "Bain Triail Eile As";
@@ -2135,7 +2135,7 @@
 "CONVERSATION_SETTINGS_ATTRIBUTES_ACCESS_SECTION_FOOTER" = "Choose who can edit the group name, photo, description, and disappearing messages timer.";
 
 /* Footer string for a contact's badges in conversation settings */
-"CONVERSATION_SETTINGS_BADGES_FOOTER" = "Get badges for your profile by supporting Signal. Tap a badge to learn more.";
+"CONVERSATION_SETTINGS_BADGES_FOOTER" = "Get badges for your profile by supporting Radar. Tap a badge to learn more.";
 
 /* Header title for a contact's badges in conversation settings */
 "CONVERSATION_SETTINGS_BADGES_HEADER" = "Suaitheantais";
@@ -2393,7 +2393,7 @@
 "DATABASE_INTEGRITY_CHECK_ACTION_RUN" = "Run";
 
 /* Message for alert before running a database integrity check */
-"DATABASE_INTEGRITY_CHECK_MESSAGE" = "Cabhróidh sé sin linn d'fhadhb a réiteach agus is féidir go mbeidh cúpla nóiméad de dhíth lena chur i gcrích. Is féidir leat Signal a dhúnadh le linn seiceáil, ach tar ar ais le do logaí a chur isteach.";
+"DATABASE_INTEGRITY_CHECK_MESSAGE" = "Cabhróidh sé sin linn d'fhadhb a réiteach agus is féidir go mbeidh cúpla nóiméad de dhíth lena chur i gcrích. Is féidir leat Radar a dhúnadh le linn seiceáil, ach tar ar ais le do logaí a chur isteach.";
 
 /* Button to skip database integrity check step */
 "DATABASE_INTEGRITY_CHECK_SKIP" = "Léim thairis seo";
@@ -2417,10 +2417,10 @@
 "DATABASE_RECOVERY_MORE_STORAGE_SPACE_NEEDED_TITLE" = "Tá tuilleadh spáis stórála ag teastáil";
 
 /* The user has tried to recover their data after it was lost due to corruption. (They have not been hacked.) This is the description on the screen where we show an error message. */
-"DATABASE_RECOVERY_RECOVERY_FAILED_DESCRIPTION" = "Níorbh fhéidir stair do theachtaireachtaí a athshlánú. Is féidir leat leanúint le Signal a úsáid i ndiaidh athshuiteáil a dhéanamh. Cuir isteach loga dífhabhtaithe ionas gur féidir linn tuiscint níos fearr a fháil ar an méid a tharla.";
+"DATABASE_RECOVERY_RECOVERY_FAILED_DESCRIPTION" = "Níorbh fhéidir stair do theachtaireachtaí a athshlánú. Is féidir leat leanúint le Radar a úsáid i ndiaidh athshuiteáil a dhéanamh. Cuir isteach loga dífhabhtaithe ionas gur féidir linn tuiscint níos fearr a fháil ar an méid a tharla.";
 
 /* The user has tried to recover their data after it was lost due to corruption. (They have not been hacked.) This button lets them delete all of their data. */
-"DATABASE_RECOVERY_RECOVERY_FAILED_RESET_APP_BUTTON" = "Athshocraigh Signal";
+"DATABASE_RECOVERY_RECOVERY_FAILED_RESET_APP_BUTTON" = "Athshocraigh Radar";
 
 /* The user has tried to recover their data after it was lost due to corruption. (They have not been hacked.) If they want to delete the app and restart, they will be presented with a confirmation dialog. This is the final button they will press before their data is reset. */
 "DATABASE_RECOVERY_RECOVERY_FAILED_RESET_APP_CONFIRMATION_CONFIRM" = "Athshocraigh";
@@ -2429,7 +2429,7 @@
 "DATABASE_RECOVERY_RECOVERY_FAILED_RESET_APP_CONFIRMATION_DESCRIPTION" = "Glanfar d'fhaisnéis chuntais, do phróifíl agus do theachtaireachtaí go léir. Dúnfaidh an app nuair a bheidh an próiseas seo críochnaithe.";
 
 /* The user has tried to recover their data after it was lost due to corruption. (They have not been hacked.) If they want to delete the app and restart, they will be presented with a confirmation dialog. This is the title of that dialog. */
-"DATABASE_RECOVERY_RECOVERY_FAILED_RESET_APP_CONFIRMATION_TITLE" = "Athshocraigh Signal";
+"DATABASE_RECOVERY_RECOVERY_FAILED_RESET_APP_CONFIRMATION_TITLE" = "Athshocraigh Radar";
 
 /* The user has tried to recover their data after it was lost due to corruption. (They have not been hacked.) They were asked to submit a debug log. This is the button that submits this log. */
 "DATABASE_RECOVERY_RECOVERY_FAILED_SUBMIT_DEBUG_LOG_BUTTON" = "Seol an Logchomhad Dífhabhtaithe";
@@ -2504,7 +2504,7 @@
 "DELETE_ACCOUNT_CONFIRMATION_ACTION_SHEEET_ACTION" = "Scrios Cuntas";
 
 /* Title for the action sheet message of the 'delete account confirmation' view controller. */
-"DELETE_ACCOUNT_CONFIRMATION_ACTION_SHEEET_MESSAGE" = "Scriosfar do chuntas Signal agus athshocrófar an aip leis sin. Dúnfar an aip nuair a bheidh an próiseas críochnaithe.";
+"DELETE_ACCOUNT_CONFIRMATION_ACTION_SHEEET_MESSAGE" = "Scriosfar do chuntas Radar agus athshocrófar an aip leis sin. Dúnfar an aip nuair a bheidh an próiseas críochnaithe.";
 
 /* Title for the action sheet confirmation title of the 'delete account confirmation' view controller. */
 "DELETE_ACCOUNT_CONFIRMATION_ACTION_SHEEET_TITLE" = "An bhfuil tú cinnte gur mhaith leat do chuntas a scriosadh?";
@@ -2528,7 +2528,7 @@
 "DELETE_ACCOUNT_CONFIRMATION_PHONE_NUMBER_TITLE" = "Uimhir Ghutháin";
 
 /* Section header */
-"DELETE_ACCOUNT_CONFIRMATION_SECTION_TITLE" = "Confirm Your Signal Number";
+"DELETE_ACCOUNT_CONFIRMATION_SECTION_TITLE" = "Confirm Your Radar Number";
 
 /* Title for the 'delete account' confirmation view. */
 "DELETE_ACCOUNT_CONFIRMATION_TITLE" = "Scrios Cuntas";
@@ -2575,7 +2575,7 @@
 
 
 /* Notification warning the user that they have been de-registered. */
-"DEREGISTRATION_NOTIFICATION" = "Logáladh amach as Signal thú ar an ngléas seo.";
+"DEREGISTRATION_NOTIFICATION" = "Logáladh amach as Radar thú ar an ngléas seo.";
 
 /* Button that lets users re-register using the same phone number. */
 "DEREGISTRATION_REREGISTER_BUTTON" = "Athchláraigh";
@@ -2584,7 +2584,7 @@
 "DEREGISTRATION_REREGISTER_PROMPT_TITLE" = "Cláraigh an uimhir ghutháin seo arís?";
 
 /* Label warning the user that they have been de-registered. */
-"DEREGISTRATION_WARNING" = "Níl an gléas seo cláraithe a thuilleadh. Is dócha gur chláraigh tú d’uimhir ghutháin le Signal ar ghléas eile is cúis leis.";
+"DEREGISTRATION_WARNING" = "Níl an gléas seo cláraithe a thuilleadh. Is dócha gur chláraigh tú d’uimhir ghutháin le Radar ar ghléas eile is cúis leis.";
 
 /* If the user has been deregistered, they'll see a warning. This is This is the call to action on that warning. */
 "DEREGISTRATION_WARNING_ACTION_TITLE" = "Athchláraigh an Gléas";
@@ -2653,7 +2653,7 @@
 "DEVICE_TRANSFER_CONTRACT_QR_CODE_BUTTON" = "Féach ar mhéid níos lú";
 
 /* An error indicating that the other device closed signal mid-transfer and it could not complete */
-"DEVICE_TRANSFER_ERROR_BACKGROUNDED" = "Níorbh fhéidir an t-aistriú a chur i gcrích. Cinntigh go bhfuil Signal ar oscailt ar an dá ghléas agus triail arís.";
+"DEVICE_TRANSFER_ERROR_BACKGROUNDED" = "Níorbh fhéidir an t-aistriú a chur i gcrích. Cinntigh go bhfuil Radar ar oscailt ar an dá ghléas agus triail arís.";
 
 /* An error indicating that we were unable to verify the identity of the new device to complete the transfer */
 "DEVICE_TRANSFER_ERROR_CERTIFICATE_MISMATCH" = "Níorbh fhéidir do ghléas nua a dheimhniú. Bain triail eile as.";
@@ -2671,13 +2671,13 @@
 "DEVICE_TRANSFER_ERROR_NOT_ENOUGH_SPACE" = "Níl go leor spáis ann chun an t-aistriú a chur i gcrích";
 
 /* An error indicating the user must update their device before trying to transfer. */
-"DEVICE_TRANSFER_ERROR_UNSUPPORTED_VERSION" = "Suiteáil an leagan is déanaí de Signal agus bain triail eile as";
+"DEVICE_TRANSFER_ERROR_UNSUPPORTED_VERSION" = "Suiteáil an leagan is déanaí de Radar agus bain triail eile as";
 
 /* Button shown to expand a QR code and view it fullscreen. */
 "DEVICE_TRANSFER_EXPAND_QR_CODE_BUTTON" = "Féach ar mhéid níos mó";
 
 /* The explanation on the action sheet prompting the user if they want to transfer their device. */
-"DEVICE_TRANSFER_PROMPT_EXPLANATION" = "Aistrigh do chuntas Signal go dtí gléas nua iOS. Deimhnigh go bhfuil an gléas nua in aice láimhe agus go bhfuil sé ar siúl.";
+"DEVICE_TRANSFER_PROMPT_EXPLANATION" = "Aistrigh do chuntas Radar go dtí gléas nua iOS. Deimhnigh go bhfuil an gléas nua in aice láimhe agus go bhfuil sé ar siúl.";
 
 /* The title on the acttion sheet prompting the user if they want to transfer their device. */
 "DEVICE_TRANSFER_PROMPT_TITLE" = "Cuntas a Aistriú";
@@ -2695,7 +2695,7 @@
 "DEVICE_TRANSFER_QRCODE_TITLE" = "Scan Cód QR";
 
 /* The explanation on the view that shows receiving progress */
-"DEVICE_TRANSFER_RECEIVING_EXPLANATION" = "Coinnigh an dá ghléas i ngar dá chéile. Ná múch ceachtar acu, agus coinnigh Signal oscailte orthu. Tá an t-aistriú criptithe ó cheann go ceann.";
+"DEVICE_TRANSFER_RECEIVING_EXPLANATION" = "Coinnigh an dá ghléas i ngar dá chéile. Ná múch ceachtar acu, agus coinnigh Radar oscailte orthu. Tá an t-aistriú criptithe ó cheann go ceann.";
 
 /* The title on the view that shows receiving progress */
 "DEVICE_TRANSFER_RECEIVING_TITLE" = "Sonraí á bhFáil";
@@ -2731,7 +2731,7 @@
 "DEVICE_TRANSFER_STATUS_NEW_DEVICE_TRANSFERRING" = "Aistriú ar bun";
 
 /* Description in the progress view displayed during device transfer. */
-"DEVICE_TRANSFER_STATUS_NEW_DEVICE_TRANSFERRING_DESCRIPTION" = "Coinnigh an dá ghléas i ngar dá chéile. Ná múch ceachtar acu, agus coinnigh Signal oscailte orthu. Tá an t-aistriú criptithe ó cheann go ceann.";
+"DEVICE_TRANSFER_STATUS_NEW_DEVICE_TRANSFERRING_DESCRIPTION" = "Coinnigh an dá ghléas i ngar dá chéile. Ná múch ceachtar acu, agus coinnigh Radar oscailte orthu. Tá an t-aistriú criptithe ó cheann go ceann.";
 
 /* Status message on old device when cancelling transfer. */
 "DEVICE_TRANSFER_STATUS_OLD_DEVICE_CANCELLING" = "Nascadh leis an iPhone nua á chur ar ceal…";
@@ -2746,7 +2746,7 @@
 "DEVICE_TRANSFER_STATUS_OLD_DEVICE_STARTING" = "Ag feitheamh le nascadh leis an iPhone nua…";
 
 /* The explanation on the action sheet that shows transfer progress */
-"DEVICE_TRANSFER_TRANSFERRING_EXPLANATION" = "Coinnigh an dá ghléas i ngar dá chéile. Ná múch ceachtar acu, agus coinnigh Signal oscailte orthu.";
+"DEVICE_TRANSFER_TRANSFERRING_EXPLANATION" = "Coinnigh an dá ghléas i ngar dá chéile. Ná múch ceachtar acu, agus coinnigh Radar oscailte orthu.";
 
 /* The title on the action sheet that shows transfer progress */
 "DEVICE_TRANSFER_TRANSFERRING_TITLE" = "Sonraí á nAistriú";
@@ -2836,13 +2836,13 @@
 "DONATE_CHOOSE_PAYMENT_METHOD_SHEET_SUBTITLE_FOR_ONE_TIME_DONATION" = "Faigh suaitheantas %1$@ a mhairfidh 30 lá";
 
 /* When users make donations on a friend's behalf, they see a sheet that lets them pick a payment method. This is the title on that sheet. Embeds {{amount of money}}, such as \"$5\". */
-"DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_DONATION_ON_BEHALF_OF_A_FRIEND" = "Tabhartas %1$@ do Signal";
+"DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_DONATION_ON_BEHALF_OF_A_FRIEND" = "Tabhartas %1$@ do Radar";
 
 /* When users make monthly donations, they see a sheet that lets them pick a payment method. This is the title on that sheet. Embeds {{amount of money per month}}, such as \"$5/month\". */
-"DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_MONTHLY_DONATION" = "Tabhair %1$@ do Signal";
+"DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_MONTHLY_DONATION" = "Tabhair %1$@ do Radar";
 
 /* When users make one-time donations, they see a sheet that lets them pick a payment method. This is the title on that sheet. Embeds {{amount of money}}, such as \"$5\". */
-"DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_ONE_TIME_DONATION" = "Tabhair %1$@ do Signal";
+"DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_ONE_TIME_DONATION" = "Tabhair %1$@ do Radar";
 
 /* Users can donate on a friend's behalf and can optionally add a message. This is tells users about that optional message. */
 "DONATE_ON_BEHALF_OF_A_FRIEND_ADDITIONAL_MESSAGE_INFO" = "Cuirfear an tabhartas in iúl don fhaighteoir i dteachtaireacht 1 le 1. Cuir do theachtaireacht féin leis thíos.";
@@ -2959,7 +2959,7 @@
 "DONATION_ON_BEHALF_OF_A_FRIEND_BADGE_REDEEMED" = "Fuascailte";
 
 /* Users can donate on behalf of a friend, and the friend will receive a badge. This is a short paragraph on the screen where users choose the badge their friend will receive. */
-"DONATION_ON_BEHALF_OF_A_FRIEND_CHOOSE_BADGE_DESCRIPTION" = "Tacaigh le Signal trí thabhartas a thabhairt ar son cara nó duine den teaghlach a úsáideann Signal. Gheobhaidh an duine sin rogha chun tacaíocht a léiriú ar an bpróifíl.";
+"DONATION_ON_BEHALF_OF_A_FRIEND_CHOOSE_BADGE_DESCRIPTION" = "Tacaigh le Radar trí thabhartas a thabhairt ar son cara nó duine den teaghlach a úsáideann Radar. Gheobhaidh an duine sin rogha chun tacaíocht a léiriú ar an bpróifíl.";
 
 /* Users can donate on behalf of a friend, and the friend will receive a badge. This is the title on the screen where users choose the badge their friend will receive. */
 "DONATION_ON_BEHALF_OF_A_FRIEND_CHOOSE_BADGE_TITLE" = "Tabhair airgead ar son Cara";
@@ -2983,7 +2983,7 @@
 "DONATION_ON_BEHALF_OF_A_FRIEND_PAYMENT_FAILED_ERROR_TITLE" = "Theip ar an Íocaíocht";
 
 /* Users can donate on a friend's behalf. If the payment was processed but the donation failed to send, this error message will be shown. */
-"DONATION_ON_BEHALF_OF_A_FRIEND_PAYMENT_SUCCEEDED_BUT_MESSAGE_FAILED_ERROR_BODY" = "Rinneadh d'íocaíocht a phróiseáil ach ní raibh Signal in ann do theachtaireacht faoin tabhartas a sheoladh. Déan teagmháil leis an bhfoireann tacaíochta.";
+"DONATION_ON_BEHALF_OF_A_FRIEND_PAYMENT_SUCCEEDED_BUT_MESSAGE_FAILED_ERROR_BODY" = "Rinneadh d'íocaíocht a phróiseáil ach ní raibh Radar in ann do theachtaireacht faoin tabhartas a sheoladh. Déan teagmháil leis an bhfoireann tacaíochta.";
 
 /* Users can donate on a friend's behalf. If the payment was processed but the donation failed to send, an error dialog will be shown. This is the title of that dialog. */
 "DONATION_ON_BEHALF_OF_A_FRIEND_PAYMENT_SUCCEEDED_BUT_MESSAGE_FAILED_ERROR_TITLE" = "Theip ar an Tabhartas";
@@ -2995,7 +2995,7 @@
 "DONATION_ON_BEHALF_OF_A_FRIEND_PREVIEW_OUTGOING" = "✨ Thug tú tabhartas ar shon %1$@";
 
 /* You received a donation from a friend. This is the title of that message in the chat. Embeds {{short contact name}}. */
-"DONATION_ON_BEHALF_OF_A_FRIEND_RECEIVED_TITLE_FORMAT" = "Thug %1$@ tabhartas do Signal ar do shon";
+"DONATION_ON_BEHALF_OF_A_FRIEND_RECEIVED_TITLE_FORMAT" = "Thug %1$@ tabhartas do Radar ar do shon";
 
 /* Users can donate on a friend's behalf. This is the error message that appears if the try to do this, but the recipient is blocked. */
 "DONATION_ON_BEHALF_OF_A_FRIEND_RECIPIENT_IS_BLOCKED_ERROR_BODY" = "Ní féidir leat tabhartas a thabhairt ar son an úsáideora seo toisc gur chuir tú bac air/uirthi.";
@@ -3019,7 +3019,7 @@
 "DONATION_ON_BEHALF_OF_A_FRIEND_SENT_TITLE_FORMAT" = "Tabhartas ar son %1$@";
 
 /* When you donate on behalf of a friend, a thank-you sheet will appear. This is the text on that sheet. Embeds {{recipient name}}. */
-"DONATION_ON_BEHALF_OF_A_FRIEND_THANKS_BODY_FORMAT" = "Thug tú tabhartas do Signal ar son %1$@. Gheobhaidh an duine sin rogha chun tacaíocht a léiriú ar an bpróifíl.";
+"DONATION_ON_BEHALF_OF_A_FRIEND_THANKS_BODY_FORMAT" = "Thug tú tabhartas do Radar ar son %1$@. Gheobhaidh an duine sin rogha chun tacaíocht a léiriú ar an bpróifíl.";
 
 /* When you donate on behalf of a friend, a thank-you sheet will appear. This is the title on that sheet. */
 "DONATION_ON_BEHALF_OF_A_FRIEND_THANKS_TITLE" = "Go raibh maith agat as do thacaíocht!";
@@ -3028,19 +3028,19 @@
 "DONATION_ON_BEHALF_OF_A_FRIEND_VIEW" = "Amharc ar";
 
 /* A friend has donated on your behalf and you received a badge. This text says that you received a badge, and from whom. Embeds {{contact's short name, such as a first name}}. */
-"DONATION_ON_BEHALF_OF_A_FRIEND_YOU_RECEIVED_A_BADGE_FORMAT" = "Thug %1$@ tabhartas do Signal ar do shon! Léirigh do thacaíocht do Signal ar do phróifíl.";
+"DONATION_ON_BEHALF_OF_A_FRIEND_YOU_RECEIVED_A_BADGE_FORMAT" = "Thug %1$@ tabhartas do Radar ar do shon! Léirigh do thacaíocht do Radar ar do phróifíl.";
 
 /* There is a screen where users can read more about their donation to Signal. This is the 1st paragraph of that screen. */
 "DONATION_READ_MORE_SCREEN_PARAGRAPH_1" = "Teachtaireachtaí príobháideacha. Gan aon fhógraí, gan aon rianairí, gan aon fhaireachas.";
 
 /* There is a screen where users can read more about their donation to Signal. This is the 2nd paragraph of that screen. */
-"DONATION_READ_MORE_SCREEN_PARAGRAPH_2" = "Tacaíonn síntiúis le Signal, rud a chiallaíonn go mbíonn do phríobháideachas i gcroílár gach a ndéanaimid. Tógadh Signal duitse; ní do do shonraí agus ní ar mhaithe le brabús.";
+"DONATION_READ_MORE_SCREEN_PARAGRAPH_2" = "Tacaíonn síntiúis le Radar, rud a chiallaíonn go mbíonn do phríobháideachas i gcroílár gach a ndéanaimid. Tógadh Radar duitse; ní do do shonraí agus ní ar mhaithe le brabús.";
 
 /* There is a screen where users can read more about their donation to Signal. This is the 3rd paragraph of that screen. */
-"DONATION_READ_MORE_SCREEN_PARAGRAPH_3" = "Más féidir leat, Bronn airgead ar Signal inniu ionas go leanfaidh sé de bheith spraíúil, iontaofa agus infhaighte ag cách.";
+"DONATION_READ_MORE_SCREEN_PARAGRAPH_3" = "Más féidir leat, Bronn airgead ar Radar inniu ionas go leanfaidh sé de bheith spraíúil, iontaofa agus infhaighte ag cách.";
 
 /* There is a screen where users can read more about their donation to Signal. This is the title of that screen. */
-"DONATION_READ_MORE_SCREEN_TITLE" = "Tá Signal difriúil.";
+"DONATION_READ_MORE_SCREEN_TITLE" = "Tá Radar difriúil.";
 
 /* Section title for donation amount on receipts */
 "DONATION_RECEIPT_AMOUNT" = "Amount";
@@ -3076,7 +3076,7 @@
 "DONATION_RECEIPTS" = "Donation Receipts";
 
 /* Text at the bottom of the donation receipts list, telling users that receipts might not be available */
-"DONATION_RECEIPTS_MIGHT_BE_MISSING_IF_YOU_REINSTALLED" = "If you have reinstalled Signal, receipts from previous donations will not be available.";
+"DONATION_RECEIPTS_MIGHT_BE_MISSING_IF_YOU_REINSTALLED" = "If you have reinstalled Radar, receipts from previous donations will not be available.";
 
 /* Error message displayed if something goes wrong with 3DSecure/iDEAL payment authorization.  This will be encountered if the user cancels the webview before authrizing the payment. */
 "DONATION_REDIRECT_ERROR_CANCELLED_MESSAGE" = "Íocaíocht curtha ar ceal. Triail arís.";
@@ -3091,7 +3091,7 @@
 "DONATION_SCREEN_DONATE_BUTTON" = "Tabhair airgead";
 
 /* On donation screens, a small amount of information text is shown. This is the subtitle for that text. */
-"DONATION_SCREENS_HEADER_DESCRIPTION" = "Teachtaireachtaí príobháideacha, maoinithe agatsa. Gan aon fhógraí, gan aon rianairí, gan aon chomhghéilleadh. Bronn airgead ar Signal anois chun tacú leis.";
+"DONATION_SCREENS_HEADER_DESCRIPTION" = "Teachtaireachtaí príobháideacha, maoinithe agatsa. Gan aon fhógraí, gan aon rianairí, gan aon chomhghéilleadh. Bronn airgead ar Radar anois chun tacú leis.";
 
 /* On donation screens, a small amount of information text is shown. Users can click this link to learn more information. */
 "DONATION_SCREENS_HEADER_READ_MORE" = "Léigh tuilleadh";
@@ -3169,7 +3169,7 @@
 "DONATION_VIEW_DONATE_ON_BEHALF_OF_A_FRIEND" = "Tabhair airgead ar son Cara";
 
 /* Text describing to the user that they're going to pay a donation to Signal */
-"DONATION_VIEW_DONATION_TO_SIGNAL" = "Donation to Signal";
+"DONATION_VIEW_DONATION_TO_SIGNAL" = "Donation to Radar";
 
 /* Title for the 'Donor FAQ' button on the donation screen */
 "DONATION_VIEW_DONOR_FAQ" = "CCanna do Thabharthóirí";
@@ -3181,7 +3181,7 @@
 "DONATION_VIEW_MANAGE_BADGES" = "Suaitheantais";
 
 /* Text describing to the user that they're going to pay a monthly donation to Signal */
-"DONATION_VIEW_MONTHLY_DONATION_TO_SIGNAL" = "Deontas Míosúil le Signal";
+"DONATION_VIEW_MONTHLY_DONATION_TO_SIGNAL" = "Deontas Míosúil le Radar";
 
 /* Title for the 'more' section on the donation screen */
 "DONATION_VIEW_MORE_SECTION_TITLE" = "Tuilleadh";
@@ -3193,7 +3193,7 @@
 "DONATION_VIEW_OTHER_WAYS_TO_DONATE_TITLE" = "Bealaí Eile le hAirgead a Thabhairt";
 
 /* Title on the 'Donate to Signal' screen */
-"DONATION_VIEW_TITLE" = "Bronn airgead ar Signal";
+"DONATION_VIEW_TITLE" = "Bronn airgead ar Radar";
 
 /* Label for the currency picker button in donation views */
 "DONATIONS_CURRENCY_PICKER_LABEL" = "Airgeadra";
@@ -3205,16 +3205,16 @@
 "DOUBLE_TAP_TO_EDIT_ALERT_TITLE" = "Déthapáil lena chur in eagar";
 
 /* Alert body for when the user has just tried to edit a contacts after declining to give Signal contacts permissions */
-"EDIT_CONTACT_WITHOUT_CONTACTS_PERMISSION_ALERT_BODY" = "Is féidir leat cead a thabhairt do Signal sna Socruithe iOS.";
+"EDIT_CONTACT_WITHOUT_CONTACTS_PERMISSION_ALERT_BODY" = "Is féidir leat cead a thabhairt do Radar sna Socruithe iOS.";
 
 /* Alert title for when the user has just tried to edit a contacts after declining to give Signal contacts permissions */
-"EDIT_CONTACT_WITHOUT_CONTACTS_PERMISSION_ALERT_TITLE" = "Teastaíonn rochtain ar do chuid teagmhálaithe ó Signal chun iad a chur in eagar";
+"EDIT_CONTACT_WITHOUT_CONTACTS_PERMISSION_ALERT_TITLE" = "Teastaíonn rochtain ar do chuid teagmhálaithe ó Radar chun iad a chur in eagar";
 
 /* The navbar title for the 'update group' view. */
 "EDIT_GROUP_DEFAULT_TITLE" = "Cuir an Grúpa in Eagar";
 
 /* Error message indicating the a user can't be added to a group. */
-"EDIT_GROUP_ERROR_CANNOT_ADD_MEMBER" = "Ní féidir an t-úsáideoir seo a chur leis an ngrúpa go dtí go nuashonróidh sé/sí Signal.";
+"EDIT_GROUP_ERROR_CANNOT_ADD_MEMBER" = "Ní féidir an t-úsáideoir seo a chur leis an ngrúpa go dtí go nuashonróidh sé/sí Radar.";
 
 /* Error message indicating that an avatar image is invalid and cannot be used. */
 "EDIT_GROUP_ERROR_INVALID_AVATAR" = "Pictiúr neamhbhailí.";
@@ -3241,13 +3241,13 @@
 "EDIT_MESSAGE_SEND_MESSAGE_UNKNOWN_ERROR" = "EDIT_MESSAGE_SEND_MESSAGE_UNKNOWN_ERROR";
 
 /* body of email sent to contacts when inviting to install Signal. Embeds {{link to install Signal}} and {{link to the Signal home page}} */
-"EMAIL_INVITE_BODY" = "Haigh,\n\nThosaigh mé ag úsáid Signal le déanaí le comhráite ar m'iPhone a choinneáil príobháideach. Ba mhaith liom go ndéanfá é a shuiteáil freisin, ionas go mbeimid cinnte nach féidir le haon duine ach tusa agus mise ár dteachtaireachtaí a léamh nó éisteacht lenár nglaonna.\n\nTá Signal ar fáil le haghaidh iPhone, Android agus Desktop. Gheobhaidh tú anseo é: %1$@\n\nOibríonn Signal mar a oibríonn an aip curtha teachtaireachtaí atá agat cheana. Is féidir linn pictiúir agus físeáin a sheoladh, glaonna a chur agus tosú ar ghrúpchomhráite. An chuid is fearr, ní féidir le haon duine eile aon cheann de na rudaí sin a fheiceáil, fiú na daoine a dhéanann Signal!\n\nGheobhaidh tú tuilleadh eolais faoi Signal anseo: %2$@";
+"EMAIL_INVITE_BODY" = "Haigh,\n\nThosaigh mé ag úsáid Radar le déanaí le comhráite ar m'iPhone a choinneáil príobháideach. Ba mhaith liom go ndéanfá é a shuiteáil freisin, ionas go mbeimid cinnte nach féidir le haon duine ach tusa agus mise ár dteachtaireachtaí a léamh nó éisteacht lenár nglaonna.\n\nTá Radar ar fáil le haghaidh iPhone, Android agus Desktop. Gheobhaidh tú anseo é: %1$@\n\nOibríonn Radar mar a oibríonn an aip curtha teachtaireachtaí atá agat cheana. Is féidir linn pictiúir agus físeáin a sheoladh, glaonna a chur agus tosú ar ghrúpchomhráite. An chuid is fearr, ní féidir le haon duine eile aon cheann de na rudaí sin a fheiceáil, fiú na daoine a dhéanann Radar!\n\nGheobhaidh tú tuilleadh eolais faoi Radar anseo: %2$@";
 
 /* subject of email sent to contacts when inviting to install Signal */
-"EMAIL_INVITE_SUBJECT" = "Bainimis úsáid as Signal";
+"EMAIL_INVITE_SUBJECT" = "Bainimis úsáid as Radar";
 
 /* Description for the fallback support sheet if user cannot send email */
-"EMAIL_SIGNAL_MESSAGE" = "Ní féidir ríomhphost a sheoladh ó do ghléas. Caithfidh tú ríomhphost a shocrú ar do ghléas nó teachtaireacht a sheoladh chuig support@signal.org chun tacaíocht a fháil";
+"EMAIL_SIGNAL_MESSAGE" = "Ní féidir ríomhphost a sheoladh ó do ghléas. Caithfidh tú ríomhphost a shocrú ar do ghléas nó teachtaireacht a sheoladh chuig support@radar.chat chun tacaíocht a fháil";
 
 /* Title for the fallback support sheet if user cannot send email */
 "EMAIL_SIGNAL_TITLE" = "Níl ríomhphost ar fáil";
@@ -3283,7 +3283,7 @@
 "EMOJI_CATEGORY_TRAVEL_NAME" = "Taisteal ⁊ Áiteanna";
 
 /* Full width label displayed when attempting to compose message */
-"EMPTY_CONTACTS_LABEL_LINE1" = "Níl fiú is teagmhálaí amháin de do chuid ag úsáid Signal.";
+"EMPTY_CONTACTS_LABEL_LINE1" = "Níl fiú is teagmhálaí amháin de do chuid ag úsáid Radar.";
 
 /* Full width label displayed when attempting to compose message */
 "EMPTY_CONTACTS_LABEL_LINE2" = "Cén fáth nach dtugann tú cuireadh do dhuine éigin?";
@@ -3349,7 +3349,7 @@
 "ERROR_DESCRIPTION_UNKNOWN_ERROR" = "Tharla earráid anaithnid.";
 
 /* Error message when attempting to send message */
-"ERROR_DESCRIPTION_UNREGISTERED_RECIPIENT" = "Ní féidir an teachtaireacht seo a sheoladh toisc nach bhfuil an duine seo ag úsáid Signal a thuilleadh.";
+"ERROR_DESCRIPTION_UNREGISTERED_RECIPIENT" = "Ní féidir an teachtaireacht seo a sheoladh toisc nach bhfuil an duine seo ag úsáid Radar a thuilleadh.";
 
 /* Error message indicating that attachment upload(s) failed. */
 "ERROR_MESSAGE_ATTACHMENT_UPLOAD_FAILED" = "Theip ar uaslódáil an cheangaltáin.";
@@ -3394,10 +3394,10 @@
 "ERROR_NETWORK_FAILURE" = "Earráid Líonra";
 
 /* Format string for an error alert notification message. Embeds {{ error string }} */
-"ERROR_NOTIFICATION_MESSAGE_FORMAT" = "Please help us improve Signal by reporting this error along with debug logs from your device to support@signal.org; %1$@";
+"ERROR_NOTIFICATION_MESSAGE_FORMAT" = "Please help us improve Radar by reporting this error along with debug logs from your device to support@radar.chat; %1$@";
 
 /* Format string for an error alert notification title. */
-"ERROR_NOTIFICATION_TITLE" = "Signal Beta: An error occurred";
+"ERROR_NOTIFICATION_TITLE" = "Radar Beta: An error occurred";
 
 /* Error indicating a send failure due to a delinked application. */
 "ERROR_SENDING_DELINKED" = "Níl do ghléas nasctha a thuilleadh. Caithfidh tú é a nascadh arís chun teachtaireachtaí a sheoladh.";
@@ -3406,7 +3406,7 @@
 "ERROR_SENDING_DEREGISTERED" = "Níl do ghléas cláraithe a thuilleadh. Caithfidh tú clárú arís chun teachtaireachtaí a sheoladh.";
 
 /* Error indicating a send failure due to an expired application. */
-"ERROR_SENDING_EXPIRED" = "Chuaigh an leagan seo de Signal i léig. Nuashonraigh é chun tuilleadh teachtaireachtaí a sheoladh.";
+"ERROR_SENDING_EXPIRED" = "Chuaigh an leagan seo de Radar i léig. Nuashonraigh é chun tuilleadh teachtaireachtaí a sheoladh.";
 
 /* Format string for 'unregistered user' error. Embeds {{the unregistered user's name or signal id}}. */
 "ERROR_UNREGISTERED_USER_FORMAT" = "Úsáideoir Gan Chlárú: %1$@";
@@ -3418,19 +3418,19 @@
 "EXIT_REREGISTRATION" = "Scoir Clárú";
 
 /* Label notifying the user that the app has expired. */
-"EXPIRATION_ERROR" = "Tá an leagan seo de Signal imithe as feidhm. Nuashonraigh chun teachtaireachtaí a sheoladh agus a fháil.";
+"EXPIRATION_ERROR" = "Tá an leagan seo de Radar imithe as feidhm. Nuashonraigh chun teachtaireachtaí a sheoladh agus a fháil.";
 
 /* If the user's app is too old, they'll be shown a warning asking them to upgrade. This is the text on the warning, and tapping it will open the App Store page for Signal. */
 "EXPIRATION_WARNING_ACTION_TITLE" = "Nuashonraigh Anois";
 
 /* Label warning the user that the app will expire soon. Embeds {{date}}. */
-"EXPIRATION_WARNING_SOON" = "Rachaidh an leagan seo de Signal as feidhm ar an %1$@. Nuashonraigh chun seoladh teachtaireachtaí a choinneáil.";
+"EXPIRATION_WARNING_SOON" = "Rachaidh an leagan seo de Radar as feidhm ar an %1$@. Nuashonraigh chun seoladh teachtaireachtaí a choinneáil.";
 
 /* Label warning the user that the app will expire today. */
-"EXPIRATION_WARNING_TODAY" = "Rachaidh an leagan seo de Signal as feidhm inniu. Nuashonraigh chun seoladh teachtaireachtaí a choinneáil.";
+"EXPIRATION_WARNING_TODAY" = "Rachaidh an leagan seo de Radar as feidhm inniu. Nuashonraigh chun seoladh teachtaireachtaí a choinneáil.";
 
 /* action sheet header when re-sending message which failed because of an invalid key signature */
-"FAILED_SENDING_BECAUSE_INVALID_KEY_SIGNATURE" = "Níorbh fhéidir an teachtaireacht a sheoladh toisc go mbeidh ar %1$@ Signal a nuashonrú agus a oscailt.";
+"FAILED_SENDING_BECAUSE_INVALID_KEY_SIGNATURE" = "Níorbh fhéidir an teachtaireacht a sheoladh toisc go mbeidh ar %1$@ Radar a nuashonrú agus a oscailt.";
 
 /* action sheet header when re-sending message which failed because of untrusted identity keys */
 "FAILED_SENDING_BECAUSE_UNTRUSTED_IDENTITY_KEY" = "Athraíodh d'uimhir shábháilteachta le %1$@ le déanaí. Ba chóir duit í a dheimhniú sula seolfaidh tú an teachtaireacht seo arís.";
@@ -3745,10 +3745,10 @@
 "GROUP_CALL_WILL_NOTIFY_TWO_PEOPLE_FORMAT" = "Cuirfear %1$@ agus %2$@ ar an eolas";
 
 /* Text shown before the user starts a group call if the user has enabled ringing and there is one other person in the group. Embeds {member name} */
-"GROUP_CALL_WILL_RING_ONE_PERSON_FORMAT" = "Cuirfidh Signal glao ar %1$@";
+"GROUP_CALL_WILL_RING_ONE_PERSON_FORMAT" = "Cuirfidh Radar glao ar %1$@";
 
 /* Text shown before the user starts a group call if the user has enabled ringing and there are two other people in the group. Embeds {{ %1$@ participant1, %2$@ participant2 }} */
-"GROUP_CALL_WILL_RING_TWO_PEOPLE_FORMAT" = "Cuirfidh Signal glao ar %1$@ agus ar %2$@";
+"GROUP_CALL_WILL_RING_TWO_PEOPLE_FORMAT" = "Cuirfidh Radar glao ar %1$@ agus ar %2$@";
 
 /* Text explaining that you are in the group call. */
 "GROUP_CALL_YOU_ARE_HERE" = "You are in the group call";
@@ -3958,7 +3958,7 @@
 "GROUP_LINK_VIEW_SHARE_LINK_VIA_QR_CODE" = "Tagairt QR";
 
 /* Label for the 'share group link via Signal' button in the 'group link' view. */
-"GROUP_LINK_VIEW_SHARE_LINK_VIA_SIGNAL" = "Comhroinn trí Signal";
+"GROUP_LINK_VIEW_SHARE_LINK_VIA_SIGNAL" = "Comhroinn trí Radar";
 
 /* Message for the 'share group link' action sheet in the 'group link' view. */
 "GROUP_LINK_VIEW_SHARE_SHEET_MESSAGE" = "Is féidir le haon duine leis an nasc seo amharc ar ainm agus baill an ghrúpa seo agus iarraidh ar dhul isteach ann. Comhroinn le daoine a bhfuil muinín agat astu é.";
@@ -4366,13 +4366,13 @@
 "HOME_VIEW_DRAFT_PREFIX" = "Dréacht: ";
 
 /* Format string for a label offering to start a new conversation with your contacts, if you have 1 Signal contact.  Embeds {{The name of 1 of your Signal contacts}}. */
-"HOME_VIEW_FIRST_CONVERSATION_OFFER_1_CONTACT_FORMAT" = "Tá teagmhálaithe de do chuid ar Signal cheana, %1$@ ina measc.";
+"HOME_VIEW_FIRST_CONVERSATION_OFFER_1_CONTACT_FORMAT" = "Tá teagmhálaithe de do chuid ar Radar cheana, %1$@ ina measc.";
 
 /* Format string for a label offering to start a new conversation with your contacts, if you have 2 Signal contacts.  Embeds {{The names of 2 of your Signal contacts}}. */
-"HOME_VIEW_FIRST_CONVERSATION_OFFER_2_CONTACTS_FORMAT" = "Tá teagmhálaithe de do chuid ar Signal cheana, %1$@ agus %2$@ ina measc";
+"HOME_VIEW_FIRST_CONVERSATION_OFFER_2_CONTACTS_FORMAT" = "Tá teagmhálaithe de do chuid ar Radar cheana, %1$@ agus %2$@ ina measc";
 
 /* Format string for a label offering to start a new conversation with your contacts, if you have at least 3 Signal contacts.  Embeds {{The names of 3 of your Signal contacts}}. */
-"HOME_VIEW_FIRST_CONVERSATION_OFFER_3_CONTACTS_FORMAT" = "Tá teagmhálaithe de do chuid ar Signal cheana, %1$@, %2$@, agus %3$@ ina measc";
+"HOME_VIEW_FIRST_CONVERSATION_OFFER_3_CONTACTS_FORMAT" = "Tá teagmhálaithe de do chuid ar Radar cheana, %1$@, %2$@, agus %3$@ ina measc";
 
 /* A label offering to start a new conversation with your contacts, if you have no Signal contacts. */
 "HOME_VIEW_FIRST_CONVERSATION_OFFER_NO_CONTACTS" = "Tosaigh ar do chéad chomhrá anseo.";
@@ -4468,7 +4468,7 @@
 "INACTIVE_LINKED_DEVICE_REMINDER_MEGAPHONE_TITLE" = "Gléas neamhghníomhach nasctha";
 
 /* Body for an in-app megaphone about a user's inactive primary device. */
-"INACTIVE_PRIMARY_DEVICE_REMINDER_MEGAPHONE_BODY" = "Chun do chuntas a choinneáil gníomhach, oscail Signal ar do phríomhghléas.";
+"INACTIVE_PRIMARY_DEVICE_REMINDER_MEGAPHONE_BODY" = "Chun do chuntas a choinneáil gníomhach, oscail Radar ar do phríomhghléas.";
 
 /* Title for a button in an in-app megaphone about a user's inactive primary device, temporarily dismissing the megaphone. */
 "INACTIVE_PRIMARY_DEVICE_REMINDER_MEGAPHONE_GOT_IT_BUTTON" = "Tuigim";
@@ -4477,7 +4477,7 @@
 "INACTIVE_PRIMARY_DEVICE_REMINDER_MEGAPHONE_LEARN_MORE_BUTTON" = "Tuilleadh faisnéise";
 
 /* Title for an in-app megaphone about a user's inactive primary device. */
-"INACTIVE_PRIMARY_DEVICE_REMINDER_MEGAPHONE_TITLE" = "Oscail Signal ar do ghuthán";
+"INACTIVE_PRIMARY_DEVICE_REMINDER_MEGAPHONE_TITLE" = "Oscail Radar ar do ghuthán";
 
 /* Label reminding the user that they are in archive mode, and that muted chats remain archived when they receive a new message. */
 "INBOX_VIEW_ARCHIVE_MODE_MUTED_CHATS_REMINDER" = "Fanfaidh comhráite balbhaithe sa chartlann fós nuair a thagann teachtaireacht nua isteach.";
@@ -4513,10 +4513,10 @@
 "INFO_MESSAGE_BLOCKED_OTHER_USER" = "Chuir tú bac ar an duine seo.";
 
 /* Indicates that a previously-removed recipient has been added back to the current user's contacts. */
-"INFO_MESSAGE_CONTACT_REINSTATED" = "Cuireadh an duine seo ar ais le do liosta teagmhálaithe Signal.";
+"INFO_MESSAGE_CONTACT_REINSTATED" = "Cuireadh an duine seo ar ais le do liosta teagmhálaithe Radar.";
 
 /* Indicates that the recipient has been removed from the current user's contacts and that messaging them will re-add them. */
-"INFO_MESSAGE_CONTACT_REMOVED" = "Bhain tú an duine seo de do liosta teagmhálaithe Signal, cuirfear é/í leis arís má sheolann tú teachtaireacht.";
+"INFO_MESSAGE_CONTACT_REMOVED" = "Bhain tú an duine seo de do liosta teagmhálaithe Radar, cuirfear é/í leis arís má sheolann tú teachtaireacht.";
 
 /* When you start a chat with someone and then later learn their profile name, we insert an in-chat message with this string to record the identifier you originally used to contact them. Embeds {{ the identifier, either a phone number or a username }}. */
 "INFO_MESSAGE_LEARNED_PROFILE_KEY" = "Chuir tú tús leis an gcomhrá seo le %1$@.";
@@ -4537,7 +4537,7 @@
 "INFO_MESSAGE_REPORTED_SPAM" = "Tuairiscithe mar thurscar";
 
 /* Body message of the alert shown when a user taps on 'learn more' via the spam info message. */
-"INFO_MESSAGE_REPORTED_SPAM_LEARN_MORE_MESSAGE" = "Cuireadh in iúl do Signal go bhféadfadh go bhfuil an duine seo ag seoladh turscair. Ní féidir le Signal inneachar comhráite a fheiceáil.";
+"INFO_MESSAGE_REPORTED_SPAM_LEARN_MORE_MESSAGE" = "Cuireadh in iúl do Radar go bhféadfadh go bhfuil an duine seo ag seoladh turscair. Ní féidir le Radar inneachar comhráite a fheiceáil.";
 
 /* Title of the alert shown when a user taps on 'learn more' via the spam info message. */
 "INFO_MESSAGE_REPORTED_SPAM_LEARN_MORE_TITLE" = "Tuairiscigh turscar";
@@ -4555,7 +4555,7 @@
 "INFO_MESSAGE_USER_CHANGED_PHONE_NUMBER_FORMAT" = "D'athraigh %1$@ an uimhir ghutháin.";
 
 /* Shown in inbox and conversation when a user joins Signal, embeds the new user's {{contact name}} */
-"INFO_MESSAGE_USER_JOINED_SIGNAL_BODY_FORMAT" = "Úsáideann %1$@ Signal!";
+"INFO_MESSAGE_USER_JOINED_SIGNAL_BODY_FORMAT" = "Úsáideann %1$@ Radar!";
 
 /* Label at the top of the input text when editing a message */
 "INPUT_TOOLBAR_EDIT_MESSAGE_LABEL" = "Cuir teachtaireacht in eagar";
@@ -4582,13 +4582,13 @@
 "INVALID_PROXY_HOST_ERROR" = "Tá an seoladh seachfhreastalaí a chuir tú isteach neamhbhailí, seiceáil an seoladh agus triail arís.";
 
 /* Alert body when contacts disabled while trying to invite contacts to signal */
-"INVITE_FLOW_REQUIRES_CONTACT_ACCESS_BODY" = "Is féidir leat rochtain ar do chuid teagmhálaithe a thabhairt do Signal sna Socruithe iOS chun cuireadh a thabhairt do chairde Signal a úsáid.";
+"INVITE_FLOW_REQUIRES_CONTACT_ACCESS_BODY" = "Is féidir leat rochtain ar do chuid teagmhálaithe a thabhairt do Radar sna Socruithe iOS chun cuireadh a thabhairt do chairde Radar a úsáid.";
 
 /* Alert title when contacts disabled while trying to invite contacts to signal */
 "INVITE_FLOW_REQUIRES_CONTACT_ACCESS_TITLE" = "Rochtain ar Theagmhálaithe ag Teastáil";
 
 /* Label for the cell that presents the 'invite contacts' workflow. */
-"INVITE_FRIENDS_CONTACT_TABLE_BUTTON" = "Tabhair Cuireadh do Chairde chun Signal a Úsáid";
+"INVITE_FRIENDS_CONTACT_TABLE_BUTTON" = "Tabhair Cuireadh do Chairde chun Radar a Úsáid";
 
 /* Header label above a section for more options for adding contacts */
 "INVITE_FRIENDS_CONTACT_TABLE_HEADER" = "Tuilleadh";
@@ -4711,7 +4711,7 @@
 "LINK_DEVICE_SCANNING_INSTRUCTIONS_SHEET_TITLE" = "Scan Cód QR";
 
 /* Body text for a sheet when a user tries to link a device informing them that they will need to authenticate their device */
-"LINK_NEW_DEVICE_AUTHENTICATION_INFO_SHEET_BODY" = "Tapáil Ar Aghaidh agus cuir isteach paschód do ghutháin chun deimhniú. Ná cuir isteach d'UAP Signal.";
+"LINK_NEW_DEVICE_AUTHENTICATION_INFO_SHEET_BODY" = "Tapáil Ar Aghaidh agus cuir isteach paschód do ghutháin chun deimhniú. Ná cuir isteach d'UAP Radar.";
 
 /* Title for a sheet when a user tries to link a device informing them that they will need to authenticate their device */
 "LINK_NEW_DEVICE_AUTHENTICATION_INFO_SHEET_TITLE" = "Deimhnigh gur tusa atá ann roimh nascadh";
@@ -4720,7 +4720,7 @@
 "LINK_NEW_DEVICE_AUTHENTICATION_REASON" = "Fíordheimhnigh chun gléas a nascadh";
 
 /* Body text for a sheet when a user has started linking a device informing them to finish the process on that other device */
-"LINK_NEW_DEVICE_FINISH_ON_OTHER_DEVICE_SHEET_BODY" = "Críochnaigh nascadh le Signal ar do ghléas eile.";
+"LINK_NEW_DEVICE_FINISH_ON_OTHER_DEVICE_SHEET_BODY" = "Críochnaigh nascadh le Radar ar do ghléas eile.";
 
 /* Title for a sheet when a user has started linking a device informing them to finish the process on that other device */
 "LINK_NEW_DEVICE_FINISH_ON_OTHER_DEVICE_SHEET_TITLE" = "Críochnaigh nascadh ar do ghléas eile";
@@ -4762,10 +4762,10 @@
 "LINK_PREVIEW_UNKNOWN_DOMAIN" = "Réamhamharc ar Nasc";
 
 /* Shown in an alert when trying to edit a contact. */
-"LINKED_DEVICE_CONTACTS_NOT_ALLOWED" = "Níl fáil ar bhainistíocht teagmhálaithe gutháin ar iPad a thuilleadh. Le teagmhálaithe Signal a chur le do theagmhálaithe gutháin, oscail Signal ar do ghuthán.";
+"LINKED_DEVICE_CONTACTS_NOT_ALLOWED" = "Níl fáil ar bhainistíocht teagmhálaithe gutháin ar iPad a thuilleadh. Le teagmhálaithe Radar a chur le do theagmhálaithe gutháin, oscail Radar ar do ghuthán.";
 
 /* Shown in a banner when you tap the 'New Chat' icon at the top of the list of chats. */
-"LINKED_DEVICE_MANAGE_CONTACTS_BANNER" = "Níl fáil ar bhainistíocht teagmhálaithe gutháin ar iPad a thuilleadh. Leanfaidh an gléas seo le haon athrú ar do liosta teagmhálaithe ó Signal ar do ghuthán a shioncronú.";
+"LINKED_DEVICE_MANAGE_CONTACTS_BANNER" = "Níl fáil ar bhainistíocht teagmhálaithe gutháin ar iPad a thuilleadh. Leanfaidh an gléas seo le haon athrú ar do liosta teagmhálaithe ó Radar ar do ghuthán a shioncronú.";
 
 /* A button shown in a banner when you tap the 'New Chat' icon at the top of the list of chats. Tapping it opens a website with more details. */
 "LINKED_DEVICE_MANAGE_CONTACTS_LEARN_MORE" = "Tuilleadh faisnéise";
@@ -4780,28 +4780,28 @@
 "LINKED_DEVICE_NOTIFICATION_TITLE" = "Nasc Tú Gléas Nua";
 
 /* Message for an action sheet telling users how to link a device, when trying to open an external device-linking URL. */
-"LINKED_DEVICE_URL_OPENED_ACTION_SHEET_EXTERNAL_URL_MESSAGE" = "Le deasc nó iPad a nascadh leis an gcuntas Signal seo, téigh chuig Gléasanna Nasctha agus tapáil \"Nasc Gléas Nua\" agus scan an cód QR athuair. Cinntigh nach scanfaidh tú ach cóid QR a thagann díreach ó Signal.";
+"LINKED_DEVICE_URL_OPENED_ACTION_SHEET_EXTERNAL_URL_MESSAGE" = "Le deasc nó iPad a nascadh leis an gcuntas Radar seo, téigh chuig Gléasanna Nasctha agus tapáil \"Nasc Gléas Nua\" agus scan an cód QR athuair. Cinntigh nach scanfaidh tú ach cóid QR a thagann díreach ó Radar.";
 
 /* Message for an action sheet telling users how to link a device, when trying to open a device-linking URL from the in-app camera. */
-"LINKED_DEVICE_URL_OPENED_ACTION_SHEET_IN_APP_CAMERA_MESSAGE" = "Is cosúil go bhfuil tú ag iarraidh gléas Signal a nascadh. Tapáil \"Ar aghaidh\" agus ansin tapáil \"Nasc Gléas Nua\" agus scan an cód QR athuair.";
+"LINKED_DEVICE_URL_OPENED_ACTION_SHEET_IN_APP_CAMERA_MESSAGE" = "Is cosúil go bhfuil tú ag iarraidh gléas Radar a nascadh. Tapáil \"Ar aghaidh\" agus ansin tapáil \"Nasc Gléas Nua\" agus scan an cód QR athuair.";
 
 /* Bullet point about downloads on the linked devices education sheet. Embeds {{ %1$@ iPad download link, %2$@ desktop download link }} */
 "LINKED_DEVICES_EDUCATION_POINT_DOWNLOADS" = "Ar do ghléas eile, téigh chuig %1$@ chun an aip iPad a shuiteáil nó chuig %2$@ chun an aip deisce a shuiteáil.";
 
 /* Bullet point about message sync on the linked devices education sheet */
-"LINKED_DEVICES_EDUCATION_POINT_MESSAGES" = "Déanfar teachtaireachtaí Signal a shioncronú le Signal ar do ghuthán póca tar éis nascadh leis.";
+"LINKED_DEVICES_EDUCATION_POINT_MESSAGES" = "Déanfar teachtaireachtaí Radar a shioncronú le Radar ar do ghuthán póca tar éis nascadh leis.";
 
 /* Bullet point about privacy on the linked devices education sheet */
 "LINKED_DEVICES_EDUCATION_POINT_PRIVACY" = "Tá cur teachtaireachtaí ar ghléasanna nasctha príobháideach";
 
 /* Title for the linked device education sheet */
-"LINKED_DEVICES_EDUCATION_TITLE" = "Signal ar Dheasc nó ar iPad";
+"LINKED_DEVICES_EDUCATION_TITLE" = "Radar ar Dheasc nó ar iPad";
 
 /* Text that appears where the linked device list would be indicating that there are no linked devices. */
 "LINKED_DEVICES_EMPTY_STATE" = "Níl aon ghléas nasctha ann";
 
 /* Description for header of the linked devices list */
-"LINKED_DEVICES_HEADER_DESCRIPTION" = "Use Signal on desktop or iPad.";
+"LINKED_DEVICES_HEADER_DESCRIPTION" = "Use Radar on desktop or iPad.";
 
 /* Footer text below the list of currently-linked devices */
 "LINKED_DEVICES_LIST_FOOTER" = "Déantar teachtaireachtaí agus faisnéis comhráite a chosaint le criptiú ó cheann ceann ar gach gléas";
@@ -4846,7 +4846,7 @@
 "LOADING_VIEW_CONTROLLER_DONT_CLOSE_APP" = "Ná dún an aip.";
 
 /* Body for local network permission action sheet */
-"LOCAL_NETWORK_PERMISSION_ACTION_SHEET_BODY" = "In order to transfer your Signal account, you need to enable local network access on both devices.";
+"LOCAL_NETWORK_PERMISSION_ACTION_SHEET_BODY" = "In order to transfer your Radar account, you need to enable local network access on both devices.";
 
 /* A button asking the user if they need further help getting their transfer working. */
 "LOCAL_NETWORK_PERMISSION_ACTION_SHEET_NEED_HELP" = "An bhfuil cúnamh uait?";
@@ -4858,7 +4858,7 @@
 "LOCAL_NETWORK_PERMISSION_ACTION_SHEET_STEP_THREE" = "Turn on “Local Network”";
 
 /* Second step for local network permission action sheet */
-"LOCAL_NETWORK_PERMISSION_ACTION_SHEET_STEP_TWO" = "Navigate to Signal";
+"LOCAL_NETWORK_PERMISSION_ACTION_SHEET_STEP_TWO" = "Navigate to Radar";
 
 /* Title for local network permission action sheet */
 "LOCAL_NETWORK_PERMISSION_ACTION_SHEET_TITLE" = "Turn on Local Network Access";
@@ -4873,7 +4873,7 @@
 "LOGGING_SECTION" = "Logáil";
 
 /* Footer for the 'logging' help section. */
-"LOGGING_SECTION_FOOTER" = "Debug logs can help Signal fix issues and crashes.";
+"LOGGING_SECTION_FOOTER" = "Debug logs can help Radar fix issues and crashes.";
 
 /* Title for the 'long text message' view. */
 "LONG_TEXT_VIEW_TITLE" = "Teachtaireacht";
@@ -4975,7 +4975,7 @@
 "MESSAGE_ACTION_DELETE_FOR_EVERYONE" = "Scrios do Chách";
 
 /* A one-time confirmation that you want to delete for everyone */
-"MESSAGE_ACTION_DELETE_FOR_EVERYONE_CONFIRMATION" = "Scriosfar an teachtaireacht seo do chách sa chomhrá má tá leagan le déanaí de Signal acu. Feicfidh siad gur scrios tú teachtaireacht.";
+"MESSAGE_ACTION_DELETE_FOR_EVERYONE_CONFIRMATION" = "Scriosfar an teachtaireacht seo do chách sa chomhrá má tá leagan le déanaí de Radar acu. Feicfidh siad gur scrios tú teachtaireacht.";
 
 /* The title for the action sheet asking who the user wants to delete the message for. */
 "MESSAGE_ACTION_DELETE_FOR_TITLE" = "Cé dóibh ar mhaith leat an teachtaireacht seo a scriosadh?";
@@ -5020,7 +5020,7 @@
 "MESSAGE_ACTION_LINK_OPEN_LINK" = "Open Link";
 
 /* Label for button to open a signal proxy. */
-"MESSAGE_ACTION_LINK_OPEN_PROXY" = "Oscail Seachfhreastalaí Signal";
+"MESSAGE_ACTION_LINK_OPEN_PROXY" = "Oscail Seachfhreastalaí Radar";
 
 /* Label for button to open a sticker pack. */
 "MESSAGE_ACTION_LINK_OPEN_STICKER_PACK" = "Amharc ar Phacáiste Greamán";
@@ -5194,7 +5194,7 @@
 "MESSAGE_REQUEST_NAME_COLLISON_UPDATE_CONTACT_ACTION" = "Nuashonraigh an teagmhálaí";
 
 /* Action sheet message to confirm reporting a conversation as spam via a message request. */
-"MESSAGE_REQUEST_REPORT_CONVERSATION_MESSAGE" = "Cuirfear in iúl do Signal go bhféadfadh go bhfuil an duine seo ag seoladh turscair. Ní féidir le Signal inneachar comhráite a fheiceáil.";
+"MESSAGE_REQUEST_REPORT_CONVERSATION_MESSAGE" = "Cuirfear in iúl do Radar go bhféadfadh go bhfuil an duine seo ag seoladh turscair. Ní féidir le Radar inneachar comhráite a fheiceáil.";
 
 /* Action sheet title to confirm reporting a conversation as spam via a message request. */
 "MESSAGE_REQUEST_REPORT_CONVERSATION_TITLE" = "Tuairiscigh turscar?";
@@ -5323,7 +5323,7 @@
 "MISSED_CALL_BLOCKED_SYSTEM_CONTACT" = "Glao caillte ó theagmhálaí atá bactha i socruithe an ghutháin";
 
 /* Action to block contact in Signal for sheet shown when the user taps a missed call from a contact blocked in iOS settings. */
-"MISSED_CALL_BLOCKED_SYSTEM_SETTINGS_SHEET_BLOCK_ACTION" = "Cuir Bac ar an Teagmhálaí in Signal freisin";
+"MISSED_CALL_BLOCKED_SYSTEM_SETTINGS_SHEET_BLOCK_ACTION" = "Cuir Bac ar an Teagmhálaí in Radar freisin";
 
 /* Message for sheet shown when the user taps a missed call from a contact blocked in iOS settings. */
 "MISSED_CALL_BLOCKED_SYSTEM_SETTINGS_SHEET_MESSAGE" = "Chaill tú an glao toisc go bhfuil bac curtha air/uirthi i socruithe do ghutháin. Téigh chuig Socruithe > Guthán agus tapáil Teagmhálaithe Bactha leis sin a bhainistiú.";
@@ -5344,19 +5344,19 @@
 "MISSING_CAMERA_PERMISSION_MESSAGE" = "Is féidir leat rochtain ar cheamara a chumasú san aip Socruithe iOS.";
 
 /* Alert title */
-"MISSING_CAMERA_PERMISSION_TITLE" = "Teastaíonn rochtain ar do cheamara ó Signal.";
+"MISSING_CAMERA_PERMISSION_TITLE" = "Teastaíonn rochtain ar do cheamara ó Radar.";
 
 /* Alert body indicating the user has denied location permissions */
 "MISSING_LOCATION_PERMISSION_MESSAGE" = "Is féidir leat cead a thabhairt don aip sna Socruithe iOS.";
 
 /* Alert title indicating the user has denied location permissions */
-"MISSING_LOCATION_PERMISSION_TITLE" = "Ní mór duit an áit ina bhfuil tú a nochtadh do Signal chun an ghné seo a úsáid.";
+"MISSING_LOCATION_PERMISSION_TITLE" = "Ní mór duit an áit ina bhfuil tú a nochtadh do Radar chun an ghné seo a úsáid.";
 
 /* Alert body when user has previously denied media library access */
 "MISSING_MEDIA_LIBRARY_PERMISSION_MESSAGE" = "Is féidir leat cead a thabhairt don aip sna Socruithe iOS.";
 
 /* Alert title when user has previously denied media library access */
-"MISSING_MEDIA_LIBRARY_PERMISSION_TITLE" = "Teastaíonn rochtain ar do chuid grianghraf ó Signal chun é seo a dhéanamh.";
+"MISSING_MEDIA_LIBRARY_PERMISSION_TITLE" = "Teastaíonn rochtain ar do chuid grianghraf ó Radar chun é seo a dhéanamh.";
 
 /* An error shown as the title of an alert when try to link a new device & the user is already at the limit. */
 "MULTIDEVICE_PAIRING_MAX_DESC" = "Ní féidir leat níos mó gléasanna a nascadh.";
@@ -5377,7 +5377,7 @@
 "MY_STORIES_SETTINGS_VISIBILITY_ALL_SIGNAL_CONNECTIONS_EXCEPT_TITLE" = "Gach Duine Ach Amháin…";
 
 /* Title for the visibility option */
-"MY_STORIES_SETTINGS_VISIBILITY_ALL_SIGNAL_CONNECTIONS_TITLE" = "Gach Teagmhálaí Signal";
+"MY_STORIES_SETTINGS_VISIBILITY_ALL_SIGNAL_CONNECTIONS_TITLE" = "Gach Teagmhálaí Radar";
 
 /* Title for the visibility option */
 "MY_STORIES_SETTINGS_VISIBILITY_ONLY_SHARE_WITH_TITLE" = "Ná Comhroinn Ach Le…";
@@ -5539,7 +5539,7 @@
 "NICKNAME_EDITOR_DELETE_CONFIRMATION_TITLE" = "Scrios leasainm?";
 
 /* The description below the title on the profile nickname editor view. */
-"NICKNAME_EDITOR_DESCRIPTION" = "Stóráiltear leasainmneacha agus nótaí le Signal agus iad criptithe ó cheann ceann. Níl siad infheicthe ach agatsa amháin.";
+"NICKNAME_EDITOR_DESCRIPTION" = "Stóráiltear leasainmneacha agus nótaí le Radar agus iad criptithe ó cheann ceann. Níl siad infheicthe ach agatsa amháin.";
 
 /* Placeholder text it the text field for the family name in the profile nickname editor. */
 "NICKNAME_EDITOR_FAMILY_NAME_PLACEHOLDER" = "Sloinne";
@@ -5602,7 +5602,7 @@
 "NOTIFICATION_PERMISSION_REMINDER_MEGAPHONE_TITLE" = "Fógraí a chur ar siúl?";
 
 /* Shown as the body of an alert when notifications can't be shown due to an error. */
-"NOTIFICATIONS_ERROR_MESSAGE" = "Atosaigh do %1$@ mura bhfuil tú ag fáil fógraí Signal.";
+"NOTIFICATIONS_ERROR_MESSAGE" = "Atosaigh do %1$@ mura bhfuil tú ag fáil fógraí Radar.";
 
 /* Shown as the title of an alert when notifications can't be shown due to an error. */
 "NOTIFICATIONS_ERROR_TITLE" = "Níorbh Fhéidir Fógraí a Thaispeáint";
@@ -5662,10 +5662,10 @@
 "ONBOARDING_2FA_SKIP_PIN_ENTRY_TITLE" = "Ná Bac le UAP?";
 
 /* The body for the device transfer 'choice' view 'restore backup' option */
-"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_BODY" = "Aischuir do chuntas agus do theachtaireachtaí ó do Chúltaca Radar/Signal";
+"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_BODY" = "Aischuir do chuntas agus do theachtaireachtaí ó do Chúltaca Radar/Radar";
 
 /* The title for the device transfer 'choice' view 'restore backup' option */
-"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_TITLE" = "Aischuir Cúltaca Slán Radar/Signal";
+"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_TITLE" = "Aischuir Cúltaca Slán Radar/Radar";
 
 /* Body for a sheet warning users about skipping restore. */
 "ONBOARDING_CHOOSE_RESTORE_METHOD_CONFIRM_SKIP_RESTORE_BODY" = "Má scipeálann tú an t-aischur anois, ní bheidh tú in ann aischur a dhéanamh níos déanaí. Má athchumasaíonn tú cúltacaí ar an ngléas seo, cuirfear do stair teachtaireachtaí nua in ionad do chúltaca reatha.";
@@ -5677,7 +5677,7 @@
 "ONBOARDING_CHOOSE_RESTORE_METHOD_DESCRIPTION" = "Roghnaigh conas ba mhaith leat stair do theachtaireachtaí agus sonraí an chuntais a aischur.";
 
 /* Message body displayed to a user during registration if there are no restore options available. */
-"ONBOARDING_CHOOSE_RESTORE_METHOD_NONE_AVAILABLE_BODY" = "Toisc go bhfuil tú ag athrú ó Android go iOS, is é an t-aon bhealach amháin le do theachtaireachtaí agus do mheáin a aistriú ná Cúltacaí Signal a chumasú ar do sheanghléas.";
+"ONBOARDING_CHOOSE_RESTORE_METHOD_NONE_AVAILABLE_BODY" = "Toisc go bhfuil tú ag athrú ó Android go iOS, is é an t-aon bhealach amháin le do theachtaireachtaí agus do mheáin a aistriú ná Cúltacaí Radar a chumasú ar do sheanghléas.";
 
 /* Title displayed to a user during registration if there are no restore options available. */
 "ONBOARDING_CHOOSE_RESTORE_METHOD_NONE_AVAILABLE_TITLE" = "Níl Cúltaca Ann le hAischur";
@@ -5737,7 +5737,7 @@
 "ONBOARDING_MODE_SWITCH_BUTTON_REGISTERING" = "Nasc iPhone";
 
 /* explanation to the user they're switching from linking to registering flow */
-"ONBOARDING_MODE_SWITCH_EXPLANATION_PROVISIONING" = "Tapáil “Cláraigh iPad” chun cuntas nua Signal a chruthú, nó cuntas atá ann cheana a nascadh leis an iPad seo. Díchumasófar Signal ar aon ghléas eile atá cláraithe leis an uimhir ghutháin chéanna.";
+"ONBOARDING_MODE_SWITCH_EXPLANATION_PROVISIONING" = "Tapáil “Cláraigh iPad” chun cuntas nua Radar a chruthú, nó cuntas atá ann cheana a nascadh leis an iPad seo. Díchumasófar Radar ar aon ghléas eile atá cláraithe leis an uimhir ghutháin chéanna.";
 
 /* explanation to the user they're switching from registering to linking flow */
 "ONBOARDING_MODE_SWITCH_EXPLANATION_REGISTERING" = "Tapáil “Nasc iPhone” chun do ghuthán a nascadh le cuntas atá ann cheana. Ní mholaimid do dhaoine guthán a nascadh go ginearálta toisc go gcuireann sé srian ar fheidhmíocht áirithe, mar shampla glaonna a chur.";
@@ -5749,13 +5749,13 @@
 "ONBOARDING_MODE_SWITCH_TITLE_REGISTERING" = "Nasc an iPhone seo";
 
 /* warning to the user that registering an ipad is not recommended */
-"ONBOARDING_MODE_SWITCH_WARNING_PROVISIONING" = "Má chláraíonn tú an iPad seo, díchumasófar Signal ar aon ghléas eile atá cláraithe leis an uimhir ghutháin chéanna.";
+"ONBOARDING_MODE_SWITCH_WARNING_PROVISIONING" = "Má chláraíonn tú an iPad seo, díchumasófar Radar ar aon ghléas eile atá cláraithe leis an uimhir ghutháin chéanna.";
 
 /* warning to the user that linking a phone is not recommended */
 "ONBOARDING_MODE_SWITCH_WARNING_REGISTERING" = "Ní mholaimid duit d'iPhone a nascadh toisc go gcuireann sé srian ar fheidhmíocht bhunúsach an ghutháin.";
 
 /* Description of the 'Contacts' permission in the 'onboarding permissions' view. */
-"ONBOARDING_PERMISSIONS_CONTACTS_DESCRIPTION" = "Aimsigh daoine a bhfuil aithne agat orthu. Tá do theagmhálaithe criptithe agus dofheicthe ag seirbhís Signal.";
+"ONBOARDING_PERMISSIONS_CONTACTS_DESCRIPTION" = "Aimsigh daoine a bhfuil aithne agat orthu. Tá do theagmhálaithe criptithe agus dofheicthe ag seirbhís Radar.";
 
 /* Title introducing the 'Contacts' permission in the 'onboarding permissions' view. */
 "ONBOARDING_PERMISSIONS_CONTACTS_TITLE" = "Teagmhálaithe";
@@ -5767,7 +5767,7 @@
 "ONBOARDING_PERMISSIONS_NOTIFICATIONS_TITLE" = "Fógraí";
 
 /* Preamble of the 'onboarding permissions' view. */
-"ONBOARDING_PERMISSIONS_PREAMBLE" = "Ba mhaith le Signal na ceadanna seo a leanas a iarraidh.";
+"ONBOARDING_PERMISSIONS_PREAMBLE" = "Ba mhaith le Radar na ceadanna seo a leanas a iarraidh.";
 
 /* Description of the 'Notification Relay' permission in the 'onboarding permissions' view. */
 "ONBOARDING_PERMISSIONS_RELAY_DESCRIPTION" = "Enable Radar notification relay to ensure you get immediate background notifications in Radar. Relay is always privacy-preserving and keeps your messages end-to-end encrypted no matter what.";
@@ -5779,7 +5779,7 @@
 "ONBOARDING_PERMISSIONS_TITLE" = "Allow Permissions";
 
 /* Explanation of the 'onboarding phone number discoverability' view. Embeds {user phone number} */
-"ONBOARDING_PHONE_NUMBER_DISCOVERABILITY_EXPLANATION_FORMAT" = "Roghnaigh na daoine ar féidir leo thú a aimsiú ar Signal le d'uimhir ghutháin %1$@";
+"ONBOARDING_PHONE_NUMBER_DISCOVERABILITY_EXPLANATION_FORMAT" = "Roghnaigh na daoine ar féidir leo thú a aimsiú ar Radar le d'uimhir ghutháin %1$@";
 
 /* Title of the 'onboarding phone number discoverability' view. */
 "ONBOARDING_PHONE_NUMBER_DISCOVERABILITY_TITLE" = "Who can find you with your number?";
@@ -5794,7 +5794,7 @@
 "ONBOARDING_PHONE_NUMBER_VALIDATION_WARNING" = "Uimhir ghutháin neamhbhailí. Cuir isteach uimhir ghutháin bhailí lena clárú.";
 
 /* Explanation of the 'onboarding pin attempts exhausted' view when reglock is disabled. */
-"ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_EXPLANATION" = "Níl aon deiseanna fágtha agat an UAP a thomhas, ach beidh tú fós in ann teacht ar do chuntas Signal trí UAP nua a chruthú. Mar gheall ar chúrsaí slándála agus príobháideachais, athshocrófar do chuntas gan aon fhaisnéis phearsanta ná socruithe.";
+"ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_EXPLANATION" = "Níl aon deiseanna fágtha agat an UAP a thomhas, ach beidh tú fós in ann teacht ar do chuntas Radar trí UAP nua a chruthú. Mar gheall ar chúrsaí slándála agus príobháideachais, athshocrófar do chuntas gan aon fhaisnéis phearsanta ná socruithe.";
 
 /* Label for the 'learn more' link when reglock is disabled in the 'onboarding pin attempts exhausted' view. */
 "ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_LEARN_MORE" = "Tuilleadh eolais faoi UAPanna";
@@ -5803,7 +5803,7 @@
 "ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_TITLE" = "UAP mhícheart";
 
 /* Explanation of the 'onboarding pin attempts exhausted' view when it is unknown if reglock is enabled. */
-"ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_WITH_UNKNOWN_REGLOCK_EXPLANATION" = "Níl aon tomhas UAP fágtha agat, ach is féidir leat fós rochtain ar do chuntas Signal a thriail trí d'uimhir ghutháin a fhíorú. Ar mhaithe le príobháideachais agus slándáil, aischuirfear do chuntas gan aon fhaisnéis phróifíle ná socruithe atá sábháilte ann.";
+"ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_WITH_UNKNOWN_REGLOCK_EXPLANATION" = "Níl aon tomhas UAP fágtha agat, ach is féidir leat fós rochtain ar do chuntas Radar a thriail trí d'uimhir ghutháin a fhíorú. Ar mhaithe le príobháideachais agus slándáil, aischuirfear do chuntas gan aon fhaisnéis phróifíle ná socruithe atá sábháilte ann.";
 
 /* Title for the setup complete screen shown at the end of the onboarding flow. */
 "ONBOARDING_SETUP_COMPLETE_TITLE" = "Socrú Críochnaithe";
@@ -5830,13 +5830,13 @@
 "ONBOARDING_SIGN_UP_USE_SIGNAL_ACCOUNT_BUTTON_TITLE" = "Use my Signal account";
 
 /* Explanation of 'do not have old device' flow for the 'Restore or Transfer' prompt */
-"ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_BODY" = "Nó tá tú ag athshuiteáil Radar/Signal ar an ngléas céanna";
+"ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_BODY" = "Nó tá tú ag athshuiteáil Radar/Radar ar an ngléas céanna";
 
 /* Title for the 'do not have my old device' choice of the 'Restore or Transfer' prompt */
 "ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_TITLE" = "Níl mo sheanghuthán agam";
 
 /* Explanation of 'have old device' flow for the 'Restore or Transfer' prompt */
-"ONBOARDING_SPLASH_HAVE_OLD_DEVICE_BODY" = "Scan cód QR ó do chuntas reatha Radar/Signal chun tosú air go tapa";
+"ONBOARDING_SPLASH_HAVE_OLD_DEVICE_BODY" = "Scan cód QR ó do chuntas reatha Radar/Radar chun tosú air go tapa";
 
 /* Title for the 'have my old device' choice of the 'Restore or Transfer' prompt */
 "ONBOARDING_SPLASH_HAVE_OLD_DEVICE_TITLE" = "Tá mo sheanghuthán agam";
@@ -5897,19 +5897,19 @@ Send money securely.";
 "OPEN_SETTINGS_BUTTON" = "Socruithe";
 
 /* Signal doesn't support old versions of iOS and shows a warning if you're on unsupported version. Some users can upgrade their device to a newer version of iOS to continue using Signal. If that's the case, they'll be shown this text. */
-"OS_EXPIRED_AND_CAN_UPGRADE_OS" = "Níl Signal ag feidhmiú ar an ngléas seo a thuilleadh. Le Signal a úsáid arís, nuashonraigh do ghléas chuig leagan níos nuaí de iOS.";
+"OS_EXPIRED_AND_CAN_UPGRADE_OS" = "Níl Radar ag feidhmiú ar an ngléas seo a thuilleadh. Le Radar a úsáid arís, nuashonraigh do ghléas chuig leagan níos nuaí de iOS.";
 
 /* Signal doesn't support old devices. If that's the case, they'll be shown this action, and tapping it will open information about Signal's minimum supported operating systems. */
-"OS_EXPIRED_AND_DEVICE_IS_STUCK" = "Níl Signal ag feidhmiú ar an ngléas seo a thuilleadh. Le Signal a úsáid arís, aistrigh chuig gléas níos nuaí.";
+"OS_EXPIRED_AND_DEVICE_IS_STUCK" = "Níl Radar ag feidhmiú ar an ngléas seo a thuilleadh. Le Radar a úsáid arís, aistrigh chuig gléas níos nuaí.";
 
 /* Signal doesn't support old versions of iOS and shows a warning if you're on an old version. Some users can upgrade their device to a newer version of iOS to continue using Signal. If that's the case, they'll be shown this action, and tapping it will open device update instructions. */
 "OS_SOON_TO_EXPIRE_ACTION_TITLE" = "Nuashonraigh Anois";
 
 /* Signal doesn't support old versions of iOS and shows a warning if you're an old version that will soon lose support. Some users can upgrade their device to a newer version of iOS to continue using Signal. If that's the case, they'll be shown this text. Embeds {{expiration date}}. */
-"OS_SOON_TO_EXPIRE_AND_CAN_UPGRADE_OS_FORMAT" = "Ní bheidh tacú ag Signal go luath leis an leagan de iOS atá ar do ghléas. Le leanúint le Signal a úsáid, nuashonraigh do ghléas chuig leagan níos nuaí de iOS faoi %1$@.";
+"OS_SOON_TO_EXPIRE_AND_CAN_UPGRADE_OS_FORMAT" = "Ní bheidh tacú ag Radar go luath leis an leagan de iOS atá ar do ghléas. Le leanúint le Radar a úsáid, nuashonraigh do ghléas chuig leagan níos nuaí de iOS faoi %1$@.";
 
 /* Signal doesn't support old versions of iOS and shows a warning if you're on an old version that will soon lose support. This is the text on that warning when users can't upgrade iOS without getting a new device. Embeds {{expiration date}}. */
-"OS_SOON_TO_EXPIRE_AND_DEVICE_WILL_BE_STUCK_FORMAT" = "Ní bheidh tacú ag Signal go luath leis an leagan de iOS atá ar do ghléas. Le leanúint le Signal a úsáid, nuashonraigh do ghléas nó aistrigh chuig gléas níos nuaí faoin %1$@.";
+"OS_SOON_TO_EXPIRE_AND_DEVICE_WILL_BE_STUCK_FORMAT" = "Ní bheidh tacú ag Radar go luath leis an leagan de iOS atá ar do ghléas. Le leanúint le Radar a úsáid, nuashonraigh do ghléas nó aistrigh chuig gléas níos nuaí faoin %1$@.";
 
 /* Info Message when another user disabled disappearing messages. Embeds {{name of other user}}. */
 "OTHER_DISABLED_DISAPPEARING_MESSAGES_CONFIGURATION" = "Dhíchumasaigh %1$@ teachtaireachtaí gearrshaolacha.";
@@ -5918,13 +5918,13 @@ Send money securely.";
 "OTHER_UPDATED_DISAPPEARING_MESSAGES_CONFIGURATION" = "Shocraigh %1$@ an tréimhse a mhaireann teachtaireachtaí gearrshaolacha go %2$@.";
 
 /* Label warning the user that the Signal service may be down. */
-"OUTAGE_WARNING" = "Tá Signal buailte le deacrachtaí teicniúla faoi láthair. Táimid ag déanamh ár ndíchill an fhadhb a réiteach chomh luath agus is féidir.";
+"OUTAGE_WARNING" = "Tá Radar buailte le deacrachtaí teicniúla faoi láthair. Táimid ag déanamh ár ndíchill an fhadhb a réiteach chomh luath agus is féidir.";
 
 /* Label for action link when the user has an outdated payment client */
 "OUTDATED_PAYMENT_CLIENT_ACTION_TITLE" = "Nuashonraigh anois é";
 
 /* Label warning the user that they should update Signal to continue using payments. */
-"OUTDATED_PAYMENT_CLIENT_REMINDER_TEXT" = "Nuashonraigh Signal chun leanúint le húsáid íocaíochtaí. Seans nach bhfuil d’iarmhéid cothrom le dáta.";
+"OUTDATED_PAYMENT_CLIENT_REMINDER_TEXT" = "Nuashonraigh Radar chun leanúint le húsáid íocaíochtaí. Seans nach bhfuil d’iarmhéid cothrom le dáta.";
 
 /* Body of prompt notifying restore was cancelled. */
 "OUTGOING_DEVICE_REGISTRATION_CANCELLED_RESTORE_BODY" = "Cuireadh an t-aischur ar ceal. Triail arís.";
@@ -5933,7 +5933,7 @@ Send money securely.";
 "OUTGOING_DEVICE_REGISTRATION_CANCELLED_RESTORE_TITLE" = "Aischur curtha ar ceal";
 
 /* Body of prompt notifying registration without restore completed on the new device. */
-"OUTGOING_DEVICE_REGISTRATION_COMPLETE_BODY" = "Tá do chuntas Signal gníomhachtaithe ar do ghléas eile. Tá Signal neamhghníomhach ar an ngléas seo anois.";
+"OUTGOING_DEVICE_REGISTRATION_COMPLETE_BODY" = "Tá do chuntas Radar gníomhachtaithe ar do ghléas eile. Tá Radar neamhghníomhach ar an ngléas seo anois.";
 
 /* Title of prompt notifying registration without restore completed on the new device. */
 "OUTGOING_DEVICE_REGISTRATION_COMPLETE_TITLE" = "Clárú curtha i gcrích";
@@ -5951,7 +5951,7 @@ Send money securely.";
 "OUTGOING_DEVICE_REGISTRATION_UNKNOWN_ERROR_TITLE" = "Earráid anaithnid";
 
 /* Body of prompt notifying device restore started on the new device. */
-"OUTGOING_DEVICE_RESTORE_COMPLETE_BODY" = "Tá tús curtha le haistriú do chuntais agus teachtaireachtaí Signal chuig do ghléas eile. Tá Signal neamhghníomhach ar an ngléas seo anois.";
+"OUTGOING_DEVICE_RESTORE_COMPLETE_BODY" = "Tá tús curtha le haistriú do chuntais agus teachtaireachtaí Radar chuig do ghléas eile. Tá Radar neamhghníomhach ar an ngléas seo anois.";
 
 /* Title of prompt notifying device restore started on the new device. */
 "OUTGOING_DEVICE_RESTORE_COMPLETE_TITLE" = "Tá an t-aischur críochnaithe";
@@ -5975,7 +5975,7 @@ Send money securely.";
 "OUTGOING_DEVICE_RESTORE_INITIAL_VIEW_TITLE" = "Aistrigh Cuntas";
 
 /* Body of prompt notifying device transfer completed. */
-"OUTGOING_DEVICE_TRANSFER_COMPLETE_BODY" = "Tá do chuntas agus teachtaireachtaí Signal aistrithe chuig do ghléas eile. Tá Signal neamhghníomhach ar an ngléas seo anois.";
+"OUTGOING_DEVICE_TRANSFER_COMPLETE_BODY" = "Tá do chuntas agus teachtaireachtaí Radar aistrithe chuig do ghléas eile. Tá Radar neamhghníomhach ar an ngléas seo anois.";
 
 /* Title of prompt notifying device transfer completed. */
 "OUTGOING_DEVICE_TRANSFER_COMPLETE_TITLE" = "Aistriú críochnaithe";
@@ -5987,10 +5987,10 @@ Send money securely.";
 "OUTGOING_MISSED_VOICE_CALL" = "Guthghlao nár freagraíodh";
 
 /* Button for action sheet shown when device transfer completes; quits the Signal app immediately (does not automatically relaunch, but the user may choose to relaunch). */
-"OUTGOING_TRANSFER_COMPLETE_EXIT_ACTION" = "Scoir Signal";
+"OUTGOING_TRANSFER_COMPLETE_EXIT_ACTION" = "Scoir Radar";
 
 /* Message for action sheet shown when device transfer completes */
-"OUTGOING_TRANSFER_COMPLETE_MESSAGE" = "Scoirfear Signal ar an ngléas seo anois";
+"OUTGOING_TRANSFER_COMPLETE_MESSAGE" = "Scoirfear Radar ar an ngléas seo anois";
 
 /* Title for action sheet shown when device transfer completes */
 "OUTGOING_TRANSFER_COMPLETE_TITLE" = "Aistrithe!";
@@ -6168,7 +6168,7 @@ Send money securely.";
 "PAYMENTS_NEW_PAYMENT_ERROR_INVALID_TRANSACTION" = "Invalid transaction";
 
 /* Indicates that a payment failed due to an outdated client. */
-"PAYMENTS_NEW_PAYMENT_ERROR_OUTDATED_CLIENT" = "Update Signal to use payments.";
+"PAYMENTS_NEW_PAYMENT_ERROR_OUTDATED_CLIENT" = "Update Radar to use payments.";
 
 /* Indicates that an outgoing payment could not be verified in a timely way. */
 "PAYMENTS_NEW_PAYMENT_ERROR_OUTGOING_VERIFICATION_TAKING_TOO_LONG" = "Payment not yet verified";
@@ -6432,13 +6432,13 @@ Send money securely.";
 "PHONE_NUMBER_DISCOVERABILITY_EVERYBODY" = "Everybody";
 
 /* A user friendly description of the 'everybody' phone number discoverability mode. */
-"PHONE_NUMBER_DISCOVERABILITY_EVERYBODY_DESCRIPTION" = "Aon duine ag a bhfuil d'uimhir ghutháin, feicfidh sé/sí go bhfuil tú ar Signal agus beidh in ann tosú ar chomhrá leat.";
+"PHONE_NUMBER_DISCOVERABILITY_EVERYBODY_DESCRIPTION" = "Aon duine ag a bhfuil d'uimhir ghutháin, feicfidh sé/sí go bhfuil tú ar Radar agus beidh in ann tosú ar chomhrá leat.";
 
 /* A user friendly name for the 'nobody' phone number discoverability mode. */
 "PHONE_NUMBER_DISCOVERABILITY_NOBODY" = "Duine ar bith";
 
 /* A user friendly description of the 'nobody' phone number discoverability mode. */
-"PHONE_NUMBER_DISCOVERABILITY_NOBODY_DESCRIPTION" = "Beidh tú dofheicthe ar Signal ag daoine ach amháin má sheolann tú teachtaireacht chucu nó má tá comhrá ar siúl agat leo.";
+"PHONE_NUMBER_DISCOVERABILITY_NOBODY_DESCRIPTION" = "Beidh tú dofheicthe ar Radar ag daoine ach amháin má sheolann tú teachtaireacht chucu nó má tá comhrá ar siúl agat leo.";
 
 /* A format for a label showing an example phone number. Embeds {{the example phone number}}. */
 "PHONE_NUMBER_EXAMPLE_FORMAT" = "Sampla: %1$@";
@@ -6540,22 +6540,22 @@ Send money securely.";
 "PIN_CREATION_DISABLE_CONFIRMATION_ACTION" = "Díchumasaigh an UAP";
 
 /* Message of the 'pin disable' action sheet. */
-"PIN_CREATION_DISABLE_CONFIRMATION_MESSAGE" = "Má dhíchumasaíonn tú an UAP, caillfidh tú do chuid sonraí go léir nuair a athchláróidh tú Signal, mura bhfuil siad ar fáil le haistriú ó ghléas iOS eile. Ní féidir leat Glas Clárúcháin a chur ar siúl agus an UAP díchumasaithe.";
+"PIN_CREATION_DISABLE_CONFIRMATION_MESSAGE" = "Má dhíchumasaíonn tú an UAP, caillfidh tú do chuid sonraí go léir nuair a athchláróidh tú Radar, mura bhfuil siad ar fáil le haistriú ó ghléas iOS eile. Ní féidir leat Glas Clárúcháin a chur ar siúl agus an UAP díchumasaithe.";
 
 /* Title of the 'pin disable' action sheet. */
 "PIN_CREATION_DISABLE_CONFIRMATION_TITLE" = "Rabhadh";
 
 /* The explanation in the 'pin creation' view. */
-"PIN_CREATION_EXPLANATION" = "Úsáidtear UAPanna chun an fhaisnéis a stórálann tú le Signal a chriptiú, ionas nach mbeidh aon duine eile in ann í a fheiceáil.  Déanfar athchóiriú ar do phróifíl agus do chuid socruithe agus teagmhálaithe nuair a shuiteálfaidh tú Signal arís. Ní bheidh an UAP ag teastáil chun an aip a oscailt.";
+"PIN_CREATION_EXPLANATION" = "Úsáidtear UAPanna chun an fhaisnéis a stórálann tú le Radar a chriptiú, ionas nach mbeidh aon duine eile in ann í a fheiceáil.  Déanfar athchóiriú ar do phróifíl agus do chuid socruithe agus teagmhálaithe nuair a shuiteálfaidh tú Radar arís. Ní bheidh an UAP ag teastáil chun an aip a oscailt.";
 
 /* Learn more action on the pin creation view */
 "PIN_CREATION_LEARN_MORE" = "Tuilleadh faisnéise faoi UAPanna";
 
 /* Users can create PINs to restore their account data later. They can learn more about this on a sheet. This is the text on that sheet. */
-"PIN_CREATION_LEARN_MORE_TEXT" = "Coinníonn UAPanna d'fhaisnéis a stóráiltear le Signal criptithe ionas nach mbeidh ach tusa in ann í a rochtain. Aischuirfear do phróifíl, socruithe agus teagmhálaithe tar éis athshuiteáil duit.";
+"PIN_CREATION_LEARN_MORE_TEXT" = "Coinníonn UAPanna d'fhaisnéis a stóráiltear le Radar criptithe ionas nach mbeidh ach tusa in ann í a rochtain. Aischuirfear do phróifíl, socruithe agus teagmhálaithe tar éis athshuiteáil duit.";
 
 /* Users can create PINs to restore their account data later. They can learn more about this on a sheet. This is the title on that sheet. */
-"PIN_CREATION_LEARN_MORE_TITLE" = "Eolas faoi UAPanna Signal";
+"PIN_CREATION_LEARN_MORE_TITLE" = "Eolas faoi UAPanna Radar";
 
 /* Label indicating that the attempted PIN does not match the first PIN */
 "PIN_CREATION_MISMATCH_ERROR" = "Ní ionann iad na UAPanna. Bain triail eile as.";
@@ -6588,7 +6588,7 @@ Send money securely.";
 "PIN_CREATION_WEAK_ERROR" = "Ba chóir duit UAP níos láidre a roghnú";
 
 /* If your attempted PIN is too weak, you'll see an error message. This is the text on the error dialog. */
-"PIN_CREATION_WEAK_ERROR_MESSAGE" = "Coinníonn UAPanna faisnéis a stóráiltear le Signal criptithe ionas nach mbeidh ach tusa in ann í a rochtain. Roghnaigh UAP níos láidre le do chuntas a chosaint.";
+"PIN_CREATION_WEAK_ERROR_MESSAGE" = "Coinníonn UAPanna faisnéis a stóráiltear le Radar criptithe ionas nach mbeidh ach tusa in ann í a rochtain. Roghnaigh UAP níos láidre le do chuntas a chosaint.";
 
 /* If the user is re-registering, they need to enter their PIN to restore all their data. In some cases, they can skip this entry and lose some data. This text is shown on a button that lets them begin to do this. */
 "PIN_ENTER_EXISTING_SKIP" = "Scipeáil an UAP";
@@ -6621,7 +6621,7 @@ Send money securely.";
 "PIN_REMINDER_MEGAPHONE_FEW_DAYS_TOAST" = "Meabhróimid duit arís i gceann cúpla lá.";
 
 /* Title for PIN reminder megaphone */
-"PIN_REMINDER_MEGAPHONE_TITLE" = "Deimhnigh d'UAP Signal";
+"PIN_REMINDER_MEGAPHONE_TITLE" = "Deimhnigh d'UAP Radar";
 
 /* Toast indicating that we'll ask you for your PIN again tomorrow, after successfully entering it. */
 "PIN_REMINDER_MEGAPHONE_TOMORROW_SUCCESSFUL_TOAST" = "UAP ceart. Meabhróimid duit arís amárach.";
@@ -6645,7 +6645,7 @@ Send money securely.";
 "PIN_REMINDER_MISMATCH_ERROR" = "UAP neamhbhailí. Bain triail eile as.";
 
 /* The title for the 'pin reminder' dialog. */
-"PIN_REMINDER_TITLE" = "Cuir isteach d'UAP Signal";
+"PIN_REMINDER_TITLE" = "Cuir isteach d'UAP Radar";
 
 /* Label indicating that the attempted PIN is too short */
 "PIN_REMINDER_TOO_SHORT_ERROR" = "Ní cheadaítear UAP atá níos giorra ná 4 dhigit.";
@@ -6660,7 +6660,7 @@ Send money securely.";
 "PINS_MEGAPHONE_ACTION" = "Cruthaigh UAP";
 
 /* Body for PIN megaphone when user doesn't have a PIN */
-"PINS_MEGAPHONE_BODY" = "Finish creating your Signal PIN.";
+"PINS_MEGAPHONE_BODY" = "Finish creating your Radar PIN.";
 
 /* Title for PIN megaphone when user doesn't have a PIN */
 "PINS_MEGAPHONE_TITLE" = "Cruthaigh UAP";
@@ -6768,19 +6768,19 @@ Send money securely.";
 "PRIVACY_VERIFICATION_FAILED_MISMATCHED_SAFETY_NUMBERS_IN_CLIPBOARD" = "Is cosúil nach í an uimhir ar do ghearrthaisce an uimhir sábháilteachta cheart don chomhrá seo.";
 
 /* Alert body for user error */
-"PRIVACY_VERIFICATION_FAILED_NO_SAFETY_NUMBERS_IN_CLIPBOARD" = "Níor aimsigh Signal uimhir shábháilteachta sa ghearrthaisce. Ar chóipeáil tú í mar is ceart?";
+"PRIVACY_VERIFICATION_FAILED_NO_SAFETY_NUMBERS_IN_CLIPBOARD" = "Níor aimsigh Radar uimhir shábháilteachta sa ghearrthaisce. Ar chóipeáil tú í mar is ceart?";
 
 /* Alert body when verifying with {{contact name}} */
-"PRIVACY_VERIFICATION_FAILED_THEY_HAVE_WRONG_KEY_FOR_ME" = "Tá uimhir shábháilteachta ar leith ag gach beirt úsáideoirí Signal. Deimhnigh gurb í *bhur n-uimhirse* atá ar taispeáint ag %1$@.";
+"PRIVACY_VERIFICATION_FAILED_THEY_HAVE_WRONG_KEY_FOR_ME" = "Tá uimhir shábháilteachta ar leith ag gach beirt úsáideoirí Radar. Deimhnigh gurb í *bhur n-uimhirse* atá ar taispeáint ag %1$@.";
 
 /* alert body */
-"PRIVACY_VERIFICATION_FAILED_WITH_OLD_LOCAL_VERSION" = "Tá seanleagan de Signal agat. Caithfidh tú é a nuashonrú sula mbeidh tú in ann deimhniú.";
+"PRIVACY_VERIFICATION_FAILED_WITH_OLD_LOCAL_VERSION" = "Tá seanleagan de Radar agat. Caithfidh tú é a nuashonrú sula mbeidh tú in ann deimhniú.";
 
 /* alert body */
-"PRIVACY_VERIFICATION_FAILED_WITH_OLD_REMOTE_VERSION" = "Tá seanleagan de Signal ag do chéile comhrá. Caithfidh sé/sí é a nuashonrú sula mbeidh sibh in ann deimhniú.";
+"PRIVACY_VERIFICATION_FAILED_WITH_OLD_REMOTE_VERSION" = "Tá seanleagan de Radar ag do chéile comhrá. Caithfidh sé/sí é a nuashonrú sula mbeidh sibh in ann deimhniú.";
 
 /* alert body */
-"PRIVACY_VERIFICATION_FAILURE_INVALID_QRCODE" = "Ní uimhir shábháilteachta í an cód a scanadh. An bhfuil sibh beirt ag baint úsáide as an leagan is déanaí de Signal?";
+"PRIVACY_VERIFICATION_FAILURE_INVALID_QRCODE" = "Ní uimhir shábháilteachta í an cód a scanadh. An bhfuil sibh beirt ag baint úsáide as an leagan is déanaí de Radar?";
 
 /* Navbar title */
 "PRIVACY_VERIFICATION_TITLE" = "Uimhir Shábháilteachta a Dheimhniú";
@@ -6855,7 +6855,7 @@ Send money securely.";
 "PROFILE_NAME_EDUCATION_SHEET_BULLET_3" = "Ná comhroinn faisnéis phearsanta le daoine nach bhfuil aithne agat orthu";
 
 /* Header for the explainer sheet for profile names */
-"PROFILE_NAME_EDUCATION_SHEET_HEADER_FORMAT" = "Roghnaíonn sealbhóir an chuntais <bold>ainm na próifíle</bold> ar Signal.";
+"PROFILE_NAME_EDUCATION_SHEET_HEADER_FORMAT" = "Roghnaíonn sealbhóir an chuntais <bold>ainm na próifíle</bold> ar Radar.";
 
 /* Title for the profile name view. */
 "PROFILE_NAME_VIEW_TITLE" = "Your Name";
@@ -7062,7 +7062,7 @@ Send money securely.";
 "RECIPIENT_PICKER_ERROR_USER_CANNOT_BE_SELECTED" = "Ní féidir an t-úsáideoir seo a roghnú.";
 
 /* Alert text. Shown after selecting a phone number that isn't valid. */
-"RECIPIENT_PICKER_INVALID_NUMBER_MESSAGE" = "Ní úsáideoir Signal é/í %1$@. Triail arís le huimhir ghutháin bhailí.";
+"RECIPIENT_PICKER_INVALID_NUMBER_MESSAGE" = "Ní úsáideoir Radar é/í %1$@. Triail arís le huimhir ghutháin bhailí.";
 
 /* Alert title. Shown after selecting a phone number that isn't valid. */
 "RECIPIENT_PICKER_INVALID_NUMBER_TITLE" = "Uimhir Ghutháin Neamhbhailí";
@@ -7071,22 +7071,22 @@ Send money securely.";
 "RECIPIENT_PICKER_INVITE_ACTION" = "Tabhair cuireadh";
 
 /* Alert text. Shown after selecting a phone number that isn't a Signal user. */
-"RECIPIENT_PICKER_INVITE_MESSAGE" = "Ní úsáideoir Signal é/í %1$@. Ar mhaith leat cuireadh a thabhairt don uimhir seo?";
+"RECIPIENT_PICKER_INVITE_MESSAGE" = "Ní úsáideoir Radar é/í %1$@. Ar mhaith leat cuireadh a thabhairt don uimhir seo?";
 
 /* Alert title. Shown after selecting a phone number that isn't a Signal user. */
-"RECIPIENT_PICKER_INVITE_TITLE" = "Tabhair cuireadh chuig Signal";
+"RECIPIENT_PICKER_INVITE_TITLE" = "Tabhair cuireadh chuig Radar";
 
 /* Alert title explaining what happens if you forget your 'two-factor auth pin'. */
 "REGISTER_2FA_FORGOT_PIN_ALERT_TITLE" = "An bhfuil cúnamh uait?";
 
 /* Alert body for a forgotten SVR (V2) PIN */
-"REGISTER_2FA_FORGOT_SVR_PIN_ALERT_MESSAGE" = "Cód 4+ dhigit is ea an UAP a chruthaigh tú, ar féidir leis a bheith uimhriúil nó alfa-uimhriúil. Mura bhfuil tú in ann cuimhneamh ar d'UAP, beidh ort fanacht 7 lá chun do chuntas a athchlárú. Má tá Cúltacaí Slána Signal cumasaithe agat, is féidir leat leanúint ar aghaidh le d'Eochair Athshlánaithe.";
+"REGISTER_2FA_FORGOT_SVR_PIN_ALERT_MESSAGE" = "Cód 4+ dhigit is ea an UAP a chruthaigh tú, ar féidir leis a bheith uimhriúil nó alfa-uimhriúil. Mura bhfuil tú in ann cuimhneamh ar d'UAP, beidh ort fanacht 7 lá chun do chuntas a athchlárú. Má tá Cúltacaí Slána Radar cumasaithe agat, is féidir leat leanúint ar aghaidh le d'Eochair Athshlánaithe.";
 
 /* Alert body for a forgotten SVR (V2) PIN when the user doesn't have reglock and they cannot necessarily create a new PIN */
-"REGISTER_2FA_FORGOT_SVR_PIN_WITHOUT_REGLOCK_ALERT_MESSAGE" = "Cód 4+ dhigit is ea an UAP a chruthaigh tú, ar féidir leis a bheith uimhriúil nó alfa-uimhriúil. Mura bhfuil tú in ann cuimhneamh ar do UAP, is féidir leat clárú agus do chuntas a úsáid ach caillfidh tú socruithe áirithe atá sábháilte, amhail d'fhaisnéis phróifíle. Má tá Cúltacaí Slána Signal cumasaithe agat, is féidir leat leanúint ar aghaidh le d'Eochair Athshlánaithe.";
+"REGISTER_2FA_FORGOT_SVR_PIN_WITHOUT_REGLOCK_ALERT_MESSAGE" = "Cód 4+ dhigit is ea an UAP a chruthaigh tú, ar féidir leis a bheith uimhriúil nó alfa-uimhriúil. Mura bhfuil tú in ann cuimhneamh ar do UAP, is féidir leat clárú agus do chuntas a úsáid ach caillfidh tú socruithe áirithe atá sábháilte, amhail d'fhaisnéis phróifíle. Má tá Cúltacaí Slána Radar cumasaithe agat, is féidir leat leanúint ar aghaidh le d'Eochair Athshlánaithe.";
 
 /* Alert body for a forgotten SVR (V2) PIN when the user doesn't have reglock and they can create a new PIN */
-"REGISTER_2FA_FORGOT_SVR_PIN_WITHOUT_REGLOCK_AND_CAN_CREATE_NEW_PIN_ALERT_MESSAGE" = "Cód 4+ dhigit is ea an UAP a chruthaigh tú, ar féidir leis a bheith uimhriúil nó alfa-uimhriúil. Mura féidir leat cuimhneamh ar d'UAP, is féidir leat ceann nua a chruthú. Is féidir leat do chuntas a chlárú agus a úsáid ach caillfidh tú roinnt socruithe amhail an fhaisnéis i do phróifíl. Má tá Cúltacaí Slána Signal cumasaithe agat, is féidir leat leanúint ar aghaidh le d'Eochair Athshlánaithe.";
+"REGISTER_2FA_FORGOT_SVR_PIN_WITHOUT_REGLOCK_AND_CAN_CREATE_NEW_PIN_ALERT_MESSAGE" = "Cód 4+ dhigit is ea an UAP a chruthaigh tú, ar féidir leis a bheith uimhriúil nó alfa-uimhriúil. Mura féidir leat cuimhneamh ar d'UAP, is féidir leat ceann nua a chruthú. Is féidir leat do chuntas a chlárú agus a úsáid ach caillfidh tú roinnt socruithe amhail an fhaisnéis i do phróifíl. Má tá Cúltacaí Slána Radar cumasaithe agat, is féidir leat leanúint ar aghaidh le d'Eochair Athshlánaithe.";
 
 /* Alert title explaining what happens if you forget your 'two-factor auth pin'. */
 "REGISTER_2FA_INVALID_PIN_ALERT_TITLE" = "UAP mhícheart";
@@ -7134,7 +7134,7 @@ Send money securely.";
 "REGISTRATION_BACKUP_RESTORE_ERROR_GENERIC_TITLE" = "Níorbh fhéidir an t-aistriú a chur i gcrích";
 
 /* Body for a sheet warning users about an incorrect recovery key. */
-"REGISTRATION_BACKUP_RESTORE_ERROR_INCORRECT_KEY_BODY" = "Is féidir gur chuir tú d'eochair athshlánaithe isteach go mícheart, nó nár chuir tú cúltaca amháin ar a laghad i gcrích ar do sheanghléas. \n\nCinntigh go bhfuil tú ag clárú leis an uimhir ghutháin agus an eochair athshlánaithe chéanna a shábháil tú agus Cúltacaí Slána Signal á gcumasú agat, agus deimhnigh go bhfuil cúltaca curtha i gcrích ar do sheanghléas.";
+"REGISTRATION_BACKUP_RESTORE_ERROR_INCORRECT_KEY_BODY" = "Is féidir gur chuir tú d'eochair athshlánaithe isteach go mícheart, nó nár chuir tú cúltaca amháin ar a laghad i gcrích ar do sheanghléas. \n\nCinntigh go bhfuil tú ag clárú leis an uimhir ghutháin agus an eochair athshlánaithe chéanna a shábháil tú agus Cúltacaí Slána Radar á gcumasú agat, agus deimhnigh go bhfuil cúltaca curtha i gcrích ar do sheanghléas.";
 
 /* Body for a sheet warning users about an incorrect recovery key and having hit a rate limit on retries. */
 "REGISTRATION_BACKUP_RESTORE_ERROR_INCORRECT_KEY_RATE_LIMIT_BODY" = "Tá líon na n-iarrachtaí leis an eochair athshlánaithe úsáidte agat. Ar mhaithe le do shlándáil, tá teorainn le líon na n-iarrachtaí is féidir leat a dhéanamh. Fan 1 uair an chloig agus triail arís.";
@@ -7167,7 +7167,7 @@ Send money securely.";
 "REGISTRATION_BACKUP_RESTORE_ERROR_UNRETRYABLE_SERVER_ERROR_TITLE" = "Ní féidir an cúltaca a aischur";
 
 /* Body for a sheet warning users about an incompatible backup version. */
-"REGISTRATION_BACKUP_RESTORE_ERROR_UNSUPPORTED_BACKUP_VERSION_BODY" = "Le do chúltaca a aischur, cinntigh go bhfuil an leagan is déanaí Signal agat agus triail arís. Má leanann an fhadhb sin, déan teagmháil leis an bhfoireann tacaíochta.";
+"REGISTRATION_BACKUP_RESTORE_ERROR_UNSUPPORTED_BACKUP_VERSION_BODY" = "Le do chúltaca a aischur, cinntigh go bhfuil an leagan is déanaí Radar agat agus triail arís. Má leanann an fhadhb sin, déan teagmháil leis an bhfoireann tacaíochta.";
 
 /* Title for a sheet warning users about an incompatible backup version. */
 "REGISTRATION_BACKUP_RESTORE_ERROR_UNSUPPORTED_BACKUP_VERSION_TITLE" = "Nuashonrú de dhíth";
@@ -7179,7 +7179,7 @@ Send money securely.";
 "REGISTRATION_CANNOT_CONTINUE_WITHOUT_UPDATING_APP_ACTION" = "Nuashonraigh";
 
 /* During (re)registration, users may need to update their app to continue. They'll be presented with an alert if this is the case, prompting them to update. This is the description text on that alert. */
-"REGISTRATION_CANNOT_CONTINUE_WITHOUT_UPDATING_APP_DESCRIPTION" = "Le leanúint leis gan chlárú, nuashonraigh chuig an leagan is déanaí de Signal.";
+"REGISTRATION_CANNOT_CONTINUE_WITHOUT_UPDATING_APP_DESCRIPTION" = "Le leanúint leis gan chlárú, nuashonraigh chuig an leagan is déanaí de Radar.";
 
 /* During (re)registration, users may need to update their app to continue. They'll be presented with an alert if this is the case, prompting them to update. This is the title on that alert. */
 "REGISTRATION_CANNOT_CONTINUE_WITHOUT_UPDATING_APP_TITLE" = "Nuashonrú De Dhíth";
@@ -7191,7 +7191,7 @@ Send money securely.";
 "REGISTRATION_DEFAULT_COUNTRY_NAME" = "Cód Tíre";
 
 /* If a user is installing Signal on a new phone, they may be asked whether they want to transfer their account from their old device. This is a description on the screen that asks them this question. */
-"REGISTRATION_DEVICE_TRANSFER_CHOICE_EXPLANATION" = "Má leanann tú ar aghaidh, díchumasófar Signal ar ghléasanna eile atá cláraithe leis an uimhir ghutháin chéanna.";
+"REGISTRATION_DEVICE_TRANSFER_CHOICE_EXPLANATION" = "Má leanann tú ar aghaidh, díchumasófar Radar ar ghléasanna eile atá cláraithe leis an uimhir ghutháin chéanna.";
 
 /* If a user is installing Signal on a new phone, they may be asked whether they want to transfer their account from their old device. This is the title on the screen that asks them this question. */
 "REGISTRATION_DEVICE_TRANSFER_CHOICE_TITLE" = "Aistrigh Cuntas agus Teachtaireachtaí";
@@ -7227,7 +7227,7 @@ Send money securely.";
 "REGISTRATION_NO_BACKUP_KEY_BUTTON_TITLE" = "Nach bhfuil eochair athshlánaithe agat?";
 
 /* Body text on a sheet with info for what to do if you don't have a recovery key */
-"REGISTRATION_NO_BACKUP_KEY_SHEET_BODY" = "Ní féidir cúltacaí a athshlánú gan a gcód athshlánaithe 64 carachtar. Má tá d'eochair athshlánaithe caillte agat, ní féidir le Signal cabhrú le haischur do chúltaca.\n\nMá tá do sheanghléas agat, is féidir leat féachaint ar d'eochair athshlánaithe i Socruithe > Comhráite > Cúltacaí. Ansin, tapáil Féach ar an Eochair Athshlánaithe.";
+"REGISTRATION_NO_BACKUP_KEY_SHEET_BODY" = "Ní féidir cúltacaí a athshlánú gan a gcód athshlánaithe 64 carachtar. Má tá d'eochair athshlánaithe caillte agat, ní féidir le Radar cabhrú le haischur do chúltaca.\n\nMá tá do sheanghléas agat, is féidir leat féachaint ar d'eochair athshlánaithe i Socruithe > Comhráite > Cúltacaí. Ansin, tapáil Féach ar an Eochair Athshlánaithe.";
 
 /* Title for sheet with info for what to do if you don't have a recovery key */
 "REGISTRATION_NO_BACKUP_KEY_SHEET_TITLE" = "Nach bhfuil eochair athshlánaithe agat?";
@@ -7290,16 +7290,16 @@ Send money securely.";
 "REGISTRATION_PROFILE_SETUP_TITLE" = "Socraigh do phróifíl";
 
 /* Error shown if an SMS/call service provider is permanently unable to send a verification code to the provided number. */
-"REGISTRATION_PROVIDER_FAILURE_MESSAGE_PERMANENT" = "Ní féidir le Signal cód SMS a sheoladh mar gheall ar fhadhbanna leis an soláthraí SMS.";
+"REGISTRATION_PROVIDER_FAILURE_MESSAGE_PERMANENT" = "Ní féidir le Radar cód SMS a sheoladh mar gheall ar fhadhbanna leis an soláthraí SMS.";
 
 /* Error shown if an SMS/call service provider is temporarily unable to send a verification code to the provided number. */
-"REGISTRATION_PROVIDER_FAILURE_MESSAGE_TRANSIENT" = "Níorbh fhéidir le Signal cód SMS a sheoladh mar gheall ar fhadhbanna leis an soláthraí SMS. Triail arís i gceann cúpla uair an chloig.";
+"REGISTRATION_PROVIDER_FAILURE_MESSAGE_TRANSIENT" = "Níorbh fhéidir le Radar cód SMS a sheoladh mar gheall ar fhadhbanna leis an soláthraí SMS. Triail arís i gceann cúpla uair an chloig.";
 
 /* Third step in directions for how to make a backup */
 "REGISTRATION_RESTORE_METHOD_MAKE_BACKUP_TUTORIAL_ENABLE_BACKUPS" = "Cumasaigh cúltacaí agus fan go dtí go bhfuil do chúltacú curtha i gcrích";
 
 /* First step in directions for how to make a backup */
-"REGISTRATION_RESTORE_METHOD_MAKE_BACKUP_TUTORIAL_OPEN_SIGNAL" = "Oscail Signal ar do sheanghléas";
+"REGISTRATION_RESTORE_METHOD_MAKE_BACKUP_TUTORIAL_OPEN_SIGNAL" = "Oscail Radar ar do sheanghléas";
 
 /* Second step in directions for how to make a backup */
 "REGISTRATION_RESTORE_METHOD_MAKE_BACKUP_TUTORIAL_TAP_SETTINGS" = "Tapáil Socruithe > Cúltacaí";
@@ -7317,7 +7317,7 @@ Send money securely.";
 "REGISTRATION_SCAN_QR_CODE_TITLE" = "Scan an cód seo le do sheanghuthán";
 
 /* Tutorial text describing the first step to scanning the restore/transfer QR code with your old phone: opening Signal */
-"REGISTRATION_SCAN_QR_CODE_TUTORIAL_OPEN_SIGNAL" = "Oscail Signal ar do sheanghléas";
+"REGISTRATION_SCAN_QR_CODE_TUTORIAL_OPEN_SIGNAL" = "Oscail Radar ar do sheanghléas";
 
 /* Tutorial text describing the third step to scanning the restore/transfer QR code with your old phone: scan the code */
 "REGISTRATION_SCAN_QR_CODE_TUTORIAL_SCAN" = "Scan an cód seo leis an gceamara";
@@ -7521,7 +7521,7 @@ Send money securely.";
 "SAFETY_NUMBER_CONFIRMATION_VIEW_ACTION" = "Amharc";
 
 /* Snippet to share {{safety number}} with a friend. sent e.g. via SMS */
-"SAFETY_NUMBER_SHARE_FORMAT" = "Ár nUimhir Shábháilteachta Signal:\n%1$@";
+"SAFETY_NUMBER_SHARE_FORMAT" = "Ár nUimhir Shábháilteachta Radar:\n%1$@";
 
 /* Title for Safety Tips button in thread details. */
 "SAFETY_TIPS_BUTTON_ACTION_TITLE" = "Leideanna Sábháilteachta";
@@ -7539,7 +7539,7 @@ Send money securely.";
 "SAFETY_TIPS_FAKE_BUSINESS_TITLE" = "Gnólachtaí agus institiúidí bréagacha";
 
 /* Message contents for the fake names safety tip. */
-"SAFETY_TIPS_FAKE_NAMES_BODY" = "Ní iarrfaidh Signal do chód clárúcháin ná UAP ort choíche. Bí ar d'fhaichill ar iarratais a dhéanann daoine eile a phearsanú. Roghnaíonn sealbhóir an chuntais ainm na próifíle agus níl an t-ainm fíoraithe.";
+"SAFETY_TIPS_FAKE_NAMES_BODY" = "Ní iarrfaidh Radar do chód clárúcháin ná UAP ort choíche. Bí ar d'fhaichill ar iarratais a dhéanann daoine eile a phearsanú. Roghnaíonn sealbhóir an chuntais ainm na próifíle agus níl an t-ainm fíoraithe.";
 
 /* Message title describing the fake names safety tip. */
 "SAFETY_TIPS_FAKE_NAMES_TITLE" = "Ainmneacha bréige agus cuntais bhréige";
@@ -7599,13 +7599,13 @@ Send money securely.";
 "SCREEN_LOCK_ERROR_LOCAL_AUTHENTICATION_PASSCODE_NOT_SET" = "Ní mór duit cód faire a chumasú sna Socruithe iOS chun Glasáil Scáileáin a chur i bhfeidhm.";
 
 /* Description of how and why Signal iOS uses Touch ID/Face ID/Phone Passcode to unlock 'screen lock'. */
-"SCREEN_LOCK_REASON_UNLOCK_SCREEN_LOCK" = "Fíordheimhnigh chun Signal a oscailt.";
+"SCREEN_LOCK_REASON_UNLOCK_SCREEN_LOCK" = "Fíordheimhnigh chun Radar a oscailt.";
 
 /* Title for alert indicating that screen lock could not be unlocked. */
 "SCREEN_LOCK_UNLOCK_FAILED" = "Theip ar Fhíordheimhniú";
 
 /* Label for button on lock screen that lets users unlock Signal. */
-"SCREEN_LOCK_UNLOCK_SIGNAL" = "Díghlasáil Signal";
+"SCREEN_LOCK_UNLOCK_SIGNAL" = "Díghlasáil Radar";
 
 /* Placeholder text indicating the user can search for contacts by name, username, or phone number. */
 "SEARCH_BY_NAME_OR_USERNAME_OR_NUMBER_PLACEHOLDER_TEXT" = "Ainm, ainm úsáideora, nó uimhir";
@@ -7638,13 +7638,13 @@ Send money securely.";
 "SECONDARY_LINKING_ERROR_DIFFERENT_ACCOUNT_TITLE" = "Account Does Not Match";
 
 /* Message for error alert indicating that a linked device must be upgraded before it can be linked. */
-"SECONDARY_LINKING_ERROR_OBSOLETE_LINKED_DEVICE_MESSAGE" = "Nuashonraigh Signal ar an ngléas seo chun é a nascadh le do ghuthán.";
+"SECONDARY_LINKING_ERROR_OBSOLETE_LINKED_DEVICE_MESSAGE" = "Nuashonraigh Radar ar an ngléas seo chun é a nascadh le do ghuthán.";
 
 /* Title for error alert indicating that a linked device must be upgraded before it can be linked. */
 "SECONDARY_LINKING_ERROR_OBSOLETE_LINKED_DEVICE_TITLE" = "Leagan Gan Tacaíocht";
 
 /* alert message for outdated linking device */
-"SECONDARY_LINKING_ERROR_OLD_VERSION_MESSAGE" = "Tá seanleagan de Signal ar an ngléas eile agus ní thacaíonn sé le cóid QR ar iPadanna. Suiteáil an leagan is déanaí de Signal agus bain triail eile as.";
+"SECONDARY_LINKING_ERROR_OLD_VERSION_MESSAGE" = "Tá seanleagan de Radar ar an ngléas eile agus ní thacaíonn sé le cóid QR ar iPadanna. Suiteáil an leagan is déanaí de Radar agus bain triail eile as.";
 
 /* alert title for outdated linking device */
 "SECONDARY_LINKING_ERROR_OLD_VERSION_TITLE" = "Nuashonraigh an Gléas Scanta";
@@ -7665,7 +7665,7 @@ Send money securely.";
 "SECONDARY_LINKING_SYNCING_UPDATE_REQUIRED_CHECK_FOR_UPDATE_BUTTON" = "Seiceáil Le hAghaidh Nuashonruithe";
 
 /* Message for action sheet when the secondary device fails to sync messages due to an app update being required. */
-"SECONDARY_LINKING_SYNCING_UPDATE_REQUIRED_ERROR_MESSAGE" = "Nuashonraigh Signal anois le sioncronú teachtaireachtaí a chur i gcrích go hiomlán.";
+"SECONDARY_LINKING_SYNCING_UPDATE_REQUIRED_ERROR_MESSAGE" = "Nuashonraigh Radar anois le sioncronú teachtaireachtaí a chur i gcrích go hiomlán.";
 
 /* Title for action sheet when the secondary device fails to sync messages due to an app update being required. */
 "SECONDARY_LINKING_SYNCING_UPDATE_REQUIRED_ERROR_TITLE" = "Nuashonrú De Dhíth";
@@ -7674,19 +7674,19 @@ Send money securely.";
 "SECONDARY_ONBOARDING_CHOOSE_DEVICE_NAME_PLACEHOLDER" = "Roghnaigh ainm";
 
 /* header text before the user can link this device */
-"SECONDARY_ONBOARDING_GET_STARTED_BY_OPENING_PRIMARY" = "Tosaigh Signal ar do ghuthán chun an iPad seo a nascadh le do chuntas";
+"SECONDARY_ONBOARDING_GET_STARTED_BY_OPENING_PRIMARY" = "Tosaigh Radar ar do ghuthán chun an iPad seo a nascadh le do chuntas";
 
 /* Link explaining what to do when trying to link a device before having a primary device. */
-"SECONDARY_ONBOARDING_GET_STARTED_DO_NOT_HAVE_PRIMARY" = "Níl Signal ar mo ghuthán…";
+"SECONDARY_ONBOARDING_GET_STARTED_DO_NOT_HAVE_PRIMARY" = "Níl Radar ar mo ghuthán…";
 
 /* alert body */
-"SECONDARY_ONBOARDING_INSTALL_PRIMARY_FIRST_BODY" = "Oscail an App Store ar do ghuthán, suiteáil Signal, cláraigh, ansin beidh tú in ann an iPad a nascadh leis an gcuntas céanna.";
+"SECONDARY_ONBOARDING_INSTALL_PRIMARY_FIRST_BODY" = "Oscail an App Store ar do ghuthán, suiteáil Radar, cláraigh, ansin beidh tú in ann an iPad a nascadh leis an gcuntas céanna.";
 
 /* alert title */
-"SECONDARY_ONBOARDING_INSTALL_PRIMARY_FIRST_TITLE" = "Suiteáil Signal ar do ghuthán";
+"SECONDARY_ONBOARDING_INSTALL_PRIMARY_FIRST_TITLE" = "Suiteáil Radar ar do ghuthán";
 
 /* body text while displaying a QR code which, when scanned, will link this device. */
-"SECONDARY_ONBOARDING_SCAN_CODE_BODY" = "Tapáil do phictiúr próifíle chun Socruithe Signal a oscailt ar do ghuthán. Ansin roghnaigh “Gléasanna Nasctha” agus “Nasc Gléas Nua” chun an cód seo a scanadh le do ghuthán:";
+"SECONDARY_ONBOARDING_SCAN_CODE_BODY" = "Tapáil do phictiúr próifíle chun Socruithe Radar a oscailt ar do ghuthán. Ansin roghnaigh “Gléasanna Nasctha” agus “Nasc Gléas Nua” chun an cód seo a scanadh le do ghuthán:";
 
 /* Link text for page with troubleshooting info shown on the QR scanning screen */
 "SECONDARY_ONBOARDING_SCAN_CODE_HELP_TEXT" = "Cúnamh le iPad a nascadh ar fáil anseo";
@@ -7698,7 +7698,7 @@ Send money securely.";
 "SECONDARY_ONBOARDING_SCAN_CODE_TITLE" = "Scan an Cód QR le do ghuthán";
 
 /* header text before the user can transfer to this device */
-"SECONDARY_TRANSFER_GET_STARTED_BY_OPENING_IPAD" = "Tosaigh Signal ar do shean-iPad chun do chuntas a aistriú";
+"SECONDARY_TRANSFER_GET_STARTED_BY_OPENING_IPAD" = "Tosaigh Radar ar do shean-iPad chun do chuntas a aistriú";
 
 /* No comment provided by engineer. */
 "SECURE_SESSION_RESET" = "Athshocraíodh an seisiún slán.";
@@ -7788,7 +7788,7 @@ Send money securely.";
 "SEPA_DONATION_NAME_PLACEHOLDER" = "Ainm ar an gCuntas Bainc";
 
 /* Description for the session refresh alert */
-"SESSION_REFRESH_ALERT_MESSAGE" = "Tá criptiú ó cheann ceann á úsáid ag Signal agus b'fhéidir go mbeidh air seisiún do chomhrá a athnuachan ó am go ham. Ní chuireann sé sin isteach ar shlándáil do chomhrá ach b'fhéidir gur chaill tú teachtaireacht ón duine seo agus go mbeidh ort athsheoladh a iarraidh.";
+"SESSION_REFRESH_ALERT_MESSAGE" = "Tá criptiú ó cheann ceann á úsáid ag Radar agus b'fhéidir go mbeidh air seisiún do chomhrá a athnuachan ó am go ham. Ní chuireann sé sin isteach ar shlándáil do chomhrá ach b'fhéidir gur chaill tú teachtaireacht ón duine seo agus go mbeidh ort athsheoladh a iarraidh.";
 
 /* Title for the session refresh alert */
 "SESSION_REFRESH_ALERT_TITLE" = "Seisiún an chomhrá athnuaite";
@@ -7830,7 +7830,7 @@ Send money securely.";
 "SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_COUNTRY" = "Suíomh";
 
 /* Table footer for the 'censorship circumvention' section when censorship circumvention can be manually enabled. */
-"SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_FOOTER" = "Leis an rogha seo, déanfaidh Signal iarracht an chinsireacht a shárú. Ná húsáid an rogha seo mura bhfuil tú i dtír a dhéanann cinsireacht ar Signal.";
+"SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_FOOTER" = "Leis an rogha seo, déanfaidh Radar iarracht an chinsireacht a shárú. Ná húsáid an rogha seo mura bhfuil tú i dtír a dhéanann cinsireacht ar Radar.";
 
 /* Table footer for the 'censorship circumvention' section shown when censorship circumvention has been auto-enabled based on local phone number. */
 "SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_FOOTER_AUTO_ENABLED" = "Cuireadh sárú na cinsireachta i bhfeidhm bunaithe ar an uimhir ghutháin atá agat.";
@@ -7842,7 +7842,7 @@ Send money securely.";
 "SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_FOOTER_NO_CONNECTION" = "Ní féidir sárú na cinsireachta a chur i bhfeidhm nuair nach bhfuil tú ceangailte leis an Idirlíon.";
 
 /* Table footer for the 'censorship circumvention' section shown when the app is connected to the Signal service. */
-"SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_FOOTER_WEBSOCKET_CONNECTED" = "Ní gá duit sárú na cinsireachta a chur i bhfeidhm; tá tú ceangailte le seirbhís Signal cheana féin.";
+"SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_FOOTER_WEBSOCKET_CONNECTED" = "Ní gá duit sárú na cinsireachta a chur i bhfeidhm; tá tú ceangailte le seirbhís Radar cheana féin.";
 
 /* Label for the 'advanced pin settings' button. */
 "SETTINGS_ADVANCED_PIN_SETTINGS" = "Ardroghanna UAP";
@@ -7869,13 +7869,13 @@ Send money securely.";
 "SETTINGS_ADVANCED_VIEW_ERROR_LOG" = "Logchomhaid Earráide";
 
 /* Information on sheet about changing the app icon - first line */
-"SETTINGS_APP_ICON_EDUCATION_APP_NAME" = "Beidh ainm na haipe \"Signal\" infheicthe ar an scáileán baile, i bhfógraí agus sa leabharlann aipeanna.";
+"SETTINGS_APP_ICON_EDUCATION_APP_NAME" = "Beidh ainm na haipe \"Radar\" infheicthe ar an scáileán baile, i bhfógraí agus sa leabharlann aipeanna.";
 
 /* Information on sheet about changing the app icon - second line */
-"SETTINGS_APP_ICON_EDUCATION_HOME_SCREEN_DOCK" = "Is féidir leat ainm na haipe \"Signal\" a fholú ón scáileán baile tríd an aip a bhogadh chuig an mbarra ag bun an scáileáin baile.";
+"SETTINGS_APP_ICON_EDUCATION_HOME_SCREEN_DOCK" = "Is féidir leat ainm na haipe \"Radar\" a fholú ón scáileán baile tríd an aip a bhogadh chuig an mbarra ag bun an scáileáin baile.";
 
 /* The footer for the app icon selection settings page. */
-"SETTINGS_APP_ICON_FOOTER" = "Beidh ainm na haipe \"Signal\" infheicthe ar an scáileán baile, i bhfógraí agus sa leabharlann aipeanna.";
+"SETTINGS_APP_ICON_FOOTER" = "Beidh ainm na haipe \"Radar\" infheicthe ar an scáileán baile, i bhfógraí agus sa leabharlann aipeanna.";
 
 /* The title for the app icon selection settings page. */
 "SETTINGS_APP_ICON_TITLE" = "Deilbhín na haipe";
@@ -7905,7 +7905,7 @@ Send money securely.";
 "SETTINGS_BLOCK_LIST_ADD_BUTTON" = "Cuir úsáideoir bactha leis";
 
 /* A label that indicates the user has no Signal contacts that they haven't blocked. */
-"SETTINGS_BLOCK_LIST_NO_CONTACTS" = "Níl fiú is teagmhálaí amháin de do chuid ag úsáid Signal.";
+"SETTINGS_BLOCK_LIST_NO_CONTACTS" = "Níl fiú is teagmhálaí amháin de do chuid ag úsáid Radar.";
 
 /* A label that indicates the user's search has no matching results. */
 "SETTINGS_BLOCK_LIST_NO_SEARCH_RESULTS" = "Gan Torthaí";
@@ -7917,7 +7917,7 @@ Send money securely.";
 "SETTINGS_CALLING_HIDES_IP_ADDRESS_PREFERENCE_TITLE" = "Cuir Glaonna trí Athsheachadán i gCónaí";
 
 /* User settings section footer, a detailed explanation */
-"SETTINGS_CALLING_HIDES_IP_ADDRESS_PREFERENCE_TITLE_DETAIL" = "Cuir gach glao trí fhreastalaí Signal ionas nach mbeidh an teagmhálaí a fhaigheann an glao in ann do sheoladh IP a fheiceáil. Imríonn seo drochthionchar ar cháilíocht an ghlao.";
+"SETTINGS_CALLING_HIDES_IP_ADDRESS_PREFERENCE_TITLE_DETAIL" = "Cuir gach glao trí fhreastalaí Radar ionas nach mbeidh an teagmhálaí a fhaigheann an glao in ann do sheoladh IP a fheiceáil. Imríonn seo drochthionchar ar cháilíocht an ghlao.";
 
 /* Label for the 'edit phone number' button in the 'change phone number' views. */
 "SETTINGS_CHANGE_PHONE_NUMBER_BACK_TO_EDIT_BUTTON" = "Edit Number";
@@ -7962,7 +7962,7 @@ Send money securely.";
 "SETTINGS_CLEAR_HISTORY" = "Glan Stair na gComhráite";
 
 /* Footer for the 'about' help section */
-"SETTINGS_COPYRIGHT" = "Cóipcheart Signal Messenger\nCeadúnaithe faoi GPLv3";
+"SETTINGS_COPYRIGHT" = "Cóipcheart Radar Messenger\nCeadúnaithe faoi GPLv3";
 
 /* Label for the 'data' section of the app settings. */
 "SETTINGS_DATA" = "Data Usage";
@@ -8034,7 +8034,7 @@ Send money securely.";
 "SETTINGS_DISAPPEARING_MESSAGES_FOOTER" = "Socraigh amadóir teachtaireachtaí sealadacha réamhshocraithe do gach comhrá nua a thosaíonn tú.";
 
 /* Title for the 'donate to signal' link in settings. */
-"SETTINGS_DONATE" = "Bronn airgead ar Signal";
+"SETTINGS_DONATE" = "Bronn airgead ar Radar";
 
 /* Title for help button and help pages in app settings. */
 "SETTINGS_HELP" = "Cabhair";
@@ -8103,7 +8103,7 @@ Send money securely.";
 "SETTINGS_NOTIFICATION_CONTENT_TITLE" = "Ábhar i bhFógraí";
 
 /* When the local device discovers a contact has recently installed signal, the app can generates a message encouraging the local user to say hello. Turning this switch off disables that feature. */
-"SETTINGS_NOTIFICATION_EVENTS_CONTACT_JOINED_SIGNAL" = "Contact Joins Signal";
+"SETTINGS_NOTIFICATION_EVENTS_CONTACT_JOINED_SIGNAL" = "Contact Joins Radar";
 
 /* table section header */
 "SETTINGS_NOTIFICATION_NOTIFY_WHEN_TITLE" = "Cuir in iúl nuair a…";
@@ -8140,7 +8140,7 @@ Send money securely.";
 "SETTINGS_PAYMENTS_BITCOIN_UNIT" = "Aonad Bitcoin";
 
 /* Error message indicating that payments could not be activated because the feature is not currently available. */
-"SETTINGS_PAYMENTS_CANNOT_ACTIVATE_PAYMENTS_KILL_SWITCH" = "Payments in Signal is no longer available. You can still transfer funds to an exchange but you can no longer send and receive payments or add funds.";
+"SETTINGS_PAYMENTS_CANNOT_ACTIVATE_PAYMENTS_KILL_SWITCH" = "Payments in Radar is no longer available. You can still transfer funds to an exchange but you can no longer send and receive payments or add funds.";
 
 /* Error message indicating that payments could not be deactivated because the current balance is unavailable. */
 "SETTINGS_PAYMENTS_CANNOT_DEACTIVATE_PAYMENTS_NO_BALANCE" = "Can't deactivate payments because your balance is not available. Check your connection and try again.";
@@ -8149,10 +8149,10 @@ Send money securely.";
 "SETTINGS_PAYMENTS_CANNOT_SEND_PAYMENT_NO_BALANCE" = "Couldn't complete payment because your balance is not available. Check your connection and try again.";
 
 /* Error message indicating that payments cannot be sent because the feature is not currently available. */
-"SETTINGS_PAYMENTS_CANNOT_SEND_PAYMENTS_KILL_SWITCH" = "Payments in Signal is no longer available. You can still transfer funds to an exchange but you can no longer send and receive payments or add funds.";
+"SETTINGS_PAYMENTS_CANNOT_SEND_PAYMENTS_KILL_SWITCH" = "Payments in Radar is no longer available. You can still transfer funds to an exchange but you can no longer send and receive payments or add funds.";
 
 /* Error message indicating that you cannot transfer into your payments wallet because the feature is not currently available. */
-"SETTINGS_PAYMENTS_CANNOT_TRANSFER_IN_KILL_SWITCH" = "Payments in Signal is no longer available. You can still transfer funds to an exchange but you can no longer send and receive payments or add funds.";
+"SETTINGS_PAYMENTS_CANNOT_TRANSFER_IN_KILL_SWITCH" = "Payments in Radar is no longer available. You can still transfer funds to an exchange but you can no longer send and receive payments or add funds.";
 
 /* Message for the 'currency conversions info' alert. */
 "SETTINGS_PAYMENTS_CURRENCY_CONVERSIONS_INFO_ALERT_MESSAGE" = "Conversions are just estimates and may not be accurate.";
@@ -8179,10 +8179,10 @@ Send money securely.";
 "SETTINGS_PAYMENTS_DEACTIVATE_TITLE" = "Deactivate Payments";
 
 /* Explanation of the 'deactivate payments with balance' process in the 'deactivate payments' settings. */
-"SETTINGS_PAYMENTS_DEACTIVATE_WITH_BALANCE_EXPLANATION" = "Moltar duit do chistí a aistriú chuig seoladh sparáin eile roimh íocaíochtaí a dhíchumasú. Má roghnaíonn tú gan do chistí a aistriú anois, fanfaidh siad i do sparán atá nasctha le Signal má chumasaíonn tú íocaíochtaí arís.";
+"SETTINGS_PAYMENTS_DEACTIVATE_WITH_BALANCE_EXPLANATION" = "Moltar duit do chistí a aistriú chuig seoladh sparáin eile roimh íocaíochtaí a dhíchumasú. Má roghnaíonn tú gan do chistí a aistriú anois, fanfaidh siad i do sparán atá nasctha le Radar má chumasaíonn tú íocaíochtaí arís.";
 
 /* Description for the 'deactivate payments confirmation' UI in the payment settings. */
-"SETTINGS_PAYMENTS_DEACTIVATE_WITHOUT_TRANSFER_CONFIRM_DESCRIPTION" = "Fanfaidh d'iarmhéid i do sparán atá nasctha le Signal má roghnaíonn tú íocaíochtaí a athghníomhachtú.";
+"SETTINGS_PAYMENTS_DEACTIVATE_WITHOUT_TRANSFER_CONFIRM_DESCRIPTION" = "Fanfaidh d'iarmhéid i do sparán atá nasctha le Radar má roghnaíonn tú íocaíochtaí a athghníomhachtú.";
 
 /* Title for the 'deactivate payments confirmation' UI in the payment settings. */
 "SETTINGS_PAYMENTS_DEACTIVATE_WITHOUT_TRANSFER_CONFIRM_TITLE" = "Deactivate Without Transferring?";
@@ -8420,7 +8420,7 @@ Send money securely.";
 "SETTINGS_PAYMENTS_PAYMENTS_LOCK_PROMPT_EXPLANATION_TOUCHID" = "Cabhraigh le srian a chur ar dhuine a bhfuil do ghuthán aige nó aici rochtain a fháil ar do chuid airgid trí ID Tadhaill a chumasú. Is féidir leat an rogha seo a dhíchumasú i Socruithe.";
 
 /* Button for payments outdated sheet. */
-"SETTINGS_PAYMENTS_PAYMENTS_OUTDATED_BUTTON" = "Nuashonraigh Signal";
+"SETTINGS_PAYMENTS_PAYMENTS_OUTDATED_BUTTON" = "Nuashonraigh Radar";
 
 /* Message for payments outdated sheet. */
 "SETTINGS_PAYMENTS_PAYMENTS_OUTDATED_MESSAGE" = "Tá nuashonrú ag teastáil chun leanúint le híocaíochtaí a sheoladh agus a fháil, agus chun féachaint ar d'iarmhéid íocaíochta atá cothrom le dáta.";
@@ -8558,7 +8558,7 @@ Send money securely.";
 "SETTINGS_PAYMENTS_TITLE" = "Íocaíochtaí";
 
 /* Error indicating that it is not valid to send yourself a payment. */
-"SETTINGS_PAYMENTS_TRANSFER_OUT_CANNOT_SEND_TO_SELF" = "You can’t transfer to your Signal wallet address. Enter the wallet address from your account at a supported exchange.";
+"SETTINGS_PAYMENTS_TRANSFER_OUT_CANNOT_SEND_TO_SELF" = "You can’t transfer to your Radar wallet address. Enter the wallet address from your account at a supported exchange.";
 
 /* Footer of the 'transfer currency out' view in the payment settings. */
 "SETTINGS_PAYMENTS_TRANSFER_OUT_FOOTER" = "Transfer Bitcoin by sending to the Lightning address or invoice provided by the recipient. The address is typically displayed below the QR code.";
@@ -8621,7 +8621,7 @@ Send money securely.";
 "SETTINGS_PAYMENTS_VIEW_PASSPHRASE_TITLE" = "Recovery Phrase";
 
 /* Header text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "Scríobh na 24 focal seo in ord agus coinnigh in áit shábháilte iad. Is féidir leat iad a úsáid chun d'iarmhéid a athchóiriú in Cake Wallet nó i sparáin eile atá comhoiriúnach le Spark.";
+"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "Scríobh na 12 focal seo in ord agus coinnigh in áit shábháilte iad. Is féidir leat iad a úsáid chun d'iarmhéid a athchóiriú in Cake Wallet nó i sparáin eile atá comhoiriúnach le Spark.";
 
 /* Footer text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
 "SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_FOOTER_2" = "Ná roinn an frása seo le haon duine";
@@ -8642,7 +8642,7 @@ Send money securely.";
 "SETTINGS_PHONE_NUMBER_DISCOVERABILITY_DISABLED_TOAST" = "Leis an socrú sin a athrú, socraigh \"Daoine atá in ann m'uimhir a fheiceáil\" go \"Duine ar bith\".";
 
 /* The description for a sheet asking for confirmation that the user wants to set their phone number discoverability to 'nobody'. */
-"SETTINGS_PHONE_NUMBER_DISCOVERABILITY_NOBODY_CONFIRMATION_DESCRIPTION" = "Má shocraítear \"Na daoine atá in ann mé a aimsiú le m'uimhir\" ag \"Duine ar bith\", beidh sé níos deacra ag daoine thú a aimsiú ar Signal.";
+"SETTINGS_PHONE_NUMBER_DISCOVERABILITY_NOBODY_CONFIRMATION_DESCRIPTION" = "Má shocraítear \"Na daoine atá in ann mé a aimsiú le m'uimhir\" ag \"Duine ar bith\", beidh sé níos deacra ag daoine thú a aimsiú ar Radar.";
 
 /* The title for a sheet asking for confirmation that the user wants to set their phone number discoverability to 'nobody'. */
 "SETTINGS_PHONE_NUMBER_DISCOVERABILITY_NOBODY_CONFIRMATION_TITLE" = "An bhfuil tú cinnte?";
@@ -8651,7 +8651,7 @@ Send money securely.";
 "SETTINGS_PHONE_NUMBER_DISCOVERABILITY_TITLE" = "Na Daoine ar Féidir leo mé a Aimsiú le hUimhir Ghutháin";
 
 /* Description label for Phone Number Privacy */
-"SETTINGS_PHONE_NUMBER_PRIVACY_DESCRIPTION_LABEL" = "Roghnaigh na daoine atá in ann d'uimhir ghutháin a fheiceáil agus teagmháil a dhéanamh leat ar Signal léi.";
+"SETTINGS_PHONE_NUMBER_PRIVACY_DESCRIPTION_LABEL" = "Roghnaigh na daoine atá in ann d'uimhir ghutháin a fheiceáil agus teagmháil a dhéanamh leat ar Radar léi.";
 
 /* The title for phone number privacy settings. */
 "SETTINGS_PHONE_NUMBER_PRIVACY_TITLE" = "Uimhir Ghutháin";
@@ -8663,16 +8663,16 @@ Send money securely.";
 "SETTINGS_PIN_REMINDER_DISABLE_CONFIRMATION_ACTION" = "Múch Meabhrúcháin";
 
 /* The explanation for the dialog asking user to confirm their PIN to disable reminders */
-"SETTINGS_PIN_REMINDER_DISABLE_CONFIRMATION_EXPLANATION" = "Ní mór duit d'UAP a chur de ghlanmheabhair nó a shábháil in áit shlán toisc nach féidir í a fháil ar ais. Dá ligfeá i ndearmad í, chaillfeá sonraí tar éis duit do chuntas Signal a chlárú arís.";
+"SETTINGS_PIN_REMINDER_DISABLE_CONFIRMATION_EXPLANATION" = "Ní mór duit d'UAP a chur de ghlanmheabhair nó a shábháil in áit shlán toisc nach féidir í a fháil ar ais. Dá ligfeá i ndearmad í, chaillfeá sonraí tar éis duit do chuntas Radar a chlárú arís.";
 
 /* The title for the dialog asking user to confirm their PIN to disable reminders */
-"SETTINGS_PIN_REMINDER_DISABLE_CONFIRMATION_TITLE" = "UAP Signal a Dheimhniú";
+"SETTINGS_PIN_REMINDER_DISABLE_CONFIRMATION_TITLE" = "UAP Radar a Dheimhniú";
 
 /* Label for the 'pin reminder' switch of the privacy settings. */
 "SETTINGS_PIN_REMINDER_SWITCH_LABEL" = "Meabhrúcháin UAP";
 
 /* Footer for the 'PINs' section of the privacy settings. */
-"SETTINGS_PINS_FOOTER" = "PINs keep information stored with Signal encrypted so only you can access it. Your PIN cannot be recovered. Your profile, settings, and contacts will restore when you reinstall Signal.";
+"SETTINGS_PINS_FOOTER" = "PINs keep information stored with Radar encrypted so only you can access it. Your PIN cannot be recovered. Your profile, settings, and contacts will restore when you reinstall Radar.";
 
 /* Label for the 'pins' item of the privacy settings when the user does have a pin. */
 "SETTINGS_PINS_ITEM" = "Athraigh d'UAP";
@@ -8681,7 +8681,7 @@ Send money securely.";
 "SETTINGS_PINS_ITEM_CREATE" = "Cruthaigh UAP";
 
 /* Title for the 'PINs' section of the privacy settings. */
-"SETTINGS_PINS_TITLE" = "UAP Signal";
+"SETTINGS_PINS_TITLE" = "UAP Radar";
 
 /* Footer for table section */
 "SETTINGS_PRIVACY_ADVANCED_FOOTER" = "Sárú cinsireachta, seachfhreastalaí, glaonna athsheolta, agus socruithe seoltóra séalaithe.";
@@ -8723,7 +8723,7 @@ Send money securely.";
 "SETTINGS_REGISTRATION_LOCK_TURN_ON_ERROR_PIN_REQUIRED" = "Ní mór duit UAP a chruthú leis an nglas cláraithe a úsáid.";
 
 /* Body for the alert confirming that the user wants to turn on registration lock. */
-"SETTINGS_REGISTRATION_LOCK_TURN_ON_MESSAGE" = "Má ligeann tú d'UAP Signal i ndearmad nuair a chláróidh tú le Signal arís, cuirfear do chuntas faoi ghlas ar feadh 7 lá.";
+"SETTINGS_REGISTRATION_LOCK_TURN_ON_MESSAGE" = "Má ligeann tú d'UAP Radar i ndearmad nuair a chláróidh tú le Radar arís, cuirfear do chuntas faoi ghlas ar feadh 7 lá.";
 
 /* Title for the alert confirming that the user wants to turn on registration lock. */
 "SETTINGS_REGISTRATION_LOCK_TURN_ON_TITLE" = "An bhfuil fonn ort Glas Clárúcháin a chur ar siúl?";
@@ -8753,19 +8753,19 @@ Send money securely.";
 "SETTINGS_SECTION_TITLE_CALLING" = "Glaonna";
 
 /* Section footer */
-"SETTINGS_SECURITY_DETAIL" = "Use Touch ID, Face ID, or your iOS device passcode to unlock Signal.";
+"SETTINGS_SECURITY_DETAIL" = "Use Touch ID, Face ID, or your iOS device passcode to unlock Radar.";
 
 /* Section footer */
-"SETTINGS_SECURITY_DETAIL_FACEID" = "Use Face ID to unlock Signal.";
+"SETTINGS_SECURITY_DETAIL_FACEID" = "Use Face ID to unlock Radar.";
 
 /* Section footer */
-"SETTINGS_SECURITY_DETAIL_OPTICID" = "Úsáid Optic ID le Signal a dhíghlasáil.";
+"SETTINGS_SECURITY_DETAIL_OPTICID" = "Úsáid Optic ID le Radar a dhíghlasáil.";
 
 /* Section footer */
-"SETTINGS_SECURITY_DETAIL_PASSCODE" = "Use your device passcode to unlock Signal.";
+"SETTINGS_SECURITY_DETAIL_PASSCODE" = "Use your device passcode to unlock Radar.";
 
 /* Section footer */
-"SETTINGS_SECURITY_DETAIL_TOUCHID" = "Use Touch ID to unlock Signal.";
+"SETTINGS_SECURITY_DETAIL_TOUCHID" = "Use Touch ID to unlock Radar.";
 
 /* Section header */
 "SETTINGS_SECURITY_TITLE" = "App Security";
@@ -8780,13 +8780,13 @@ Send money securely.";
 "SETTINGS_SHARING_SUGGESTIONS" = "Share Contacts with iOS";
 
 /* Footer for setting for enabling & disabling contact and notification sharing with iOS. */
-"SETTINGS_SHARING_SUGGESTIONS_NOTIFICATIONS_FOOTER" = "Ceadaigh do iOS rochtain a dhéanamh ar theagmhálaithe agus comhráite Signal le haghaidh gnéithe amhail moltaí agus fógraí a chomhroinnt.";
+"SETTINGS_SHARING_SUGGESTIONS_NOTIFICATIONS_FOOTER" = "Ceadaigh do iOS rochtain a dhéanamh ar theagmhálaithe agus comhráite Radar le haghaidh gnéithe amhail moltaí agus fógraí a chomhroinnt.";
 
 /* Label for the 'enable registration lock' switch of the privacy settings. */
 "SETTINGS_TWO_FACTOR_AUTH_SWITCH_LABEL" = "Glas Clárúcháin";
 
 /* Footer for the 'two factor auth' section of the privacy settings when Signal PINs are available. */
-"SETTINGS_TWO_FACTOR_PINS_AUTH_FOOTER" = "Éiligh d'UAP Signal le d'uimhir ghutháin a chlárú le Signal arís.";
+"SETTINGS_TWO_FACTOR_PINS_AUTH_FOOTER" = "Éiligh d'UAP Radar le d'uimhir ghutháin a chlárú le Radar arís.";
 
 /* Label for the 'typing indicators' setting. */
 "SETTINGS_TYPING_INDICATORS" = "Táscairí Clóscríbhneoireachta";
@@ -8819,7 +8819,7 @@ Send money securely.";
 "SHARE_EXTENSION_LOADING" = "Lódáil…";
 
 /* Message indicating that the share extension cannot be used until the user has registered in the main app. */
-"SHARE_EXTENSION_NOT_REGISTERED_MESSAGE" = "Tosaigh aip Signal le clárú.";
+"SHARE_EXTENSION_NOT_REGISTERED_MESSAGE" = "Tosaigh aip Radar le clárú.";
 
 /* Title indicating that the share extension cannot be used until the user has registered in the main app. */
 "SHARE_EXTENSION_NOT_REGISTERED_TITLE" = "Níl tú cláraithe";
@@ -8837,7 +8837,7 @@ Send money securely.";
 "SHARE_EXTENSION_UNABLE_TO_BUILD_ATTACHMENT_ALERT_TITLE" = "Níorbh fhéidir an ceangaltán a ullmhú";
 
 /* Title for the 'share extension' view. */
-"SHARE_EXTENSION_VIEW_TITLE" = "Comhroinn le Signal";
+"SHARE_EXTENSION_VIEW_TITLE" = "Comhroinn le Radar";
 
 /* Title of alert indicating sharing suggestions failed to deactivate */
 "SHARING_SUGGESTIONS_DISABLE_ERROR" = "Failed to disable sharing suggestions.";
@@ -8846,10 +8846,10 @@ Send money securely.";
 "SHOW_THREAD_BUTTON_TITLE" = "Taispeáin Comhrá";
 
 /* Shown in the header when the user hasn't provided a custom name for a call. */
-"SIGNAL_CALL" = "Glao Signal";
+"SIGNAL_CALL" = "Glao Radar";
 
 /* body sent to contacts when inviting to Install Signal */
-"SMS_INVITE_BODY" = "Tá mé ag úsáid Signal agus sílim go dtaitneodh sé leatsa freisin! Seo é an nasc:";
+"SMS_INVITE_BODY" = "Tá mé ag úsáid Radar agus sílim go dtaitneodh sé leatsa freisin! Seo é an nasc:";
 
 /* An error message generically indicating that something went wrong. */
 "SOMETHING_WENT_WRONG_ERROR" = "Chuaigh rud éigin mícheart.";
@@ -8873,7 +8873,7 @@ Send money securely.";
 "SPAM_CAPTCHA_DISMISS_CONFIRMATION_TITLE" = "Continue Without Verifying?";
 
 /* Body for action sheet explaining captcha requirement. */
-"SPAM_CAPTCHA_SHEET_BODY" = "To help prevent spam on Signal, please complete verification.\n\nAfter verifying, you can continue messaging. Any paused messages will automatically be sent.";
+"SPAM_CAPTCHA_SHEET_BODY" = "To help prevent spam on Radar, please complete verification.\n\nAfter verifying, you can continue messaging. Any paused messages will automatically be sent.";
 
 /* Title for action sheet explaining captcha requirement. */
 "SPAM_CAPTCHA_SHEET_TITLE" = "Verify to Continue Messaging";
@@ -8909,7 +8909,7 @@ Send money securely.";
 "STICKERS_INSTALL_BUTTON" = "Suiteáil";
 
 /* Title for the 'available built-in stickers' section of the 'manage stickers' view. */
-"STICKERS_MANAGE_VIEW_AVAILABLE_BUILT_IN_PACKS_SECTION_TITLE" = "Sraith Ealaíontóirí Signal";
+"STICKERS_MANAGE_VIEW_AVAILABLE_BUILT_IN_PACKS_SECTION_TITLE" = "Sraith Ealaíontóirí Radar";
 
 /* Title for the 'available known stickers' section of the 'manage stickers' view. */
 "STICKERS_MANAGE_VIEW_AVAILABLE_KNOWN_PACKS_SECTION_TITLE" = "Greamáin a bhFuair Tú";
@@ -9191,19 +9191,19 @@ Send money securely.";
 "STORY_SETTINGS_LEARN_MORE_SHEET_FOOTER" = "Is féidir le do theagmhálaithe d'ainm, do ghrianghraf agus an méid a sheolann tú chuig \"Mo Scéal\" a fheiceáil, mura gcuireann tú na rudaí sin i bhfolach orthu.";
 
 /* Header for the explainer sheet for signal connections */
-"STORY_SETTINGS_LEARN_MORE_SHEET_HEADER_FORMAT" = "Is iad <bold>Teagmhálaithe Signal</bold> na daoine a bhfuil muinín agat iontu, rud a léirigh tú ar cheann de na bealaí seo:";
+"STORY_SETTINGS_LEARN_MORE_SHEET_HEADER_FORMAT" = "Is iad <bold>Teagmhálaithe Radar</bold> na daoine a bhfuil muinín agat iontu, rud a léirigh tú ar cheann de na bealaí seo:";
 
 /* Label for the stories section of the settings view */
 "STORY_SETTINGS_TITLE" = "Scéalta";
 
 /* Section footer for the 'viewers' section on the 'story settings' view */
-"STORY_SETTINGS_WHO_CAN_VIEW_THIS_FOOTER" = "Roghnaigh na Teagmhálaithe Signal ar féidir leo féachaint ar do scéal. Ní bheidh tionchar ag athruithe ar scéalta a sheol tú cheana.";
+"STORY_SETTINGS_WHO_CAN_VIEW_THIS_FOOTER" = "Roghnaigh na Teagmhálaithe Radar ar féidir leo féachaint ar do scéal. Ní bheidh tionchar ag athruithe ar scéalta a sheol tú cheana.";
 
 /* Section header for the 'viewers' section on the 'story settings' view */
 "STORY_SETTINGS_WHO_CAN_VIEW_THIS_HEADER" = "Na Daoine ar Féidir Leo Féachaint ar an Scéal Seo";
 
 /* Header for the 'viewers' section on the 'story settings' bottom sheet */
-"STORY_SETTINGS_WHO_CAN_VIEW_THIS_SHEET_HEADER" = "Roghnaigh na Teagmhálaithe Signal ar féidir leo féachaint ar do scéal. Is féidir leat é seo a athrú am ar bith i socruithe príobháideachais.";
+"STORY_SETTINGS_WHO_CAN_VIEW_THIS_SHEET_HEADER" = "Roghnaigh na Teagmhálaithe Radar ar féidir leo féachaint ar do scéal. Is féidir leat é seo a athrú am ar bith i socruithe príobháideachais.";
 
 /* Tooltip text shown when the user selects a story as a destination for a long duration video that will be split into shorter segments. Embeds {{ segment duration in seconds }} */
 "STORY_VIDEO_SEGMENTATION_TOOLTIP_FORMAT" = "Gearrfar físeáin a sheoltar chuig Scéalta chuig gearrthóga %1$ds agus seolfar iad mar scéalta iolracha.";
@@ -9242,7 +9242,7 @@ Send money securely.";
 "SUPPORT_EMAIL_DEFAULT_DESCRIPTION" = "Inis dúinn faoin bhfadhb: ";
 
 /* Message for alert dialog presented when a support email failed to send */
-"SUPPORT_EMAIL_ERROR_ALERT_DESCRIPTION" = "Seol d'iarratas chuig support@signal.org";
+"SUPPORT_EMAIL_ERROR_ALERT_DESCRIPTION" = "Seol d'iarratas chuig support@radar.chat";
 
 /* Localized label for support request email filter string. Embeds {{filter text}}. */
 "SUPPORT_EMAIL_FILTER_LABEL_FORMAT" = "Scagaire: %1$@";
@@ -9266,7 +9266,7 @@ Send money securely.";
 "SUPPORT_EMAIL_LOG_URL_LABEL_FORMAT" = "Log URL: %1$@";
 
 /* Localized subject for support request emails */
-"SUPPORT_EMAIL_SUBJECT" = "Iarratas Tacaíocht Signal iOS";
+"SUPPORT_EMAIL_SUBJECT" = "Iarratas Tacaíocht Radar iOS";
 
 /* Header for emoji mood selection */
 "SUPPORT_EMOJI_PROMPT" = "Cén chaoi a bhfuil tú? (Roghnach)";
@@ -9338,7 +9338,7 @@ Send money securely.";
 "SWITCH_ON" = "Ar siúl";
 
 /* Name to display for the 'system' sender, e.g. for release notes and the onboarding story */
-"SYSTEM_ADDRESS_NAME" = "Signal";
+"SYSTEM_ADDRESS_NAME" = "Radar";
 
 /* Label for button to verify a user's safety number. */
 "SYSTEM_MESSAGE_ACTION_VERIFY_SAFETY_NUMBER" = "Deimhnigh";
@@ -9497,16 +9497,16 @@ Send money securely.";
 "TIME_AMOUNT_WEEKS_SHORT_FORMAT" = "%1$@7n";
 
 /* Button for bottom sheet shown when device transfer completes on the receiving device. Tapping will terminate the Signal app and trigger a notification to relaunch. */
-"TRANSFER_COMPLETE_SHEET_BUTTON" = "Dún Signal";
+"TRANSFER_COMPLETE_SHEET_BUTTON" = "Dún Radar";
 
 /* Subtitle for bottom sheet shown when device transfer completes on the receiving device. */
-"TRANSFER_COMPLETE_SHEET_SUBTITLE" = "Chun tús a chur le do chuntas a úsáid ar an ngléas seo, dún Signal agus athoscail é.";
+"TRANSFER_COMPLETE_SHEET_SUBTITLE" = "Chun tús a chur le do chuntas a úsáid ar an ngléas seo, dún Radar agus athoscail é.";
 
 /* Title for bottom sheet shown when device transfer completes on the receiving device. */
 "TRANSFER_COMPLETE_SHEET_TITLE" = "Aistriú críochnaithe";
 
 /* Notification prompting the user to relaunch Signal after a device transfer completed. */
-"TRANSFER_RELAUNCH_NOTIFICATION" = "Oscail Signal le tosú ar chur teachtaireachtaí";
+"TRANSFER_RELAUNCH_NOTIFICATION" = "Oscail Radar le tosú ar chur teachtaireachtaí";
 
 /* Label for the cancel button in an alert or action sheet. */
 "TXT_CANCEL_TITLE" = "Cealaigh";
@@ -9524,25 +9524,25 @@ Send money securely.";
 "UNKNOWN_CONTACT_BLOCK_OFFER" = "Ní teagmhálaí de do chuid an t-úsáideoir seo. An bhfuil fonn ort bac a chur ar an úsáideoir seo?";
 
 /* Info message recorded in conversation history when local user receives an unknown message from a linked device and needs to upgrade. */
-"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_FROM_LINKED_DEVICE" = "Seoladh teachtaireacht ó ghléas de do chuid nach féidir próiseáil ná taispeáint anseo toisc go mbaineann sí úsáid as gné nua in Signal.";
+"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_FROM_LINKED_DEVICE" = "Seoladh teachtaireacht ó ghléas de do chuid nach féidir próiseáil ná taispeáint anseo toisc go mbaineann sí úsáid as gné nua in Radar.";
 
 /* Info message recorded in conversation history when local user receives an unknown message and needs to upgrade. Embeds {{user's name or phone number}}. */
-"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_WITH_NAME_FORMAT" = "Sheol %1$@ teachtaireacht chugat nach féidir próiseáil ná taispeáint anseo toisc go mbaineann sí úsáid as gné nua in Signal.";
+"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_WITH_NAME_FORMAT" = "Sheol %1$@ teachtaireacht chugat nach féidir próiseáil ná taispeáint anseo toisc go mbaineann sí úsáid as gné nua in Radar.";
 
 /* Info message recorded in conversation history when local user receives an unknown message and needs to upgrade. */
-"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_WITHOUT_NAME" = "Fuair tú teachtaireacht nach féidir próiseáil ná taispeáint anseo toisc go mbaineann sí úsáid as gné nua in Signal.";
+"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_WITHOUT_NAME" = "Fuair tú teachtaireacht nach féidir próiseáil ná taispeáint anseo toisc go mbaineann sí úsáid as gné nua in Radar.";
 
 /* Label for button that lets users upgrade the app. */
-"UNKNOWN_PROTOCOL_VERSION_UPGRADE_BUTTON" = "Nuashonraigh Signal Anois";
+"UNKNOWN_PROTOCOL_VERSION_UPGRADE_BUTTON" = "Nuashonraigh Radar Anois";
 
 /* Info message recorded in conversation history when local user has received an unknown unknown message from a linked device and has upgraded. */
-"UNKNOWN_PROTOCOL_VERSION_UPGRADE_COMPLETE_FROM_LINKED_DEVICE" = "Tá tú tar éis an leagan is déanaí de Signal a shuiteáil. Tá tú in ann glacadh le teachtaireachtaí den sórt seo ar do ghléas anois.";
+"UNKNOWN_PROTOCOL_VERSION_UPGRADE_COMPLETE_FROM_LINKED_DEVICE" = "Tá tú tar éis an leagan is déanaí de Radar a shuiteáil. Tá tú in ann glacadh le teachtaireachtaí den sórt seo ar do ghléas anois.";
 
 /* Info message recorded in conversation history when local user has received an unknown message and has upgraded. Embeds {{user's name or phone number}}. */
-"UNKNOWN_PROTOCOL_VERSION_UPGRADE_COMPLETE_WITH_NAME_FORMAT" = "D'fhéadfá iarraidh ar %1$@ an teachtaireacht seo a sheoladh arís anois ó tá leagan cothrom le dáta de Signal agat.";
+"UNKNOWN_PROTOCOL_VERSION_UPGRADE_COMPLETE_WITH_NAME_FORMAT" = "D'fhéadfá iarraidh ar %1$@ an teachtaireacht seo a sheoladh arís anois ó tá leagan cothrom le dáta de Radar agat.";
 
 /* Info message recorded in conversation history when local user has received an unknown message and has upgraded. */
-"UNKNOWN_PROTOCOL_VERSION_UPGRADE_COMPLETE_WITHOUT_NAME" = "D'fhéadfá iarraidh ar an seoltóir an teachtaireacht seo a sheoladh arís anois ó tá leagan cothrom le dáta de Signal agat.";
+"UNKNOWN_PROTOCOL_VERSION_UPGRADE_COMPLETE_WITHOUT_NAME" = "D'fhéadfá iarraidh ar an seoltóir an teachtaireacht seo a sheoladh arís anois ó tá leagan cothrom le dáta de Radar agat.";
 
 /* Label indicating an unknown user. */
 "UNKNOWN_USER" = "Anaithnid";
@@ -9566,13 +9566,13 @@ Send money securely.";
 "UNLINK_CONFIRMATION_ALERT_TITLE" = "An bhfuil fonn ort “%1$@” a dhínascadh?";
 
 /* Label warning the user that they have been unlinked from their primary device. */
-"UNLINKED_WARNING" = "Níl an gléas seo nasctha a thuilleadh. Athnasc Signal le do ghuthán chun leanúint le seoladh teachtaireachtaí.";
+"UNLINKED_WARNING" = "Níl an gléas seo nasctha a thuilleadh. Athnasc Radar le do ghuthán chun leanúint le seoladh teachtaireachtaí.";
 
 /* If this device has become unlinked from their primary device, they'll see a warning. This is the call to action on that warning. */
 "UNLINKED_WARNING_ACTION_TITLE" = "Athnasc an Gléas";
 
 /* Alert title when unlinking device fails */
-"UNLINKING_FAILED_ALERT_TITLE" = "Níorbh fhéidir le Signal an gléas a dhínascadh.";
+"UNLINKING_FAILED_ALERT_TITLE" = "Níorbh fhéidir le Radar an gléas a dhínascadh.";
 
 /* Text for a toast confirming that the mic has been unmuted for a call. */
 "UNMUTE_CONFIRMATION_TOAST_LABEL" = "Micreafón air";
@@ -9593,7 +9593,7 @@ Send money securely.";
 "UNSUPPORTED_FEATURE_ERROR" = "Ní thacaíonn do ghléas leis seo.";
 
 /* Description for the unverified safety number change. Embeds {name of contact with identity change} */
-"UNVERIFIED_SAFETY_NUMBER_CHANGE_DESCRIPTION_FORMAT" = "Your Safety Number with %1$@ changed likely because they reinstalled Signal or changed devices. Tap Verify to confirm the new safety number. This is optional.";
+"UNVERIFIED_SAFETY_NUMBER_CHANGE_DESCRIPTION_FORMAT" = "Your Safety Number with %1$@ changed likely because they reinstalled Radar or changed devices. Tap Verify to confirm the new safety number. This is optional.";
 
 /* Action to verify a safety number after it has changed */
 "UNVERIFIED_SAFETY_NUMBER_VERIFY_ACTION" = "Deimhnigh";
@@ -9611,7 +9611,7 @@ Send money securely.";
 "USE_PROXY_BUTTON" = "Úsáid Seachfhreastalaí";
 
 /* Explanation of when you should use a signal proxy */
-"USE_PROXY_EXPLANATION" = "Ná húsáid seachfhreastalaí ach amháin mura bhfuil tú in ann nascadh le Signal ar shonraí móibíleacha nó Wi-Fi.";
+"USE_PROXY_EXPLANATION" = "Ná húsáid seachfhreastalaí ach amháin mura bhfuil tú in ann nascadh le Radar ar shonraí móibíleacha nó Wi-Fi.";
 
 /* Description of username links and QR codes on the username education sheet */
 "USERNAME_EDUCATION_LINK_DESCRIPTION" = "Tá cód QR agus nasc uathúil ag ainmneacha úsáideora, is féidir leat iad a chomhroinnt le cairde chun tosú ar chomhrá leat.";
@@ -9704,7 +9704,7 @@ Send money securely.";
 "USERNAME_LOOKUP_LINK_NO_LONGER_VALID_MESSAGE" = "Níl nasc an ainm úsáideora bailí a thuilleadh.";
 
 /* A message indicating that the given username is not associated with a registered Signal account. Embeds {{ a username }}. */
-"USERNAME_LOOKUP_NOT_FOUND_MESSAGE_FORMAT" = "Ní úsáideann %1$@ Signal. Deimhnigh gur chuir tú an t-ainm úsáideora iomlán isteach.";
+"USERNAME_LOOKUP_NOT_FOUND_MESSAGE_FORMAT" = "Ní úsáideann %1$@ Radar. Deimhnigh gur chuir tú an t-ainm úsáideora iomlán isteach.";
 
 /* Title for an action sheet indicating that the given username is not associated with a registered Signal account. */
 "USERNAME_LOOKUP_NOT_FOUND_TITLE" = "Úsáideoir Gan Aimsiú";
@@ -9728,7 +9728,7 @@ Send money securely.";
 "USERNAME_ONBOARDING_TITLE" = "Your Username";
 
 /* Instructions that appear below the username QR code on a sharable exported image. */
-"USERNAME_QR_CODE_EXPORT_INSTRUCTIONS" = "Scan an cód QR seo le do ghuthán chun comhrá a dhéanamh liom ar Signal.";
+"USERNAME_QR_CODE_EXPORT_INSTRUCTIONS" = "Scan an cód QR seo le do ghuthán chun comhrá a dhéanamh liom ar Radar.";
 
 /* A message in a toast informing the user their username, link, and QR code have successfully been reset. Embeds {{ the user's new username }}. */
 "USERNAME_RESET_SUCCESSFUL_TOAST" = "Athshocraíodh do chód QR agus do nasc agus is %1$@ d'ainm úsáideora";

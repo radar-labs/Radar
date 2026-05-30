@@ -32,7 +32,7 @@
 "ACCOUNT_DATA_REPORT_CONFIRM_EXPORT_CONFIRM_BUTTON" = "보고서 내보내기";
 
 /* Users can request a report of their account data. Before they get their account export, they are warned to only share account data with trustworthy sources. This is the message on that warning. */
-"ACCOUNT_DATA_REPORT_CONFIRM_EXPORT_MESSAGE" = "Signal 계정 데이터를 신뢰하는 사람 또는 앱에만 공유하세요.";
+"ACCOUNT_DATA_REPORT_CONFIRM_EXPORT_MESSAGE" = "Radar 계정 데이터를 신뢰하는 사람 또는 앱에만 공유하세요.";
 
 /* Users can request a report of their account data. If this request fails (probably because of a network connection problem), they will see an error sheet. This is the message on that error. */
 "ACCOUNT_DATA_REPORT_ERROR_MESSAGE" = "연결을 확인하고 다시 시도하세요.";
@@ -59,7 +59,7 @@
 "ACCOUNT_DATA_REPORT_FOOTER" = "보고서는 내보내기를 하는 시점에만 생성되며, 기기의 Signal에는 저장되지 않습니다.";
 
 /* Users can request a report of their account data. This is the subtitle on the screen where they do this, giving them more information. */
-"ACCOUNT_DATA_REPORT_SUBTITLE" = "Signal 계정 데이터 보고서를 다운로드하고 내보냅니다. 이 보고서는 메시지나 미디어를 포함하지 않습니다.";
+"ACCOUNT_DATA_REPORT_SUBTITLE" = "Radar 계정 데이터 보고서를 다운로드하고 내보냅니다. 이 보고서는 메시지나 미디어를 포함하지 않습니다.";
 
 /* Users can request a report of their account data. This is the title on the screen where they do this. */
 "ACCOUNT_DATA_REPORT_TITLE" = "내 계정 데이터";
@@ -83,7 +83,7 @@
 "ACTION_VIDEO_CALL" = "영상 통화";
 
 /* Label for 'voice call' button in contact view. */
-"ACTION_VOICE_CALL" = "Signal 통화";
+"ACTION_VOICE_CALL" = "Radar 통화";
 
 /* The title for the 'add group members' view. */
 "ADD_GROUP_MEMBERS_VIEW_TITLE" = "멤버 추가";
@@ -203,13 +203,13 @@
 "APN_Message" = "새 메시지가 있을 수 있음";
 
 /* Default message for the 'app launch failed' alert. */
-"APP_LAUNCH_FAILURE_ALERT_MESSAGE" = "Signal 시작에 실패했습니다. 문제 해결을 위해 디버그 로그를 support@signal.org로 보내주세요.";
+"APP_LAUNCH_FAILURE_ALERT_MESSAGE" = "Radar 시작에 실패했습니다. 문제 해결을 위해 디버그 로그를 support@radar.chat로 보내주세요.";
 
 /* Button to try launching the app even though the last launch failed */
-"APP_LAUNCH_FAILURE_CONTINUE" = "대신 Signal 열기";
+"APP_LAUNCH_FAILURE_CONTINUE" = "대신 Radar 열기";
 
 /* Message for an error indicating that the app couldn't launch because some unexpected error happened with the user's registration status. */
-"APP_LAUNCH_FAILURE_CORRUPT_REGISTRATION_MESSAGE" = "우리가 이 문제를 해결할 수 있도록 support@signal.org로 디버그 로그를 보내주세요.";
+"APP_LAUNCH_FAILURE_CORRUPT_REGISTRATION_MESSAGE" = "우리가 이 문제를 해결할 수 있도록 support@radar.chat로 디버그 로그를 보내주세요.";
 
 /* Title for an error indicating that the app couldn't launch because some unexpected error happened with the user's registration status. */
 "APP_LAUNCH_FAILURE_CORRUPT_REGISTRATION_TITLE" = "Signal을 열 수 없음";
@@ -224,7 +224,7 @@
 "APP_LAUNCH_FAILURE_INVALID_DATABASE_VERSION_TITLE" = "데이터베이스 버전을 알 수 없습니다.";
 
 /* Error indicating that the app crashed during the previous launch. */
-"APP_LAUNCH_FAILURE_LAST_LAUNCH_CRASHED_MESSAGE" = "Signal을 여는 도중 오류가 발생했습니다. 문제 해결을 위해 support@signal.org에 디버그 로그를 보내주세요.";
+"APP_LAUNCH_FAILURE_LAST_LAUNCH_CRASHED_MESSAGE" = "Signal을 여는 도중 오류가 발생했습니다. 문제 해결을 위해 support@radar.chat에 디버그 로그를 보내주세요.";
 
 /* Error indicating that the app crashed during the previous launch. */
 "APP_LAUNCH_FAILURE_LAST_LAUNCH_CRASHED_TITLE" = "Signal을 열 수 없음";
@@ -236,7 +236,7 @@
 "APP_LAUNCH_FAILURE_LOW_STORAGE_SPACE_AVAILABLE_TITLE" = "저장공간 부족";
 
 /* Error indicating that the app could not restore transferred data. */
-"APP_LAUNCH_FAILURE_RESTORE_FAILED_MESSAGE" = "이전 기기에서 전송한 데이터를 복구할 수 없습니다. 문제를 해결할 수 있도록 support@signal.org로 디버그 로그를 보내 주세요. Signal을 다시 설치하면 메시지 기록이 손실될 수 있습니다.";
+"APP_LAUNCH_FAILURE_RESTORE_FAILED_MESSAGE" = "이전 기기에서 전송한 데이터를 복구할 수 없습니다. 문제를 해결할 수 있도록 support@radar.chat로 디버그 로그를 보내 주세요. Signal을 다시 설치하면 메시지 기록이 손실될 수 있습니다.";
 
 /* Error indicating that the app could not restore transferred data. */
 "APP_LAUNCH_FAILURE_RESTORE_FAILED_TITLE" = "전송을 완료할 수 없음";
@@ -260,7 +260,7 @@
 "APP_UPDATE_NAG_ALERT_MESSAGE_FORMAT" = "%1$@ 버전을 지금 App Store에서 다운로드할 수 있습니다.";
 
 /* Title for the 'new app version available' alert. */
-"APP_UPDATE_NAG_ALERT_TITLE" = "Signal 새 버전 이용 가능";
+"APP_UPDATE_NAG_ALERT_TITLE" = "Radar 새 버전 이용 가능";
 
 /* Label for the 'update' button in the 'new app version available' alert. */
 "APP_UPDATE_NAG_ALERT_UPDATE_BUTTON" = "업데이트";
@@ -596,10 +596,10 @@
 "BACKUP_ONBOARDING_INTRO_NOT_NOW_TOAST" = "설정에서 백업을 활성화할 수 있습니다.";
 
 /* Subtitle for a view introducing Backups during an onboarding flow. */
-"BACKUP_ONBOARDING_INTRO_SUBTITLE" = "Signal의 안전한 엔드투엔드 암호화 저장소 서비스를 사용하여 메시지와 미디어를 백업하세요. 새 휴대폰을 구매하거나 Signal을 다시 설치하는 경우에도 메시지를 손실할 염려가 없습니다.";
+"BACKUP_ONBOARDING_INTRO_SUBTITLE" = "Radar의 안전한 엔드투엔드 암호화 저장소 서비스를 사용하여 메시지와 미디어를 백업하세요. 새 휴대폰을 구매하거나 Radar을 다시 설치하는 경우에도 메시지를 손실할 염려가 없습니다.";
 
 /* Title for a view introducing Backups during an onboarding flow. */
-"BACKUP_ONBOARDING_INTRO_TITLE" = "Signal 안전 백업";
+"BACKUP_ONBOARDING_INTRO_TITLE" = "Radar 안전 백업";
 
 /* Text for a bullet point in a view introducing the 'Recovery Key' during an onboarding flow. */
 "BACKUP_ONBOARDING_KEY_INTRO_BULLET_1" = "복구 키는 백업을 복구하는 데 필요한 64자 코드입니다.";
@@ -617,10 +617,10 @@
 "BACKUP_ONBOARDING_KEY_INTRO_TITLE" = "복구 키";
 
 /* Body for a sheet shown when your Backup plan is downgraded. */
-"BACKUP_PLAN_DOWNGRADED_SHEET_BODY" = "현재 등록된 결제 수단으로 갱신할 수 없어 백업 구독이 만료되었습니다.\n\n미디어 백업을 계속하려면 다시 구독하세요. 무료 Signal 백업 플랜을 계속 이용할 수 있습니다.";
+"BACKUP_PLAN_DOWNGRADED_SHEET_BODY" = "현재 등록된 결제 수단으로 갱신할 수 없어 백업 구독이 만료되었습니다.\n\n미디어 백업을 계속하려면 다시 구독하세요. 무료 Radar 백업 플랜을 계속 이용할 수 있습니다.";
 
 /* Body for a sheet shown when your Backup plan is downgraded because you stopped using TestFlight. */
-"BACKUP_PLAN_DOWNGRADED_SHEET_BODY_TESTFLIGHT" = "TestFlight를 더 이상 사용하지 않아 백업 구독이 만료되었습니다.\n\n미디어 백업을 계속하려면 다시 구독하세요. 무료 Signal 백업 플랜을 계속 이용할 수 있습니다.";
+"BACKUP_PLAN_DOWNGRADED_SHEET_BODY_TESTFLIGHT" = "TestFlight를 더 이상 사용하지 않아 백업 구독이 만료되었습니다.\n\n미디어 백업을 계속하려면 다시 구독하세요. 무료 Radar 백업 플랜을 계속 이용할 수 있습니다.";
 
 /* Primary button for a sheet shown when your Backup plan is downgraded. */
 "BACKUP_PLAN_DOWNGRADED_SHEET_PRIMARY_BUTTON" = "백업 관리";
@@ -746,7 +746,7 @@
 "BACKUP_SETTINGS_BACKUP_PLAN_PAID_BUT_IAP_NOT_FOUND_LOCALLY_ACTION_BUTTON_TITLE" = "갱신";
 
 /* Text describing that the user's paid backup plan did not correspond to a App Store subscription on this device. */
-"BACKUP_SETTINGS_BACKUP_PLAN_PAID_BUT_IAP_NOT_FOUND_LOCALLY_DESCRIPTION" = "이 기기에서 구독 정보를 찾지 못했습니다. Signal 백업을 계속 사용하려면 갱신하세요.";
+"BACKUP_SETTINGS_BACKUP_PLAN_PAID_BUT_IAP_NOT_FOUND_LOCALLY_DESCRIPTION" = "이 기기에서 구독 정보를 찾지 못했습니다. Radar 백업을 계속 사용하려면 갱신하세요.";
 
 /* Header describing what the paid backup plan includes. */
 "BACKUP_SETTINGS_BACKUP_PLAN_PAID_HEADER" = "텍스트 + 모든 미디어 백업";
@@ -842,7 +842,7 @@
 "BACKUP_SETTINGS_DISABLING_SUBSCRIPTION_CANCEL_ACTION_SHEET_MANAGE_SUBSCRIPTION_BUTTON" = "구독 관리";
 
 /* Message for an action sheet shown when the user disables Backups, but is still subscribed to the paid plan. */
-"BACKUP_SETTINGS_DISABLING_SUBSCRIPTION_CANCEL_ACTION_SHEET_MESSAGE" = "구독을 취소하려면 구독 > Signal > 구독 취소를 탭하세요";
+"BACKUP_SETTINGS_DISABLING_SUBSCRIPTION_CANCEL_ACTION_SHEET_MESSAGE" = "구독을 취소하려면 구독 > Radar > 구독 취소를 탭하세요";
 
 /* Title for an action sheet shown when the user disables Backups, but is still subscribed to the paid plan. */
 "BACKUP_SETTINGS_DISABLING_SUBSCRIPTION_CANCEL_ACTION_SHEET_TITLE" = "유료 백업 플랜을 계속 구독 중입니다";
@@ -941,7 +941,7 @@
 "BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_TOGGLE_FOOTER_AVAILABLE_FOR_TESTERS" = "사용하지 않은 미디어는 오프로드되지만, TestFlight를 사용하는 동안에는 언제든지 백업에서 다운로드할 수 있습니다.";
 
 /* Footer for a toggle allowing users to change the Optimize Local Storage setting, if the toggle is unavailable. */
-"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_TOGGLE_FOOTER_UNAVAILABLE" = "저장 공간 최적화는 유료 Signal 백업으로만 사용할 수 있습니다. 이 기능을 사용하기 시작하려면 백업 플랜을 업그레이드하세요.";
+"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_TOGGLE_FOOTER_UNAVAILABLE" = "저장 공간 최적화는 유료 Radar 백업으로만 사용할 수 있습니다. 이 기능을 사용하기 시작하려면 백업 플랜을 업그레이드하세요.";
 
 /* Title for a toggle allowing users to change the Optimize Local Storage setting. */
 "BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_TOGGLE_TITLE" = "기기 저장 공간 최적화";
@@ -1001,10 +1001,10 @@
 "BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_MESSAGE" = "백업 용량에 따라 시간이 더 오래 걸릴 수 있습니다. 백업이 진행되는 동안에는 평소처럼 Signal을 사용할 수 있습니다.";
 
 /* Title for a sheet shown after the user enables backups. */
-"BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_TITLE" = "Signal 안전 백업에 오신 걸 환영합니다. 지금 백업을 시작하세요.";
+"BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_TITLE" = "Radar 안전 백업에 오신 걸 환영합니다. 지금 백업을 시작하세요.";
 
 /* Message for a sheet shown when your Backup subscription fails to renew. */
-"BACKUP_SUBSCRIPTION_FAILED_TO_RENEW_SHEET_MESSAGE" = "결제 수단이 최신 상태인지 확인하세요. 구독 관리 > Signal > 결제 수단 업데이트를 탭하세요.";
+"BACKUP_SUBSCRIPTION_FAILED_TO_RENEW_SHEET_MESSAGE" = "결제 수단이 최신 상태인지 확인하세요. 구독 관리 > Radar > 결제 수단 업데이트를 탭하세요.";
 
 /* Primary button for a sheet shown when your Backup subscription fails to renew. */
 "BACKUP_SUBSCRIPTION_FAILED_TO_RENEW_SHEET_PRIMARY_BUTTON" = "구독 관리";
@@ -1022,7 +1022,7 @@
 "BACKUPS_SETTINGS_TITLE" = "안전 백업";
 
 /* Body for system notification or megaphone when backups is enabled. Embeds {{ time backups was enabled }} */
-"BACKUPS_TURNED_ON_NOTIFICATION_BODY_FORMAT" = "%1$@에 이 계정의 Signal 백업을 켰습니다. 탭하여 확인하세요.";
+"BACKUPS_TURNED_ON_NOTIFICATION_BODY_FORMAT" = "%1$@에 이 계정의 Radar 백업을 켰습니다. 탭하여 확인하세요.";
 
 /* Title for system notification or megaphone when backups is enabled */
 "BACKUPS_TURNED_ON_TITLE" = "백업을 켜야 함";
@@ -1319,7 +1319,7 @@
 "CALL_LINK_JOIN_REQUEST_PROMPT" = "전화 받기…";
 
 /* Shown in a message bubble when you send a call link in a Signal chat */
-"CALL_LINK_LINK_PREVIEW_DESCRIPTION" = "이 링크를 사용하여 Signal 통화에 참여하세요.";
+"CALL_LINK_LINK_PREVIEW_DESCRIPTION" = "이 링크를 사용하여 Radar 통화에 참여하세요.";
 
 /* Text that appears on a toast in a call lobby before joining a call link informing the user what information will be shared with other call members when they have phone number sharing turned off. */
 "CALL_LINK_LOBBY_SHARING_INFO_PHONE_NUMBER_SHARING_OFF" = "링크를 통해 이 통화에 참여하는 모든 사용자에게 귀하의 이름과 사진이 표시됩니다.";
@@ -1448,10 +1448,10 @@
 "CALLING_MEMBER_VIEW_YOUR_CAMERA_IS_OFF" = "카메라가 꺼졌습니다.";
 
 /* The generic name used for calls if CallKit privacy is enabled */
-"CALLKIT_ANONYMOUS_CONTACT_NAME" = "Signal 사용자";
+"CALLKIT_ANONYMOUS_CONTACT_NAME" = "Radar 사용자";
 
 /* The generic name used for group calls if CallKit privacy is enabled */
-"CALLKIT_ANONYMOUS_GROUP_NAME" = "Signal 그룹";
+"CALLKIT_ANONYMOUS_GROUP_NAME" = "Radar 그룹";
 
 /* Title for the calls list view. */
 "CALLS_LIST_TITLE" = "전화";
@@ -1625,7 +1625,7 @@
 "CARD_DONATION_EXPIRATION_DATE_PLACEHOLDER" = "MM/YY";
 
 /* Users can choose to learn more about their credit/debit card donations, which will open a sheet with additional information. This is the body text of that sheet. */
-"CARD_DONATION_READ_MORE_SHEET_BODY" = "Signal은 기부할 때 사용자의 개인 정보를 수집하거나 저장하지 않습니다.\n\nSignal은 기부를 받을 때 Stripe를 결제 처리자로 사용합니다. Signal은 사용자가 Stripe에 제공하는 어떠한 정보에도 액세스하지 않으며, 이를 보관하거나 저장하지 않습니다.\n\nSignal은 사용자의 기부를 Signal 계정에 연결하거나 연결을 시도하지 않습니다.\n\nSignal을 지지해 주셔서 감사합니다!";
+"CARD_DONATION_READ_MORE_SHEET_BODY" = "Signal은 기부할 때 사용자의 개인 정보를 수집하거나 저장하지 않습니다.\n\nSignal은 기부를 받을 때 Stripe를 결제 처리자로 사용합니다. Signal은 사용자가 Stripe에 제공하는 어떠한 정보에도 액세스하지 않으며, 이를 보관하거나 저장하지 않습니다.\n\nSignal은 사용자의 기부를 Radar 계정에 연결하거나 연결을 시도하지 않습니다.\n\nSignal을 지지해 주셔서 감사합니다!";
 
 /* Users can choose to learn more about their credit/debit card donations, which will open a sheet with additional information. This is the title of that sheet. */
 "CARD_DONATION_READ_MORE_SHEET_TITLE" = "개인 정보는 비공개로 유지됩니다.";
@@ -1772,7 +1772,7 @@
 "COMPARE_SAFETY_NUMBER_ACTION" = "클립보드로 비교";
 
 /* Accessibility hint describing what you can do with the compose button */
-"COMPOSE_BUTTON_HINT" = "대화를 시작할 Signal 사용자를 선택하거나 검색하세요.";
+"COMPOSE_BUTTON_HINT" = "대화를 시작할 Radar 사용자를 선택하거나 검색하세요.";
 
 /* Accessibility label from compose button. */
 "COMPOSE_BUTTON_LABEL" = "작성";
@@ -1850,7 +1850,7 @@
 "CONTACT_ABOUT_SHEET_SECONDARY_NAME_TOOLTIP_MESSAGE" = "'%1$@'은(는) 사용자가 본인을 위해 Signal에 설정한 프로필 이름입니다.";
 
 /* A label indicating a user is a signal connection. */
-"CONTACT_ABOUT_SHEET_SIGNAL_CONNECTION_LABEL" = "Signal 커넥션";
+"CONTACT_ABOUT_SHEET_SIGNAL_CONNECTION_LABEL" = "Radar 커넥션";
 
 /* The title for a contact 'about' sheet. */
 "CONTACT_ABOUT_SHEET_TITLE" = "정보";
@@ -1952,7 +1952,7 @@
 "CONTACT_SHARE_INVALID_CONTACT" = "잘못된 연락처입니다.";
 
 /* Alert body when contacts disabled while trying to share a contact. */
-"CONTACT_SHARING_NO_ACCESS_BODY" = "Signal에 연락처 접근 권한이 필요합니다. iOS 설정으로 가서 연락처를 켜세요. 연락처는 암호화되며 Signal 서비스에 표시되지 않습니다.";
+"CONTACT_SHARING_NO_ACCESS_BODY" = "Signal에 연락처 접근 권한이 필요합니다. iOS 설정으로 가서 연락처를 켜세요. 연락처는 암호화되며 Radar 서비스에 표시되지 않습니다.";
 
 /* Alert title when contacts disabled while trying to share a contact. */
 "CONTACT_SHARING_NO_ACCESS_TITLE" = "연락처 접근 허용";
@@ -2420,7 +2420,7 @@
 "DATABASE_RECOVERY_RECOVERY_FAILED_DESCRIPTION" = "메시지 기록을 복구할 수 없습니다. Signal을 다시 설치하고 계속 사용할 수 있습니다. 어디에 문제가 있었는지 확인할 수 있도록 디버그 로그를 제출해 주세요.";
 
 /* The user has tried to recover their data after it was lost due to corruption. (They have not been hacked.) This button lets them delete all of their data. */
-"DATABASE_RECOVERY_RECOVERY_FAILED_RESET_APP_BUTTON" = "Signal 초기화";
+"DATABASE_RECOVERY_RECOVERY_FAILED_RESET_APP_BUTTON" = "Radar 초기화";
 
 /* The user has tried to recover their data after it was lost due to corruption. (They have not been hacked.) If they want to delete the app and restart, they will be presented with a confirmation dialog. This is the final button they will press before their data is reset. */
 "DATABASE_RECOVERY_RECOVERY_FAILED_RESET_APP_CONFIRMATION_CONFIRM" = "초기화";
@@ -2429,7 +2429,7 @@
 "DATABASE_RECOVERY_RECOVERY_FAILED_RESET_APP_CONFIRMATION_DESCRIPTION" = "내 계정 정보와 프로필, 모든 메시지를 삭제합니다. 이 프로세스를 완료하면 앱을 종료합니다.";
 
 /* The user has tried to recover their data after it was lost due to corruption. (They have not been hacked.) If they want to delete the app and restart, they will be presented with a confirmation dialog. This is the title of that dialog. */
-"DATABASE_RECOVERY_RECOVERY_FAILED_RESET_APP_CONFIRMATION_TITLE" = "Signal 초기화";
+"DATABASE_RECOVERY_RECOVERY_FAILED_RESET_APP_CONFIRMATION_TITLE" = "Radar 초기화";
 
 /* The user has tried to recover their data after it was lost due to corruption. (They have not been hacked.) They were asked to submit a debug log. This is the button that submits this log. */
 "DATABASE_RECOVERY_RECOVERY_FAILED_SUBMIT_DEBUG_LOG_BUTTON" = "디버그 로그 보내기";
@@ -2504,7 +2504,7 @@
 "DELETE_ACCOUNT_CONFIRMATION_ACTION_SHEEET_ACTION" = "계정 삭제";
 
 /* Title for the action sheet message of the 'delete account confirmation' view controller. */
-"DELETE_ACCOUNT_CONFIRMATION_ACTION_SHEEET_MESSAGE" = "이후 Signal 계정이 삭제되고 애플리케이션이 재설정됩니다. 프로세스가 완료되면 앱이 닫힙니다.";
+"DELETE_ACCOUNT_CONFIRMATION_ACTION_SHEEET_MESSAGE" = "이후 Radar 계정이 삭제되고 애플리케이션이 재설정됩니다. 프로세스가 완료되면 앱이 닫힙니다.";
 
 /* Title for the action sheet confirmation title of the 'delete account confirmation' view controller. */
 "DELETE_ACCOUNT_CONFIRMATION_ACTION_SHEEET_TITLE" = "계정을 삭제하시겠습니까?";
@@ -2528,7 +2528,7 @@
 "DELETE_ACCOUNT_CONFIRMATION_PHONE_NUMBER_TITLE" = "전화번호";
 
 /* Section header */
-"DELETE_ACCOUNT_CONFIRMATION_SECTION_TITLE" = "Signal 전화번호 확인";
+"DELETE_ACCOUNT_CONFIRMATION_SECTION_TITLE" = "Radar 전화번호 확인";
 
 /* Title for the 'delete account' confirmation view. */
 "DELETE_ACCOUNT_CONFIRMATION_TITLE" = "계정 삭제";
@@ -2671,13 +2671,13 @@
 "DEVICE_TRANSFER_ERROR_NOT_ENOUGH_SPACE" = "이동에 필요한 저장 공간이 부족합니다";
 
 /* An error indicating the user must update their device before trying to transfer. */
-"DEVICE_TRANSFER_ERROR_UNSUPPORTED_VERSION" = "최신 Signal 버전으로 업데이트한 후 다시 시도해 주세요.";
+"DEVICE_TRANSFER_ERROR_UNSUPPORTED_VERSION" = "최신 Radar 버전으로 업데이트한 후 다시 시도해 주세요.";
 
 /* Button shown to expand a QR code and view it fullscreen. */
 "DEVICE_TRANSFER_EXPAND_QR_CODE_BUTTON" = "더 크게 보기";
 
 /* The explanation on the action sheet prompting the user if they want to transfer their device. */
-"DEVICE_TRANSFER_PROMPT_EXPLANATION" = "새 iOS 기기로 Signal 계정을 이동하세요. 새 기기가 가까이 있고 켜져 있는지 확인하세요.";
+"DEVICE_TRANSFER_PROMPT_EXPLANATION" = "새 iOS 기기로 Radar 계정을 이동하세요. 새 기기가 가까이 있고 켜져 있는지 확인하세요.";
 
 /* The title on the acttion sheet prompting the user if they want to transfer their device. */
 "DEVICE_TRANSFER_PROMPT_TITLE" = "계정 이동";
@@ -3169,7 +3169,7 @@
 "DONATION_VIEW_DONATE_ON_BEHALF_OF_A_FRIEND" = "친구를 대신해 기부하세요.";
 
 /* Text describing to the user that they're going to pay a donation to Signal */
-"DONATION_VIEW_DONATION_TO_SIGNAL" = "Signal 기부";
+"DONATION_VIEW_DONATION_TO_SIGNAL" = "Radar 기부";
 
 /* Title for the 'Donor FAQ' button on the donation screen */
 "DONATION_VIEW_DONOR_FAQ" = "기부자 FAQ";
@@ -3181,7 +3181,7 @@
 "DONATION_VIEW_MANAGE_BADGES" = "배지";
 
 /* Text describing to the user that they're going to pay a monthly donation to Signal */
-"DONATION_VIEW_MONTHLY_DONATION_TO_SIGNAL" = "Signal 월간 기부";
+"DONATION_VIEW_MONTHLY_DONATION_TO_SIGNAL" = "Radar 월간 기부";
 
 /* Title for the 'more' section on the donation screen */
 "DONATION_VIEW_MORE_SECTION_TITLE" = "더 보기";
@@ -3247,7 +3247,7 @@
 "EMAIL_INVITE_SUBJECT" = "Signal로 옮깁시다";
 
 /* Description for the fallback support sheet if user cannot send email */
-"EMAIL_SIGNAL_MESSAGE" = "이 기기에서는 이메일을 보낼 수 있도록 설정되어 있지 않습니다. 지원 요청을 보내려면 이 기기에서 이메일을 보낼 수 있도록 설정하거나, support@signal.org 주소로 이메일을 보내주세요.";
+"EMAIL_SIGNAL_MESSAGE" = "이 기기에서는 이메일을 보낼 수 있도록 설정되어 있지 않습니다. 지원 요청을 보내려면 이 기기에서 이메일을 보낼 수 있도록 설정하거나, support@radar.chat 주소로 이메일을 보내주세요.";
 
 /* Title for the fallback support sheet if user cannot send email */
 "EMAIL_SIGNAL_TITLE" = "이메일 이용 불가";
@@ -3394,10 +3394,10 @@
 "ERROR_NETWORK_FAILURE" = "네트워크 오류";
 
 /* Format string for an error alert notification message. Embeds {{ error string }} */
-"ERROR_NOTIFICATION_MESSAGE_FORMAT" = "장치의 디버그 로그와 함께 support@signal.org에 이 오류(%1$@)를 보고하여 Signal 서비스를 개선할 수 있도록 도와주세요.";
+"ERROR_NOTIFICATION_MESSAGE_FORMAT" = "장치의 디버그 로그와 함께 support@radar.chat에 이 오류(%1$@)를 보고하여 Radar 서비스를 개선할 수 있도록 도와주세요.";
 
 /* Format string for an error alert notification title. */
-"ERROR_NOTIFICATION_TITLE" = "Signal 베타: 오류 발생";
+"ERROR_NOTIFICATION_TITLE" = "Radar 베타: 오류 발생";
 
 /* Error indicating a send failure due to a delinked application. */
 "ERROR_SENDING_DELINKED" = "내 기기의 연결이 끊겼습니다. 메시지를 보내려면 다시 연결해주세요.";
@@ -3406,7 +3406,7 @@
 "ERROR_SENDING_DEREGISTERED" = "내 기기의 등록이 해제되었습니다. 메시지를 보내려면 다시 등록해주세요.";
 
 /* Error indicating a send failure due to an expired application. */
-"ERROR_SENDING_EXPIRED" = "설치된 Signal 버전이 만료되었습니다. 메시지를 보내려면 최신 버전으로 업데이트하세요.";
+"ERROR_SENDING_EXPIRED" = "설치된 Radar 버전이 만료되었습니다. 메시지를 보내려면 최신 버전으로 업데이트하세요.";
 
 /* Format string for 'unregistered user' error. Embeds {{the unregistered user's name or signal id}}. */
 "ERROR_UNREGISTERED_USER_FORMAT" = "등록되지 않은 사용자: %1$@";
@@ -3418,16 +3418,16 @@
 "EXIT_REREGISTRATION" = "등록 종료";
 
 /* Label notifying the user that the app has expired. */
-"EXPIRATION_ERROR" = "이 Signal 버전은 만료되었습니다. 메시지를 주고받으려면 업데이트하세요.";
+"EXPIRATION_ERROR" = "이 Radar 버전은 만료되었습니다. 메시지를 주고받으려면 업데이트하세요.";
 
 /* If the user's app is too old, they'll be shown a warning asking them to upgrade. This is the text on the warning, and tapping it will open the App Store page for Signal. */
 "EXPIRATION_WARNING_ACTION_TITLE" = "지금 업데이트하세요.";
 
 /* Label warning the user that the app will expire soon. Embeds {{date}}. */
-"EXPIRATION_WARNING_SOON" = "이 Signal 버전은 %1$@에 만료됩니다. 업데이트하여 계속 메시지를 주고받으세요.";
+"EXPIRATION_WARNING_SOON" = "이 Radar 버전은 %1$@에 만료됩니다. 업데이트하여 계속 메시지를 주고받으세요.";
 
 /* Label warning the user that the app will expire today. */
-"EXPIRATION_WARNING_TODAY" = "이 Signal 버전은 오늘 만료됩니다. 업데이트하여 계속 메시지를 주고받으세요.";
+"EXPIRATION_WARNING_TODAY" = "이 Radar 버전은 오늘 만료됩니다. 업데이트하여 계속 메시지를 주고받으세요.";
 
 /* action sheet header when re-sending message which failed because of an invalid key signature */
 "FAILED_SENDING_BECAUSE_INVALID_KEY_SIGNATURE" = "메시지를 전송하지 못했습니다. %1$@님이 Signal을 업데이트한 후 다시 열어야 합니다.";
@@ -4513,10 +4513,10 @@
 "INFO_MESSAGE_BLOCKED_OTHER_USER" = "이 사용자를 차단했습니다.";
 
 /* Indicates that a previously-removed recipient has been added back to the current user's contacts. */
-"INFO_MESSAGE_CONTACT_REINSTATED" = "이 사용자를 Signal 연락처 목록에 다시 추가했습니다.";
+"INFO_MESSAGE_CONTACT_REINSTATED" = "이 사용자를 Radar 연락처 목록에 다시 추가했습니다.";
 
 /* Indicates that the recipient has been removed from the current user's contacts and that messaging them will re-add them. */
-"INFO_MESSAGE_CONTACT_REMOVED" = "Signal 연락처 목록에서 삭제한 사용자입니다. 메시지를 보내면 해당 사용자가 연락처 목록에 다시 추가됩니다.";
+"INFO_MESSAGE_CONTACT_REMOVED" = "Radar 연락처 목록에서 삭제한 사용자입니다. 메시지를 보내면 해당 사용자가 연락처 목록에 다시 추가됩니다.";
 
 /* When you start a chat with someone and then later learn their profile name, we insert an in-chat message with this string to record the identifier you originally used to contact them. Embeds {{ the identifier, either a phone number or a username }}. */
 "INFO_MESSAGE_LEARNED_PROFILE_KEY" = "%1$@ 님과 이 대화를 시작했습니다.";
@@ -4711,7 +4711,7 @@
 "LINK_DEVICE_SCANNING_INSTRUCTIONS_SHEET_TITLE" = "QR 코드 스캔";
 
 /* Body text for a sheet when a user tries to link a device informing them that they will need to authenticate their device */
-"LINK_NEW_DEVICE_AUTHENTICATION_INFO_SHEET_BODY" = "계속을 탭하고 휴대폰 잠금을 풀어 확인하세요. Signal PIN을 입력하지 마세요.";
+"LINK_NEW_DEVICE_AUTHENTICATION_INFO_SHEET_BODY" = "계속을 탭하고 휴대폰 잠금을 풀어 확인하세요. Radar PIN을 입력하지 마세요.";
 
 /* Title for a sheet when a user tries to link a device informing them that they will need to authenticate their device */
 "LINK_NEW_DEVICE_AUTHENTICATION_INFO_SHEET_TITLE" = "연결 전 본인 확인";
@@ -4720,7 +4720,7 @@
 "LINK_NEW_DEVICE_AUTHENTICATION_REASON" = "기기를 연결하려면 인증하세요.";
 
 /* Body text for a sheet when a user has started linking a device informing them to finish the process on that other device */
-"LINK_NEW_DEVICE_FINISH_ON_OTHER_DEVICE_SHEET_BODY" = "다른 기기에서 Signal 연결을 완료하세요.";
+"LINK_NEW_DEVICE_FINISH_ON_OTHER_DEVICE_SHEET_BODY" = "다른 기기에서 Radar 연결을 완료하세요.";
 
 /* Title for a sheet when a user has started linking a device informing them to finish the process on that other device */
 "LINK_NEW_DEVICE_FINISH_ON_OTHER_DEVICE_SHEET_TITLE" = "다른 기기에서 연결 완료";
@@ -4762,7 +4762,7 @@
 "LINK_PREVIEW_UNKNOWN_DOMAIN" = "링크 미리보기";
 
 /* Shown in an alert when trying to edit a contact. */
-"LINKED_DEVICE_CONTACTS_NOT_ALLOWED" = "iPad에서는 더 이상 휴대폰 연락처 관리 기능을 사용할 수 없습니다. 휴대폰 연락처에 Signal 커넥션을 추가하려면 휴대폰에서 Signal을 여세요.";
+"LINKED_DEVICE_CONTACTS_NOT_ALLOWED" = "iPad에서는 더 이상 휴대폰 연락처 관리 기능을 사용할 수 없습니다. 휴대폰 연락처에 Radar 커넥션을 추가하려면 휴대폰에서 Signal을 여세요.";
 
 /* Shown in a banner when you tap the 'New Chat' icon at the top of the list of chats. */
 "LINKED_DEVICE_MANAGE_CONTACTS_BANNER" = "iPad에서는 더 이상 휴대폰 연락처 관리 기능이 지원되지 않습니다. 이 기기는 휴대폰의 Signal에 적용되는 모든 변경 내용을 계속해서 동기화합니다.";
@@ -4780,28 +4780,28 @@
 "LINKED_DEVICE_NOTIFICATION_TITLE" = "새 기기를 연결함";
 
 /* Message for an action sheet telling users how to link a device, when trying to open an external device-linking URL. */
-"LINKED_DEVICE_URL_OPENED_ACTION_SHEET_EXTERNAL_URL_MESSAGE" = "이 Signal 계정에 데스크톱이나 iPad를 연결하려면 연결된 기기로 이동하여 '새 기기 연결'을 탭한 다음 QR 코드를 다시 스캔하세요. Signal에서 직접 제공한 QR 코드만 스캔하세요.";
+"LINKED_DEVICE_URL_OPENED_ACTION_SHEET_EXTERNAL_URL_MESSAGE" = "이 Radar 계정에 데스크톱이나 iPad를 연결하려면 연결된 기기로 이동하여 '새 기기 연결'을 탭한 다음 QR 코드를 다시 스캔하세요. Signal에서 직접 제공한 QR 코드만 스캔하세요.";
 
 /* Message for an action sheet telling users how to link a device, when trying to open a device-linking URL from the in-app camera. */
-"LINKED_DEVICE_URL_OPENED_ACTION_SHEET_IN_APP_CAMERA_MESSAGE" = "Signal 기기를 연결하려는 것 같네요. 계속을 탭한 다음 '새 기기 연결'을 탭하고 QR 코드를 다시 스캔하세요.";
+"LINKED_DEVICE_URL_OPENED_ACTION_SHEET_IN_APP_CAMERA_MESSAGE" = "Radar 기기를 연결하려는 것 같네요. 계속을 탭한 다음 '새 기기 연결'을 탭하고 QR 코드를 다시 스캔하세요.";
 
 /* Bullet point about downloads on the linked devices education sheet. Embeds {{ %1$@ iPad download link, %2$@ desktop download link }} */
 "LINKED_DEVICES_EDUCATION_POINT_DOWNLOADS" = "다른 장치에서 %1$@을(를) 방문하여 iPad 앱을 설치하거나, %2$@을(를) 방문하여 데스크톱 앱을 설치하세요.";
 
 /* Bullet point about message sync on the linked devices education sheet */
-"LINKED_DEVICES_EDUCATION_POINT_MESSAGES" = "휴대폰의 Signal과 연결하면 Signal 메시지가 동기화됩니다.";
+"LINKED_DEVICES_EDUCATION_POINT_MESSAGES" = "휴대폰의 Signal과 연결하면 Radar 메시지가 동기화됩니다.";
 
 /* Bullet point about privacy on the linked devices education sheet */
 "LINKED_DEVICES_EDUCATION_POINT_PRIVACY" = "연결된 기기의 모든 메시지는 비공개입니다.";
 
 /* Title for the linked device education sheet */
-"LINKED_DEVICES_EDUCATION_TITLE" = "데스크톱 또는 iPad의 Signal";
+"LINKED_DEVICES_EDUCATION_TITLE" = "데스크톱 또는 iPad의 Radar";
 
 /* Text that appears where the linked device list would be indicating that there are no linked devices. */
 "LINKED_DEVICES_EMPTY_STATE" = "연결된 기기 없음";
 
 /* Description for header of the linked devices list */
-"LINKED_DEVICES_HEADER_DESCRIPTION" = "Use Signal on desktop or iPad.";
+"LINKED_DEVICES_HEADER_DESCRIPTION" = "Use Radar on desktop or iPad.";
 
 /* Footer text below the list of currently-linked devices */
 "LINKED_DEVICES_LIST_FOOTER" = "메시지와 대화 정보는 모든 장치에서 엔드투엔드 암호화로 보호됩니다";
@@ -4846,7 +4846,7 @@
 "LOADING_VIEW_CONTROLLER_DONT_CLOSE_APP" = "Signal을 닫지 마세요.";
 
 /* Body for local network permission action sheet */
-"LOCAL_NETWORK_PERMISSION_ACTION_SHEET_BODY" = "Signal 계정을 이전하려면 두 기기 모두에서 로컬 네트워크 액세스를 활성화해야 합니다.";
+"LOCAL_NETWORK_PERMISSION_ACTION_SHEET_BODY" = "Radar 계정을 이전하려면 두 기기 모두에서 로컬 네트워크 액세스를 활성화해야 합니다.";
 
 /* A button asking the user if they need further help getting their transfer working. */
 "LOCAL_NETWORK_PERMISSION_ACTION_SHEET_NEED_HELP" = "도움이 필요하신가요?";
@@ -4858,7 +4858,7 @@
 "LOCAL_NETWORK_PERMISSION_ACTION_SHEET_STEP_THREE" = "로컬 네트워크를 켭니다.";
 
 /* Second step for local network permission action sheet */
-"LOCAL_NETWORK_PERMISSION_ACTION_SHEET_STEP_TWO" = "Signal 탐색하기";
+"LOCAL_NETWORK_PERMISSION_ACTION_SHEET_STEP_TWO" = "Radar 탐색하기";
 
 /* Title for local network permission action sheet */
 "LOCAL_NETWORK_PERMISSION_ACTION_SHEET_TITLE" = "로컬 네트워크 액세스 켜기";
@@ -5020,7 +5020,7 @@
 "MESSAGE_ACTION_LINK_OPEN_LINK" = "링크 열기";
 
 /* Label for button to open a signal proxy. */
-"MESSAGE_ACTION_LINK_OPEN_PROXY" = "Signal 프록시 열기";
+"MESSAGE_ACTION_LINK_OPEN_PROXY" = "Radar 프록시 열기";
 
 /* Label for button to open a sticker pack. */
 "MESSAGE_ACTION_LINK_OPEN_STICKER_PACK" = "스티커 팩 보기";
@@ -5377,7 +5377,7 @@
 "MY_STORIES_SETTINGS_VISIBILITY_ALL_SIGNAL_CONNECTIONS_EXCEPT_TITLE" = "다음을 제외한 모든 사용자…";
 
 /* Title for the visibility option */
-"MY_STORIES_SETTINGS_VISIBILITY_ALL_SIGNAL_CONNECTIONS_TITLE" = "모든 Signal 커넥션";
+"MY_STORIES_SETTINGS_VISIBILITY_ALL_SIGNAL_CONNECTIONS_TITLE" = "모든 Radar 커넥션";
 
 /* Title for the visibility option */
 "MY_STORIES_SETTINGS_VISIBILITY_ONLY_SHARE_WITH_TITLE" = "다음 사용자와만 공유…";
@@ -5602,7 +5602,7 @@
 "NOTIFICATION_PERMISSION_REMINDER_MEGAPHONE_TITLE" = "알림을 켜시겠습니까?";
 
 /* Shown as the body of an alert when notifications can't be shown due to an error. */
-"NOTIFICATIONS_ERROR_MESSAGE" = "Signal 알림을 받지 못하는 경우 %1$@을(를) 다시 시작하세요.";
+"NOTIFICATIONS_ERROR_MESSAGE" = "Radar 알림을 받지 못하는 경우 %1$@을(를) 다시 시작하세요.";
 
 /* Shown as the title of an alert when notifications can't be shown due to an error. */
 "NOTIFICATIONS_ERROR_TITLE" = "알림을 표시할 수 없음";
@@ -5662,10 +5662,10 @@
 "ONBOARDING_2FA_SKIP_PIN_ENTRY_TITLE" = "PIN 입력을 건너뛰시겠습니까?";
 
 /* The body for the device transfer 'choice' view 'restore backup' option */
-"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_BODY" = "Radar/Signal 백업에서 계정과 메시지 복원하기";
+"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_BODY" = "Radar/Radar 백업에서 계정과 메시지 복원하기";
 
 /* The title for the device transfer 'choice' view 'restore backup' option */
-"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_TITLE" = "Radar/Signal 안전 백업 복원";
+"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_TITLE" = "Radar/Radar 안전 백업 복원";
 
 /* Body for a sheet warning users about skipping restore. */
 "ONBOARDING_CHOOSE_RESTORE_METHOD_CONFIRM_SKIP_RESTORE_BODY" = "지금 복원을 건너뛰면 나중에 복원할 수 없습니다. 이 기기에서 백업을 다시 활성화하면 현재 백업이 새 메시지 기록으로 바뀝니다.";
@@ -5677,7 +5677,7 @@
 "ONBOARDING_CHOOSE_RESTORE_METHOD_DESCRIPTION" = "메시지 기록과 계정 데이터를 복원할 방법을 선택하세요.";
 
 /* Message body displayed to a user during registration if there are no restore options available. */
-"ONBOARDING_CHOOSE_RESTORE_METHOD_NONE_AVAILABLE_BODY" = "Android에서 iOS로 이동하는 경우, 메시지와 미디어를 전송하는 유일한 방법은 이전 기기에서 Signal 백업을 활성화하는 것입니다.";
+"ONBOARDING_CHOOSE_RESTORE_METHOD_NONE_AVAILABLE_BODY" = "Android에서 iOS로 이동하는 경우, 메시지와 미디어를 전송하는 유일한 방법은 이전 기기에서 Radar 백업을 활성화하는 것입니다.";
 
 /* Title displayed to a user during registration if there are no restore options available. */
 "ONBOARDING_CHOOSE_RESTORE_METHOD_NONE_AVAILABLE_TITLE" = "복원할 백업이 없음";
@@ -5737,7 +5737,7 @@
 "ONBOARDING_MODE_SWITCH_BUTTON_REGISTERING" = "iPhone 연결하기";
 
 /* explanation to the user they're switching from linking to registering flow */
-"ONBOARDING_MODE_SWITCH_EXPLANATION_PROVISIONING" = "\"iPad 등록\"을 탭하면 새로운 Signal 계정을 만들거나 기존 계정을 iPad로 이전할 수 있습니다. 같은 전화번호로 등록된 다른 기기의 Signal은 모두 비활성화됩니다.";
+"ONBOARDING_MODE_SWITCH_EXPLANATION_PROVISIONING" = "\"iPad 등록\"을 탭하면 새로운 Radar 계정을 만들거나 기존 계정을 iPad로 이전할 수 있습니다. 같은 전화번호로 등록된 다른 기기의 Signal은 모두 비활성화됩니다.";
 
 /* explanation to the user they're switching from registering to linking flow */
 "ONBOARDING_MODE_SWITCH_EXPLANATION_REGISTERING" = "\"iPhone 연결\"을 탭하면 기존 계정을 휴대전화에 연결할 수 있습니다. 전화 등 일부 기능이 제한되기에 휴대전화를 연결하는 것은 권장하지 않습니다.";
@@ -5755,7 +5755,7 @@
 "ONBOARDING_MODE_SWITCH_WARNING_REGISTERING" = "iPhone을 연결하면 각종 주요 기능이 제한되기에 추천해 드리지 않습니다.";
 
 /* Description of the 'Contacts' permission in the 'onboarding permissions' view. */
-"ONBOARDING_PERMISSIONS_CONTACTS_DESCRIPTION" = "아는 사람을 찾으세요. 연락처는 암호화되며 Signal 서비스에 표시되지 않습니다.";
+"ONBOARDING_PERMISSIONS_CONTACTS_DESCRIPTION" = "아는 사람을 찾으세요. 연락처는 암호화되며 Radar 서비스에 표시되지 않습니다.";
 
 /* Title introducing the 'Contacts' permission in the 'onboarding permissions' view. */
 "ONBOARDING_PERMISSIONS_CONTACTS_TITLE" = "연락처";
@@ -5767,7 +5767,7 @@
 "ONBOARDING_PERMISSIONS_NOTIFICATIONS_TITLE" = "알림";
 
 /* Preamble of the 'onboarding permissions' view. */
-"ONBOARDING_PERMISSIONS_PREAMBLE" = "Signal에서 다음 사용 권한을 요청합니다.";
+"ONBOARDING_PERMISSIONS_PREAMBLE" = "Radar에서 다음 사용 권한을 요청합니다.";
 
 /* Description of the 'Notification Relay' permission in the 'onboarding permissions' view. */
 "ONBOARDING_PERMISSIONS_RELAY_DESCRIPTION" = "Enable Radar notification relay to ensure you get immediate background notifications in Radar. Relay is always privacy-preserving and keeps your messages end-to-end encrypted no matter what.";
@@ -5794,7 +5794,7 @@
 "ONBOARDING_PHONE_NUMBER_VALIDATION_WARNING" = "잘못된 전화번호입니다. 올바른 전화번호 입력 후 가입하세요";
 
 /* Explanation of the 'onboarding pin attempts exhausted' view when reglock is disabled. */
-"ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_EXPLANATION" = "PIN 시도 횟수 제한에 도달했으나 새로운 PIN을 만들어 Signal 계정에 계속 접근할 수 있습니다. 개인정보와 보안을 위해 저장된 프로필 정보 또는 설정은 삭제된 채로 복원됩니다.";
+"ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_EXPLANATION" = "PIN 시도 횟수 제한에 도달했으나 새로운 PIN을 만들어 Radar 계정에 계속 접근할 수 있습니다. 개인정보와 보안을 위해 저장된 프로필 정보 또는 설정은 삭제된 채로 복원됩니다.";
 
 /* Label for the 'learn more' link when reglock is disabled in the 'onboarding pin attempts exhausted' view. */
 "ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_LEARN_MORE" = "PIN에 대해 더 알아보기";
@@ -5803,7 +5803,7 @@
 "ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_TITLE" = "올바르지 않은 PIN";
 
 /* Explanation of the 'onboarding pin attempts exhausted' view when it is unknown if reglock is enabled. */
-"ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_WITH_UNKNOWN_REGLOCK_EXPLANATION" = "PIN 시도 횟수 제한에 도달했으나 전화번호를 확인하여 Signal 계정에 액세스할 수 있습니다. 개인 정보를 보호하고 보안을 지키기 위해 저장한 프로필 정보와 설정 없이 계정을 복원합니다.";
+"ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_WITH_UNKNOWN_REGLOCK_EXPLANATION" = "PIN 시도 횟수 제한에 도달했으나 전화번호를 확인하여 Radar 계정에 액세스할 수 있습니다. 개인 정보를 보호하고 보안을 지키기 위해 저장한 프로필 정보와 설정 없이 계정을 복원합니다.";
 
 /* Title for the setup complete screen shown at the end of the onboarding flow. */
 "ONBOARDING_SETUP_COMPLETE_TITLE" = "설정 완료";
@@ -5836,7 +5836,7 @@
 "ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_TITLE" = "이전 휴대폰이 없음";
 
 /* Explanation of 'have old device' flow for the 'Restore or Transfer' prompt */
-"ONBOARDING_SPLASH_HAVE_OLD_DEVICE_BODY" = "현재 Radar/Signal 계정에서 QR 코드를 스캔하여 빠르게 시작하세요";
+"ONBOARDING_SPLASH_HAVE_OLD_DEVICE_BODY" = "현재 Radar/Radar 계정에서 QR 코드를 스캔하여 빠르게 시작하세요";
 
 /* Title for the 'have my old device' choice of the 'Restore or Transfer' prompt */
 "ONBOARDING_SPLASH_HAVE_OLD_DEVICE_TITLE" = "이전 휴대폰을 가지고 있음";
@@ -5933,7 +5933,7 @@ Send money securely.";
 "OUTGOING_DEVICE_REGISTRATION_CANCELLED_RESTORE_TITLE" = "복원 취소됨";
 
 /* Body of prompt notifying registration without restore completed on the new device. */
-"OUTGOING_DEVICE_REGISTRATION_COMPLETE_BODY" = "귀하의 Signal 계정이 다른 기기에서 활성화되었습니다. 이 기기의 Signal이 이제 비활성화됩니다.";
+"OUTGOING_DEVICE_REGISTRATION_COMPLETE_BODY" = "귀하의 Radar 계정이 다른 기기에서 활성화되었습니다. 이 기기의 Signal이 이제 비활성화됩니다.";
 
 /* Title of prompt notifying registration without restore completed on the new device. */
 "OUTGOING_DEVICE_REGISTRATION_COMPLETE_TITLE" = "등록 완료";
@@ -5951,7 +5951,7 @@ Send money securely.";
 "OUTGOING_DEVICE_REGISTRATION_UNKNOWN_ERROR_TITLE" = "알 수 없는 오류";
 
 /* Body of prompt notifying device restore started on the new device. */
-"OUTGOING_DEVICE_RESTORE_COMPLETE_BODY" = "Signal 계정과 메시지를 다른 기기로 전송하기 시작했습니다. 이제 이 기기의 Signal이 비활성화됩니다.";
+"OUTGOING_DEVICE_RESTORE_COMPLETE_BODY" = "Radar 계정과 메시지를 다른 기기로 전송하기 시작했습니다. 이제 이 기기의 Signal이 비활성화됩니다.";
 
 /* Title of prompt notifying device restore started on the new device. */
 "OUTGOING_DEVICE_RESTORE_COMPLETE_TITLE" = "복구가 완료되었습니다.";
@@ -5975,7 +5975,7 @@ Send money securely.";
 "OUTGOING_DEVICE_RESTORE_INITIAL_VIEW_TITLE" = "계정 이동";
 
 /* Body of prompt notifying device transfer completed. */
-"OUTGOING_DEVICE_TRANSFER_COMPLETE_BODY" = "Signal 계정과 메시지를 다른 기기로 전송했습니다. 이제 이 기기의 Signal이 비활성화됩니다.";
+"OUTGOING_DEVICE_TRANSFER_COMPLETE_BODY" = "Radar 계정과 메시지를 다른 기기로 전송했습니다. 이제 이 기기의 Signal이 비활성화됩니다.";
 
 /* Title of prompt notifying device transfer completed. */
 "OUTGOING_DEVICE_TRANSFER_COMPLETE_TITLE" = "전송 완료";
@@ -5987,7 +5987,7 @@ Send money securely.";
 "OUTGOING_MISSED_VOICE_CALL" = "미응답 음성 통화";
 
 /* Button for action sheet shown when device transfer completes; quits the Signal app immediately (does not automatically relaunch, but the user may choose to relaunch). */
-"OUTGOING_TRANSFER_COMPLETE_EXIT_ACTION" = "Signal 종료";
+"OUTGOING_TRANSFER_COMPLETE_EXIT_ACTION" = "Radar 종료";
 
 /* Message for action sheet shown when device transfer completes */
 "OUTGOING_TRANSFER_COMPLETE_MESSAGE" = "이제 이 기기에서 Signal을 종료합니다.";
@@ -6555,7 +6555,7 @@ Send money securely.";
 "PIN_CREATION_LEARN_MORE_TEXT" = "PIN은 사용자만 액세스할 수 있도록 사용자 정보를 Singal에 암호화하여 저장합니다. 다시 설치하면 프로필, 설정, 연락처가 복원됩니다.";
 
 /* Users can create PINs to restore their account data later. They can learn more about this on a sheet. This is the title on that sheet. */
-"PIN_CREATION_LEARN_MORE_TITLE" = "Signal PIN 정보";
+"PIN_CREATION_LEARN_MORE_TITLE" = "Radar PIN 정보";
 
 /* Label indicating that the attempted PIN does not match the first PIN */
 "PIN_CREATION_MISMATCH_ERROR" = "PIN이 일치하지 않습니다. 다시 시도해 주세요.";
@@ -6621,7 +6621,7 @@ Send money securely.";
 "PIN_REMINDER_MEGAPHONE_FEW_DAYS_TOAST" = "며칠 뒤 다시 알려드리겠습니다.";
 
 /* Title for PIN reminder megaphone */
-"PIN_REMINDER_MEGAPHONE_TITLE" = "Signal PIN 인증";
+"PIN_REMINDER_MEGAPHONE_TITLE" = "Radar PIN 인증";
 
 /* Toast indicating that we'll ask you for your PIN again tomorrow, after successfully entering it. */
 "PIN_REMINDER_MEGAPHONE_TOMORROW_SUCCESSFUL_TOAST" = "PIN이 올바릅니다. 내일 다시 알려드리겠습니다.";
@@ -6645,7 +6645,7 @@ Send money securely.";
 "PIN_REMINDER_MISMATCH_ERROR" = "잘못된 PIN입니다. 다시 시도해 주세요.";
 
 /* The title for the 'pin reminder' dialog. */
-"PIN_REMINDER_TITLE" = "Signal PIN 입력";
+"PIN_REMINDER_TITLE" = "Radar PIN 입력";
 
 /* Label indicating that the attempted PIN is too short */
 "PIN_REMINDER_TOO_SHORT_ERROR" = "PIN은 최소 4자리입니다.";
@@ -6660,7 +6660,7 @@ Send money securely.";
 "PINS_MEGAPHONE_ACTION" = "PIN 만들기";
 
 /* Body for PIN megaphone when user doesn't have a PIN */
-"PINS_MEGAPHONE_BODY" = "Signal PIN을 마저 만드세요.";
+"PINS_MEGAPHONE_BODY" = "Radar PIN을 마저 만드세요.";
 
 /* Title for PIN megaphone when user doesn't have a PIN */
 "PINS_MEGAPHONE_TITLE" = "PIN 만들기";
@@ -6771,7 +6771,7 @@ Send money securely.";
 "PRIVACY_VERIFICATION_FAILED_NO_SAFETY_NUMBERS_IN_CLIPBOARD" = "Signal이 클립보드에서 안전 번호를 찾을 수 없습니다. 올바르게 복사하셨나요?";
 
 /* Alert body when verifying with {{contact name}} */
-"PRIVACY_VERIFICATION_FAILED_THEY_HAVE_WRONG_KEY_FOR_ME" = "모든 Signal 사용자 쌍은 각자 다른 안전 번호를 가지고 있습니다. %1$@ 님이 *나와의* 안전 번호를 가졌는지 다시 한 번 확인하세요.";
+"PRIVACY_VERIFICATION_FAILED_THEY_HAVE_WRONG_KEY_FOR_ME" = "모든 Radar 사용자 쌍은 각자 다른 안전 번호를 가지고 있습니다. %1$@ 님이 *나와의* 안전 번호를 가졌는지 다시 한 번 확인하세요.";
 
 /* alert body */
 "PRIVACY_VERIFICATION_FAILED_WITH_OLD_LOCAL_VERSION" = "이전 버전의 Signal을 사용 중입니다. 인증 전에 먼저 업데이트해야 합니다.";
@@ -7062,7 +7062,7 @@ Send money securely.";
 "RECIPIENT_PICKER_ERROR_USER_CANNOT_BE_SELECTED" = "사용자를 선택할 수 없습니다.";
 
 /* Alert text. Shown after selecting a phone number that isn't valid. */
-"RECIPIENT_PICKER_INVALID_NUMBER_MESSAGE" = "%1$@ 님은 Signal 사용자가 아닙니다. 올바른 전화번호로 다시 시도하세요.";
+"RECIPIENT_PICKER_INVALID_NUMBER_MESSAGE" = "%1$@ 님은 Radar 사용자가 아닙니다. 올바른 전화번호로 다시 시도하세요.";
 
 /* Alert title. Shown after selecting a phone number that isn't valid. */
 "RECIPIENT_PICKER_INVALID_NUMBER_TITLE" = "잘못된 전화번호";
@@ -7071,7 +7071,7 @@ Send money securely.";
 "RECIPIENT_PICKER_INVITE_ACTION" = "초대";
 
 /* Alert text. Shown after selecting a phone number that isn't a Signal user. */
-"RECIPIENT_PICKER_INVITE_MESSAGE" = "%1$@ 님은 Signal 사용자가 아닙니다. 이 전화번호를 초대할까요?";
+"RECIPIENT_PICKER_INVITE_MESSAGE" = "%1$@ 님은 Radar 사용자가 아닙니다. 이 전화번호를 초대할까요?";
 
 /* Alert title. Shown after selecting a phone number that isn't a Signal user. */
 "RECIPIENT_PICKER_INVITE_TITLE" = "Signal로 초대";
@@ -7080,13 +7080,13 @@ Send money securely.";
 "REGISTER_2FA_FORGOT_PIN_ALERT_TITLE" = "도움이 필요하신가요?";
 
 /* Alert body for a forgotten SVR (V2) PIN */
-"REGISTER_2FA_FORGOT_SVR_PIN_ALERT_MESSAGE" = "PIN은 사용자가 만든 4자리 이상의 영숫자 조합 코드입니다. PIN이 기억나지 않는 경우 7일 동안 기다렸다가 계정을 다시 등록해야 합니다. Signal 안전 백업을 활성화한 경우, 복구 키로 계속할 수 있습니다.";
+"REGISTER_2FA_FORGOT_SVR_PIN_ALERT_MESSAGE" = "PIN은 사용자가 만든 4자리 이상의 영숫자 조합 코드입니다. PIN이 기억나지 않는 경우 7일 동안 기다렸다가 계정을 다시 등록해야 합니다. Radar 안전 백업을 활성화한 경우, 복구 키로 계속할 수 있습니다.";
 
 /* Alert body for a forgotten SVR (V2) PIN when the user doesn't have reglock and they cannot necessarily create a new PIN */
-"REGISTER_2FA_FORGOT_SVR_PIN_WITHOUT_REGLOCK_ALERT_MESSAGE" = "PIN은 사용자가 만든 4자리 이상의 영숫자 조합 코드입니다. PIN이 기억나지 않는다면 새로 만들어서 계정을 사용할 수 있지만, 프로필 정보 등 일부 저장 설정이 손실됩니다. Signal 안전 백업을 활성화한 경우, 복구 키로 계속할 수 있습니다.";
+"REGISTER_2FA_FORGOT_SVR_PIN_WITHOUT_REGLOCK_ALERT_MESSAGE" = "PIN은 사용자가 만든 4자리 이상의 영숫자 조합 코드입니다. PIN이 기억나지 않는다면 새로 만들어서 계정을 사용할 수 있지만, 프로필 정보 등 일부 저장 설정이 손실됩니다. Radar 안전 백업을 활성화한 경우, 복구 키로 계속할 수 있습니다.";
 
 /* Alert body for a forgotten SVR (V2) PIN when the user doesn't have reglock and they can create a new PIN */
-"REGISTER_2FA_FORGOT_SVR_PIN_WITHOUT_REGLOCK_AND_CAN_CREATE_NEW_PIN_ALERT_MESSAGE" = "PIN은 사용자가 만든 4자리 이상의 영숫자 조합 코드입니다. PIN이 기억나지 않는다면 새로운 PIN을 만드세요. 계정을 등록하여 사용할 수 있지만 프로필 정보 등 일부 저장된 설정이 손실됩니다. Signal 안전 백업을 활성화한 경우, 복구 키로 계속할 수 있습니다.";
+"REGISTER_2FA_FORGOT_SVR_PIN_WITHOUT_REGLOCK_AND_CAN_CREATE_NEW_PIN_ALERT_MESSAGE" = "PIN은 사용자가 만든 4자리 이상의 영숫자 조합 코드입니다. PIN이 기억나지 않는다면 새로운 PIN을 만드세요. 계정을 등록하여 사용할 수 있지만 프로필 정보 등 일부 저장된 설정이 손실됩니다. Radar 안전 백업을 활성화한 경우, 복구 키로 계속할 수 있습니다.";
 
 /* Alert title explaining what happens if you forget your 'two-factor auth pin'. */
 "REGISTER_2FA_INVALID_PIN_ALERT_TITLE" = "올바르지 않은 PIN";
@@ -7521,7 +7521,7 @@ Send money securely.";
 "SAFETY_NUMBER_CONFIRMATION_VIEW_ACTION" = "보기";
 
 /* Snippet to share {{safety number}} with a friend. sent e.g. via SMS */
-"SAFETY_NUMBER_SHARE_FORMAT" = "Signal 안전 번호:\n%1$@";
+"SAFETY_NUMBER_SHARE_FORMAT" = "Radar 안전 번호:\n%1$@";
 
 /* Title for Safety Tips button in thread details. */
 "SAFETY_TIPS_BUTTON_ACTION_TITLE" = "안전 팁";
@@ -7605,7 +7605,7 @@ Send money securely.";
 "SCREEN_LOCK_UNLOCK_FAILED" = "인증 실패";
 
 /* Label for button on lock screen that lets users unlock Signal. */
-"SCREEN_LOCK_UNLOCK_SIGNAL" = "Signal 잠금 해제";
+"SCREEN_LOCK_UNLOCK_SIGNAL" = "Radar 잠금 해제";
 
 /* Placeholder text indicating the user can search for contacts by name, username, or phone number. */
 "SEARCH_BY_NAME_OR_USERNAME_OR_NUMBER_PLACEHOLDER_TEXT" = "이름, 사용자 이름 또는 전화번호";
@@ -7644,7 +7644,7 @@ Send money securely.";
 "SECONDARY_LINKING_ERROR_OBSOLETE_LINKED_DEVICE_TITLE" = "지원되지 않는 버전";
 
 /* alert message for outdated linking device */
-"SECONDARY_LINKING_ERROR_OLD_VERSION_MESSAGE" = "다른 기기에서 iPad QR 코드를 지원하지 않는 Signal 구 버전을 실행하고 있습니다. 최신 Signal 버전을 설치한 후 다시 시도해 주세요.";
+"SECONDARY_LINKING_ERROR_OLD_VERSION_MESSAGE" = "다른 기기에서 iPad QR 코드를 지원하지 않는 Radar 구 버전을 실행하고 있습니다. 최신 Radar 버전을 설치한 후 다시 시도해 주세요.";
 
 /* alert title for outdated linking device */
 "SECONDARY_LINKING_ERROR_OLD_VERSION_TITLE" = "스캔 기기 업데이트";
@@ -7686,7 +7686,7 @@ Send money securely.";
 "SECONDARY_ONBOARDING_INSTALL_PRIMARY_FIRST_TITLE" = "당신의 휴대전화에 Signal을 설치하세요";
 
 /* body text while displaying a QR code which, when scanned, will link this device. */
-"SECONDARY_ONBOARDING_SCAN_CODE_BODY" = "휴대전화에서 프로필 사진을 탭하여 Signal 설정을 여세요. \"연결된 기기\", \"새 기기 연결\"을 차례대로 눌러 이 코드를 휴대전화에서 스캔하세요.";
+"SECONDARY_ONBOARDING_SCAN_CODE_BODY" = "휴대전화에서 프로필 사진을 탭하여 Radar 설정을 여세요. \"연결된 기기\", \"새 기기 연결\"을 차례대로 눌러 이 코드를 휴대전화에서 스캔하세요.";
 
 /* Link text for page with troubleshooting info shown on the QR scanning screen */
 "SECONDARY_ONBOARDING_SCAN_CODE_HELP_TEXT" = "여기에서 iPad 연결 관련 도움을 받아보세요.";
@@ -7842,7 +7842,7 @@ Send money securely.";
 "SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_FOOTER_NO_CONNECTION" = "검열 우회는 인터넷에 연결되었을 때만 활성화할 수 있습니다.";
 
 /* Table footer for the 'censorship circumvention' section shown when the app is connected to the Signal service. */
-"SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_FOOTER_WEBSOCKET_CONNECTED" = "검열 우회는 필수가 아닙니다. Signal 서비스에 연결되어 있다면 필요하지 않습니다.";
+"SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_FOOTER_WEBSOCKET_CONNECTED" = "검열 우회는 필수가 아닙니다. Radar 서비스에 연결되어 있다면 필요하지 않습니다.";
 
 /* Label for the 'advanced pin settings' button. */
 "SETTINGS_ADVANCED_PIN_SETTINGS" = "PIN 고급 설정";
@@ -7869,13 +7869,13 @@ Send money securely.";
 "SETTINGS_ADVANCED_VIEW_ERROR_LOG" = "오류 로그";
 
 /* Information on sheet about changing the app icon - first line */
-"SETTINGS_APP_ICON_EDUCATION_APP_NAME" = "홈 화면, 알림, 앱 라이브러리에 앱 이름 'Signal'이 표시됩니다.";
+"SETTINGS_APP_ICON_EDUCATION_APP_NAME" = "홈 화면, 알림, 앱 라이브러리에 앱 이름 'Radar'이 표시됩니다.";
 
 /* Information on sheet about changing the app icon - second line */
-"SETTINGS_APP_ICON_EDUCATION_HOME_SCREEN_DOCK" = "홈 화면 맨 아래에 있는 Dock으로 앱을 옮겨 홈 화면에서 앱 이름 'Signal'을 숨길 수 있습니다.";
+"SETTINGS_APP_ICON_EDUCATION_HOME_SCREEN_DOCK" = "홈 화면 맨 아래에 있는 Dock으로 앱을 옮겨 홈 화면에서 앱 이름 'Radar'을 숨길 수 있습니다.";
 
 /* The footer for the app icon selection settings page. */
-"SETTINGS_APP_ICON_FOOTER" = "홈 화면, 알림, 앱 라이브러리에 앱 이름 'Signal'이 표시됩니다.";
+"SETTINGS_APP_ICON_FOOTER" = "홈 화면, 알림, 앱 라이브러리에 앱 이름 'Radar'이 표시됩니다.";
 
 /* The title for the app icon selection settings page. */
 "SETTINGS_APP_ICON_TITLE" = "앱 아이콘";
@@ -7917,7 +7917,7 @@ Send money securely.";
 "SETTINGS_CALLING_HIDES_IP_ADDRESS_PREFERENCE_TITLE" = "항상 릴레이 통화";
 
 /* User settings section footer, a detailed explanation */
-"SETTINGS_CALLING_HIDES_IP_ADDRESS_PREFERENCE_TITLE_DETAIL" = "내 연락처에게 IP 주소가 표시되지 않도록 모든 통화를 Signal 서버로 중계합니다. 전화 품질이 떨어질 수 있습니다.";
+"SETTINGS_CALLING_HIDES_IP_ADDRESS_PREFERENCE_TITLE_DETAIL" = "내 연락처에게 IP 주소가 표시되지 않도록 모든 통화를 Radar 서버로 중계합니다. 전화 품질이 떨어질 수 있습니다.";
 
 /* Label for the 'edit phone number' button in the 'change phone number' views. */
 "SETTINGS_CHANGE_PHONE_NUMBER_BACK_TO_EDIT_BUTTON" = "번호 편집";
@@ -7962,7 +7962,7 @@ Send money securely.";
 "SETTINGS_CLEAR_HISTORY" = "대화 기록 삭제";
 
 /* Footer for the 'about' help section */
-"SETTINGS_COPYRIGHT" = "Signal Messenger 저작권\nAGPLv3에 따라 라이선스 부여됨";
+"SETTINGS_COPYRIGHT" = "Radar Messenger 저작권\nAGPLv3에 따라 라이선스 부여됨";
 
 /* Label for the 'data' section of the app settings. */
 "SETTINGS_DATA" = "데이터 사용량";
@@ -8103,7 +8103,7 @@ Send money securely.";
 "SETTINGS_NOTIFICATION_CONTENT_TITLE" = "알림 내용";
 
 /* When the local device discovers a contact has recently installed signal, the app can generates a message encouraging the local user to say hello. Turning this switch off disables that feature. */
-"SETTINGS_NOTIFICATION_EVENTS_CONTACT_JOINED_SIGNAL" = "연락처에 있는 사용자가 Signal에 가입한 경우";
+"SETTINGS_NOTIFICATION_EVENTS_CONTACT_JOINED_SIGNAL" = "연락처에 있는 사용자가 Radar에 가입한 경우";
 
 /* table section header */
 "SETTINGS_NOTIFICATION_NOTIFY_WHEN_TITLE" = "다음 경우에 알림";
@@ -8140,7 +8140,7 @@ Send money securely.";
 "SETTINGS_PAYMENTS_BITCOIN_UNIT" = "비트코인 단위";
 
 /* Error message indicating that payments could not be activated because the feature is not currently available. */
-"SETTINGS_PAYMENTS_CANNOT_ACTIVATE_PAYMENTS_KILL_SWITCH" = "Signal 결제는 더 이상 사용할 수 없습니다. 여전히 거래소로 자금을 이체할 수 있지만 더 이상 지불을 주고받거나 자금을 추가할 수 없습니다.";
+"SETTINGS_PAYMENTS_CANNOT_ACTIVATE_PAYMENTS_KILL_SWITCH" = "Radar 결제는 더 이상 사용할 수 없습니다. 여전히 거래소로 자금을 이체할 수 있지만 더 이상 지불을 주고받거나 자금을 추가할 수 없습니다.";
 
 /* Error message indicating that payments could not be deactivated because the current balance is unavailable. */
 "SETTINGS_PAYMENTS_CANNOT_DEACTIVATE_PAYMENTS_NO_BALANCE" = "잔액을 사용할 수 없기 때문에 결제를 비활성화할 수 없습니다. 연결을 확인하고 다시 시도하세요.";
@@ -8149,10 +8149,10 @@ Send money securely.";
 "SETTINGS_PAYMENTS_CANNOT_SEND_PAYMENT_NO_BALANCE" = "잔액을 사용할 수 없기 때문에 결제를 완료할 수 없습니다. 연결을 확인하고 다시 시도하세요.";
 
 /* Error message indicating that payments cannot be sent because the feature is not currently available. */
-"SETTINGS_PAYMENTS_CANNOT_SEND_PAYMENTS_KILL_SWITCH" = "Signal 결제는 더 이상 사용할 수 없습니다. 여전히 거래소로 자금을 이체할 수 있지만 더 이상 지불을 주고받거나 자금을 추가할 수 없습니다.";
+"SETTINGS_PAYMENTS_CANNOT_SEND_PAYMENTS_KILL_SWITCH" = "Radar 결제는 더 이상 사용할 수 없습니다. 여전히 거래소로 자금을 이체할 수 있지만 더 이상 지불을 주고받거나 자금을 추가할 수 없습니다.";
 
 /* Error message indicating that you cannot transfer into your payments wallet because the feature is not currently available. */
-"SETTINGS_PAYMENTS_CANNOT_TRANSFER_IN_KILL_SWITCH" = "Signal 결제는 더 이상 사용할 수 없습니다. 여전히 거래소로 자금을 이체할 수 있지만 더 이상 지불을 주고받거나 자금을 추가할 수 없습니다.";
+"SETTINGS_PAYMENTS_CANNOT_TRANSFER_IN_KILL_SWITCH" = "Radar 결제는 더 이상 사용할 수 없습니다. 여전히 거래소로 자금을 이체할 수 있지만 더 이상 지불을 주고받거나 자금을 추가할 수 없습니다.";
 
 /* Message for the 'currency conversions info' alert. */
 "SETTINGS_PAYMENTS_CURRENCY_CONVERSIONS_INFO_ALERT_MESSAGE" = "전환된 금액은 추정치일 뿐 정확하지 않을 수 있습니다.";
@@ -8420,7 +8420,7 @@ Send money securely.";
 "SETTINGS_PAYMENTS_PAYMENTS_LOCK_PROMPT_EXPLANATION_TOUCHID" = "터치 ID를 설정하여 다른 사람이 사용자의 휴대폰을 손에 넣어 자금에 액세스할 수 없도록 예방하세요. 이 옵션은 설정에서 비활성화 할 수 있습니다.";
 
 /* Button for payments outdated sheet. */
-"SETTINGS_PAYMENTS_PAYMENTS_OUTDATED_BUTTON" = "Signal 업데이트";
+"SETTINGS_PAYMENTS_PAYMENTS_OUTDATED_BUTTON" = "Radar 업데이트";
 
 /* Message for payments outdated sheet. */
 "SETTINGS_PAYMENTS_PAYMENTS_OUTDATED_MESSAGE" = "입/출금 기능을 계속 이용하고 결제 잔액 최신 상태를 보려면 앱을 업데이트해야 합니다.";
@@ -8558,7 +8558,7 @@ Send money securely.";
 "SETTINGS_PAYMENTS_TITLE" = "결제";
 
 /* Error indicating that it is not valid to send yourself a payment. */
-"SETTINGS_PAYMENTS_TRANSFER_OUT_CANNOT_SEND_TO_SELF" = "Signal 지갑 주소로 이체할 수 없습니다. 지원되는 거래소에서 귀하의 계정에서 지갑 주소를 입력하세요.";
+"SETTINGS_PAYMENTS_TRANSFER_OUT_CANNOT_SEND_TO_SELF" = "Radar 지갑 주소로 이체할 수 없습니다. 지원되는 거래소에서 귀하의 계정에서 지갑 주소를 입력하세요.";
 
 /* Footer of the 'transfer currency out' view in the payment settings. */
 "SETTINGS_PAYMENTS_TRANSFER_OUT_FOOTER" = "Transfer Bitcoin by sending to the Lightning address or invoice provided by the recipient. The address is typically displayed below the QR code.";
@@ -8621,7 +8621,7 @@ Send money securely.";
 "SETTINGS_PAYMENTS_VIEW_PASSPHRASE_TITLE" = "복구 문구";
 
 /* Header text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "이 24개 단어를 순서대로 적어 안전한 곳에 보관하세요. Cake Wallet이나 다른 Spark 호환 지갑에서 잔액을 복원하는 데 사용할 수 있습니다.";
+"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "이 12개 단어를 순서대로 적어 안전한 곳에 보관하세요. Cake Wallet이나 다른 Spark 호환 지갑에서 잔액을 복원하는 데 사용할 수 있습니다.";
 
 /* Footer text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
 "SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_FOOTER_2" = "이 구문을 누구와도 공유하지 마세요";
@@ -8663,16 +8663,16 @@ Send money securely.";
 "SETTINGS_PIN_REMINDER_DISABLE_CONFIRMATION_ACTION" = "리마인더 해제";
 
 /* The explanation for the dialog asking user to confirm their PIN to disable reminders */
-"SETTINGS_PIN_REMINDER_DISABLE_CONFIRMATION_EXPLANATION" = "PIN을 외웠거나 안전한 곳에 저장했는지 확인하세요. PIN은 복원할 수 없습니다. PIN을 잊어버리면 Signal 계정 재등록 시 데이터를 복원할 수 없습니다.";
+"SETTINGS_PIN_REMINDER_DISABLE_CONFIRMATION_EXPLANATION" = "PIN을 외웠거나 안전한 곳에 저장했는지 확인하세요. PIN은 복원할 수 없습니다. PIN을 잊어버리면 Radar 계정 재등록 시 데이터를 복원할 수 없습니다.";
 
 /* The title for the dialog asking user to confirm their PIN to disable reminders */
-"SETTINGS_PIN_REMINDER_DISABLE_CONFIRMATION_TITLE" = "Signal PIN 확인";
+"SETTINGS_PIN_REMINDER_DISABLE_CONFIRMATION_TITLE" = "Radar PIN 확인";
 
 /* Label for the 'pin reminder' switch of the privacy settings. */
 "SETTINGS_PIN_REMINDER_SWITCH_LABEL" = "PIN 리마인더";
 
 /* Footer for the 'PINs' section of the privacy settings. */
-"SETTINGS_PINS_FOOTER" = "PIN을 사용하면 Signal에 저장된 정보를 암호화하여 사용자만 액세스할 수 있습니다. PIN은 복구할 수 없습니다. Signal을 다시 설치하면 프로필, 설정 및 연락처가 복원됩니다.";
+"SETTINGS_PINS_FOOTER" = "PIN을 사용하면 Radar에 저장된 정보를 암호화하여 사용자만 액세스할 수 있습니다. PIN은 복구할 수 없습니다. Radar을 다시 설치하면 프로필, 설정 및 연락처가 복원됩니다.";
 
 /* Label for the 'pins' item of the privacy settings when the user does have a pin. */
 "SETTINGS_PINS_ITEM" = "PIN 변경";
@@ -8681,7 +8681,7 @@ Send money securely.";
 "SETTINGS_PINS_ITEM_CREATE" = "PIN 만들기";
 
 /* Title for the 'PINs' section of the privacy settings. */
-"SETTINGS_PINS_TITLE" = "Signal 번호";
+"SETTINGS_PINS_TITLE" = "Radar 번호";
 
 /* Footer for table section */
 "SETTINGS_PRIVACY_ADVANCED_FOOTER" = "검열 우회, 프록시, 중계 통화, 보낸 사람 감추기 설정.";
@@ -8723,7 +8723,7 @@ Send money securely.";
 "SETTINGS_REGISTRATION_LOCK_TURN_ON_ERROR_PIN_REQUIRED" = "등록 잠금을 사용하려면 PIN을 생성해야 합니다.";
 
 /* Body for the alert confirming that the user wants to turn on registration lock. */
-"SETTINGS_REGISTRATION_LOCK_TURN_ON_MESSAGE" = "Signal에 등록할 때 Signal PIN을 또 잊어버린다면 7일간 계정이 잠깁니다.";
+"SETTINGS_REGISTRATION_LOCK_TURN_ON_MESSAGE" = "Signal에 등록할 때 Radar PIN을 또 잊어버린다면 7일간 계정이 잠깁니다.";
 
 /* Title for the alert confirming that the user wants to turn on registration lock. */
 "SETTINGS_REGISTRATION_LOCK_TURN_ON_TITLE" = "등록 잠금을 켜시겠습니까?";
@@ -8780,13 +8780,13 @@ Send money securely.";
 "SETTINGS_SHARING_SUGGESTIONS" = "iOS와 연락처 공유";
 
 /* Footer for setting for enabling & disabling contact and notification sharing with iOS. */
-"SETTINGS_SHARING_SUGGESTIONS_NOTIFICATIONS_FOOTER" = "추천 공유, 알림 등 기능을 사용하기 위해 iOS에서 Signal 연락처 및 대화에 액세스하도록 허용합니다.";
+"SETTINGS_SHARING_SUGGESTIONS_NOTIFICATIONS_FOOTER" = "추천 공유, 알림 등 기능을 사용하기 위해 iOS에서 Radar 연락처 및 대화에 액세스하도록 허용합니다.";
 
 /* Label for the 'enable registration lock' switch of the privacy settings. */
 "SETTINGS_TWO_FACTOR_AUTH_SWITCH_LABEL" = "등록 잠금";
 
 /* Footer for the 'two factor auth' section of the privacy settings when Signal PINs are available. */
-"SETTINGS_TWO_FACTOR_PINS_AUTH_FOOTER" = "Signal에 전화번호를 다시 등록하려면 Signal PIN이 필요합니다.";
+"SETTINGS_TWO_FACTOR_PINS_AUTH_FOOTER" = "Radar에 전화번호를 다시 등록하려면 Radar PIN이 필요합니다.";
 
 /* Label for the 'typing indicators' setting. */
 "SETTINGS_TYPING_INDICATORS" = "입력 안내";
@@ -8819,7 +8819,7 @@ Send money securely.";
 "SHARE_EXTENSION_LOADING" = "불러오는 중…";
 
 /* Message indicating that the share extension cannot be used until the user has registered in the main app. */
-"SHARE_EXTENSION_NOT_REGISTERED_MESSAGE" = "Signal 앱을 실행하여 등록하세요.";
+"SHARE_EXTENSION_NOT_REGISTERED_MESSAGE" = "Radar 앱을 실행하여 등록하세요.";
 
 /* Title indicating that the share extension cannot be used until the user has registered in the main app. */
 "SHARE_EXTENSION_NOT_REGISTERED_TITLE" = "등록되지 않음";
@@ -8846,7 +8846,7 @@ Send money securely.";
 "SHOW_THREAD_BUTTON_TITLE" = "대화 표시";
 
 /* Shown in the header when the user hasn't provided a custom name for a call. */
-"SIGNAL_CALL" = "Signal 통화";
+"SIGNAL_CALL" = "Radar 통화";
 
 /* body sent to contacts when inviting to Install Signal */
 "SMS_INVITE_BODY" = "당신을 Signal로 초대합니다! 여기에 링크가 있습니다:";
@@ -8909,7 +8909,7 @@ Send money securely.";
 "STICKERS_INSTALL_BUTTON" = "설치";
 
 /* Title for the 'available built-in stickers' section of the 'manage stickers' view. */
-"STICKERS_MANAGE_VIEW_AVAILABLE_BUILT_IN_PACKS_SECTION_TITLE" = "Signal 아티스트 시리즈";
+"STICKERS_MANAGE_VIEW_AVAILABLE_BUILT_IN_PACKS_SECTION_TITLE" = "Radar 아티스트 시리즈";
 
 /* Title for the 'available known stickers' section of the 'manage stickers' view. */
 "STICKERS_MANAGE_VIEW_AVAILABLE_KNOWN_PACKS_SECTION_TITLE" = "받은 스티커";
@@ -9191,19 +9191,19 @@ Send money securely.";
 "STORY_SETTINGS_LEARN_MORE_SHEET_FOOTER" = "내 커넥션은 내 이름과 사진을 볼 수 있으며, 따로 숨기지 않는 한 '내 스토리'에 전송하는 스토리를 볼 수 있습니다.";
 
 /* Header for the explainer sheet for signal connections */
-"STORY_SETTINGS_LEARN_MORE_SHEET_HEADER_FORMAT" = "<bold>Signal 커넥션</bold>은 다음과 같은 방법을 통해 내가 신뢰하는 사용자로 선택한 사람들입니다.";
+"STORY_SETTINGS_LEARN_MORE_SHEET_HEADER_FORMAT" = "<bold>Radar 커넥션</bold>은 다음과 같은 방법을 통해 내가 신뢰하는 사용자로 선택한 사람들입니다.";
 
 /* Label for the stories section of the settings view */
 "STORY_SETTINGS_TITLE" = "스토리";
 
 /* Section footer for the 'viewers' section on the 'story settings' view */
-"STORY_SETTINGS_WHO_CAN_VIEW_THIS_FOOTER" = "내 스토리를 볼 수 있는 Signal 커넥션을 선택하세요. 이미 보낸 스토리에는 변경 내용이 적용되지 않습니다.";
+"STORY_SETTINGS_WHO_CAN_VIEW_THIS_FOOTER" = "내 스토리를 볼 수 있는 Radar 커넥션을 선택하세요. 이미 보낸 스토리에는 변경 내용이 적용되지 않습니다.";
 
 /* Section header for the 'viewers' section on the 'story settings' view */
 "STORY_SETTINGS_WHO_CAN_VIEW_THIS_HEADER" = "이 스토리를 볼 수 있는 사람";
 
 /* Header for the 'viewers' section on the 'story settings' bottom sheet */
-"STORY_SETTINGS_WHO_CAN_VIEW_THIS_SHEET_HEADER" = "내 스토리를 볼 수 있는 Signal 커넥션을 선택하세요. 개인정보보호 설정에서 언제든지 변경할 수 있습니다.";
+"STORY_SETTINGS_WHO_CAN_VIEW_THIS_SHEET_HEADER" = "내 스토리를 볼 수 있는 Radar 커넥션을 선택하세요. 개인정보보호 설정에서 언제든지 변경할 수 있습니다.";
 
 /* Tooltip text shown when the user selects a story as a destination for a long duration video that will be split into shorter segments. Embeds {{ segment duration in seconds }} */
 "STORY_VIDEO_SEGMENTATION_TOOLTIP_FORMAT" = "스토리에 보낸 동영상이 %1$d초 클립으로 편집되어 여러 개의 스토리로 전송됩니다.";
@@ -9242,7 +9242,7 @@ Send money securely.";
 "SUPPORT_EMAIL_DEFAULT_DESCRIPTION" = "문제에 대해 알려주세요. ";
 
 /* Message for alert dialog presented when a support email failed to send */
-"SUPPORT_EMAIL_ERROR_ALERT_DESCRIPTION" = "support@signal.org 이메일 주소로 지원 요청을 보내주세요.";
+"SUPPORT_EMAIL_ERROR_ALERT_DESCRIPTION" = "support@radar.chat 이메일 주소로 지원 요청을 보내주세요.";
 
 /* Localized label for support request email filter string. Embeds {{filter text}}. */
 "SUPPORT_EMAIL_FILTER_LABEL_FORMAT" = "필터: %1$@";
@@ -9266,7 +9266,7 @@ Send money securely.";
 "SUPPORT_EMAIL_LOG_URL_LABEL_FORMAT" = "로그 URL: %1$@";
 
 /* Localized subject for support request emails */
-"SUPPORT_EMAIL_SUBJECT" = "Signal iOS 지원 요청";
+"SUPPORT_EMAIL_SUBJECT" = "Radar iOS 지원 요청";
 
 /* Header for emoji mood selection */
 "SUPPORT_EMOJI_PROMPT" = "기분이 어떠세요? (선택)";
@@ -9338,7 +9338,7 @@ Send money securely.";
 "SWITCH_ON" = "켜짐";
 
 /* Name to display for the 'system' sender, e.g. for release notes and the onboarding story */
-"SYSTEM_ADDRESS_NAME" = "Signal";
+"SYSTEM_ADDRESS_NAME" = "Radar";
 
 /* Label for button to verify a user's safety number. */
 "SYSTEM_MESSAGE_ACTION_VERIFY_SAFETY_NUMBER" = "검증";
@@ -9497,7 +9497,7 @@ Send money securely.";
 "TIME_AMOUNT_WEEKS_SHORT_FORMAT" = "%1$@주";
 
 /* Button for bottom sheet shown when device transfer completes on the receiving device. Tapping will terminate the Signal app and trigger a notification to relaunch. */
-"TRANSFER_COMPLETE_SHEET_BUTTON" = "Signal 종료";
+"TRANSFER_COMPLETE_SHEET_BUTTON" = "Radar 종료";
 
 /* Subtitle for bottom sheet shown when device transfer completes on the receiving device. */
 "TRANSFER_COMPLETE_SHEET_SUBTITLE" = "이 기기에서 계정을 사용하기 시작하려면 Signal을 종료했다가 다시 시작하세요.";
@@ -9524,19 +9524,19 @@ Send money securely.";
 "UNKNOWN_CONTACT_BLOCK_OFFER" = "연락처에 없는 사용자입니다. 이 사용자를 차단할까요?";
 
 /* Info message recorded in conversation history when local user receives an unknown message from a linked device and needs to upgrade. */
-"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_FROM_LINKED_DEVICE" = "내 기기 중 하나에서 새 Signal 기능을 사용한 메시지를 보냈기에 여기에서는 처리되거나 표시할 수 없습니다.";
+"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_FROM_LINKED_DEVICE" = "내 기기 중 하나에서 새 Radar 기능을 사용한 메시지를 보냈기에 여기에서는 처리되거나 표시할 수 없습니다.";
 
 /* Info message recorded in conversation history when local user receives an unknown message and needs to upgrade. Embeds {{user's name or phone number}}. */
-"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_WITH_NAME_FORMAT" = "%1$@ 님이 새 Signal 기능을 사용하기 때문에 처리 또는 표시될 수 없는 메시지를 보냈습니다.";
+"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_WITH_NAME_FORMAT" = "%1$@ 님이 새 Radar 기능을 사용하기 때문에 처리 또는 표시될 수 없는 메시지를 보냈습니다.";
 
 /* Info message recorded in conversation history when local user receives an unknown message and needs to upgrade. */
-"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_WITHOUT_NAME" = "새 Signal 기능을 사용하기 때문에 처리 또는 표시될 수 없는 메시지를 보냈습니다.";
+"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_WITHOUT_NAME" = "새 Radar 기능을 사용하기 때문에 처리 또는 표시될 수 없는 메시지를 보냈습니다.";
 
 /* Label for button that lets users upgrade the app. */
-"UNKNOWN_PROTOCOL_VERSION_UPGRADE_BUTTON" = "지금 Signal 업데이트";
+"UNKNOWN_PROTOCOL_VERSION_UPGRADE_BUTTON" = "지금 Radar 업데이트";
 
 /* Info message recorded in conversation history when local user has received an unknown unknown message from a linked device and has upgraded. */
-"UNKNOWN_PROTOCOL_VERSION_UPGRADE_COMPLETE_FROM_LINKED_DEVICE" = "최신 Signal 버전으로 업데이트되었습니다. 이제 내 기기에서 해당 메시지 유형을 수신할 수 있습니다.";
+"UNKNOWN_PROTOCOL_VERSION_UPGRADE_COMPLETE_FROM_LINKED_DEVICE" = "최신 Radar 버전으로 업데이트되었습니다. 이제 내 기기에서 해당 메시지 유형을 수신할 수 있습니다.";
 
 /* Info message recorded in conversation history when local user has received an unknown message and has upgraded. Embeds {{user's name or phone number}}. */
 "UNKNOWN_PROTOCOL_VERSION_UPGRADE_COMPLETE_WITH_NAME_FORMAT" = "이제 최신 버전의 Signal을 이용하고 계시네요. %1$@ 님에게 다시 메시지를 보내달라고 요청해보세요.";
@@ -9704,7 +9704,7 @@ Send money securely.";
 "USERNAME_LOOKUP_LINK_NO_LONGER_VALID_MESSAGE" = "이 사용자 이름 링크가 더 이상 유효하지 않습니다.";
 
 /* A message indicating that the given username is not associated with a registered Signal account. Embeds {{ a username }}. */
-"USERNAME_LOOKUP_NOT_FOUND_MESSAGE_FORMAT" = "%1$@ 님은 Signal 사용자가 아닙니다. 사용자 이름을 제대로 입력했는지 확인하세요.";
+"USERNAME_LOOKUP_NOT_FOUND_MESSAGE_FORMAT" = "%1$@ 님은 Radar 사용자가 아닙니다. 사용자 이름을 제대로 입력했는지 확인하세요.";
 
 /* Title for an action sheet indicating that the given username is not associated with a registered Signal account. */
 "USERNAME_LOOKUP_NOT_FOUND_TITLE" = "사용자 찾을 수 없음";

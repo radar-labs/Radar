@@ -32,7 +32,7 @@
 "ACCOUNT_DATA_REPORT_CONFIRM_EXPORT_CONFIRM_BUTTON" = "Vie raportti";
 
 /* Users can request a report of their account data. Before they get their account export, they are warned to only share account data with trustworthy sources. This is the message on that warning. */
-"ACCOUNT_DATA_REPORT_CONFIRM_EXPORT_MESSAGE" = "Jaa Signal-tilisi tiedot vain niiden henkilöiden ja sovellusten kanssa, joihin luotat.";
+"ACCOUNT_DATA_REPORT_CONFIRM_EXPORT_MESSAGE" = "Jaa Radar-tilisi tiedot vain niiden henkilöiden ja sovellusten kanssa, joihin luotat.";
 
 /* Users can request a report of their account data. If this request fails (probably because of a network connection problem), they will see an error sheet. This is the message on that error. */
 "ACCOUNT_DATA_REPORT_ERROR_MESSAGE" = "Tarkista verkkoyhteys ja yritä uudelleen.";
@@ -56,10 +56,10 @@
 "ACCOUNT_DATA_REPORT_EXPORT_REPORT_BUTTON" = "Vie raportti";
 
 /* Users can request a report of their account data. This text appears at the bottom of this screen, offering more information. */
-"ACCOUNT_DATA_REPORT_FOOTER" = "Raportti luodaan vain viennin yhteydessä, eikä Signal tallenna sitä laitteellesi.";
+"ACCOUNT_DATA_REPORT_FOOTER" = "Raportti luodaan vain viennin yhteydessä, eikä Radar tallenna sitä laitteellesi.";
 
 /* Users can request a report of their account data. This is the subtitle on the screen where they do this, giving them more information. */
-"ACCOUNT_DATA_REPORT_SUBTITLE" = "Lataa ja vie raportti Signal-tilisi tiedoista. Tämä raportti ei sisällä viestejä tai mediasisältöä.";
+"ACCOUNT_DATA_REPORT_SUBTITLE" = "Lataa ja vie raportti Radar-tilisi tiedoista. Tämä raportti ei sisällä viestejä tai mediasisältöä.";
 
 /* Users can request a report of their account data. This is the title on the screen where they do this. */
 "ACCOUNT_DATA_REPORT_TITLE" = "Tilitietosi";
@@ -83,7 +83,7 @@
 "ACTION_VIDEO_CALL" = "Videopuhelu";
 
 /* Label for 'voice call' button in contact view. */
-"ACTION_VOICE_CALL" = "Signal-puhelu";
+"ACTION_VOICE_CALL" = "Radar-puhelu";
 
 /* The title for the 'add group members' view. */
 "ADD_GROUP_MEMBERS_VIEW_TITLE" = "Lisää jäseniä";
@@ -203,13 +203,13 @@
 "APN_Message" = "Olet saattanut saada uusia viestejä";
 
 /* Default message for the 'app launch failed' alert. */
-"APP_LAUNCH_FAILURE_ALERT_MESSAGE" = "Signal ei avaudu. Lähetä virheenkorjausloki osoitteeseen support@signal.org, jotta voimme selvittää ongelman.";
+"APP_LAUNCH_FAILURE_ALERT_MESSAGE" = "Radar ei avaudu. Lähetä virheenkorjausloki osoitteeseen support@radar.chat, jotta voimme selvittää ongelman.";
 
 /* Button to try launching the app even though the last launch failed */
 "APP_LAUNCH_FAILURE_CONTINUE" = "Avaa sovellus silti";
 
 /* Message for an error indicating that the app couldn't launch because some unexpected error happened with the user's registration status. */
-"APP_LAUNCH_FAILURE_CORRUPT_REGISTRATION_MESSAGE" = "Lähetä virheenkorjausloki osoitteeseen support@signal.org, jotta voimme selvittää ongelman.";
+"APP_LAUNCH_FAILURE_CORRUPT_REGISTRATION_MESSAGE" = "Lähetä virheenkorjausloki osoitteeseen support@radar.chat, jotta voimme selvittää ongelman.";
 
 /* Title for an error indicating that the app couldn't launch because some unexpected error happened with the user's registration status. */
 "APP_LAUNCH_FAILURE_CORRUPT_REGISTRATION_TITLE" = "Signalia ei voitu avata";
@@ -224,10 +224,10 @@
 "APP_LAUNCH_FAILURE_INVALID_DATABASE_VERSION_TITLE" = "Tuntematon tietokantaversio.";
 
 /* Error indicating that the app crashed during the previous launch. */
-"APP_LAUNCH_FAILURE_LAST_LAUNCH_CRASHED_MESSAGE" = "Signal havaitsi ongelman käynnistyessään. Lähetä virheenkorjausloki osoitteeseen support@signal.org – tämä auttaa meitä virheen selvittämisessä.";
+"APP_LAUNCH_FAILURE_LAST_LAUNCH_CRASHED_MESSAGE" = "Radar havaitsi ongelman käynnistyessään. Lähetä virheenkorjausloki osoitteeseen support@radar.chat – tämä auttaa meitä virheen selvittämisessä.";
 
 /* Error indicating that the app crashed during the previous launch. */
-"APP_LAUNCH_FAILURE_LAST_LAUNCH_CRASHED_TITLE" = "Signal ei avaudu";
+"APP_LAUNCH_FAILURE_LAST_LAUNCH_CRASHED_TITLE" = "Radar ei avaudu";
 
 /* Error description indicating that the app crashed because there was low storage space available on the device. */
 "APP_LAUNCH_FAILURE_LOW_STORAGE_SPACE_AVAILABLE_MESSAGE" = "Signalia ei voitu avata, koska laitteen tallennustila on vähissä. Jos haluat käyttää Signalia, vapauta tallennustilaa laitteen asetuksissa.";
@@ -236,7 +236,7 @@
 "APP_LAUNCH_FAILURE_LOW_STORAGE_SPACE_AVAILABLE_TITLE" = "Tallennustila vähissä";
 
 /* Error indicating that the app could not restore transferred data. */
-"APP_LAUNCH_FAILURE_RESTORE_FAILED_MESSAGE" = "Aiemmasta laitteesta siirrettyjä tietoja ei voitu palauttaa. Lähetä virheenkorjausloki osoitteeseen support@signal.org, jotta voimme selvittää ongelman. Jos asennat Signalin uudelleen, viestihistoriasi saatetaan menettää.";
+"APP_LAUNCH_FAILURE_RESTORE_FAILED_MESSAGE" = "Aiemmasta laitteesta siirrettyjä tietoja ei voitu palauttaa. Lähetä virheenkorjausloki osoitteeseen support@radar.chat, jotta voimme selvittää ongelman. Jos asennat Signalin uudelleen, viestihistoriasi saatetaan menettää.";
 
 /* Error indicating that the app could not restore transferred data. */
 "APP_LAUNCH_FAILURE_RESTORE_FAILED_TITLE" = "Siirtoa ei voitu suorittaa loppuun";
@@ -569,7 +569,7 @@
 "BACKUP_ONBOARDING_CANCEL_SHEET_TITLE" = "Poistutaanko varmuuskopioinnin asetuksista?";
 
 /* Body for a sheet warning users to their 'Recovery Key' safe. */
-"BACKUP_ONBOARDING_CONFIRM_KEY_KEEP_KEY_SAFE_SHEET_BODY" = "Signal ei voi auttaa sinua palauttamaan varmuuskopiota, jos kadotat avaimesi. Säilytä avain turvallisessa paikassa äläkä jaa sitä muiden kanssa.";
+"BACKUP_ONBOARDING_CONFIRM_KEY_KEEP_KEY_SAFE_SHEET_BODY" = "Radar ei voi auttaa sinua palauttamaan varmuuskopiota, jos kadotat avaimesi. Säilytä avain turvallisessa paikassa äläkä jaa sitä muiden kanssa.";
 
 /* Title for a sheet warning users to their 'Recovery Key' safe. */
 "BACKUP_ONBOARDING_CONFIRM_KEY_KEEP_KEY_SAFE_SHEET_TITLE" = "Pidä avain turvassa";
@@ -596,10 +596,10 @@
 "BACKUP_ONBOARDING_INTRO_NOT_NOW_TOAST" = "Voit ottaa varmuuskopiot käyttöön asetuksissa.";
 
 /* Subtitle for a view introducing Backups during an onboarding flow. */
-"BACKUP_ONBOARDING_INTRO_SUBTITLE" = "Varmuuskopioi viestit ja mediasisältö käyttämällä Signalin turvallista, päästä päähän salattua tallennuspalvelua. Älä koskaan menetä viestiä, kun hankit uuden puhelimen tai asennat Signalin uudelleen.";
+"BACKUP_ONBOARDING_INTRO_SUBTITLE" = "Varmuuskopioi viestit ja mediasisältö käyttämällä Radarin turvallista, päästä päähän salattua tallennuspalvelua. Älä koskaan menetä viestiä, kun hankit uuden puhelimen tai asennat Radarin uudelleen.";
 
 /* Title for a view introducing Backups during an onboarding flow. */
-"BACKUP_ONBOARDING_INTRO_TITLE" = "Signal Secure -varmuuskopiointi";
+"BACKUP_ONBOARDING_INTRO_TITLE" = "Radar Secure -varmuuskopiointi";
 
 /* Text for a bullet point in a view introducing the 'Recovery Key' during an onboarding flow. */
 "BACKUP_ONBOARDING_KEY_INTRO_BULLET_1" = "Palautusavain on 64-numeroinen koodi, jota tarvitaan varmuuskopion palauttamiseen.";
@@ -617,10 +617,10 @@
 "BACKUP_ONBOARDING_KEY_INTRO_TITLE" = "Palautusavain";
 
 /* Body for a sheet shown when your Backup plan is downgraded. */
-"BACKUP_PLAN_DOWNGRADED_SHEET_BODY" = "Varmuuskopioinnin maksullinen tilaus on vanhentunut, koska sitä ei voitu uusia valitsemallasi maksutavalla.\n\nVoit jatkaa median varmuuskopiointia tekemällä uuden tilauksen. Sinulla on edelleen pääsy Signal-varmuuskopioiden ilmaiseen versioon.";
+"BACKUP_PLAN_DOWNGRADED_SHEET_BODY" = "Varmuuskopioinnin maksullinen tilaus on vanhentunut, koska sitä ei voitu uusia valitsemallasi maksutavalla.\n\nVoit jatkaa median varmuuskopiointia tekemällä uuden tilauksen. Sinulla on edelleen pääsy Radar-varmuuskopioiden ilmaiseen versioon.";
 
 /* Body for a sheet shown when your Backup plan is downgraded because you stopped using TestFlight. */
-"BACKUP_PLAN_DOWNGRADED_SHEET_BODY_TESTFLIGHT" = "Varmuuskopioinnin tilaus on vanhentunut, koska et enää käytä TestFlightia.\n\nVoit jatkaa median varmuuskopiointia tekemällä uuden tilauksen. Sinulla on edelleen pääsy Signal-varmuuskopioiden ilmaiseen versioon.";
+"BACKUP_PLAN_DOWNGRADED_SHEET_BODY_TESTFLIGHT" = "Varmuuskopioinnin tilaus on vanhentunut, koska et enää käytä TestFlightia.\n\nVoit jatkaa median varmuuskopiointia tekemällä uuden tilauksen. Sinulla on edelleen pääsy Radar-varmuuskopioiden ilmaiseen versioon.";
 
 /* Primary button for a sheet shown when your Backup plan is downgraded. */
 "BACKUP_PLAN_DOWNGRADED_SHEET_PRIMARY_BUTTON" = "Hallitse varmuuskopioita";
@@ -746,7 +746,7 @@
 "BACKUP_SETTINGS_BACKUP_PLAN_PAID_BUT_IAP_NOT_FOUND_LOCALLY_ACTION_BUTTON_TITLE" = "Uusi";
 
 /* Text describing that the user's paid backup plan did not correspond to a App Store subscription on this device. */
-"BACKUP_SETTINGS_BACKUP_PLAN_PAID_BUT_IAP_NOT_FOUND_LOCALLY_DESCRIPTION" = "Tilaustasi ei löydy tältä laitteelta. Uusi jatkaaksesi Signal-varmuuskopioinnin käyttöä.";
+"BACKUP_SETTINGS_BACKUP_PLAN_PAID_BUT_IAP_NOT_FOUND_LOCALLY_DESCRIPTION" = "Tilaustasi ei löydy tältä laitteelta. Uusi jatkaaksesi Radar-varmuuskopioinnin käyttöä.";
 
 /* Header describing what the paid backup plan includes. */
 "BACKUP_SETTINGS_BACKUP_PLAN_PAID_HEADER" = "Tekstin + kaiken median varmuuskopio";
@@ -824,7 +824,7 @@
 "BACKUP_SETTINGS_DISABLING_CONFIRMATION_ACTION_SHEET_TITLE" = "Kytketäänkö varmuuskopio pois käytöstä ja poistetaanko se?";
 
 /* Message shown in an action sheet when the user disables Backups, explaining that their media is downloading first. */
-"BACKUP_SETTINGS_DISABLING_DOWNLOADS_STARTED_ACTION_SHEET_MESSAGE" = "Sinulla on mediasisältöä, jota ei ole tällä laitteella. Varmuuskopion lataaminen voi kestää kauan, joten pidä Signal auki keskeytysten välttämiseksi.";
+"BACKUP_SETTINGS_DISABLING_DOWNLOADS_STARTED_ACTION_SHEET_MESSAGE" = "Sinulla on mediasisältöä, jota ei ole tällä laitteella. Varmuuskopion lataaminen voi kestää kauan, joten pidä Radar auki keskeytysten välttämiseksi.";
 
 /* Title shown in an action sheet when the user disables Backups, explaining that their media is downloading first. */
 "BACKUP_SETTINGS_DISABLING_DOWNLOADS_STARTED_ACTION_SHEET_TITLE" = "Ladataan varmuuskopiota";
@@ -842,7 +842,7 @@
 "BACKUP_SETTINGS_DISABLING_SUBSCRIPTION_CANCEL_ACTION_SHEET_MANAGE_SUBSCRIPTION_BUTTON" = "Muokkaa tilausta";
 
 /* Message for an action sheet shown when the user disables Backups, but is still subscribed to the paid plan. */
-"BACKUP_SETTINGS_DISABLING_SUBSCRIPTION_CANCEL_ACTION_SHEET_MESSAGE" = "Jos haluat peruuttaa tilauksen, napauta Hallinnoi tilausta > Signal > Peruuta tilaus.";
+"BACKUP_SETTINGS_DISABLING_SUBSCRIPTION_CANCEL_ACTION_SHEET_MESSAGE" = "Jos haluat peruuttaa tilauksen, napauta Hallinnoi tilausta > Radar > Peruuta tilaus.";
 
 /* Title for an action sheet shown when the user disables Backups, but is still subscribed to the paid plan. */
 "BACKUP_SETTINGS_DISABLING_SUBSCRIPTION_CANCEL_ACTION_SHEET_TITLE" = "Varmuuskopioinnin maksullinen tilaus on edelleen voimassa.";
@@ -920,7 +920,7 @@
 "BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_DOWNLOAD_SHEET_LATER_ACTION" = "Lataa myöhemmin";
 
 /* Message for an action sheet allowing users to download their offloaded media. */
-"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_DOWNLOAD_SHEET_MESSAGE" = "Sinulla on mediasisältöä, jota ei ole tällä laitteella. Lataaminen voi kestää kauan. Pidä Signal auki, jotta lataus ei keskeydy.";
+"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_DOWNLOAD_SHEET_MESSAGE" = "Sinulla on mediasisältöä, jota ei ole tällä laitteella. Lataaminen voi kestää kauan. Pidä Radar auki, jotta lataus ei keskeydy.";
 
 /* Action in an action sheet allowing users to download their offloaded media now. */
 "BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_DOWNLOAD_SHEET_NOW_ACTION" = "Lataa nyt";
@@ -971,7 +971,7 @@
 "BACKUP_SETTINGS_SUBSCRIPTION_ALREADY_REDEEMED_NOTICE_TITLE" = "Varmuuskopiotilausta ei voitu lunastaa";
 
 /* Body for a sheet explaining that the user's Backups subscription was already redeemed. */
-"BACKUP_SETTINGS_SUBSCRIPTION_ALREADY_REDEEMED_SHEET_BODY" = "Liian moni laite on yrittänyt lunastaa tilauksen tässä kuussa.\n\nOlet ehkä rekisteröinyt Signal-tilisi uudelleen liian monta kertaa, tai liian monella laitteella on käytössä sama tilaus.";
+"BACKUP_SETTINGS_SUBSCRIPTION_ALREADY_REDEEMED_SHEET_BODY" = "Liian moni laite on yrittänyt lunastaa tilauksen tässä kuussa.\n\nOlet ehkä rekisteröinyt Radar-tilisi uudelleen liian monta kertaa, tai liian monella laitteella on käytössä sama tilaus.";
 
 /* Button for a sheet explaining that the user's Backups subscription was already redeemed. */
 "BACKUP_SETTINGS_SUBSCRIPTION_ALREADY_REDEEMED_SHEET_GOT_IT_BUTTON" = "Selvä";
@@ -1001,10 +1001,10 @@
 "BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_MESSAGE" = "Varmuuskopion koosta riippuen tämä voi kestää pitkään. Voit käyttää Signalia tavalliseen tapaan varmuuskopioinnin aikana.";
 
 /* Title for a sheet shown after the user enables backups. */
-"BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_TITLE" = "Tervetuloa Signal Secure -varmuuskopioihin. Aloita varmuuskopiointi nyt.";
+"BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_TITLE" = "Tervetuloa Radar Secure -varmuuskopioihin. Aloita varmuuskopiointi nyt.";
 
 /* Message for a sheet shown when your Backup subscription fails to renew. */
-"BACKUP_SUBSCRIPTION_FAILED_TO_RENEW_SHEET_MESSAGE" = "Varmista, että maksutapasi on ajan tasalla. Napauta Hallinnoi tilausta > Signal > Päivitä maksutapa.";
+"BACKUP_SUBSCRIPTION_FAILED_TO_RENEW_SHEET_MESSAGE" = "Varmista, että maksutapasi on ajan tasalla. Napauta Hallinnoi tilausta > Radar > Päivitä maksutapa.";
 
 /* Primary button for a sheet shown when your Backup subscription fails to renew. */
 "BACKUP_SUBSCRIPTION_FAILED_TO_RENEW_SHEET_PRIMARY_BUTTON" = "Muokkaa tilausta";
@@ -1019,10 +1019,10 @@
 "BACKUPS_MEDIA_UPLOAD_FAILURE_NOTIFICATION_TITLE" = "Mediasisällön varmuuskopioinnissa tapahtui virhe";
 
 /* Title for the 'Backup' settings menu. */
-"BACKUPS_SETTINGS_TITLE" = "Signal Secure -varmuuskopiointi";
+"BACKUPS_SETTINGS_TITLE" = "Radar Secure -varmuuskopiointi";
 
 /* Body for system notification or megaphone when backups is enabled. Embeds {{ time backups was enabled }} */
-"BACKUPS_TURNED_ON_NOTIFICATION_BODY_FORMAT" = "Signal-varmuuskopiot otettiin käyttöön tälle tilille klo %1$@. Näytä napauttamalla.";
+"BACKUPS_TURNED_ON_NOTIFICATION_BODY_FORMAT" = "Radar-varmuuskopiot otettiin käyttöön tälle tilille klo %1$@. Näytä napauttamalla.";
 
 /* Title for system notification or megaphone when backups is enabled */
 "BACKUPS_TURNED_ON_TITLE" = "Otit varmuuskopioinnin käyttöön";
@@ -1088,7 +1088,7 @@
 "BANK_DONATION_FOOTER_FIND_ACCOUNT_INFO" = "Etsi tilin tiedot";
 
 /* On the bank transfer donation screen, a small amount of information text is shown. This is that text. It should (1) instruct users to enter their bank information (2) tell them that Signal does not collect or store their personal information. */
-"BANK_DONATION_SUBHEADER_TEXT" = "Anna pankkitietosi. Signal ei kerää tai tallenna henkilötietojasi.";
+"BANK_DONATION_SUBHEADER_TEXT" = "Anna pankkitietosi. Radar ei kerää tai tallenna henkilötietojasi.";
 
 /* Users can donate to Signal with a bank account. We are required to show them a mandate with information about bank transfers. This is a label for a button to agree to the mandate. */
 "BANK_MANDATE_AGREE" = "Hyväksy";
@@ -1097,7 +1097,7 @@
 "BANK_MANDATE_READ_MORE" = "Lue lisää";
 
 /* Users can donate to Signal with a bank account. We are required to show them a mandate with information about bank transfers. This is a subtitle about the payment processor Stripe above that mandate. */
-"BANK_MANDATE_SUBTITLE" = "Stripe käsittelee Signalille tehdyt lahjoitukset. Signal ei kerää tai tallenna henkilötietojasi.";
+"BANK_MANDATE_SUBTITLE" = "Stripe käsittelee Signalille tehdyt lahjoitukset. Radar ei kerää tai tallenna henkilötietojasi.";
 
 /* Users can donate to Signal with a bank account. We are required to show them a mandate with information about bank transfers. This is the title above that mandate. */
 "BANK_MANDATE_TITLE" = "Pankkisiirto";
@@ -1319,7 +1319,7 @@
 "CALL_LINK_JOIN_REQUEST_PROMPT" = "Haluaa liittyä…";
 
 /* Shown in a message bubble when you send a call link in a Signal chat */
-"CALL_LINK_LINK_PREVIEW_DESCRIPTION" = "Liity Signal-puheluun tämän linkin avulla";
+"CALL_LINK_LINK_PREVIEW_DESCRIPTION" = "Liity Radar-puheluun tämän linkin avulla";
 
 /* Text that appears on a toast in a call lobby before joining a call link informing the user what information will be shared with other call members when they have phone number sharing turned off. */
 "CALL_LINK_LOBBY_SHARING_INFO_PHONE_NUMBER_SHARING_OFF" = "Kuka tahansa, joka liittyy tähän puheluun linkin kautta, näkee nimesi ja kuvasi.";
@@ -1448,10 +1448,10 @@
 "CALLING_MEMBER_VIEW_YOUR_CAMERA_IS_OFF" = "Kamera on pois päältä";
 
 /* The generic name used for calls if CallKit privacy is enabled */
-"CALLKIT_ANONYMOUS_CONTACT_NAME" = "Signal-käyttäjä";
+"CALLKIT_ANONYMOUS_CONTACT_NAME" = "Radar-käyttäjä";
 
 /* The generic name used for group calls if CallKit privacy is enabled */
-"CALLKIT_ANONYMOUS_GROUP_NAME" = "Signal-ryhmä";
+"CALLKIT_ANONYMOUS_GROUP_NAME" = "Radar-ryhmä";
 
 /* Title for the calls list view. */
 "CALLS_LIST_TITLE" = "Puhelut";
@@ -1625,7 +1625,7 @@
 "CARD_DONATION_EXPIRATION_DATE_PLACEHOLDER" = "KK/VV";
 
 /* Users can choose to learn more about their credit/debit card donations, which will open a sheet with additional information. This is the body text of that sheet. */
-"CARD_DONATION_READ_MORE_SHEET_BODY" = "Signal ei kerää tai tallenna mitään henkilötietoja, kun teet lahjoituksen.\n\nKäytämme Stripea maksujen käsittelijänä lahjoitusten vastaanottamiseksi. Emme käytä, säilytä tai tallenna mitään heille antamistasi tiedoista.\n\nSignal ei yhdistä eikä voi yhdistää lahjoitustasi Signal-tiliisi.\n\nKiitos tuestasi!";
+"CARD_DONATION_READ_MORE_SHEET_BODY" = "Radar ei kerää tai tallenna mitään henkilötietoja, kun teet lahjoituksen.\n\nKäytämme Stripea maksujen käsittelijänä lahjoitusten vastaanottamiseksi. Emme käytä, säilytä tai tallenna mitään heille antamistasi tiedoista.\n\nSignal ei yhdistä eikä voi yhdistää lahjoitustasi Radar-tiliisi.\n\nKiitos tuestasi!";
 
 /* Users can choose to learn more about their credit/debit card donations, which will open a sheet with additional information. This is the title of that sheet. */
 "CARD_DONATION_READ_MORE_SHEET_TITLE" = "Tietosi ovat yksityisiä";
@@ -1634,7 +1634,7 @@
 "CARD_DONATION_SUBHEADER_LEARN_MORE" = "Lue lisää";
 
 /* On the credit/debit card donation screen, a small amount of information text is shown. This is that text. It should (1) instruct users to enter their credit/debit card information (2) tell them that Signal does not collect or store their personal information. */
-"CARD_DONATION_SUBHEADER_TEXT" = "Anna kortin tiedot. Signal ei kerää tai tallenna henkilötietojasi.";
+"CARD_DONATION_SUBHEADER_TEXT" = "Anna kortin tiedot. Radar ei kerää tai tallenna henkilötietojasi.";
 
 /* Title for the 'censorship circumvention country' view. */
 "CENSORSHIP_CIRCUMVENTION_COUNTRY_VIEW_TITLE" = "Valitse maa";
@@ -1772,7 +1772,7 @@
 "COMPARE_SAFETY_NUMBER_ACTION" = "Vertaa leikepöytään";
 
 /* Accessibility hint describing what you can do with the compose button */
-"COMPOSE_BUTTON_HINT" = "Aloita keskustelu valitsemalla tai etsimällä Signal-käyttäjä.";
+"COMPOSE_BUTTON_HINT" = "Aloita keskustelu valitsemalla tai etsimällä Radar-käyttäjä.";
 
 /* Accessibility label from compose button. */
 "COMPOSE_BUTTON_LABEL" = "Syötä";
@@ -1850,7 +1850,7 @@
 "CONTACT_ABOUT_SHEET_SECONDARY_NAME_TOOLTIP_MESSAGE" = "”%1$@” on profiilinimi, jonka tämä henkilö on asettanut Signalissa.";
 
 /* A label indicating a user is a signal connection. */
-"CONTACT_ABOUT_SHEET_SIGNAL_CONNECTION_LABEL" = "Signal-kontaktit";
+"CONTACT_ABOUT_SHEET_SIGNAL_CONNECTION_LABEL" = "Radar-kontaktit";
 
 /* The title for a contact 'about' sheet. */
 "CONTACT_ABOUT_SHEET_TITLE" = "Tietoja";
@@ -1952,7 +1952,7 @@
 "CONTACT_SHARE_INVALID_CONTACT" = "Virheellinen yhteystieto";
 
 /* Alert body when contacts disabled while trying to share a contact. */
-"CONTACT_SHARING_NO_ACCESS_BODY" = "Signal tarvitsee luvan käyttää yhteystietojasi. Siirry iOS-asetuksiin ja anna lupa yhteystietojen käytölle. Yhteystietosi salataan, eivätkä ne näy Signal-palvelussa.";
+"CONTACT_SHARING_NO_ACCESS_BODY" = "Radar tarvitsee luvan käyttää yhteystietojasi. Siirry iOS-asetuksiin ja anna lupa yhteystietojen käytölle. Yhteystietosi salataan, eivätkä ne näy Radar-palvelussa.";
 
 /* Alert title when contacts disabled while trying to share a contact. */
 "CONTACT_SHARING_NO_ACCESS_TITLE" = "Salli yhteystietojen käyttö";
@@ -2006,7 +2006,7 @@
 "CONTACT_SUPPORT_FILTER_SOMETHING_NOT_WORKING_SHORT" = "Jokin ei toimi";
 
 /* Alert body */
-"CONTACT_SUPPORT_PROMPT_ERROR_ALERT_BODY" = "Signal ei voinut ratkaista tukipyyntöäsi.";
+"CONTACT_SUPPORT_PROMPT_ERROR_ALERT_BODY" = "Radar ei voinut ratkaista tukipyyntöäsi.";
 
 /* button text */
 "CONTACT_SUPPORT_PROMPT_ERROR_TRY_AGAIN" = "Yritä uudelleen";
@@ -2420,7 +2420,7 @@
 "DATABASE_RECOVERY_RECOVERY_FAILED_DESCRIPTION" = "Viestihistoriaa ei voitu palauttaa. Voit jatkaa Signalin käyttöä asennettuasi sen uudelleen. Lähetä virheenkorjausloki, jotta voimme paremmin ymmärtää, mikä meni vikaan.";
 
 /* The user has tried to recover their data after it was lost due to corruption. (They have not been hacked.) This button lets them delete all of their data. */
-"DATABASE_RECOVERY_RECOVERY_FAILED_RESET_APP_BUTTON" = "Palauta Signal";
+"DATABASE_RECOVERY_RECOVERY_FAILED_RESET_APP_BUTTON" = "Palauta Radar";
 
 /* The user has tried to recover their data after it was lost due to corruption. (They have not been hacked.) If they want to delete the app and restart, they will be presented with a confirmation dialog. This is the final button they will press before their data is reset. */
 "DATABASE_RECOVERY_RECOVERY_FAILED_RESET_APP_CONFIRMATION_CONFIRM" = "Palauta alkuasetuksiin";
@@ -2429,7 +2429,7 @@
 "DATABASE_RECOVERY_RECOVERY_FAILED_RESET_APP_CONFIRMATION_DESCRIPTION" = "Tilin tiedot, profiili ja kaikki viestit poistetaan. Sovellus sulkeutuu, kun prosessi on valmis.";
 
 /* The user has tried to recover their data after it was lost due to corruption. (They have not been hacked.) If they want to delete the app and restart, they will be presented with a confirmation dialog. This is the title of that dialog. */
-"DATABASE_RECOVERY_RECOVERY_FAILED_RESET_APP_CONFIRMATION_TITLE" = "Palauta Signal";
+"DATABASE_RECOVERY_RECOVERY_FAILED_RESET_APP_CONFIRMATION_TITLE" = "Palauta Radar";
 
 /* The user has tried to recover their data after it was lost due to corruption. (They have not been hacked.) They were asked to submit a debug log. This is the button that submits this log. */
 "DATABASE_RECOVERY_RECOVERY_FAILED_SUBMIT_DEBUG_LOG_BUTTON" = "Lähetä virheenkorjausloki";
@@ -2504,7 +2504,7 @@
 "DELETE_ACCOUNT_CONFIRMATION_ACTION_SHEEET_ACTION" = "Poista tili";
 
 /* Title for the action sheet message of the 'delete account confirmation' view controller. */
-"DELETE_ACCOUNT_CONFIRMATION_ACTION_SHEEET_MESSAGE" = "Signal-tili poistetaan ja sovellus palautetaan alkuasetuksiin. Sovellus sulkeutuu prosessin päätteeksi.";
+"DELETE_ACCOUNT_CONFIRMATION_ACTION_SHEEET_MESSAGE" = "Radar-tili poistetaan ja sovellus palautetaan alkuasetuksiin. Sovellus sulkeutuu prosessin päätteeksi.";
 
 /* Title for the action sheet confirmation title of the 'delete account confirmation' view controller. */
 "DELETE_ACCOUNT_CONFIRMATION_ACTION_SHEEET_TITLE" = "Haluatko varmasti poistaa tilisi?";
@@ -2528,7 +2528,7 @@
 "DELETE_ACCOUNT_CONFIRMATION_PHONE_NUMBER_TITLE" = "Puhelinnumero";
 
 /* Section header */
-"DELETE_ACCOUNT_CONFIRMATION_SECTION_TITLE" = "Varmenna Signal-tilin puhelinnumero";
+"DELETE_ACCOUNT_CONFIRMATION_SECTION_TITLE" = "Varmenna Radar-tilin puhelinnumero";
 
 /* Title for the 'delete account' confirmation view. */
 "DELETE_ACCOUNT_CONFIRMATION_TITLE" = "Poista tili";
@@ -2653,7 +2653,7 @@
 "DEVICE_TRANSFER_CONTRACT_QR_CODE_BUTTON" = "Näytä pienempänä";
 
 /* An error indicating that the other device closed signal mid-transfer and it could not complete */
-"DEVICE_TRANSFER_ERROR_BACKGROUNDED" = "Siirto ei onnistunut. Varmista, että Signal on auki molemmissa laitteissa ja yritä uudelleen.";
+"DEVICE_TRANSFER_ERROR_BACKGROUNDED" = "Siirto ei onnistunut. Varmista, että Radar on auki molemmissa laitteissa ja yritä uudelleen.";
 
 /* An error indicating that we were unable to verify the identity of the new device to complete the transfer */
 "DEVICE_TRANSFER_ERROR_CERTIFICATE_MISMATCH" = "Uutta laitetta ei voitu varmentaa. Yritä uudelleen";
@@ -2671,13 +2671,13 @@
 "DEVICE_TRANSFER_ERROR_NOT_ENOUGH_SPACE" = "Ei tarpeeksi tallennustilaa. Siirtoa ei voi tehdä";
 
 /* An error indicating the user must update their device before trying to transfer. */
-"DEVICE_TRANSFER_ERROR_UNSUPPORTED_VERSION" = "Päivitä Signal uusimpaan versioon ja yritä uudelleen";
+"DEVICE_TRANSFER_ERROR_UNSUPPORTED_VERSION" = "Päivitä Radar uusimpaan versioon ja yritä uudelleen";
 
 /* Button shown to expand a QR code and view it fullscreen. */
 "DEVICE_TRANSFER_EXPAND_QR_CODE_BUTTON" = "Näytä suurempana";
 
 /* The explanation on the action sheet prompting the user if they want to transfer their device. */
-"DEVICE_TRANSFER_PROMPT_EXPLANATION" = "Siirtää Signal-tili uuteen iOS-laitteeseen. Varmista, että uusi laite on lähettyvillä ja päällä.";
+"DEVICE_TRANSFER_PROMPT_EXPLANATION" = "Siirtää Radar-tili uuteen iOS-laitteeseen. Varmista, että uusi laite on lähettyvillä ja päällä.";
 
 /* The title on the acttion sheet prompting the user if they want to transfer their device. */
 "DEVICE_TRANSFER_PROMPT_TITLE" = "Siirrä tili";
@@ -2695,7 +2695,7 @@
 "DEVICE_TRANSFER_QRCODE_TITLE" = "Skannaa QR-koodi";
 
 /* The explanation on the view that shows receiving progress */
-"DEVICE_TRANSFER_RECEIVING_EXPLANATION" = "Pidä laitteet lähellä toisiaan. Älä sammuta niitä ja pidä Signal avoinna. Siirrot salataan täysin.";
+"DEVICE_TRANSFER_RECEIVING_EXPLANATION" = "Pidä laitteet lähellä toisiaan. Älä sammuta niitä ja pidä Radar avoinna. Siirrot salataan täysin.";
 
 /* The title on the view that shows receiving progress */
 "DEVICE_TRANSFER_RECEIVING_TITLE" = "Tietoja vastaanotetaan";
@@ -2731,7 +2731,7 @@
 "DEVICE_TRANSFER_STATUS_NEW_DEVICE_TRANSFERRING" = "Siirretään";
 
 /* Description in the progress view displayed during device transfer. */
-"DEVICE_TRANSFER_STATUS_NEW_DEVICE_TRANSFERRING_DESCRIPTION" = "Pidä laitteet lähellä toisiaan. Älä sammuta niitä ja pidä Signal avoinna. Siirrot salataan täysin.";
+"DEVICE_TRANSFER_STATUS_NEW_DEVICE_TRANSFERRING_DESCRIPTION" = "Pidä laitteet lähellä toisiaan. Älä sammuta niitä ja pidä Radar avoinna. Siirrot salataan täysin.";
 
 /* Status message on old device when cancelling transfer. */
 "DEVICE_TRANSFER_STATUS_OLD_DEVICE_CANCELLING" = "Peruutetaan yhteyden muodostus uuteen iPhoneen…";
@@ -2746,7 +2746,7 @@
 "DEVICE_TRANSFER_STATUS_OLD_DEVICE_STARTING" = "Odotetaan yhteyden muodostamista uuteen iPhoneen…";
 
 /* The explanation on the action sheet that shows transfer progress */
-"DEVICE_TRANSFER_TRANSFERRING_EXPLANATION" = "Pidä laitteet lähellä toisiaan. Älä sammuta niitä ja pidä Signal avoinna.";
+"DEVICE_TRANSFER_TRANSFERRING_EXPLANATION" = "Pidä laitteet lähellä toisiaan. Älä sammuta niitä ja pidä Radar avoinna.";
 
 /* The title on the action sheet that shows transfer progress */
 "DEVICE_TRANSFER_TRANSFERRING_TITLE" = "Tietoja siirretään";
@@ -2983,7 +2983,7 @@
 "DONATION_ON_BEHALF_OF_A_FRIEND_PAYMENT_FAILED_ERROR_TITLE" = "Maksu epäonnistui";
 
 /* Users can donate on a friend's behalf. If the payment was processed but the donation failed to send, this error message will be shown. */
-"DONATION_ON_BEHALF_OF_A_FRIEND_PAYMENT_SUCCEEDED_BUT_MESSAGE_FAILED_ERROR_BODY" = "Maksusi käsiteltiin, mutta Signal ei voinut lähettää lahjoitusviestiäsi. Ota yhteys tukeen.";
+"DONATION_ON_BEHALF_OF_A_FRIEND_PAYMENT_SUCCEEDED_BUT_MESSAGE_FAILED_ERROR_BODY" = "Maksusi käsiteltiin, mutta Radar ei voinut lähettää lahjoitusviestiäsi. Ota yhteys tukeen.";
 
 /* Users can donate on a friend's behalf. If the payment was processed but the donation failed to send, an error dialog will be shown. This is the title of that dialog. */
 "DONATION_ON_BEHALF_OF_A_FRIEND_PAYMENT_SUCCEEDED_BUT_MESSAGE_FAILED_ERROR_TITLE" = "Lahjoitus epäonnistui";
@@ -3034,13 +3034,13 @@
 "DONATION_READ_MORE_SCREEN_PARAGRAPH_1" = "Yksityistä viestintää. Ei mainoksia, seurantaevästeitä tai valvontaa.";
 
 /* There is a screen where users can read more about their donation to Signal. This is the 2nd paragraph of that screen. */
-"DONATION_READ_MORE_SCREEN_PARAGRAPH_2" = "Signalia tuetaan lahjoituksilla. Tämä tarkoittaa, että yksityisyytesi on koko toimintamme keskiössä. Signal on luotu sinua varten, ei datan tarpeisiin tai voiton tavoittelemiseksi.";
+"DONATION_READ_MORE_SCREEN_PARAGRAPH_2" = "Signalia tuetaan lahjoituksilla. Tämä tarkoittaa, että yksityisyytesi on koko toimintamme keskiössä. Radar on luotu sinua varten, ei datan tarpeisiin tai voiton tavoittelemiseksi.";
 
 /* There is a screen where users can read more about their donation to Signal. This is the 3rd paragraph of that screen. */
-"DONATION_READ_MORE_SCREEN_PARAGRAPH_3" = "Jos mahdollista, lahjoita Signalille jo tänään varmistaaksesi, että Signal pysyy jatkossakin hauskana, luotettavana ja kaikkien käytettävissä.";
+"DONATION_READ_MORE_SCREEN_PARAGRAPH_3" = "Jos mahdollista, lahjoita Signalille jo tänään varmistaaksesi, että Radar pysyy jatkossakin hauskana, luotettavana ja kaikkien käytettävissä.";
 
 /* There is a screen where users can read more about their donation to Signal. This is the title of that screen. */
-"DONATION_READ_MORE_SCREEN_TITLE" = "Signal on erilainen.";
+"DONATION_READ_MORE_SCREEN_TITLE" = "Radar on erilainen.";
 
 /* Section title for donation amount on receipts */
 "DONATION_RECEIPT_AMOUNT" = "Summa";
@@ -3208,7 +3208,7 @@
 "EDIT_CONTACT_WITHOUT_CONTACTS_PERMISSION_ALERT_BODY" = "Voit antaa käyttöoikeuden iOS-asetuksissa.";
 
 /* Alert title for when the user has just tried to edit a contacts after declining to give Signal contacts permissions */
-"EDIT_CONTACT_WITHOUT_CONTACTS_PERMISSION_ALERT_TITLE" = "Signal tarvitsee oikeuden käyttää yhteystietojasi, jotta se voi muokata niitä";
+"EDIT_CONTACT_WITHOUT_CONTACTS_PERMISSION_ALERT_TITLE" = "Radar tarvitsee oikeuden käyttää yhteystietojasi, jotta se voi muokata niitä";
 
 /* The navbar title for the 'update group' view. */
 "EDIT_GROUP_DEFAULT_TITLE" = "Muokkaa ryhmää";
@@ -3247,7 +3247,7 @@
 "EMAIL_INVITE_SUBJECT" = "Vaihdetaan Signaliin";
 
 /* Description for the fallback support sheet if user cannot send email */
-"EMAIL_SIGNAL_MESSAGE" = "Laitteesi ei tue sähköpostien lähetystä. Lähettääksesi tukipyynnön, määritä laitteesi sähköpostiasetukset tai lähetä sähköposti osoitteeseen support@signal.org";
+"EMAIL_SIGNAL_MESSAGE" = "Laitteesi ei tue sähköpostien lähetystä. Lähettääksesi tukipyynnön, määritä laitteesi sähköpostiasetukset tai lähetä sähköposti osoitteeseen support@radar.chat";
 
 /* Title for the fallback support sheet if user cannot send email */
 "EMAIL_SIGNAL_TITLE" = "Sähköposti ei käytettävissä";
@@ -3394,10 +3394,10 @@
 "ERROR_NETWORK_FAILURE" = "Verkkovirhe";
 
 /* Format string for an error alert notification message. Embeds {{ error string }} */
-"ERROR_NOTIFICATION_MESSAGE_FORMAT" = "Ole hyvä ja auta meitä parantamaan Signalia lähettämällä tämä virheilmoitus laitteesi virheenkorjauslokien kanssa osoitteeseen support@signal.org; %1$@";
+"ERROR_NOTIFICATION_MESSAGE_FORMAT" = "Ole hyvä ja auta meitä parantamaan Signalia lähettämällä tämä virheilmoitus laitteesi virheenkorjauslokien kanssa osoitteeseen support@radar.chat; %1$@";
 
 /* Format string for an error alert notification title. */
-"ERROR_NOTIFICATION_TITLE" = "Signal Beta: Tapahtui virhe";
+"ERROR_NOTIFICATION_TITLE" = "Radar Beta: Tapahtui virhe";
 
 /* Error indicating a send failure due to a delinked application. */
 "ERROR_SENDING_DELINKED" = "Laitteesi ei ole enää yhdistetty. Yhdistä uudelleen jatkaaksesi viestintää.";
@@ -3418,19 +3418,19 @@
 "EXIT_REREGISTRATION" = "Poistu rekisteröitymisestä";
 
 /* Label notifying the user that the app has expired. */
-"EXPIRATION_ERROR" = "Tämä Signal-versio on vanhentunut. Päivitä lähettääksesi ja vastaanottaaksesi viestejä.";
+"EXPIRATION_ERROR" = "Tämä Radar-versio on vanhentunut. Päivitä lähettääksesi ja vastaanottaaksesi viestejä.";
 
 /* If the user's app is too old, they'll be shown a warning asking them to upgrade. This is the text on the warning, and tapping it will open the App Store page for Signal. */
 "EXPIRATION_WARNING_ACTION_TITLE" = "Päivitä nyt";
 
 /* Label warning the user that the app will expire soon. Embeds {{date}}. */
-"EXPIRATION_WARNING_SOON" = "Tämä Signal-versio vanhenee %1$@. Päivitä jatkaaksesi viestintää.";
+"EXPIRATION_WARNING_SOON" = "Tämä Radar-versio vanhenee %1$@. Päivitä jatkaaksesi viestintää.";
 
 /* Label warning the user that the app will expire today. */
-"EXPIRATION_WARNING_TODAY" = "Tämä Signal-versio vanhenee tänään. Päivitä jatkaaksesi viestintää.";
+"EXPIRATION_WARNING_TODAY" = "Tämä Radar-versio vanhenee tänään. Päivitä jatkaaksesi viestintää.";
 
 /* action sheet header when re-sending message which failed because of an invalid key signature */
-"FAILED_SENDING_BECAUSE_INVALID_KEY_SIGNATURE" = "Viestiä ei voitu lähettää, koska käyttäjän %1$@ on päivitettävä ja avattava Signal.";
+"FAILED_SENDING_BECAUSE_INVALID_KEY_SIGNATURE" = "Viestiä ei voitu lähettää, koska käyttäjän %1$@ on päivitettävä ja avattava Radar.";
 
 /* action sheet header when re-sending message which failed because of untrusted identity keys */
 "FAILED_SENDING_BECAUSE_UNTRUSTED_IDENTITY_KEY" = "Turvanumerosi yhteystiedon %1$@ kanssa on vaihtunut hiljattain. Saatat halua varmentaa sen ennen viestin uudelleen lähettämistä.";
@@ -3745,10 +3745,10 @@
 "GROUP_CALL_WILL_NOTIFY_TWO_PEOPLE_FORMAT" = "Käyttäjille %1$@ ja %2$@ ilmoitetaan";
 
 /* Text shown before the user starts a group call if the user has enabled ringing and there is one other person in the group. Embeds {member name} */
-"GROUP_CALL_WILL_RING_ONE_PERSON_FORMAT" = "Signal soittaa käyttäjälle %1$@";
+"GROUP_CALL_WILL_RING_ONE_PERSON_FORMAT" = "Radar soittaa käyttäjälle %1$@";
 
 /* Text shown before the user starts a group call if the user has enabled ringing and there are two other people in the group. Embeds {{ %1$@ participant1, %2$@ participant2 }} */
-"GROUP_CALL_WILL_RING_TWO_PEOPLE_FORMAT" = "Signal soittaa käyttäjille %1$@ ja %2$@";
+"GROUP_CALL_WILL_RING_TWO_PEOPLE_FORMAT" = "Radar soittaa käyttäjille %1$@ ja %2$@";
 
 /* Text explaining that you are in the group call. */
 "GROUP_CALL_YOU_ARE_HERE" = "Olet ryhmäpuhelussa";
@@ -4468,7 +4468,7 @@
 "INACTIVE_LINKED_DEVICE_REMINDER_MEGAPHONE_TITLE" = "Ei-aktiivinen yhdistetty laite";
 
 /* Body for an in-app megaphone about a user's inactive primary device. */
-"INACTIVE_PRIMARY_DEVICE_REMINDER_MEGAPHONE_BODY" = "Pidä tilisi aktiivisena avaamalla Signal ensisijaisella laitteellasi.";
+"INACTIVE_PRIMARY_DEVICE_REMINDER_MEGAPHONE_BODY" = "Pidä tilisi aktiivisena avaamalla Radar ensisijaisella laitteellasi.";
 
 /* Title for a button in an in-app megaphone about a user's inactive primary device, temporarily dismissing the megaphone. */
 "INACTIVE_PRIMARY_DEVICE_REMINDER_MEGAPHONE_GOT_IT_BUTTON" = "Selvä";
@@ -4477,7 +4477,7 @@
 "INACTIVE_PRIMARY_DEVICE_REMINDER_MEGAPHONE_LEARN_MORE_BUTTON" = "Lue lisää";
 
 /* Title for an in-app megaphone about a user's inactive primary device. */
-"INACTIVE_PRIMARY_DEVICE_REMINDER_MEGAPHONE_TITLE" = "Avaa Signal puhelimessa";
+"INACTIVE_PRIMARY_DEVICE_REMINDER_MEGAPHONE_TITLE" = "Avaa Radar puhelimessa";
 
 /* Label reminding the user that they are in archive mode, and that muted chats remain archived when they receive a new message. */
 "INBOX_VIEW_ARCHIVE_MODE_MUTED_CHATS_REMINDER" = "Arkistoidut mykistetyt keskustelut pysyvät arkistoituina, kun uusi viesti saapuu.";
@@ -4513,10 +4513,10 @@
 "INFO_MESSAGE_BLOCKED_OTHER_USER" = "Estit tämän henkilön.";
 
 /* Indicates that a previously-removed recipient has been added back to the current user's contacts. */
-"INFO_MESSAGE_CONTACT_REINSTATED" = "Tämä henkilö lisättiin takaisin Signal-yhteystietoluetteloosi.";
+"INFO_MESSAGE_CONTACT_REINSTATED" = "Tämä henkilö lisättiin takaisin Radar-yhteystietoluetteloosi.";
 
 /* Indicates that the recipient has been removed from the current user's contacts and that messaging them will re-add them. */
-"INFO_MESSAGE_CONTACT_REMOVED" = "Olet poistanut tämän henkilön Signal-yhteystietoluettelostasi. Jos lähetät hänelle viestin, lisäät hänet takaisin.";
+"INFO_MESSAGE_CONTACT_REMOVED" = "Olet poistanut tämän henkilön Radar-yhteystietoluettelostasi. Jos lähetät hänelle viestin, lisäät hänet takaisin.";
 
 /* When you start a chat with someone and then later learn their profile name, we insert an in-chat message with this string to record the identifier you originally used to contact them. Embeds {{ the identifier, either a phone number or a username }}. */
 "INFO_MESSAGE_LEARNED_PROFILE_KEY" = "Aloitit keskustelun henkilön %1$@ kanssa.";
@@ -4528,7 +4528,7 @@
 "INFO_MESSAGE_PAYMENTS_ACTIVATION_REQUEST_FINISHED" = "%1$@ voi nyt hyväksyä maksuja.";
 
 /* Shown when a user receives a payment activation request. Embeds: {{ the user's name}} */
-"INFO_MESSAGE_PAYMENTS_ACTIVATION_REQUEST_RECEIVED" = "%1$@ haluaa sinun aktivoivan Signal-maksut. Lähetä maksuja vain henkilöille, joihin luotat.";
+"INFO_MESSAGE_PAYMENTS_ACTIVATION_REQUEST_RECEIVED" = "%1$@ haluaa sinun aktivoivan Radar-maksut. Lähetä maksuja vain henkilöille, joihin luotat.";
 
 /* Shown when requesting a user activates payments. Embeds: {{ the user's name}} */
 "INFO_MESSAGE_PAYMENTS_ACTIVATION_REQUEST_SENT" = "Lähetit käyttäjälle %1$@ maksujen aktivointipyynnön.";
@@ -4537,7 +4537,7 @@
 "INFO_MESSAGE_REPORTED_SPAM" = "Ilmoitettu roskapostista";
 
 /* Body message of the alert shown when a user taps on 'learn more' via the spam info message. */
-"INFO_MESSAGE_REPORTED_SPAM_LEARN_MORE_MESSAGE" = "Signal on saanut ilmoituksen, että tämä henkilö saattaa lähettää roskapostia. Signal ei näe keskustelujen sisältöä.";
+"INFO_MESSAGE_REPORTED_SPAM_LEARN_MORE_MESSAGE" = "Radar on saanut ilmoituksen, että tämä henkilö saattaa lähettää roskapostia. Radar ei näe keskustelujen sisältöä.";
 
 /* Title of the alert shown when a user taps on 'learn more' via the spam info message. */
 "INFO_MESSAGE_REPORTED_SPAM_LEARN_MORE_TITLE" = "Ilmoitettu roskapostista";
@@ -4762,7 +4762,7 @@
 "LINK_PREVIEW_UNKNOWN_DOMAIN" = "Linkin esikatselukuva";
 
 /* Shown in an alert when trying to edit a contact. */
-"LINKED_DEVICE_CONTACTS_NOT_ALLOWED" = "Puhelimen yhteystietojen hallinta ei ole enää käytettävissä iPadilla. Avaa Signal puhelimessasi, jos haluat lisätä Signal-kontakteja puhelimen yhteystietoihin.";
+"LINKED_DEVICE_CONTACTS_NOT_ALLOWED" = "Puhelimen yhteystietojen hallinta ei ole enää käytettävissä iPadilla. Avaa Radar puhelimessasi, jos haluat lisätä Radar-kontakteja puhelimen yhteystietoihin.";
 
 /* Shown in a banner when you tap the 'New Chat' icon at the top of the list of chats. */
 "LINKED_DEVICE_MANAGE_CONTACTS_BANNER" = "Puhelimen yhteystietojen hallintaa ei enää tueta iPadilla. Tämä laite synkronoi edelleen yhteystietoluetteloon tehdyt muutokset puhelimen Signalista.";
@@ -4780,7 +4780,7 @@
 "LINKED_DEVICE_NOTIFICATION_TITLE" = "Yhdistit uuden laitteen";
 
 /* Message for an action sheet telling users how to link a device, when trying to open an external device-linking URL. */
-"LINKED_DEVICE_URL_OPENED_ACTION_SHEET_EXTERNAL_URL_MESSAGE" = "Jos haluat yhdistää tietokoneen tai iPadin tähän Signal-tiliin, siirry kohtaan Yhdistetyt laitteet, napauta Yhdistä uusi laite ja skannaa QR-koodi uudelleen. Skannaa vain QR-koodeja, jotka tulevat suoraan Signalista.";
+"LINKED_DEVICE_URL_OPENED_ACTION_SHEET_EXTERNAL_URL_MESSAGE" = "Jos haluat yhdistää tietokoneen tai iPadin tähän Radar-tiliin, siirry kohtaan Yhdistetyt laitteet, napauta Yhdistä uusi laite ja skannaa QR-koodi uudelleen. Skannaa vain QR-koodeja, jotka tulevat suoraan Signalista.";
 
 /* Message for an action sheet telling users how to link a device, when trying to open a device-linking URL from the in-app camera. */
 "LINKED_DEVICE_URL_OPENED_ACTION_SHEET_IN_APP_CAMERA_MESSAGE" = "Vaikuttaa siltä, että yrität yhdistää laitetta Signaliin. Napauta Jatka ja napauta sitten Yhdistä uusi laite ja skannaa QR-koodi uudelleen.";
@@ -4789,19 +4789,19 @@
 "LINKED_DEVICES_EDUCATION_POINT_DOWNLOADS" = "Asenna iPad-sovellus toiseen laitteeseesi käymällä osoitteessa %1$@ tai asenna työpöytäsovellus osoitteesta %2$@.";
 
 /* Bullet point about message sync on the linked devices education sheet */
-"LINKED_DEVICES_EDUCATION_POINT_MESSAGES" = "Signalin viestit synkronoidaan matkapuhelimesi Signal-sovelluksen kanssa, kun laite on yhdistetty.";
+"LINKED_DEVICES_EDUCATION_POINT_MESSAGES" = "Signalin viestit synkronoidaan matkapuhelimesi Radar-sovelluksen kanssa, kun laite on yhdistetty.";
 
 /* Bullet point about privacy on the linked devices education sheet */
 "LINKED_DEVICES_EDUCATION_POINT_PRIVACY" = "Kaikki viestit yhdistetyillä laitteilla ovat yksityisiä";
 
 /* Title for the linked device education sheet */
-"LINKED_DEVICES_EDUCATION_TITLE" = "Signal tietokoneille tai iPadille";
+"LINKED_DEVICES_EDUCATION_TITLE" = "Radar tietokoneille tai iPadille";
 
 /* Text that appears where the linked device list would be indicating that there are no linked devices. */
 "LINKED_DEVICES_EMPTY_STATE" = "Ei yhdistettyjä laitteita";
 
 /* Description for header of the linked devices list */
-"LINKED_DEVICES_HEADER_DESCRIPTION" = "Use Signal on desktop or iPad.";
+"LINKED_DEVICES_HEADER_DESCRIPTION" = "Use Radar on desktop or iPad.";
 
 /* Footer text below the list of currently-linked devices */
 "LINKED_DEVICES_LIST_FOOTER" = "Viestit ja keskustelujen tiedot on suojattu päästä päähän -salauksella kaikilla laitteilla";
@@ -4846,7 +4846,7 @@
 "LOADING_VIEW_CONTROLLER_DONT_CLOSE_APP" = "Älä sulje Signalia.";
 
 /* Body for local network permission action sheet */
-"LOCAL_NETWORK_PERMISSION_ACTION_SHEET_BODY" = "Signal-tilisi siirtämiseksi sinun on sallittava paikallisen verkon käyttö molemmissa laitteissa.";
+"LOCAL_NETWORK_PERMISSION_ACTION_SHEET_BODY" = "Radar-tilisi siirtämiseksi sinun on sallittava paikallisen verkon käyttö molemmissa laitteissa.";
 
 /* A button asking the user if they need further help getting their transfer working. */
 "LOCAL_NETWORK_PERMISSION_ACTION_SHEET_NEED_HELP" = "Tarvitsetko apua?";
@@ -4858,7 +4858,7 @@
 "LOCAL_NETWORK_PERMISSION_ACTION_SHEET_STEP_THREE" = "Ota käyttöön Paikallinen verkko";
 
 /* Second step for local network permission action sheet */
-"LOCAL_NETWORK_PERMISSION_ACTION_SHEET_STEP_TWO" = "Siirry kohtaan Signal";
+"LOCAL_NETWORK_PERMISSION_ACTION_SHEET_STEP_TWO" = "Siirry kohtaan Radar";
 
 /* Title for local network permission action sheet */
 "LOCAL_NETWORK_PERMISSION_ACTION_SHEET_TITLE" = "Ota käyttöön paikallinen verkko";
@@ -5194,7 +5194,7 @@
 "MESSAGE_REQUEST_NAME_COLLISON_UPDATE_CONTACT_ACTION" = "Päivitä yhteystieto";
 
 /* Action sheet message to confirm reporting a conversation as spam via a message request. */
-"MESSAGE_REQUEST_REPORT_CONVERSATION_MESSAGE" = "Signal saa ilmoituksen, että tämä henkilö saattaa lähettää roskapostia. Signal ei näe keskustelujen sisältöä.";
+"MESSAGE_REQUEST_REPORT_CONVERSATION_MESSAGE" = "Radar saa ilmoituksen, että tämä henkilö saattaa lähettää roskapostia. Radar ei näe keskustelujen sisältöä.";
 
 /* Action sheet title to confirm reporting a conversation as spam via a message request. */
 "MESSAGE_REQUEST_REPORT_CONVERSATION_TITLE" = "Ilmoita roskapostista?";
@@ -5344,19 +5344,19 @@
 "MISSING_CAMERA_PERMISSION_MESSAGE" = "Voit antaa kameran käyttöoikeuden iOS Asetukset-sovelluksessa.";
 
 /* Alert title */
-"MISSING_CAMERA_PERMISSION_TITLE" = "Signal tarvitsee oikeuden käyttää kameraa.";
+"MISSING_CAMERA_PERMISSION_TITLE" = "Radar tarvitsee oikeuden käyttää kameraa.";
 
 /* Alert body indicating the user has denied location permissions */
 "MISSING_LOCATION_PERMISSION_MESSAGE" = "Voit antaa tämän käyttöoikeuden laitteesi Asetuksista.";
 
 /* Alert title indicating the user has denied location permissions */
-"MISSING_LOCATION_PERMISSION_TITLE" = "Tämän toiminnon käyttämiseksi Signal tarvitsee luvan käyttää laitteesi sijaintitietoa.";
+"MISSING_LOCATION_PERMISSION_TITLE" = "Tämän toiminnon käyttämiseksi Radar tarvitsee luvan käyttää laitteesi sijaintitietoa.";
 
 /* Alert body when user has previously denied media library access */
 "MISSING_MEDIA_LIBRARY_PERMISSION_MESSAGE" = "Voit antaa käyttöoikeuden iOS-asetuksissa.";
 
 /* Alert title when user has previously denied media library access */
-"MISSING_MEDIA_LIBRARY_PERMISSION_TITLE" = "Tämän toiminnon käyttämiseksi Signal tarvitsee luvan käyttää laitteesi mediakirjastoa.";
+"MISSING_MEDIA_LIBRARY_PERMISSION_TITLE" = "Tämän toiminnon käyttämiseksi Radar tarvitsee luvan käyttää laitteesi mediakirjastoa.";
 
 /* An error shown as the title of an alert when try to link a new device & the user is already at the limit. */
 "MULTIDEVICE_PAIRING_MAX_DESC" = "Et voi yhdistää enempää laitteita.";
@@ -5377,7 +5377,7 @@
 "MY_STORIES_SETTINGS_VISIBILITY_ALL_SIGNAL_CONNECTIONS_EXCEPT_TITLE" = "Kaikki, paitsi…";
 
 /* Title for the visibility option */
-"MY_STORIES_SETTINGS_VISIBILITY_ALL_SIGNAL_CONNECTIONS_TITLE" = "Kaikki Signal-kontaktit";
+"MY_STORIES_SETTINGS_VISIBILITY_ALL_SIGNAL_CONNECTIONS_TITLE" = "Kaikki Radar-kontaktit";
 
 /* Title for the visibility option */
 "MY_STORIES_SETTINGS_VISIBILITY_ONLY_SHARE_WITH_TITLE" = "Jaa vain seuraaville…";
@@ -5662,10 +5662,10 @@
 "ONBOARDING_2FA_SKIP_PIN_ENTRY_TITLE" = "Ohitetaanko tunnusluvun syöttö?";
 
 /* The body for the device transfer 'choice' view 'restore backup' option */
-"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_BODY" = "Palauta tilisi ja viestisi Radar/Signal-varmuuskopiolla";
+"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_BODY" = "Palauta tilisi ja viestisi Radar/Radar-varmuuskopiolla";
 
 /* The title for the device transfer 'choice' view 'restore backup' option */
-"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_TITLE" = "Palauta Radar/Signal Secure -varmuuskopio";
+"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_TITLE" = "Palauta Radar/Radar Secure -varmuuskopio";
 
 /* Body for a sheet warning users about skipping restore. */
 "ONBOARDING_CHOOSE_RESTORE_METHOD_CONFIRM_SKIP_RESTORE_BODY" = "Jos ohitat palauttamisen nyt, et voi tehdä palautusta enää myöhemmin. Jos otat varmuuskopiot uudelleen käyttöön tällä laitteella, nykyinen varmuuskopio korvataan uudella viestihistoriallasi.";
@@ -5677,7 +5677,7 @@
 "ONBOARDING_CHOOSE_RESTORE_METHOD_DESCRIPTION" = "Valitse, miten haluat palauttaa viestihistoriasi ja tilitietosi.";
 
 /* Message body displayed to a user during registration if there are no restore options available. */
-"ONBOARDING_CHOOSE_RESTORE_METHOD_NONE_AVAILABLE_BODY" = "Koska olet siirtymässä Androidista iOS:ään, ainoa tapa siirtää viestit ja mediasisältö on ottaa Signal-varmuuskopiot käyttöön vanhassa laitteessa.";
+"ONBOARDING_CHOOSE_RESTORE_METHOD_NONE_AVAILABLE_BODY" = "Koska olet siirtymässä Androidista iOS:ään, ainoa tapa siirtää viestit ja mediasisältö on ottaa Radar-varmuuskopiot käyttöön vanhassa laitteessa.";
 
 /* Title displayed to a user during registration if there are no restore options available. */
 "ONBOARDING_CHOOSE_RESTORE_METHOD_NONE_AVAILABLE_TITLE" = "Ei palautettavaa varmuuskopiota";
@@ -5737,7 +5737,7 @@
 "ONBOARDING_MODE_SWITCH_BUTTON_REGISTERING" = "Yhdistä iPhone";
 
 /* explanation to the user they're switching from linking to registering flow */
-"ONBOARDING_MODE_SWITCH_EXPLANATION_PROVISIONING" = "Napauttamalla Rekisteröi iPad voit luoda uuden Signal-tilin tai siirtää olemassa olevan tilin tähän iPadiin. Tämä poistaa Signalin käytöstä muissa samalla puhelinnumerolla rekisteröidyissä laitteissa.";
+"ONBOARDING_MODE_SWITCH_EXPLANATION_PROVISIONING" = "Napauttamalla Rekisteröi iPad voit luoda uuden Radar-tilin tai siirtää olemassa olevan tilin tähän iPadiin. Tämä poistaa Signalin käytöstä muissa samalla puhelinnumerolla rekisteröidyissä laitteissa.";
 
 /* explanation to the user they're switching from registering to linking flow */
 "ONBOARDING_MODE_SWITCH_EXPLANATION_REGISTERING" = "Napauttamalla Yhdistä iPhone voit yhdistää puhelimesi olemassa olevaan tiliin. Puhelimen yhdistämistä ei yleensä suositella, ja se rajoittaa joitain toimintoja, kuten soittamista.";
@@ -5755,7 +5755,7 @@
 "ONBOARDING_MODE_SWITCH_WARNING_REGISTERING" = "iPhonen yhdistämistä ei suositella. Se rajoittaa myös ydintoimintoja.";
 
 /* Description of the 'Contacts' permission in the 'onboarding permissions' view. */
-"ONBOARDING_PERMISSIONS_CONTACTS_DESCRIPTION" = "Etsi tuntemiasi ihmisiä. Yhteystietosi salataan, eivätkä ne näy Signal-palvelussa.";
+"ONBOARDING_PERMISSIONS_CONTACTS_DESCRIPTION" = "Etsi tuntemiasi ihmisiä. Yhteystietosi salataan, eivätkä ne näy Radar-palvelussa.";
 
 /* Title introducing the 'Contacts' permission in the 'onboarding permissions' view. */
 "ONBOARDING_PERMISSIONS_CONTACTS_TITLE" = "Yhteystiedot";
@@ -5767,7 +5767,7 @@
 "ONBOARDING_PERMISSIONS_NOTIFICATIONS_TITLE" = "Ilmoitukset";
 
 /* Preamble of the 'onboarding permissions' view. */
-"ONBOARDING_PERMISSIONS_PREAMBLE" = "Signal pyytää seuraavia käyttöoikeuksia:";
+"ONBOARDING_PERMISSIONS_PREAMBLE" = "Radar pyytää seuraavia käyttöoikeuksia:";
 
 /* Description of the 'Notification Relay' permission in the 'onboarding permissions' view. */
 "ONBOARDING_PERMISSIONS_RELAY_DESCRIPTION" = "Enable Radar notification relay to ensure you get immediate background notifications in Radar. Relay is always privacy-preserving and keeps your messages end-to-end encrypted no matter what.";
@@ -5794,7 +5794,7 @@
 "ONBOARDING_PHONE_NUMBER_VALIDATION_WARNING" = "Virheellinen puhelinnumero. Syötä kelvollinen puhelinnumero vaihtaaksesi numeroa.";
 
 /* Explanation of the 'onboarding pin attempts exhausted' view when reglock is disabled. */
-"ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_EXPLANATION" = "Tunnuslukuyritykset ovat loppuneet, mutta voit silti käyttää Signal-tiliäsi luomalla uuden tunnusluvun. Yksityisyys- ja tietoturvasyistä tili palautetaan ilman tallennettuja profiilitietoja tai asetuksia.";
+"ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_EXPLANATION" = "Tunnuslukuyritykset ovat loppuneet, mutta voit silti käyttää Radar-tiliäsi luomalla uuden tunnusluvun. Yksityisyys- ja tietoturvasyistä tili palautetaan ilman tallennettuja profiilitietoja tai asetuksia.";
 
 /* Label for the 'learn more' link when reglock is disabled in the 'onboarding pin attempts exhausted' view. */
 "ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_LEARN_MORE" = "Lisätietoa tunnusluvuista";
@@ -5803,7 +5803,7 @@
 "ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_TITLE" = "Väärä tunnusluku";
 
 /* Explanation of the 'onboarding pin attempts exhausted' view when it is unknown if reglock is enabled. */
-"ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_WITH_UNKNOWN_REGLOCK_EXPLANATION" = "Olet syöttänyt PIN-koodin liian monta kertaa väärin, mutta voit vielä yrittää käyttää Signal-tiliäsi vahvistamalla puhelinnumerosi. Yksityisyys- ja tietoturvasyistä tilisi palautetaan ilman tallennettuja profiilitietoja tai asetuksia.";
+"ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_WITH_UNKNOWN_REGLOCK_EXPLANATION" = "Olet syöttänyt PIN-koodin liian monta kertaa väärin, mutta voit vielä yrittää käyttää Radar-tiliäsi vahvistamalla puhelinnumerosi. Yksityisyys- ja tietoturvasyistä tilisi palautetaan ilman tallennettuja profiilitietoja tai asetuksia.";
 
 /* Title for the setup complete screen shown at the end of the onboarding flow. */
 "ONBOARDING_SETUP_COMPLETE_TITLE" = "Asetukset valmis";
@@ -5836,7 +5836,7 @@
 "ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_TITLE" = "Minulla ei ole vanhaa puhelintani";
 
 /* Explanation of 'have old device' flow for the 'Restore or Transfer' prompt */
-"ONBOARDING_SPLASH_HAVE_OLD_DEVICE_BODY" = "Aloita nopeasti skannaamalla nykyisen Radar/Signal-tilisi QR-koodi";
+"ONBOARDING_SPLASH_HAVE_OLD_DEVICE_BODY" = "Aloita nopeasti skannaamalla nykyisen Radar/Radar-tilisi QR-koodi";
 
 /* Title for the 'have my old device' choice of the 'Restore or Transfer' prompt */
 "ONBOARDING_SPLASH_HAVE_OLD_DEVICE_TITLE" = "Minulla on vanha puhelimeni";
@@ -5897,10 +5897,10 @@ Send money securely.";
 "OPEN_SETTINGS_BUTTON" = "Asetukset";
 
 /* Signal doesn't support old versions of iOS and shows a warning if you're on unsupported version. Some users can upgrade their device to a newer version of iOS to continue using Signal. If that's the case, they'll be shown this text. */
-"OS_EXPIRED_AND_CAN_UPGRADE_OS" = "Signal ei enää toimi tässä laitteessa. Jos haluat käyttää Signalia uudelleen, päivitä laite uudempaan iOS-versioon.";
+"OS_EXPIRED_AND_CAN_UPGRADE_OS" = "Radar ei enää toimi tässä laitteessa. Jos haluat käyttää Signalia uudelleen, päivitä laite uudempaan iOS-versioon.";
 
 /* Signal doesn't support old devices. If that's the case, they'll be shown this action, and tapping it will open information about Signal's minimum supported operating systems. */
-"OS_EXPIRED_AND_DEVICE_IS_STUCK" = "Signal ei enää toimi tässä laitteessa. Jos haluat käyttää Signalia uudelleen, vaihda uudempaan laitteeseen.";
+"OS_EXPIRED_AND_DEVICE_IS_STUCK" = "Radar ei enää toimi tässä laitteessa. Jos haluat käyttää Signalia uudelleen, vaihda uudempaan laitteeseen.";
 
 /* Signal doesn't support old versions of iOS and shows a warning if you're on an old version. Some users can upgrade their device to a newer version of iOS to continue using Signal. If that's the case, they'll be shown this action, and tapping it will open device update instructions. */
 "OS_SOON_TO_EXPIRE_ACTION_TITLE" = "Päivitä nyt";
@@ -5933,7 +5933,7 @@ Send money securely.";
 "OUTGOING_DEVICE_REGISTRATION_CANCELLED_RESTORE_TITLE" = "Palautus peruutettu";
 
 /* Body of prompt notifying registration without restore completed on the new device. */
-"OUTGOING_DEVICE_REGISTRATION_COMPLETE_BODY" = "Signal-tilisi on aktivoitu toisella laitteella. Signal ei ole enää aktiivisena tällä laitteella.";
+"OUTGOING_DEVICE_REGISTRATION_COMPLETE_BODY" = "Radar-tilisi on aktivoitu toisella laitteella. Radar ei ole enää aktiivisena tällä laitteella.";
 
 /* Title of prompt notifying registration without restore completed on the new device. */
 "OUTGOING_DEVICE_REGISTRATION_COMPLETE_TITLE" = "Rekisteröinti valmis";
@@ -5951,7 +5951,7 @@ Send money securely.";
 "OUTGOING_DEVICE_REGISTRATION_UNKNOWN_ERROR_TITLE" = "Tuntematon virhe";
 
 /* Body of prompt notifying device restore started on the new device. */
-"OUTGOING_DEVICE_RESTORE_COMPLETE_BODY" = "Signal-tilisi ja viestiesi siirto toiseen laitteeseen on käynnissä. Signal ei ole enää aktiivisena tällä laitteella.";
+"OUTGOING_DEVICE_RESTORE_COMPLETE_BODY" = "Radar-tilisi ja viestiesi siirto toiseen laitteeseen on käynnissä. Radar ei ole enää aktiivisena tällä laitteella.";
 
 /* Title of prompt notifying device restore started on the new device. */
 "OUTGOING_DEVICE_RESTORE_COMPLETE_TITLE" = "Palautus suoritettu";
@@ -5975,7 +5975,7 @@ Send money securely.";
 "OUTGOING_DEVICE_RESTORE_INITIAL_VIEW_TITLE" = "Siirrä tili";
 
 /* Body of prompt notifying device transfer completed. */
-"OUTGOING_DEVICE_TRANSFER_COMPLETE_BODY" = "Signal-tilisi ja viestisi on siirretty toiseen laitteeseen. Signal ei ole enää aktiivisena tällä laitteella.";
+"OUTGOING_DEVICE_TRANSFER_COMPLETE_BODY" = "Radar-tilisi ja viestisi on siirretty toiseen laitteeseen. Radar ei ole enää aktiivisena tällä laitteella.";
 
 /* Title of prompt notifying device transfer completed. */
 "OUTGOING_DEVICE_TRANSFER_COMPLETE_TITLE" = "Siirto valmis";
@@ -6322,10 +6322,10 @@ Send money securely.";
 "PAYMENTS_RECIPIENT_PAYMENTS_NOT_ENABLED_BUTTON" = "Lähetä pyyntö";
 
 /* Message for error alert indicating that a given user cannot receive payments because they have not enabled payments. */
-"PAYMENTS_RECIPIENT_PAYMENTS_NOT_ENABLED_MESSAGE" = "Haluatko lähettää vastaanottajalle Signal-maksujen aktivointipyynnön?";
+"PAYMENTS_RECIPIENT_PAYMENTS_NOT_ENABLED_MESSAGE" = "Haluatko lähettää vastaanottajalle Radar-maksujen aktivointipyynnön?";
 
 /* Title for error alert indicating that a given user cannot receive payments because they have not enabled payments. Embeds {{ the contact's name }} */
-"PAYMENTS_RECIPIENT_PAYMENTS_NOT_ENABLED_TITLE" = "%1$@ ei ole aktivoinut Signal-maksuja";
+"PAYMENTS_RECIPIENT_PAYMENTS_NOT_ENABLED_TITLE" = "%1$@ ei ole aktivoinut Radar-maksuja";
 
 /* Label for 'send' button on the payments screen. */
 "PAYMENTS_SCREEN_SEND_BUTTON" = "Send";
@@ -6552,10 +6552,10 @@ Send money securely.";
 "PIN_CREATION_LEARN_MORE" = "Lisätietoja PIN-koodeista";
 
 /* Users can create PINs to restore their account data later. They can learn more about this on a sheet. This is the text on that sheet. */
-"PIN_CREATION_LEARN_MORE_TEXT" = "PIN-koodin avulla salataan Signaliin tallennetut tietosi, jotta vain sinulla on pääsy niihin. Profiilitiedot, asetukset ja yhteystiedot palautetaan, jos Signal asennetaan uudelleen.";
+"PIN_CREATION_LEARN_MORE_TEXT" = "PIN-koodin avulla salataan Signaliin tallennetut tietosi, jotta vain sinulla on pääsy niihin. Profiilitiedot, asetukset ja yhteystiedot palautetaan, jos Radar asennetaan uudelleen.";
 
 /* Users can create PINs to restore their account data later. They can learn more about this on a sheet. This is the title on that sheet. */
-"PIN_CREATION_LEARN_MORE_TITLE" = "Tietoja Signal-PIN-koodeista";
+"PIN_CREATION_LEARN_MORE_TITLE" = "Tietoja Radar-PIN-koodeista";
 
 /* Label indicating that the attempted PIN does not match the first PIN */
 "PIN_CREATION_MISMATCH_ERROR" = "Tunnusluvut eivät täsmää. Yritä uudelleen.";
@@ -6621,7 +6621,7 @@ Send money securely.";
 "PIN_REMINDER_MEGAPHONE_FEW_DAYS_TOAST" = "Muistutamme sinua jälleen muutaman päivän päästä.";
 
 /* Title for PIN reminder megaphone */
-"PIN_REMINDER_MEGAPHONE_TITLE" = "Varmenna Signal-tunnuslukusi";
+"PIN_REMINDER_MEGAPHONE_TITLE" = "Varmenna Radar-tunnuslukusi";
 
 /* Toast indicating that we'll ask you for your PIN again tomorrow, after successfully entering it. */
 "PIN_REMINDER_MEGAPHONE_TOMORROW_SUCCESSFUL_TOAST" = "Oikea PIN-koodi. Muistutamme sinua jälleen huomenna.";
@@ -6645,7 +6645,7 @@ Send money securely.";
 "PIN_REMINDER_MISMATCH_ERROR" = "Väärä tunnusluku, yritä uudelleen.";
 
 /* The title for the 'pin reminder' dialog. */
-"PIN_REMINDER_TITLE" = "Syötä Signal-tunnuslukusi";
+"PIN_REMINDER_TITLE" = "Syötä Radar-tunnuslukusi";
 
 /* Label indicating that the attempted PIN is too short */
 "PIN_REMINDER_TOO_SHORT_ERROR" = "Tunnusluvussa on oltava vähintään 4 numeroa.";
@@ -6660,7 +6660,7 @@ Send money securely.";
 "PINS_MEGAPHONE_ACTION" = "Luo tunnusluku";
 
 /* Body for PIN megaphone when user doesn't have a PIN */
-"PINS_MEGAPHONE_BODY" = "Viimeistele Signal-tunnusluvun luonti.";
+"PINS_MEGAPHONE_BODY" = "Viimeistele Radar-tunnusluvun luonti.";
 
 /* Title for PIN megaphone when user doesn't have a PIN */
 "PINS_MEGAPHONE_TITLE" = "Luo tunnusluku";
@@ -6768,13 +6768,13 @@ Send money securely.";
 "PRIVACY_VERIFICATION_FAILED_MISMATCHED_SAFETY_NUMBERS_IN_CLIPBOARD" = "Leikepöydällä oleva numero ei ole oikea turvanumero tälle keskustelulle.";
 
 /* Alert body for user error */
-"PRIVACY_VERIFICATION_FAILED_NO_SAFETY_NUMBERS_IN_CLIPBOARD" = "Signal ei löytänyt turvanumeroa leikepöydältä. Oletko varmasti kopioinut sen oikein?";
+"PRIVACY_VERIFICATION_FAILED_NO_SAFETY_NUMBERS_IN_CLIPBOARD" = "Radar ei löytänyt turvanumeroa leikepöydältä. Oletko varmasti kopioinut sen oikein?";
 
 /* Alert body when verifying with {{contact name}} */
-"PRIVACY_VERIFICATION_FAILED_THEY_HAVE_WRONG_KEY_FOR_ME" = "Turvanumero on yksilöllinen aina kahden Signal-käyttäjän välillä. Tarkista vielä, että käyttäjän %1$@ laitteessa näkyy juuri tämä turvanumero.";
+"PRIVACY_VERIFICATION_FAILED_THEY_HAVE_WRONG_KEY_FOR_ME" = "Turvanumero on yksilöllinen aina kahden Radar-käyttäjän välillä. Tarkista vielä, että käyttäjän %1$@ laitteessa näkyy juuri tämä turvanumero.";
 
 /* alert body */
-"PRIVACY_VERIFICATION_FAILED_WITH_OLD_LOCAL_VERSION" = "Käytössäsi on vanha Signal-versio Signalista. Päivitä sovellus, jotta voit varmentaa.";
+"PRIVACY_VERIFICATION_FAILED_WITH_OLD_LOCAL_VERSION" = "Käytössäsi on vanha Radar-versio Signalista. Päivitä sovellus, jotta voit varmentaa.";
 
 /* alert body */
 "PRIVACY_VERIFICATION_FAILED_WITH_OLD_REMOTE_VERSION" = "Vastapuolella on käytössä vanha versio Signalista. Hänen tulee ensin päivittää, jotta voitte varmentaa.";
@@ -7080,13 +7080,13 @@ Send money securely.";
 "REGISTER_2FA_FORGOT_PIN_ALERT_TITLE" = "Tarvitsetko apua?";
 
 /* Alert body for a forgotten SVR (V2) PIN */
-"REGISTER_2FA_FORGOT_SVR_PIN_ALERT_MESSAGE" = "PIN-koodi on vähintään nelinumeroinen koodi, joka voi sisältää pelkkiä numeroita tai numeroita ja kirjaimia. Jos et muista PIN-koodia, joudut odottamaan 7 päivää ennen kuin voit rekisteröityä uudelleen. Jos Signal Secure-varmuuskopiointi on käytössä, voit jatkaa palautusavaimella.";
+"REGISTER_2FA_FORGOT_SVR_PIN_ALERT_MESSAGE" = "PIN-koodi on vähintään nelinumeroinen koodi, joka voi sisältää pelkkiä numeroita tai numeroita ja kirjaimia. Jos et muista PIN-koodia, joudut odottamaan 7 päivää ennen kuin voit rekisteröityä uudelleen. Jos Radar Secure-varmuuskopiointi on käytössä, voit jatkaa palautusavaimella.";
 
 /* Alert body for a forgotten SVR (V2) PIN when the user doesn't have reglock and they cannot necessarily create a new PIN */
-"REGISTER_2FA_FORGOT_SVR_PIN_WITHOUT_REGLOCK_ALERT_MESSAGE" = "Luomasi PIN-koodi on vähintään nelinumeroinen koodi, ja se voi olla numeerinen tai aakkosnumeerinen. Jos et muista PIN-koodia, voit rekisteröityä ja käyttää tiliäsi, mutta menetät joitain tallennettuja asetuksia, kuten profiilitietosi. Jos Signal Secure-varmuuskopiointi on käytössä, voit jatkaa palautusavaimella.";
+"REGISTER_2FA_FORGOT_SVR_PIN_WITHOUT_REGLOCK_ALERT_MESSAGE" = "Luomasi PIN-koodi on vähintään nelinumeroinen koodi, ja se voi olla numeerinen tai aakkosnumeerinen. Jos et muista PIN-koodia, voit rekisteröityä ja käyttää tiliäsi, mutta menetät joitain tallennettuja asetuksia, kuten profiilitietosi. Jos Radar Secure-varmuuskopiointi on käytössä, voit jatkaa palautusavaimella.";
 
 /* Alert body for a forgotten SVR (V2) PIN when the user doesn't have reglock and they can create a new PIN */
-"REGISTER_2FA_FORGOT_SVR_PIN_WITHOUT_REGLOCK_AND_CAN_CREATE_NEW_PIN_ALERT_MESSAGE" = "Luomasi PIN-koodi on vähintään nelinumeroinen koodi, ja se voi olla numeerinen tai aakkosnumeerinen. Jos et muista PIN-koodia, voit luoda uuden. Voit rekisteröityä ja käyttää tiliäsi, mutta menetät joitain tallennettuja asetuksia, kuten profiilitietosi. Jos Signal Secure-varmuuskopiointi on käytössä, voit jatkaa palautusavaimella.";
+"REGISTER_2FA_FORGOT_SVR_PIN_WITHOUT_REGLOCK_AND_CAN_CREATE_NEW_PIN_ALERT_MESSAGE" = "Luomasi PIN-koodi on vähintään nelinumeroinen koodi, ja se voi olla numeerinen tai aakkosnumeerinen. Jos et muista PIN-koodia, voit luoda uuden. Voit rekisteröityä ja käyttää tiliäsi, mutta menetät joitain tallennettuja asetuksia, kuten profiilitietosi. Jos Radar Secure-varmuuskopiointi on käytössä, voit jatkaa palautusavaimella.";
 
 /* Alert title explaining what happens if you forget your 'two-factor auth pin'. */
 "REGISTER_2FA_INVALID_PIN_ALERT_TITLE" = "Väärä tunnusluku";
@@ -7134,7 +7134,7 @@ Send money securely.";
 "REGISTRATION_BACKUP_RESTORE_ERROR_GENERIC_TITLE" = "Siirtoa ei voitu suorittaa loppuun";
 
 /* Body for a sheet warning users about an incorrect recovery key. */
-"REGISTRATION_BACKUP_RESTORE_ERROR_INCORRECT_KEY_BODY" = "Olet ehkä syöttänyt palautusavaimesi väärin tai et ole tehnyt vähintään yhtä varmuuskopiota vanhalla laitteellasi. \n\nVarmista, että rekisteröidyt samalla puhelinnumerolla ja palautusavaimella, jotka tallensit ottaessasi Signal Secure -varmuuskopioinnin käyttöön, ja tarkista, että vanha laitteesi on suorittanut varmuuskopioinnin loppuun.";
+"REGISTRATION_BACKUP_RESTORE_ERROR_INCORRECT_KEY_BODY" = "Olet ehkä syöttänyt palautusavaimesi väärin tai et ole tehnyt vähintään yhtä varmuuskopiota vanhalla laitteellasi. \n\nVarmista, että rekisteröidyt samalla puhelinnumerolla ja palautusavaimella, jotka tallensit ottaessasi Radar Secure -varmuuskopioinnin käyttöön, ja tarkista, että vanha laitteesi on suorittanut varmuuskopioinnin loppuun.";
 
 /* Body for a sheet warning users about an incorrect recovery key and having hit a rate limit on retries. */
 "REGISTRATION_BACKUP_RESTORE_ERROR_INCORRECT_KEY_RATE_LIMIT_BODY" = "Palautusavaimen syöttöyritykset ovat loppuneet. Turvallisuutesi vuoksi yritysten määrä on rajoitettu. Odota tunti ja yritä uudelleen.";
@@ -7227,7 +7227,7 @@ Send money securely.";
 "REGISTRATION_NO_BACKUP_KEY_BUTTON_TITLE" = "Eikö sinulla ole palautusavainta?";
 
 /* Body text on a sheet with info for what to do if you don't have a recovery key */
-"REGISTRATION_NO_BACKUP_KEY_SHEET_BODY" = "Varmuuskopioita ei voi palauttaa ilman 64 merkkiä sisältävää palautuskoodia. Jos olet kadottanut palautusavaimen, Signal ei voi palauttaa varmuuskopiota.\n\nJos vanha laite on tallella, löydät palautusavaimen kohdasta Asetukset > Keskustelut > Signal-varmuuskopiot. Napauta sitten Näytä palautusavain.";
+"REGISTRATION_NO_BACKUP_KEY_SHEET_BODY" = "Varmuuskopioita ei voi palauttaa ilman 64 merkkiä sisältävää palautuskoodia. Jos olet kadottanut palautusavaimen, Radar ei voi palauttaa varmuuskopiota.\n\nJos vanha laite on tallella, löydät palautusavaimen kohdasta Asetukset > Keskustelut > Radar-varmuuskopiot. Napauta sitten Näytä palautusavain.";
 
 /* Title for sheet with info for what to do if you don't have a recovery key */
 "REGISTRATION_NO_BACKUP_KEY_SHEET_TITLE" = "Eikö sinulla ole palautusavainta?";
@@ -7290,16 +7290,16 @@ Send money securely.";
 "REGISTRATION_PROFILE_SETUP_TITLE" = "Määritä profiilisi";
 
 /* Error shown if an SMS/call service provider is permanently unable to send a verification code to the provided number. */
-"REGISTRATION_PROVIDER_FAILURE_MESSAGE_PERMANENT" = "Signal ei voinut lähettää tekstiviestikoodia operaattoriin liittyvien ongelmien vuoksi.";
+"REGISTRATION_PROVIDER_FAILURE_MESSAGE_PERMANENT" = "Radar ei voinut lähettää tekstiviestikoodia operaattoriin liittyvien ongelmien vuoksi.";
 
 /* Error shown if an SMS/call service provider is temporarily unable to send a verification code to the provided number. */
-"REGISTRATION_PROVIDER_FAILURE_MESSAGE_TRANSIENT" = "Signal ei voinut lähettää tekstiviestikoodia operaattoriin liittyvien ongelmien vuoksi. Yritä uudelleen muutaman tunnin kuluttua.";
+"REGISTRATION_PROVIDER_FAILURE_MESSAGE_TRANSIENT" = "Radar ei voinut lähettää tekstiviestikoodia operaattoriin liittyvien ongelmien vuoksi. Yritä uudelleen muutaman tunnin kuluttua.";
 
 /* Third step in directions for how to make a backup */
 "REGISTRATION_RESTORE_METHOD_MAKE_BACKUP_TUTORIAL_ENABLE_BACKUPS" = "Ota varmuuskopiointi käyttöön ja odota, kunnes varmuuskopiointi on valmis";
 
 /* First step in directions for how to make a backup */
-"REGISTRATION_RESTORE_METHOD_MAKE_BACKUP_TUTORIAL_OPEN_SIGNAL" = "Avaa Signal vanhassa laitteessasi";
+"REGISTRATION_RESTORE_METHOD_MAKE_BACKUP_TUTORIAL_OPEN_SIGNAL" = "Avaa Radar vanhassa laitteessasi";
 
 /* Second step in directions for how to make a backup */
 "REGISTRATION_RESTORE_METHOD_MAKE_BACKUP_TUTORIAL_TAP_SETTINGS" = "Napauta Asetukset > Varmuuskopiot";
@@ -7317,7 +7317,7 @@ Send money securely.";
 "REGISTRATION_SCAN_QR_CODE_TITLE" = "Skannaa tämä koodi vanhalla puhelimellasi";
 
 /* Tutorial text describing the first step to scanning the restore/transfer QR code with your old phone: opening Signal */
-"REGISTRATION_SCAN_QR_CODE_TUTORIAL_OPEN_SIGNAL" = "Avaa Signal vanhassa laitteessasi";
+"REGISTRATION_SCAN_QR_CODE_TUTORIAL_OPEN_SIGNAL" = "Avaa Radar vanhassa laitteessasi";
 
 /* Tutorial text describing the third step to scanning the restore/transfer QR code with your old phone: scan the code */
 "REGISTRATION_SCAN_QR_CODE_TUTORIAL_SCAN" = "Skannaa tämä koodi kameralla";
@@ -7521,7 +7521,7 @@ Send money securely.";
 "SAFETY_NUMBER_CONFIRMATION_VIEW_ACTION" = "Näytä";
 
 /* Snippet to share {{safety number}} with a friend. sent e.g. via SMS */
-"SAFETY_NUMBER_SHARE_FORMAT" = "Keskustelumme Signal-turvanumero:\n%1$@";
+"SAFETY_NUMBER_SHARE_FORMAT" = "Keskustelumme Radar-turvanumero:\n%1$@";
 
 /* Title for Safety Tips button in thread details. */
 "SAFETY_TIPS_BUTTON_ACTION_TITLE" = "Turvallisuusvinkkejä";
@@ -7539,7 +7539,7 @@ Send money securely.";
 "SAFETY_TIPS_FAKE_BUSINESS_TITLE" = "Väärennetyt yritykset ja organisaatiot";
 
 /* Message contents for the fake names safety tip. */
-"SAFETY_TIPS_FAKE_NAMES_BODY" = "Signal ei koskaan ota sinuun yhteyttä pyytääkseen rekisteröintikoodia tai PIN-koodia. Varo pyyntöjä, joissa esitetään toista käyttäjää. Profiilin nimi on tilin haltijan valittavissa eikä sitä vahvisteta.";
+"SAFETY_TIPS_FAKE_NAMES_BODY" = "Radar ei koskaan ota sinuun yhteyttä pyytääkseen rekisteröintikoodia tai PIN-koodia. Varo pyyntöjä, joissa esitetään toista käyttäjää. Profiilin nimi on tilin haltijan valittavissa eikä sitä vahvisteta.";
 
 /* Message title describing the fake names safety tip. */
 "SAFETY_TIPS_FAKE_NAMES_TITLE" = "Väärennetyt nimet ja tilit";
@@ -7599,7 +7599,7 @@ Send money securely.";
 "SCREEN_LOCK_ERROR_LOCAL_AUTHENTICATION_PASSCODE_NOT_SET" = "Aseta pääsykoodi puhelimesi asetuksista, jotta voit käyttää näytön lukitusta.";
 
 /* Description of how and why Signal iOS uses Touch ID/Face ID/Phone Passcode to unlock 'screen lock'. */
-"SCREEN_LOCK_REASON_UNLOCK_SCREEN_LOCK" = "Avaa Signal tunnistautumalla";
+"SCREEN_LOCK_REASON_UNLOCK_SCREEN_LOCK" = "Avaa Radar tunnistautumalla";
 
 /* Title for alert indicating that screen lock could not be unlocked. */
 "SCREEN_LOCK_UNLOCK_FAILED" = "Tunnistautuminen epäonnistui";
@@ -7638,7 +7638,7 @@ Send money securely.";
 "SECONDARY_LINKING_ERROR_DIFFERENT_ACCOUNT_TITLE" = "Tili ei täsmää";
 
 /* Message for error alert indicating that a linked device must be upgraded before it can be linked. */
-"SECONDARY_LINKING_ERROR_OBSOLETE_LINKED_DEVICE_MESSAGE" = "Tämän laitteen Signal on päivitettävä ennen puhelimen yhdistämistä.";
+"SECONDARY_LINKING_ERROR_OBSOLETE_LINKED_DEVICE_MESSAGE" = "Tämän laitteen Radar on päivitettävä ennen puhelimen yhdistämistä.";
 
 /* Title for error alert indicating that a linked device must be upgraded before it can be linked. */
 "SECONDARY_LINKING_ERROR_OBSOLETE_LINKED_DEVICE_TITLE" = "Ei-tuettu versio";
@@ -7665,7 +7665,7 @@ Send money securely.";
 "SECONDARY_LINKING_SYNCING_UPDATE_REQUIRED_CHECK_FOR_UPDATE_BUTTON" = "Tarkista päivitykset";
 
 /* Message for action sheet when the secondary device fails to sync messages due to an app update being required. */
-"SECONDARY_LINKING_SYNCING_UPDATE_REQUIRED_ERROR_MESSAGE" = "Viimeistele viestien synkronointi päivittämällä Signal nyt.";
+"SECONDARY_LINKING_SYNCING_UPDATE_REQUIRED_ERROR_MESSAGE" = "Viimeistele viestien synkronointi päivittämällä Radar nyt.";
 
 /* Title for action sheet when the secondary device fails to sync messages due to an app update being required. */
 "SECONDARY_LINKING_SYNCING_UPDATE_REQUIRED_ERROR_TITLE" = "Päivitys vaaditaan";
@@ -7674,19 +7674,19 @@ Send money securely.";
 "SECONDARY_ONBOARDING_CHOOSE_DEVICE_NAME_PLACEHOLDER" = "Valitse nimi";
 
 /* header text before the user can link this device */
-"SECONDARY_ONBOARDING_GET_STARTED_BY_OPENING_PRIMARY" = "Aloita tämän iPadin yhdistäminen avaamalla Signal puhelimessasi";
+"SECONDARY_ONBOARDING_GET_STARTED_BY_OPENING_PRIMARY" = "Aloita tämän iPadin yhdistäminen avaamalla Radar puhelimessasi";
 
 /* Link explaining what to do when trying to link a device before having a primary device. */
 "SECONDARY_ONBOARDING_GET_STARTED_DO_NOT_HAVE_PRIMARY" = "Minulla ei ole Signalia puhelimessa…";
 
 /* alert body */
-"SECONDARY_ONBOARDING_INSTALL_PRIMARY_FIRST_BODY" = "Siirry puhelimesi App Store -sovellukseen, asenna Signal, viimeistele rekisteröintiprosessi ja yhdistä sitten iPad samaan tiliin.";
+"SECONDARY_ONBOARDING_INSTALL_PRIMARY_FIRST_BODY" = "Siirry puhelimesi App Store -sovellukseen, asenna Radar, viimeistele rekisteröintiprosessi ja yhdistä sitten iPad samaan tiliin.";
 
 /* alert title */
-"SECONDARY_ONBOARDING_INSTALL_PRIMARY_FIRST_TITLE" = "Asenna Signal puhelimeesi";
+"SECONDARY_ONBOARDING_INSTALL_PRIMARY_FIRST_TITLE" = "Asenna Radar puhelimeesi";
 
 /* body text while displaying a QR code which, when scanned, will link this device. */
-"SECONDARY_ONBOARDING_SCAN_CODE_BODY" = "Avaa Signal-asetukset napauttamalla profiilikuvaasi. Napauta Yhdistetyt laitteet, sitten Yhdistä uusi laite ja skannaa sitten tämä koodi puhelimellasi:";
+"SECONDARY_ONBOARDING_SCAN_CODE_BODY" = "Avaa Radar-asetukset napauttamalla profiilikuvaasi. Napauta Yhdistetyt laitteet, sitten Yhdistä uusi laite ja skannaa sitten tämä koodi puhelimellasi:";
 
 /* Link text for page with troubleshooting info shown on the QR scanning screen */
 "SECONDARY_ONBOARDING_SCAN_CODE_HELP_TEXT" = "Saa apua iPadin yhdistämiseen täältä";
@@ -7698,7 +7698,7 @@ Send money securely.";
 "SECONDARY_ONBOARDING_SCAN_CODE_TITLE" = "Skannaa QR-koodi puhelimellasi";
 
 /* header text before the user can transfer to this device */
-"SECONDARY_TRANSFER_GET_STARTED_BY_OPENING_IPAD" = "Avaa Signal vanhalla iPadillasi tilisi siirtämiseksi";
+"SECONDARY_TRANSFER_GET_STARTED_BY_OPENING_IPAD" = "Avaa Radar vanhalla iPadillasi tilisi siirtämiseksi";
 
 /* No comment provided by engineer. */
 "SECURE_SESSION_RESET" = "Suojattu istunto alustettu.";
@@ -7830,7 +7830,7 @@ Send money securely.";
 "SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_COUNTRY" = "Sijainti";
 
 /* Table footer for the 'censorship circumvention' section when censorship circumvention can be manually enabled. */
-"SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_FOOTER" = "Signal yrittää kiertää sensuuria toiminnon ollessa käytössä. Käytä toimintoa vain paikassa, jossa Signal on sensuroitu.";
+"SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_FOOTER" = "Radar yrittää kiertää sensuuria toiminnon ollessa käytössä. Käytä toimintoa vain paikassa, jossa Radar on sensuroitu.";
 
 /* Table footer for the 'censorship circumvention' section shown when censorship circumvention has been auto-enabled based on local phone number. */
 "SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_FOOTER_AUTO_ENABLED" = "Puhelinnumerosi sijaintiin perustuva sensuurin kiertäminen otettu käyttöön.";
@@ -7842,7 +7842,7 @@ Send money securely.";
 "SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_FOOTER_NO_CONNECTION" = "Sensuurin kiertäminen toimii ainoastaan laitteen ollessa Internet-yhteydessä.";
 
 /* Table footer for the 'censorship circumvention' section shown when the app is connected to the Signal service. */
-"SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_FOOTER_WEBSOCKET_CONNECTED" = "Sensuurin kiertäminen ei ole tarpeellista, sillä laite on jo yhdistetty Signal-palvelimeen.";
+"SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_FOOTER_WEBSOCKET_CONNECTED" = "Sensuurin kiertäminen ei ole tarpeellista, sillä laite on jo yhdistetty Radar-palvelimeen.";
 
 /* Label for the 'advanced pin settings' button. */
 "SETTINGS_ADVANCED_PIN_SETTINGS" = "Tunnusluvun lisäasetukset";
@@ -7869,13 +7869,13 @@ Send money securely.";
 "SETTINGS_ADVANCED_VIEW_ERROR_LOG" = "Virhelokit";
 
 /* Information on sheet about changing the app icon - first line */
-"SETTINGS_APP_ICON_EDUCATION_APP_NAME" = "Sovelluksen nimi Signal näkyy aloitusnäytöllä, ilmoituksissa ja sovelluskirjastossa.";
+"SETTINGS_APP_ICON_EDUCATION_APP_NAME" = "Sovelluksen nimi Radar näkyy aloitusnäytöllä, ilmoituksissa ja sovelluskirjastossa.";
 
 /* Information on sheet about changing the app icon - second line */
-"SETTINGS_APP_ICON_EDUCATION_HOME_SCREEN_DOCK" = "Voit piilottaa sovelluksen nimen Signal aloitusnäytöltä siirtämällä sovelluksen aloitusnäytön alareunassa olevaan telakkaan.";
+"SETTINGS_APP_ICON_EDUCATION_HOME_SCREEN_DOCK" = "Voit piilottaa sovelluksen nimen Radar aloitusnäytöltä siirtämällä sovelluksen aloitusnäytön alareunassa olevaan telakkaan.";
 
 /* The footer for the app icon selection settings page. */
-"SETTINGS_APP_ICON_FOOTER" = "Sovelluksen nimi Signal näkyy aloitusnäytöllä, ilmoituksissa ja sovelluskirjastossa.";
+"SETTINGS_APP_ICON_FOOTER" = "Sovelluksen nimi Radar näkyy aloitusnäytöllä, ilmoituksissa ja sovelluskirjastossa.";
 
 /* The title for the app icon selection settings page. */
 "SETTINGS_APP_ICON_TITLE" = "Sovelluskuvake";
@@ -7962,7 +7962,7 @@ Send money securely.";
 "SETTINGS_CLEAR_HISTORY" = "Tyhjennä keskusteluhistoria";
 
 /* Footer for the 'about' help section */
-"SETTINGS_COPYRIGHT" = "Copyright Signal Messenger\nLisensoitu AGPLv3-lisenssillä";
+"SETTINGS_COPYRIGHT" = "Copyright Radar Messenger\nLisensoitu AGPLv3-lisenssillä";
 
 /* Label for the 'data' section of the app settings. */
 "SETTINGS_DATA" = "Datankäyttö";
@@ -8103,7 +8103,7 @@ Send money securely.";
 "SETTINGS_NOTIFICATION_CONTENT_TITLE" = "Ilmoitusten sisältö";
 
 /* When the local device discovers a contact has recently installed signal, the app can generates a message encouraging the local user to say hello. Turning this switch off disables that feature. */
-"SETTINGS_NOTIFICATION_EVENTS_CONTACT_JOINED_SIGNAL" = "Yhteystieto liittyy Signaliin";
+"SETTINGS_NOTIFICATION_EVENTS_CONTACT_JOINED_SIGNAL" = "Yhteystieto liittyy Radariin";
 
 /* table section header */
 "SETTINGS_NOTIFICATION_NOTIFY_WHEN_TITLE" = "Ilmoita minulle";
@@ -8140,7 +8140,7 @@ Send money securely.";
 "SETTINGS_PAYMENTS_BITCOIN_UNIT" = "Bitcoin-yksikkö";
 
 /* Error message indicating that payments could not be activated because the feature is not currently available. */
-"SETTINGS_PAYMENTS_CANNOT_ACTIVATE_PAYMENTS_KILL_SWITCH" = "Signalin maksutoiminto ei ole enää käytettävissä. Varat voi yhä siirtää toiseen kauppapaikkaan, mutta varojen lisääminen tai maksujen lähettäminen ja vastaanottaminen ei ole enää mahdollista.";
+"SETTINGS_PAYMENTS_CANNOT_ACTIVATE_PAYMENTS_KILL_SWITCH" = "Radarin maksutoiminto ei ole enää käytettävissä. Varat voi yhä siirtää toiseen kauppapaikkaan, mutta varojen lisääminen tai maksujen lähettäminen ja vastaanottaminen ei ole enää mahdollista.";
 
 /* Error message indicating that payments could not be deactivated because the current balance is unavailable. */
 "SETTINGS_PAYMENTS_CANNOT_DEACTIVATE_PAYMENTS_NO_BALANCE" = "Maksuja ei voi ottaa pois käytöstä, koska saldotieto ei ole saatavilla. Tarkista verkkoyhteys ja yritä uudelleen.";
@@ -8149,10 +8149,10 @@ Send money securely.";
 "SETTINGS_PAYMENTS_CANNOT_SEND_PAYMENT_NO_BALANCE" = "Maksu epäonnistui, koska saldotieto ei ole saatavilla. Tarkista verkkoyhteys ja yritä uudelleen.";
 
 /* Error message indicating that payments cannot be sent because the feature is not currently available. */
-"SETTINGS_PAYMENTS_CANNOT_SEND_PAYMENTS_KILL_SWITCH" = "Signalin maksutoiminto ei ole enää käytettävissä. Varat voi yhä siirtää toiseen kauppapaikkaan, mutta varojen lisääminen tai maksujen lähettäminen ja vastaanottaminen ei ole enää mahdollista.";
+"SETTINGS_PAYMENTS_CANNOT_SEND_PAYMENTS_KILL_SWITCH" = "Radarin maksutoiminto ei ole enää käytettävissä. Varat voi yhä siirtää toiseen kauppapaikkaan, mutta varojen lisääminen tai maksujen lähettäminen ja vastaanottaminen ei ole enää mahdollista.";
 
 /* Error message indicating that you cannot transfer into your payments wallet because the feature is not currently available. */
-"SETTINGS_PAYMENTS_CANNOT_TRANSFER_IN_KILL_SWITCH" = "Signalin maksutoiminto ei ole enää käytettävissä. Varat voi yhä siirtää toiseen kauppapaikkaan, mutta varojen lisääminen tai maksujen lähettäminen ja vastaanottaminen ei ole enää mahdollista.";
+"SETTINGS_PAYMENTS_CANNOT_TRANSFER_IN_KILL_SWITCH" = "Radarin maksutoiminto ei ole enää käytettävissä. Varat voi yhä siirtää toiseen kauppapaikkaan, mutta varojen lisääminen tai maksujen lähettäminen ja vastaanottaminen ei ole enää mahdollista.";
 
 /* Message for the 'currency conversions info' alert. */
 "SETTINGS_PAYMENTS_CURRENCY_CONVERSIONS_INFO_ALERT_MESSAGE" = "Muunnokset ovat vain arvioita ja saattavat olla epätarkkoja.";
@@ -8179,10 +8179,10 @@ Send money securely.";
 "SETTINGS_PAYMENTS_DEACTIVATE_TITLE" = "Poista maksut käytöstä";
 
 /* Explanation of the 'deactivate payments with balance' process in the 'deactivate payments' settings. */
-"SETTINGS_PAYMENTS_DEACTIVATE_WITH_BALANCE_EXPLANATION" = "Varat kannattaa siirtää toiseen lompakko-osoitteeseen ennen maksujen ottamista pois käytöstä. Jos varoja ei siirretä nyt, ne säilyvät Signal-tiliin liitetyssä lompakossa siltä varalta jos maksut otetaan uudestaan käyttöön.";
+"SETTINGS_PAYMENTS_DEACTIVATE_WITH_BALANCE_EXPLANATION" = "Varat kannattaa siirtää toiseen lompakko-osoitteeseen ennen maksujen ottamista pois käytöstä. Jos varoja ei siirretä nyt, ne säilyvät Radar-tiliin liitetyssä lompakossa siltä varalta jos maksut otetaan uudestaan käyttöön.";
 
 /* Description for the 'deactivate payments confirmation' UI in the payment settings. */
-"SETTINGS_PAYMENTS_DEACTIVATE_WITHOUT_TRANSFER_CONFIRM_DESCRIPTION" = "Varat säilytetään Signal-tiliin liitetyssä lompakossa siltä varalta jos maksut otetaan uudestaan käyttöön.";
+"SETTINGS_PAYMENTS_DEACTIVATE_WITHOUT_TRANSFER_CONFIRM_DESCRIPTION" = "Varat säilytetään Radar-tiliin liitetyssä lompakossa siltä varalta jos maksut otetaan uudestaan käyttöön.";
 
 /* Title for the 'deactivate payments confirmation' UI in the payment settings. */
 "SETTINGS_PAYMENTS_DEACTIVATE_WITHOUT_TRANSFER_CONFIRM_TITLE" = "Poistetaanko käytöstä siirtämättä varoja?";
@@ -8420,7 +8420,7 @@ Send money securely.";
 "SETTINGS_PAYMENTS_PAYMENTS_LOCK_PROMPT_EXPLANATION_TOUCHID" = "Ota käyttöön Touch ID, jonka avulla voit estää puhelintasi käyttävää henkilöä käyttämästä varojasi. Voit poistaa tämän asetuksen käytöstä asetuksissa.";
 
 /* Button for payments outdated sheet. */
-"SETTINGS_PAYMENTS_PAYMENTS_OUTDATED_BUTTON" = "Päivitä Signal";
+"SETTINGS_PAYMENTS_PAYMENTS_OUTDATED_BUTTON" = "Päivitä Radar";
 
 /* Message for payments outdated sheet. */
 "SETTINGS_PAYMENTS_PAYMENTS_OUTDATED_MESSAGE" = "Sovellus on päivitettävä, jotta voit jatkossakin lähettää ja vastaanottaa maksuja ja nähdä ajantasaiset saldotiedot.";
@@ -8621,7 +8621,7 @@ Send money securely.";
 "SETTINGS_PAYMENTS_VIEW_PASSPHRASE_TITLE" = "Palautuslause";
 
 /* Header text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "Kirjoita nämä 24 sanaa järjestyksessä ja säilytä ne turvallisessa paikassa. Voit käyttää niitä saldon palauttamiseen Cake Walletissa tai muissa Spark-yhteensopivissa lompakoissa.";
+"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "Kirjoita nämä 12 sanaa järjestyksessä ja säilytä ne turvallisessa paikassa. Voit käyttää niitä saldon palauttamiseen Cake Walletissa tai muissa Spark-yhteensopivissa lompakoissa.";
 
 /* Footer text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
 "SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_FOOTER_2" = "Älä jaa tätä lauseketta kenellekään";
@@ -8663,16 +8663,16 @@ Send money securely.";
 "SETTINGS_PIN_REMINDER_DISABLE_CONFIRMATION_ACTION" = "Poista muistutukset käytöstä";
 
 /* The explanation for the dialog asking user to confirm their PIN to disable reminders */
-"SETTINGS_PIN_REMINDER_DISABLE_CONFIRMATION_EXPLANATION" = "Opettele tunnusluku ulkoa tai tallenna se turvallisesti, sillä sitä ei voi palauttaa. Jos tunnusluku unohtuu ja Signal rekisteröidään uudelleen, tietoja voi kadota.";
+"SETTINGS_PIN_REMINDER_DISABLE_CONFIRMATION_EXPLANATION" = "Opettele tunnusluku ulkoa tai tallenna se turvallisesti, sillä sitä ei voi palauttaa. Jos tunnusluku unohtuu ja Radar rekisteröidään uudelleen, tietoja voi kadota.";
 
 /* The title for the dialog asking user to confirm their PIN to disable reminders */
-"SETTINGS_PIN_REMINDER_DISABLE_CONFIRMATION_TITLE" = "Vahvista Signal-tunnuslukusi";
+"SETTINGS_PIN_REMINDER_DISABLE_CONFIRMATION_TITLE" = "Vahvista Radar-tunnuslukusi";
 
 /* Label for the 'pin reminder' switch of the privacy settings. */
 "SETTINGS_PIN_REMINDER_SWITCH_LABEL" = "Tunnuslukumuistutukset";
 
 /* Footer for the 'PINs' section of the privacy settings. */
-"SETTINGS_PINS_FOOTER" = "Tunnusluvulla salataan Signaliin tallennetut tiedot, jotta vain sinä pääset niihin käsiksi. Profiili, asetukset ja yhteystiedot palautetaan, jos Signal asennetaan uudelleen.";
+"SETTINGS_PINS_FOOTER" = "Tunnusluvulla salataan Radariin tallennetut tiedot, jotta vain sinä pääset niihin käsiksi. Profiili, asetukset ja yhteystiedot palautetaan, jos Radar asennetaan uudelleen.";
 
 /* Label for the 'pins' item of the privacy settings when the user does have a pin. */
 "SETTINGS_PINS_ITEM" = "Vaihda tunnusluku";
@@ -8681,7 +8681,7 @@ Send money securely.";
 "SETTINGS_PINS_ITEM_CREATE" = "Luo tunnusluku";
 
 /* Title for the 'PINs' section of the privacy settings. */
-"SETTINGS_PINS_TITLE" = "Signal-tunnusluku";
+"SETTINGS_PINS_TITLE" = "Radar-tunnusluku";
 
 /* Footer for table section */
 "SETTINGS_PRIVACY_ADVANCED_FOOTER" = "Sensuurin kierron, välityspalvelimen, puheluiden välityksen ja lähettäjäsinetin asetukset.";
@@ -8723,7 +8723,7 @@ Send money securely.";
 "SETTINGS_REGISTRATION_LOCK_TURN_ON_ERROR_PIN_REQUIRED" = "Sinun on luotava PIN-koodi käyttääksesi rekisteröintiestoa.";
 
 /* Body for the alert confirming that the user wants to turn on registration lock. */
-"SETTINGS_REGISTRATION_LOCK_TURN_ON_MESSAGE" = "Jos et muista Signal-tunnuslukua, kun rekisteröit Signalin uudelleen, tili lukitaan 7 päiväksi.";
+"SETTINGS_REGISTRATION_LOCK_TURN_ON_MESSAGE" = "Jos et muista Radar-tunnuslukua, kun rekisteröit Signalin uudelleen, tili lukitaan 7 päiväksi.";
 
 /* Title for the alert confirming that the user wants to turn on registration lock. */
 "SETTINGS_REGISTRATION_LOCK_TURN_ON_TITLE" = "Otetaanko rekisteröintiesto käyttöön?";
@@ -8780,13 +8780,13 @@ Send money securely.";
 "SETTINGS_SHARING_SUGGESTIONS" = "Jaa yhteystiedot iOS:n kanssa";
 
 /* Footer for setting for enabling & disabling contact and notification sharing with iOS. */
-"SETTINGS_SHARING_SUGGESTIONS_NOTIFICATIONS_FOOTER" = "Salli iOS:lle käyttöoikeus Signal-yhteystietoihin ja keskusteluihin, jotta tietyt ominaisuudet toimivat, mm. jakamisehdotukset";
+"SETTINGS_SHARING_SUGGESTIONS_NOTIFICATIONS_FOOTER" = "Salli iOS:lle käyttöoikeus Radar-yhteystietoihin ja keskusteluihin, jotta tietyt ominaisuudet toimivat, mm. jakamisehdotukset";
 
 /* Label for the 'enable registration lock' switch of the privacy settings. */
 "SETTINGS_TWO_FACTOR_AUTH_SWITCH_LABEL" = "Rekisteröintiesto";
 
 /* Footer for the 'two factor auth' section of the privacy settings when Signal PINs are available. */
-"SETTINGS_TWO_FACTOR_PINS_AUTH_FOOTER" = "Vaadi Signal-tunnuslukua aina, kun tällä puhelinnumerolla rekisteröidytään Signaliin.";
+"SETTINGS_TWO_FACTOR_PINS_AUTH_FOOTER" = "Vaadi Radar-tunnuslukua aina, kun tällä puhelinnumerolla rekisteröidytään Radariin.";
 
 /* Label for the 'typing indicators' setting. */
 "SETTINGS_TYPING_INDICATORS" = "Kirjoittamisen ilmaisin";
@@ -8819,7 +8819,7 @@ Send money securely.";
 "SHARE_EXTENSION_LOADING" = "Ladataan…";
 
 /* Message indicating that the share extension cannot be used until the user has registered in the main app. */
-"SHARE_EXTENSION_NOT_REGISTERED_MESSAGE" = "Rekisteröidy avaamalla Signal";
+"SHARE_EXTENSION_NOT_REGISTERED_MESSAGE" = "Rekisteröidy avaamalla Radar";
 
 /* Title indicating that the share extension cannot be used until the user has registered in the main app. */
 "SHARE_EXTENSION_NOT_REGISTERED_TITLE" = "Ei rekisteröity";
@@ -8846,7 +8846,7 @@ Send money securely.";
 "SHOW_THREAD_BUTTON_TITLE" = "Näytä keskustelu";
 
 /* Shown in the header when the user hasn't provided a custom name for a call. */
-"SIGNAL_CALL" = "Signal-puhelu";
+"SIGNAL_CALL" = "Radar-puhelu";
 
 /* body sent to contacts when inviting to Install Signal */
 "SMS_INVITE_BODY" = "Tule käyttämään Signalia! Tässä linkki:";
@@ -8909,7 +8909,7 @@ Send money securely.";
 "STICKERS_INSTALL_BUTTON" = "Asenna";
 
 /* Title for the 'available built-in stickers' section of the 'manage stickers' view. */
-"STICKERS_MANAGE_VIEW_AVAILABLE_BUILT_IN_PACKS_SECTION_TITLE" = "Signal Artist -sarja";
+"STICKERS_MANAGE_VIEW_AVAILABLE_BUILT_IN_PACKS_SECTION_TITLE" = "Radar Artist -sarja";
 
 /* Title for the 'available known stickers' section of the 'manage stickers' view. */
 "STICKERS_MANAGE_VIEW_AVAILABLE_KNOWN_PACKS_SECTION_TITLE" = "Vastaanotetut tarrat";
@@ -9191,19 +9191,19 @@ Send money securely.";
 "STORY_SETTINGS_LEARN_MORE_SHEET_FOOTER" = "Kontaktisi näkevät nimesi ja valokuvasi sekä Omaan tarinaan tekemäsi julkaisut, ellet piilota sitä heiltä.";
 
 /* Header for the explainer sheet for signal connections */
-"STORY_SETTINGS_LEARN_MORE_SHEET_HEADER_FORMAT" = "<bold>Signal-kontaktit</bold> ovat käyttäjiä, jotka olet valinnut luotetuiksi jollakin seuraavista tavoista:";
+"STORY_SETTINGS_LEARN_MORE_SHEET_HEADER_FORMAT" = "<bold>Radar-kontaktit</bold> ovat käyttäjiä, jotka olet valinnut luotetuiksi jollakin seuraavista tavoista:";
 
 /* Label for the stories section of the settings view */
 "STORY_SETTINGS_TITLE" = "Tarinat";
 
 /* Section footer for the 'viewers' section on the 'story settings' view */
-"STORY_SETTINGS_WHO_CAN_VIEW_THIS_FOOTER" = "Valitse Signal-kontaktit, jotka voivat nähdä tarinasi. Muutokset eivät vaikuta jo lähettämiisi tarinoihin.";
+"STORY_SETTINGS_WHO_CAN_VIEW_THIS_FOOTER" = "Valitse Radar-kontaktit, jotka voivat nähdä tarinasi. Muutokset eivät vaikuta jo lähettämiisi tarinoihin.";
 
 /* Section header for the 'viewers' section on the 'story settings' view */
 "STORY_SETTINGS_WHO_CAN_VIEW_THIS_HEADER" = "Kuka voi nähdä tämän tarinan";
 
 /* Header for the 'viewers' section on the 'story settings' bottom sheet */
-"STORY_SETTINGS_WHO_CAN_VIEW_THIS_SHEET_HEADER" = "Valitse Signal-kontaktit, jotka voivat nähdä tarinasi. Voit muuttaa tätä valintaa milloin tahansa yksityisyysasetuksissa.";
+"STORY_SETTINGS_WHO_CAN_VIEW_THIS_SHEET_HEADER" = "Valitse Radar-kontaktit, jotka voivat nähdä tarinasi. Voit muuttaa tätä valintaa milloin tahansa yksityisyysasetuksissa.";
 
 /* Tooltip text shown when the user selects a story as a destination for a long duration video that will be split into shorter segments. Embeds {{ segment duration in seconds }} */
 "STORY_VIDEO_SEGMENTATION_TOOLTIP_FORMAT" = "Tarinoihin lähetetyt videot lyhennetään %1$d sekunnin leikkeiksi ja lähetetään useina tarinoina.";
@@ -9242,7 +9242,7 @@ Send money securely.";
 "SUPPORT_EMAIL_DEFAULT_DESCRIPTION" = "Kuvaile ongelmaa: ";
 
 /* Message for alert dialog presented when a support email failed to send */
-"SUPPORT_EMAIL_ERROR_ALERT_DESCRIPTION" = "Lähetä tukipyyntösi sähköpostitse osoitteeseen support@signal.org";
+"SUPPORT_EMAIL_ERROR_ALERT_DESCRIPTION" = "Lähetä tukipyyntösi sähköpostitse osoitteeseen support@radar.chat";
 
 /* Localized label for support request email filter string. Embeds {{filter text}}. */
 "SUPPORT_EMAIL_FILTER_LABEL_FORMAT" = "Suodatin: %1$@";
@@ -9266,7 +9266,7 @@ Send money securely.";
 "SUPPORT_EMAIL_LOG_URL_LABEL_FORMAT" = "Lokin osoite: %1$@";
 
 /* Localized subject for support request emails */
-"SUPPORT_EMAIL_SUBJECT" = "Signal iOS -tukipyyntö";
+"SUPPORT_EMAIL_SUBJECT" = "Radar iOS -tukipyyntö";
 
 /* Header for emoji mood selection */
 "SUPPORT_EMOJI_PROMPT" = "Mitä mieltä olet? (valinnainen)";
@@ -9338,7 +9338,7 @@ Send money securely.";
 "SWITCH_ON" = "Käytössä";
 
 /* Name to display for the 'system' sender, e.g. for release notes and the onboarding story */
-"SYSTEM_ADDRESS_NAME" = "Signal";
+"SYSTEM_ADDRESS_NAME" = "Radar";
 
 /* Label for button to verify a user's safety number. */
 "SYSTEM_MESSAGE_ACTION_VERIFY_SAFETY_NUMBER" = "Varmenna";
@@ -9497,16 +9497,16 @@ Send money securely.";
 "TIME_AMOUNT_WEEKS_SHORT_FORMAT" = "%1$@ vk";
 
 /* Button for bottom sheet shown when device transfer completes on the receiving device. Tapping will terminate the Signal app and trigger a notification to relaunch. */
-"TRANSFER_COMPLETE_SHEET_BUTTON" = "Sulje Signal";
+"TRANSFER_COMPLETE_SHEET_BUTTON" = "Sulje Radar";
 
 /* Subtitle for bottom sheet shown when device transfer completes on the receiving device. */
-"TRANSFER_COMPLETE_SHEET_SUBTITLE" = "Aloita tilisi käyttö tällä laitteella sulkemalla Signal ja avaamalla se uudelleen.";
+"TRANSFER_COMPLETE_SHEET_SUBTITLE" = "Aloita tilisi käyttö tällä laitteella sulkemalla Radar ja avaamalla se uudelleen.";
 
 /* Title for bottom sheet shown when device transfer completes on the receiving device. */
 "TRANSFER_COMPLETE_SHEET_TITLE" = "Siirto valmis";
 
 /* Notification prompting the user to relaunch Signal after a device transfer completed. */
-"TRANSFER_RELAUNCH_NOTIFICATION" = "Aloita viestittely avaamalla Signal";
+"TRANSFER_RELAUNCH_NOTIFICATION" = "Aloita viestittely avaamalla Radar";
 
 /* Label for the cancel button in an alert or action sheet. */
 "TXT_CANCEL_TITLE" = "Peruuta";
@@ -9524,25 +9524,25 @@ Send money securely.";
 "UNKNOWN_CONTACT_BLOCK_OFFER" = "Käyttäjä ei ole yhteystiedoissasi. Estetäänkö käyttäjä?";
 
 /* Info message recorded in conversation history when local user receives an unknown message from a linked device and needs to upgrade. */
-"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_FROM_LINKED_DEVICE" = "Yksi laitteistasi lähetti viestin, jota ei voida käsitellä tai näyttää, koska se käyttää uutta Signal-ominaisuutta.";
+"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_FROM_LINKED_DEVICE" = "Yksi laitteistasi lähetti viestin, jota ei voida käsitellä tai näyttää, koska se käyttää uutta Radar-ominaisuutta.";
 
 /* Info message recorded in conversation history when local user receives an unknown message and needs to upgrade. Embeds {{user's name or phone number}}. */
-"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_WITH_NAME_FORMAT" = "%1$@ lähetti sinulle viestin, jota ei voida käsitellä tai näyttää, koska se käyttää uutta Signal-ominaisuutta.";
+"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_WITH_NAME_FORMAT" = "%1$@ lähetti sinulle viestin, jota ei voida käsitellä tai näyttää, koska se käyttää uutta Radar-ominaisuutta.";
 
 /* Info message recorded in conversation history when local user receives an unknown message and needs to upgrade. */
-"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_WITHOUT_NAME" = "Sait viestin, jota ei voida käsitellä tai näyttää, koska se käyttää uutta Signal-ominaisuutta.";
+"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_WITHOUT_NAME" = "Sait viestin, jota ei voida käsitellä tai näyttää, koska se käyttää uutta Radar-ominaisuutta.";
 
 /* Label for button that lets users upgrade the app. */
-"UNKNOWN_PROTOCOL_VERSION_UPGRADE_BUTTON" = "Päivitä Signal nyt";
+"UNKNOWN_PROTOCOL_VERSION_UPGRADE_BUTTON" = "Päivitä Radar nyt";
 
 /* Info message recorded in conversation history when local user has received an unknown unknown message from a linked device and has upgraded. */
-"UNKNOWN_PROTOCOL_VERSION_UPGRADE_COMPLETE_FROM_LINKED_DEVICE" = "Signal on päivitetty uusimpaan versioon. Voit nyt vastaanottaa tämän viestityypin laitteellasi.";
+"UNKNOWN_PROTOCOL_VERSION_UPGRADE_COMPLETE_FROM_LINKED_DEVICE" = "Radar on päivitetty uusimpaan versioon. Voit nyt vastaanottaa tämän viestityypin laitteellasi.";
 
 /* Info message recorded in conversation history when local user has received an unknown message and has upgraded. Embeds {{user's name or phone number}}. */
-"UNKNOWN_PROTOCOL_VERSION_UPGRADE_COMPLETE_WITH_NAME_FORMAT" = "Voit pyytää käyttäjää %1$@ lähettämään tämän viestin uudelleen, nyt kun käytät ajantasaista Signal-versiota.";
+"UNKNOWN_PROTOCOL_VERSION_UPGRADE_COMPLETE_WITH_NAME_FORMAT" = "Voit pyytää käyttäjää %1$@ lähettämään tämän viestin uudelleen, nyt kun käytät ajantasaista Radar-versiota.";
 
 /* Info message recorded in conversation history when local user has received an unknown message and has upgraded. */
-"UNKNOWN_PROTOCOL_VERSION_UPGRADE_COMPLETE_WITHOUT_NAME" = "Voit pyytää lähettäjää lähettämään tämän viestin uudelleen, nyt kun käytät ajan tasalla olevaa Signal-versiota.";
+"UNKNOWN_PROTOCOL_VERSION_UPGRADE_COMPLETE_WITHOUT_NAME" = "Voit pyytää lähettäjää lähettämään tämän viestin uudelleen, nyt kun käytät ajan tasalla olevaa Radar-versiota.";
 
 /* Label indicating an unknown user. */
 "UNKNOWN_USER" = "Tuntematon";
@@ -9566,13 +9566,13 @@ Send money securely.";
 "UNLINK_CONFIRMATION_ALERT_TITLE" = "Poistetaanko %1$@?";
 
 /* Label warning the user that they have been unlinked from their primary device. */
-"UNLINKED_WARNING" = "Tämä laite ei ole enää yhdistetty. Yhdistä Signal uudelleen puhelimeesi jatkaaksesi viestintää.";
+"UNLINKED_WARNING" = "Tämä laite ei ole enää yhdistetty. Yhdistä Radar uudelleen puhelimeesi jatkaaksesi viestintää.";
 
 /* If this device has become unlinked from their primary device, they'll see a warning. This is the call to action on that warning. */
 "UNLINKED_WARNING_ACTION_TITLE" = "Yhdistä laite uudelleen";
 
 /* Alert title when unlinking device fails */
-"UNLINKING_FAILED_ALERT_TITLE" = "Signal ei onnistunut poistamaan laitteesi yhdistämistä.";
+"UNLINKING_FAILED_ALERT_TITLE" = "Radar ei onnistunut poistamaan laitteesi yhdistämistä.";
 
 /* Text for a toast confirming that the mic has been unmuted for a call. */
 "UNMUTE_CONFIRMATION_TOAST_LABEL" = "Mikrofoni päällä";
