@@ -276,7 +276,7 @@ public class SendPaymentConfirmViewController: OWSViewController {
                 SSKEnvironment.shared.contactManagerRef.displayName(for: address, tx: tx).resolvedValue()
             }
         case .publicAddress(let inputType):
-            return PaymentsImpl.format(inputType: inputType)
+            return PaymentsImpl.formatForDisplay(inputType: inputType)
         }
     }
 

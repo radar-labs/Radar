@@ -491,7 +491,7 @@ public class SendPaymentCompletionActionSheet: ActionSheetController {
                 SSKEnvironment.shared.contactManagerRef.displayName(for: recipientAddress, tx: transaction).resolvedValue()
             }
         case .publicAddress(let inputType):
-            otherUserName = PaymentsImpl.format(inputType: inputType)
+            otherUserName = PaymentsImpl.formatForDisplay(inputType: inputType)
         }
         let userFormat = OWSLocalizedString("PAYMENTS_NEW_PAYMENT_RECIPIENT_AMOUNT_FORMAT",
                                            comment: "Format for the 'payment recipient amount' indicator. Embeds {{ the name of the recipient of the payment }}.")

@@ -5,7 +5,7 @@
 
 public import MobileCoin
 public import SignalServiceKit
-public import BreezSdkSpark
+import BreezSdkSpark
 
 @objc
 public protocol Payments: AnyObject {
@@ -104,7 +104,7 @@ public protocol SendPaymentRecipient {
 // MARK: -
 
 public protocol PreparedPayment {
-    var preparedPayment: PrepareLnurlPayResponse { get }
+    var preparedTransaction: PreparedTransaction { get }
     var feeAmount: TSPaymentAmount { get }
 }
 

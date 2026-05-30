@@ -614,15 +614,27 @@ private class PaymentProcessingOperation {
             throw PaymentsError.tooOldToSubmit
         }
 
-        guard let prepareLnurlPayResponse = paymentModel.asPrepareLnurlPayResponse() else {
+        guard let preparedTransaction = paymentModel.asPreparedTransaction() else {
             await Self.handleIndeterminatePayment(paymentModel: paymentModel)
             throw PaymentsError.indeterminateState
         }
 
         do {
             let sdk = try SUIEnvironment.shared.paymentsImplRef.getBreezSdk()
-            let paymentResponse = try await sdk.lnurlPay(request: LnurlPayRequest(prepareResponse: prepareLnurlPayResponse))
-            try await Self.updatePaymentReceiptData(paymentModel: paymentModel, receiptData: paymentResponse.serializeData())
+            let receipt: PaymentReceipt
+            switch preparedTransaction {
+            case .lnurlPay(let prepareLnurlPayResponse):
+                let paymentResponse = try await sdk.lnurlPay(request: LnurlPayRequest(prepareResponse: prepareLnurlPayResponse))
+                receipt = .lnurlPay(paymentResponse)
+            case .bolt11(let prepareSendPaymentResponse):
+                let paymentResponse = try await sdk.sendPayment(request: SendPaymentRequest(
+                    prepareResponse: prepareSendPaymentResponse,
+                    options: .bolt11Invoice(preferSpark: true, completionTimeoutSecs: nil),
+                    idempotencyKey: nil
+                ))
+                receipt = .bolt11(paymentResponse)
+            }
+            try await Self.updatePaymentReceiptData(paymentModel: paymentModel, receiptData: receipt.serializeData())
             try await Self.updatePaymentStatePromise(paymentModel: paymentModel, fromState: .outgoingUnsubmitted, toState: .outgoingUnverified)
         } catch PaymentsError.inputsAlreadySpent {
             // e.g. if we double-submit a transaction, it should become unverified,
@@ -637,15 +649,15 @@ private class PaymentProcessingOperation {
         let sdk = try SUIEnvironment.shared.paymentsImplRef.getBreezSdk()
 
         guard
-            let transaction = paymentModel.asLnurlPayResponse()
+            let receipt = paymentModel.asPaymentReceipt()
         else {
             await Self.handleIndeterminatePayment(paymentModel: paymentModel)
             throw PaymentsError.indeterminateState
         }
 
         _ = try await sdk.syncWallet(request: SyncWalletRequest())
-        guard let payment = try? await sdk.getPayment(request: GetPaymentRequest(paymentId: transaction.payment.id)).payment else {
-            owsFailDebug("Payment with ID: \(transaction.payment.id) not found.")
+        guard let payment = try? await sdk.getPayment(request: GetPaymentRequest(paymentId: receipt.paymentId)).payment else {
+            owsFailDebug("Payment with ID: \(receipt.paymentId) not found.")
             return
         }
 
@@ -829,25 +841,23 @@ private class PaymentProcessingOperation {
 
 // TODO: Separate into a file
 extension TSPaymentModel {
-    func asPrepareLnurlPayResponse() -> PrepareLnurlPayResponse? {
+    func asPreparedTransaction() -> PreparedTransaction? {
         guard
             let transactionData = mcTransactionData,
-            transactionData.count > 0,
-            let type = try? PrepareLnurlPayResponse.deserialize(from: transactionData) else {
+            transactionData.count > 0 else {
                 return nil
             }
 
-        return type
+        return PreparedTransaction.deserialize(from: transactionData)
     }
 
-    func asLnurlPayResponse() -> LnurlPayResponse? {
+    func asPaymentReceipt() -> PaymentReceipt? {
         guard
             let receiptData = mcReceiptData,
-            receiptData.count > 0,
-            let type = try? LnurlPayResponse.deserialize(from: receiptData) else {
+            receiptData.count > 0 else {
                 return nil
             }
 
-        return type
+        return PaymentReceipt.deserialize(from: receiptData)
     }
 }

@@ -579,7 +579,7 @@ extension PaymentsImpl {
         recipientAci: Aci?,
         recipientAddress: InputType,
         paymentAmount: TSPaymentAmount,
-        preparedPayment: PrepareLnurlPayResponse,
+        preparedTransaction: PreparedTransaction,
         memoMessage: String?,
         isOutgoingTransfer: Bool
     ) async throws -> TSPaymentModel {
@@ -591,7 +591,7 @@ extension PaymentsImpl {
             throw OWSAssertionError("Invalid amount.")
         }
         guard
-            TSPaymentAmount(currency: .bitcoin, picoMob: preparedPayment.feeSats).isValidAmount(
+            TSPaymentAmount(currency: .bitcoin, picoMob: preparedTransaction.feeSats).isValidAmount(
                 canBeEmpty: false)
         else {
             throw OWSAssertionError("Invalid fee.")
@@ -599,9 +599,9 @@ extension PaymentsImpl {
 
         let paymentType: TSPaymentType = isOutgoingTransfer ? .outgoingTransfer : .outgoingPayment
         let recipientAddressData = recipientAddress.serializeData()
-        let transactionData = preparedPayment.serializeData()
-        let feeAmount = TSPaymentAmount(currency: .bitcoin, picoMob: preparedPayment.feeSats)
-        let hash = preparedPayment.invoiceDetails.paymentHash.data(using: .utf8) ?? Data()
+        let transactionData = preparedTransaction.serializeData()
+        let feeAmount = TSPaymentAmount(currency: .bitcoin, picoMob: preparedTransaction.feeSats)
+        let hash = preparedTransaction.paymentHash.data(using: .utf8) ?? Data()
 
         let mobileCoin = MobileCoinPayment(
             recipientPublicAddressData: recipientAddressData,
@@ -900,7 +900,7 @@ extension PaymentsImpl {
                 paymentAmount: paymentAmount,
                 memoMessage: memoMessage,
                 isOutgoingTransfer: isOutgoingTransfer,
-                preparedPayment: preparedPayment
+                preparedTransaction: .lnurlPay(preparedPayment)
             )
         case .lightningAddress(v1: let details):
             let amountSats: UInt64 = paymentAmount.picoMob
@@ -924,10 +924,39 @@ extension PaymentsImpl {
                 paymentAmount: paymentAmount,
                 memoMessage: memoMessage,
                 isOutgoingTransfer: isOutgoingTransfer,
-                preparedPayment: preparedPayment
+                preparedTransaction: .lnurlPay(preparedPayment)
+            )
+        case .bolt11Invoice(let details):
+            let isAmountless = details.amountMsat == nil
+            let amount: U128? = isAmountless ? BInt(paymentAmount.picoMob) : nil
+
+            let request = PrepareSendPaymentRequest(
+                paymentRequest: details.invoice.bolt11,
+                amount: amount,
+                tokenIdentifier: nil,
+                conversionOptions: nil,
+                feePolicy: nil
+            )
+
+            let preparedPayment = try await sdk.prepareSendPayment(request: request)
+
+            let resolvedAmount: TSPaymentAmount
+            if let resolvedSats = UInt64(preparedPayment.amount.asString(radix: 10)) {
+                resolvedAmount = TSPaymentAmount(currency: .bitcoin, picoMob: resolvedSats)
+            } else {
+                resolvedAmount = paymentAmount
+            }
+
+            return PreparedPaymentImpl(
+                recipientAci: recipientAci,
+                recipientAddress: recipientAddress,
+                paymentAmount: resolvedAmount,
+                memoMessage: memoMessage,
+                isOutgoingTransfer: isOutgoingTransfer,
+                preparedTransaction: .bolt11(preparedPayment)
             )
         default:
-            owsFail("Unsupported input type")
+            throw PaymentsError.invalidInput
         }
     }
 
@@ -1034,7 +1063,7 @@ extension PaymentsImpl {
             recipientAci: preparedPayment.recipientAci,
             recipientAddress: preparedPayment.recipientAddress,
             paymentAmount: preparedPayment.paymentAmount,
-            preparedPayment: preparedPayment.preparedPayment,
+            preparedTransaction: preparedPayment.preparedTransaction,
             memoMessage: preparedPayment.memoMessage,
             isOutgoingTransfer: preparedPayment.isOutgoingTransfer
         )
@@ -1460,10 +1489,30 @@ extension PaymentsImpl {
         switch inputType {
         case .lightningAddress(let details):
             return details.address
+        case .bolt11Invoice(let details):
+            return details.invoice.bolt11
         default:
             owsFailDebug("Unsupported input type")
             return ""
         }
+    }
+
+    public static func formatForDisplay(inputType: InputType) -> String {
+        switch inputType {
+        case .bolt11Invoice(let details):
+            return Self.abbreviate(details.invoice.bolt11)
+        default:
+            return format(inputType: inputType)
+        }
+    }
+
+    private static func abbreviate(_ value: String) -> String {
+        let prefixLength = 10
+        let suffixLength = 9
+        guard value.count > prefixLength + suffixLength + 1 else {
+            return value
+        }
+        return "\(value.prefix(prefixLength))…\(value.suffix(suffixLength))"
     }
 
     public static func parse(url: URL) -> InputType? {
@@ -1514,10 +1563,10 @@ public struct PreparedPaymentImpl: PreparedPayment {
     fileprivate let memoMessage: String?
     fileprivate let isOutgoingTransfer: Bool
 
-    public let preparedPayment: PrepareLnurlPayResponse
+    public let preparedTransaction: PreparedTransaction
 
     public var feeAmount: TSPaymentAmount {
-        return TSPaymentAmount(currency: .bitcoin, picoMob: preparedPayment.feeSats)
+        return TSPaymentAmount(currency: .bitcoin, picoMob: preparedTransaction.feeSats)
     }
 }
 
@@ -1556,6 +1605,32 @@ extension LnurlPayResponse {
     }
 }
 
+extension PrepareSendPaymentResponse {
+    public static func deserialize(from data: Data) throws -> Self {
+        var input = (data: data, offset: 0)
+        return try FfiConverterTypePrepareSendPaymentResponse.read(from: &input)
+    }
+
+    public func serializeData() -> Data {
+        var bytes = [UInt8]()
+        FfiConverterTypePrepareSendPaymentResponse.write(self, into: &bytes)
+        return Data(bytes)
+    }
+}
+
+extension SendPaymentResponse {
+    public static func deserialize(from data: Data) throws -> Self {
+        var input = (data: data, offset: 0)
+        return try FfiConverterTypeSendPaymentResponse.read(from: &input)
+    }
+
+    public func serializeData() -> Data {
+        var bytes = [UInt8]()
+        FfiConverterTypeSendPaymentResponse.write(self, into: &bytes)
+        return Data(bytes)
+    }
+}
+
 extension InputType {
     public static func deserialize(from data: Data) throws -> Self {
         var input = (data: data, offset: 0)
@@ -1566,6 +1641,109 @@ extension InputType {
         var bytes = [UInt8]()
         FfiConverterTypeInputType.write(self, into: &bytes)
         return Data(bytes)
+    }
+}
+
+// MARK: -
+
+public enum PreparedTransaction {
+    case lnurlPay(PrepareLnurlPayResponse)
+    case bolt11(PrepareSendPaymentResponse)
+
+    fileprivate static let bolt11Magic = Data("BOLT".utf8)
+
+    public var feeSats: UInt64 {
+        switch self {
+        case .lnurlPay(let response):
+            return response.feeSats
+        case .bolt11(let response):
+            switch response.paymentMethod {
+            case .bolt11Invoice(_, let sparkTransferFeeSats, let lightningFeeSats):
+                return sparkTransferFeeSats ?? lightningFeeSats
+            case .bitcoinAddress, .sparkAddress, .sparkInvoice:
+                owsFailDebug("Unexpected payment method for BOLT11 invoice.")
+                return 0
+            }
+        }
+    }
+
+    public var paymentHash: String {
+        switch self {
+        case .lnurlPay(let response):
+            return response.invoiceDetails.paymentHash
+        case .bolt11(let response):
+            switch response.paymentMethod {
+            case .bolt11Invoice(let invoiceDetails, _, _):
+                return invoiceDetails.paymentHash
+            case .bitcoinAddress, .sparkAddress, .sparkInvoice:
+                owsFailDebug("Unexpected payment method for BOLT11 invoice.")
+                return ""
+            }
+        }
+    }
+
+    public func serializeData() -> Data {
+        switch self {
+        case .lnurlPay(let response):
+            return response.serializeData()
+        case .bolt11(let response):
+            return Self.bolt11Magic + response.serializeData()
+        }
+    }
+
+    public static func deserialize(from data: Data) -> PreparedTransaction? {
+        if data.starts(with: bolt11Magic) {
+            let payload = data.suffix(from: data.startIndex + bolt11Magic.count)
+            guard let response = try? PrepareSendPaymentResponse.deserialize(from: Data(payload)) else {
+                return nil
+            }
+            return .bolt11(response)
+        } else {
+            guard let response = try? PrepareLnurlPayResponse.deserialize(from: data) else {
+                return nil
+            }
+            return .lnurlPay(response)
+        }
+    }
+}
+
+public enum PaymentReceipt {
+    case lnurlPay(LnurlPayResponse)
+    case bolt11(SendPaymentResponse)
+
+    fileprivate static let bolt11Magic = Data("BOLT".utf8)
+
+    public var paymentId: String {
+        switch self {
+        case .lnurlPay(let response):
+            return response.payment.id
+        case .bolt11(let response):
+            return response.payment.id
+        }
+    }
+
+    public func serializeData() -> Data {
+        switch self {
+        case .lnurlPay(let response):
+            return response.serializeData()
+        case .bolt11(let response):
+            return Self.bolt11Magic + response.serializeData()
+        }
+    }
+
+    public static func deserialize(from data: Data) -> PaymentReceipt? {
+        if data.starts(with: bolt11Magic) {
+            let payload = data.suffix(from: data.startIndex + bolt11Magic.count)
+            guard let response = try? SendPaymentResponse.deserialize(from: Data(payload)) else {
+                return nil
+            }
+            return .bolt11(response)
+        } else {
+            guard let response = try? LnurlPayResponse.deserialize(from: data) else {
+                return nil
+            }
+            return .lnurlPay(response)
+        }
     }
 }
 
