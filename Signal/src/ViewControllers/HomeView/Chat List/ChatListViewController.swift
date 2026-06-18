@@ -1117,9 +1117,10 @@ public class ChatListViewController: OWSViewController, HomeTabViewController {
         dismissIcon.autoCenterInSuperview()
 
         paymentsBannerView.dismissButton = dismissButton
-        paymentsBannerView.dismissBlock = { [weak paymentsReminderView] in
+        paymentsBannerView.dismissBlock = { [weak self, weak paymentsReminderView] in
             PaymentsViewUtils.markAllUnreadPaymentsAsReadWithSneakyTransaction()
             paymentsReminderView?.isHidden = true
+            self?.loadCoordinator.loadIfNecessary()
         }
         let dismissTap = UITapGestureRecognizer(target: paymentsBannerView, action: #selector(PaymentsBannerView.didTapDismiss))
         dismissButton.addGestureRecognizer(dismissTap)
