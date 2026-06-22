@@ -50,6 +50,7 @@ public class PaymentsImpl: NSObject, PaymentsSwift {
     private var onRegistrationStateChange: NotificationCenter.Observer?
 
     private var onWalletAddressDidLoad: NotificationCenter.Observer?
+    private var onLocalProfileDidUpdateOnService: NotificationCenter.Observer?
 
     private let inflightReupload = AtomicOptional<Task<Void, Error>>(nil, lock: .sharedGlobal)
 
@@ -92,6 +93,16 @@ public class PaymentsImpl: NSObject, PaymentsSwift {
 
         onWalletAddressDidLoad = NotificationCenter.default.addObserver(
             name: Self.walletAddressDidLoad
+        ) { [weak self] _ in
+            self?.reuploadPaymentProfileForLoadedWalletAddress()
+        }
+
+        // A standard-version profile upload (name/avatar edit, profile-key rotation, group/UD reupload,
+        // LocalProfileChecker, etc.) makes the standard version the account's current server profile,
+        // which hides the Lightning payment address stored at the fixed payment profile version. Re-
+        // publish at the fixed version so it becomes current again and senders can read it.
+        onLocalProfileDidUpdateOnService = NotificationCenter.default.addObserver(
+            name: OWSProfileManager.localProfileDidUpdateOnService
         ) { [weak self] _ in
             self?.reuploadPaymentProfileForLoadedWalletAddress()
         }

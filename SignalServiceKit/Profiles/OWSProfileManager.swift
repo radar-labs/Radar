@@ -533,6 +533,14 @@ extension OWSProfileManager: ProfileManager {
     }
 
     // This will re-upload the existing local profile state.
+    /// Posted after the local profile is successfully uploaded to the service at the standard
+    /// (profile-key-derived) version. The Bitcoin Lightning payment address lives at a separate fixed
+    /// profile version (`PaymentsConstants.bitcoinLightningProfileKeyVersion`) that the server only
+    /// serves while it is the account's *current* version; a standard upload makes the standard
+    /// version current and hides it. `PaymentsImpl` observes this to re-publish the payment profile at
+    /// the fixed version, making it current again.
+    public static let localProfileDidUpdateOnService = Notification.Name("localProfileDidUpdateOnService")
+
     public func reuploadLocalProfile(
         unsavedRotatedProfileKey: Aes256Key?,
         mustReuploadAvatar: Bool,
@@ -1434,6 +1442,17 @@ extension OWSProfileManager: ProfileManager {
             // method will fail because it will the just-obsoleted profile key.
             if newProfileKey == nil {
                 _ = try await fetchLocalUsersProfile(authedAccount: authedAccount)
+            }
+
+            // The upload above just became the account's current server profile, which hides the
+            // Lightning payment address stored at the fixed payment profile version. Let the payments
+            // layer re-publish at that version so senders can still read it. Skip when this WAS the
+            // payment-version upload, to avoid a redundant re-publish.
+            if profileKeyVersion != PaymentsConstants.bitcoinLightningProfileKeyVersion {
+                NotificationCenter.default.postOnMainThread(
+                    name: Self.localProfileDidUpdateOnService,
+                    object: nil
+                )
             }
         } catch let error where error.isNetworkFailureOrTimeout {
             // We retry network errors forever (with exponential backoff).
