@@ -232,7 +232,14 @@ extension ChatListViewController {
                 )
             }
         } else if unreadPaymentNotificationsCount == 0 || firstUnreadPaymentModel == nil {
-            self.paymentsReminderView.isHidden = true
+            if !self.paymentsReminderView.isHidden {
+                self.paymentsReminderView.isHidden = true
+                // Hiding the banner collapses the reminders cell's content, but the
+                // table keeps its cached row height (and the section) until a load
+                // recomputes them. Without this, dismissing the banner by viewing the
+                // payment leaves an empty strip where the banner was.
+                self.loadCoordinator.loadIfNecessary()
+            }
         } else {
             self.paymentsReminderView.isHidden = false
             self.configureUnreadPaymentsBannerMultiple(paymentsReminderView, unreadCount: unreadPaymentNotificationsCount)
