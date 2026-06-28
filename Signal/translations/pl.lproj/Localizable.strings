@@ -1757,7 +1757,7 @@
 "CHOOSE_BACKUP_PLAN_SUBSCRIBE_PAID_BUTTON_TEXT" = "Subskrybuj za %1$@/mies.";
 
 /* Subtitle for a view allowing users to choose a Backup plan. */
-"CHOOSE_BACKUP_PLAN_SUBTITLE" = "Kopie zapasowe są szyfrowane metodą end-to-end. Signal jest organizacją non profit. Opłata za tworzenie kopii zapasowych to wsparcie w realizacji naszej misji.";
+"CHOOSE_BACKUP_PLAN_SUBTITLE" = "Kopie zapasowe są szyfrowane metodą end-to-end. Signal jest organizacją non profit. Opłata za tworzenie kopii zapasowych to wsparcie dla Signal.";
 
 /* Title for a label allowing users to view Signal's Terms & Conditions. */
 "CHOOSE_BACKUP_PLAN_TERM_AND_PRIVACY_POLICY_TEXT" = "Regulamin i polityka prywatności";
@@ -4786,7 +4786,7 @@
 "LINKED_DEVICE_URL_OPENED_ACTION_SHEET_IN_APP_CAMERA_MESSAGE" = "Wygląda na to, że próbujesz połączyć swoje konto Radar z nowym urządzeniem. Aby to zrobić, dotknij opcji „Kontynuuj”, a potem „Połącz nowe urządzenie” i zeskanuj kod QR ponownie.";
 
 /* Bullet point about downloads on the linked devices education sheet. Embeds {{ %1$@ iPad download link, %2$@ desktop download link }} */
-"LINKED_DEVICES_EDUCATION_POINT_DOWNLOADS" = "Zainstaluj odpowiednią wersję aplikacji na drugim urządzeniu: wejdź na %1$@ (na iPadzie) lub %2$@ (na komputerze).";
+"LINKED_DEVICES_EDUCATION_POINT_DOWNLOADS" = "Zainstaluj aplikację na iPadzie: na drugim urządzeniu wejdź na %1$@.";
 
 /* Bullet point about message sync on the linked devices education sheet */
 "LINKED_DEVICES_EDUCATION_POINT_MESSAGES" = "Po połączeniu urządzeń wiadomości będą synchronizowane z aplikacją Radar na Twoim telefonie komórkowym.";
@@ -4795,7 +4795,7 @@
 "LINKED_DEVICES_EDUCATION_POINT_PRIVACY" = "Wszystkie wiadomości na połączonych urządzeniach są prywatne.";
 
 /* Title for the linked device education sheet */
-"LINKED_DEVICES_EDUCATION_TITLE" = "Radar na komputery lub iPady";
+"LINKED_DEVICES_EDUCATION_TITLE" = "Radar na iPady";
 
 /* Text that appears where the linked device list would be indicating that there are no linked devices. */
 "LINKED_DEVICES_EMPTY_STATE" = "Brak połączonych urządzeń";
@@ -7962,7 +7962,8 @@ Send money securely.";
 "SETTINGS_CLEAR_HISTORY" = "Usuń historię czatu";
 
 /* Footer for the 'about' help section */
-"SETTINGS_COPYRIGHT" = "Copyright Radar Messenger\nOprogramowanie udostępniane na licencji AGPLv3";
+"SETTINGS_COPYRIGHT" = "Copyright 2013-2025 Signal Messenger, LLC
+Copyright 2026 Radar Chat, Inc.";
 
 /* Label for the 'data' section of the app settings. */
 "SETTINGS_DATA" = "Użycie danych";

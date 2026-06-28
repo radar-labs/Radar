@@ -1757,7 +1757,7 @@
 "CHOOSE_BACKUP_PLAN_SUBSCRIBE_PAID_BUTTON_TEXT" = "Langganan dengan %1$@/bulan";
 
 /* Subtitle for a view allowing users to choose a Backup plan. */
-"CHOOSE_BACKUP_PLAN_SUBTITLE" = "Pencadangan dienkripsi secara menyeluruh. Signal adalah organisasi nirlaba. Membayar paket pencadangan adalah bentuk dukungan Anda kepada kami.";
+"CHOOSE_BACKUP_PLAN_SUBTITLE" = "Pencadangan dienkripsi secara menyeluruh. Signal adalah organisasi nirlaba. Membayar paket pencadangan adalah bentuk dukungan Anda kepada Signal.";
 
 /* Title for a label allowing users to view Signal's Terms & Conditions. */
 "CHOOSE_BACKUP_PLAN_TERM_AND_PRIVACY_POLICY_TEXT" = "Syarat & Kebijakan Privasi";
@@ -4786,7 +4786,7 @@
 "LINKED_DEVICE_URL_OPENED_ACTION_SHEET_IN_APP_CAMERA_MESSAGE" = "Sepertinya Anda sedang mencoba menghubungkan perangkat Radar. Ketuk lanjutkan, lalu ketuk \"Hubungkan Perangkat Baru\" dan pindai kode QR lagi.";
 
 /* Bullet point about downloads on the linked devices education sheet. Embeds {{ %1$@ iPad download link, %2$@ desktop download link }} */
-"LINKED_DEVICES_EDUCATION_POINT_DOWNLOADS" = "Di perangkat satunya, buka %1$@ untuk menginstal aplikasi Radar di iPad atau %2$@ untuk menginstal di desktop.";
+"LINKED_DEVICES_EDUCATION_POINT_DOWNLOADS" = "Di perangkat satunya, buka %1$@ untuk menginstal aplikasi Radar di iPad.";
 
 /* Bullet point about message sync on the linked devices education sheet */
 "LINKED_DEVICES_EDUCATION_POINT_MESSAGES" = "Pesan Radar akan disinkronkan di ponsel Anda setelah perangkat terhubung.";
@@ -4795,7 +4795,7 @@
 "LINKED_DEVICES_EDUCATION_POINT_PRIVACY" = "Semua pesan di perangkat terhubung bersifat privat";
 
 /* Title for the linked device education sheet */
-"LINKED_DEVICES_EDUCATION_TITLE" = "Radar di Desktop atau iPad";
+"LINKED_DEVICES_EDUCATION_TITLE" = "Radar di iPad";
 
 /* Text that appears where the linked device list would be indicating that there are no linked devices. */
 "LINKED_DEVICES_EMPTY_STATE" = "Tidak ada perangkat terhubung";
@@ -7962,7 +7962,8 @@ Send money securely.";
 "SETTINGS_CLEAR_HISTORY" = "Hapus Riwayat Obrolan";
 
 /* Footer for the 'about' help section */
-"SETTINGS_COPYRIGHT" = "Hak Cipta Radar Messenger\nBerlisensi di bawah AGPLv3";
+"SETTINGS_COPYRIGHT" = "Copyright 2013-2025 Signal Messenger, LLC
+Copyright 2026 Radar Chat, Inc.";
 
 /* Label for the 'data' section of the app settings. */
 "SETTINGS_DATA" = "Penggunaan Data";

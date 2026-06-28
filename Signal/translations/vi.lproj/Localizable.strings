@@ -1757,7 +1757,7 @@
 "CHOOSE_BACKUP_PLAN_SUBSCRIBE_PAID_BUTTON_TEXT" = "Đăng ký gói với giá %1$@/tháng";
 
 /* Subtitle for a view allowing users to choose a Backup plan. */
-"CHOOSE_BACKUP_PLAN_SUBTITLE" = "Các bản sao lưu được mã hóa đầu cuối. Signal là một tổ chức phi lợi nhuận. Việc chi trả cho cơ chế sao lưu góp phần hỗ trợ chúng tôi.";
+"CHOOSE_BACKUP_PLAN_SUBTITLE" = "Các bản sao lưu được mã hóa đầu cuối. Signal là một tổ chức phi lợi nhuận. Việc chi trả cho cơ chế sao lưu góp phần hỗ trợ Signal.";
 
 /* Title for a label allowing users to view Signal's Terms & Conditions. */
 "CHOOSE_BACKUP_PLAN_TERM_AND_PRIVACY_POLICY_TEXT" = "Điều khoản và Chính sách bảo mật";
@@ -4786,7 +4786,7 @@
 "LINKED_DEVICE_URL_OPENED_ACTION_SHEET_IN_APP_CAMERA_MESSAGE" = "Có vẻ như bạn đang cố liên kết một thiết bị Radar. Nhấn tiếp tục và sau đó nhấn \"Liên kết thiết bị mới\" và quét lại mã QR.";
 
 /* Bullet point about downloads on the linked devices education sheet. Embeds {{ %1$@ iPad download link, %2$@ desktop download link }} */
-"LINKED_DEVICES_EDUCATION_POINT_DOWNLOADS" = "Trên thiết bị khác của bạn, truy cập %1$@ để cài đặt ứng dụng iPad hoặc %2$@ để cài ứng dụng cho máy tính.";
+"LINKED_DEVICES_EDUCATION_POINT_DOWNLOADS" = "Trên thiết bị khác của bạn, truy cập %1$@ để cài đặt ứng dụng iPad.";
 
 /* Bullet point about message sync on the linked devices education sheet */
 "LINKED_DEVICES_EDUCATION_POINT_MESSAGES" = "Tin nhắn Radar được đồng bộ với Radar trên điện thoại của bạn sau khi được liên kết.";
@@ -4795,7 +4795,7 @@
 "LINKED_DEVICES_EDUCATION_POINT_PRIVACY" = "Tất cả nội dung tin nhắn được bảo mật trên các thiết bị đã liên kết";
 
 /* Title for the linked device education sheet */
-"LINKED_DEVICES_EDUCATION_TITLE" = "Radar trên máy tính hoặc iPad";
+"LINKED_DEVICES_EDUCATION_TITLE" = "Radar trên iPad";
 
 /* Text that appears where the linked device list would be indicating that there are no linked devices. */
 "LINKED_DEVICES_EMPTY_STATE" = "Không có thiết bị liên kết";
@@ -7962,7 +7962,8 @@ Send money securely.";
 "SETTINGS_CLEAR_HISTORY" = "Xóa Lịch sử Trò chuyện";
 
 /* Footer for the 'about' help section */
-"SETTINGS_COPYRIGHT" = "Bản quyền Radar Messenger\nCấp phép theo GPLv3";
+"SETTINGS_COPYRIGHT" = "Copyright 2013-2025 Signal Messenger, LLC
+Copyright 2026 Radar Chat, Inc.";
 
 /* Label for the 'data' section of the app settings. */
 "SETTINGS_DATA" = "Việc sử dụng Dữ liệu";

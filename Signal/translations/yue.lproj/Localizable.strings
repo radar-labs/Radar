@@ -1757,7 +1757,7 @@
 "CHOOSE_BACKUP_PLAN_SUBSCRIBE_PAID_BUTTON_TEXT" = "每月課金 %1$@";
 
 /* Subtitle for a view allowing users to choose a Backup plan. */
-"CHOOSE_BACKUP_PLAN_SUBTITLE" = "備份經端對端加密。Signal 係一間非牟利組織。課金備份，支持我哋啦。";
+"CHOOSE_BACKUP_PLAN_SUBTITLE" = "備份經端對端加密。Signal 係一間非牟利組織。課金備份，支持 Signal 啦。";
 
 /* Title for a label allowing users to view Signal's Terms & Conditions. */
 "CHOOSE_BACKUP_PLAN_TERM_AND_PRIVACY_POLICY_TEXT" = "使用條款同私隱政策";
@@ -4786,7 +4786,7 @@
 "LINKED_DEVICE_URL_OPENED_ACTION_SHEET_IN_APP_CAMERA_MESSAGE" = "你似乎嘗試緊連結一部裝咗 Radar 嘅裝置。㩒一下繼續，然後㩒一下「連結新裝置」再掃描二維碼。";
 
 /* Bullet point about downloads on the linked devices education sheet. Embeds {{ %1$@ iPad download link, %2$@ desktop download link }} */
-"LINKED_DEVICES_EDUCATION_POINT_DOWNLOADS" = "喺另一部機度，去 %1$@ 安裝 iPad 版 APP 或者 %2$@ 去安裝桌面版 APP。";
+"LINKED_DEVICES_EDUCATION_POINT_DOWNLOADS" = "喺另一部機度，去 %1$@ 安裝 iPad 版 APP。";
 
 /* Bullet point about message sync on the linked devices education sheet */
 "LINKED_DEVICES_EDUCATION_POINT_MESSAGES" = "連結之後，Radar 訊息會同手機上嘅 Radar 同步。";
@@ -4795,7 +4795,7 @@
 "LINKED_DEVICES_EDUCATION_POINT_PRIVACY" = "所有連結裝置上面嘅訊息都係私密嘅";
 
 /* Title for the linked device education sheet */
-"LINKED_DEVICES_EDUCATION_TITLE" = "桌面電腦或者 iPad 上嘅 Radar";
+"LINKED_DEVICES_EDUCATION_TITLE" = "iPad 上嘅 Radar";
 
 /* Text that appears where the linked device list would be indicating that there are no linked devices. */
 "LINKED_DEVICES_EMPTY_STATE" = "冇連結咗嘅裝置";
@@ -7962,7 +7962,8 @@ Send money securely.";
 "SETTINGS_CLEAR_HISTORY" = "清除聊天紀錄";
 
 /* Footer for the 'about' help section */
-"SETTINGS_COPYRIGHT" = "Radar Messenger 版權所有\n由 AGPLv3 許可";
+"SETTINGS_COPYRIGHT" = "Copyright 2013-2025 Signal Messenger, LLC
+Copyright 2026 Radar Chat, Inc.";
 
 /* Label for the 'data' section of the app settings. */
 "SETTINGS_DATA" = "數據用量";

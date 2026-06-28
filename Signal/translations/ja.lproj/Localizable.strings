@@ -1757,7 +1757,7 @@
 "CHOOSE_BACKUP_PLAN_SUBSCRIBE_PAID_BUTTON_TEXT" = "%1$@ /月で申し込む";
 
 /* Subtitle for a view allowing users to choose a Backup plan. */
-"CHOOSE_BACKUP_PLAN_SUBTITLE" = "バックアップはエンドツーエンドで暗号化されます。Signalは非営利団体です。バックアップを有料でご利用いただくことは私たちをサポートしていただくことに繋がります。";
+"CHOOSE_BACKUP_PLAN_SUBTITLE" = "バックアップはエンドツーエンドで暗号化されます。Signalは非営利団体です。バックアップを有料でご利用いただくことはSignalをサポートしていただくことに繋がります。";
 
 /* Title for a label allowing users to view Signal's Terms & Conditions. */
 "CHOOSE_BACKUP_PLAN_TERM_AND_PRIVACY_POLICY_TEXT" = "利用規約とプライバシーポリシー";
@@ -4786,7 +4786,7 @@
 "LINKED_DEVICE_URL_OPENED_ACTION_SHEET_IN_APP_CAMERA_MESSAGE" = "Signalの端末をリンクするには、［続ける］→［新しい端末をリンクする］をタップし、もう一度QRコードをスキャンしてください。";
 
 /* Bullet point about downloads on the linked devices education sheet. Embeds {{ %1$@ iPad download link, %2$@ desktop download link }} */
-"LINKED_DEVICES_EDUCATION_POINT_DOWNLOADS" = "他の端末の場合は、%1$@ にアクセスしてiPadアプリをインストールする、または %2$@ にアクセスしてDesktopアプリをインストールします。";
+"LINKED_DEVICES_EDUCATION_POINT_DOWNLOADS" = "他の端末の場合は、%1$@ にアクセスしてiPadアプリをインストールします。";
 
 /* Bullet point about message sync on the linked devices education sheet */
 "LINKED_DEVICES_EDUCATION_POINT_MESSAGES" = "Radar メッセージは、リンク後にお使いのスマートフォンの Radar と同期されます。";
@@ -4795,7 +4795,7 @@
 "LINKED_DEVICES_EDUCATION_POINT_PRIVACY" = "リンク済み端末上のすべてのメッセージはプライバシーが保護されています";
 
 /* Title for the linked device education sheet */
-"LINKED_DEVICES_EDUCATION_TITLE" = "DesktopまたはiPad上のSignal";
+"LINKED_DEVICES_EDUCATION_TITLE" = "iPad上のRadar";
 
 /* Text that appears where the linked device list would be indicating that there are no linked devices. */
 "LINKED_DEVICES_EMPTY_STATE" = "リンク済み端末はありません";
@@ -7962,7 +7962,8 @@ Send money securely.";
 "SETTINGS_CLEAR_HISTORY" = "チャット履歴の消去";
 
 /* Footer for the 'about' help section */
-"SETTINGS_COPYRIGHT" = "Copyright Radar Messenger\nLicensed under the GPLv3";
+"SETTINGS_COPYRIGHT" = "Copyright 2013-2025 Signal Messenger, LLC
+Copyright 2026 Radar Chat, Inc.";
 
 /* Label for the 'data' section of the app settings. */
 "SETTINGS_DATA" = "データ通信量";

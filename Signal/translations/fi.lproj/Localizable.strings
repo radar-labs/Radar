@@ -1757,7 +1757,7 @@
 "CHOOSE_BACKUP_PLAN_SUBSCRIBE_PAID_BUTTON_TEXT" = "Tilaa hintaan %1$@ / kk";
 
 /* Subtitle for a view allowing users to choose a Backup plan. */
-"CHOOSE_BACKUP_PLAN_SUBTITLE" = "Kaikki varmuuskopiot salataan päästä päähän. Signal on voittoa tavoittelematon organisaatio. Varmuuskopioinnin maksullisuus tukee tehtäväämme.";
+"CHOOSE_BACKUP_PLAN_SUBTITLE" = "Kaikki varmuuskopiot salataan päästä päähän. Signal on voittoa tavoittelematon organisaatio. Varmuuskopioinnin maksullisuus tukee Signalia.";
 
 /* Title for a label allowing users to view Signal's Terms & Conditions. */
 "CHOOSE_BACKUP_PLAN_TERM_AND_PRIVACY_POLICY_TEXT" = "Käyttöehdot ja tietosuoja";
@@ -4786,7 +4786,7 @@
 "LINKED_DEVICE_URL_OPENED_ACTION_SHEET_IN_APP_CAMERA_MESSAGE" = "Vaikuttaa siltä, että yrität yhdistää laitetta Signaliin. Napauta Jatka ja napauta sitten Yhdistä uusi laite ja skannaa QR-koodi uudelleen.";
 
 /* Bullet point about downloads on the linked devices education sheet. Embeds {{ %1$@ iPad download link, %2$@ desktop download link }} */
-"LINKED_DEVICES_EDUCATION_POINT_DOWNLOADS" = "Asenna iPad-sovellus toiseen laitteeseesi käymällä osoitteessa %1$@ tai asenna työpöytäsovellus osoitteesta %2$@.";
+"LINKED_DEVICES_EDUCATION_POINT_DOWNLOADS" = "Asenna iPad-sovellus toiseen laitteeseesi käymällä osoitteessa %1$@.";
 
 /* Bullet point about message sync on the linked devices education sheet */
 "LINKED_DEVICES_EDUCATION_POINT_MESSAGES" = "Signalin viestit synkronoidaan matkapuhelimesi Radar-sovelluksen kanssa, kun laite on yhdistetty.";
@@ -4795,7 +4795,7 @@
 "LINKED_DEVICES_EDUCATION_POINT_PRIVACY" = "Kaikki viestit yhdistetyillä laitteilla ovat yksityisiä";
 
 /* Title for the linked device education sheet */
-"LINKED_DEVICES_EDUCATION_TITLE" = "Radar tietokoneille tai iPadille";
+"LINKED_DEVICES_EDUCATION_TITLE" = "Radar iPadille";
 
 /* Text that appears where the linked device list would be indicating that there are no linked devices. */
 "LINKED_DEVICES_EMPTY_STATE" = "Ei yhdistettyjä laitteita";
@@ -7962,7 +7962,8 @@ Send money securely.";
 "SETTINGS_CLEAR_HISTORY" = "Tyhjennä keskusteluhistoria";
 
 /* Footer for the 'about' help section */
-"SETTINGS_COPYRIGHT" = "Copyright Radar Messenger\nLisensoitu AGPLv3-lisenssillä";
+"SETTINGS_COPYRIGHT" = "Copyright 2013-2025 Signal Messenger, LLC
+Copyright 2026 Radar Chat, Inc.";
 
 /* Label for the 'data' section of the app settings. */
 "SETTINGS_DATA" = "Datankäyttö";

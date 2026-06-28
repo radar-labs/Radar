@@ -1757,7 +1757,7 @@
 "CHOOSE_BACKUP_PLAN_SUBSCRIBE_PAID_BUTTON_TEXT" = "%1$@/ay ile abone ol";
 
 /* Subtitle for a view allowing users to choose a Backup plan. */
-"CHOOSE_BACKUP_PLAN_SUBTITLE" = "Yedeklemeler uçtan uca şifrelenmiştir. Signal kâr amacı gütmeyen bir kuruluştur. Yedeklemeler için yapılan ödemeler bizi desteklemeye yardımcı olur.";
+"CHOOSE_BACKUP_PLAN_SUBTITLE" = "Yedeklemeler uçtan uca şifrelenmiştir. Signal kâr amacı gütmeyen bir kuruluştur. Yedeklemeler için yapılan ödemeler Signal'i desteklemeye yardımcı olur.";
 
 /* Title for a label allowing users to view Signal's Terms & Conditions. */
 "CHOOSE_BACKUP_PLAN_TERM_AND_PRIVACY_POLICY_TEXT" = "Şartlar ve Gizlilik İlkesi";
@@ -4786,7 +4786,7 @@
 "LINKED_DEVICE_URL_OPENED_ACTION_SHEET_IN_APP_CAMERA_MESSAGE" = "Radar cihazını bağlamaya çalışıyorsun gibi görünüyor. Devam et'e dokun ve ardından \"Yeni Bir Cihaz Bağla\"ya dokun ve kare kodu tekrar tara.";
 
 /* Bullet point about downloads on the linked devices education sheet. Embeds {{ %1$@ iPad download link, %2$@ desktop download link }} */
-"LINKED_DEVICES_EDUCATION_POINT_DOWNLOADS" = "Diğer cihazına iPad uygulamasını yüklemek için %1$@ adresini ya da masaüstü uygulamasını yüklemek için %2$@ adresini ziyaret et.";
+"LINKED_DEVICES_EDUCATION_POINT_DOWNLOADS" = "Diğer cihazına iPad uygulamasını yüklemek için %1$@ adresini ziyaret et.";
 
 /* Bullet point about message sync on the linked devices education sheet */
 "LINKED_DEVICES_EDUCATION_POINT_MESSAGES" = "Radar mesajları, bağlandıktan sonra cep telefonundaki Radar uygulamasıyla senkronize edilir.";
@@ -4795,7 +4795,7 @@
 "LINKED_DEVICES_EDUCATION_POINT_PRIVACY" = "Bağlı cihazlardaki tüm mesajlaşmalar özeldir";
 
 /* Title for the linked device education sheet */
-"LINKED_DEVICES_EDUCATION_TITLE" = "Desktop veya iPad'de Radar";
+"LINKED_DEVICES_EDUCATION_TITLE" = "iPad'de Radar";
 
 /* Text that appears where the linked device list would be indicating that there are no linked devices. */
 "LINKED_DEVICES_EMPTY_STATE" = "Bağlı cihaz yok";
@@ -7962,7 +7962,8 @@ Send money securely.";
 "SETTINGS_CLEAR_HISTORY" = "Sohbet Geçmişini Temizle";
 
 /* Footer for the 'about' help section */
-"SETTINGS_COPYRIGHT" = "Telif Hakkı Radar Messenger\n AGPLv3 altında lisanslanmıştır";
+"SETTINGS_COPYRIGHT" = "Copyright 2013-2025 Signal Messenger, LLC
+Copyright 2026 Radar Chat, Inc.";
 
 /* Label for the 'data' section of the app settings. */
 "SETTINGS_DATA" = "Veri kullanımı";

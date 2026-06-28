@@ -51,17 +51,15 @@ class LinkedDevicesEducationSheet: StackSheetViewController {
         )
         stackView.addArrangedSubview(messagesBulletPoint)
 
-        let iPadDownloadLinkString = "signal.org/install"
-        let iPadDownloadURL = URL(string: "https://signal.org/install/")!
-        let desktopDownloadLinkString = "signal.org/download"
-        let desktopDownloadURL = URL(string: "https://signal.org/download/")!
+        let iPadDownloadLinkString = "radar.chat/install"
+        let iPadDownloadURL = URL(string: "https://radar.chat/install/")!
 
         let downloadsString = String(
             format: OWSLocalizedString(
                 "LINKED_DEVICES_EDUCATION_POINT_DOWNLOADS",
-                comment: "Bullet point about downloads on the linked devices education sheet. Embeds {{ %1$@ iPad download link, %2$@ desktop download link }}"
+                comment: "Bullet point about downloads on the linked devices education sheet. Embeds {{ %1$@ iPad download link }}"
             ),
-            iPadDownloadLinkString, desktopDownloadLinkString
+            iPadDownloadLinkString
         )
 
         let downloadsAttributedString = NSMutableAttributedString(string: downloadsString)
@@ -69,11 +67,6 @@ class LinkedDevicesEducationSheet: StackSheetViewController {
         downloadsAttributedString.addAttributes(
             [.link: iPadDownloadURL],
             range: (downloadsString as NSString).range(of: iPadDownloadLinkString)
-        )
-
-        downloadsAttributedString.addAttributes(
-            [.link: desktopDownloadURL],
-            range: (downloadsString as NSString).range(of: desktopDownloadLinkString)
         )
 
         let downloadsBulletPoint = Self.bulletPoint(

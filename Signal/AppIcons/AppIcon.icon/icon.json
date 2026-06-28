@@ -10,14 +10,43 @@
           "hidden" : false,
           "image-name-specializations" : [
             {
-              "value" : "radar-icon-2.png"
+              "value" : "radar-square-2.png"
+            },
+            {
+              "appearance" : "dark",
+              "value" : "radar-new-dark.png"
             },
             {
               "appearance" : "tinted",
-              "value" : "radar-2-mono.png"
+              "value" : "radar-new-tinted.png"
+            },
+            {
+              "idiom" : "watchOS",
+              "value" : "radar-circle-2.png"
             }
           ],
-          "name" : "radar-2-mono"
+          "name" : "radar-new-dark",
+          "position-specializations" : [
+            {
+              "value" : {
+                "scale" : 1,
+                "translation-in-points" : [
+                  0,
+                  0
+                ]
+              }
+            },
+            {
+              "idiom" : "watchOS",
+              "value" : {
+                "scale" : 1,
+                "translation-in-points" : [
+                  0,
+                  0
+                ]
+              }
+            }
+          ]
         }
       ],
       "shadow" : {
@@ -31,6 +60,9 @@
     }
   ],
   "supported-platforms" : {
+    "circles" : [
+      "watchOS"
+    ],
     "squares" : "shared"
   }
 }

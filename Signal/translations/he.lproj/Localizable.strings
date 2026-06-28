@@ -1757,7 +1757,7 @@
 "CHOOSE_BACKUP_PLAN_SUBSCRIBE_PAID_BUTTON_TEXT" = "רכישת מנוי עבור %1$@/חודש";
 
 /* Subtitle for a view allowing users to choose a Backup plan. */
-"CHOOSE_BACKUP_PLAN_SUBTITLE" = "הגיבויים מוצפנים מקצה לקצה. Signal היא עמותה ללא מטרות רווח. התשלום עבור הגיבויים עוזר לתמוך בנו.";
+"CHOOSE_BACKUP_PLAN_SUBTITLE" = "הגיבויים מוצפנים מקצה לקצה. Signal היא עמותה ללא מטרות רווח. התשלום עבור הגיבויים עוזר לתמוך ב-Signal.";
 
 /* Title for a label allowing users to view Signal's Terms & Conditions. */
 "CHOOSE_BACKUP_PLAN_TERM_AND_PRIVACY_POLICY_TEXT" = "תנאים ומדיניות פרטיות";
@@ -4786,7 +4786,7 @@
 "LINKED_DEVICE_URL_OPENED_ACTION_SHEET_IN_APP_CAMERA_MESSAGE" = "נראה שאת/ה מנסה לקשר מכשיר Radar. יש ללחוץ על המשך ואז ללחוץ על ״קישור מכשיר חדש״ ולסרוק שנית את קוד ה–QR.";
 
 /* Bullet point about downloads on the linked devices education sheet. Embeds {{ %1$@ iPad download link, %2$@ desktop download link }} */
-"LINKED_DEVICES_EDUCATION_POINT_DOWNLOADS" = "במכשיר האחר שלך, יש לבקר ב–%1$@ כדי להתקין את האפליקציה למכשיר iPad או %2$@ כדי להתקין את האפליקציה לשולחן העבודה.";
+"LINKED_DEVICES_EDUCATION_POINT_DOWNLOADS" = "במכשיר האחר שלך, יש לבקר ב–%1$@ כדי להתקין את האפליקציה למכשיר iPad.";
 
 /* Bullet point about message sync on the linked devices education sheet */
 "LINKED_DEVICES_EDUCATION_POINT_MESSAGES" = "הודעות Radar יסונכרנו עם Radar בטלפון הנייד שלך לאחר שהוא יקושר.";
@@ -4795,7 +4795,7 @@
 "LINKED_DEVICES_EDUCATION_POINT_PRIVACY" = "כל התכתבות במכשירים המקושרים היא פרטית";
 
 /* Title for the linked device education sheet */
-"LINKED_DEVICES_EDUCATION_TITLE" = "Radar לשולחן העבודה או ל–iPad";
+"LINKED_DEVICES_EDUCATION_TITLE" = "Radar ל–iPad";
 
 /* Text that appears where the linked device list would be indicating that there are no linked devices. */
 "LINKED_DEVICES_EMPTY_STATE" = "אין מכשירים מקושרים";
@@ -7962,7 +7962,8 @@ Send money securely.";
 "SETTINGS_CLEAR_HISTORY" = "ניקוי היסטוריית צ׳אט";
 
 /* Footer for the 'about' help section */
-"SETTINGS_COPYRIGHT" = "זכויות יוצרים Radar Messenger\nברישיון תחת AGPLv3";
+"SETTINGS_COPYRIGHT" = "Copyright 2013-2025 Signal Messenger, LLC
+Copyright 2026 Radar Chat, Inc.";
 
 /* Label for the 'data' section of the app settings. */
 "SETTINGS_DATA" = "שימוש בנתונים";

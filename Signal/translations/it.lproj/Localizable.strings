@@ -1757,7 +1757,7 @@
 "CHOOSE_BACKUP_PLAN_SUBSCRIBE_PAID_BUTTON_TEXT" = "Abbonati a %1$@ al mese";
 
 /* Subtitle for a view allowing users to choose a Backup plan. */
-"CHOOSE_BACKUP_PLAN_SUBTITLE" = "I backup vengono crittografati end-to-end. Signal è un'organizzazione no-profit. I guadagni derivanti dal servizio di backup ci aiutano a mantenere il servizio attivo.";
+"CHOOSE_BACKUP_PLAN_SUBTITLE" = "I backup vengono crittografati end-to-end. Signal è un'organizzazione no-profit. I guadagni derivanti dal servizio di backup aiutano Signal a mantenere il servizio attivo.";
 
 /* Title for a label allowing users to view Signal's Terms & Conditions. */
 "CHOOSE_BACKUP_PLAN_TERM_AND_PRIVACY_POLICY_TEXT" = "Termini e Informativa sulla privacy";
@@ -4786,7 +4786,7 @@
 "LINKED_DEVICE_URL_OPENED_ACTION_SHEET_IN_APP_CAMERA_MESSAGE" = "Sembra che tu stia provando a collegare un dispositivo a Radar. Tocca continua, poi \"Collega un nuovo dispositivo\" e scansiona di nuovo il codice QR.";
 
 /* Bullet point about downloads on the linked devices education sheet. Embeds {{ %1$@ iPad download link, %2$@ desktop download link }} */
-"LINKED_DEVICES_EDUCATION_POINT_DOWNLOADS" = "Sull'altro dispositivo, visita la pagina %1$@ per installare l'app per iPad o la pagina %2$@ per l'app per desktop.";
+"LINKED_DEVICES_EDUCATION_POINT_DOWNLOADS" = "Sull'altro dispositivo, visita la pagina %1$@ per installare l'app per iPad.";
 
 /* Bullet point about message sync on the linked devices education sheet */
 "LINKED_DEVICES_EDUCATION_POINT_MESSAGES" = "I messaggi di Radar vengono sincronizzati con l'app di Radar sul tuo dispositivo mobile dopo aver effettuato il collegamento.";
@@ -4795,7 +4795,7 @@
 "LINKED_DEVICES_EDUCATION_POINT_PRIVACY" = "Tutti i messaggi sui dispositivi collegati sono privati";
 
 /* Title for the linked device education sheet */
-"LINKED_DEVICES_EDUCATION_TITLE" = "Radar su Desktop o iPad";
+"LINKED_DEVICES_EDUCATION_TITLE" = "Radar su iPad";
 
 /* Text that appears where the linked device list would be indicating that there are no linked devices. */
 "LINKED_DEVICES_EMPTY_STATE" = "Nessun dispositivo collegato";
@@ -7962,7 +7962,8 @@ Send money securely.";
 "SETTINGS_CLEAR_HISTORY" = "Elimina la cronologia delle chat";
 
 /* Footer for the 'about' help section */
-"SETTINGS_COPYRIGHT" = "Copyright Radar Messenger\nDistribuito con licenza AGPLv3";
+"SETTINGS_COPYRIGHT" = "Copyright 2013-2025 Signal Messenger, LLC
+Copyright 2026 Radar Chat, Inc.";
 
 /* Label for the 'data' section of the app settings. */
 "SETTINGS_DATA" = "Utilizzo dati";

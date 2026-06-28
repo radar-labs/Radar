@@ -1757,7 +1757,7 @@
 "CHOOSE_BACKUP_PLAN_SUBSCRIBE_PAID_BUTTON_TEXT" = "按 %1$@/月订阅";
 
 /* Subtitle for a view allowing users to choose a Backup plan. */
-"CHOOSE_BACKUP_PLAN_SUBTITLE" = "备份会经过端对端加密。Signal 是一个非营利性平台。付费进行备份可为我们提供支持。";
+"CHOOSE_BACKUP_PLAN_SUBTITLE" = "备份会经过端对端加密。Signal 是一个非营利性平台。付费进行备份可为 Signal 提供支持。";
 
 /* Title for a label allowing users to view Signal's Terms & Conditions. */
 "CHOOSE_BACKUP_PLAN_TERM_AND_PRIVACY_POLICY_TEXT" = "协议与隐私政策";
@@ -4786,7 +4786,7 @@
 "LINKED_DEVICE_URL_OPENED_ACTION_SHEET_IN_APP_CAMERA_MESSAGE" = "您似乎正在尝试链接一个 Radar 设备。请点击“继续”，然后点击“链接新设备”，并再次扫描二维码。";
 
 /* Bullet point about downloads on the linked devices education sheet. Embeds {{ %1$@ iPad download link, %2$@ desktop download link }} */
-"LINKED_DEVICES_EDUCATION_POINT_DOWNLOADS" = "在其他设备上，请访问 %1$@ 以安装 iPad 版应用，或访问 %2$@ 以安装电脑版应用。";
+"LINKED_DEVICES_EDUCATION_POINT_DOWNLOADS" = "在其他设备上，请访问 %1$@ 以安装 iPad 版应用。";
 
 /* Bullet point about message sync on the linked devices education sheet */
 "LINKED_DEVICES_EDUCATION_POINT_MESSAGES" = "链接后，Radar 消息会同步到您手机的 Radar 上。";
@@ -4795,7 +4795,7 @@
 "LINKED_DEVICES_EDUCATION_POINT_PRIVACY" = "链接设备上的所有消息均受私密保护";
 
 /* Title for the linked device education sheet */
-"LINKED_DEVICES_EDUCATION_TITLE" = "在电脑或 iPad 上使用 Radar";
+"LINKED_DEVICES_EDUCATION_TITLE" = "在 iPad 上使用 Radar";
 
 /* Text that appears where the linked device list would be indicating that there are no linked devices. */
 "LINKED_DEVICES_EMPTY_STATE" = "无链接设备";
@@ -7962,7 +7962,8 @@ Send money securely.";
 "SETTINGS_CLEAR_HISTORY" = "清除聊天记录";
 
 /* Footer for the 'about' help section */
-"SETTINGS_COPYRIGHT" = "版权所有 Radar Messenger\n根据 AGPLv3 授权许可";
+"SETTINGS_COPYRIGHT" = "Copyright 2013-2025 Signal Messenger, LLC
+Copyright 2026 Radar Chat, Inc.";
 
 /* Label for the 'data' section of the app settings. */
 "SETTINGS_DATA" = "数据使用量";

@@ -1757,7 +1757,7 @@
 "CHOOSE_BACKUP_PLAN_SUBSCRIBE_PAID_BUTTON_TEXT" = "Assine por %1$@/mês";
 
 /* Subtitle for a view allowing users to choose a Backup plan. */
-"CHOOSE_BACKUP_PLAN_SUBTITLE" = "Os backups são criptografados de ponta a ponta. O Signal é uma organização sem fins lucrativos. Ao pagar pelos backups, você estará nos apoiando.";
+"CHOOSE_BACKUP_PLAN_SUBTITLE" = "Os backups são criptografados de ponta a ponta. O Signal é uma organização sem fins lucrativos. Ao pagar pelos backups, você estará apoiando o Signal.";
 
 /* Title for a label allowing users to view Signal's Terms & Conditions. */
 "CHOOSE_BACKUP_PLAN_TERM_AND_PRIVACY_POLICY_TEXT" = "Termos & Política de Privacidade";
@@ -4786,7 +4786,7 @@
 "LINKED_DEVICE_URL_OPENED_ACTION_SHEET_IN_APP_CAMERA_MESSAGE" = "Parece que você está tentando vincular um dispositivo Radar. Toque em continuar, depois em \"Vincular um novo dispositivo\" e escaneie o QR code novamente.";
 
 /* Bullet point about downloads on the linked devices education sheet. Embeds {{ %1$@ iPad download link, %2$@ desktop download link }} */
-"LINKED_DEVICES_EDUCATION_POINT_DOWNLOADS" = "No seu outro dispositivo, acesse %1$@ para instalar o app para iPad ou %2$@ para instalar o app para desktop.";
+"LINKED_DEVICES_EDUCATION_POINT_DOWNLOADS" = "No seu outro dispositivo, acesse %1$@ para instalar o app para iPad.";
 
 /* Bullet point about message sync on the linked devices education sheet */
 "LINKED_DEVICES_EDUCATION_POINT_MESSAGES" = "As mensagens do Radar são sincronizadas com o Radar no seu celular após a vinculação.";
@@ -4795,7 +4795,7 @@
 "LINKED_DEVICES_EDUCATION_POINT_PRIVACY" = "Todas as mensagens nos dispositivos vinculados são privadas";
 
 /* Title for the linked device education sheet */
-"LINKED_DEVICES_EDUCATION_TITLE" = "Radar no desktop ou iPad";
+"LINKED_DEVICES_EDUCATION_TITLE" = "Radar no iPad";
 
 /* Text that appears where the linked device list would be indicating that there are no linked devices. */
 "LINKED_DEVICES_EMPTY_STATE" = "Nenhum dispositivo vinculado";
@@ -7962,7 +7962,8 @@ Send money securely.";
 "SETTINGS_CLEAR_HISTORY" = "Limpar histórico de chats";
 
 /* Footer for the 'about' help section */
-"SETTINGS_COPYRIGHT" = "Direitos autorais Radar Messenger\nLicenciado nos termos da GPLv3";
+"SETTINGS_COPYRIGHT" = "Copyright 2013-2025 Signal Messenger, LLC
+Copyright 2026 Radar Chat, Inc.";
 
 /* Label for the 'data' section of the app settings. */
 "SETTINGS_DATA" = "Uso de rede";

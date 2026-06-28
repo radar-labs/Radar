@@ -1757,7 +1757,7 @@
 "CHOOSE_BACKUP_PLAN_SUBSCRIBE_PAID_BUTTON_TEXT" = "Subscriu-te per %1$@/mes";
 
 /* Subtitle for a view allowing users to choose a Backup plan. */
-"CHOOSE_BACKUP_PLAN_SUBTITLE" = "Les còpies de seguretat estan xifrades d'extrem a extrem. Signal és una organització sense ànim de lucre: pagar per les còpies de seguretat ens ajuda a poder continuar endavant.";
+"CHOOSE_BACKUP_PLAN_SUBTITLE" = "Les còpies de seguretat estan xifrades d'extrem a extrem. Signal és una organització sense ànim de lucre: pagar per les còpies de seguretat ajuda Signal a poder continuar endavant.";
 
 /* Title for a label allowing users to view Signal's Terms & Conditions. */
 "CHOOSE_BACKUP_PLAN_TERM_AND_PRIVACY_POLICY_TEXT" = "Condicions de servei i política de privadesa";
@@ -4786,7 +4786,7 @@
 "LINKED_DEVICE_URL_OPENED_ACTION_SHEET_IN_APP_CAMERA_MESSAGE" = "Sembla que estàs intentant enllaçar un dispositiu a Radar. Toca \"Continuar\", selecciona \"Vincular un nou dispositiu\" i torna a escanejar el codi QR.";
 
 /* Bullet point about downloads on the linked devices education sheet. Embeds {{ %1$@ iPad download link, %2$@ desktop download link }} */
-"LINKED_DEVICES_EDUCATION_POINT_DOWNLOADS" = "Al teu altre dispositiu, ves a %1$@ per instal·lar l'iPad app, o a %2$@ per instal·lar l'app d'escriptori.";
+"LINKED_DEVICES_EDUCATION_POINT_DOWNLOADS" = "Al teu altre dispositiu, ves a %1$@ per instal·lar l'iPad app.";
 
 /* Bullet point about message sync on the linked devices education sheet */
 "LINKED_DEVICES_EDUCATION_POINT_MESSAGES" = "Els missatges de Radar se sincronitzaran amb l'app al teu telèfon un cop l'hagis vinculat.";
@@ -4795,7 +4795,7 @@
 "LINKED_DEVICES_EDUCATION_POINT_PRIVACY" = "Tots els missatges dels dispositius connectats són privats";
 
 /* Title for the linked device education sheet */
-"LINKED_DEVICES_EDUCATION_TITLE" = "Radar per a Escriptori o iPad";
+"LINKED_DEVICES_EDUCATION_TITLE" = "Radar per a iPad";
 
 /* Text that appears where the linked device list would be indicating that there are no linked devices. */
 "LINKED_DEVICES_EMPTY_STATE" = "No hi ha dispositius connectats";
@@ -7962,7 +7962,8 @@ Send money securely.";
 "SETTINGS_CLEAR_HISTORY" = "Neteja l'historial del xat";
 
 /* Footer for the 'about' help section */
-"SETTINGS_COPYRIGHT" = "Copyright Radar Messenger\nAmb llicència de AGPLv3";
+"SETTINGS_COPYRIGHT" = "Copyright 2013-2025 Signal Messenger, LLC
+Copyright 2026 Radar Chat, Inc.";
 
 /* Label for the 'data' section of the app settings. */
 "SETTINGS_DATA" = "Ús de dades";

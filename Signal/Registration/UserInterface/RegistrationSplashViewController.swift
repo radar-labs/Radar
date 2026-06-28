@@ -100,7 +100,8 @@ public class RegistrationSplashViewController: OWSViewController, OWSNavigationC
         // "Radar." wordmark below icon.
         let wordmarkView = UILabel()
         wordmarkView.text = "Radar."
-        wordmarkView.textColor = .Signal.label
+        // Match the orange of the app icon (#F46300).
+        wordmarkView.textColor = UIColor(red: 244 / 255, green: 99 / 255, blue: 0 / 255, alpha: 1)
         wordmarkView.font = UIFont.systemFont(ofSize: 48, weight: .bold)
         wordmarkView.textAlignment = .center
         wordmarkView.accessibilityIdentifier = "registration.splash.wordmark"

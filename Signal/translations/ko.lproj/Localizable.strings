@@ -4786,7 +4786,7 @@
 "LINKED_DEVICE_URL_OPENED_ACTION_SHEET_IN_APP_CAMERA_MESSAGE" = "Radar 기기를 연결하려는 것 같네요. 계속을 탭한 다음 '새 기기 연결'을 탭하고 QR 코드를 다시 스캔하세요.";
 
 /* Bullet point about downloads on the linked devices education sheet. Embeds {{ %1$@ iPad download link, %2$@ desktop download link }} */
-"LINKED_DEVICES_EDUCATION_POINT_DOWNLOADS" = "다른 장치에서 %1$@을(를) 방문하여 iPad 앱을 설치하거나, %2$@을(를) 방문하여 데스크톱 앱을 설치하세요.";
+"LINKED_DEVICES_EDUCATION_POINT_DOWNLOADS" = "다른 장치에서 %1$@을(를) 방문하여 iPad 앱을 설치하세요.";
 
 /* Bullet point about message sync on the linked devices education sheet */
 "LINKED_DEVICES_EDUCATION_POINT_MESSAGES" = "휴대폰의 Signal과 연결하면 Radar 메시지가 동기화됩니다.";
@@ -4795,7 +4795,7 @@
 "LINKED_DEVICES_EDUCATION_POINT_PRIVACY" = "연결된 기기의 모든 메시지는 비공개입니다.";
 
 /* Title for the linked device education sheet */
-"LINKED_DEVICES_EDUCATION_TITLE" = "데스크톱 또는 iPad의 Radar";
+"LINKED_DEVICES_EDUCATION_TITLE" = "iPad의 Radar";
 
 /* Text that appears where the linked device list would be indicating that there are no linked devices. */
 "LINKED_DEVICES_EMPTY_STATE" = "연결된 기기 없음";
@@ -7962,7 +7962,8 @@ Send money securely.";
 "SETTINGS_CLEAR_HISTORY" = "대화 기록 삭제";
 
 /* Footer for the 'about' help section */
-"SETTINGS_COPYRIGHT" = "Radar Messenger 저작권\nAGPLv3에 따라 라이선스 부여됨";
+"SETTINGS_COPYRIGHT" = "Copyright 2013-2025 Signal Messenger, LLC
+Copyright 2026 Radar Chat, Inc.";
 
 /* Label for the 'data' section of the app settings. */
 "SETTINGS_DATA" = "데이터 사용량";

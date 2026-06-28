@@ -1757,7 +1757,7 @@
 "CHOOSE_BACKUP_PLAN_SUBSCRIBE_PAID_BUTTON_TEXT" = "%1$@/महिना सदस्यता";
 
 /* Subtitle for a view allowing users to choose a Backup plan. */
-"CHOOSE_BACKUP_PLAN_SUBTITLE" = "बॅकअप्स हे एंड-टू-एंड एन्क्रिप्टेड म्हणजे कूटबद्ध केलेले असतात. Signal ना-नफा संस्था आहे. बॅकअप्सकरिता पैसे भरल्याने आम्हाला सपोर्ट मिळण्यास मदत होते.";
+"CHOOSE_BACKUP_PLAN_SUBTITLE" = "बॅकअप्स हे एंड-टू-एंड एन्क्रिप्टेड म्हणजे कूटबद्ध केलेले असतात. Signal ना-नफा संस्था आहे. बॅकअप्सकरिता पैसे भरल्याने Signal ला सपोर्ट मिळण्यास मदत होते.";
 
 /* Title for a label allowing users to view Signal's Terms & Conditions. */
 "CHOOSE_BACKUP_PLAN_TERM_AND_PRIVACY_POLICY_TEXT" = "अटी आणि गोपनीयता धोरण";
@@ -4786,7 +4786,7 @@
 "LINKED_DEVICE_URL_OPENED_ACTION_SHEET_IN_APP_CAMERA_MESSAGE" = "आपण Radar डिव्हाइस लिंक करण्याचा प्रयत्न करत आहात असे दिसते. चालू ठेवा वर टॅप करा आणि मग \"नवीन डिव्हाईस लिंक करा\" वर टॅप करा आणि QR कोड पुन्हा स्कॅन करा.";
 
 /* Bullet point about downloads on the linked devices education sheet. Embeds {{ %1$@ iPad download link, %2$@ desktop download link }} */
-"LINKED_DEVICES_EDUCATION_POINT_DOWNLOADS" = "आपल्या दुसऱ्या डिव्हाईस, %1$@ ला भेट द्या आणि iPad ॲप स्थापित करा किंवा डेस्कटॉप ॲप स्थापित करण्यासाठी %2$@ ला भेट द्या.";
+"LINKED_DEVICES_EDUCATION_POINT_DOWNLOADS" = "आपल्या दुसऱ्या डिव्हाईस, %1$@ ला भेट द्या आणि iPad ॲप स्थापित करा.";
 
 /* Bullet point about message sync on the linked devices education sheet */
 "LINKED_DEVICES_EDUCATION_POINT_MESSAGES" = "Radar संदेश हे आपल्या मोबाइल फोन वरील Radar सोबत लिंक केल्यानंतर सिंक्रोनाईज केले जातात.";
@@ -4795,7 +4795,7 @@
 "LINKED_DEVICES_EDUCATION_POINT_PRIVACY" = "लिंंक केलेल्या डिव्हाइसेसवरील सर्व संदेशन गोपनीय आहे";
 
 /* Title for the linked device education sheet */
-"LINKED_DEVICES_EDUCATION_TITLE" = "डेस्कटॉप किंवा iPad वर Radar";
+"LINKED_DEVICES_EDUCATION_TITLE" = "iPad वर Radar";
 
 /* Text that appears where the linked device list would be indicating that there are no linked devices. */
 "LINKED_DEVICES_EMPTY_STATE" = "कोणताही लिंक केला डिव्हाइस नाही";
@@ -7962,7 +7962,8 @@ Send money securely.";
 "SETTINGS_CLEAR_HISTORY" = "चॅट इतिहास साफ करा";
 
 /* Footer for the 'about' help section */
-"SETTINGS_COPYRIGHT" = "कॉपीराईट Radar संदेशक\nAGPLv3 अतंर्गत परवानाकृत";
+"SETTINGS_COPYRIGHT" = "Copyright 2013-2025 Signal Messenger, LLC
+Copyright 2026 Radar Chat, Inc.";
 
 /* Label for the 'data' section of the app settings. */
 "SETTINGS_DATA" = "डेटा वापर";

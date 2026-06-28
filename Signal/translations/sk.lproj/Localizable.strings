@@ -1757,7 +1757,7 @@
 "CHOOSE_BACKUP_PLAN_SUBSCRIBE_PAID_BUTTON_TEXT" = "Predplatiť za %1$@ mesačne";
 
 /* Subtitle for a view allowing users to choose a Backup plan. */
-"CHOOSE_BACKUP_PLAN_SUBTITLE" = "Zálohy sú chránené end-to-end šifrovaním. Signal je nezisková organizácia. Platbami za zálohovanie nás podporujete.";
+"CHOOSE_BACKUP_PLAN_SUBTITLE" = "Zálohy sú chránené end-to-end šifrovaním. Signal je nezisková organizácia. Platbami za zálohovanie podporujete Signal.";
 
 /* Title for a label allowing users to view Signal's Terms & Conditions. */
 "CHOOSE_BACKUP_PLAN_TERM_AND_PRIVACY_POLICY_TEXT" = "Podmienky a Ochrana osobných údajov";
@@ -4786,7 +4786,7 @@
 "LINKED_DEVICE_URL_OPENED_ACTION_SHEET_IN_APP_CAMERA_MESSAGE" = "Vyzerá to, že sa snažíte prepojiť zariadenie Radar. Ťuknite na Pokračovať, potom na „Prepojiť nové zariadenie“ a znova naskenujte QR kód.";
 
 /* Bullet point about downloads on the linked devices education sheet. Embeds {{ %1$@ iPad download link, %2$@ desktop download link }} */
-"LINKED_DEVICES_EDUCATION_POINT_DOWNLOADS" = "Na druhom zariadení prejdite na %1$@ a nainštalujte si aplikáciu pre iPad alebo na %2$@ a nainštalujte počítačovú aplikáciu.";
+"LINKED_DEVICES_EDUCATION_POINT_DOWNLOADS" = "Na druhom zariadení prejdite na %1$@ a nainštalujte si aplikáciu pre iPad.";
 
 /* Bullet point about message sync on the linked devices education sheet */
 "LINKED_DEVICES_EDUCATION_POINT_MESSAGES" = "Radar správy sú po prepojení synchronizované s aplikáciou Radar vo vašom mobilnom telefóne.";
@@ -4795,7 +4795,7 @@
 "LINKED_DEVICES_EDUCATION_POINT_PRIVACY" = "Všetky správy na prepojených zariadeniach sú súkromné";
 
 /* Title for the linked device education sheet */
-"LINKED_DEVICES_EDUCATION_TITLE" = "Radar na počítači alebo iPade";
+"LINKED_DEVICES_EDUCATION_TITLE" = "Radar na iPade";
 
 /* Text that appears where the linked device list would be indicating that there are no linked devices. */
 "LINKED_DEVICES_EMPTY_STATE" = "Žiadne prepojené zariadenia";
@@ -7962,7 +7962,8 @@ Send money securely.";
 "SETTINGS_CLEAR_HISTORY" = "Vymazať históriu četov";
 
 /* Footer for the 'about' help section */
-"SETTINGS_COPYRIGHT" = "Autorské práva Radar Messenger\nLicencované pod GPLv3";
+"SETTINGS_COPYRIGHT" = "Copyright 2013-2025 Signal Messenger, LLC
+Copyright 2026 Radar Chat, Inc.";
 
 /* Label for the 'data' section of the app settings. */
 "SETTINGS_DATA" = "Využitie dát";

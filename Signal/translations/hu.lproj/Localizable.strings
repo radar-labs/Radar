@@ -1757,7 +1757,7 @@
 "CHOOSE_BACKUP_PLAN_SUBSCRIBE_PAID_BUTTON_TEXT" = "Fizess elő %1$@/hó áron";
 
 /* Subtitle for a view allowing users to choose a Backup plan. */
-"CHOOSE_BACKUP_PLAN_SUBTITLE" = "A biztonsági mentések végponttól végpontig titkosítva vannak. A Signal egy nonprofit szervezet. A biztonsági mentésekért fizetve támogatsz minket.";
+"CHOOSE_BACKUP_PLAN_SUBTITLE" = "A biztonsági mentések végponttól végpontig titkosítva vannak. A Signal egy nonprofit szervezet. A biztonsági mentésekért fizetve támogatod a Signalt.";
 
 /* Title for a label allowing users to view Signal's Terms & Conditions. */
 "CHOOSE_BACKUP_PLAN_TERM_AND_PRIVACY_POLICY_TEXT" = "Adatvédelmi és Általános Szerződési Feltételek";
@@ -4786,7 +4786,7 @@
 "LINKED_DEVICE_URL_OPENED_ACTION_SHEET_IN_APP_CAMERA_MESSAGE" = "Úgy tűnik, hogy egy Radar-eszközt próbálsz társítani. Koppints a Folytatás, majd az „Új eszköz összekapcsolása” elemre, és olvasd be újra a QR-kódot.";
 
 /* Bullet point about downloads on the linked devices education sheet. Embeds {{ %1$@ iPad download link, %2$@ desktop download link }} */
-"LINKED_DEVICES_EDUCATION_POINT_DOWNLOADS" = "A másik eszközödön az iPad alkalmazás telepítéséhez keresd fel a(z) %1$@ oldalt, vagy a(z) %2$@ oldalt az asztali alkalmazás telepítéséhez.";
+"LINKED_DEVICES_EDUCATION_POINT_DOWNLOADS" = "A másik eszközödön az iPad alkalmazás telepítéséhez keresd fel a(z) %1$@ oldalt.";
 
 /* Bullet point about message sync on the linked devices education sheet */
 "LINKED_DEVICES_EDUCATION_POINT_MESSAGES" = "A Radar-üzenetek szinkronizálva vannak a mobiltelefonodon megtalálható Signallal, miután összekapcsolásra kerültek.";
@@ -4795,7 +4795,7 @@
 "LINKED_DEVICES_EDUCATION_POINT_PRIVACY" = "A kapcsolt eszközökön minden üzenet privát";
 
 /* Title for the linked device education sheet */
-"LINKED_DEVICES_EDUCATION_TITLE" = "A Radar asztali számítógépen vagy iPaden";
+"LINKED_DEVICES_EDUCATION_TITLE" = "A Radar iPaden";
 
 /* Text that appears where the linked device list would be indicating that there are no linked devices. */
 "LINKED_DEVICES_EMPTY_STATE" = "Nincsenek kapcsolt eszközök";
@@ -7962,7 +7962,8 @@ Send money securely.";
 "SETTINGS_CLEAR_HISTORY" = "Összes csevegési előzmény törlése";
 
 /* Footer for the 'about' help section */
-"SETTINGS_COPYRIGHT" = "Copyright Radar Messenger\nLicenc típusa: AGPLv3";
+"SETTINGS_COPYRIGHT" = "Copyright 2013-2025 Signal Messenger, LLC
+Copyright 2026 Radar Chat, Inc.";
 
 /* Label for the 'data' section of the app settings. */
 "SETTINGS_DATA" = "Adathasználat";

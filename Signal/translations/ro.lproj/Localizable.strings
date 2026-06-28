@@ -1757,7 +1757,7 @@
 "CHOOSE_BACKUP_PLAN_SUBSCRIBE_PAID_BUTTON_TEXT" = "Abonează-te pentru %1$@/lună";
 
 /* Subtitle for a view allowing users to choose a Backup plan. */
-"CHOOSE_BACKUP_PLAN_SUBTITLE" = "Toate backup-urile sunt criptate end-to-end. Signal este o organizație non-profit. Plata pentru backup-uri reprezintă un mod de a ne susține.";
+"CHOOSE_BACKUP_PLAN_SUBTITLE" = "Toate backup-urile sunt criptate end-to-end. Signal este o organizație non-profit. Plata pentru backup-uri reprezintă un mod de a susține Signal.";
 
 /* Title for a label allowing users to view Signal's Terms & Conditions. */
 "CHOOSE_BACKUP_PLAN_TERM_AND_PRIVACY_POLICY_TEXT" = "Termeni și politica de confidențialitate";
@@ -4786,7 +4786,7 @@
 "LINKED_DEVICE_URL_OPENED_ACTION_SHEET_IN_APP_CAMERA_MESSAGE" = "Se pare că încerci să asociezi un dispozitiv Radar. Atinge Continuă, apoi atinge „Asociază un dispozitiv nou” și scanează din nou codul QR.";
 
 /* Bullet point about downloads on the linked devices education sheet. Embeds {{ %1$@ iPad download link, %2$@ desktop download link }} */
-"LINKED_DEVICES_EDUCATION_POINT_DOWNLOADS" = "Pe celălalt dispozitiv, accesează %1$@ pentru a instala aplicația iPad sau %2$@ pentru a instala aplicația desktop.";
+"LINKED_DEVICES_EDUCATION_POINT_DOWNLOADS" = "Pe celălalt dispozitiv, accesează %1$@ pentru a instala aplicația iPad.";
 
 /* Bullet point about message sync on the linked devices education sheet */
 "LINKED_DEVICES_EDUCATION_POINT_MESSAGES" = "Mesajele Radar sunt sincronizate cu Radar de pe telefonul mobil după ce acesta este asociat.";
@@ -4795,7 +4795,7 @@
 "LINKED_DEVICES_EDUCATION_POINT_PRIVACY" = "Toate mesajele de pe dispozitivele conectate sunt private";
 
 /* Title for the linked device education sheet */
-"LINKED_DEVICES_EDUCATION_TITLE" = "Radar pe desktop sau iPad";
+"LINKED_DEVICES_EDUCATION_TITLE" = "Radar pe iPad";
 
 /* Text that appears where the linked device list would be indicating that there are no linked devices. */
 "LINKED_DEVICES_EMPTY_STATE" = "Nu există dispozitive asociate";
@@ -7962,7 +7962,8 @@ Send money securely.";
 "SETTINGS_CLEAR_HISTORY" = "Șterge Istoricul Conversației";
 
 /* Footer for the 'about' help section */
-"SETTINGS_COPYRIGHT" = "Drepturi de autor Radar Messenger\nSub licența GPLv3";
+"SETTINGS_COPYRIGHT" = "Copyright 2013-2025 Signal Messenger, LLC
+Copyright 2026 Radar Chat, Inc.";
 
 /* Label for the 'data' section of the app settings. */
 "SETTINGS_DATA" = "Utilizare date";

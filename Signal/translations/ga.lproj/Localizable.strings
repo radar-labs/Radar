@@ -1757,7 +1757,7 @@
 "CHOOSE_BACKUP_PLAN_SUBSCRIBE_PAID_BUTTON_TEXT" = "Íoc síntiús %1$@/sa mhí";
 
 /* Subtitle for a view allowing users to choose a Backup plan. */
-"CHOOSE_BACKUP_PLAN_SUBTITLE" = "Tá cúltacaí criptithe ó cheann ceann. Eagraíocht neamhbhrabúis is ea é Signal. Cuidíonn íoc as cúltacaí le tacú linn.";
+"CHOOSE_BACKUP_PLAN_SUBTITLE" = "Tá cúltacaí criptithe ó cheann ceann. Eagraíocht neamhbhrabúis is ea é Signal. Cuidíonn íoc as cúltacaí le tacú le Signal.";
 
 /* Title for a label allowing users to view Signal's Terms & Conditions. */
 "CHOOSE_BACKUP_PLAN_TERM_AND_PRIVACY_POLICY_TEXT" = "Téarmaí agus Polasaí Príobháideachais";
@@ -4786,7 +4786,7 @@
 "LINKED_DEVICE_URL_OPENED_ACTION_SHEET_IN_APP_CAMERA_MESSAGE" = "Is cosúil go bhfuil tú ag iarraidh gléas Radar a nascadh. Tapáil \"Ar aghaidh\" agus ansin tapáil \"Nasc Gléas Nua\" agus scan an cód QR athuair.";
 
 /* Bullet point about downloads on the linked devices education sheet. Embeds {{ %1$@ iPad download link, %2$@ desktop download link }} */
-"LINKED_DEVICES_EDUCATION_POINT_DOWNLOADS" = "Ar do ghléas eile, téigh chuig %1$@ chun an aip iPad a shuiteáil nó chuig %2$@ chun an aip deisce a shuiteáil.";
+"LINKED_DEVICES_EDUCATION_POINT_DOWNLOADS" = "Ar do ghléas eile, téigh chuig %1$@ chun an aip iPad a shuiteáil.";
 
 /* Bullet point about message sync on the linked devices education sheet */
 "LINKED_DEVICES_EDUCATION_POINT_MESSAGES" = "Déanfar teachtaireachtaí Radar a shioncronú le Radar ar do ghuthán póca tar éis nascadh leis.";
@@ -4795,7 +4795,7 @@
 "LINKED_DEVICES_EDUCATION_POINT_PRIVACY" = "Tá cur teachtaireachtaí ar ghléasanna nasctha príobháideach";
 
 /* Title for the linked device education sheet */
-"LINKED_DEVICES_EDUCATION_TITLE" = "Radar ar Dheasc nó ar iPad";
+"LINKED_DEVICES_EDUCATION_TITLE" = "Radar ar iPad";
 
 /* Text that appears where the linked device list would be indicating that there are no linked devices. */
 "LINKED_DEVICES_EMPTY_STATE" = "Níl aon ghléas nasctha ann";
@@ -7962,7 +7962,8 @@ Send money securely.";
 "SETTINGS_CLEAR_HISTORY" = "Glan Stair na gComhráite";
 
 /* Footer for the 'about' help section */
-"SETTINGS_COPYRIGHT" = "Cóipcheart Radar Messenger\nCeadúnaithe faoi GPLv3";
+"SETTINGS_COPYRIGHT" = "Copyright 2013-2025 Signal Messenger, LLC
+Copyright 2026 Radar Chat, Inc.";
 
 /* Label for the 'data' section of the app settings. */
 "SETTINGS_DATA" = "Data Usage";

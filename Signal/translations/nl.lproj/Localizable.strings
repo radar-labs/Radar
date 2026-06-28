@@ -1757,7 +1757,7 @@
 "CHOOSE_BACKUP_PLAN_SUBSCRIBE_PAID_BUTTON_TEXT" = "Abonneren voor %1$@/maand";
 
 /* Subtitle for a view allowing users to choose a Backup plan. */
-"CHOOSE_BACKUP_PLAN_SUBTITLE" = "Back-ups zijn end-to-end versleuteld. Signal is een non-profitorganisatie. Door te betalen voor back-ups help je onze missie te ondersteunen.";
+"CHOOSE_BACKUP_PLAN_SUBTITLE" = "Back-ups zijn end-to-end versleuteld. Signal is een non-profitorganisatie. Door te betalen voor back-ups help je Signal te ondersteunen.";
 
 /* Title for a label allowing users to view Signal's Terms & Conditions. */
 "CHOOSE_BACKUP_PLAN_TERM_AND_PRIVACY_POLICY_TEXT" = "Voorwaarden en privacybeleid";
@@ -4786,7 +4786,7 @@
 "LINKED_DEVICE_URL_OPENED_ACTION_SHEET_IN_APP_CAMERA_MESSAGE" = "Het lijkt erop dat je een Radar-apparaat probeert te koppelen. Tik op Doorgaan, vervolgens op ‘Een nieuw apparaat koppelen’ en scan de QR-code opnieuw.";
 
 /* Bullet point about downloads on the linked devices education sheet. Embeds {{ %1$@ iPad download link, %2$@ desktop download link }} */
-"LINKED_DEVICES_EDUCATION_POINT_DOWNLOADS" = "Ga op je andere apparaat naar %1$@ om de iPad-app te installeren of naar %2$@ om de desktop-app te installeren.";
+"LINKED_DEVICES_EDUCATION_POINT_DOWNLOADS" = "Ga op je andere apparaat naar %1$@ om de iPad-app te installeren.";
 
 /* Bullet point about message sync on the linked devices education sheet */
 "LINKED_DEVICES_EDUCATION_POINT_MESSAGES" = "Radar-berichten worden na het koppelen gesynchroniseerd met Radar op je mobiele telefoon.";
@@ -4795,7 +4795,7 @@
 "LINKED_DEVICES_EDUCATION_POINT_PRIVACY" = "Alle berichten op gekoppelde apparaten zijn privé";
 
 /* Title for the linked device education sheet */
-"LINKED_DEVICES_EDUCATION_TITLE" = "Radar op een desktop of iPad";
+"LINKED_DEVICES_EDUCATION_TITLE" = "Radar op een iPad";
 
 /* Text that appears where the linked device list would be indicating that there are no linked devices. */
 "LINKED_DEVICES_EMPTY_STATE" = "Geen gekoppelde apparaten";
@@ -7962,7 +7962,8 @@ Send money securely.";
 "SETTINGS_CLEAR_HISTORY" = "Chatgeschiedenis wissen";
 
 /* Footer for the 'about' help section */
-"SETTINGS_COPYRIGHT" = "Auteursrecht Radar Messenger\nGelicentieerd onder de GPLv3";
+"SETTINGS_COPYRIGHT" = "Copyright 2013-2025 Signal Messenger, LLC
+Copyright 2026 Radar Chat, Inc.";
 
 /* Label for the 'data' section of the app settings. */
 "SETTINGS_DATA" = "Datagebruik";

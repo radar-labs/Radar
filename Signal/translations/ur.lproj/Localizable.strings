@@ -1757,7 +1757,7 @@
 "CHOOSE_BACKUP_PLAN_SUBSCRIBE_PAID_BUTTON_TEXT" = "%1$@/ماہ کے لیے سبسکرائب کریں";
 
 /* Subtitle for a view allowing users to choose a Backup plan. */
-"CHOOSE_BACKUP_PLAN_SUBTITLE" = "بیک اپس آخر سے اخر تک انکرپٹ کردہ ہیں۔ Signal غیر منافع بخش ادارہ ہے۔ بیک اپس کے لیے ادائیگی ہماری سپورٹ میں مدد کرتی ہے۔";
+"CHOOSE_BACKUP_PLAN_SUBTITLE" = "بیک اپس آخر سے اخر تک انکرپٹ کردہ ہیں۔ Signal غیر منافع بخش ادارہ ہے۔ بیک اپس کے لیے ادائیگی Signal کی سپورٹ میں مدد کرتی ہے۔";
 
 /* Title for a label allowing users to view Signal's Terms & Conditions. */
 "CHOOSE_BACKUP_PLAN_TERM_AND_PRIVACY_POLICY_TEXT" = "شرائط اور رازداری کی پالیسی";
@@ -4786,7 +4786,7 @@
 "LINKED_DEVICE_URL_OPENED_ACTION_SHEET_IN_APP_CAMERA_MESSAGE" = "ایسا لگتا ہے کہ آپ Radar ڈیوائس کو لنک کرنے کی کوشش کر رہے ہیں۔ جاری رکھیں پر ٹیپ کریں اور پھر \"نئی ڈیوائس لنک کریں\" پر ٹیپ کریں اور QR کوڈ کو دوبارہ اسکین کریں۔";
 
 /* Bullet point about downloads on the linked devices education sheet. Embeds {{ %1$@ iPad download link, %2$@ desktop download link }} */
-"LINKED_DEVICES_EDUCATION_POINT_DOWNLOADS" = "اپنی دوسری ڈیوائس پر، iPad ایپ انسٹال کرنے کے لیے %1$@ یا ڈیسک ٹاپ ایپ انسٹال کرنے کے لیے %2$@ پر جائیں۔";
+"LINKED_DEVICES_EDUCATION_POINT_DOWNLOADS" = "اپنی دوسری ڈیوائس پر، iPad ایپ انسٹال کرنے کے لیے %1$@ پر جائیں۔";
 
 /* Bullet point about message sync on the linked devices education sheet */
 "LINKED_DEVICES_EDUCATION_POINT_MESSAGES" = "Radar کے لنک ہونے کے بعد آپ کے موبائل فون پر Radar میسجز اس کے ساتھ ہم وقت ساز ہوتے ہیں۔";
@@ -4795,7 +4795,7 @@
 "LINKED_DEVICES_EDUCATION_POINT_PRIVACY" = "لنک کردہ ڈیوائسز پر تمام میسجنگ نجی ہے";
 
 /* Title for the linked device education sheet */
-"LINKED_DEVICES_EDUCATION_TITLE" = "ڈیسک ٹاپ یا iPad پر Radar";
+"LINKED_DEVICES_EDUCATION_TITLE" = "iPad پر Radar";
 
 /* Text that appears where the linked device list would be indicating that there are no linked devices. */
 "LINKED_DEVICES_EMPTY_STATE" = "کوئی لنک کردہ ڈیوائسز نہیں";
@@ -7962,7 +7962,8 @@ Send money securely.";
 "SETTINGS_CLEAR_HISTORY" = "چیٹ ہسٹری صاف کریں";
 
 /* Footer for the 'about' help section */
-"SETTINGS_COPYRIGHT" = "کاپی رائٹ Radar میسنجر\nAGPLv3 کے تحت لائسنس یافتہ";
+"SETTINGS_COPYRIGHT" = "Copyright 2013-2025 Signal Messenger, LLC
+Copyright 2026 Radar Chat, Inc.";
 
 /* Label for the 'data' section of the app settings. */
 "SETTINGS_DATA" = "ڈیٹا کا استعمال";

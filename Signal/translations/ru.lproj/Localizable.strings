@@ -1757,7 +1757,7 @@
 "CHOOSE_BACKUP_PLAN_SUBSCRIBE_PAID_BUTTON_TEXT" = "Подписаться за %1$@/месяц";
 
 /* Subtitle for a view allowing users to choose a Backup plan. */
-"CHOOSE_BACKUP_PLAN_SUBTITLE" = "Резервные копии защищены сквозным шифрованием. Signal — это некоммерческая организация. Платное резервное копирование помогает поддержать нас.";
+"CHOOSE_BACKUP_PLAN_SUBTITLE" = "Резервные копии защищены сквозным шифрованием. Signal — это некоммерческая организация. Платное резервное копирование помогает поддержать Signal.";
 
 /* Title for a label allowing users to view Signal's Terms & Conditions. */
 "CHOOSE_BACKUP_PLAN_TERM_AND_PRIVACY_POLICY_TEXT" = "Условия и Политика конфиденциальности";
@@ -4786,7 +4786,7 @@
 "LINKED_DEVICE_URL_OPENED_ACTION_SHEET_IN_APP_CAMERA_MESSAGE" = "Похоже, вы пытаетесь привязать устройство Radar. Нажмите «Продолжить», затем «Привязать новое устройство» и снова просканируйте QR-код.";
 
 /* Bullet point about downloads on the linked devices education sheet. Embeds {{ %1$@ iPad download link, %2$@ desktop download link }} */
-"LINKED_DEVICES_EDUCATION_POINT_DOWNLOADS" = "На другом устройстве зайдите на %1$@, чтобы установить приложение для iPad, или на %2$@, чтобы установить приложение для ПК.";
+"LINKED_DEVICES_EDUCATION_POINT_DOWNLOADS" = "На другом устройстве зайдите на %1$@, чтобы установить приложение для iPad.";
 
 /* Bullet point about message sync on the linked devices education sheet */
 "LINKED_DEVICES_EDUCATION_POINT_MESSAGES" = "Сообщения Radar синхронизируются с Radar на вашем мобильном телефоне, после того как он будет привязан.";
@@ -4795,7 +4795,7 @@
 "LINKED_DEVICES_EDUCATION_POINT_PRIVACY" = "Все сообщения на связанных устройствах являются приватными";
 
 /* Title for the linked device education sheet */
-"LINKED_DEVICES_EDUCATION_TITLE" = "Radar на компьютере или iPad";
+"LINKED_DEVICES_EDUCATION_TITLE" = "Radar на iPad";
 
 /* Text that appears where the linked device list would be indicating that there are no linked devices. */
 "LINKED_DEVICES_EMPTY_STATE" = "Нет связанных устройств";
@@ -7962,7 +7962,8 @@ Send money securely.";
 "SETTINGS_CLEAR_HISTORY" = "Очистить историю чатов";
 
 /* Footer for the 'about' help section */
-"SETTINGS_COPYRIGHT" = "Авторские права Radar Messenger\nЛицензировано под AGPLv3";
+"SETTINGS_COPYRIGHT" = "Copyright 2013-2025 Signal Messenger, LLC
+Copyright 2026 Radar Chat, Inc.";
 
 /* Label for the 'data' section of the app settings. */
 "SETTINGS_DATA" = "Использование данных";

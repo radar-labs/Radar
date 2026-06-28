@@ -1757,7 +1757,7 @@
 "CHOOSE_BACKUP_PLAN_SUBSCRIBE_PAID_BUTTON_TEXT" = "สมัครใช้งาน %1$@/เดือน";
 
 /* Subtitle for a view allowing users to choose a Backup plan. */
-"CHOOSE_BACKUP_PLAN_SUBTITLE" = "การสำรองข้อมูลจะถูกเข้ารหัสตั้งแต่ต้นทางถึงปลายทาง Signal เป็นแอปที่ไม่แสวงผลกำไร ร่วมสนับสนุนเราได้ด้วยการสมัครบริการสำรองข้อมูล";
+"CHOOSE_BACKUP_PLAN_SUBTITLE" = "การสำรองข้อมูลจะถูกเข้ารหัสตั้งแต่ต้นทางถึงปลายทาง Signal เป็นแอปที่ไม่แสวงผลกำไร ร่วมสนับสนุน Signal ได้ด้วยการสมัครบริการสำรองข้อมูล";
 
 /* Title for a label allowing users to view Signal's Terms & Conditions. */
 "CHOOSE_BACKUP_PLAN_TERM_AND_PRIVACY_POLICY_TEXT" = "เงื่อนไขและนโยบายความเป็นส่วนตัว";
@@ -4786,7 +4786,7 @@
 "LINKED_DEVICE_URL_OPENED_ACTION_SHEET_IN_APP_CAMERA_MESSAGE" = "ดูเหมือนว่าคุณพยายามจะเชื่อมโยงอุปกรณ์ Radar แตะดำเนินการต่อ จากนั้นให้แตะ \"เชื่อมโยงอุปกรณ์เครื่องใหม่\" แล้วสแกนคิวอาร์โค้ดอีกครั้ง";
 
 /* Bullet point about downloads on the linked devices education sheet. Embeds {{ %1$@ iPad download link, %2$@ desktop download link }} */
-"LINKED_DEVICES_EDUCATION_POINT_DOWNLOADS" = "ติดตั้งแอปบนอุปกรณ์อีกเครื่องของคุณ โดยไปที่ %1$@ สำหรับ iPad หรือ %2$@ สำหรับเดสก์ท็อป";
+"LINKED_DEVICES_EDUCATION_POINT_DOWNLOADS" = "ติดตั้งแอปบนอุปกรณ์อีกเครื่องของคุณ โดยไปที่ %1$@ สำหรับ iPad";
 
 /* Bullet point about message sync on the linked devices education sheet */
 "LINKED_DEVICES_EDUCATION_POINT_MESSAGES" = "ข้อความ Radar จะเริ่มซิงค์กับแอป Radar บนมือถือคุณหลังการเชื่อมโยงอุปกรณ์เสร็จสิ้น";
@@ -4795,7 +4795,7 @@
 "LINKED_DEVICES_EDUCATION_POINT_PRIVACY" = "ทุกการส่งและรับข้อความบนอุปกรณ์ที่เชื่อมโยงอยู่นั้นเป็นส่วนตัว";
 
 /* Title for the linked device education sheet */
-"LINKED_DEVICES_EDUCATION_TITLE" = "Radar บนเดสก์ท็อปหรือ iPad";
+"LINKED_DEVICES_EDUCATION_TITLE" = "Radar บน iPad";
 
 /* Text that appears where the linked device list would be indicating that there are no linked devices. */
 "LINKED_DEVICES_EMPTY_STATE" = "ไม่มีอุปกรณ์ที่เชื่อมโยงอยู่";
@@ -7962,7 +7962,8 @@ Send money securely.";
 "SETTINGS_CLEAR_HISTORY" = "ล้างประวัติแชท";
 
 /* Footer for the 'about' help section */
-"SETTINGS_COPYRIGHT" = "ลิขสิทธิ์ Radar Messenger\nเผยแพร่ภายใต้สัญญาอนุญาต AGPLv3";
+"SETTINGS_COPYRIGHT" = "Copyright 2013-2025 Signal Messenger, LLC
+Copyright 2026 Radar Chat, Inc.";
 
 /* Label for the 'data' section of the app settings. */
 "SETTINGS_DATA" = "การใช้ข้อมูล";

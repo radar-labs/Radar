@@ -1757,7 +1757,7 @@
 "CHOOSE_BACKUP_PLAN_SUBSCRIBE_PAID_BUTTON_TEXT" = "Abonner for %1$@/måned";
 
 /* Subtitle for a view allowing users to choose a Backup plan. */
-"CHOOSE_BACKUP_PLAN_SUBTITLE" = "Sikkerhedskopier er end-to-end-krypteret. Signal er en nonprofitorganisation. Når du betaler for sikkerhedskopier hjælper du med at støtte os.";
+"CHOOSE_BACKUP_PLAN_SUBTITLE" = "Sikkerhedskopier er end-to-end-krypteret. Signal er en nonprofitorganisation. Når du betaler for sikkerhedskopier hjælper du med at støtte Signal.";
 
 /* Title for a label allowing users to view Signal's Terms & Conditions. */
 "CHOOSE_BACKUP_PLAN_TERM_AND_PRIVACY_POLICY_TEXT" = "Vilkår og privatlivspolitik";
@@ -4786,7 +4786,7 @@
 "LINKED_DEVICE_URL_OPENED_ACTION_SHEET_IN_APP_CAMERA_MESSAGE" = "Det ser ud til, at du forsøger at tilknytte en Radar-enhed. Tryk på fortsæt, tryk \"Tilknyt en ny enhed\" og scan QR-koden igen.";
 
 /* Bullet point about downloads on the linked devices education sheet. Embeds {{ %1$@ iPad download link, %2$@ desktop download link }} */
-"LINKED_DEVICES_EDUCATION_POINT_DOWNLOADS" = "På din anden enhed skal du gå til %1$@ for at installere iPad-appen eller %2$@ for at installere computerappen.";
+"LINKED_DEVICES_EDUCATION_POINT_DOWNLOADS" = "På din anden enhed skal du gå til %1$@ for at installere iPad-appen.";
 
 /* Bullet point about message sync on the linked devices education sheet */
 "LINKED_DEVICES_EDUCATION_POINT_MESSAGES" = "Radar-beskeder synkroniseres med Radar på din mobiltelefon, når forbindelsen er oprettet.";
@@ -4795,7 +4795,7 @@
 "LINKED_DEVICES_EDUCATION_POINT_PRIVACY" = "Alle beskeder på forbundne enheder er private";
 
 /* Title for the linked device education sheet */
-"LINKED_DEVICES_EDUCATION_TITLE" = "Radar på computer eller iPad";
+"LINKED_DEVICES_EDUCATION_TITLE" = "Radar på iPad";
 
 /* Text that appears where the linked device list would be indicating that there are no linked devices. */
 "LINKED_DEVICES_EMPTY_STATE" = "Ingen tilknyttede enheder";
@@ -7962,7 +7962,8 @@ Send money securely.";
 "SETTINGS_CLEAR_HISTORY" = "Ryd chathistorik";
 
 /* Footer for the 'about' help section */
-"SETTINGS_COPYRIGHT" = "Copyright Radar Messenger\nLicenseret under AGPLv3";
+"SETTINGS_COPYRIGHT" = "Copyright 2013-2025 Signal Messenger, LLC
+Copyright 2026 Radar Chat, Inc.";
 
 /* Label for the 'data' section of the app settings. */
 "SETTINGS_DATA" = "Dataforbrug";

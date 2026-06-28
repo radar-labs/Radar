@@ -1757,7 +1757,7 @@
 "CHOOSE_BACKUP_PLAN_SUBSCRIBE_PAID_BUTTON_TEXT" = "Bli abonnent for %1$@ per måned";
 
 /* Subtitle for a view allowing users to choose a Backup plan. */
-"CHOOSE_BACKUP_PLAN_SUBTITLE" = "Alle sikkerhetskopier er ende-til-ende-kryptert. Signal er en ideell organisasjon. Du bidrar til å holde hjulene i gang ved å betale for sikkerhetskopiering.";
+"CHOOSE_BACKUP_PLAN_SUBTITLE" = "Alle sikkerhetskopier er ende-til-ende-kryptert. Signal er en ideell organisasjon. Ved å betale for sikkerhetskopiering bidrar du til å støtte Signal.";
 
 /* Title for a label allowing users to view Signal's Terms & Conditions. */
 "CHOOSE_BACKUP_PLAN_TERM_AND_PRIVACY_POLICY_TEXT" = "Vilkår og personvernerklæring";
@@ -4786,7 +4786,7 @@
 "LINKED_DEVICE_URL_OPENED_ACTION_SHEET_IN_APP_CAMERA_MESSAGE" = "Det ser ut til at du prøver å koble til en enhet med Radar. Trykk på «Fortsett» og så «Koble til ny enhet», og skann deretter QR-koden på nytt.";
 
 /* Bullet point about downloads on the linked devices education sheet. Embeds {{ %1$@ iPad download link, %2$@ desktop download link }} */
-"LINKED_DEVICES_EDUCATION_POINT_DOWNLOADS" = "Gå til %1$@ på den andre enheten for å installere Radar-appen for iPad eller %2$@ for å laste ned Radar Desktop.";
+"LINKED_DEVICES_EDUCATION_POINT_DOWNLOADS" = "Gå til %1$@ på den andre enheten for å installere Radar-appen for iPad.";
 
 /* Bullet point about message sync on the linked devices education sheet */
 "LINKED_DEVICES_EDUCATION_POINT_MESSAGES" = "De nye Radar-meldingene dine blir synkronisert med Radar på mobilen din etter tilkobling.";
@@ -4795,7 +4795,7 @@
 "LINKED_DEVICES_EDUCATION_POINT_PRIVACY" = "Alle meldingene på de tilkoblede enhetene er private";
 
 /* Title for the linked device education sheet */
-"LINKED_DEVICES_EDUCATION_TITLE" = "Radar på datamaskin eller iPad";
+"LINKED_DEVICES_EDUCATION_TITLE" = "Radar på iPad";
 
 /* Text that appears where the linked device list would be indicating that there are no linked devices. */
 "LINKED_DEVICES_EMPTY_STATE" = "Ingen tilkoblede enheter";
@@ -7962,7 +7962,8 @@ Send money securely.";
 "SETTINGS_CLEAR_HISTORY" = "Slett samtalelogg";
 
 /* Footer for the 'about' help section */
-"SETTINGS_COPYRIGHT" = "Opphavsrett: Radar Messenger\nLisensiert under AGPLv3";
+"SETTINGS_COPYRIGHT" = "Copyright 2013-2025 Signal Messenger, LLC
+Copyright 2026 Radar Chat, Inc.";
 
 /* Label for the 'data' section of the app settings. */
 "SETTINGS_DATA" = "Dataforbruk";

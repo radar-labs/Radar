@@ -1757,7 +1757,7 @@
 "CHOOSE_BACKUP_PLAN_SUBSCRIBE_PAID_BUTTON_TEXT" = "اشترِك مقابل %1$@/شهريًا";
 
 /* Subtitle for a view allowing users to choose a Backup plan. */
-"CHOOSE_BACKUP_PLAN_SUBTITLE" = "النُسخ الاحتياطية مُشفَّرة من طرف لطرف. سيجنال شركة غير ربحية. يُساعد الدفع مقابل النسخ الاحتياطية في دعم مهمتنا.";
+"CHOOSE_BACKUP_PLAN_SUBTITLE" = "النُسخ الاحتياطية مُشفَّرة من طرف لطرف. سيجنال شركة غير ربحية. يُساعد الدفع مقابل النسخ الاحتياطية في دعم سيجنال.";
 
 /* Title for a label allowing users to view Signal's Terms & Conditions. */
 "CHOOSE_BACKUP_PLAN_TERM_AND_PRIVACY_POLICY_TEXT" = "الشروط وسياسة الخصوصية";
@@ -4786,7 +4786,7 @@
 "LINKED_DEVICE_URL_OPENED_ACTION_SHEET_IN_APP_CAMERA_MESSAGE" = "يبدو أنك تحاول ربط جهاز يستخدم Radar. انقر على \"متابعة\" ثم انقر على \"ربط جهاز جديد\" وامسح كود الـ QR من جديد.";
 
 /* Bullet point about downloads on the linked devices education sheet. Embeds {{ %1$@ iPad download link, %2$@ desktop download link }} */
-"LINKED_DEVICES_EDUCATION_POINT_DOWNLOADS" = "قُم بزيارة %1$@ لتثبيت تطبيق iPad أو %2$@ على جهازك لتثبيت نسخة التطبيق الخاصة بالحاسوب.";
+"LINKED_DEVICES_EDUCATION_POINT_DOWNLOADS" = "قُم بزيارة %1$@ على جهازك الآخر لتثبيت تطبيق iPad.";
 
 /* Bullet point about message sync on the linked devices education sheet */
 "LINKED_DEVICES_EDUCATION_POINT_MESSAGES" = "تتمُّ مُزامنة رسائل تطبيق Radar مع تطبيق Radar على هاتفك المحمول بعد ربطه.";
@@ -4795,7 +4795,7 @@
 "LINKED_DEVICES_EDUCATION_POINT_PRIVACY" = "تتَّسِم جميع المراسلات في الأجهزة المُرتبِطة بالخصوصية.";
 
 /* Title for the linked device education sheet */
-"LINKED_DEVICES_EDUCATION_TITLE" = "تطبيق Radar على الحاسوب المكتبي أو جهاز الآيباد";
+"LINKED_DEVICES_EDUCATION_TITLE" = "تطبيق Radar على جهاز الآيباد";
 
 /* Text that appears where the linked device list would be indicating that there are no linked devices. */
 "LINKED_DEVICES_EMPTY_STATE" = "لا توجد أجهزة مُرتبِطة";
@@ -7962,7 +7962,8 @@ Send money securely.";
 "SETTINGS_CLEAR_HISTORY" = "إزالة سجل الدردشة";
 
 /* Footer for the 'about' help section */
-"SETTINGS_COPYRIGHT" = "حقوق النشر محفوظة لتطبيق Radar للدردشة\nمُرخَّص بموجب AGPLv3";
+"SETTINGS_COPYRIGHT" = "Copyright 2013-2025 Signal Messenger, LLC
+Copyright 2026 Radar Chat, Inc.";
 
 /* Label for the 'data' section of the app settings. */
 "SETTINGS_DATA" = "استخدام البيانات";

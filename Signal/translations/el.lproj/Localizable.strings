@@ -1757,7 +1757,7 @@
 "CHOOSE_BACKUP_PLAN_SUBSCRIBE_PAID_BUTTON_TEXT" = "Εγγράψου για %1$@/μήνα";
 
 /* Subtitle for a view allowing users to choose a Backup plan. */
-"CHOOSE_BACKUP_PLAN_SUBTITLE" = "Τα αντίγραφα ασφαλείας είναι κρυπτογραφημένα πλήρως. Το Signal είναι μη κερδοσκοπικό. H πληρωμή για αντίγραφα ασφαλείας βοηθά στην υποστήριξή μας.";
+"CHOOSE_BACKUP_PLAN_SUBTITLE" = "Τα αντίγραφα ασφαλείας είναι κρυπτογραφημένα πλήρως. Το Signal είναι μη κερδοσκοπικό. H πληρωμή για αντίγραφα ασφαλείας βοηθά στην υποστήριξη του Signal.";
 
 /* Title for a label allowing users to view Signal's Terms & Conditions. */
 "CHOOSE_BACKUP_PLAN_TERM_AND_PRIVACY_POLICY_TEXT" = "Όροι & Πολιτική Απορρήτου";
@@ -4786,7 +4786,7 @@
 "LINKED_DEVICE_URL_OPENED_ACTION_SHEET_IN_APP_CAMERA_MESSAGE" = "Φαίνεται πως προσπαθείς να συνδέσεις μια συσκευή Radar. Πάτησε «Συνέχεια», μετά «Σύνδεση νέας συσκευής» και σκάναρε ξανά τον κωδικό QR.";
 
 /* Bullet point about downloads on the linked devices education sheet. Embeds {{ %1$@ iPad download link, %2$@ desktop download link }} */
-"LINKED_DEVICES_EDUCATION_POINT_DOWNLOADS" = "Στην άλλη συσκευή σου, επισκέψου το %1$@ για να εγκαταστήσεις την εφαρμογή iPad ή το %2$@ για να εγκαταστήσεις την εφαρμογή για υπολογιστές.";
+"LINKED_DEVICES_EDUCATION_POINT_DOWNLOADS" = "Στην άλλη συσκευή σου, επισκέψου το %1$@ για να εγκαταστήσεις την εφαρμογή iPad.";
 
 /* Bullet point about message sync on the linked devices education sheet */
 "LINKED_DEVICES_EDUCATION_POINT_MESSAGES" = "Τα μηνύματα Radar συγχρονίζονται με το Radar στο τηλέφωνό σου, αφού αυτό συνδεθεί.";
@@ -4795,7 +4795,7 @@
 "LINKED_DEVICES_EDUCATION_POINT_PRIVACY" = "Όλα τα μηνύματα στις συνδεδεμένες συσκευές είναι ιδιωτικά";
 
 /* Title for the linked device education sheet */
-"LINKED_DEVICES_EDUCATION_TITLE" = "Radar στον υπολογιστή ή το iPad";
+"LINKED_DEVICES_EDUCATION_TITLE" = "Radar στο iPad";
 
 /* Text that appears where the linked device list would be indicating that there are no linked devices. */
 "LINKED_DEVICES_EMPTY_STATE" = "Δεν υπάρχουν συνδεδεμένες συσκευές";
@@ -7962,7 +7962,8 @@ Send money securely.";
 "SETTINGS_CLEAR_HISTORY" = "Εκκαθάριση ιστορικού συνομιλιών";
 
 /* Footer for the 'about' help section */
-"SETTINGS_COPYRIGHT" = "Πνευματική ιδιοκτησία Radar Messenger\nΥπό την άδεια AGPLv3";
+"SETTINGS_COPYRIGHT" = "Copyright 2013-2025 Signal Messenger, LLC
+Copyright 2026 Radar Chat, Inc.";
 
 /* Label for the 'data' section of the app settings. */
 "SETTINGS_DATA" = "Χρήση δεδομένων";

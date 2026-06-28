@@ -1757,7 +1757,7 @@
 "CHOOSE_BACKUP_PLAN_SUBSCRIBE_PAID_BUTTON_TEXT" = "اشتراک به‌قیمت %1$@ در ماه";
 
 /* Subtitle for a view allowing users to choose a Backup plan. */
-"CHOOSE_BACKUP_PLAN_SUBTITLE" = "نسخه‌های پشتیبان سرتاسر رمزگذاری شده‌اند. سیگنال یک شرکت غیرانتفاعی است. پرداخت هزینه برای پشتیبان‌گیری به پشتیبانی از ما کمک می‌کند.";
+"CHOOSE_BACKUP_PLAN_SUBTITLE" = "نسخه‌های پشتیبان سرتاسر رمزگذاری شده‌اند. سیگنال یک شرکت غیرانتفاعی است. پرداخت هزینه برای پشتیبان‌گیری به پشتیبانی از سیگنال کمک می‌کند.";
 
 /* Title for a label allowing users to view Signal's Terms & Conditions. */
 "CHOOSE_BACKUP_PLAN_TERM_AND_PRIVACY_POLICY_TEXT" = "شرایط و سیاست های حفظ حریم خصوصی";
@@ -4786,7 +4786,7 @@
 "LINKED_DEVICE_URL_OPENED_ACTION_SHEET_IN_APP_CAMERA_MESSAGE" = "به نظر می‌رسد می‌خواهید یک دستگاه Radar را متصل کنید. روی ادامه و سپس روی «اتصال دستگاه جدید» ضربه بزنید و دوباره کد QR را اسکن کنید.";
 
 /* Bullet point about downloads on the linked devices education sheet. Embeds {{ %1$@ iPad download link, %2$@ desktop download link }} */
-"LINKED_DEVICES_EDUCATION_POINT_DOWNLOADS" = "در دستگاه دیگرتان، برای نصب برنامه iPad به %1$@ یا برای نصب برنامه دسک‌تاپ به %2$@ بروید.";
+"LINKED_DEVICES_EDUCATION_POINT_DOWNLOADS" = "در دستگاه دیگرتان، برای نصب برنامه iPad به %1$@ بروید.";
 
 /* Bullet point about message sync on the linked devices education sheet */
 "LINKED_DEVICES_EDUCATION_POINT_MESSAGES" = "پس از متصل شدن تلفن، پیام‌های Radar با Radar در تلفن همراهتان همگام‌سازی می‌شوند.";
@@ -4795,7 +4795,7 @@
 "LINKED_DEVICES_EDUCATION_POINT_PRIVACY" = "همۀ پیام‌ها در دستگاه‌های متصل خصوصی هستند";
 
 /* Title for the linked device education sheet */
-"LINKED_DEVICES_EDUCATION_TITLE" = "Radar روی دسک‌تاپ یا آی‌پد";
+"LINKED_DEVICES_EDUCATION_TITLE" = "Radar روی آی‌پد";
 
 /* Text that appears where the linked device list would be indicating that there are no linked devices. */
 "LINKED_DEVICES_EMPTY_STATE" = "هیچ دستگاه متصلی وجود ندارد";
@@ -7962,7 +7962,8 @@ Send money securely.";
 "SETTINGS_CLEAR_HISTORY" = "پاک کردن تاریخچهٔ گفتگو";
 
 /* Footer for the 'about' help section */
-"SETTINGS_COPYRIGHT" = "حق تکثیر پیام‌رسان Radar\nگواهی شده تحت AGPLv3";
+"SETTINGS_COPYRIGHT" = "Copyright 2013-2025 Signal Messenger, LLC
+Copyright 2026 Radar Chat, Inc.";
 
 /* Label for the 'data' section of the app settings. */
 "SETTINGS_DATA" = "مصرف داده";

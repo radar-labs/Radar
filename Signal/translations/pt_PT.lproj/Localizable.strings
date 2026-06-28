@@ -1757,7 +1757,7 @@
 "CHOOSE_BACKUP_PLAN_SUBSCRIBE_PAID_BUTTON_TEXT" = "Subscreva por %1$@/mês";
 
 /* Subtitle for a view allowing users to choose a Backup plan. */
-"CHOOSE_BACKUP_PLAN_SUBTITLE" = "As cópias de segurança são encriptadas de ponta a ponta. O Signal é uma organização sem fins lucrativos. Pagar pelas cópias de segurança é uma forma de nos apoiar.";
+"CHOOSE_BACKUP_PLAN_SUBTITLE" = "As cópias de segurança são encriptadas de ponta a ponta. O Signal é uma organização sem fins lucrativos. Pagar pelas cópias de segurança é uma forma de apoiar o Signal.";
 
 /* Title for a label allowing users to view Signal's Terms & Conditions. */
 "CHOOSE_BACKUP_PLAN_TERM_AND_PRIVACY_POLICY_TEXT" = "Termos e política de privacidade";
@@ -4786,7 +4786,7 @@
 "LINKED_DEVICE_URL_OPENED_ACTION_SHEET_IN_APP_CAMERA_MESSAGE" = "Parece que está a tentar associar um dispositivo Radar. Toque em continuar e depois em \"Associe um novo dispositivo\" e leia novamente o código QR.";
 
 /* Bullet point about downloads on the linked devices education sheet. Embeds {{ %1$@ iPad download link, %2$@ desktop download link }} */
-"LINKED_DEVICES_EDUCATION_POINT_DOWNLOADS" = "No seu outro dispositivo, visite %1$@ para instalar a app iPad ou %2$@ para instalar a app desktop.";
+"LINKED_DEVICES_EDUCATION_POINT_DOWNLOADS" = "No seu outro dispositivo, visite %1$@ para instalar a app iPad.";
 
 /* Bullet point about message sync on the linked devices education sheet */
 "LINKED_DEVICES_EDUCATION_POINT_MESSAGES" = "As mensagens do Radar são sincronizadas com o Radar no seu telemóvel depois de este ser associado.";
@@ -4795,7 +4795,7 @@
 "LINKED_DEVICES_EDUCATION_POINT_PRIVACY" = "Todas as mensagens em dispositivos conectados são privadas";
 
 /* Title for the linked device education sheet */
-"LINKED_DEVICES_EDUCATION_TITLE" = "Radar no Desktop ou iPad";
+"LINKED_DEVICES_EDUCATION_TITLE" = "Radar no iPad";
 
 /* Text that appears where the linked device list would be indicating that there are no linked devices. */
 "LINKED_DEVICES_EMPTY_STATE" = "Não há dispositivos conectados";
@@ -7962,7 +7962,8 @@ Send money securely.";
 "SETTINGS_CLEAR_HISTORY" = "Apagar histórico de chats";
 
 /* Footer for the 'about' help section */
-"SETTINGS_COPYRIGHT" = "Copyright Radar Messenger\nDistribuição guiada pela licença GPLv3";
+"SETTINGS_COPYRIGHT" = "Copyright 2013-2025 Signal Messenger, LLC
+Copyright 2026 Radar Chat, Inc.";
 
 /* Label for the 'data' section of the app settings. */
 "SETTINGS_DATA" = "Utilização de dados";

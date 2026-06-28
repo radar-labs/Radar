@@ -730,7 +730,7 @@ private class NoSelectedConversationViewController: OWSViewController {
         view = UIView()
         view.backgroundColor = UIColor.Signal.background
 
-        logoImageView.image = #imageLiteral(resourceName: "signal-logo-128").withRenderingMode(.alwaysTemplate)
+        logoImageView.image = #imageLiteral(resourceName: "radar-glyph").withRenderingMode(.alwaysTemplate)
         logoImageView.tintColor = UIColor.Signal.quaternaryLabel
         logoImageView.contentMode = .scaleAspectFit
         logoImageView.autoSetDimension(.height, toSize: 112)

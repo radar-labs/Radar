@@ -1757,7 +1757,7 @@
 "CHOOSE_BACKUP_PLAN_SUBSCRIBE_PAID_BUTTON_TEXT" = "Pretplati se za %1$@ mjesečno";
 
 /* Subtitle for a view allowing users to choose a Backup plan. */
-"CHOOSE_BACKUP_PLAN_SUBTITLE" = "Sigurnosne kopije zaštićene su sveobuhvatnim šifriranjem. Signal je neprofitna organizacija. Plaćanjem sigurnosnog kopiranja podržavate našu misiju.";
+"CHOOSE_BACKUP_PLAN_SUBTITLE" = "Sigurnosne kopije zaštićene su sveobuhvatnim šifriranjem. Signal je neprofitna organizacija. Plaćanjem sigurnosnog kopiranja podržavate Signal.";
 
 /* Title for a label allowing users to view Signal's Terms & Conditions. */
 "CHOOSE_BACKUP_PLAN_TERM_AND_PRIVACY_POLICY_TEXT" = "Uvjeti i pravila o privatnosti";
@@ -4786,7 +4786,7 @@
 "LINKED_DEVICE_URL_OPENED_ACTION_SHEET_IN_APP_CAMERA_MESSAGE" = "Čini se da pokušavate povezati uređaj sa Signalom. Dodirnite „Nastavi“, zatim „Poveži novi uređaj“ i ponovno skenirajte QR kôd.";
 
 /* Bullet point about downloads on the linked devices education sheet. Embeds {{ %1$@ iPad download link, %2$@ desktop download link }} */
-"LINKED_DEVICES_EDUCATION_POINT_DOWNLOADS" = "Na drugom uređaju posjetite %1$@ kako biste instalirali aplikaciju za iPad ili %2$@ kako biste instalirali aplikaciju za stolno računalo.";
+"LINKED_DEVICES_EDUCATION_POINT_DOWNLOADS" = "Na drugom uređaju posjetite %1$@ kako biste instalirali aplikaciju za iPad.";
 
 /* Bullet point about message sync on the linked devices education sheet */
 "LINKED_DEVICES_EDUCATION_POINT_MESSAGES" = "Radar poruke sinkronizirat će se sa Signalom na vašem mobilnom uređaju nakon što ga povežete.";
@@ -4795,7 +4795,7 @@
 "LINKED_DEVICES_EDUCATION_POINT_PRIVACY" = "Sve poruke na povezanim uređajima su privatne";
 
 /* Title for the linked device education sheet */
-"LINKED_DEVICES_EDUCATION_TITLE" = "Radar za desktop ili iPad";
+"LINKED_DEVICES_EDUCATION_TITLE" = "Radar za iPad";
 
 /* Text that appears where the linked device list would be indicating that there are no linked devices. */
 "LINKED_DEVICES_EMPTY_STATE" = "Nema povezanih uređaja";
@@ -7962,7 +7962,8 @@ Send money securely.";
 "SETTINGS_CLEAR_HISTORY" = "Izbriši povijest razgovora";
 
 /* Footer for the 'about' help section */
-"SETTINGS_COPYRIGHT" = "Copyright Radar Messenger\nLicenca AGPLv3";
+"SETTINGS_COPYRIGHT" = "Copyright 2013-2025 Signal Messenger, LLC
+Copyright 2026 Radar Chat, Inc.";
 
 /* Label for the 'data' section of the app settings. */
 "SETTINGS_DATA" = "Upotreba podatkovnih podataka";

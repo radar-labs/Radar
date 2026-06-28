@@ -1757,7 +1757,7 @@
 "CHOOSE_BACKUP_PLAN_SUBSCRIBE_PAID_BUTTON_TEXT" = "%1$@/ ئايلىقى مۇشتەرى بولۇڭ";
 
 /* Subtitle for a view allowing users to choose a Backup plan. */
-"CHOOSE_BACKUP_PLAN_SUBTITLE" = "زاپاسلاشلار ئاخىرىغىچە مەخپىيلەشتۈرۈلگەن. Signal پايدا ئالمايدىغان ئەپ. زاپاسلاش ھەققى تۆلەش بىزنى قوللاشقا ياردەم بېرىدۇ.";
+"CHOOSE_BACKUP_PLAN_SUBTITLE" = "زاپاسلاشلار ئاخىرىغىچە مەخپىيلەشتۈرۈلگەن. Signal پايدا ئالمايدىغان ئەپ. زاپاسلاش ھەققى تۆلەش Signal نى قوللاشقا ياردەم بېرىدۇ.";
 
 /* Title for a label allowing users to view Signal's Terms & Conditions. */
 "CHOOSE_BACKUP_PLAN_TERM_AND_PRIVACY_POLICY_TEXT" = "شەرتلەر &  مەخپىيەتلىك تۈزۈمى";
@@ -4786,7 +4786,7 @@
 "LINKED_DEVICE_URL_OPENED_ACTION_SHEET_IN_APP_CAMERA_MESSAGE" = "بىر Radar ئۈسكۈنىسىنى ئۇلىماقچى بولغاندەك تۇرىسىز. داۋاملاشتۇرۇشنى چېكىپ ئاندىن «يېڭى ئۈسكۈنىنى ئۇلاش» نى چېكىڭ ھەمدە QR كودىنى قايتا سىكانېرلاڭ.";
 
 /* Bullet point about downloads on the linked devices education sheet. Embeds {{ %1$@ iPad download link, %2$@ desktop download link }} */
-"LINKED_DEVICES_EDUCATION_POINT_DOWNLOADS" = "باشقا ئۈسكۈنىڭىزدە ، ئەپنى %1$@ نى زىيارەت قىلىپ iPad كە قاچىلاڭ ياكى %2$@ نى چېكىپ ئۈستەل يۈزىگە ئورنىتىڭ.";
+"LINKED_DEVICES_EDUCATION_POINT_DOWNLOADS" = "باشقا ئۈسكۈنىڭىزدە ، ئەپنى %1$@ نى زىيارەت قىلىپ iPad كە قاچىلاڭ.";
 
 /* Bullet point about message sync on the linked devices education sheet */
 "LINKED_DEVICES_EDUCATION_POINT_MESSAGES" = "سىگنال ئۇچۇرلىرى ، ئۇلانغاندىن كېيىن ، يانفونىڭىزدىكى سىگنال بىلەن ماسقەدەملىنىدۇ.";
@@ -4795,7 +4795,7 @@
 "LINKED_DEVICES_EDUCATION_POINT_PRIVACY" = "بارلىق باغلانغان ئۈسكۈنىلەردە ئۇچۇرلىشىش مەخپىيەتلىككە كاپالەتلىك قىلىنغان ئاساسدا ئېلىپ بېرىلىدۇ";
 
 /* Title for the linked device education sheet */
-"LINKED_DEVICES_EDUCATION_TITLE" = "Radar ئۈستەل يۈزىدە ياكى iPad دە";
+"LINKED_DEVICES_EDUCATION_TITLE" = "Radar iPad دە";
 
 /* Text that appears where the linked device list would be indicating that there are no linked devices. */
 "LINKED_DEVICES_EMPTY_STATE" = "باغلانغان ئۈسكۈنە يوق";
@@ -7962,7 +7962,8 @@ Send money securely.";
 "SETTINGS_CLEAR_HISTORY" = "سۆھبەت خاتىرەسىنى تازىلا";
 
 /* Footer for the 'about' help section */
-"SETTINGS_COPYRIGHT" = "‫Radar Messenger نەشر ھوقۇقىغا ئىگە\nGPLv3 ئىجازىتىدە تارقىتىلدى";
+"SETTINGS_COPYRIGHT" = "Copyright 2013-2025 Signal Messenger, LLC
+Copyright 2026 Radar Chat, Inc.";
 
 /* Label for the 'data' section of the app settings. */
 "SETTINGS_DATA" = "مەلۇمات ئىشلىتىلىشى";
