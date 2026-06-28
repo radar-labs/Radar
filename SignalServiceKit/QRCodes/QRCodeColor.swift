@@ -14,13 +14,14 @@ public enum QRCodeColor: String, UnknownEnumCodable, CaseIterable {
     case pink
     case purple
 
-    public static var unknown: QRCodeColor { .blue }
+    public static var unknown: QRCodeColor { .orange }
 
     /// Background color for the QR code.
     public var background: UIColor {
         switch self {
         case .blue:
-            return UIColor(rgbHex: 0x506ECD)
+            // Radar brand orange (card background around the QR).
+            return UIColor(rgbHex: 0xF46300)
         case .white:
             return .white
         case .grey:
@@ -42,7 +43,8 @@ public enum QRCodeColor: String, UnknownEnumCodable, CaseIterable {
     public var foreground: UIColor {
         switch self {
         case .blue:
-            return UIColor(rgbHex: 0x2449C0)
+            // Darker orange for the QR dots — high contrast on the white QR panel.
+            return UIColor(rgbHex: 0xC24E00)
         case .white:
             return .black
         case .grey:
@@ -64,7 +66,8 @@ public enum QRCodeColor: String, UnknownEnumCodable, CaseIterable {
     public var canvas: UIColor {
         switch self {
         case .blue:
-            return UIColor(rgbHex: 0xEDF0FA)
+            // Light peach canvas for the QR share image.
+            return UIColor(rgbHex: 0xFCF1EB)
         case .white:
             return UIColor(rgbHex: 0xF5F5F5)
         case .grey:

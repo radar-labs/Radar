@@ -139,17 +139,18 @@ public extension UIColor {
     /// Nav Bar, Primary Buttons
     @objc(ows_accentBlueColor)
     class var ows_accentBlue: UIColor {
-        // Ultramarine UI
-        return UIColor(rgbHex: 0x2C6BED)
+        // Radar brand orange
+        return UIColor(rgbHex: 0xF46300)
     }
 
     class var ows_accentBlueDark: UIColor {
-        // Ultramarine UI Light
-        return UIColor(rgbHex: 0x6191F3)
+        // Radar brand orange
+        return UIColor(rgbHex: 0xF46300)
     }
 
     class var ows_accentBlueTint: UIColor {
-        return UIColor(rgbHex: 0xB0C8F9)
+        // Light-orange tint of the Radar brand orange
+        return UIColor(rgbHex: 0xFBD0B3)
     }
 
     /// Making calls, success states

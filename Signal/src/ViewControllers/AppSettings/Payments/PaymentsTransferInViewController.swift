@@ -8,7 +8,9 @@ import SignalUI
 
 class PaymentsTransferInViewController: OWSViewController {
 
-    private static let accentBlue = UIColor(red: 0, green: 105/255, blue: 254/255, alpha: 1)
+    // Radar brand accent (orange). Named `accentBlue` for historical reasons; now
+    // points at the app-wide primary so this screen stays in sync with the theme.
+    private static let accentBlue = UIColor.ows_accentBlue
     private static let grayFill   = UIColor(red: 120/255, green: 120/255, blue: 128/255, alpha: 0.16)
 
     private let isOnboarding: Bool
@@ -51,9 +53,11 @@ class PaymentsTransferInViewController: OWSViewController {
             comment: "Label for 'add money' view in the payment settings."
         )
         if !isOnboarding {
-            navigationItem.leftBarButtonItem = UIBarButtonItem(
+            let doneButton = UIBarButtonItem(
                 barButtonSystemItem: .done, target: self, action: #selector(didTapDone)
             )
+            doneButton.tintColor = .Signal.accent
+            navigationItem.leftBarButtonItem = doneButton
         }
         navigationItem.rightBarButtonItem = UIBarButtonItem(
             image: Theme.iconImage(.buttonShare), style: .plain,

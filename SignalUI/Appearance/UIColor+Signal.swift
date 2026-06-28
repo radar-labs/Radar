@@ -69,11 +69,13 @@ extension UIColor.Signal {
     // MARK: Accent
 
     public static var ultramarine: UIColor {
+        // Radar brand orange (#F46300). High-contrast variants are derived
+        // darker/lighter so accent UI stays legible when "Increase Contrast" is on.
         UIColor.byRGBHex(
-            light: 0x2267F5,
-            lightHighContrast: 0x0A43B9,
-            dark: 0x2D70FA,
-            darkHighContrast: 0x5D92FF
+            light: 0xF46300,
+            lightHighContrast: 0xC24E00,
+            dark: 0xF46300,
+            darkHighContrast: 0xFF8A3D
         )
     }
 

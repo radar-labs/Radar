@@ -23,11 +23,8 @@ extension PaletteChatColor {
     public var colorSetting: ColorOrGradientSetting {
         switch self {
         case .ultramarine:
-            return .gradient(
-                gradientColor1: OWSColor(red: 0.0196078431372549, green: 0.3215686274509804, blue: 0.9411764705882353),
-                gradientColor2: OWSColor(red: 0.17254901960784313, green: 0.4196078431372549, blue: 0.9294117647058824),
-                angleRadians: CGFloat.pi * 0
-            )
+            // Radar brand orange (#F46300).
+            return .solidColor(color: OWSColor(red: 0.9568627450980393, green: 0.38823529411764707, blue: 0.0))
         case .crimson:
             return .solidColor(color: OWSColor(red: 0.8117647058823529, green: 0.08627450980392157, blue: 0.24313725490196078))
         case .vermilion:
