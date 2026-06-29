@@ -7,6 +7,7 @@ import Combine
 import SwiftUI
 import SignalUI
 import SignalServiceKit
+import LibSignalClient
 import LocalAuthentication
 
 // This has a long and awful name so that if the condition is ever changed,

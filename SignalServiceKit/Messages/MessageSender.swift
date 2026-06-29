@@ -54,7 +54,9 @@ public class MessageSender {
             guard let session = try sessionStore.loadSession(for: serviceId, deviceId: deviceId, tx: tx) else {
                 return nil
             }
-            guard session.hasCurrentState else {
+            // requirePqRatio: 0 preserves the pre-libsignal-0.96 behavior of not
+            // requiring a post-quantum ratchet for a session to be considered current.
+            guard session.hasCurrentState(requirePqRatio: 0) else {
                 return nil
             }
             return session
@@ -220,10 +222,18 @@ public class MessageSender {
 
         do {
             let identityManager = DependenciesBridge.shared.identityManager
+            let tsAccountManager = DependenciesBridge.shared.tsAccountManager
             let protocolAddress = ProtocolAddress(serviceId, deviceId: deviceId.uint32Value)
+            guard
+                let localIdentifiers = tsAccountManager.localIdentifiers(tx: transaction),
+                let localDeviceId = tsAccountManager.storedDeviceId(tx: transaction).ifValid
+            else {
+                throw OWSAssertionError("Can't create session without a registered local identity.")
+            }
             try processPreKeyBundle(
                 bundle,
                 for: protocolAddress,
+                ourAddress: ProtocolAddress(localIdentifiers.aci, deviceId: localDeviceId),
                 sessionStore: DependenciesBridge.shared.signalProtocolStoreManager.signalProtocolStore(for: .aci).sessionStore,
                 identityStore: identityManager.libSignalStore(for: .aci, tx: transaction),
                 context: transaction,
@@ -1833,10 +1843,19 @@ public class MessageSender {
         let messageType: SSKProtoEnvelopeType
 
         let identityManager = DependenciesBridge.shared.identityManager
+        let tsAccountManager = DependenciesBridge.shared.tsAccountManager
         let signalProtocolStoreManager = DependenciesBridge.shared.signalProtocolStoreManager
         let signalProtocolStore = signalProtocolStoreManager.signalProtocolStore(for: .aci)
         let preKeyStore = signalProtocolStoreManager.preKeyStore.forIdentity(.aci)
         let protocolAddress = ProtocolAddress(serviceId, deviceId: deviceId)
+
+        guard
+            let localIdentifiers = tsAccountManager.localIdentifiers(tx: transaction),
+            let localDeviceId = tsAccountManager.storedDeviceId(tx: transaction).ifValid
+        else {
+            throw OWSAssertionError("Can't encrypt message without a registered local identity.")
+        }
+        let localAddress = ProtocolAddress(localIdentifiers.aci, deviceId: localDeviceId)
 
         if let sealedSenderParameters {
             let secretCipher = SMKSecretSessionCipher(
@@ -1849,8 +1868,8 @@ public class MessageSender {
             )
 
             serializedMessage = try secretCipher.encryptMessage(
-                for: serviceId,
-                deviceId: deviceId,
+                for: protocolAddress,
+                localAddress: localAddress,
                 paddedPlaintext: paddedPlaintext,
                 contentHint: sealedSenderParameters.contentHint.signalClientHint,
                 groupId: sealedSenderParameters.envelopeGroupId(tx: transaction),
@@ -1864,6 +1883,7 @@ public class MessageSender {
             let result = try signalEncrypt(
                 message: paddedPlaintext,
                 for: protocolAddress,
+                localAddress: localAddress,
                 sessionStore: signalProtocolStore.sessionStore,
                 identityStore: identityManager.libSignalStore(for: .aci, tx: transaction),
                 context: transaction

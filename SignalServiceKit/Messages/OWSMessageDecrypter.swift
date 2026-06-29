@@ -400,6 +400,13 @@ public class OWSMessageDecrypter {
             let signalProtocolStore = signalProtocolStoreManager.signalProtocolStore(for: validatedEnvelope.localIdentity)
             let preKeyStore = signalProtocolStoreManager.preKeyStore.forIdentity(validatedEnvelope.localIdentity)
 
+            guard let localDeviceId = DependenciesBridge.shared.tsAccountManager.storedDeviceId(tx: transaction).ifValid else {
+                throw OWSError(error: .failedToDecryptMessage,
+                               description: "Not registered; can't decrypt message.",
+                               isRetryable: false)
+            }
+            let localProtocolAddress = ProtocolAddress(validatedEnvelope.localServiceId, deviceId: localDeviceId)
+
             let plaintext: Data
             switch cipherType {
             case .whisper:
@@ -407,6 +414,7 @@ public class OWSMessageDecrypter {
                 plaintext = try signalDecrypt(
                     message: message,
                     from: protocolAddress,
+                    to: localProtocolAddress,
                     sessionStore: signalProtocolStore.sessionStore,
                     identityStore: identityManager.libSignalStore(for: localIdentity, tx: transaction),
                     context: transaction
@@ -420,6 +428,7 @@ public class OWSMessageDecrypter {
                 plaintext = try signalDecryptPreKey(
                     message: message,
                     from: protocolAddress,
+                    localAddress: localProtocolAddress,
                     sessionStore: signalProtocolStore.sessionStore,
                     identityStore: identityManager.libSignalStore(for: localIdentity, tx: transaction),
                     preKeyStore: preKeyStore,
@@ -562,6 +571,12 @@ public class OWSMessageDecrypter {
             senderKeyStore: SSKEnvironment.shared.senderKeyStoreRef
         )
 
+        // Sealed sender envelopes are only ever delivered to the ACI identity
+        // (enforced by ValidatedIncomingEnvelope), so the local service id is
+        // always the local ACI.
+        guard let localDeviceId = localDeviceId.ifValid else {
+            throw OWSAssertionError("Can't decrypt sealed sender message without a valid local device id.")
+        }
         let decryptResult: SMKDecryptResult
         do {
             decryptResult = try cipher.decryptMessage(
@@ -569,6 +584,7 @@ public class OWSMessageDecrypter {
                 cipherTextData: encryptedData,
                 timestamp: validatedEnvelope.serverTimestamp,
                 localIdentifiers: localIdentifiers,
+                localServiceId: localIdentifiers.aci,
                 localDeviceId: localDeviceId,
                 protocolContext: transaction
             )

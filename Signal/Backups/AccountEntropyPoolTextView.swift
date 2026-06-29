@@ -63,7 +63,7 @@ class AccountEntropyPoolTextView: UIView {
         switch mode {
         case .display(let aep):
             textView.isEditable = false
-            textView.text = aep.displayString
+            textView.text = aep.forDisplay.displayString
         case .entry:
             break
         }
@@ -160,7 +160,7 @@ extension AccountEntropyPoolTextView: TextViewWithPlaceholderDelegate {
             uiTextView,
             shouldChangeCharactersIn: range,
             replacementString: text,
-            allowedCharacters: .alphanumeric,
+            allowedCharacters: DisplayableAccountEntropyPool.allowedCharacters,
             maxCharacters: AccountEntropyPool.Constants.byteLength,
             format: { unformatted in
                 return unformatted.uppercased()

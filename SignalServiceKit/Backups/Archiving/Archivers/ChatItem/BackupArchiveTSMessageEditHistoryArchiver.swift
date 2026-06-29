@@ -189,6 +189,10 @@ final class BackupArchiveTSMessageEditHistoryArchiver<MessageType: TSMessage>
             unexpectedRevisionsMessageType = .viewOnceMessage
         case .poll:
             unexpectedRevisionsMessageType = .poll
+        case .adminDeletedMessage:
+            // Admin-deleted messages aren't modeled in this fork, so they're
+            // never archived here. Bail early rather than treat as unexpected.
+            return .success(())
         }
         if let unexpectedRevisionsMessageType {
             return .partialFailure((), [.archiveFrameError(

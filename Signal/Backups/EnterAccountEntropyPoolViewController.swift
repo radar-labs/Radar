@@ -143,15 +143,15 @@ class EnterAccountEntropyPoolViewController: OWSViewController {
     }
 
     private func validateAEPText() -> AEPValidationResult {
-        let enteredAepText = aepTextView.text.filter {
-            $0.isNumber || $0.isLetter
-        }
+        // Keep the swizzled display characters (= and #); strip only whitespace
+        // formatting. DisplayableAccountEntropyPool un-swizzles before validating.
+        let enteredAepText = aepTextView.text.filter { !$0.isWhitespace }
 
         guard enteredAepText.count == AccountEntropyPool.Constants.byteLength else {
             return .notFullyEntered
         }
 
-        guard let enteredAep = try? AccountEntropyPool(key: enteredAepText) else {
+        guard let enteredAep = try? DisplayableAccountEntropyPool(displayString: enteredAepText).rawValue else {
             return .malformedAEP
         }
 

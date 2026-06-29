@@ -377,6 +377,9 @@ extension BackupArchive {
                         self = .ChatItem_DirectStoryReplyMessage
                     case .poll:
                         self = .ChatItem_Poll
+                    case .adminDeletedMessage:
+                        // Not modeled in this fork; not benchmarked.
+                        return nil
                     case nil:
                         return nil
 
@@ -415,6 +418,9 @@ extension BackupArchive {
                             self = .ChatItem_ChatUpdateMessage_IndividualCall
                         case .pollTerminate:
                             self = .ChatItem_ChatUpdateMessage_PollTerminate
+                        case .pinMessage:
+                            // Not modeled in this fork; not benchmarked.
+                            return nil
                         case nil:
                             return nil
                         }

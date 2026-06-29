@@ -301,6 +301,12 @@ final class BackupArchiveChatUpdateMessageArchiver: BackupArchiveProtoStreamWrit
                 chatThread: chatThread,
                 context: context
             )
+        case .pinMessage:
+            // Pinned messages aren't modeled in this fork; skip the update frame
+            // and proceed restoring other frames.
+            return .unrecognizedEnum(BackupArchive.UnrecognizedEnumError(
+                enumType: BackupProto_ChatUpdateMessage.OneOf_Update.self
+            ))
         }
     }
 }
