@@ -125,6 +125,9 @@ public struct PaymentsHistoryModelItem: PaymentsHistoryItem {
     }
     
     public var formattedFiatPaymentAmount: String? {
+        guard !PaymentsDisplayPreferences.shared.isBalanceHidden else {
+            return nil
+        }
         let localCurrencyCode = SSKEnvironment.shared.paymentsCurrenciesRef.currentCurrencyCode
         guard let currencyConversionInfo = SSKEnvironment.shared.paymentsCurrenciesRef.conversionInfo(forCurrencyCode: localCurrencyCode)  else {
             return nil
