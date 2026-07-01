@@ -65,6 +65,7 @@ struct TestProtocolRunner {
         try processPreKeyBundle(
             bobBundle,
             for: recipientClient.protocolAddress,
+            ourAddress: senderClient.protocolAddress,
             sessionStore: senderClient.sessionStore,
             identityStore: senderClient.identityKeyStore,
             context: transaction,
@@ -131,6 +132,7 @@ struct TestProtocolRunner {
         _ = try signalDecryptPreKey(
             message: PreKeySignalMessage(bytes: aliceMessage.serialize()),
             from: senderClient.protocolAddress,
+            localAddress: recipientClient.protocolAddress,
             sessionStore: recipientClient.sessionStore,
             identityStore: recipientClient.identityKeyStore,
             preKeyStore: recipientClient.preKeyStore,
@@ -146,6 +148,7 @@ struct TestProtocolRunner {
                                      context: transaction)
         _ = try signalDecrypt(message: SignalMessage(bytes: bobMessage.serialize()),
                               from: recipientClient.protocolAddress,
+                              to: senderClient.protocolAddress,
                               sessionStore: senderClient.sessionStore,
                               identityStore: senderClient.identityKeyStore,
                               context: transaction)
@@ -157,6 +160,7 @@ struct TestProtocolRunner {
                         context: StoreContext) throws -> CiphertextMessage {
         return try signalEncrypt(message: plaintext,
                                  for: recipient,
+                                 localAddress: senderClient.protocolAddress,
                                  sessionStore: senderClient.sessionStore,
                                  identityStore: senderClient.identityKeyStore,
                                  context: context)
@@ -171,6 +175,7 @@ struct TestProtocolRunner {
         return try signalDecrypt(
             message: message,
             from: sender,
+            to: recipientClient.protocolAddress,
             sessionStore: recipientClient.sessionStore,
             identityStore: recipientClient.identityKeyStore,
             context: context,

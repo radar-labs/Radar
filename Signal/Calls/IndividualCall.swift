@@ -4,6 +4,7 @@
 //
 
 import AVFoundation
+import LibSignalClient
 import SignalRingRTC
 public import SignalServiceKit
 import SignalUI

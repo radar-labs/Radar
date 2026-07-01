@@ -472,6 +472,7 @@ public class BackupArchiveChatItemArchiver: BackupArchiveProtoStreamWriter {
                     .remoteDeletedMessage,
                     .stickerMessage,
                     .directStoryReplyMessage,
+                    .adminDeletedMessage,
                     .poll:
                 return restoreFrameError(.invalidProtoData(.directionlessChatItemNotUpdateMessage))
             case .updateMessage:

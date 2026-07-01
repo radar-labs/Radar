@@ -173,7 +173,7 @@ class BackupRecordKeyViewController: OWSViewController, OWSNavigationChildContro
 
     private func copyToClipboard() {
         UIPasteboard.general.setItems(
-            [[UIPasteboard.typeAutomatic: aep.displayString]],
+            [[UIPasteboard.typeAutomatic: aep.forDisplay.displayString]],
             options: [.expirationDate: Date().addingTimeInterval(60)]
         )
 

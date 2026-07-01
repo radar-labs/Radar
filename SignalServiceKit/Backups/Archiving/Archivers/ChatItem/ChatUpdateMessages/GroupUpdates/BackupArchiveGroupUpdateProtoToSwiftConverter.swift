@@ -640,6 +640,32 @@ final class BackupArchiveGroupUpdateProtoToSwiftConverter {
                     return .messageFailure([error])
                 }
             }
+        case .groupMemberLabelAccessLevelChangeUpdate(let proto):
+            // Per-member labels aren't modeled in this fork; preserve the update
+            // as a generic group update rather than dropping the chat item.
+            switch unwrapOptionalAci(proto, \.updaterAci) {
+            case .unknown:
+                return .success([.genericUpdateByUnknownUser])
+            case .localUser:
+                return .success([.genericUpdateByLocalUser])
+            case .otherUser(let aci):
+                return .success([.genericUpdateByOtherUser(updaterAci: aci)])
+            case .invalidAci(let error):
+                return .messageFailure([error])
+            }
+        case .groupTerminateChangeUpdate(let proto):
+            // Group termination isn't modeled in this fork; preserve the update
+            // as a generic group update rather than dropping the chat item.
+            switch unwrapOptionalAci(proto, \.updaterAci) {
+            case .unknown:
+                return .success([.genericUpdateByUnknownUser])
+            case .localUser:
+                return .success([.genericUpdateByLocalUser])
+            case .otherUser(let aci):
+                return .success([.genericUpdateByOtherUser(updaterAci: aci)])
+            case .invalidAci(let error):
+                return .messageFailure([error])
+            }
         }
     }
 }

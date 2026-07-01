@@ -1121,6 +1121,12 @@ class BackupArchiveTSMessageContentsArchiver: BackupArchiveProtoStreamWriter {
                 .developerError(OWSAssertionError("Chat update has no contents to restore!")),
                 chatItemId
             )])
+        case .adminDeletedMessage:
+            // Admin-deleted messages aren't modeled in this fork; skip the frame
+            // and proceed restoring other frames.
+            return .unrecognizedEnum(BackupArchive.UnrecognizedEnumError(
+                enumType: BackupProto_ChatItem.OneOf_Item.self
+            ))
         }
     }
 

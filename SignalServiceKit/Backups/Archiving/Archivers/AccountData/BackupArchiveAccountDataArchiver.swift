@@ -307,8 +307,41 @@ public class BackupArchiveAccountDataArchiver: BackupArchiveProtoStreamWriter {
             return .failure(archiveFrameError)
         }
 
-        accountSettings.showSealedSenderIndicators = udManager.shouldAllowUnrestrictedAccessLocal(tx: context.tx)
+        accountSettings.allowSealedSenderFromAnyone = udManager.shouldAllowUnrestrictedAccessLocal(tx: context.tx)
         accountSettings.defaultSentMediaQuality = (imageQuality.resolvedQuality(tx: context.tx) == .high ? .high : .standard)
+
+        // App theme. `Theme` lives in SignalUI, which SignalServiceKit can't
+        // depend on, so read the persisted value directly from its store.
+        // Theme.Mode is { system = 0, light = 1, dark = 2 }; unset means system.
+        let themeStore = KeyValueStore(collection: "ThemeCollection")
+        accountSettings.appTheme = switch themeStore.getUInt("ThemeKeyCurrentMode", transaction: context.tx) {
+        case 1: .light
+        case 2: .dark
+        default: .system
+        }
+
+        // Calls-use-less-data. `CallService` lives in the Signal target, so read
+        // its persisted high-data interface set directly. Unset means
+        // wifiAndCellular (i.e. never use less data).
+        let callServiceStore = KeyValueStore(collection: "CallService")
+        let highDataInterfaces = callServiceStore.getUInt("HighBandwidthPreferenceKey", transaction: context.tx)
+            .map(NetworkInterfaceSet.init(rawValue:)) ?? .wifiAndCellular
+        accountSettings.callsUseLessDataSetting = if highDataInterfaces == .wifiAndCellular {
+            .wifiAndMobileData
+        } else if highDataInterfaces == .cellular {
+            .mobileDataOnly
+        } else {
+            .never
+        }
+
+        // Key transparency isn't supported in this fork. Blind-preserve whatever
+        // value a previous backup carried so that re-exporting stays lossless.
+        let preservedSettingsStore = KeyValueStore(collection: "BackupPreservedAccountSettings")
+        accountSettings.allowAutomaticKeyVerification = preservedSettingsStore.getBool(
+            "allowAutomaticKeyVerification",
+            defaultValue: false,
+            transaction: context.tx
+        )
 
         var downloadSettings = BackupProto_AccountData.AutoDownloadSettings()
         for type in MediaBandwidthPreferences.MediaType.allCases {
@@ -544,7 +577,36 @@ public class BackupArchiveAccountDataArchiver: BackupArchiveProtoStreamWriter {
                 return .failure(errors)
             }
 
-            udManager.setShouldAllowUnrestrictedAccessLocal(settings.showSealedSenderIndicators, tx: context.tx)
+            udManager.setShouldAllowUnrestrictedAccessLocal(settings.allowSealedSenderFromAnyone, tx: context.tx)
+
+            // App theme: write to the same store SignalUI's `Theme` reads from.
+            // Theme.Mode is { system = 0, light = 1, dark = 2 }.
+            let themeStore = KeyValueStore(collection: "ThemeCollection")
+            let themeRawMode: UInt = switch settings.appTheme {
+            case .light: 1
+            case .dark: 2
+            case .system, .unknownAppTheme, .UNRECOGNIZED: 0
+            }
+            themeStore.setUInt(themeRawMode, key: "ThemeKeyCurrentMode", transaction: context.tx)
+
+            // Calls-use-less-data: write to `CallService`'s store as the
+            // high-data interface set (the inverse framing of the proto field).
+            let callServiceStore = KeyValueStore(collection: "CallService")
+            let highDataInterfaces: NetworkInterfaceSet = switch settings.callsUseLessDataSetting {
+            case .mobileDataOnly: .cellular
+            case .wifiAndMobileData: .wifiAndCellular
+            case .never, .unknownCallDataSetting, .UNRECOGNIZED: .none
+            }
+            callServiceStore.setUInt(highDataInterfaces.rawValue, key: "HighBandwidthPreferenceKey", transaction: context.tx)
+
+            // Key transparency isn't supported in this fork; blind-preserve the
+            // value so a subsequent export round-trips it unchanged.
+            let preservedSettingsStore = KeyValueStore(collection: "BackupPreservedAccountSettings")
+            preservedSettingsStore.setBool(
+                settings.allowAutomaticKeyVerification,
+                key: "allowAutomaticKeyVerification",
+                transaction: context.tx
+            )
 
             switch settings.defaultSentMediaQuality {
             case .unknownQuality, .UNRECOGNIZED, .standard:

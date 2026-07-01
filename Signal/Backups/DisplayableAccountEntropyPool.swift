@@ -1,0 +1,66 @@
+//
+// Copyright 2026 Signal Messenger, LLC
+// SPDX-License-Identifier: AGPL-3.0-only
+//
+
+import SignalServiceKit
+import SignalUI
+
+/// A user-facing representation of an ``AccountEntropyPool`` that swizzles
+/// ambiguous look-alike characters so they're easier to read and transcribe:
+///
+/// - `0` (zero) is displayed/entered as `=`
+/// - `O` (letter O) is displayed/entered as `#`
+///
+/// The underlying ``AccountEntropyPool`` remains plain alphanumeric; the
+/// swizzled characters are mapped back before validation.
+struct DisplayableAccountEntropyPool {
+    let rawValue: AccountEntropyPool
+
+    init(aep: AccountEntropyPool) {
+        self.rawValue = aep
+    }
+
+    init(displayString: String) throws {
+        let swizzledString = String(displayString.map { char in
+            return switch char {
+            case "=": "0"
+            case "#": "O"
+            default: char
+            }
+        })
+
+        self.init(aep: try AccountEntropyPool(key: swizzledString))
+    }
+
+    var displayString: String {
+        String(
+            rawValue.rawString
+                .uppercased()
+                .map { char in
+                    switch char {
+                    case "0": "="
+                    case "O", "o": "#"
+                    default: char
+                    }
+                }
+        )
+    }
+
+    // MARK: -
+
+    static let allowedCharacters = FormattedNumberField.AllowedCharacters(
+        keyboardType: .asciiCapable,
+        stringFilter: {
+            return $0.isAsciiAlphanumeric || $0 == "=" || $0 == "#"
+        }
+    )
+}
+
+// MARK: -
+
+extension AccountEntropyPool {
+    var forDisplay: DisplayableAccountEntropyPool {
+        DisplayableAccountEntropyPool(aep: self)
+    }
+}

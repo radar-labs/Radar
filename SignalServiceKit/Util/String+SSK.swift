@@ -83,6 +83,14 @@ extension Optional where Wrapped == String {
     }
 }
 
+public extension Character {
+    /// Is this an ASCII digit between 0 and 9?
+    var isAsciiDigit: Bool { isASCII && isNumber }
+
+    /// Is this an ASCII alphanumeric (letter or digit)?
+    var isAsciiAlphanumeric: Bool { isASCII && (isLetter || isNumber) }
+}
+
 public extension String {
     /// A version of the string that only contains ASCII digits.
     ///
