@@ -158,7 +158,7 @@ private struct QRCodeStyler {
             // Draw the logo inside the circle in the deadzone. Use the transparent
             // glyph (not the full app icon) since the QR is rendered as a tinted
             // template — an opaque image would fill the deadzone with a solid block.
-            let logo = UIImage(named: "radar-glyph")!
+            let logo = UIImage(named: "radar-icon-mono")!
             let logoRect = circleRect.scaled(toPercentage: Constants.deadzoneLogoSizePercentage)
             styledQRCodeContext.draw(logo.cgImage!, in: logoRect)
         }

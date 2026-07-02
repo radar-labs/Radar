@@ -76,18 +76,10 @@ struct AddFundsIntroView: View {
     }
 
     private var iconView: some View {
-        ZStack(alignment: .topLeading) {
-            Image("payments-add-funds-bitcoin")
-                .resizable()
-                .scaledToFit()
-                .frame(width: 100, height: 100)
-
-            Image("payments-add-funds-plus-badge")
-                .resizable()
-                .frame(width: 45, height: 44)
-                .offset(x: 74, y: 75)
-        }
-        .frame(width: 125, height: 125)
+        Image("payments-add-funds-bitcoin")
+            .resizable()
+            .scaledToFit()
+            .frame(width: 125, height: 125)
     }
 }
 

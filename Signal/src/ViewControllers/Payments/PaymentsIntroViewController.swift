@@ -77,17 +77,10 @@ struct PaymentsIntroView: View {
     }
 
     private var iconsRow: some View {
-        HStack(spacing: 15) {
-            Image("radar-logo")
-                .resizable()
-                .scaledToFit()
-                .frame(width: 75, height: 75)
-
-            Image("bitcoin-icon")
-                .resizable()
-                .scaledToFit()
-                .frame(width: 75, height: 75)
-        }
+        Image("introducing-payments")
+            .resizable()
+            .scaledToFit()
+            .frame(width: 235, height: 125)
     }
 }
 
