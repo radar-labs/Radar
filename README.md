@@ -1,14 +1,30 @@
 # Radar iOS
 
-Radar is the Signal you love, now with simple, self-custodial payments over Bitcoin.
+Your messages. Your Bitcoin. Together, at last.
 
-- Send money like a message. Just type an amount. Tap send. Settles on Bitcoin Lightning instantly.
-- Your money, always. Radar is self-custodial without the headache of seed phrases or clunky backups. Your funds live with your Signal profile, end-to-end encrypted.
-- Signal meets Lightning. Reach any Signal or Radar user. Pay any Lightning wallet. Two global networks, one app.
-- Dollars or Bitcoin. Dollars when you want stability. Bitcoin when you want maximum sovereignty. Swap at a tap.
-- Fast where it matters. Private by default. All of your messages are encrypted by default, and every Lightning payment is just between you and the recipient, no trusted third-parties.
+Radar is the first app to bring private messaging and self-custodial Bitcoin into one seamless experience. The two most personal things you do every day — who you talk to and what you do with your money — finally live in one place.
 
-[![Available on TestFlight in open beta](https://camo.githubusercontent.com/f751e3df2c11a6cf76cd7edeab241a6c5780a510063117f627ff59d7c3db5411/68747470733a2f2f61736b796f757273656c662e6170702f6173736574732f74657374666c696768742e706e67)](https://testflight.apple.com/join/AxhRCa8K)
+For too long it's taken two apps. One to send a private message. Another to send Bitcoin. Copy, paste, switch, repeat. Radar ends the shuffle.
+
+Send sats like you send a text
+No switching apps. No copy-paste. Just open a chat and send — settled instantly over Bitcoin Lightning. Split dinner, cover a friend, send rent, or surprise someone you love, right inside the conversation.
+
+Your people are already here
+Radar is built on Signal's trusted messaging network, so the people you already talk to come with you. No rebuilding your network. No new account necessary.
+
+Private by default, yours by design
+• End-to-end encrypted — built on Signal's battle-tested protocol for encryption you can actually trust.
+• Self-custodial — your keys, your coins. Radar never holds your money; no one can freeze, seize, or lose it but you.
+• Instant Bitcoin payments over the Lightning Network, settled in seconds.
+• No ads or trackers. We don't sell ads and we don't track you. Your chats and payments are nobody's business but yours.
+• Open source. Every line is open to inspect, audit, and build on — no black boxes.
+• Always free. No subscriptions, no paid tiers, no hidden fees, for everyone, everywhere.
+
+We even give back to the protocol we rely on — Signal's mission to keep private messaging alive is ours too.
+
+The people you connect with. The money you trust. Together, at last.
+
+Note: Radar is an independent project and is not affiliated with or endorsed by Signal Messenger, LLC.
 
 
 ## Questions?
@@ -17,7 +33,7 @@ For troubleshooting and questions, please send us an email at [support@radar.cha
 
 ## Contributing Bug Reports
 
-The best way to submit a bug report or support request is via issues in this repo or via [email[(mailto:support@radar.chat). Radar iOS doesn't collect any analytics or telemetry, and we rely on your feedback to help us troubleshoot and fix problems when something isn't working correctly.
+The best way to submit a bug report or support request is via issues in this repo or via [email](mailto:support@radar.chat). Radar iOS doesn't collect any analytics or telemetry, and we rely on your feedback to help us troubleshoot and fix problems when something isn't working correctly.
 
 ## Contributing Code
 
