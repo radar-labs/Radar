@@ -2823,17 +2823,19 @@ private struct BackupSubscriptionLoadedView: View {
     private func buttonsView() -> some View {
         switch loadedBackupSubscription {
         case .freeAndEnabled:
-            loadedViewButton(
-                label: OWSLocalizedString(
-                    "BACKUP_SETTINGS_BACKUP_PLAN_FREE_ACTION_BUTTON_TITLE",
-                    comment: "Title for a button allowing users to upgrade from a free to paid backup plan."
-                ), action: {
-                    viewModel.enableBackups(
-                        planSelection: .userChoice(initialSelection: .free),
-                        shouldShowWelcomeToBackupsSheet: false,
-                    )
-                }
-            )
+            if BuildFlags.Backups.showPaidPlan {
+                loadedViewButton(
+                    label: OWSLocalizedString(
+                        "BACKUP_SETTINGS_BACKUP_PLAN_FREE_ACTION_BUTTON_TITLE",
+                        comment: "Title for a button allowing users to upgrade from a free to paid backup plan."
+                    ), action: {
+                        viewModel.enableBackups(
+                            planSelection: .userChoice(initialSelection: .free),
+                            shouldShowWelcomeToBackupsSheet: false,
+                        )
+                    }
+                )
+            }
         case .freeAndDisabled:
             // We already expose a "reenable Backups" button, so no need here.
             EmptyView()

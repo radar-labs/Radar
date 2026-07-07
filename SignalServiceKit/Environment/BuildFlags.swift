@@ -46,6 +46,10 @@ public enum BuildFlags {
         public static let showMegaphones = build <= .internal
         public static let showOptimizeMedia = build <= .dev
 
+        /// Gates the paid Backups plan (the paid tier in the plan chooser and
+        /// the upgrade button in Backup settings). Disabled.
+        public static let showPaidPlan = false
+
         public static let restoreFailOnAnyError = build <= .beta
         public static let detailedBenchLogging = build <= .internal
         public static let errorDisplay = build <= .internal

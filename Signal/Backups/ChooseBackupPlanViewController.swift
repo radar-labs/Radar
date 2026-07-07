@@ -79,7 +79,11 @@ class ChooseBackupPlanViewController: HostingController<ChooseBackupPlanView> {
             from: fromViewController,
         ) { () throws(ActionSheetDisplayableError) in
             let storeKitAvailability: StoreKitAvailability
-            if BuildFlags.Backups.avoidStoreKitForTesters {
+            if !BuildFlags.Backups.showPaidPlan {
+                // The paid plan is hidden, so its price is never shown; don't
+                // fetch it from StoreKit.
+                storeKitAvailability = .unavailableForTesters
+            } else if BuildFlags.Backups.avoidStoreKitForTesters {
                 storeKitAvailability = .unavailableForTesters
             } else {
                 do {
@@ -267,56 +271,58 @@ struct ChooseBackupPlanView: View {
                     }
                 )
 
-                Spacer().frame(height: 16)
+                if BuildFlags.Backups.showPaidPlan {
+                    Spacer().frame(height: 16)
 
-                PlanOptionView(
-                    title: {
-                        switch viewModel.storeKitAvailability {
-                        case .available(let paidPlanDisplayPrice):
-                            String(
-                                format: OWSLocalizedString(
-                                    "CHOOSE_BACKUP_PLAN_PAID_PLAN_TITLE",
-                                    comment: "Title for the paid plan option, when choosing a Backup plan. Embeds {{ the formatted monthly cost, as currency, of the paid plan }}."
-                                ),
-                                paidPlanDisplayPrice
-                            )
-                        case .unavailableForTesters:
-                            OWSLocalizedString(
-                                "CHOOSE_BACKUP_PLAN_PAID_PLAN_NO_PURCHASES_TITLE",
-                                comment: "Title for the paid plan option, when choosing a Backup plan as a tester."
-                            )
-                        }
-                    }(),
-                    subtitle: OWSLocalizedString(
-                        "CHOOSE_BACKUP_PLAN_PAID_PLAN_SUBTITLE",
-                        comment: "Subtitle for the paid plan option, when choosing a Backup plan."
-                    ),
-                    bullets: [
-                        PlanOptionView.BulletPoint(iconKey: "thread", text: OWSLocalizedString(
-                            "CHOOSE_BACKUP_PLAN_BULLET_FULL_TEXT_BACKUP",
-                            comment: "Text for a bullet point in a list of Backup features, describing that all text messages are included."
-                        )),
-                        PlanOptionView.BulletPoint(iconKey: "album-tilt", text: OWSLocalizedString(
-                            "CHOOSE_BACKUP_PLAN_BULLET_FULL_MEDIA_BACKUP",
-                            comment: "Text for a bullet point in a list of Backup features, describing that all media is included."
-                        )),
-                        PlanOptionView.BulletPoint(iconKey: "data", text: String(
-                            format: OWSLocalizedString(
-                                "CHOOSE_BACKUP_PLAN_BULLET_STORAGE_AMOUNT",
-                                comment: "Text for a bullet point in a list of Backup features, describing the amount of included storage. Embeds {{ the amount of storage preformatted as a localized byte count, e.g. '100 GB' }}."
-                            ),
-                            viewModel.storageAllowanceBytes.formatted(.owsByteCount(
-                                fudgeBase2ToBase10: true,
-                                zeroPadFractionDigits: false,
+                    PlanOptionView(
+                        title: {
+                            switch viewModel.storeKitAvailability {
+                            case .available(let paidPlanDisplayPrice):
+                                String(
+                                    format: OWSLocalizedString(
+                                        "CHOOSE_BACKUP_PLAN_PAID_PLAN_TITLE",
+                                        comment: "Title for the paid plan option, when choosing a Backup plan. Embeds {{ the formatted monthly cost, as currency, of the paid plan }}."
+                                    ),
+                                    paidPlanDisplayPrice
+                                )
+                            case .unavailableForTesters:
+                                OWSLocalizedString(
+                                    "CHOOSE_BACKUP_PLAN_PAID_PLAN_NO_PURCHASES_TITLE",
+                                    comment: "Title for the paid plan option, when choosing a Backup plan as a tester."
+                                )
+                            }
+                        }(),
+                        subtitle: OWSLocalizedString(
+                            "CHOOSE_BACKUP_PLAN_PAID_PLAN_SUBTITLE",
+                            comment: "Subtitle for the paid plan option, when choosing a Backup plan."
+                        ),
+                        bullets: [
+                            PlanOptionView.BulletPoint(iconKey: "thread", text: OWSLocalizedString(
+                                "CHOOSE_BACKUP_PLAN_BULLET_FULL_TEXT_BACKUP",
+                                comment: "Text for a bullet point in a list of Backup features, describing that all text messages are included."
                             )),
-                        )),
-                    ],
-                    isCurrentPlan: viewModel.initialPlanSelection == .paid,
-                    isSelected: viewModel.planSelection == .paid,
-                    onTap: {
-                        viewModel.planSelection = .paid
-                    }
-                )
+                            PlanOptionView.BulletPoint(iconKey: "album-tilt", text: OWSLocalizedString(
+                                "CHOOSE_BACKUP_PLAN_BULLET_FULL_MEDIA_BACKUP",
+                                comment: "Text for a bullet point in a list of Backup features, describing that all media is included."
+                            )),
+                            PlanOptionView.BulletPoint(iconKey: "data", text: String(
+                                format: OWSLocalizedString(
+                                    "CHOOSE_BACKUP_PLAN_BULLET_STORAGE_AMOUNT",
+                                    comment: "Text for a bullet point in a list of Backup features, describing the amount of included storage. Embeds {{ the amount of storage preformatted as a localized byte count, e.g. '100 GB' }}."
+                                ),
+                                viewModel.storageAllowanceBytes.formatted(.owsByteCount(
+                                    fudgeBase2ToBase10: true,
+                                    zeroPadFractionDigits: false,
+                                )),
+                            )),
+                        ],
+                        isCurrentPlan: viewModel.initialPlanSelection == .paid,
+                        isSelected: viewModel.planSelection == .paid,
+                        onTap: {
+                            viewModel.planSelection = .paid
+                        }
+                    )
+                }
             }
             .padding(.horizontal, 16)
             termsAndConditionsLink()
