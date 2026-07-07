@@ -6,19 +6,22 @@ Radar is the first app to bring private messaging and self-custodial Bitcoin int
 
 For too long it's taken two apps. One to send a private message. Another to send Bitcoin. Copy, paste, switch, repeat. Radar ends the shuffle.
 
-Send sats like you send a text
+### Send sats like you send a text
+
 No switching apps. No copy-paste. Just open a chat and send — settled instantly over Bitcoin Lightning. Split dinner, cover a friend, send rent, or surprise someone you love, right inside the conversation.
 
-Your people are already here
+### Your people are already here
+
 Radar is built on Signal's trusted messaging network, so the people you already talk to come with you. No rebuilding your network. No new account necessary.
 
-Private by default, yours by design
-• End-to-end encrypted — built on Signal's battle-tested protocol for encryption you can actually trust.
-• Self-custodial — your keys, your coins. Radar never holds your money; no one can freeze, seize, or lose it but you.
-• Instant Bitcoin payments over the Lightning Network, settled in seconds.
-• No ads or trackers. We don't sell ads and we don't track you. Your chats and payments are nobody's business but yours.
-• Open source. Every line is open to inspect, audit, and build on — no black boxes.
-• Always free. No subscriptions, no paid tiers, no hidden fees, for everyone, everywhere.
+### Private by default, yours by design
+
+• End-to-end encrypted — built on Signal's battle-tested protocol for encryption you can actually trust.  
+• Self-custodial — your keys, your coins. Radar never holds your money; no one can freeze, seize, or lose it but you.  
+• Instant Bitcoin payments over the Lightning Network, settled in seconds.  
+• No ads or trackers. We don't sell ads and we don't track you. Your chats and payments are nobody's business but yours.  
+• Open source. Every line is open to inspect, audit, and build on — no black boxes.  
+• Always free. No subscriptions, no paid tiers, no hidden fees, for everyone, everywhere.  
 
 We even give back to the protocol we rely on — Signal's mission to keep private messaging alive is ours too.
 
