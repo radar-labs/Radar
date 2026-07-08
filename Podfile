@@ -117,6 +117,7 @@ post_install do |installer|
   disable_non_development_pod_warnings(installer)
   fix_ringrtc_project_symlink(installer)
   patch_reachability_private_header(installer)
+  disable_extension_api_only_for_breez(installer)
   fetch_ringrtc
   copy_acknowledgements
 end
@@ -136,6 +137,16 @@ def enable_extension_support_for_purelayout(installer)
       target.build_configurations.each do |build_configuration|
          build_configuration.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= '$(inherited)'
          build_configuration.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] << ' PURELAYOUT_APP_EXTENSIONS=1'
+      end
+    end
+  end
+end
+
+def disable_extension_api_only_for_breez(installer)
+  installer.pods_project.targets.each do |target|
+    if target.name == "BreezSdkSpark"
+      target.build_configurations.each do |build_configuration|
+        build_configuration.build_settings['APPLICATION_EXTENSION_API_ONLY'] = 'NO'
       end
     end
   end
