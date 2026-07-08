@@ -5841,11 +5841,29 @@
 /* Title for the 'have my old device' choice of the 'Restore or Transfer' prompt */
 "ONBOARDING_SPLASH_HAVE_OLD_DEVICE_TITLE" = "مېنىڭ كونا تېلېفونىم بار";
 
+/* Explanation of the 'link device' flow for the 'Restore or Transfer' prompt */
+"ONBOARDING_SPLASH_LINK_DEVICE_BODY" = "بۇنى نۆۋەتتىكى ئەڭگىمەڭىز ئۈچۈن قوشۇمچە ئۈسكۈنە سۈپىتىدە ئىشلىتىڭ";
+
+/* Title for the 'link device' choice of the 'Restore or Transfer' prompt */
+"ONBOARDING_SPLASH_LINK_DEVICE_TITLE" = "ئۈسكۈنە ئۇلاش";
+
+/* Explanation of the 'migrate from Signal' flow for the 'Restore or Transfer' prompt */
+"ONBOARDING_SPLASH_MIGRATE_FROM_SIGNAL_BODY" = "ھېساباتىڭىزنى بۇ ئۈسكۈنىگە قاچىلانغان Signal ئەپىدىن ئەسلىگە كەلتۈرۈڭ";
+
+/* Title for the 'migrate from Signal' choice of the 'Restore or Transfer' prompt */
+"ONBOARDING_SPLASH_MIGRATE_FROM_SIGNAL_TITLE" = "Signal دىن كۆچۈش";
+
 /* Primary button on the 'onboarding splash' view for users who are new to the app. */
 "ONBOARDING_SPLASH_NEW_TO_SIGNAL_BUTTON_TITLE" = "I'm new to Radar";
 
 /* Button for restoring or transferring account in the 'onboarding splash' view. */
 "ONBOARDING_SPLASH_RESTORE_OR_TRANSFER_BUTTON_TITLE" = "I already have an account";
+
+/* Explanation of the 'set up my new phone' flow for the 'Restore or Transfer' prompt */
+"ONBOARDING_SPLASH_SET_UP_NEW_PHONE_BODY" = "تېز باشلاش ئۈچۈن نۆۋەتتىكى Signal/Radar ھېساباتىڭىزدىن QR كودىنى سايىلەڭ";
+
+/* Title for the 'set up my new phone' choice of the 'Restore or Transfer' prompt */
+"ONBOARDING_SPLASH_SET_UP_NEW_PHONE_TITLE" = "يېڭى تېلېفونۇمنى تەڭشەش";
 
 /* Link to the 'terms and privacy policy' in the 'onboarding splash' view. */
 "ONBOARDING_SPLASH_TERM_AND_PRIVACY_POLICY" = "شەرتلەر &  مەخپىيەتلىك تۈزۈمى";

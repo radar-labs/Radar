@@ -31,8 +31,8 @@ public class InviteFlow: NSObject {
         }
     }
 
-    private let installUrl = "https://signal.org/install/"
-    private let homepageUrl = "https://signal.org"
+    private let installUrl = "https://radar.chat/install/"
+    private let homepageUrl = "https://radar.chat"
 
     private weak var presentingViewController: UIViewController?
     private weak var modalPresentationViewController: UIViewController?

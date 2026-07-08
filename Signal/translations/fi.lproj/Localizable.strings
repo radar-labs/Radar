@@ -5841,11 +5841,29 @@
 /* Title for the 'have my old device' choice of the 'Restore or Transfer' prompt */
 "ONBOARDING_SPLASH_HAVE_OLD_DEVICE_TITLE" = "Minulla on vanha puhelimeni";
 
+/* Explanation of the 'link device' flow for the 'Restore or Transfer' prompt */
+"ONBOARDING_SPLASH_LINK_DEVICE_BODY" = "Käytä tätä laitetta nykyisen istuntosi toissijaisena laitteena";
+
+/* Title for the 'link device' choice of the 'Restore or Transfer' prompt */
+"ONBOARDING_SPLASH_LINK_DEVICE_TITLE" = "Yhdistä laite";
+
+/* Explanation of the 'migrate from Signal' flow for the 'Restore or Transfer' prompt */
+"ONBOARDING_SPLASH_MIGRATE_FROM_SIGNAL_BODY" = "Palauta tilisi tälle laitteelle asennetusta Signal-sovelluksesta";
+
+/* Title for the 'migrate from Signal' choice of the 'Restore or Transfer' prompt */
+"ONBOARDING_SPLASH_MIGRATE_FROM_SIGNAL_TITLE" = "Siirry Signalista";
+
 /* Primary button on the 'onboarding splash' view for users who are new to the app. */
 "ONBOARDING_SPLASH_NEW_TO_SIGNAL_BUTTON_TITLE" = "I'm new to Radar";
 
 /* Button for restoring or transferring account in the 'onboarding splash' view. */
 "ONBOARDING_SPLASH_RESTORE_OR_TRANSFER_BUTTON_TITLE" = "I already have an account";
+
+/* Explanation of the 'set up my new phone' flow for the 'Restore or Transfer' prompt */
+"ONBOARDING_SPLASH_SET_UP_NEW_PHONE_BODY" = "Skannaa QR-koodi nykyiseltä Signal/Radar-tililtäsi aloittaaksesi nopeasti";
+
+/* Title for the 'set up my new phone' choice of the 'Restore or Transfer' prompt */
+"ONBOARDING_SPLASH_SET_UP_NEW_PHONE_TITLE" = "Määritä uusi puhelimeni";
 
 /* Link to the 'terms and privacy policy' in the 'onboarding splash' view. */
 "ONBOARDING_SPLASH_TERM_AND_PRIVACY_POLICY" = "Käyttöehdot ja tietosuoja";

@@ -5841,11 +5841,29 @@
 /* Title for the 'have my old device' choice of the 'Restore or Transfer' prompt */
 "ONBOARDING_SPLASH_HAVE_OLD_DEVICE_TITLE" = "Ik heb mijn oude telefoon";
 
+/* Explanation of the 'link device' flow for the 'Restore or Transfer' prompt */
+"ONBOARDING_SPLASH_LINK_DEVICE_BODY" = "Gebruik dit als een secundair apparaat voor je bestaande sessie";
+
+/* Title for the 'link device' choice of the 'Restore or Transfer' prompt */
+"ONBOARDING_SPLASH_LINK_DEVICE_TITLE" = "Apparaat koppelen";
+
+/* Explanation of the 'migrate from Signal' flow for the 'Restore or Transfer' prompt */
+"ONBOARDING_SPLASH_MIGRATE_FROM_SIGNAL_BODY" = "Herstel je account vanuit de Signal-app die op dit apparaat is geïnstalleerd";
+
+/* Title for the 'migrate from Signal' choice of the 'Restore or Transfer' prompt */
+"ONBOARDING_SPLASH_MIGRATE_FROM_SIGNAL_TITLE" = "Overstappen van Signal";
+
 /* Primary button on the 'onboarding splash' view for users who are new to the app. */
 "ONBOARDING_SPLASH_NEW_TO_SIGNAL_BUTTON_TITLE" = "I'm new to Radar";
 
 /* Button for restoring or transferring account in the 'onboarding splash' view. */
 "ONBOARDING_SPLASH_RESTORE_OR_TRANSFER_BUTTON_TITLE" = "I already have an account";
+
+/* Explanation of the 'set up my new phone' flow for the 'Restore or Transfer' prompt */
+"ONBOARDING_SPLASH_SET_UP_NEW_PHONE_BODY" = "Scan een QR-code van je huidige Signal/Radar-account om snel aan de slag te gaan";
+
+/* Title for the 'set up my new phone' choice of the 'Restore or Transfer' prompt */
+"ONBOARDING_SPLASH_SET_UP_NEW_PHONE_TITLE" = "Mijn nieuwe telefoon instellen";
 
 /* Link to the 'terms and privacy policy' in the 'onboarding splash' view. */
 "ONBOARDING_SPLASH_TERM_AND_PRIVACY_POLICY" = "Voorwaarden en privacybeleid";

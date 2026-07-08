@@ -66,6 +66,7 @@ extension UIButton {
         title: String,
         subtitle: String,
         iconName: String,
+        iconRenderingMode: UIImage.RenderingMode = .alwaysTemplate,
         primaryAction: UIAction? = nil
     ) -> Self {
         let button = UIButton(configuration: .gray(), primaryAction: primaryAction)
@@ -82,7 +83,8 @@ extension UIButton {
         let contentConfiguration = RegistrationChoiceButtonContentConfiguration(
             title: title,
             subtitle: subtitle,
-            iconName: iconName
+            iconName: iconName,
+            iconRenderingMode: iconRenderingMode
         )
         let contentView = contentConfiguration.makeContentView()
         button.addSubview(contentView)
@@ -102,6 +104,7 @@ private struct RegistrationChoiceButtonContentConfiguration: UIContentConfigurat
     var title: String
     var subtitle: String
     var iconName: String
+    var iconRenderingMode: UIImage.RenderingMode = .alwaysTemplate
     var imageSize: CGFloat?
 
     func makeContentView() -> UIView & UIContentView {
@@ -144,7 +147,7 @@ private class RegistrationChoiceButtonContentView: UIView, UIContentView {
     func apply(configuration: RegistrationChoiceButtonContentConfiguration) {
         titleLabel.text = configuration.title
         subtitleLabel.text = configuration.subtitle
-        iconView.image = UIImage(named: configuration.iconName)?.withRenderingMode(.alwaysTemplate)
+        iconView.image = UIImage(named: configuration.iconName)?.withRenderingMode(configuration.iconRenderingMode)
         iconView.sizeToFit()
     }
 

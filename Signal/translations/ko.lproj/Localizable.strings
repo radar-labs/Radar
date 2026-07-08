@@ -5841,11 +5841,29 @@
 /* Title for the 'have my old device' choice of the 'Restore or Transfer' prompt */
 "ONBOARDING_SPLASH_HAVE_OLD_DEVICE_TITLE" = "이전 휴대폰을 가지고 있음";
 
+/* Explanation of the 'link device' flow for the 'Restore or Transfer' prompt */
+"ONBOARDING_SPLASH_LINK_DEVICE_BODY" = "이 기기를 기존 세션의 보조 기기로 사용합니다";
+
+/* Title for the 'link device' choice of the 'Restore or Transfer' prompt */
+"ONBOARDING_SPLASH_LINK_DEVICE_TITLE" = "기기 연결";
+
+/* Explanation of the 'migrate from Signal' flow for the 'Restore or Transfer' prompt */
+"ONBOARDING_SPLASH_MIGRATE_FROM_SIGNAL_BODY" = "이 기기에 설치된 Signal 앱에서 계정을 복원합니다";
+
+/* Title for the 'migrate from Signal' choice of the 'Restore or Transfer' prompt */
+"ONBOARDING_SPLASH_MIGRATE_FROM_SIGNAL_TITLE" = "Signal에서 이전";
+
 /* Primary button on the 'onboarding splash' view for users who are new to the app. */
 "ONBOARDING_SPLASH_NEW_TO_SIGNAL_BUTTON_TITLE" = "I'm new to Radar";
 
 /* Button for restoring or transferring account in the 'onboarding splash' view. */
 "ONBOARDING_SPLASH_RESTORE_OR_TRANSFER_BUTTON_TITLE" = "I already have an account";
+
+/* Explanation of the 'set up my new phone' flow for the 'Restore or Transfer' prompt */
+"ONBOARDING_SPLASH_SET_UP_NEW_PHONE_BODY" = "빠르게 시작하려면 현재 Signal/Radar 계정에서 QR 코드를 스캔하세요";
+
+/* Title for the 'set up my new phone' choice of the 'Restore or Transfer' prompt */
+"ONBOARDING_SPLASH_SET_UP_NEW_PHONE_TITLE" = "새 휴대폰 설정";
 
 /* Link to the 'terms and privacy policy' in the 'onboarding splash' view. */
 "ONBOARDING_SPLASH_TERM_AND_PRIVACY_POLICY" = "이용약관 및 개인정보 처리방침";

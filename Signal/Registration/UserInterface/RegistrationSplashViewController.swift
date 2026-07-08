@@ -258,50 +258,57 @@ class RestoreOrTransferPickerController: StackSheetViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         stackView.spacing = 16
-        
-        if BuildFlags.linkedPhones {
-            let linkIphoneButton = UIButton.registrationChoiceButton(
-                title: "Link your device",
-                subtitle: "Scan QR code for link this device to your account.",
-                iconName: "qr-code-48",
-                primaryAction: UIAction { [weak self] _ in
-                    self?.showRelinkingBlock()
-                }
-            )
-            stackView.addArrangedSubview(linkIphoneButton)
-        }
+
+        let migrateFromSignalButton = UIButton.registrationChoiceButton(
+            title: OWSLocalizedString(
+                "ONBOARDING_SPLASH_MIGRATE_FROM_SIGNAL_TITLE",
+                comment: "Title for the 'migrate from Signal' choice of the 'Restore or Transfer' prompt"
+            ),
+            subtitle: OWSLocalizedString(
+                "ONBOARDING_SPLASH_MIGRATE_FROM_SIGNAL_BODY",
+                comment: "Explanation of the 'migrate from Signal' flow for the 'Restore or Transfer' prompt"
+            ),
+            iconName: "signal-app-48",
+            iconRenderingMode: .alwaysOriginal,
+            primaryAction: UIAction { [weak self] _ in
+                self?.setHasOldDeviceBlock(false)
+            }
+        )
+        stackView.addArrangedSubview(migrateFromSignalButton)
 
         let hasDeviceButton = UIButton.registrationChoiceButton(
             title: OWSLocalizedString(
-                "ONBOARDING_SPLASH_HAVE_OLD_DEVICE_TITLE",
-                comment: "Title for the 'have my old device' choice of the 'Restore or Transfer' prompt"
+                "ONBOARDING_SPLASH_SET_UP_NEW_PHONE_TITLE",
+                comment: "Title for the 'set up my new phone' choice of the 'Restore or Transfer' prompt"
             ),
             subtitle: OWSLocalizedString(
-                "ONBOARDING_SPLASH_HAVE_OLD_DEVICE_BODY",
-                comment: "Explanation of 'have old device' flow for the 'Restore or Transfer' prompt"
+                "ONBOARDING_SPLASH_SET_UP_NEW_PHONE_BODY",
+                comment: "Explanation of the 'set up my new phone' flow for the 'Restore or Transfer' prompt"
             ),
-            iconName: "qr-code-48",
+            iconName: "transfer-phone-48",
             primaryAction: UIAction { [weak self] _ in
                 self?.setHasOldDeviceBlock(true)
             }
         )
         stackView.addArrangedSubview(hasDeviceButton)
 
-        let noDeviceButton = UIButton.registrationChoiceButton(
-            title: OWSLocalizedString(
-                "ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_TITLE",
-                comment: "Title for the 'do not have my old device' choice of the 'Restore or Transfer' prompt"
-            ),
-            subtitle: OWSLocalizedString(
-                "ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_BODY",
-                comment: "Explanation of 'do not have old device' flow for the 'Restore or Transfer' prompt"
-            ),
-            iconName: "no-phone-48",
-            primaryAction: UIAction { [weak self] _ in
-                self?.setHasOldDeviceBlock(false)
-            }
-        )
-        stackView.addArrangedSubview(noDeviceButton)
+        if BuildFlags.linkedPhones {
+            let linkDeviceButton = UIButton.registrationChoiceButton(
+                title: OWSLocalizedString(
+                    "ONBOARDING_SPLASH_LINK_DEVICE_TITLE",
+                    comment: "Title for the 'link device' choice of the 'Restore or Transfer' prompt"
+                ),
+                subtitle: OWSLocalizedString(
+                    "ONBOARDING_SPLASH_LINK_DEVICE_BODY",
+                    comment: "Explanation of the 'link device' flow for the 'Restore or Transfer' prompt"
+                ),
+                iconName: "link-48",
+                primaryAction: UIAction { [weak self] _ in
+                    self?.showRelinkingBlock()
+                }
+            )
+            stackView.addArrangedSubview(linkDeviceButton)
+        }
     }
 }
 
