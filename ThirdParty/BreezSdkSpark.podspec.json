@@ -1,8 +1,8 @@
 {
   "name": "BreezSdkSpark",
-  "version": "0.14.0",
+  "version": "0.18.0",
   "summary": "Swift bindings to the Breez Spark SDK",
-  "description": "Local wrapper around the upstream 0.14.0 tag. The upstream BreezSdkSpark.podspec is frozen at spec.version = 0.11.0-dev2 since the 0.11.0 tag, which forces CocoaPods to pull a mismatched FFI binary. This podspec depends on our locally vendored breez_sdk_sparkFFI = 0.14.0 instead. Replace with the upstream pod once Breez fixes their podspec.",
+  "description": "Local wrapper around the upstream 0.18.0 tag. The upstream BreezSdkSpark.podspec is frozen at spec.version = 0.11.0-dev2 since the 0.11.0 tag, which forces CocoaPods to pull a mismatched FFI binary. This podspec depends on our locally vendored breez_sdk_sparkFFI = 0.18.0 instead. Replace with the upstream pod once Breez fixes their podspec.",
   "homepage": "https://breez.technology",
   "documentation_url": "https://sdk-doc-spark.breez.technology",
   "license": { "type": "MIT" },
@@ -10,7 +10,7 @@
   "platforms": { "ios": "13.0" },
   "source": {
     "git": "https://github.com/breez/breez-sdk-spark-swift.git",
-    "tag": "0.14.0"
+    "tag": "0.18.0"
   },
   "source_files": [
     "Sources/BreezSdkSpark/*.swift",
@@ -18,7 +18,8 @@
   ],
   "static_framework": true,
   "dependencies": {
-    "breez_sdk_sparkFFI": ["= 0.14.0"],
+    "breez_sdk_sparkFFI": ["= 0.18.0"],
+    "PasskeyPRFHelperObjC": ["= 0.18.0"],
     "Swift-BigInt": ["~> 2.0"]
   }
 }

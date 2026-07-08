@@ -1,16 +1,16 @@
 {
   "name": "breez_sdk_sparkFFI",
-  "version": "0.14.0",
+  "version": "0.18.0",
   "summary": "Low-level bindings to the Breez Spark SDK Rust API",
-  "description": "Pinned to the 0.14.0 GitHub release asset. The upstream CocoaPods trunk only publishes the 0.11.0-dev2 FFI binary, but the BreezSdkSpark Swift bindings from tag 0.14.0 reference symbols only present in the 0.14.0 xcframework. Replace this file with the upstream trunk pod once Breez publishes a matching breez_sdk_sparkFFI pod version.",
+  "description": "Pinned to the 0.18.0 GitHub release asset. The upstream CocoaPods trunk only publishes the 0.11.0-dev2 FFI binary, but the BreezSdkSpark Swift bindings from tag 0.18.0 reference symbols only present in the 0.18.0 xcframework. Replace this file with the upstream trunk pod once Breez publishes a matching breez_sdk_sparkFFI pod version.",
   "homepage": "https://breez.technology",
   "documentation_url": "https://sdk-doc-spark.breez.technology",
   "license": { "type": "MIT" },
   "authors": { "Breez": "contact@breez.technology" },
   "platforms": { "ios": "13.0" },
   "source": {
-    "http": "https://github.com/breez/breez-sdk-spark-swift/releases/download/0.14.0/breez_sdk_sparkFFI.xcframework.zip",
-    "sha256": "98049ab035146cc304e1b9b818870a675181d77df0acf32af7f9b43acf60b951"
+    "http": "https://github.com/breez/breez-sdk-spark-swift/releases/download/0.18.0/breez_sdk_sparkFFI.xcframework.zip",
+    "sha256": "20e28c6a0dbe9f906647b3e4644e06c6088ebfbcabec109c494842d03a735ca2"
   },
   "vendored_frameworks": "breez_sdk_sparkFFI.xcframework"
 }

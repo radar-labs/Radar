@@ -26,9 +26,13 @@ let breezSdkConfig = Config(
     useDefaultExternalInputParsers: false,
     realTimeSyncServerUrl: nil,
     privateEnabledDefault: false,
-    optimizationConfig: OptimizationConfig(autoEnabled: true, multiplicity: 1),
+    leafOptimizationConfig: LeafOptimizationConfig(autoEnabled: true, multiplicity: 1),
+    tokenOptimizationConfig: TokenOptimizationConfig(autoEnabled: true, targetOutputCount: 5, minOutputsThreshold: 50),
     stableBalanceConfig: nil,
-    maxConcurrentClaims: 4
+    maxConcurrentClaims: 4,
+    sparkConfig: nil,
+    backgroundTasksEnabled: true,
+    crossChainConfig: nil,
 )
 EOF
 

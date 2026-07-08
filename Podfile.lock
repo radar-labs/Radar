@@ -1,9 +1,10 @@
 PODS:
   - blurhash (0.0.1)
   - BonMot (6.0.0)
-  - breez_sdk_sparkFFI (0.14.0)
-  - BreezSdkSpark (0.14.0):
-    - breez_sdk_sparkFFI (= 0.14.0)
+  - breez_sdk_sparkFFI (0.18.0)
+  - BreezSdkSpark (0.18.0):
+    - breez_sdk_sparkFFI (= 0.18.0)
+    - PasskeyPRFHelperObjC (= 0.18.0)
     - Swift-BigInt (~> 2.0)
   - CocoaLumberjack (3.7.4):
     - CocoaLumberjack/Core (= 3.7.4)
@@ -36,6 +37,7 @@ PODS:
   - MobileCoin/CoreHTTP (6.0.3):
     - LibMobileCoin/CoreHTTP (~> 6.0.0-pre1)
     - Logging (~> 1.4)
+  - PasskeyPRFHelperObjC (0.18.0)
   - PureLayout (3.1.4)
   - Reachability (3.7.7)
   - SDWebImage (5.21.2):
@@ -71,6 +73,7 @@ DEPENDENCIES:
   - Mantle (from `https://github.com/signalapp/Mantle`, branch `signal-master`)
   - MnemonicSwift (from `https://github.com/zcash/swift-bip39`, tag `2.2.5`)
   - MobileCoin/CoreHTTP (from `https://github.com/mobilecoinofficial/MobileCoin-Swift`, tag `v6.0.3`)
+  - PasskeyPRFHelperObjC (from `./ThirdParty/PasskeyPRFHelperObjC.podspec.json`)
   - PureLayout
   - Reachability (~> 3.7.7)
   - SDWebImage
@@ -121,6 +124,8 @@ EXTERNAL SOURCES:
   MobileCoin:
     :git: https://github.com/mobilecoinofficial/MobileCoin-Swift
     :tag: v6.0.3
+  PasskeyPRFHelperObjC:
+    :podspec: "./ThirdParty/PasskeyPRFHelperObjC.podspec.json"
   SignalRingRTC:
     :git: https://github.com/signalapp/ringrtc
     :tag: v2.59.3
@@ -164,8 +169,8 @@ CHECKOUT OPTIONS:
 SPEC CHECKSUMS:
   blurhash: f588a9d659f4c742a325bbbbd438d1ef3c34af19
   BonMot: fb2b6a2209cb3149aca37b7131d49c051c04ae86
-  breez_sdk_sparkFFI: 9e2443a7a7d2463603519335d335155b15295553
-  BreezSdkSpark: 3cd0525be3190706860f94b978bc026a58b574ef
+  breez_sdk_sparkFFI: 1abaa6de805a8fa7f5205307bb8484770e51c73f
+  BreezSdkSpark: 10fdbf6b3792274bd66a398e50e4ab4218ea3405
   CocoaLumberjack: 543c79c114dadc3b1aba95641d8738b06b05b646
   GRDB.swift: 1395cb3556df6b16ed69dfc74c3886abc75d2825
   LibMobileCoin: 8503f567fa32184a5be7bc038fbd727747dd9991
@@ -177,6 +182,7 @@ SPEC CHECKSUMS:
   Mantle: 2fa750afa478cd625a94230fbf1c13462f29395b
   MnemonicSwift: 40ba76b951b75b32e2719df989b4d6da5798fe26
   MobileCoin: cd7f49d6eaa2d362e4c9f8324cae0cc3bc3c53b5
+  PasskeyPRFHelperObjC: b5fe0ff7428ae227a468b081d8e8cf7153781591
   PureLayout: f08c01b8dec00bb14a1fefa3de4c7d9c265df85e
   Reachability: 8bf74b755b2993968c344b465c13e602db2b1044
   SDWebImage: 9f177d83116802728e122410fb25ad88f5c7608a
@@ -186,6 +192,6 @@ SPEC CHECKSUMS:
   Swift-BigInt: 39035927416daca0ff0ee7949f5fef18b3a1a7db
   SwiftProtobuf: e02f51c8c2df5845657aee2d4de9d61bf50ef788
 
-PODFILE CHECKSUM: 32fceaf4ec4c2685e583693418b1cef32fc6bab8
+PODFILE CHECKSUM: 32dc003a5daf1a59c7ea630f86da1c719a037cfe
 
 COCOAPODS: 1.16.2
