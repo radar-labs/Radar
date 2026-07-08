@@ -36,8 +36,8 @@ class InteractionFinderTest: SSKBaseTest {
         let finder1 = InteractionFinder(threadUniqueId: contactThread1.uniqueId)
         let finder2 = InteractionFinder(threadUniqueId: contactThread2.uniqueId)
         self.read { transaction in
-            XCTAssertEqual(0, try! finder1.fetchUniqueIdsForConversationView(rowIdFilter: .newest, limit: 100, tx: transaction).count)
-            XCTAssertEqual(0, try! finder2.fetchUniqueIdsForConversationView(rowIdFilter: .newest, limit: 100, tx: transaction).count)
+            XCTAssertEqual(0, try! finder1.fetchUniqueIdsForConversationView(rowIdFilter: .newest, limit: 100, tx: transaction, onlyStarred: false).count)
+            XCTAssertEqual(0, try! finder2.fetchUniqueIdsForConversationView(rowIdFilter: .newest, limit: 100, tx: transaction, onlyStarred: false).count)
         }
 
         self.write { transaction in
@@ -55,8 +55,8 @@ class InteractionFinderTest: SSKBaseTest {
         }
 
         self.read { transaction in
-            XCTAssertEqual(4, try! finder1.fetchUniqueIdsForConversationView(rowIdFilter: .newest, limit: 100, tx: transaction).count)
-            XCTAssertEqual(2, try! finder2.fetchUniqueIdsForConversationView(rowIdFilter: .newest, limit: 100, tx: transaction).count)
+            XCTAssertEqual(4, try! finder1.fetchUniqueIdsForConversationView(rowIdFilter: .newest, limit: 100, tx: transaction, onlyStarred: false).count)
+            XCTAssertEqual(2, try! finder2.fetchUniqueIdsForConversationView(rowIdFilter: .newest, limit: 100, tx: transaction, onlyStarred: false).count)
         }
     }
 
