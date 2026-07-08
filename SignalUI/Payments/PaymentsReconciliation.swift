@@ -1134,7 +1134,7 @@ extension BreezSdkSpark.Payment: LightningTransactionHistoryItem {
 
     public var preimageAsData: Data? {
         switch details {
-        case .lightning(_, _, _, let details, _, _, _):
+        case .lightning(_, _, _, let details, _, _, _, _):
             return details.preimage?.data(using: .utf8)
         case .spark(_, let details, _):
             return details?.preimage?.data(using: .utf8)

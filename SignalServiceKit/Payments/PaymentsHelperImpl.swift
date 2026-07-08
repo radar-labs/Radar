@@ -796,7 +796,7 @@ public struct PaymentsPassphrase: Equatable {
 extension Payment {
     var hash: String? {
         switch details {
-        case .lightning(_, _, _, let htlcDetails, _, _, _):
+        case .lightning(_, _, _, let htlcDetails, _, _, _, _):
             return htlcDetails.paymentHash
         case .spark(_, let htlcDetails, _):
             return htlcDetails?.paymentHash

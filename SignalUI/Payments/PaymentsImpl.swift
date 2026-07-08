@@ -942,7 +942,7 @@ extension PaymentsImpl {
             let amount: U128? = isAmountless ? BInt(paymentAmount.picoMob) : nil
 
             let request = PrepareSendPaymentRequest(
-                paymentRequest: details.invoice.bolt11,
+                paymentRequest: PaymentRequest.input(input: details.invoice.bolt11),
                 amount: amount,
                 tokenIdentifier: nil,
                 conversionOptions: nil,
@@ -1671,7 +1671,7 @@ public enum PreparedTransaction {
             switch response.paymentMethod {
             case .bolt11Invoice(_, let sparkTransferFeeSats, let lightningFeeSats):
                 return sparkTransferFeeSats ?? lightningFeeSats
-            case .bitcoinAddress, .sparkAddress, .sparkInvoice:
+            case .bitcoinAddress, .sparkAddress, .sparkInvoice, .crossChainAddress:
                 owsFailDebug("Unexpected payment method for BOLT11 invoice.")
                 return 0
             }
@@ -1686,7 +1686,7 @@ public enum PreparedTransaction {
             switch response.paymentMethod {
             case .bolt11Invoice(let invoiceDetails, _, _):
                 return invoiceDetails.paymentHash
-            case .bitcoinAddress, .sparkAddress, .sparkInvoice:
+            case .bitcoinAddress, .sparkAddress, .sparkInvoice, .crossChainAddress:
                 owsFailDebug("Unexpected payment method for BOLT11 invoice.")
                 return ""
             }
@@ -1762,23 +1762,23 @@ extension BreezSdk {
     func payment(by hash: String) async throws -> Payment? {
         let payments = try await listPayments(request: ListPaymentsRequest()).payments
 
-        return payments.first {
-            switch $0.details {
-            case .lightning(_, _, _, let htlcDetails, _, _, _):
+        return payments.first(where: { payment in
+            switch payment.details {
+            case .lightning(_, _, _, let htlcDetails, _, _, _, _):
                 return htlcDetails.paymentHash == hash
             case .spark(_, let htlcDetails, _):
                 return htlcDetails?.paymentHash == hash
             default:
                 return false
             }
-        }
+        })
     }
 }
 
 extension Payment {
     var hash: String? {
         switch details {
-        case .lightning(_, _, _, let htlcDetails, _, _, _):
+        case .lightning(_, _, _, let htlcDetails, _, _, _, _):
             return htlcDetails.paymentHash
         case .spark(_, let htlcDetails, _):
             return htlcDetails?.paymentHash

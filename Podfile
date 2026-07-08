@@ -56,6 +56,7 @@ def ui_pods
   pod 'MobileCoin/CoreHTTP', git: 'https://github.com/mobilecoinofficial/MobileCoin-Swift', tag: 'v6.0.3'
 
   pod 'Swift-BigInt', '2.4.0'
+  pod 'PasskeyPRFHelperObjC', :podspec => './ThirdParty/PasskeyPRFHelperObjC.podspec.json'
   pod 'breez_sdk_sparkFFI', :podspec => './ThirdParty/breez_sdk_sparkFFI.podspec.json'
   pod 'BreezSdkSpark', :podspec => './ThirdParty/BreezSdkSpark.podspec.json'
 
@@ -91,6 +92,7 @@ target 'SignalServiceKit' do
   pod 'CocoaLumberjack'
 
   pod 'Swift-BigInt', '2.4.0'
+  pod 'PasskeyPRFHelperObjC', :podspec => './ThirdParty/PasskeyPRFHelperObjC.podspec.json'
   pod 'breez_sdk_sparkFFI', :podspec => './ThirdParty/breez_sdk_sparkFFI.podspec.json'
   pod 'BreezSdkSpark', :podspec => './ThirdParty/BreezSdkSpark.podspec.json'
 
