@@ -5,7 +5,7 @@
 
 import Foundation
 public import GRDB
-public import LibSignalClient
+import LibSignalClient
 
 public struct OWSDevice: Codable, FetchableRecord, PersistableRecord {
     public static let primaryDeviceId: UInt32 = 1
@@ -74,11 +74,11 @@ public struct OWSDevice: Codable, FetchableRecord, PersistableRecord {
 #if DEBUG
 extension OWSDevice {
     public static func previewItem(
-        id: DeviceId,
+        id: UInt32,
         name: String,
     ) -> OWSDevice {
         OWSDevice(
-            deviceId: id,
+            deviceId: DeviceId(validating: id)!,
             createdAt: Date().addingTimeInterval(-86_400 * TimeInterval(Int.random(in: 10...20))),
             lastSeenAt: Date().addingTimeInterval(-86_400 * TimeInterval(Int.random(in: 0...10))),
             name: name,

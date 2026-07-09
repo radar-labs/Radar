@@ -15,25 +15,18 @@ cat > "$OUTPUT_FILE" << EOF
 
 import BreezSdkSpark
 
-let breezSdkConfig = Config(
-    apiKey: "$BREEZ_API_KEY",
-    network: Network.mainnet,
-    syncIntervalSecs: 10,
-    maxDepositClaimFee: nil,
-    lnurlDomain: "radar.cash",
-    preferSparkOverLightning: true,
-    externalInputParsers: nil,
-    useDefaultExternalInputParsers: false,
-    realTimeSyncServerUrl: nil,
-    privateEnabledDefault: false,
-    leafOptimizationConfig: LeafOptimizationConfig(autoEnabled: true, multiplicity: 1),
-    tokenOptimizationConfig: TokenOptimizationConfig(autoEnabled: true, targetOutputCount: 5, minOutputsThreshold: 50),
-    stableBalanceConfig: nil,
-    maxConcurrentClaims: 4,
-    sparkConfig: nil,
-    backgroundTasksEnabled: true,
-    crossChainConfig: nil,
-)
+let breezSdkConfig: Config = {
+    // Start from Breez's defaults, then apply Radar overrides. Everything not set
+    // below (sync interval, external input parsers, real-time sync, private-mode
+    // default, etc.) intentionally inherits Breez defaults. Using defaultConfig()
+    // keeps this file compiling across SDK versions that add/rename Config fields.
+    var config = defaultConfig(network: Network.mainnet)
+    config.apiKey = "$BREEZ_API_KEY"
+    config.lnurlDomain = "radar.cash"
+    config.preferSparkOverLightning = true
+    config.maxDepositClaimFee = MaxFee.networkRecommended(leewaySatPerVbyte: 5)
+    return config
+}()
 EOF
 
 echo "Generated: $OUTPUT_FILE"
