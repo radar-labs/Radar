@@ -103,11 +103,15 @@ public struct AccountAttributes: Codable {
         public let transfer = true
         public let hasSVRBackups: Bool
         public let spqr = true
+        public let attachmentBackfill = true
+        public let usernameChangeSyncMessage = true
 
         public enum CodingKeys: String, CodingKey {
             case transfer
             case hasSVRBackups = "storage"
             case spqr
+            case attachmentBackfill
+            case usernameChangeSyncMessage
         }
 
         public init(hasSVRBackups: Bool) {
