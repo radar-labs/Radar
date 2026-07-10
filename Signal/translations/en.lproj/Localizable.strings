@@ -8350,6 +8350,9 @@ Copyright 2026 Radar Chat, Inc.";
 /* Label for the 'MobileCoin network fee' in the payment details view in the app settings. */
 "SETTINGS_PAYMENTS_PAYMENT_DETAILS_FEE" = "Network Fee";
 
+/* Label for the sender's message attached to a received payment in the payment details view. */
+"SETTINGS_PAYMENTS_PAYMENT_DETAILS_MESSAGE" = "Message";
+
 /* Indicates that you received a payment in the payment details view in the app settings. */
 "SETTINGS_PAYMENTS_PAYMENT_DETAILS_RECEIVED" = "Received";
 
