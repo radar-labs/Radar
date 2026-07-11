@@ -648,16 +648,20 @@ private class PaymentProcessingOperation {
 
         let sdk = try SUIEnvironment.shared.paymentsImplRef.getBreezSdk()
 
+        // asPaymentReceipt() only reads the current SDK layout; BreezReceiptParser also reads the
+        // frozen 0.14.0 layout, so an outgoing payment that was still unverified across an app
+        // upgrade is not deleted as indeterminate.
         guard
-            let receipt = paymentModel.asPaymentReceipt()
+            let paymentId = paymentModel.asPaymentReceipt()?.paymentId
+                ?? BreezReceiptParser.parse(paymentModel.mcReceiptData)?.paymentId
         else {
             await Self.handleIndeterminatePayment(paymentModel: paymentModel)
             throw PaymentsError.indeterminateState
         }
 
         _ = try await sdk.syncWallet(request: SyncWalletRequest())
-        guard let payment = try? await sdk.getPayment(request: GetPaymentRequest(paymentId: receipt.paymentId)).payment else {
-            owsFailDebug("Payment with ID: \(receipt.paymentId) not found.")
+        guard let payment = try? await sdk.getPayment(request: GetPaymentRequest(paymentId: paymentId)).payment else {
+            owsFailDebug("Payment with ID: \(paymentId) not found.")
             return
         }
 
@@ -754,19 +758,22 @@ private class PaymentProcessingOperation {
         owsAssertDebug(paymentModel.paymentState == .incomingUnverified)
         let sdk = try SUIEnvironment.shared.paymentsImplRef.getBreezSdk()
 
-        guard let mcReceiptData = paymentModel.mcReceiptData, let receipt = try? LnurlPayResponse.deserialize(from: mcReceiptData) else {
+        // BreezReceiptParser, not the raw SDK reader: a receipt serialized by an older breez
+        // build (frozen 0.14.0 layout) is still a real, verifiable payment. Failing here would
+        // route it to handleIndeterminatePayment, which DELETES the payment model.
+        guard let mcReceiptData = paymentModel.mcReceiptData, let receipt = BreezReceiptParser.parse(mcReceiptData) else {
             await Self.handleIndeterminatePayment(paymentModel: paymentModel)
             throw PaymentsError.indeterminateState
         }
 
         _ = try await sdk.syncWallet(request: SyncWalletRequest())
-        guard let paymentHash = receipt.payment.hash else {
-            owsFailDebug("Payment hash for: \(receipt.payment.id) not found.")
+        guard let paymentHash = receipt.paymentHash else {
+            owsFailDebug("Payment hash for: \(receipt.paymentId ?? "unknown") not found.")
             return
         }
 
         guard let payment = try? await sdk.payment(by: paymentHash) else {
-            owsFailDebug("Payment with ID: \(receipt.payment.id) not found.")
+            owsFailDebug("Payment with ID: \(receipt.paymentId ?? "unknown") not found.")
             return
         }
 

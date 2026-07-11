@@ -117,6 +117,13 @@ public class PaymentsImpl: NSObject, PaymentsSwift {
         ) { [weak self] in
             self?.updateCurrentPaymentBalanceIfNecessary()
         }
+
+        // One-shot repair: payments whose receipts older builds couldn't decode (cross-version
+        // breez layouts) have a chat message but no TSPaymentModel. Recreate the missing models
+        // now that BreezReceiptParser reads every known layout.
+        appReadiness.runNowOrWhenMainAppDidBecomeReadyAsync {
+            BreezPaymentBackfill.runIfNeeded()
+        }
     }
 
     public func initializeComponents(warmCaches: Bool = false) async {
@@ -671,16 +678,15 @@ extension PaymentsImpl {
         }
     }
 
-    // Only valid for the recipient
-    public func unmaskReceiptAmount(data: Data?) -> MobileCoin.Amount? {
-        guard let data = data else { return nil }
-        let account = localMobileCoinAccount(paymentsState: self.paymentsState)
-        guard let accountKey = account?.accountKey else { return nil }
-        guard let receipt = Receipt(serializedData: data) else { return nil }
-        guard let amount = receipt.validateAndUnmaskAmount(accountKey: accountKey) else {
-            return nil
-        }
-        return amount
+    /// The amount carried by a payment receipt, or nil when the receipt cannot be decoded.
+    ///
+    /// Radar receipts are breez `LnurlPayResponse` blobs (current-SDK layout, or the frozen
+    /// 0.14.0 layout for receipts from old-breez senders); the amount is plaintext, so this
+    /// works for sender and recipient alike. The MobileCoin receipt unmasking this replaced
+    /// predates the fork and never matched breez bytes, which left recipient bubbles dependent
+    /// on a TSPaymentModel that cross-version receipts could not create ("UNAVAILABLE sats").
+    public func unmaskReceiptAmount(data: Data?) -> ParsedBreezReceipt? {
+        return BreezReceiptParser.parse(data)
     }
 
     public func buildLocalPaymentAddress(paymentsState: PaymentsState) -> TSPaymentAddress? {
