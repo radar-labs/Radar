@@ -127,6 +127,13 @@ public class PaymentsHelperImpl: PaymentsHelperSwift, PaymentsHelper {
     }
 
     public func enablePayments(withPaymentsEntropy newPaymentsEntropy: Data, transaction: DBWriteTransaction) -> Bool {
+        // Reject invalid entropy here (not just in PaymentsState.build, which
+        // silently degrades to .disabled) so callers like the restore flow
+        // report failure to the user instead of dismissing as if it succeeded.
+        guard PaymentsConstants.supportedPaymentsEntropyLengths.contains(newPaymentsEntropy.count) else {
+            owsFailDebug("Invalid paymentsEntropy length: \(newPaymentsEntropy.count).")
+            return false
+        }
         let oldPaymentsEntropy = Self.loadPaymentsState(transaction: transaction).paymentsEntropy
         guard oldPaymentsEntropy == nil || oldPaymentsEntropy == newPaymentsEntropy else {
             owsFailDebug("paymentsEntropy is already set.")
