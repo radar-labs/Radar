@@ -467,6 +467,10 @@ public class PaymentsReconciliation {
         let spentKeyImages: [Data]? = Array(Set(unaccountedForSpentKeyImages)).nilIfEmpty
         let incomingTransactionPublicKeys: [Data]? = unaccountedForReceivedItems.map { $0.hashAsData }.nilIfEmpty
 
+        // Surface the LNURL sender comment (Satogram message) from a received
+        // lightning payment so it shows on the payment details screen.
+        let receivedSenderComment: String? = unaccountedForReceivedItems.lazy.compactMap { $0.senderComment }.first
+
         let mobileCoin = MobileCoinPayment(recipientPublicAddressData: nil,
                                            transactionData: nil,
                                            receiptData: nil,
@@ -481,7 +485,7 @@ public class PaymentsReconciliation {
                               paymentAmount: paymentAmount,
                               createdDate: createdDate,
                               senderOrRecipientAci: nil,
-                              memoMessage: nil,
+                              memoMessage: receivedSenderComment,
                               isUnread: markUnaccountedForItemsAsUnread,
                               interactionUniqueId: nil,
                               mobileCoin: mobileCoin)
@@ -1085,6 +1089,8 @@ public protocol LightningTransactionHistoryItem {
     var isOutgoing: Bool { get }
 
     var preimageAsData: Data? { get }
+
+    var senderComment: String? { get }
 }
 
 extension Array where Element == LightningTransactionHistoryItem {
@@ -1138,6 +1144,17 @@ extension BreezSdkSpark.Payment: LightningTransactionHistoryItem {
             return details.preimage?.data(using: .utf8)
         case .spark(_, let details, _):
             return details?.preimage?.data(using: .utf8)
+        default:
+            return nil
+        }
+    }
+
+    // LNURL sender comment on a received lightning payment (index 6 of the
+    // .lightning case, lnurlReceiveMetadata), or nil for other payment types.
+    public var senderComment: String? {
+        switch details {
+        case .lightning(_, _, _, _, _, _, let lnurlReceiveMetadata, _):
+            return lnurlReceiveMetadata?.senderComment
         default:
             return nil
         }
