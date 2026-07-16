@@ -728,40 +728,14 @@ public class PaymentsHelperImpl: PaymentsHelperSwift, PaymentsHelper {
                                                                   thread: TSThread,
                                                                   senderAci: Aci,
                                                                   transaction: DBWriteTransaction) {
+        // BreezReceiptParser understands the current SDK layout and the frozen 0.14.0 layout, so
+        // a receipt from a sender on an old-breez build still yields a payment model instead of
+        // leaving the bubble amount-less ("UNAVAILABLE sats").
+        guard let paymentModel = paymentNotification.buildIncomingPaymentModel(senderAci: senderAci, isUnread: true) else {
+            owsFailDebug("Undecodable payment receipt (\(paymentNotification.mcReceiptData.count) bytes).")
+            return
+        }
         do {
-            let mcReceiptData = paymentNotification.mcReceiptData
-            var receiptInput = (data: mcReceiptData, offset: 0)
-            let receiptInfo = try FfiConverterTypeLnurlPayResponse.read(from: &receiptInput)
-            let incomingTransactionPublicKeys: [Data] = {
-                if
-                    let hash = receiptInfo.payment.hash,
-                    let hashData = hash.data(using: .utf8) {
-                    return [hashData]
-                }
-                return []
-            }()
-
-            let mobileCoin = MobileCoinPayment(recipientPublicAddressData: nil,
-                                               transactionData: nil,
-                                               receiptData: paymentNotification.mcReceiptData,
-                                               incomingTransactionPublicKeys: incomingTransactionPublicKeys,
-                                               spentKeyImages: nil,
-                                               outputPublicKeys: nil,
-                                               ledgerBlockTimestamp: 0,
-                                               ledgerBlockIndex: 0,
-                                               feeAmount: nil)
-            let paymentModel = TSPaymentModel(paymentType: .incomingPayment,
-                                              paymentState: .incomingUnverified,
-                                              paymentAmount: TSPaymentAmount(currency: .bitcoin, picoMob: UInt64(receiptInfo.payment.amount)),
-                                              createdDate: Date(timeIntervalSince1970: TimeInterval(receiptInfo.payment.timestamp)),
-                                              senderOrRecipientAci: AciObjC(senderAci),
-                                              memoMessage: paymentNotification.memoMessage?.nilIfEmpty,
-                                              isUnread: true,
-                                              interactionUniqueId: nil,
-                                              mobileCoin: mobileCoin)
-            guard paymentModel.isValid else {
-                throw OWSAssertionError("Invalid paymentModel.")
-            }
             try tryToInsertPaymentModel(paymentModel, transaction: transaction)
 
             // TODO: Remove any corresponding payment request.
