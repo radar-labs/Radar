@@ -5,6 +5,7 @@
 
 import BigNumber
 public import BreezSdkSpark
+import CryptoKit
 import Foundation
 public import LibSignalClient
 import MnemonicSwift
@@ -417,14 +418,51 @@ public class PaymentsImpl: NSObject, PaymentsSwift {
     }
 
     public func paymentsEntropy(forPassphrase passphrase: PaymentsPassphrase) -> Data? {
-        do {
-            let bytes = try MnemonicSwift.Mnemonic.deterministicSeedBytes(
-                from: passphrase.asPassphrase)
-            return Data(bytes)
-        } catch {
-            owsFailDebug("Error: \(error)")
+        // This must be the exact inverse of passphrase(forPaymentsEntropy:) so that
+        // restoring from the displayed phrase reconstructs the original wallet.
+        // Do NOT use Mnemonic.deterministicSeedBytes here: that is the one-way
+        // BIP-39 PBKDF2 mnemonic->seed derivation, not the mnemonic->entropy decode.
+        Self.bip39Entropy(fromMnemonicWords: passphrase.words)
+    }
+
+    /// Decodes a BIP-39 mnemonic back to its entropy: each word is an 11-bit index
+    /// into the wordlist; the trailing bits are a SHA-256 checksum of the entropy.
+    /// Supports 12-word (16-byte) and 24-word (32-byte) phrases.
+    /// Returns nil for unknown words or a checksum mismatch (i.e. a mistyped phrase).
+    private static func bip39Entropy(fromMnemonicWords words: [String]) -> Data? {
+        guard words.count == 12 || words.count == 24 else {
+            Logger.warn("Invalid word count: \(words.count)")
             return nil
         }
+        let wordlist = MnemonicSwift.MnemonicLanguageType.english.words()
+        var bits = [Bool]()
+        bits.reserveCapacity(words.count * 11)
+        for word in words {
+            guard let index = wordlist.firstIndex(of: word.lowercased()) else {
+                Logger.warn("Word not in BIP-39 wordlist.")
+                return nil
+            }
+            for bit in (0..<11).reversed() {
+                bits.append((index >> bit) & 1 == 1)
+            }
+        }
+        let checksumBitCount = bits.count / 33
+        let entropyBitCount = bits.count - checksumBitCount
+        var entropy = Data(count: entropyBitCount / 8)
+        for i in 0..<entropyBitCount where bits[i] {
+            entropy[i / 8] |= 1 << (7 - (i % 8))
+        }
+        // checksumBitCount is at most 8, so only the digest's first byte is used.
+        guard let checksumByte = Data(SHA256.hash(data: entropy)).first else {
+            return nil
+        }
+        for i in 0..<checksumBitCount {
+            guard bits[entropyBitCount + i] == ((checksumByte >> (7 - i)) & 1 == 1) else {
+                Logger.warn("Mnemonic checksum mismatch.")
+                return nil
+            }
+        }
+        return entropy
     }
 
     public func isValidPassphraseWord(_ word: String?) -> Bool {

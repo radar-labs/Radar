@@ -18,26 +18,55 @@ class PaymentsTest: SignalBaseTest {
         SUIEnvironment.shared.paymentsRef = PaymentsImpl(appReadiness: AppReadinessMock())
     }
 
-    func test_passphraseRoundtrip1() {
-        let paymentsEntropy = Randomness.generateRandomBytes(PaymentsConstants.paymentsEntropyLength)
-        guard let passphrase = SUIEnvironment.shared.paymentsSwiftRef.passphrase(forPaymentsEntropy: paymentsEntropy) else {
-            XCTFail("Missing passphrase.")
-            return
+    func test_passphraseRoundtrip_randomEntropy() {
+        // The property that makes restore-from-phrase work at all: the entropy
+        // recovered from the displayed words must equal the entropy that seeded
+        // the wallet. Check 16-byte (12-word) and 32-byte (24-word) entropy.
+        for entropyLength: UInt in [PaymentsConstants.paymentsEntropyLength, 32] {
+            for _ in 0..<100 {
+                let paymentsEntropy = Randomness.generateRandomBytes(entropyLength)
+                guard let passphrase = SUIEnvironment.shared.paymentsSwiftRef.passphrase(forPaymentsEntropy: paymentsEntropy) else {
+                    XCTFail("Missing passphrase.")
+                    return
+                }
+                XCTAssertEqual(paymentsEntropy, SUIEnvironment.shared.paymentsSwiftRef.paymentsEntropy(forPassphrase: passphrase))
+            }
         }
-        XCTAssertEqual(paymentsEntropy, SUIEnvironment.shared.paymentsSwiftRef.paymentsEntropy(forPassphrase: passphrase))
     }
 
-    func test_passphraseRoundtrip2() {
-        let passphraseWords: [String] = "glide belt note artist surge aware disease cry mobile assume weird space pigeon scrap vast iron maximum begin rug public spice remember sword cruel".split(separator: " ").map { String($0) }
-        let passphrase1 = try! PaymentsPassphrase(words: passphraseWords)
-        let paymentsEntropy = SUIEnvironment.shared.paymentsSwiftRef.paymentsEntropy(forPassphrase: passphrase1)!
-        guard let passphrase2 = SUIEnvironment.shared.paymentsSwiftRef.passphrase(forPaymentsEntropy: paymentsEntropy) else {
-            XCTFail("Missing passphrase.")
-            return
+    func test_passphraseKnownBip39Vectors() {
+        // Standard BIP-39 reference vectors (entropy <-> mnemonic), so the phrase
+        // stays interoperable with other BIP-39 wallets.
+        let vectors: [(entropyHex: String, mnemonic: String)] = [
+            ("00000000000000000000000000000000",
+             "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about"),
+            ("7f7f7f7f7f7f7f7f7f7f7f7f7f7f7f7f",
+             "legal winner thank year wave sausage worth useful legal winner thank yellow"),
+            ("80808080808080808080808080808080",
+             "letter advice cage absurd amount doctor acoustic avoid letter advice cage above"),
+            ("ffffffffffffffffffffffffffffffff",
+             "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo wrong"),
+            ("0000000000000000000000000000000000000000000000000000000000000000",
+             "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon art"),
+            ("ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+             "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo vote"),
+        ]
+        for vector in vectors {
+            let entropy = Data.data(fromHex: vector.entropyHex)!
+            let words = vector.mnemonic.split(separator: " ").map { String($0) }
+            let passphrase = try! PaymentsPassphrase(words: words)
+            XCTAssertEqual(entropy, SUIEnvironment.shared.paymentsSwiftRef.paymentsEntropy(forPassphrase: passphrase))
+            XCTAssertEqual(passphrase, SUIEnvironment.shared.paymentsSwiftRef.passphrase(forPaymentsEntropy: entropy))
         }
-        XCTAssertEqual(passphrase1, passphrase2)
-        let paymentsEntropyExpected = Data(base64Encoded: "YwKeWoaNpCCPwamOYb/k6CpLgvxrsoliivRWjRlrdxE=")!
-        XCTAssertEqual(paymentsEntropyExpected, paymentsEntropy)
+    }
+
+    func test_passphraseRejectsInvalidChecksum() {
+        // 12 x "abandon" encodes all-zero entropy but the wrong checksum
+        // (the valid final word is "about") -- a mistyped phrase must not
+        // silently restore some other wallet.
+        let words = Array(repeating: "abandon", count: 12)
+        let passphrase = try! PaymentsPassphrase(words: words)
+        XCTAssertNil(SUIEnvironment.shared.paymentsSwiftRef.paymentsEntropy(forPassphrase: passphrase))
     }
 
     func test_paymentAddressSigning() {
