@@ -14,6 +14,10 @@ import UserNotifications
 /// observes incoming envelopes for our account, and pings APNs so the iOS
 /// NSE wakes — even when the host app has been force-quit.
 ///
+/// Linked devices (e.g. iPad) can't provision a phantom — only the primary can
+/// get a device-provisioning code — so they register their own APNs token and
+/// attach it to the primary's relay (`runEnsureAttached`).
+///
 /// This is purely additive: it does not change the existing primary-device
 /// push-token sync, so Signal's chat-server push path still runs in parallel.
 ///
@@ -192,6 +196,17 @@ public enum RadarPushRelay {
             return
         }
 
+        // Only the primary can provision the phantom linked device (the chat
+        // server issues device-provisioning codes to the primary alone), so
+        // linked devices such as iPad attach to the primary's relay instead.
+        let isPrimaryDevice = dependencies.db.read { tx in
+            dependencies.tsAccountManager.registrationState(tx: tx).isRegisteredPrimaryDevice
+        }
+        guard isPrimaryDevice else {
+            try await runEnsureAttached(dependencies: dependencies, apnsHex: apnsHex)
+            return
+        }
+
         var (storedRelayToken, hasLinked) = dependencies.db.read { tx in
             return (Store.getRelayToken(tx: tx), Store.isLinked(tx: tx))
         }
@@ -271,6 +286,118 @@ public enum RadarPushRelay {
         }
     }
 
+    /// Linked-device (e.g. iPad) counterpart of `runEnsure`: register this
+    /// device's APNs token with the relay, then attach it to the account's
+    /// phantom linked device (provisioned by the primary) so the relay pings
+    /// this token too. The request is signed with the account's ACI identity
+    /// key, which every device on the account holds; no Signal credentials
+    /// for this device are sent to the relay.
+    private static func runEnsureAttached(dependencies: Dependencies, apnsHex: String) async throws {
+        var (storedRelayToken, isAttached) = dependencies.db.read { tx in
+            (Store.getRelayToken(tx: tx), Store.isAttached(tx: tx))
+        }
+
+        // 1. If we believe we're attached, confirm with the relay. Re-attach if
+        //    it no longer agrees (e.g. the relay dropped the attachment).
+        if isAttached, let token = storedRelayToken {
+            do {
+                let status = try await API.status(relayToken: token)
+                if status.attached != true {
+                    Logger.warn("RadarPushRelay: relay reports not attached; re-attaching")
+                    isAttached = false
+                }
+            } catch RelayError.http(status: 404, _) {
+                Logger.warn("RadarPushRelay: relay does not know our token; re-registering")
+                storedRelayToken = nil
+                isAttached = false
+            }
+            if !isAttached {
+                let clearRelayToken = storedRelayToken == nil
+                await dependencies.db.awaitableWrite { tx in
+                    Store.setIsAttached(false, tx: tx)
+                    if clearRelayToken {
+                        Store.setRelayToken(nil, tx: tx)
+                    }
+                }
+            }
+        }
+
+        // 2. Register this device's APNs token with the relay.
+        let relayToken: String
+        if let storedRelayToken {
+            relayToken = storedRelayToken
+        } else {
+            relayToken = try await retrying { try await API.register(apnsHex: apnsHex) }
+            await dependencies.db.awaitableWrite { tx in
+                Store.setRelayToken(relayToken, tx: tx)
+            }
+            Logger.info("RadarPushRelay: registered linked device with relay")
+        }
+
+        // 3. Attach to the account's relay. Fails with 404 until the primary
+        //    has enabled the relay; we retry on the next launch / token update.
+        if !isAttached {
+            let request = try makeAttachRequest(dependencies: dependencies, relayToken: relayToken)
+            try await retrying { try await API.attach(relayToken: relayToken, request: request) }
+            await dependencies.db.awaitableWrite { tx in
+                Store.setIsAttached(true, tx: tx)
+            }
+            Logger.info("RadarPushRelay: attached linked device to account relay")
+        }
+
+        // 4. Keep the relay's copy of our APNs token current.
+        try await retrying {
+            try await API.updateAPNsToken(relayToken: relayToken, apnsHex: apnsHex)
+        }
+    }
+
+    /// The exact bytes signed to attach. Must stay byte-identical to
+    /// `signed_message` in radar-push-relay `src/routes/attach.rs`.
+    private static func attachMessage(aci: Aci, deviceId: UInt32, relayToken: String, timestampMs: UInt64) -> Data {
+        let fields = [
+            "RadarPushRelayAttach-v1",
+            aci.rawUUID.uuidString.lowercased(),
+            String(deviceId),
+            relayToken.lowercased(),
+            String(timestampMs),
+        ]
+        return Data(fields.joined(separator: "\n").utf8)
+    }
+
+    private static func makeAttachRequest(dependencies: Dependencies, relayToken: String) throws -> API.AttachRequest {
+        let (localIdentifiers, deviceId, identityKeyPair) = dependencies.db.read { tx in
+            (
+                dependencies.tsAccountManager.localIdentifiers(tx: tx),
+                dependencies.tsAccountManager.storedDeviceId(tx: tx).ifValid,
+                dependencies.identityManager.identityKeyPair(for: .aci, tx: tx)
+            )
+        }
+        guard let aci = localIdentifiers?.aci else {
+            throw RelayError.missingPrimaryState("no local identifiers")
+        }
+        guard let deviceId else {
+            throw RelayError.missingPrimaryState("no device id")
+        }
+        guard let identityKeyPair else {
+            throw RelayError.missingPrimaryState("no aci identity")
+        }
+
+        let timestampMs = Date.ows_millisecondTimestamp()
+        let message = attachMessage(
+            aci: aci,
+            deviceId: deviceId.uint32Value,
+            relayToken: relayToken,
+            timestampMs: timestampMs
+        )
+        let signature = identityKeyPair.identityKeyPair.privateKey.generateSignature(message: message)
+        return API.AttachRequest(
+            signalAci: aci.rawUUID.uuidString.lowercased(),
+            signalDeviceId: deviceId.uint32Value,
+            timestampMs: timestampMs,
+            signature: signature.base64EncodedString()
+        )
+    }
+
     /// Shared teardown path used by both logout and explicit user-disable.
     /// Best-effort: each step logs and proceeds independently so local
     /// state always ends up clean.
@@ -307,6 +434,7 @@ public enum RadarPushRelay {
         await SSKEnvironment.shared.databaseStorageRef.awaitableWrite { tx in
             Store.setRelayToken(nil, tx: tx)
             Store.setIsLinked(false, tx: tx)
+            Store.setIsAttached(false, tx: tx)
             Store.setPhantomDeviceId(nil, tx: tx)
         }
     }
@@ -405,6 +533,30 @@ public enum RadarPushRelay {
             }
         }
 
+        struct AttachRequest: Encodable {
+            let signalAci: String
+            let signalDeviceId: UInt32
+            let timestampMs: UInt64
+            let signature: String
+        }
+
+        struct AttachResponse: Decodable {
+            let attached: Bool
+        }
+
+        static func attach(relayToken: String, request: AttachRequest) async throws {
+            let body = try encoder.encode(request)
+            let response: AttachResponse = try await send(
+                method: "POST",
+                path: "/api/v1/attach",
+                body: body,
+                relayToken: relayToken
+            )
+            guard response.attached else {
+                throw RelayError.linkRejected
+            }
+        }
+
         static func updateAPNsToken(relayToken: String, apnsHex: String) async throws {
             struct Body: Encodable {
                 let newApnsToken: String
@@ -421,6 +573,9 @@ public enum RadarPushRelay {
 
         struct StatusResponse: Decodable {
             let linked: Bool
+            /// Whether this (linked-device) registration is attached to the
+            /// account's relay. Absent from relays that predate attaching.
+            let attached: Bool?
             let bridge: Bridge?
 
             struct Bridge: Decodable {
@@ -757,6 +912,7 @@ private enum Store {
     private static let kvStore = KeyValueStore(collection: "RadarPushRelay")
     private static let relayTokenKey = "relayToken"
     private static let isLinkedKey = "isLinked"
+    private static let isAttachedKey = "isAttached"
     private static let isEnabledKey = "isEnabled"
     private static let phantomDeviceIdKey = "phantomDeviceId"
     private static let hasAskedAboutRelayKey = "hasAskedAboutRelay"
@@ -779,6 +935,16 @@ private enum Store {
 
     static func setIsLinked(_ value: Bool, tx: DBWriteTransaction) {
         kvStore.setBool(value, key: isLinkedKey, transaction: tx)
+    }
+
+    /// Linked devices only: whether this device's relay registration is
+    /// attached to the account's phantom linked device.
+    static func isAttached(tx: DBReadTransaction) -> Bool {
+        return kvStore.getBool(isAttachedKey, defaultValue: false, transaction: tx)
+    }
+
+    static func setIsAttached(_ value: Bool, tx: DBWriteTransaction) {
+        kvStore.setBool(value, key: isAttachedKey, transaction: tx)
     }
 
     /// Defaults to `false`: relay is off until the user explicitly opts in via
