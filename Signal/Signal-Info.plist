@@ -13,11 +13,11 @@
 	<key>BuildDetails</key>
 	<dict>
 		<key>DateTime</key>
-		<string>Thu Aug  6 20:22:49 UTC 2026</string>
+		<string>Fri Oct  2 18:47:30 UTC 2026</string>
 		<key>SignalCommit</key>
-		<string>b4f557f2be7c70d7e204b2a852e6fe5f14e4ce50 onboarding improvements</string>
+		<string>dbd44194707045f73a56c91d7c5f2f2eca80f497 Ring linked devices (iPad) by attaching them to the push relay (#52)</string>
 		<key>Timestamp</key>
-		<integer>1786047769</integer>
+		<integer>1790966850</integer>
 		<key>XCodeVersion</key>
 		<string>2600.2660</string>
 	</dict>
@@ -40,7 +40,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>7.93</string>
+	<string>7.94</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleURLTypes</key>
@@ -57,7 +57,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>3</string>
+	<string>4</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>LOGS_EMAIL</key>

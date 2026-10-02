@@ -793,7 +793,8 @@ extension PaymentsImpl {
                     description: description,
                     amountSats: nil,
                     expirySecs: expirySecs,
-                    paymentHash: nil
+                    paymentHash: nil,
+                    receiverIdentityPublicKey: nil
                 )
             )
         )
