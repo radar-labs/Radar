@@ -34,6 +34,10 @@ extension ConversationViewController {
             }
         }
 
+        if let banner = createPinnedMessageBanner() {
+            banners.append(banner)
+        }
+
         // Pending Member requests
         if let banner = createPendingJoinRequestBanner(viewState: viewState) {
             banners.append(banner)
@@ -76,6 +80,51 @@ extension ConversationViewController {
         if hasViewDidAppearEverBegun {
             updateContentInsets()
         }
+    }
+}
+
+private extension ConversationViewController {
+    func createPinnedMessageBanner() -> ConversationBannerView? {
+        guard let interactionId = threadViewModel.pinnedMessageIds.first else {
+            return nil
+        }
+
+        let pinnedMessage: (id: String, title: String)? = DependenciesBridge.shared.db.read { tx in
+            guard let message = DependenciesBridge.shared.interactionStore.fetchInteraction(
+                rowId: interactionId,
+                tx: tx
+            ) as? TSMessage else {
+                return nil
+            }
+            return (
+                message.uniqueId,
+                message.rawBody(transaction: tx)?.nilIfEmpty
+                    ?? OWSLocalizedString(
+                        "PINNED_MESSAGE_BANNER_TITLE",
+                        comment: "Title shown for a pinned message banner"
+                    )
+            )
+        }
+        guard let pinnedMessage else { return nil }
+
+        return ConversationBannerView(
+            configuration: .init(
+                title: pinnedMessage.title,
+                viewButtonTitle: OWSLocalizedString(
+                    "PINNED_MESSAGE_BANNER_VIEW",
+                    comment: "Button to open a pinned message"
+                ),
+                viewButtonAction: UIAction { [weak self] _ in
+                    self?.ensureInteractionLoadedThenScrollToInteraction(
+                        pinnedMessage.id,
+                        alignment: .centerIfNotEntirelyOnScreen,
+                        isAnimated: true
+                    )
+                },
+                dismissButtonAction: nil,
+                accessoryView: UIImageView(image: UIImage(named: "pin"))
+            )
+        )
     }
 }
 

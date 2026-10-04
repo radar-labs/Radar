@@ -25,6 +25,10 @@ protocol PhotoCaptureViewControllerDelegate: AnyObject {
                                     didRequestSwitchCaptureModeTo captureMode: PhotoCaptureViewController.CaptureMode,
                                     completion: @escaping (Bool) -> Void)
     func photoCaptureViewControllerCanShowTextEditor(_ photoCaptureViewController: PhotoCaptureViewController) -> Bool
+    func photoCaptureViewController(
+        _ photoCaptureViewController: PhotoCaptureViewController,
+        didScanLightningInvoice invoice: String
+    )
 }
 
 protocol PhotoCaptureViewControllerDataSource: AnyObject {
@@ -36,6 +40,7 @@ class PhotoCaptureViewController: OWSViewController, OWSNavigationChildControlle
 
     weak var delegate: PhotoCaptureViewControllerDelegate?
     weak var dataSource: PhotoCaptureViewControllerDataSource?
+    var allowsLightningInvoiceScanning = false
     private var interactiveDismiss: PhotoCaptureInteractiveDismiss?
 
     private lazy var qrCodeSampleBufferScanner = QRCodeSampleBufferScanner(delegate: self)
@@ -1290,6 +1295,23 @@ extension PhotoCaptureViewController: QRCodeSampleBufferScannerDelegate {
 
     func qrCodeFound(string qrCodeString: String?, data qrCodeData: Data?) {
         guard let qrCodeString else {
+            return
+        }
+
+        let normalizedQRCode = qrCodeString
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .lowercased()
+        let isLightningInvoice = normalizedQRCode.hasPrefix("lnbc")
+            || normalizedQRCode.hasPrefix("lntb")
+            || normalizedQRCode.hasPrefix("lnbcrt")
+            || normalizedQRCode.hasPrefix("lightning:ln")
+        if isLightningInvoice {
+            guard allowsLightningInvoiceScanning else { return }
+            qrCodeScanned = true
+            delegate?.photoCaptureViewController(
+                self,
+                didScanLightningInvoice: qrCodeString.trimmingCharacters(in: .whitespacesAndNewlines)
+            )
             return
         }
 

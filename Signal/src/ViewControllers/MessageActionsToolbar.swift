@@ -28,8 +28,8 @@ public class MessageAction: NSObject {
         case edit
         case showPaymentDetails
         case endPoll
-        case star
-        case unstar
+        case pin
+        case unpin
 
         /// Lower priority numbers indicate an action should be shown earlier.
         var priority: Int {
@@ -47,8 +47,8 @@ public class MessageAction: NSObject {
             case .stopSpeaking: 10
             case .info: 11
             case .delete: 12
-            case .star: 13
-            case .unstar: 13
+            case .pin: 12
+            case .unpin: 13
             }
         }
     }
@@ -99,10 +99,10 @@ public class MessageAction: NSObject {
                 return .settingsPayments
             case .endPoll:
                 return .pollStopLight
-            case .star:
-                return .contextMenuStarEmpty
-            case .unstar:
-                return .contextMenuStarFill
+            case .pin:
+                return .contextMenuPin
+            case .unpin:
+                return .contextMenuUnpin
             }
         }()
         return Theme.iconImage(icon)

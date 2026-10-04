@@ -653,6 +653,7 @@ fileprivate extension ConversationViewController {
 
                 let pickerModal = SendMediaNavigationController.showingCameraFirst(
                     hasQuotedReplyDraft: self.inputToolbar?.quotedReplyDraft != nil,
+                    allowsLightningInvoiceScanning: true
                 )
                 pickerModal.sendMediaNavDelegate = self
                 pickerModal.sendMediaNavDataSource = self
@@ -934,6 +935,20 @@ extension ConversationViewController: SendMediaNavDelegate {
 
     func sendMediaNav(_ sendMediaNavigationController: SendMediaNavigationController, didChangeViewOnceState isViewOnce: Bool) {
         // We can ignore this event.
+    }
+
+    func sendMediaNav(
+        _ sendMediaNavigationController: SendMediaNavigationController,
+        didScanLightningInvoice invoice: String
+    ) {
+        dismiss(animated: true) { [weak self] in
+            guard let self else { return }
+            SendPaymentViewController.presentLightningInvoice(
+                from: self,
+                delegate: self,
+                invoice: invoice
+            )
+        }
     }
 }
 

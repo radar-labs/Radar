@@ -10,6 +10,17 @@ import SignalUI
 protocol CameraFirstCaptureDelegate: AnyObject {
     func cameraFirstCaptureSendFlowDidComplete(_ cameraFirstCaptureSendFlow: CameraFirstCaptureSendFlow)
     func cameraFirstCaptureSendFlowDidCancel(_ cameraFirstCaptureSendFlow: CameraFirstCaptureSendFlow)
+    func cameraFirstCaptureSendFlow(
+        _ cameraFirstCaptureSendFlow: CameraFirstCaptureSendFlow,
+        didScanLightningInvoice invoice: String
+    )
+}
+
+extension CameraFirstCaptureDelegate {
+    func cameraFirstCaptureSendFlow(
+        _ cameraFirstCaptureSendFlow: CameraFirstCaptureSendFlow,
+        didScanLightningInvoice invoice: String
+    ) {}
 }
 
 class CameraFirstCaptureSendFlow {
@@ -104,6 +115,13 @@ extension CameraFirstCaptureSendFlow: SendMediaNavDelegate {
         guard !self.storiesOnly else { return }
         // Don't enable view once media to send to stories.
         self.showsStoriesInPicker = !isViewOnce
+    }
+
+    func sendMediaNav(
+        _ sendMediaNavigationController: SendMediaNavigationController,
+        didScanLightningInvoice invoice: String
+    ) {
+        delegate?.cameraFirstCaptureSendFlow(self, didScanLightningInvoice: invoice)
     }
 }
 

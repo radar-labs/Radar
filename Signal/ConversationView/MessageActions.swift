@@ -16,7 +16,7 @@ protocol MessageActionsDelegate: AnyObject {
     func messageActionsEditItem(_ itemViewModel: CVItemViewModelImpl)
     func messageActionsShowPaymentDetails(_ itemViewModel: CVItemViewModelImpl)
     func messageActionsEndPoll(_ itemViewModel: CVItemViewModelImpl)
-    func messageActionsStarItem(_ itemViewModel: CVItemViewModelImpl)
+    func messageActionsChangePinStatus(_ itemViewModel: CVItemViewModelImpl, pin: Bool)
 }
 
 // MARK: -
@@ -181,19 +181,36 @@ struct MessageActionBuilder {
         )
     }
     
-    static func star(itemViewModel: CVItemViewModelImpl, delegate: MessageActionsDelegate) -> MessageAction {
-        let isStarred = (itemViewModel.interaction as? TSMessage)?.isStarred ?? false
-        let title = isStarred ? "UNSTAR" : "STAR"
-        
-        return MessageAction(isStarred ? .unstar : .star,
-                             accessibilityLabel: OWSLocalizedString(title, comment: "Action sheet button title"),
-                             accessibilityIdentifier: UIView.accessibilityIdentifier(containerName: "message_action", name: "star"),
-                             contextMenuTitle: OWSLocalizedString(title,  comment: "Context menu button title"),
-                             contextMenuAttributes: [],
-                             block: { [weak delegate] (_) in
-                                delegate?.messageActionsStarItem(itemViewModel)
+    static func changePinStatus(
+        itemViewModel: CVItemViewModelImpl,
+        delegate: MessageActionsDelegate
+    ) -> MessageAction? {
+        guard BuildFlags.PinnedMessages.send else { return nil }
 
-        })
+        if let groupThread = itemViewModel.thread as? TSGroupThread,
+           let groupModel = groupThread.groupModel as? TSGroupModelV2,
+           let localAci = DependenciesBridge.shared.tsAccountManager.localIdentifiersWithMaybeSneakyTransaction?.aci,
+           groupModel.access.attributes == .administrator,
+           !groupThread.groupModel.groupMembership.isFullMemberAndAdministrator(localAci) {
+            return nil
+        }
+
+        guard let footerState = itemViewModel.renderItem.itemViewState.footerState else {
+            return nil
+        }
+
+        let isPinned = footerState.isPinnedMessage
+        let title = isPinned ? "PINNED_MESSAGE_UNPIN_ACTION_TITLE" : "PINNED_MESSAGE_PIN_ACTION_TITLE"
+        return MessageAction(
+            isPinned ? .unpin : .pin,
+            accessibilityLabel: OWSLocalizedString(title, comment: "Label for button to pin or unpin a message"),
+            accessibilityIdentifier: UIView.accessibilityIdentifier(containerName: "message_action", name: "pin"),
+            contextMenuTitle: OWSLocalizedString(title, comment: "Context menu button title"),
+            contextMenuAttributes: [],
+            block: { [weak delegate] _ in
+                delegate?.messageActionsChangePinStatus(itemViewModel, pin: !isPinned)
+            }
+        )
     }
 }
 
@@ -218,8 +235,9 @@ class MessageActions: NSObject {
             actions.append(replyAction)
         }
         
-        let starAction = MessageActionBuilder.star(itemViewModel: itemViewModel, delegate: delegate)
-        actions.append(starAction)
+        if let pinAction = MessageActionBuilder.changePinStatus(itemViewModel: itemViewModel, delegate: delegate) {
+            actions.append(pinAction)
+        }
 
         if itemViewModel.canForwardMessage {
             actions.append(MessageActionBuilder.forwardMessage(itemViewModel: itemViewModel, delegate: delegate))
@@ -284,6 +302,10 @@ class MessageActions: NSObject {
         let selectAction = MessageActionBuilder.selectMessage(itemViewModel: itemViewModel, delegate: delegate)
         actions.append(selectAction)
 
+        if let pinAction = MessageActionBuilder.changePinStatus(itemViewModel: itemViewModel, delegate: delegate) {
+            actions.append(pinAction)
+        }
+
         return actions
     }
 
@@ -312,6 +334,10 @@ class MessageActions: NSObject {
 
         let selectAction = MessageActionBuilder.selectMessage(itemViewModel: itemViewModel, delegate: delegate)
         actions.append(selectAction)
+
+        if let pinAction = MessageActionBuilder.changePinStatus(itemViewModel: itemViewModel, delegate: delegate) {
+            actions.append(pinAction)
+        }
 
         return actions
     }
@@ -355,6 +381,10 @@ class MessageActions: NSObject {
         )
         actions.append(selectAction)
 
+        if let pinAction = MessageActionBuilder.changePinStatus(itemViewModel: itemViewModel, delegate: delegate) {
+            actions.append(pinAction)
+        }
+
         return actions
     }
 
@@ -387,6 +417,10 @@ class MessageActions: NSObject {
             delegate: delegate
         )
         actions.append(selectAction)
+
+        if let pinAction = MessageActionBuilder.changePinStatus(itemViewModel: itemViewModel, delegate: delegate) {
+            actions.append(pinAction)
+        }
 
         if let poll = itemViewModel.componentState.poll?.state.poll, poll.ownerIsLocalUser, !poll.isEnded {
             let endPollAction = MessageActionBuilder.endPoll(

@@ -1055,6 +1055,50 @@ public final class MessageReceiver {
             return nil
         }
 
+        if BuildFlags.PinnedMessages.receive,
+           dataMessage.pinMessage != nil || dataMessage.unpinMessage != nil {
+            guard thread.canUserEditPinnedMessages(aci: envelope.sourceAci),
+                  let threadId = thread.grdbId?.int64Value else {
+                return nil
+            }
+
+            if let pinMessage = dataMessage.pinMessage {
+                do {
+                    let targetMessage = try DependenciesBridge.shared.pinnedMessageManager.pinMessage(
+                        pinMessageProto: pinMessage,
+                        threadId: threadId,
+                        timestamp: Int64(dataMessage.timestamp),
+                        transaction: tx
+                    )
+                    SSKEnvironment.shared.databaseStorageRef.touch(
+                        interaction: targetMessage,
+                        shouldReindex: false,
+                        tx: tx
+                    )
+                } catch {
+                    owsFailDebug("Could not process pin message: \(error)")
+                }
+                return nil
+            }
+
+            if let unpinMessage = dataMessage.unpinMessage {
+                do {
+                    let targetMessage = try DependenciesBridge.shared.pinnedMessageManager.unpinMessage(
+                        unpinMessageProto: unpinMessage,
+                        transaction: tx
+                    )
+                    SSKEnvironment.shared.databaseStorageRef.touch(
+                        interaction: targetMessage,
+                        shouldReindex: false,
+                        tx: tx
+                    )
+                } catch {
+                    owsFailDebug("Could not process unpin message: \(error)")
+                }
+                return nil
+            }
+        }
+
         if request.shouldDiscardVisibleMessages {
             // Now that "reactions" and "delete for everyone" have been processed, the
             // only possible outcome of further processing is a visible message or

@@ -20,6 +20,10 @@ protocol SendMediaNavDelegate: AnyObject {
     func sendMediaNav(_ sendMediaNavigationController: SendMediaNavigationController, didChangeMessageBody newMessageBody: MessageBody?)
 
     func sendMediaNav(_ sendMediaNavigationController: SendMediaNavigationController, didChangeViewOnceState isViewOnce: Bool)
+    func sendMediaNav(
+        _ sendMediaNavigationController: SendMediaNavigationController,
+        didScanLightningInvoice invoice: String
+    )
 }
 
 protocol SendMediaNavDataSource: AnyObject {
@@ -49,8 +53,10 @@ class CameraFirstCaptureNavigationController: SendMediaNavigationController {
         storiesOnly: Bool = false,
         hasQuotedReplyDraft: Bool,
         delegate: CameraFirstCaptureDelegate,
+        allowsLightningInvoiceScanning: Bool = false,
     ) -> CameraFirstCaptureNavigationController {
         let navController = CameraFirstCaptureNavigationController(hasQuotedReplyDraft: hasQuotedReplyDraft)
+        navController.captureViewController.allowsLightningInvoiceScanning = allowsLightningInvoiceScanning
         navController.setViewControllers([navController.captureViewController], animated: false)
 
         let cameraFirstCaptureSendFlow = CameraFirstCaptureSendFlow(storiesOnly: storiesOnly, delegate: delegate)
@@ -91,8 +97,12 @@ class SendMediaNavigationController: OWSNavigationController {
     weak var sendMediaNavDelegate: SendMediaNavDelegate?
     weak var sendMediaNavDataSource: SendMediaNavDataSource?
 
-    class func showingCameraFirst(hasQuotedReplyDraft: Bool) -> SendMediaNavigationController {
+    class func showingCameraFirst(
+        hasQuotedReplyDraft: Bool,
+        allowsLightningInvoiceScanning: Bool = false
+    ) -> SendMediaNavigationController {
         let navController = SendMediaNavigationController(hasQuotedReplyDraft: hasQuotedReplyDraft)
+        navController.captureViewController.allowsLightningInvoiceScanning = allowsLightningInvoiceScanning
         navController.setViewControllers([navController.captureViewController], animated: false)
         return navController
     }
@@ -353,6 +363,13 @@ extension SendMediaNavigationController: PhotoCaptureViewControllerDelegate {
 
     func photoCaptureViewControllerCanShowTextEditor(_ photoCaptureViewController: PhotoCaptureViewController) -> Bool {
         return canSendToStories
+    }
+
+    func photoCaptureViewController(
+        _ photoCaptureViewController: PhotoCaptureViewController,
+        didScanLightningInvoice invoice: String
+    ) {
+        sendMediaNavDelegate?.sendMediaNav(self, didScanLightningInvoice: invoice)
     }
 }
 
