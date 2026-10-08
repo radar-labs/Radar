@@ -263,6 +263,15 @@ class PaymentsDetailViewController: OWSTableViewController2 {
             )
         }
 
+        // Message (the LNURL sender comment on an external / unidentified receive).
+        // Gated to unidentified incoming payments so it never duplicates the memo
+        // pill shown on the contact header.
+        if paymentItem.address == nil,
+           paymentItem.isIncoming,
+           let message = paymentItem.memoMessage?.ows_stripped().nilIfEmpty {
+            section.add(buildMessageItem(message: message))
+        }
+
         return section
     }
 
@@ -296,6 +305,44 @@ class PaymentsDetailViewController: OWSTableViewController2 {
             return cell
         },
         actionBlock: nil)
+    }
+
+    private func buildMessageItem(message: String) -> OWSTableItem {
+        OWSTableItem(
+            customCellBlock: {
+                let cell = OWSTableItem.newCell()
+
+                let topLabel = UILabel()
+                topLabel.text = OWSLocalizedString(
+                    "SETTINGS_PAYMENTS_PAYMENT_DETAILS_MESSAGE",
+                    comment: "Label for the sender's message attached to a received payment in the payment details view."
+                )
+                topLabel.textColor = Theme.primaryTextColor
+                topLabel.font = UIFont.dynamicTypeBodyClamped
+
+                let bottomLabel = UILabel()
+                bottomLabel.text = message
+                bottomLabel.textColor = Theme.secondaryTextAndIconColor
+                bottomLabel.font = UIFont.dynamicTypeFootnoteClamped
+                bottomLabel.numberOfLines = 3
+                bottomLabel.lineBreakMode = .byTruncatingTail
+
+                let stack = UIStackView(arrangedSubviews: [topLabel, bottomLabel])
+                stack.axis = .vertical
+                stack.alignment = .fill
+
+                cell.contentView.addSubview(stack)
+                stack.autoPinEdgesToSuperviewMargins()
+
+                cell.accessoryType = .disclosureIndicator
+
+                return cell
+            },
+            actionBlock: { [weak self] in
+                guard let self else { return }
+                self.present(PaymentMessageSheet(message: message), animated: true)
+            }
+        )
     }
 
     private func configureHeader(cell: UITableViewCell) {
@@ -484,5 +531,76 @@ extension PaymentsDetailViewController: DatabaseChangeDelegate {
 
     public func databaseChangesDidReset() {
         updateItem()
+    }
+}
+
+// MARK: - Sender message sheet
+
+private class PaymentMessageSheet: OWSTableSheetViewController {
+    private let messageTableViewController: PaymentMessageTableViewController
+
+    override var tableViewController: OWSTableViewController2 {
+        get { messageTableViewController }
+        set {}
+    }
+
+    init(message: String) {
+        self.messageTableViewController = PaymentMessageTableViewController(message: message)
+        super.init()
+    }
+
+    override func tableContents() -> OWSTableContents {
+        messageTableViewController.tableContents()
+    }
+}
+
+private class PaymentMessageTableViewController: OWSTableViewController2, TextViewWithPlaceholderDelegate {
+    private let message: String
+
+    private let messageTextView: TextViewWithPlaceholder = {
+        let textView = TextViewWithPlaceholder()
+        textView.isEditable = false
+        textView.linkTextAttributes = [
+            .underlineStyle: NSUnderlineStyle.single.rawValue,
+        ]
+        return textView
+    }()
+
+    init(message: String) {
+        self.message = message
+    }
+
+    func tableContents() -> OWSTableContents {
+        let header: UIView = {
+            let headerContainer = UIView()
+            headerContainer.layoutMargins = .init(top: 0, left: 16, bottom: 24, right: 16)
+
+            let titleLabel = UILabel()
+            headerContainer.addSubview(titleLabel)
+            titleLabel.text = OWSLocalizedString(
+                "SETTINGS_PAYMENTS_PAYMENT_DETAILS_MESSAGE",
+                comment: "Label for the sender's message attached to a received payment in the payment details view."
+            )
+            titleLabel.font = .dynamicTypeHeadline.semibold()
+            titleLabel.textColor = Theme.primaryTextColor
+            titleLabel.autoCenterInSuperviewMargins()
+            titleLabel.autoPinHeightToSuperviewMargins()
+
+            return headerContainer
+        }()
+
+        self.messageTextView.text = message
+
+        let section = OWSTableSection(
+            items: [
+                self.textViewItem(
+                    self.messageTextView,
+                    dataDetectorTypes: .all
+                )
+            ],
+            headerView: header
+        )
+
+        return OWSTableContents(sections: [section])
     }
 }
