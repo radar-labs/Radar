@@ -25,7 +25,11 @@ extension ChatListViewController: CameraFirstCaptureDelegate {
                     Logger.warn("Proceeding with no microphone access.")
                 }
 
-                let cameraModal = CameraFirstCaptureNavigationController.cameraFirstModal(hasQuotedReplyDraft: false, delegate: self)
+                let cameraModal = CameraFirstCaptureNavigationController.cameraFirstModal(
+                    hasQuotedReplyDraft: false,
+                    delegate: self,
+                    allowsLightningInvoiceScanning: true
+                )
                 cameraModal.modalPresentationStyle = .overFullScreen
 
                 // Defer hiding status bar until modal is fully onscreen
@@ -50,5 +54,26 @@ extension ChatListViewController: CameraFirstCaptureDelegate {
 
     func cameraFirstCaptureSendFlowDidCancel(_ cameraFirstCaptureSendFlow: CameraFirstCaptureSendFlow) {
         dismiss(animated: true)
+    }
+
+    func cameraFirstCaptureSendFlow(
+        _ cameraFirstCaptureSendFlow: CameraFirstCaptureSendFlow,
+        didScanLightningInvoice invoice: String
+    ) {
+        dismiss(animated: true) { [weak self] in
+            guard let self else { return }
+            SendPaymentViewController.presentLightningInvoice(
+                from: self,
+                delegate: self,
+                invoice: invoice
+            )
+        }
+    }
+}
+
+extension ChatListViewController: SendPaymentViewDelegate {
+    public func didSendPayment(success: Bool) {
+        guard success else { return }
+        PaymentOnboarding.presentBiometricLockPromptIfNeeded {}
     }
 }

@@ -466,6 +466,39 @@ public class SendPaymentViewController: OWSViewController {
         )
     }
 
+    public static func presentLightningInvoice(
+        from viewController: UIViewController,
+        delegate: SendPaymentViewDelegate,
+        invoice: String
+    ) {
+        guard let inputType = PaymentsImpl.parse(input: invoice)
+                ?? URL(string: invoice).flatMap({ PaymentsImpl.parse(url: $0) })
+        else {
+            OWSActionSheets.showErrorAlert(
+                message: OWSLocalizedString(
+                    "SETTINGS_PAYMENTS_TRANSFER_OUT_INVALID_PUBLIC_ADDRESS",
+                    comment: "Error indicating that a Lightning payment input is not valid."
+                )
+            )
+            return
+        }
+
+        let recipient = SendPaymentRecipientImpl.publicAddress(inputType: inputType)
+        let paymentView = SendPaymentViewController(
+            recipient: recipient,
+            initialPaymentAmount: PaymentsImpl.bitcoinAmountSats(for: inputType).map {
+                TSPaymentAmount(currency: .bitcoin, picoMob: $0)
+            },
+            isOutgoingTransfer: true,
+            mode: .fromConversationView
+        )
+        paymentView.delegate = delegate
+        viewController.presentFormSheet(
+            OWSNavigationController(rootViewController: paymentView),
+            animated: true
+        )
+    }
+
     open override func viewDidLoad() {
         super.viewDidLoad()
 

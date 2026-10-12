@@ -141,7 +141,10 @@ public class PaymentsHelperImpl: PaymentsHelperSwift, PaymentsHelper {
         }
         let paymentsState = PaymentsState.build(arePaymentsEnabled: true,
                                                 paymentsEntropy: newPaymentsEntropy)
-        owsAssertDebug(paymentsState.isEnabled)
+        guard paymentsState.isEnabled else {
+            owsFailDebug("PaymentsState rejected the supplied paymentsEntropy.")
+            return false
+        }
         setPaymentsState(paymentsState,
                          originatedLocally: true,
                          transaction: transaction)
