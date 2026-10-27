@@ -13,11 +13,11 @@
 	<key>BuildDetails</key>
 	<dict>
 		<key>DateTime</key>
-		<string>Fri Oct  2 20:57:21 UTC 2026</string>
+		<string>Tue Oct 27 19:00:11 UTC 2026</string>
 		<key>SignalCommit</key>
-		<string>6fad85c6ddd7160a67ef34c62c7ac671f9742d17 update app version and breez</string>
+		<string>d793b6f14197f37b5095337070082acc57adfd19 replace signal app link with Radar</string>
 		<key>Timestamp</key>
-		<integer>1790974641</integer>
+		<integer>1793127611</integer>
 		<key>XCodeVersion</key>
 		<string>2600.2660</string>
 	</dict>
@@ -40,7 +40,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>7.94</string>
+	<string>7.95</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleURLTypes</key>
@@ -57,7 +57,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>4</string>
+	<string>5</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>LOGS_EMAIL</key>
