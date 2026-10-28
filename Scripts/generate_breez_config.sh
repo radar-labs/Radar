@@ -24,7 +24,9 @@ let breezSdkConfig: Config = {
     config.apiKey = "$BREEZ_API_KEY"
     config.lnurlDomain = "radar.cash"
     config.preferSparkOverLightning = true
-    config.maxDepositClaimFee = MaxFee.networkRecommended(leewaySatPerVbyte: 5)
+    // Deposit claim fee cap: network fee at the fastest recommended rate + 5 sat/vB,
+    // plus 0.1% of the deposit (Breez's default) for the provider's claim fee.
+    config.maxDepositClaimFee = MaxFee(onchain: .networkRecommended(leewaySatPerVbyte: 5), proportionalPpm: 1_000)
     return config
 }()
 EOF
