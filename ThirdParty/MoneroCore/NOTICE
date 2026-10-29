@@ -1,0 +1,9 @@
+MoneroCore includes the LGPL-3.0 C bridge from monero_c by MrCyjaneK and
+contributors, and Monero Project wallet API headers licensed under the BSD
+3-Clause License. The native Monero binary is distributed by the MoneroKit
+Swift release artifact under its published license terms.
+
+C bridge source: https://github.com/horizontalsystems/MoneroKit.Swift
+Original bridge: https://github.com/MrCyjaneK/monero_c
+Native artifact: https://github.com/horizontalsystems/MoneroKit.Swift/releases/tag/frameworks-4
+The LGPL-3.0 license text is included in LICENSE-LGPL.

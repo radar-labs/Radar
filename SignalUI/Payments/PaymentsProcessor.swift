@@ -381,6 +381,7 @@ private class PaymentProcessingOperation {
             case let paymentsError as PaymentsError:
                 switch paymentsError {
                 case .notEnabled,
+                     .sdkNotInitialized,
                      .userNotRegisteredOrAppNotReady,
                      .userHasNoPublicAddress,
                      .invalidCurrency,
@@ -439,6 +440,7 @@ private class PaymentProcessingOperation {
         case let paymentsError as PaymentsError:
             switch paymentsError {
             case .notEnabled,
+                 .sdkNotInitialized,
                  .userNotRegisteredOrAppNotReady,
                  .userHasNoPublicAddress,
                  .invalidCurrency,
@@ -627,9 +629,18 @@ private class PaymentProcessingOperation {
                 let paymentResponse = try await sdk.lnurlPay(request: LnurlPayRequest(prepareResponse: prepareLnurlPayResponse))
                 receipt = .lnurlPay(paymentResponse)
             case .bolt11(let prepareSendPaymentResponse):
+                let options: SendPaymentOptions
+                switch prepareSendPaymentResponse.paymentMethod {
+                case .bitcoinAddress:
+                    options = .bitcoinAddress(confirmationSpeed: .medium)
+                case .bolt11Invoice:
+                    options = .bolt11Invoice(preferSpark: true, completionTimeoutSecs: nil)
+                case .sparkAddress, .sparkInvoice, .crossChainAddress:
+                    throw PaymentsError.invalidInput
+                }
                 let paymentResponse = try await sdk.sendPayment(request: SendPaymentRequest(
                     prepareResponse: prepareSendPaymentResponse,
-                    options: .bolt11Invoice(preferSpark: true, completionTimeoutSecs: nil),
+                    options: options,
                     idempotencyKey: nil
                 ))
                 receipt = .bolt11(paymentResponse)

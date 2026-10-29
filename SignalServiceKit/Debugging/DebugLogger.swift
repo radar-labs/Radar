@@ -4,7 +4,7 @@
 //
 
 import AudioToolbox
-import CocoaLumberjack
+public import CocoaLumberjack
 import LibSignalClient
 import SignalRingRTC
 

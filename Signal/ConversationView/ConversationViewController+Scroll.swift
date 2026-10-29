@@ -182,7 +182,9 @@ extension ConversationViewController {
         }
 
         guard let indexPath = indexPath(forInteractionUniqueId: lastVisibleInteraction.uniqueId) else {
-            owsFailDebug("No index path for interaction, scrolling to bottom")
+            // Some protocol-only interactions (e.g. Monero address exchange messages)
+            // are intentionally omitted from the conversation's render items.
+            // The persisted last-visible interaction can still point at one of them.
             scrollToBottomOfConversation(animated: animated)
             return
         }
@@ -376,6 +378,12 @@ extension ConversationViewController {
             }
             if let lastKnownDistanceFromBottom = self.lastKnownDistanceFromBottom,
                lastKnownDistanceFromBottom < 50 {
+                return CVScrollAction(action: .bottomOfLoadWindow, isAnimated: false)
+            }
+
+            // A persisted last-visible interaction may be a protocol-only message
+            // with no corresponding cell in the current render state.
+            guard self.indexPath(forInteractionUniqueId: lastVisibleInteraction.uniqueId) != nil else {
                 return CVScrollAction(action: .bottomOfLoadWindow, isAnimated: false)
             }
 

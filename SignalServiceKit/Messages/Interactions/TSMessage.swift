@@ -8,6 +8,19 @@ public import LibSignalClient
 
 extension TSMessage {
 
+    private static func isMoneroAddressExchangeControl(_ body: String) -> Bool {
+        let prefix = "radar-monero-exchange-v1:"
+        guard let marker = body.range(of: prefix),
+              let data = Data(base64Encoded: body[marker.upperBound...].trimmingCharacters(in: .whitespacesAndNewlines)),
+              let payload = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+              payload["version"] as? Int == 1,
+              let id = payload["id"] as? String, UUID(uuidString: id) != nil,
+              let network = payload["network"] as? Int, (0...2).contains(network),
+              let expiry = payload["expiresAt"] as? Double, expiry.isFinite,
+              let kind = payload["kind"] as? String else { return false }
+        return ["request", "address", "unavailable"].contains(kind)
+    }
+
     @objc
     public var isIncoming: Bool { self is TSIncomingMessage }
 
@@ -523,6 +536,7 @@ extension TSMessage {
     public func notificationPreviewText(_ tx: DBReadTransaction) -> String {
         switch previewText(tx) {
         case .body(let body, let prefix, let ranges):
+            if Self.isMoneroAddressExchangeControl(body) { return "" }
             let hydrated = MessageBody(text: body, ranges: ranges ?? .empty)
                 .hydrating(
                     mentionHydrator: ContactsMentionHydrator.mentionHydrator(transaction: tx)

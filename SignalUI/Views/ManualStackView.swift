@@ -118,8 +118,9 @@ open class ManualStackView: ManualLayoutView {
             return .zero
         }
         guard let measurement = measurement else {
-            owsFailDebug("Missing measurement: \(self.name).")
-            return super.sizeThatFits(size)
+            // Reusable conversation cells can be measured during the brief interval
+            // after reset() clears their measurement and before reconfiguration.
+            return .zero
         }
         return measurement.measuredSize
     }

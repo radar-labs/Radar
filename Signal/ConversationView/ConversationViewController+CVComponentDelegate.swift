@@ -545,6 +545,15 @@ extension ConversationViewController: CVComponentDelegate {
     }
 
     func handleUrl(_ url: URL) {
+        if url.scheme?.lowercased() == "monero" {
+            guard let request = MoneroPaymentRequest.parse(url.absoluteString) else {
+                OWSActionSheets.showErrorAlert(message: "This Monero payment request is invalid.")
+                return
+            }
+            MoneroSendPaymentViewController.present(from: self, delegate: self, request: request)
+            return
+        }
+
         if StickerPackInfo.isStickerPackShare(url) {
             if let stickerPackInfo = StickerPackInfo.parseStickerPackShare(url) {
                 didTapStickerPack(stickerPackInfo)

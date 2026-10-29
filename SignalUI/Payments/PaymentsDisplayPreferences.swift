@@ -10,15 +10,25 @@ public final class PaymentsDisplayPreferences {
     private init() {}
 
     public static let balanceHiddenDidChange = Notification.Name("paymentsBalanceHiddenDidChange")
+    public static let moneroBalanceHiddenDidChange = Notification.Name("paymentsMoneroBalanceHiddenDidChange")
     public static let amountTypeDidChange = Notification.Name("paymentsAmountTypeDidChange")
 
     private static let balanceHiddenKey = "payments_balance_hidden"
+    private static let moneroBalanceHiddenKey = "payments_monero_balance_hidden"
 
     public var isBalanceHidden: Bool {
         get { UserDefaults.standard.bool(forKey: Self.balanceHiddenKey) }
         set {
             UserDefaults.standard.set(newValue, forKey: Self.balanceHiddenKey)
             NotificationCenter.default.post(name: Self.balanceHiddenDidChange, object: nil)
+        }
+    }
+
+    public var isMoneroBalanceHidden: Bool {
+        get { UserDefaults.standard.bool(forKey: Self.moneroBalanceHiddenKey) }
+        set {
+            UserDefaults.standard.set(newValue, forKey: Self.moneroBalanceHiddenKey)
+            NotificationCenter.default.post(name: Self.moneroBalanceHiddenDidChange, object: nil)
         }
     }
 

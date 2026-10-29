@@ -133,6 +133,8 @@ public enum ThemeIcon: UInt {
     case contextMenuMessage
     case contextMenuStarEmpty
     case contextMenuStarFill
+    case contextMenuPin
+    case contextMenuUnpin
 
     case composeNewGroupLarge
     case composeFindByUsernameLarge
@@ -207,6 +209,10 @@ public extension Theme {
             return UIImage(systemName: "star") ?? UIImage()
         case .contextMenuStarFill:
             return UIImage(systemName: "star.fill") ?? UIImage()
+        case .contextMenuPin:
+            return UIImage(named: "pin") ?? UIImage()
+        case .contextMenuUnpin:
+            return UIImage(named: "pin-slash") ?? UIImage()
         default:
             let name = iconName(icon, isDarkThemeEnabled: isDarkThemeEnabled)
             guard let image = UIImage(named: name) else {
@@ -479,6 +485,10 @@ public extension Theme {
             return "star"
         case .contextMenuStarFill:
             return "star.fill"
+        case .contextMenuPin:
+            return "pin"
+        case .contextMenuUnpin:
+            return "pin-slash"
 
             // Empty chat list
         case .composeNewGroupLarge:

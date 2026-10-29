@@ -27,6 +27,22 @@ public enum PaymentsSettingsMode: UInt, CustomStringConvertible {
 
 public class PaymentsSettingsViewController: OWSTableViewController2 {
 
+    private let paymentAssetSelector = UISegmentedControl(items: ["Bitcoin", "Monero"])
+    private let moneroRefreshButton = UIButton(type: .system)
+    private let paymentsPullToRefresh = UIRefreshControl()
+    private var isRefreshingPayments = false
+    private var paymentRefreshTimeout: DispatchWorkItem?
+    private var isShowingMonero = false
+    private var moneroSnapshot: MoneroWalletSnapshot?
+    private var moneroTransactions: [MoneroTransaction] = []
+    private var moneroStatus = "Set up a Monero wallet to see its balance."
+    private var moneroRefreshError: String?
+    private var moneroRefreshTimer: Timer?
+    private var isOpeningMoneroWallet = false
+    private var hasResolvedMoneroWalletState = false
+    private var moneroFiatRate: (currencyCode: String, price: Double, updatedAt: Date)?
+    private var moneroRateRequestInFlight = false
+
     private let appReadiness: AppReadinessSetter
     private let mode: PaymentsSettingsMode
 
@@ -59,6 +75,11 @@ public class PaymentsSettingsViewController: OWSTableViewController2 {
         placeholderView.translatesAutoresizingMaskIntoConstraints = false
         placeholderView.heightAnchor.constraint(equalToConstant: 1).isActive = true
         topHeaderStackView.addArrangedSubview(placeholderView)
+
+        paymentAssetSelector.selectedSegmentIndex = 0
+        paymentAssetSelector.accessibilityIdentifier = "paymentsAssetSelector"
+        paymentAssetSelector.addTarget(self, action: #selector(didChangePaymentAsset), for: .valueChanged)
+        topHeaderStackView.addArrangedSubview(paymentAssetSelector)
     }
 
     // MARK: - Update Balance Timer
@@ -78,14 +99,15 @@ public class PaymentsSettingsViewController: OWSTableViewController2 {
                                                            target: self,
                                                            userInfo: nil,
                                                            repeats: true) { _ in
-            Self.updateBalanceTimerDidFire()
+            self.updateBalanceTimerDidFire()
         }
     }
 
-    private static func updateBalanceTimerDidFire() {
+    private func updateBalanceTimerDidFire() {
         guard CurrentAppContext().isMainAppAndActive else {
             return
         }
+        guard !isShowingMonero else { return }
         SUIEnvironment.shared.paymentsSwiftRef.updateCurrentPaymentBalance()
     }
 
@@ -258,6 +280,9 @@ public class PaymentsSettingsViewController: OWSTableViewController2 {
         super.viewDidLoad()
 
         view.backgroundColor = tableBackgroundColor
+        moneroRefreshButton.addTarget(self, action: #selector(didTapPaymentsRefresh), for: .touchUpInside)
+        paymentsPullToRefresh.addTarget(self, action: #selector(didTapPaymentsRefresh), for: .valueChanged)
+        paymentsPullToRefresh.tintColor = .secondaryLabel
 
         title = OWSLocalizedString("SETTINGS_PAYMENTS_VIEW_TITLE",
                                   comment: "Title for the 'payments settings' view in the app settings.")
@@ -279,6 +304,23 @@ public class PaymentsSettingsViewController: OWSTableViewController2 {
     }
 
     private func updateNavbar() {
+        if isShowingMonero {
+            let isHidden = PaymentsDisplayPreferences.shared.isMoneroBalanceHidden
+            navigationItem.leftBarButtonItem = UIBarButtonItem(
+                image: UIImage(systemName: isHidden ? "eye.slash" : "eye"),
+                style: .plain,
+                target: self,
+                action: #selector(didTapMoneroEyeButton)
+            )
+            navigationItem.rightBarButtonItem = UIBarButtonItem(
+                image: UIImage(systemName: "gear"),
+                style: .plain,
+                target: self,
+                action: #selector(didTapSettings)
+            )
+            return
+        }
+
         if SSKEnvironment.shared.paymentsHelperRef.arePaymentsEnabled {
             let eyeImageName = PaymentsDisplayPreferences.shared.isBalanceHidden ? "eye.slash" : "eye"
             navigationItem.leftBarButtonItem = UIBarButtonItem(
@@ -310,10 +352,17 @@ public class PaymentsSettingsViewController: OWSTableViewController2 {
     public override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
 
-        SUIEnvironment.shared.paymentsSwiftRef.updateCurrentPaymentBalance()
-        SSKEnvironment.shared.paymentsCurrenciesRef.updateConversionRates()
-
-        startUpdateBalanceTimer()
+        tableView.refreshControl = paymentsPullToRefresh
+        tableView.alwaysBounceVertical = true
+        if isShowingMonero {
+            refreshMoneroWallet()
+            refreshMoneroFiatRateIfNeeded()
+            startMoneroRefreshTimer()
+        } else {
+            SUIEnvironment.shared.paymentsSwiftRef.updateCurrentPaymentBalance()
+            SSKEnvironment.shared.paymentsCurrenciesRef.updateConversionRates()
+            startUpdateBalanceTimer()
+        }
         let clientOutdated = SSKEnvironment.shared.paymentsHelperRef.isPaymentsVersionOutdated
         if clientOutdated {
             OWSActionSheets.showPaymentsOutdatedClientSheet(title: .updateRequired)
@@ -331,6 +380,12 @@ public class PaymentsSettingsViewController: OWSTableViewController2 {
         }
 
         stopUpdateBalanceTimer()
+        moneroRefreshTimer?.invalidate()
+        moneroRefreshTimer = nil
+        paymentRefreshTimeout?.cancel()
+        paymentRefreshTimeout = nil
+        isRefreshingPayments = false
+        paymentsPullToRefresh.endRefreshing()
     }
 
     public override func themeDidChange() {
@@ -354,7 +409,7 @@ public class PaymentsSettingsViewController: OWSTableViewController2 {
         )
         NotificationCenter.default.addObserver(
             self,
-            selector: #selector(updateTableContents),
+            selector: #selector(didUpdatePaymentBalance),
             name: PaymentsImpl.currentPaymentBalanceDidChange,
             object: nil
         )
@@ -374,6 +429,12 @@ public class PaymentsSettingsViewController: OWSTableViewController2 {
             self,
             selector: #selector(updateTableContents),
             name: PaymentsDisplayPreferences.amountTypeDidChange,
+            object: nil
+        )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(moneroBalanceVisibilityDidChange),
+            name: PaymentsDisplayPreferences.moneroBalanceHiddenDidChange,
             object: nil
         )
     }
@@ -398,8 +459,19 @@ public class PaymentsSettingsViewController: OWSTableViewController2 {
     }
 
     @objc
+    private func moneroBalanceVisibilityDidChange() {
+        updateNavbar()
+        updateTableContents()
+    }
+
+    @objc
     private func updateTableContents() {
         AssertIsOnMainThread()
+
+        if isShowingMonero {
+            updateTableContentsMonero()
+            return
+        }
 
         let arePaymentsEnabled = SSKEnvironment.shared.paymentsHelperRef.arePaymentsEnabled
         if arePaymentsEnabled {
@@ -407,6 +479,16 @@ public class PaymentsSettingsViewController: OWSTableViewController2 {
         } else {
             updateTableContentsNotEnabled()
         }
+    }
+
+    @objc
+    private func didUpdatePaymentBalance() {
+        updateTableContents()
+        guard !isShowingMonero, isRefreshingPayments else { return }
+        paymentRefreshTimeout?.cancel()
+        paymentRefreshTimeout = nil
+        isRefreshingPayments = false
+        paymentsPullToRefresh.endRefreshing()
     }
 
     private func updateTableContentsEnabled() {
@@ -437,6 +519,386 @@ public class PaymentsSettingsViewController: OWSTableViewController2 {
         contents.add(historySection)
 
         self.contents = contents
+    }
+
+    private func updateTableContentsMonero() {
+        AssertIsOnMainThread()
+
+        let contents = OWSTableContents()
+        let section = OWSTableSection()
+        section.hasBackground = false
+        section.shouldDisableCellSelection = true
+        section.add(OWSTableItem(customCellBlock: { [weak self] in
+            let cell = OWSTableItem.newCell()
+            self?.configureMoneroHeader(cell: cell)
+            return cell
+        }, actionBlock: nil))
+        contents.add(section)
+
+        let history = OWSTableSection()
+        history.headerTitle = "RECENT MONERO ACTIVITY"
+        history.shouldDisableCellSelection = true
+        if moneroTransactions.isEmpty {
+            history.add(OWSTableItem(customCellBlock: {
+                let cell = OWSTableItem.newCell()
+                cell.selectionStyle = .none
+                let label = UILabel()
+                label.text = self.moneroSnapshot?.isSynchronized == true
+                    ? "No Monero payments received or sent yet."
+                    : "Transactions will appear here as the wallet scans the blockchain."
+                label.textColor = Theme.secondaryTextAndIconColor
+                label.font = .dynamicTypeBodyClamped
+                label.numberOfLines = 0
+                cell.contentView.addSubview(label)
+                label.autoPinEdgesToSuperviewMargins()
+                return cell
+            }, actionBlock: nil))
+        } else {
+            for transaction in moneroTransactions {
+                history.add(OWSTableItem(customCellBlock: {
+                    self.buildMoneroTransactionCell(transaction)
+                }, actionBlock: nil))
+            }
+        }
+        contents.add(history)
+        self.contents = contents
+    }
+
+    private func configureMoneroHeader(cell: UITableViewCell) {
+        cell.backgroundColor = .clear
+        cell.contentView.backgroundColor = .clear
+
+        let titleLabel = UILabel()
+        titleLabel.text = "MONERO BALANCE"
+        titleLabel.font = .dynamicTypeSubheadlineClamped
+        titleLabel.textColor = Theme.secondaryTextAndIconColor
+        titleLabel.textAlignment = .center
+
+        moneroRefreshButton.setImage(UIImage(systemName: "arrow.clockwise"), for: .normal)
+        moneroRefreshButton.tintColor = Theme.secondaryTextAndIconColor
+        moneroRefreshButton.accessibilityLabel = "Refresh Monero balance"
+        moneroRefreshButton.autoSetDimensions(to: CGSize(width: 44, height: 44))
+        let titleRow = UIView()
+        titleRow.autoSetDimension(.height, toSize: 44)
+        titleRow.addSubview(titleLabel)
+        titleLabel.autoCenterInSuperview()
+        titleRow.addSubview(moneroRefreshButton)
+        moneroRefreshButton.autoPinEdge(toSuperviewEdge: .trailing, withInset: 4)
+        moneroRefreshButton.autoVCenterInSuperview()
+
+        let balanceLabel = UILabel()
+        balanceLabel.font = UIFont.regularFont(ofSize: 54)
+        balanceLabel.textAlignment = .center
+        balanceLabel.adjustsFontSizeToFitWidth = true
+        balanceLabel.minimumScaleFactor = 0.7
+        balanceLabel.text = PaymentsDisplayPreferences.shared.isMoneroBalanceHidden
+            ? "•••••• XMR"
+            : (moneroSnapshot.map {
+                "\(MoneroPaymentRequest.decimalString($0.balance)) XMR"
+            } ?? "— XMR")
+
+        let availableBalanceLabel = UILabel()
+        availableBalanceLabel.font = .dynamicTypeSubheadlineClamped
+        availableBalanceLabel.textAlignment = .center
+        availableBalanceLabel.textColor = Theme.secondaryTextAndIconColor
+        if let snapshot = moneroSnapshot {
+            availableBalanceLabel.text = PaymentsDisplayPreferences.shared.isMoneroBalanceHidden
+                ? "•••••• XMR available"
+                : "\(MoneroPaymentRequest.decimalString(snapshot.unlockedBalance)) XMR available to spend"
+        }
+
+        let statusLabel = UILabel()
+        statusLabel.text = {
+            if let moneroRefreshError {
+                return moneroRefreshError
+            }
+            if isRefreshingPayments {
+                return moneroStatus
+            }
+            return moneroSnapshot.map { snapshot in
+                let sync: String
+                if snapshot.isSynchronized {
+                    sync = "Synchronized"
+                } else if snapshot.daemonHeight > 0 {
+                    let formatter = NumberFormatter()
+                    formatter.numberStyle = .decimal
+                    let walletHeight = formatter.string(from: NSNumber(value: snapshot.blockchainHeight)) ?? "\(snapshot.blockchainHeight)"
+                    let nodeHeight = formatter.string(from: NSNumber(value: snapshot.daemonHeight)) ?? "\(snapshot.daemonHeight)"
+                    sync = "Syncing blocks · \(walletHeight) / \(nodeHeight)"
+                } else {
+                    sync = "Waiting for node height…"
+                }
+                return "\(sync) · \(snapshot.isConnected ? "Connected" : "Node disconnected") · \(snapshot.nodeHost)"
+            } ?? moneroStatus
+        }()
+        statusLabel.textAlignment = .center
+        statusLabel.textColor = moneroRefreshError != nil || moneroSnapshot?.isConnected == false
+            ? .systemRed
+            : Theme.secondaryTextAndIconColor
+        statusLabel.font = .dynamicTypeBodyClamped
+        statusLabel.numberOfLines = 0
+
+        let fiatLabel = UILabel()
+        fiatLabel.textAlignment = .center
+        fiatLabel.textColor = Theme.secondaryTextAndIconColor
+        fiatLabel.font = .dynamicTypeBodyClamped
+        if !PaymentsDisplayPreferences.shared.isMoneroBalanceHidden,
+           let snapshot = moneroSnapshot,
+           let rate = moneroFiatRate,
+           rate.currencyCode == SSKEnvironment.shared.paymentsCurrenciesRef.currentCurrencyCode {
+            let amount = Double(snapshot.balance) / 1_000_000_000_000 * rate.price
+            let formatter = NumberFormatter()
+            formatter.numberStyle = .currency
+            formatter.currencyCode = rate.currencyCode
+            fiatLabel.text = formatter.string(from: NSNumber(value: amount)).map { "≈ \($0)" }
+        }
+
+        let buttons: [UIView]
+        if moneroSnapshot == nil {
+            buttons = [buildHeaderButton(title: "Set up Monero wallet",
+                                         iconName: "wallet.pass",
+                                         selector: #selector(didTapMoneroWallet),
+                                         isPrimary: true)]
+        } else {
+            buttons = [
+                buildHeaderButton(title: "Receive XMR",
+                                  iconName: "arrow.down.left",
+                                  selector: #selector(didTapMoneroReceive),
+                                  isPrimary: false),
+                buildHeaderButton(title: "Send XMR",
+                                  iconName: "paperplane.fill",
+                                  selector: #selector(didTapMoneroSend),
+                                  isPrimary: true)
+            ]
+        }
+        let buttonStack = UIStackView(arrangedSubviews: buttons)
+        buttonStack.axis = .vertical
+        buttonStack.spacing = 10
+        buttonStack.alignment = .fill
+
+        let stack = UIStackView(arrangedSubviews: [titleRow, balanceLabel, availableBalanceLabel, fiatLabel, statusLabel, buttonStack])
+        stack.axis = .vertical
+        stack.alignment = .fill
+        stack.spacing = 14
+        stack.layoutMargins = .init(top: 24, left: 0, bottom: 20, right: 0)
+        stack.isLayoutMarginsRelativeArrangement = true
+        cell.contentView.addSubview(stack)
+        stack.autoPinEdgesToSuperviewEdges()
+    }
+
+    private func buildMoneroTransactionCell(_ transaction: MoneroTransaction) -> UITableViewCell {
+        let cell = OWSTableItem.newCell()
+        cell.selectionStyle = .none
+
+        let isIncoming: Bool
+        switch transaction.direction {
+        case .incoming: isIncoming = true
+        case .outgoing: isIncoming = false
+        }
+
+        let iconView = UIImageView(image: UIImage(systemName: isIncoming ? "arrow.down.left" : "arrow.up.right"))
+        iconView.tintColor = transaction.isFailed ? .systemRed : (isIncoming ? .ows_accentGreen : .ows_accentBlue)
+        iconView.contentMode = .scaleAspectFit
+        iconView.autoSetDimensions(to: .square(20))
+
+        let titleLabel = UILabel()
+        titleLabel.text = isIncoming ? "Received Monero" : "Sent Monero"
+        titleLabel.font = .dynamicTypeBodyClamped
+        titleLabel.textColor = Theme.primaryTextColor
+
+        let state: String
+        if transaction.isFailed {
+            state = "Failed"
+        } else if transaction.isPending {
+            state = "Pending confirmation"
+        } else if transaction.confirmations == 0 {
+            state = "Unconfirmed"
+        } else {
+            state = "\(isIncoming ? "Received" : "Confirmed") · \(transaction.confirmations) confirmations"
+        }
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateStyle = .medium
+        dateFormatter.timeStyle = .short
+        let statusLabel = UILabel()
+        statusLabel.text = "\(dateFormatter.string(from: transaction.timestamp)) · \(state)"
+        statusLabel.font = .dynamicTypeSubheadlineClamped
+        statusLabel.textColor = transaction.isFailed ? .systemRed : Theme.secondaryTextAndIconColor
+        statusLabel.numberOfLines = 0
+
+        let detailsStack = UIStackView(arrangedSubviews: [titleLabel, statusLabel])
+        detailsStack.axis = .vertical
+        detailsStack.spacing = 2
+
+        let amountLabel = UILabel()
+        let amount = MoneroPaymentRequest.decimalString(transaction.amount.magnitude)
+        amountLabel.text = "\(isIncoming ? "+" : "−") \(amount) XMR"
+        amountLabel.font = .dynamicTypeSubheadlineClamped.semibold()
+        amountLabel.textAlignment = .right
+        amountLabel.textColor = transaction.isFailed ? .systemRed : (isIncoming ? .ows_accentGreen : Theme.primaryTextColor)
+        amountLabel.setContentCompressionResistancePriority(.required, for: .horizontal)
+
+        let row = UIStackView(arrangedSubviews: [iconView, detailsStack, amountLabel])
+        row.axis = .horizontal
+        row.alignment = .center
+        row.spacing = 12
+        cell.contentView.addSubview(row)
+        row.autoPinEdgesToSuperviewMargins()
+        return cell
+    }
+
+    private func refreshMoneroWallet() {
+        guard isShowingMonero, !isOpeningMoneroWallet else { return }
+        MoneroWalletService.shared.snapshot { [weak self] result in
+            switch result {
+            case .success(let snapshot):
+                DispatchQueue.main.async {
+                    guard let self else { return }
+                    self.moneroRefreshError = nil
+                    self.moneroSnapshot = snapshot
+                    self.moneroStatus = snapshot.isConnected ? "Connected" : "Node disconnected"
+                    self.refreshMoneroFiatRateIfNeeded()
+                    self.updateTableContents()
+                    MoneroWalletService.shared.transactions { result in
+                        guard case .success(let transactions) = result else { return }
+                        DispatchQueue.main.async {
+                            guard self.isShowingMonero else { return }
+                            self.moneroTransactions = transactions.sorted { $0.timestamp > $1.timestamp }
+                            self.updateTableContents()
+                        }
+                    }
+                    if !snapshot.isConnected {
+                        MoneroWalletService.shared.reconnectIfDisconnected { reconnectResult in
+                            DispatchQueue.main.async {
+                                guard self.isShowingMonero else { return }
+                                switch reconnectResult {
+                                case .success(let updatedSnapshot):
+                                    self.moneroSnapshot = updatedSnapshot
+                                    self.moneroRefreshError = nil
+                                    self.moneroStatus = updatedSnapshot.isConnected
+                                        ? "Connected to \(updatedSnapshot.nodeHost)"
+                                        : "Node disconnected"
+                                case .failure(let error):
+                                    self.moneroRefreshError = error.localizedDescription
+                                }
+                                self.updateTableContents()
+                            }
+                        }
+                    }
+                }
+            case .failure:
+                DispatchQueue.main.async {
+                    guard let self,
+                          self.isShowingMonero,
+                          !self.isOpeningMoneroWallet else { return }
+                    if self.hasResolvedMoneroWalletState {
+                        self.moneroRefreshError = MoneroLocalized("Could not refresh the Monero wallet. Check your node connection and try again.")
+                        self.updateTableContents()
+                        return
+                    }
+                    self.isOpeningMoneroWallet = true
+                    MoneroWalletService.shared.openWallet { [weak self] openResult in
+                        DispatchQueue.main.async {
+                            guard let self else { return }
+                            self.isOpeningMoneroWallet = false
+                            self.hasResolvedMoneroWalletState = true
+                            switch openResult {
+                            case .success:
+                                self.moneroRefreshError = nil
+                                self.moneroStatus = "Synchronizing wallet…"
+                                self.refreshMoneroWallet()
+                            case .failure(let error):
+                                self.moneroSnapshot = nil
+                                self.moneroRefreshError = nil
+                                self.moneroStatus = error.localizedDescription
+                                self.updateTableContents()
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @objc
+    private func didTapPaymentsRefresh() {
+        guard !isRefreshingPayments else {
+            paymentsPullToRefresh.endRefreshing()
+            return
+        }
+        isRefreshingPayments = true
+
+        if isShowingMonero {
+            moneroRefreshButton.isEnabled = false
+            moneroStatus = "Refreshing Monero wallet…"
+            moneroRefreshError = nil
+            updateTableContents()
+            MoneroWalletService.shared.refresh { [weak self] result in
+                DispatchQueue.main.async {
+                    guard let self else { return }
+                    self.isRefreshingPayments = false
+                    self.moneroRefreshButton.isEnabled = true
+                    self.paymentsPullToRefresh.endRefreshing()
+                    switch result {
+                    case .success(let snapshot):
+                        self.moneroRefreshError = nil
+                        self.moneroSnapshot = snapshot
+                        self.moneroStatus = snapshot.isConnected ? "Connected" : "Node disconnected"
+                        self.refreshMoneroWallet()
+                    case .failure(let error):
+                        self.moneroRefreshError = error.localizedDescription
+                        self.moneroStatus = error.localizedDescription
+                        // Keep the failure visible. refreshMoneroWallet() reads the last
+                        // cached snapshot and would replace this error with "Connected",
+                        // even though the explicit native refresh just failed.
+                        self.updateTableContents()
+                    }
+                }
+            }
+            return
+        }
+
+        SUIEnvironment.shared.paymentsSwiftRef.updateCurrentPaymentBalance()
+        SSKEnvironment.shared.paymentsCurrenciesRef.updateConversionRates()
+        let timeout = DispatchWorkItem { [weak self] in
+            guard let self, self.isRefreshingPayments else { return }
+            self.isRefreshingPayments = false
+            self.paymentsPullToRefresh.endRefreshing()
+        }
+        paymentRefreshTimeout = timeout
+        DispatchQueue.main.asyncAfter(deadline: .now() + 30, execute: timeout)
+    }
+
+    private func refreshMoneroFiatRateIfNeeded() {
+        let currencyCode = SSKEnvironment.shared.paymentsCurrenciesRef.currentCurrencyCode
+        if let moneroFiatRate,
+           moneroFiatRate.currencyCode == currencyCode,
+           Date().timeIntervalSince(moneroFiatRate.updatedAt) < 15 * 60 {
+            return
+        }
+        guard !moneroRateRequestInFlight else { return }
+        var components = URLComponents(string: "https://api.coingecko.com/api/v3/simple/price")
+        components?.queryItems = [
+            URLQueryItem(name: "ids", value: "monero"),
+            URLQueryItem(name: "vs_currencies", value: currencyCode.lowercased())
+        ]
+        guard let url = components?.url else { return }
+        moneroRateRequestInFlight = true
+        URLSession.shared.dataTask(with: url) { [weak self] data, _, _ in
+            let decodedPrices = data.flatMap {
+                try? JSONDecoder().decode([String: [String: Double]].self, from: $0)
+            }
+            let price = decodedPrices?["monero"]?[currencyCode.lowercased()]
+            DispatchQueue.main.async {
+                guard let self else { return }
+                self.moneroRateRequestInFlight = false
+                if let price, price.isFinite, price > 0 {
+                    self.moneroFiatRate = (currencyCode, price, Date())
+                }
+                if self.isShowingMonero {
+                    self.updateTableContents()
+                }
+            }
+        }.resume()
     }
 
     private func configureEnabledHeader(cell: UITableViewCell) {
@@ -471,15 +933,29 @@ public class PaymentsSettingsViewController: OWSTableViewController2 {
 
         balanceLabel.attributedText = PaymentsFormat.formattedBalance(paymentBalance, withSpace: true)
 
-        // Show spinner only while loading and not hidden.
+        // Keep the spinner only for an SDK that is still trying to initialize.
+        let breezUnavailable = paymentBalance == nil
+            && !prefs.isBalanceHidden
+            && SUIEnvironment.shared.paymentsImplRef.isBreezInitializationUnavailable
         if paymentBalance == nil && !prefs.isBalanceHidden {
-            let activityIndicator = UIActivityIndicatorView(style: .medium)
-            balanceLabel.addSubview(activityIndicator)
-            activityIndicator.autoCenterInSuperview()
-            activityIndicator.startAnimating()
+            if breezUnavailable {
+                balanceLabel.text = "—"
+                conversionLabel.text = "Lightning unavailable · check Breez API configuration"
+                conversionLabel.numberOfLines = 0
+                conversionLabel.textAlignment = .center
+            } else {
+                let activityIndicator = UIActivityIndicatorView(style: .medium)
+                balanceLabel.addSubview(activityIndicator)
+                activityIndicator.autoCenterInSuperview()
+                activityIndicator.startAnimating()
+            }
         }
 
-        if !prefs.isBalanceHidden,
+        if breezUnavailable {
+            conversionLabel.text = "Lightning unavailable · check Breez API configuration"
+            conversionLabel.numberOfLines = 0
+            conversionLabel.textAlignment = .center
+        } else if !prefs.isBalanceHidden,
            let paymentBalance,
            let balanceConversionText = Self.buildBalanceConversionText(paymentBalance: paymentBalance) {
             conversionLabel.text = balanceConversionText
@@ -497,15 +973,15 @@ public class PaymentsSettingsViewController: OWSTableViewController2 {
                                                   iconName: "paperplane.fill",
                                                   selector: #selector(didTapSendPaymentSheet),
                                                   isPrimary: true)
-        
+
         let buttonStack = UIStackView(arrangedSubviews: [
             addMoneyButton,
             sendPaymentButton
         ])
-        buttonStack.axis = .horizontal
-        buttonStack.spacing = 8
+        buttonStack.axis = .vertical
+        buttonStack.spacing = 10
         buttonStack.alignment = .fill
-        buttonStack.distribution = .fillEqually
+        buttonStack.distribution = .fill
 
         let headerStack = OWSStackView(name: "headerStack",
                                        arrangedSubviews: [
@@ -1067,6 +1543,13 @@ public class PaymentsSettingsViewController: OWSTableViewController2 {
     }
 
     @objc
+    private func didTapMoneroEyeButton() {
+        PaymentsDisplayPreferences.shared.isMoneroBalanceHidden.toggle()
+        updateNavbar()
+        updateTableContents()
+    }
+
+    @objc
     private func didTapSendPaymentSheet() {
         if SSKEnvironment.shared.paymentsHelperRef.isPaymentsVersionOutdated {
             OWSActionSheets.showPaymentsOutdatedClientSheet(title: .updateRequired)
@@ -1075,6 +1558,58 @@ public class PaymentsSettingsViewController: OWSTableViewController2 {
         let view = PaymentsTransferOutViewController(transferAmount: nil)
         let navigationController = OWSNavigationController(rootViewController: view)
         present(navigationController, animated: true, completion: nil)
+    }
+
+    @objc
+    private func didTapMoneroWallet() {
+        navigationController?.pushViewController(MoneroWalletViewController(), animated: true)
+    }
+
+    @objc
+    private func didChangePaymentAsset() {
+        isShowingMonero = paymentAssetSelector.selectedSegmentIndex == 1
+        updateNavbar()
+        updateTableContents()
+
+        if isShowingMonero {
+            tableView.refreshControl = paymentsPullToRefresh
+            tableView.alwaysBounceVertical = true
+            stopUpdateBalanceTimer()
+            refreshMoneroWallet()
+            startMoneroRefreshTimer()
+        } else {
+            tableView.refreshControl = paymentsPullToRefresh
+            tableView.alwaysBounceVertical = true
+            moneroRefreshTimer?.invalidate()
+            moneroRefreshTimer = nil
+            SUIEnvironment.shared.paymentsSwiftRef.updateCurrentPaymentBalance()
+            SSKEnvironment.shared.paymentsCurrenciesRef.updateConversionRates()
+            startUpdateBalanceTimer()
+        }
+    }
+
+    private func startMoneroRefreshTimer() {
+        moneroRefreshTimer?.invalidate()
+        moneroRefreshTimer = WeakTimer.scheduledTimer(timeInterval: 15,
+                                                      target: self,
+                                                      userInfo: nil,
+                                                      repeats: true) { [weak self] _ in
+            self?.refreshMoneroWallet()
+        }
+    }
+
+    @objc
+    private func didTapMoneroReceive() {
+        navigationController?.pushViewController(MoneroReceiveViewController(), animated: true)
+    }
+
+    @objc
+    private func didTapMoneroSend() {
+        guard moneroSnapshot != nil else {
+            didTapMoneroWallet()
+            return
+        }
+        MoneroSendPaymentViewController.present(from: self, request: nil)
     }
 
     private func showPaymentsHistoryView() {

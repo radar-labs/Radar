@@ -298,8 +298,12 @@ public final class ConversationViewController: OWSViewController {
         guard hasViewWillAppearEverBegun else {
             return result
         }
-        guard let inputToolbar = inputToolbar else {
-            owsFailDebug("Missing inputToolbar.")
+        // Restricted conversations (including pending message requests) can become
+        // first responder while using their request banner instead of the composer.
+        guard let inputToolbar else {
+            if result {
+                resignFirstResponder()
+            }
             return result
         }
 
@@ -500,17 +504,14 @@ public final class ConversationViewController: OWSViewController {
         guard hasViewWillAppearEverBegun else {
             return
         }
-        guard let inputToolbar else {
-            owsFailDebug("Missing inputToolbar.")
-            return
+        // Message-request and other restricted conversations intentionally show a different
+        // bottom bar, so the composer may not exist until the request is accepted.
+        if let inputToolbar {
+            // We resize the inputToolbar whenever its text is modified, including when setting a
+            // saved draft. The draft can be set before the inputToolbar is mounted, so ensure its
+            // proper height once layout has established the available width.
+            inputToolbar.ensureTextViewHeight()
         }
-
-        // We resize the inputToolbar whenever it's text is modified, including when setting saved draft-text.
-        // However it's possible this draft-text is set before the inputToolbar (an inputAccessoryView) is mounted
-        // in the view hierarchy. Since it's not in the view hierarchy, it hasn't been laid out and has no width,
-        // which is used to determine height.
-        // So here we unsure the proper height once we know everything's been laid out.
-        inputToolbar.ensureTextViewHeight()
 
         updateContentInsets()
     }

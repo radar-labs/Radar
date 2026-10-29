@@ -545,13 +545,7 @@ public class QRCodePayload {
             let modeLength: UInt = 4
             let modeBits = try bitstream.readUInt8(bitCount: modeLength)
             guard let mode = Mode(rawValue: UInt(modeBits)) else {
-                let ignoreUnknownMode = CurrentAppContext().isRunningTests
-                if ignoreUnknownMode {
-                    Logger.error("Invalid mode: \(modeBits)")
-                    return nil
-                } else {
-                    owsFailDebug("Invalid mode: \(modeBits)")
-                }
+                Logger.warn("Unsupported QR code mode: \(modeBits)")
                 throw QRCodeError.unknownMode
             }
             // TODO: We currently only support .byte mode.
@@ -575,7 +569,7 @@ public class QRCodePayload {
             }
             return QRCodePayload(version: version, mode: mode, bytes: bytes)
         } catch {
-            owsFailDebug("Error: \(error)")
+            Logger.warn("Unable to parse QR code payload: \(error)")
             return nil
         }
     }

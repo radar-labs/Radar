@@ -46,6 +46,8 @@ public class PaymentsImpl: NSObject, PaymentsSwift {
 
     private let paymentsProcessor: PaymentsProcessor
 
+    public private(set) var isBreezInitializationUnavailable = false
+
     private var onIncommingTransactionNotificationProcessing: NotificationCenter.Observer?
 
     private var onRegistrationStateChange: NotificationCenter.Observer?
@@ -139,11 +141,16 @@ public class PaymentsImpl: NSObject, PaymentsSwift {
 
             tryToReuploadPaymentProfile()
         } catch PaymentsError.notEnabled {
+            isBreezInitializationUnavailable = false
             return
         } catch {
+            isBreezInitializationUnavailable = currentSdk == nil
             Logger.warn("Failed initialize components with error: \(error)")
+            NotificationCenter.default.postOnMainThread(name: Self.currentPaymentBalanceDidChange, object: nil)
             return
         }
+
+        isBreezInitializationUnavailable = false
     }
 
     fileprivate func reloadComponents() async {
@@ -153,8 +160,13 @@ public class PaymentsImpl: NSObject, PaymentsSwift {
         default:
             currentSdk = nil
             currentWalletAddress = nil
+            isBreezInitializationUnavailable = false
             tryToReuploadPaymentProfile()
         }
+    }
+
+    func reconcilePaymentsAfterSDKInitialization() {
+        paymentsReconciliation.reconcileIfNecessary()
     }
 
     private func initializeBreezSdk() async throws {
@@ -364,7 +376,7 @@ public class PaymentsImpl: NSObject, PaymentsSwift {
         }
 
         guard let sdk = currentSdk else {
-            throw OWSAssertionError("Current Breez SDK is not initialized!")
+            throw PaymentsError.sdkNotInitialized
         }
 
         return sdk
@@ -546,6 +558,12 @@ public class PaymentsImpl: NSObject, PaymentsSwift {
 
         Task { @MainActor in
             do {
+                // Payment screens can become visible before a transient SDK startup
+                // failure has recovered. Retry initialization when refreshing so the
+                // balance does not remain stuck in its initial loading state.
+                if currentSdk == nil {
+                    await initializeComponents()
+                }
                 _ = try await _updateCurrentPaymentBalance()
             } catch {
                 let paymentsError = error as? PaymentsError
@@ -553,6 +571,10 @@ public class PaymentsImpl: NSObject, PaymentsSwift {
                     paymentsError == .outdatedClient
                     || paymentsError == .attestationVerificationFailed
                 SSKEnvironment.shared.paymentsHelperRef.setPaymentsVersionOutdated(outdated)
+                if let paymentsError, case .sdkNotInitialized = paymentsError {
+                    Logger.info("Deferring payment balance refresh until the Breez SDK is initialized.")
+                    return
+                }
                 owsFailDebug("Unexpected error: \(error)")
             }
         }
@@ -1051,6 +1073,58 @@ extension PaymentsImpl {
             let request = PrepareSendPaymentRequest(
                 paymentRequest: PaymentRequest.input(input: details.invoice.bolt11),
                 amount: amount,
+                tokenIdentifier: nil,
+                conversionOptions: nil,
+                feePolicy: nil
+            )
+
+            let preparedPayment = try await sdk.prepareSendPayment(request: request)
+
+            let resolvedAmount: TSPaymentAmount
+            if let resolvedSats = UInt64(preparedPayment.amount.asString(radix: 10)) {
+                resolvedAmount = TSPaymentAmount(currency: .bitcoin, picoMob: resolvedSats)
+            } else {
+                resolvedAmount = paymentAmount
+            }
+
+            return PreparedPaymentImpl(
+                recipientAci: recipientAci,
+                recipientAddress: recipientAddress,
+                paymentAmount: resolvedAmount,
+                memoMessage: memoMessage,
+                isOutgoingTransfer: isOutgoingTransfer,
+                preparedTransaction: .bolt11(preparedPayment)
+            )
+        case .bitcoinAddress(let details):
+            let request = PrepareSendPaymentRequest(
+                paymentRequest: PaymentRequest.input(input: details.address),
+                amount: BInt(paymentAmount.picoMob),
+                tokenIdentifier: nil,
+                conversionOptions: nil,
+                feePolicy: nil
+            )
+
+            let preparedPayment = try await sdk.prepareSendPayment(request: request)
+
+            let resolvedAmount: TSPaymentAmount
+            if let resolvedSats = UInt64(preparedPayment.amount.asString(radix: 10)) {
+                resolvedAmount = TSPaymentAmount(currency: .bitcoin, picoMob: resolvedSats)
+            } else {
+                resolvedAmount = paymentAmount
+            }
+
+            return PreparedPaymentImpl(
+                recipientAci: recipientAci,
+                recipientAddress: recipientAddress,
+                paymentAmount: resolvedAmount,
+                memoMessage: memoMessage,
+                isOutgoingTransfer: isOutgoingTransfer,
+                preparedTransaction: .bolt11(preparedPayment)
+            )
+        case .bip21(let details):
+            let request = PrepareSendPaymentRequest(
+                paymentRequest: PaymentRequest.input(input: details.uri),
+                amount: BInt(details.amountSat ?? paymentAmount.picoMob),
                 tokenIdentifier: nil,
                 conversionOptions: nil,
                 feePolicy: nil
@@ -1574,6 +1648,7 @@ public class PaymentsEventsMainApp: NSObject, PaymentsEvents {
     public func paymentsStateDidChange() {
         Task {
             await SUIEnvironment.shared.paymentsImplRef.reloadComponents()
+            SUIEnvironment.shared.paymentsImplRef.reconcilePaymentsAfterSDKInitialization()
             SUIEnvironment.shared.paymentsImplRef.updateCurrentPaymentBalance()
         }
     }
@@ -1605,6 +1680,10 @@ extension PaymentsImpl {
 
     public static func format(inputType: InputType) -> String {
         switch inputType {
+        case .bitcoinAddress(let details):
+            return details.address
+        case .bip21(let details):
+            return details.uri
         case .lightningAddress(let details):
             return details.address
         case .bolt11Invoice(let details):
@@ -1635,6 +1714,20 @@ extension PaymentsImpl {
 
     public static func parse(url: URL) -> InputType? {
         return parse(input: url.absoluteString)
+    }
+
+    public static func bitcoinAmountSats(for inputType: InputType) -> UInt64? {
+        switch inputType {
+        case .bolt11Invoice(let details):
+            guard let amountMsat = details.amountMsat, amountMsat >= 1_000 else {
+                return nil
+            }
+            return amountMsat / 1_000
+        case .bip21(let details):
+            return details.amountSat
+        default:
+            return nil
+        }
     }
 
     public static func parse(input: String) -> InputType? {
@@ -1778,8 +1871,11 @@ public enum PreparedTransaction {
             switch response.paymentMethod {
             case .bolt11Invoice(_, let sparkTransferFeeSats, let lightningFeeSats):
                 return sparkTransferFeeSats ?? lightningFeeSats
-            case .bitcoinAddress, .sparkAddress, .sparkInvoice, .crossChainAddress:
-                owsFailDebug("Unexpected payment method for BOLT11 invoice.")
+            case .bitcoinAddress(_, let feeQuote):
+                let fee = feeQuote.speedMedium
+                return fee.userFeeSat + fee.l1BroadcastFeeSat
+            case .sparkAddress, .sparkInvoice, .crossChainAddress:
+                owsFailDebug("Unsupported payment method.")
                 return 0
             }
         }
@@ -1793,8 +1889,10 @@ public enum PreparedTransaction {
             switch response.paymentMethod {
             case .bolt11Invoice(let invoiceDetails, _, _):
                 return invoiceDetails.paymentHash
-            case .bitcoinAddress, .sparkAddress, .sparkInvoice, .crossChainAddress:
-                owsFailDebug("Unexpected payment method for BOLT11 invoice.")
+            case .bitcoinAddress(let address, _):
+                return address.address
+            case .sparkAddress, .sparkInvoice, .crossChainAddress:
+                owsFailDebug("Unsupported payment method.")
                 return ""
             }
         }

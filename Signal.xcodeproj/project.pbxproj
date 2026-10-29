@@ -1692,6 +1692,18 @@
 		A1A018521805C5E800A052A6 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A11CD70C17FA230600A2D1B1 /* QuartzCore.framework */; };
 		A1A018531805C60D00A052A6 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D221A091169C9E5E00537ABF /* CoreGraphics.framework */; };
 		A1B2C3D4E5F64789AB0CD1E2 /* AddFundsIntroViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2C3D4E5F6074891AB1CD2E3 /* AddFundsIntroViewController.swift */; };
+		A20000000000000000000003 /* MoneroCore in Frameworks */ = {isa = PBXBuildFile; productRef = A20000000000000000000002 /* MoneroCore */; };
+		A20000000000000000000004 /* MoneroCore in Frameworks */ = {isa = PBXBuildFile; productRef = A20000000000000000000002 /* MoneroCore */; };
+		A20000000000000000000005 /* MoneroCore in Frameworks */ = {isa = PBXBuildFile; productRef = A20000000000000000000002 /* MoneroCore */; };
+		A20000000000000000000007 /* MoneroWalletService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000006 /* MoneroWalletService.swift */; };
+		A20000000000000000000008 /* MoneroPaymentRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000009 /* MoneroPaymentRequest.swift */; };
+		A2000000000000000000000A /* MoneroPaymentRequestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000000B /* MoneroPaymentRequestTests.swift */; };
+		A2000000000000000000000E /* MoneroChatPayments.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000000F /* MoneroChatPayments.swift */; };
+		A2000000000000000000000C /* MoneroCore in Frameworks */ = {isa = PBXBuildFile; productRef = A20000000000000000000002 /* MoneroCore */; };
+		A2000000000000000000000D /* MoneroCore in Frameworks */ = {isa = PBXBuildFile; productRef = A20000000000000000000002 /* MoneroCore */; };
+		A30000000000000000000001 /* MoneroSendPaymentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A30000000000000000000002 /* MoneroSendPaymentViewController.swift */; };
+		A30000000000000000000003 /* MoneroWalletViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A30000000000000000000004 /* MoneroWalletViewController.swift */; };
+		A30000000000000000000005 /* MoneroPaymentRequestViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A30000000000000000000006 /* MoneroPaymentRequestViewController.swift */; };
 		A5E7C675248C5443007C949A /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = A5E7C673248C5442007C949A /* InfoPlist.strings */; };
 		AA000001302600000000A001 /* LightningLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000002302600000000A002 /* LightningLogger.swift */; };
 		AA000003302600000000A003 /* LightningLogsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000004302600000000A004 /* LightningLogsViewController.swift */; };
@@ -5659,6 +5671,13 @@
 		A1C32D4D17A0652C000A904E /* AddressBook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AddressBook.framework; path = System/Library/Frameworks/AddressBook.framework; sourceTree = SDKROOT; };
 		A1C32D4F17A06537000A904E /* AddressBookUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AddressBookUI.framework; path = System/Library/Frameworks/AddressBookUI.framework; sourceTree = SDKROOT; };
 		A1FDCBEE16DAA6C300868894 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
+		A20000000000000000000006 /* MoneroWalletService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoneroWalletService.swift; sourceTree = "<group>"; };
+		A20000000000000000000009 /* MoneroPaymentRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoneroPaymentRequest.swift; sourceTree = "<group>"; };
+		A2000000000000000000000B /* MoneroPaymentRequestTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoneroPaymentRequestTests.swift; sourceTree = "<group>"; };
+		A2000000000000000000000F /* MoneroChatPayments.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoneroChatPayments.swift; sourceTree = "<group>"; };
+		A30000000000000000000002 /* MoneroSendPaymentViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoneroSendPaymentViewController.swift; sourceTree = "<group>"; };
+		A30000000000000000000004 /* MoneroWalletViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoneroWalletViewController.swift; sourceTree = "<group>"; };
+		A30000000000000000000006 /* MoneroPaymentRequestViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoneroPaymentRequestViewController.swift; sourceTree = "<group>"; };
 		A33E43CA8A572CA70089C4CC /* Pods-SignalServiceKit.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SignalServiceKit.debug.xcconfig"; path = "Target Support Files/Pods-SignalServiceKit/Pods-SignalServiceKit.debug.xcconfig"; sourceTree = "<group>"; };
 		A566C0C0B69138202C0367E6 /* Pods-Signal.app store release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Signal.app store release.xcconfig"; path = "Target Support Files/Pods-Signal/Pods-Signal.app store release.xcconfig"; sourceTree = "<group>"; };
 		A5E7C674248C5442007C949A /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = translations/en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -7800,6 +7819,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A20000000000000000000003 /* MoneroCore in Frameworks */,
 				616577F953D77424E32C7438 /* Pods_SignalUI.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -7810,6 +7830,7 @@
 			files = (
 				EC7A9D369AF9724FEEE5B653 /* Pods_SignalUITests.framework in Frameworks */,
 				34A954B2271A471300B05242 /* SignalUI.framework in Frameworks */,
+				A20000000000000000000004 /* MoneroCore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7818,6 +7839,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				9FDF89F65C026F8F33FD38C1 /* Pods_SignalShareExtension.framework in Frameworks */,
+				A20000000000000000000005 /* MoneroCore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7847,6 +7869,7 @@
 				A163E8AB16F3F6AA0094D68B /* Security.framework in Frameworks */,
 				F9C5C8AA289451B900548EEE /* SignalServiceKit.framework in Frameworks */,
 				34A954BD271A471300B05242 /* SignalUI.framework in Frameworks */,
+				A2000000000000000000000C /* MoneroCore in Frameworks */,
 				4CC1ECF9211A47CE00CC13BE /* StoreKit.framework in Frameworks */,
 				D2179CFE16BB0B480006F3AB /* SystemConfiguration.framework in Frameworks */,
 				D221A08E169C9E5E00537ABF /* UIKit.framework in Frameworks */,
@@ -7871,6 +7894,7 @@
 				D202868216DBE0F4009068E9 /* SystemConfiguration.framework in Frameworks */,
 				D221A0AD169C9E5F00537ABF /* UIKit.framework in Frameworks */,
 				B69CD25119773E79005CE69A /* XCTest.framework in Frameworks */,
+				A2000000000000000000000D /* MoneroCore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8368,6 +8392,8 @@
 				3497972225DAAE3800E99FA4 /* SendPaymentHelper.swift */,
 				34EEECF125E846EC00574F0D /* SendPaymentMemoViewController.swift */,
 				3497971F25DAA86100E99FA4 /* SendPaymentViewController.swift */,
+				A30000000000000000000002 /* MoneroSendPaymentViewController.swift */,
+				A30000000000000000000006 /* MoneroPaymentRequestViewController.swift */,
 			);
 			path = Payments;
 			sourceTree = "<group>";
@@ -8392,6 +8418,7 @@
 				9F6D5347F4DB44F2AE1B3F53 /* PaymentSettingsMenuViewController.swift */,
 				AA000004302600000000A004 /* LightningLogsViewController.swift */,
 				3498AC8F2518E92B00B1F315 /* PaymentsSettingsViewController.swift */,
+				A30000000000000000000004 /* MoneroWalletViewController.swift */,
 				34848D6225D44EBD00E5034B /* PaymentsTransferInViewController.swift */,
 				DE357466A03B42A7A4362BC9 /* RadarUsernameViewController.swift */,
 				3406D32125DD40F000885B14 /* PaymentsTransferOutViewController.swift */,
@@ -8752,6 +8779,10 @@
 			isa = PBXGroup;
 			children = (
 				0C0656B12F912FE700CA36E7 /* BreezSdkExt.swift */,
+				A20000000000000000000006 /* MoneroWalletService.swift */,
+				A20000000000000000000009 /* MoneroPaymentRequest.swift */,
+				A2000000000000000000000B /* MoneroPaymentRequestTests.swift */,
+				A2000000000000000000000F /* MoneroChatPayments.swift */,
 				AA000002302600000000A002 /* LightningLogger.swift */,
 				34D21DA127297FBE00D891F4 /* DebugLogger+Payments.swift */,
 				3465F4D227287675001663AF /* MobileCoinAPI+Configuration.swift */,
@@ -14884,6 +14915,9 @@
 				7254656E2BA0401E00EABFD2 /* PBXTargetDependency */,
 			);
 			name = SignalUI;
+			packageProductDependencies = (
+				A20000000000000000000002 /* MoneroCore */,
+			);
 			productName = SignalUI;
 			productReference = 34A954A8271A471200B05242 /* SignalUI.framework */;
 			productType = "com.apple.product-type.framework";
@@ -14904,6 +14938,9 @@
 				34A954B6271A471300B05242 /* PBXTargetDependency */,
 			);
 			name = SignalUITests;
+			packageProductDependencies = (
+				A20000000000000000000002 /* MoneroCore */,
+			);
 			productName = SignalUITests;
 			productReference = 34A954B1271A471300B05242 /* SignalUITests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
@@ -14924,6 +14961,9 @@
 				34A954D1271B4D3C00B05242 /* PBXTargetDependency */,
 			);
 			name = SignalShareExtension;
+			packageProductDependencies = (
+				A20000000000000000000002 /* MoneroCore */,
+			);
 			productName = SignalShareExtension;
 			productReference = 453518681FC635DD00210559 /* SignalShareExtension.appex */;
 			productType = "com.apple.product-type.app-extension";
@@ -14951,6 +14991,9 @@
 				F9C5C8A9289451B900548EEE /* PBXTargetDependency */,
 			);
 			name = Signal;
+			packageProductDependencies = (
+				A20000000000000000000002 /* MoneroCore */,
+			);
 			productName = RedPhone;
 			productReference = D221A089169C9E5E00537ABF /* Signal.app */;
 			productType = "com.apple.product-type.application";
@@ -14972,6 +15015,9 @@
 				B6AFCEBB19A93DA60098CFCB /* PBXTargetDependency */,
 			);
 			name = SignalTests;
+			packageProductDependencies = (
+				A20000000000000000000002 /* MoneroCore */,
+			);
 			productName = RedPhoneTests;
 			productReference = D221A0AA169C9E5F00537ABF /* SignalTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
@@ -15159,6 +15205,7 @@
 			);
 			mainGroup = D221A07E169C9E5E00537ABF;
 			packageReferences = (
+				A20000000000000000000001 /* XCLocalSwiftPackageReference "ThirdParty/MoneroCore" */,
 			);
 			productRefGroup = D221A08A169C9E5E00537ABF /* Products */;
 			projectDirPath = "";
@@ -16730,6 +16777,9 @@
 				765283AE2A00D8B4004583A9 /* OWSTableContents.swift in Sources */,
 				765283B22A00D8EC004583A9 /* OWSTableItem.swift in Sources */,
 				0C0656B22F912FE700CA36E7 /* BreezSdkExt.swift in Sources */,
+				A20000000000000000000007 /* MoneroWalletService.swift in Sources */,
+				A20000000000000000000008 /* MoneroPaymentRequest.swift in Sources */,
+				A2000000000000000000000E /* MoneroChatPayments.swift in Sources */,
 				AA000001302600000000A001 /* LightningLogger.swift in Sources */,
 				765283B02A00D8CE004583A9 /* OWSTableSection.swift in Sources */,
 				8868A08C287F4F81000E74A5 /* OWSTableSheetViewController.swift in Sources */,
@@ -16850,6 +16900,7 @@
 				507B69112C503FA800F1C6D7 /* CallLinkTest.swift in Sources */,
 				50BF51082BB2030C00C2C309 /* FormattedNumberFieldTest.swift in Sources */,
 				509085BA2C498C4400409B85 /* HTMLMetadataTests.swift in Sources */,
+				A2000000000000000000000A /* MoneroPaymentRequestTests.swift in Sources */,
 				5073EACB2C4F3A16001FBB3E /* LinkPreviewFetcherTest.swift in Sources */,
 				50BF510A2BB2031600C2C309 /* LinkPreviewFetchStateTest.swift in Sources */,
 				50BF510C2BB2032500C2C309 /* MobileCoinHelperSDKTest.swift in Sources */,
@@ -17551,6 +17602,9 @@
 				3497972325DAAE3800E99FA4 /* SendPaymentHelper.swift in Sources */,
 				34EEECF225E846ED00574F0D /* SendPaymentMemoViewController.swift in Sources */,
 				3497972125DAA86100E99FA4 /* SendPaymentViewController.swift in Sources */,
+				A30000000000000000000001 /* MoneroSendPaymentViewController.swift in Sources */,
+				A30000000000000000000003 /* MoneroWalletViewController.swift in Sources */,
+				A30000000000000000000005 /* MoneroPaymentRequestViewController.swift in Sources */,
 				8876CE4A26A914B8002217ED /* SentMediaQualitySettingsViewController.swift in Sources */,
 				D9DCFDAB2A39402F00C73C0B /* SettingsHeaderButton.swift in Sources */,
 				886BB3D325BA0CA400079781 /* SetWallpaperViewController.swift in Sources */,
@@ -21650,6 +21704,21 @@
 			defaultConfigurationName = "App Store Release";
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		A20000000000000000000001 /* XCLocalSwiftPackageReference "ThirdParty/MoneroCore" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ThirdParty/MoneroCore;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		A20000000000000000000002 /* MoneroCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A20000000000000000000001 /* XCLocalSwiftPackageReference "ThirdParty/MoneroCore" */;
+			productName = MoneroCore;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = D221A080169C9E5E00537ABF /* Project object */;
 }

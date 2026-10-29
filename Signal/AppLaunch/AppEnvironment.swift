@@ -5,6 +5,7 @@
 
 public import Foundation
 import SignalServiceKit
+import SignalUI
 
 public class AppEnvironment: NSObject {
 
@@ -51,6 +52,9 @@ public class AppEnvironment: NSObject {
     }
 
     func setUp(appReadiness: AppReadiness, callService: CallService) {
+        appReadiness.runNowOrWhenMainAppDidBecomeReadyAsync {
+            MoneroChatPayments.shared.start()
+        }
         let backupAttachmentUploadEraStore = BackupAttachmentUploadEraStore()
         let backupNonceStore = BackupNonceMetadataStore()
         let backupSettingsStore = BackupSettingsStore()
@@ -205,7 +209,7 @@ public class AppEnvironment: NSObject {
                         )
                     } catch {
                         // Do nothing, we'll try again on the next app launch.
-                        owsFailDebug("Error registering backup ID \(error)")
+                        Logger.warn("Error registering backup ID; it will be retried: \(error)")
                     }
                 }
 
