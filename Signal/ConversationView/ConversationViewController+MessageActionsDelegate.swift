@@ -303,13 +303,51 @@ extension ConversationViewController: MessageActionsDelegate {
         }
     }
 
-    func messageActionsStarItem(_ itemViewModel: CVItemViewModelImpl) {
-        guard let message = itemViewModel.interaction as? TSMessage else {
+    private func sendPinMessageChange(_ message: TSOutgoingMessage) async throws {
+        let db = DependenciesBridge.shared.db
+        let promise = await db.awaitableWrite { tx in
+            let preparedMessage = PreparedOutgoingMessage.preprepared(
+                transientMessageWithoutAttachments: message
+            )
+            return SSKEnvironment.shared.messageSenderJobQueueRef.add(
+                .promise,
+                message: preparedMessage,
+                transaction: tx
+            )
+        }
+        try await promise.awaitable()
+    }
+
+    func messageActionsChangePinStatus(_ itemViewModel: CVItemViewModelImpl, pin: Bool) {
+        guard let message = itemViewModel.renderItem.interaction as? TSMessage else {
             return owsFailDebug("Invalid interaction.")
         }
-        
-        SSKEnvironment.shared.databaseStorageRef.write { transaction in
-            message.update(withIsStarred: !message.isStarred, transaction: transaction)
+
+        let db = DependenciesBridge.shared.db
+        let outgoingMessage: TSOutgoingMessage? = db.read { tx in
+            if pin {
+                return DependenciesBridge.shared.pinnedMessageManager.getOutgoingPinMessage(
+                    interaction: message,
+                    thread: thread,
+                    tx: tx
+                )
+            } else {
+                return DependenciesBridge.shared.pinnedMessageManager.getOutgoingUnpinMessage(
+                    interaction: message,
+                    thread: thread,
+                    tx: tx
+                )
+            }
+        }
+
+        guard let outgoingMessage else { return }
+
+        Task { [weak self] in
+            do {
+                try await self?.sendPinMessageChange(outgoingMessage)
+            } catch {
+                Logger.error("Failed to change pinned message status: \(error)")
+            }
         }
     }
 }

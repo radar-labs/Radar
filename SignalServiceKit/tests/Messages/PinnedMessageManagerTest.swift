@@ -14,7 +14,11 @@ struct PinnedMessageManagerTest {
     private let pinnedMessageManager: PinnedMessageManager
 
     init() throws {
-        pinnedMessageManager = PinnedMessageManager()
+        pinnedMessageManager = PinnedMessageManager(
+            interactionStore: MockInteractionStore(),
+            accountManager: MockTSAccountManager(),
+            disappearingMessagesConfigurationStore: MockDisappearingMessagesConfigurationStore()
+        )
     }
 
     private func createIncomingMessage(
