@@ -69,7 +69,7 @@ class RegistrationQuickRestoreQRCodeViewController:
         super.viewDidAppear(animated)
         provisioningSocketManager.reset()
 
-        Task {
+        Task { [self] in
             do {
                 let message: RegistrationProvisioningMessage = try await provisioningSocketManager.waitForMessage()
                 presenter?.didReceiveRegistrationMessage(message)

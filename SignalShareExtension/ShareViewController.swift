@@ -60,7 +60,13 @@ public class ShareViewController: OWSNavigationController, ShareViewDelegate, SA
             // Wait one run loop to ensure the loading indicator is visible if setUp
             // blocks the main thread.
             DispatchQueue.main.async {
-                Task { try await self.setUp(initialLoadViewController: initialLoadViewController) }
+                Task {
+                    do {
+                        try await self.setUp(initialLoadViewController: initialLoadViewController)
+                    } catch {
+                        Logger.error("Unable to setup ShareViewController \(error)")
+                    }
+                }
             }
         }
     }

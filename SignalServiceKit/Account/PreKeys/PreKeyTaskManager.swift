@@ -502,7 +502,11 @@ internal struct PreKeyTaskManager {
                 try self.persistStateAfterUpload(bundle: bundle, tx: tx)
             }
             Task {
-                try await self.messageProcessor.waitForFetchingAndProcessing()
+                do {
+                    try await self.messageProcessor.waitForFetchingAndProcessing()
+                } catch {
+                    return
+                }
                 await self.db.awaitableWrite { tx in self.cullStateAfterMessageProcessing(tx: tx) }
             }
         case let .failure(error) where error.httpStatusCode == 422:

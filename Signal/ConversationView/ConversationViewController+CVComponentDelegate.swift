@@ -160,7 +160,7 @@ extension ConversationViewController: CVComponentDelegate {
                 return
             }
 
-            let messageHasAnyEnqueuedBackupDownloads = try db.read { tx throws in
+            let messageHasAnyEnqueuedBackupDownloads = (try? db.read { tx throws in
                 let referencedAttachments = attachmentStore
                     .fetchAllReferencedAttachments(owningMessageRowId: messageRowId, tx: tx)
 
@@ -185,7 +185,7 @@ extension ConversationViewController: CVComponentDelegate {
                         return true
                     }
                 }
-            }
+            }) ?? false
 
             if messageHasAnyEnqueuedBackupDownloads {
                 await db.awaitableWrite { tx in
@@ -460,15 +460,19 @@ extension ConversationViewController: CVComponentDelegate {
         let timestamp = Date().ows_millisecondsSince1970
         let attachmentId = attachment.attachmentId
         Task {
-            try await DependenciesBridge.shared.db.awaitableWrite { tx in
-                guard let attachment = DependenciesBridge.shared.attachmentStore.fetch(id: attachmentId, tx: tx) else {
-                    return
+            do {
+                try await DependenciesBridge.shared.db.awaitableWrite { tx in
+                    guard let attachment = DependenciesBridge.shared.attachmentStore.fetch(id: attachmentId, tx: tx) else {
+                        return
+                    }
+                    try DependenciesBridge.shared.attachmentStore.markViewedFullscreen(
+                        attachment: attachment,
+                        timestamp: timestamp,
+                        tx: tx
+                    )
                 }
-                try DependenciesBridge.shared.attachmentStore.markViewedFullscreen(
-                    attachment: attachment,
-                    timestamp: timestamp,
-                    tx: tx
-                )
+            } catch {
+                Logger.warn("Failed to mark attachment as viewed: \(error)")
             }
         }
 

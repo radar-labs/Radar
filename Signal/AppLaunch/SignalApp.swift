@@ -43,9 +43,13 @@ extension SignalApp {
         return conversationSplitViewController?.selectedThread != nil
     }
 
-    func showConversationSplitView(appReadiness: AppReadinessSetter) {
+    func showConversationSplitView(appReadiness: AppReadinessSetter, in window: UIWindow? = nil) {
+        guard let window = window ?? CurrentAppContext().mainWindow else {
+            owsFailDebug("Missing window.")
+            return
+        }
         let splitViewController = ConversationSplitViewController(appReadiness: appReadiness)
-        UIApplication.shared.delegate?.window??.rootViewController = splitViewController
+        window.rootViewController = splitViewController
         self.conversationSplitViewController = splitViewController
     }
 
@@ -67,7 +71,12 @@ extension SignalApp {
     }
 
     @MainActor
-    func showLaunchInterface(_ launchInterface: LaunchInterface, appReadiness: AppReadinessSetter, launchStartedAt: TimeInterval) {
+    func showLaunchInterface(
+        _ launchInterface: LaunchInterface,
+        in window: UIWindow,
+        appReadiness: AppReadinessSetter,
+        launchStartedAt: TimeInterval,
+    ) {
         owsPrecondition(appReadiness.isAppReady)
 
         let startupDuration = CACurrentMediaTime() - launchStartedAt
@@ -83,13 +92,13 @@ extension SignalApp {
 
         switch launchInterface {
         case .registration(let registrationLoader, let desiredMode):
-            showRegistration(loader: registrationLoader, desiredMode: desiredMode, appReadiness: appReadiness)
+            showRegistration(loader: registrationLoader, desiredMode: desiredMode, appReadiness: appReadiness, in: window)
             appReadiness.setUIIsReady()
         case .secondaryProvisioning:
             showSecondaryProvisioning(appReadiness: appReadiness)
             appReadiness.setUIIsReady()
         case .chatList:
-            showConversationSplitView(appReadiness: appReadiness)
+            showConversationSplitView(appReadiness: appReadiness, in: window)
         }
 
         AppUpdateNag.shared.showAppUpgradeNagIfNecessary()
@@ -108,8 +117,13 @@ extension SignalApp {
     func showRegistration(
         loader: RegistrationCoordinatorLoader,
         desiredMode: RegistrationMode,
-        appReadiness: AppReadinessSetter
+        appReadiness: AppReadinessSetter,
+        in window: UIWindow? = nil
     ) {
+        guard let window = window ?? CurrentAppContext().mainWindow else {
+            owsFailDebug("Missing window.")
+            return
+        }
         switch desiredMode {
         case .registering:
             Logger.info("Attempting initial registration on app launch")
@@ -123,7 +137,7 @@ extension SignalApp {
         }
         let navController = RegistrationNavigationController.withCoordinator(coordinator, appReadiness: appReadiness)
 
-        UIApplication.shared.delegate?.window??.rootViewController = navController
+        window.rootViewController = navController
 
         conversationSplitViewController = nil
     }
@@ -321,7 +335,7 @@ extension SignalApp {
 
         UserNotificationPresenter().clearAllNotifications()
         UIApplication.shared.applicationIconBadgeNumber = 0
-        AppDelegate.updateApplicationShortcutItems(isRegistered: false)
+        AppLifecycleManager.updateApplicationShortcutItems(isRegistered: false)
 
         DebugLogger.shared.wipeLogsAlways(appContext: CurrentAppContext() as! MainAppContext)
     }

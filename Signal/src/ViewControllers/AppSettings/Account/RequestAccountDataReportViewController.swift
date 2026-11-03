@@ -167,7 +167,7 @@ class RequestAccountDataReportViewController: OWSTableViewController2 {
         ModalActivityIndicatorViewController.present(
             fromViewController: self,
             canCancel: true,
-            asyncBlock: { modal in
+            asyncBlock: { [self] modal in
                 do {
                     let response = try await SSKEnvironment.shared.networkManagerRef.asyncRequest(request)
                     let status = response.responseStatusCode

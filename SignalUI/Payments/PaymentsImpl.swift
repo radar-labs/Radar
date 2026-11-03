@@ -72,7 +72,7 @@ public class PaymentsImpl: NSObject, PaymentsSwift {
 
         onIncommingTransactionNotificationProcessing = NotificationCenter.default.addObserver(
             name: Notification.Name("processIncomingPaymentNotification")
-        ) { _ in
+        ) { [self] _ in
             DispatchQueue.global().async { [weak self] in
                 SSKEnvironment.shared.databaseStorageRef.write { transaction in
                     self?.paymentsReconciliation.scheduleReconciliationNow(transaction: transaction)

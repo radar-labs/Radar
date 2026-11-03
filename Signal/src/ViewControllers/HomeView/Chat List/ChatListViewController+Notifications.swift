@@ -136,7 +136,7 @@ extension ChatListViewController {
 
         viewState.backupDownloadProgressViewState.downloadQueueStatus =
             DependenciesBridge.shared.backupAttachmentDownloadQueueStatusReporter.currentStatus(for: .fullsize)
-        Task { @MainActor in
+        Task { @MainActor [self] in
             self.viewState.backupDownloadProgressViewState.downloadProgressObserver = await DependenciesBridge.shared
                 .backupAttachmentDownloadProgress
                 .addObserver { [weak self] progress in
