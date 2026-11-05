@@ -265,7 +265,7 @@ public actor AttachmentUploadManagerImpl: AttachmentUploadManager {
         let localMetadata = try Upload.LocalUploadMetadata.validateAndBuild(fileUrl: temporaryFile, metadata: metadata)
         let form = try await Upload.FormRequest(
             networkManager: networkManager
-        ).start()
+        ).fetchForm(encryptedByteLength: localMetadata.encryptedDataLength)
 
         do {
             // We don't show progress for transient uploads
@@ -313,7 +313,7 @@ public actor AttachmentUploadManagerImpl: AttachmentUploadManager {
         let metadata = Upload.LinkNSyncUploadMetadata(fileUrl: sourceURL, encryptedDataLength: dataLength)
         let form = try await Upload.FormRequest(
             networkManager: networkManager
-        ).start()
+        ).fetchForm(encryptedByteLength: metadata.encryptedDataLength)
 
         do {
             // We don't show progress for transient uploads
@@ -807,7 +807,7 @@ public actor AttachmentUploadManagerImpl: AttachmentUploadManager {
             case .transitTier:
                 uploadForm = try await Upload.FormRequest(
                     networkManager: self.networkManager
-                ).start()
+                ).fetchForm(encryptedByteLength: localMetadata.encryptedDataLength)
             case .mediaTier(let auth, _):
                 uploadForm = try await self.backupRequestManager
                     .fetchBackupMediaAttachmentUploadForm(

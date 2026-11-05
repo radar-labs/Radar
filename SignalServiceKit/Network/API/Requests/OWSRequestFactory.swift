@@ -23,8 +23,12 @@ public enum OWSRequestFactory {
 
     // MARK: - Other
 
-    static func allocAttachmentRequestV4() -> TSRequest {
-        return TSRequest(url: URL(string: "v4/attachments/form/upload")!, method: "GET", parameters: [:])
+    /// - parameter encryptedByteLength: length in bytes of the encrypted file we will upload.
+    /// The server requires it (since 2026-11-04) and caps the returned form at that size.
+    static func allocAttachmentRequestV4(encryptedByteLength: UInt32) -> TSRequest {
+        var urlComps = URLComponents(string: "v4/attachments/form/upload")!
+        urlComps.queryItems = [URLQueryItem(name: "uploadLength", value: "\(encryptedByteLength)")]
+        return TSRequest(url: urlComps.url!, method: "GET", parameters: [:])
     }
 
     static func currencyConversionRequest() -> TSRequest {

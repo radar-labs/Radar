@@ -404,8 +404,8 @@ extension Upload {
             self.networkManager = networkManager
         }
 
-        public func start() async throws -> Upload.Form {
-            let request = OWSRequestFactory.allocAttachmentRequestV4()
+        public func fetchForm(encryptedByteLength: UInt32) async throws -> Upload.Form {
+            let request = OWSRequestFactory.allocAttachmentRequestV4(encryptedByteLength: encryptedByteLength)
             return try await fetchUploadForm(request: request)
         }
 
