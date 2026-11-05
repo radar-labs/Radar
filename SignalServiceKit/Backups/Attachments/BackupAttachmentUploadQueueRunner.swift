@@ -194,7 +194,7 @@ class BackupAttachmentUploadQueueRunnerImpl: BackupAttachmentUploadQueueRunner {
                 switch status {
                 case .expired:
                     Task {
-                        try await taskQueue?.stop()
+                        try? await taskQueue?.stop()
                     }
                 case .couldNotStart, .success:
                     break

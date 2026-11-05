@@ -1267,7 +1267,7 @@ class BackupSettingsViewController:
             ),
             primary: .button(HeroSheetViewController.Button(
                 title: primaryButtonTitle,
-                action: { sheet in
+                action: { [self] sheet in
                     sheet.dismiss(animated: true) { [weak self] in
                         guard let self else { return }
                         showRecordNewRecoveryKey()
@@ -1364,7 +1364,7 @@ class BackupSettingsViewController:
             secondaryButton: HeroSheetViewController.Button(
                 title: CommonStrings.learnMore,
                 style: .secondary,
-                action: .custom({ sheet in
+                action: .custom({ [self] sheet in
                     sheet.dismiss(animated: true) { [weak self] in
                         guard let self else { return }
                         ContactSupportActionSheet.present(
@@ -1398,7 +1398,7 @@ class BackupSettingsViewController:
             secondaryButton: HeroSheetViewController.Button(
                 title: CommonStrings.contactSupport,
                 style: .secondary,
-                action: .custom({ sheet in
+                action: .custom({ [self] sheet in
                     sheet.dismiss(animated: true) { [weak self] in
                         guard let self else { return }
                         ContactSupportActionSheet.present(

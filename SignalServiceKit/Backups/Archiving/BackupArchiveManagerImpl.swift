@@ -1356,13 +1356,21 @@ public class BackupArchiveManagerImpl: BackupArchiveManager {
                 disappearingMessagesJob
             ] in
                 Task {
-                    // Kick off avatar fetches enqueued during restore.
-                    try await avatarFetcher.runIfNeeded()
+                    do {
+                        // Kick off avatar fetches enqueued during restore.
+                        try await avatarFetcher.runIfNeeded()
+                    } catch {
+                        Logger.error("[Backups] Failed to fetch avatars: \(error)")
+                    }
                 }
 
                 Task {
-                    // Kick off attachment downloads enqueued during restore.
-                    try await backupAttachmentCoordinator.restoreAttachmentsIfNeeded()
+                    do {
+                        // Kick off attachment downloads enqueued during restore.
+                        try await backupAttachmentCoordinator.restoreAttachmentsIfNeeded()
+                    } catch {
+                        Logger.error("[Backups] Unable to restore remote backup attachments: \(error)")
+                    }
                 }
 
                 // Start ticking down for disappearing messages.

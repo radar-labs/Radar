@@ -54,10 +54,14 @@ public class BackupArchiveFullTextSearchIndexerImpl: BackupArchiveFullTextSearch
         self.taskQueue = SerialTaskQueue()
 
         appReadiness.runNowOrWhenAppDidBecomeReadyAsync {
-            Task {
-                try await self.taskQueue.enqueue(operation: { [weak self] in
-                    try await self?.runMessagesJobIfNeeded()
-                }).value
+            Task { [self] in
+                do {
+                    try await self.taskQueue.enqueue(operation: { [weak self] in
+                        try await self?.runMessagesJobIfNeeded()
+                    }).value
+                } catch {
+                    Logger.warn("[Backups] Failed to index messages: \(error)")
+                }
             }
         }
     }
@@ -77,7 +81,7 @@ public class BackupArchiveFullTextSearchIndexerImpl: BackupArchiveFullTextSearch
         )
         if let maxInteractionRowId {
             setMaxInteractionRowIdInclusive(maxInteractionRowId, tx: tx)
-            tx.addSyncCompletion {
+            tx.addSyncCompletion { [self] in
                 self.taskQueue.enqueue { [weak self] in
                     try await self?.runMessagesJobIfNeeded()
                 }

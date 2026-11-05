@@ -334,7 +334,7 @@ extension AttachmentApprovalToolbar {
         }
         viewOnceTooltip = tooltip
 
-        DispatchQueue.global().async {
+        DispatchQueue.global().async { [self] in
             SSKEnvironment.shared.preferencesRef.setWasViewOnceTooltipShown()
 
             DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 5) { [weak self] in

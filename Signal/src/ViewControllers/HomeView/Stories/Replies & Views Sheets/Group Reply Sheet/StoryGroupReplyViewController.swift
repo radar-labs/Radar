@@ -275,7 +275,7 @@ extension StoryGroupReplyViewController: ContextMenuInteractionDelegate {
         guard let indexPath = tableView.indexPathForRow(at: location),
               let item = replyLoader?.replyItem(for: indexPath) else { return nil }
 
-        return .init(identifier: indexPath as NSCopying, forceDarkTheme: true) { _ in
+        return .init(identifier: indexPath as NSCopying, forceDarkTheme: true) { [self] _ in
 
             var actions = [ContextMenuAction]()
 

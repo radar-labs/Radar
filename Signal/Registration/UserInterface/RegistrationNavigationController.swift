@@ -454,7 +454,7 @@ public class RegistrationNavigationController: OWSNavigationController {
             Logger.info("Finished with registration!")
             SignalApp.shared.showConversationSplitView(appReadiness: appReadiness)
             DispatchQueue.main.async {
-                guard let rootVC = UIApplication.shared.delegate?.window??.rootViewController else { return }
+                guard let rootVC = CurrentAppContext().mainWindow?.rootViewController else { return }
                 let nav = OWSNavigationController()
                 let coordinator = PaymentsOnboardingCoordinator()
                 nav.viewControllers = [coordinator.prepareForPresentation(inNavController: nav)]

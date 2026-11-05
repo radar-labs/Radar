@@ -50,7 +50,9 @@ extension SignalProxy {
             Logger.info("Relay server starting...")
 
             do {
-                listener = try NWListener(using: .tcp, on: .any)
+                let parameters = NWParameters.tcp
+                parameters.requiredInterfaceType = .loopback
+                listener = try NWListener(using: parameters, on: .any)
                 listener?.stateUpdateHandler = stateDidChange
                 listener?.newConnectionHandler = didAccept
                 listener?.start(queue: queue)

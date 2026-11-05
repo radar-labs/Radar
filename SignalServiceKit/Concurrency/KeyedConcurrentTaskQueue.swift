@@ -31,7 +31,8 @@ public actor KeyedConcurrentTaskQueue<KeyType: Hashable> {
         }
     }
 
-    /// See the corresponding ConcurrentTaskQueue method.
+    /// See the corresponding ConcurrentTaskQueue method (also disfavored there).
+    @_disfavoredOverload
     public func run<T>(forKey key: KeyType, _ block: () async throws -> T) async throws -> T {
         return try await withTaskQueue(forKey: key) { (taskQueue) async throws in
             return try await taskQueue.run(block)

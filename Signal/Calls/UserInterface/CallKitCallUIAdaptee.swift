@@ -154,7 +154,7 @@ final class CallKitCallUIAdaptee: NSObject, CallUIAdaptee, @preconcurrency CXPro
 
     @MainActor
     private func endCallOnceReported(_ call: SignalCall, reason: CXCallEndedReason) {
-        Self.providerReadyFlag.runNowOrWhenDidBecomeReadySync {
+        Self.providerReadyFlag.runNowOrWhenDidBecomeReadySync { [call] in
             switch call.commonState.systemState {
             case .notReported:
                 // Do nothing. This call was never reported to CallKit, so we don't need to report it ending.

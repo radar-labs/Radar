@@ -174,14 +174,23 @@ class AuthCredentialManagerImpl: AuthCredentialManager {
                 owsFailDebug("Dropping call link credential we didn't ask for")
                 continue
             }
-            let receivedValue = try CallLinkAuthCredentialResponse(
-                contents: fetchedValue.credential
-            ).receive(
-                userId: localIdentifiers.aci,
-                redemptionTime: Date(timeIntervalSince1970: TimeInterval(fetchedValue.redemptionTime)),
-                params: callLinkPublicParams
-            )
-            result.callLinkAuthCredentials.append((fetchedValue.redemptionTime, receivedValue))
+            // A call link credential we can't parse must not block the group
+            // credentials fetched alongside it. Signal is moving call link
+            // credentials to new zkgroup params (Signal-Server 355d95c6,
+            // libsignal v0.101.0) whose format this libsignal can't read; if the
+            // server starts sending those to us, skip them and keep groups working.
+            do {
+                let receivedValue = try CallLinkAuthCredentialResponse(
+                    contents: fetchedValue.credential
+                ).receive(
+                    userId: localIdentifiers.aci,
+                    redemptionTime: Date(timeIntervalSince1970: TimeInterval(fetchedValue.redemptionTime)),
+                    params: callLinkPublicParams
+                )
+                result.callLinkAuthCredentials.append((fetchedValue.redemptionTime, receivedValue))
+            } catch {
+                Logger.warn("Skipping call link credential we couldn't parse: \(error)")
+            }
         }
         return result
     }

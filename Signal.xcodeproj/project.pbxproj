@@ -3147,7 +3147,9 @@
 		F915A77229CB6F6F00EB6F68 /* AccountDataReportTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = F915A77129CB6F6F00EB6F68 /* AccountDataReportTest.swift */; };
 		F9189AC02947D9F300CD8EF6 /* DonationViewsUtil+LocalizedStripeError.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9189ABF2947D9F300CD8EF6 /* DonationViewsUtil+LocalizedStripeError.swift */; };
 		F9198485299AA7FC007FD5E4 /* RegistrationPhoneNumberInputView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9198484299AA7FC007FD5E4 /* RegistrationPhoneNumberInputView.swift */; };
-		F92074762888648A00B7F087 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F92074752888648A00B7F087 /* AppDelegate.swift */; };
+		F92074762888648A00B7F087 /* AppLifecycleManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F92074752888648A00B7F087 /* AppLifecycleManager.swift */; };
+		D99744C43040FD240052C54A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D99744C33040FD220052C54A /* AppDelegate.swift */; };
+		D95150933047770900931FB0 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D95150923047770700931FB0 /* SceneDelegate.swift */; };
 		F924A68228F8706200E368C8 /* DonationReadMoreSheetViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F924A68128F8706200E368C8 /* DonationReadMoreSheetViewController.swift */; };
 		F925A3AB29493D0D009024D0 /* DisappearingMessagesFinder.swift in Sources */ = {isa = PBXBuildFile; fileRef = F925A3AA29493D0C009024D0 /* DisappearingMessagesFinder.swift */; };
 		F9262C46289462F600063502 /* SignalServiceKit-Prefix.pch in Headers */ = {isa = PBXBuildFile; fileRef = F9C985D2289459860029F9AD /* SignalServiceKit-Prefix.pch */; };
@@ -7167,7 +7169,9 @@
 		F9189ABD2947D7C300CD8EF6 /* Stripe+StripeError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Stripe+StripeError.swift"; sourceTree = "<group>"; };
 		F9189ABF2947D9F300CD8EF6 /* DonationViewsUtil+LocalizedStripeError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DonationViewsUtil+LocalizedStripeError.swift"; sourceTree = "<group>"; };
 		F9198484299AA7FC007FD5E4 /* RegistrationPhoneNumberInputView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegistrationPhoneNumberInputView.swift; sourceTree = "<group>"; };
-		F92074752888648A00B7F087 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		F92074752888648A00B7F087 /* AppLifecycleManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLifecycleManager.swift; sourceTree = "<group>"; };
+		D99744C33040FD220052C54A /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		D95150923047770700931FB0 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		F924A68128F8706200E368C8 /* DonationReadMoreSheetViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DonationReadMoreSheetViewController.swift; sourceTree = "<group>"; };
 		F925A3AA29493D0C009024D0 /* DisappearingMessagesFinder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DisappearingMessagesFinder.swift; sourceTree = "<group>"; };
 		F925A3AC29493D35009024D0 /* DisappearingMessageFinderTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DisappearingMessageFinderTest.swift; sourceTree = "<group>"; };
@@ -9138,7 +9142,9 @@
 		5045F44129E0DAA400058E5F /* AppLaunch */ = {
 			isa = PBXGroup;
 			children = (
-				F92074752888648A00B7F087 /* AppDelegate.swift */,
+				D99744C33040FD220052C54A /* AppDelegate.swift */,
+				F92074752888648A00B7F087 /* AppLifecycleManager.swift */,
+				D95150923047770700931FB0 /* SceneDelegate.swift */,
 				34D99CE3217509C1000AFB39 /* AppEnvironment.swift */,
 				349C3636233D198300D52012 /* LaunchJobs.swift */,
 				4542DF53208D40AC007B4E76 /* LoadingViewController.swift */,
@@ -16890,7 +16896,9 @@
 				45D49115296F69AA00B92BB1 /* AllMediaViewController.swift in Sources */,
 				32E958AA25C12B3800BF12AD /* AnimatedProgressView.swift in Sources */,
 				50A76F562AF573CE00FCF02D /* AppActivePrecondition.swift in Sources */,
-				F92074762888648A00B7F087 /* AppDelegate.swift in Sources */,
+				D99744C43040FD240052C54A /* AppDelegate.swift in Sources */,
+				F92074762888648A00B7F087 /* AppLifecycleManager.swift in Sources */,
+				D95150933047770900931FB0 /* SceneDelegate.swift in Sources */,
 				8827004E23208A1900F01C46 /* AppearanceSettingsTableViewController.swift in Sources */,
 				34D99CE4217509C2000AFB39 /* AppEnvironment.swift in Sources */,
 				052D178A2C7E60340023D56F /* AppIcon.swift in Sources */,

@@ -542,7 +542,11 @@ class ProvisioningCoordinatorImpl: ProvisioningCoordinator {
             // block on a contact sync after doing one. We still do the
             // contact sync in the background to get contact avatars.
             Task {
-                try await doSyncsAndRestores()
+                do {
+                    try await doSyncsAndRestores()
+                } catch {
+                    Logger.error("Failed to complete link&sync: \(error)")
+                }
             }
         } else {
             try await doSyncsAndRestores()

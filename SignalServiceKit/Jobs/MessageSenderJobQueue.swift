@@ -332,7 +332,7 @@ public class MessageSenderJobQueue {
 
     public func setUp() {
         let jobRecordFinder = JobRecordFinderImpl<MessageSenderJobRecord>(db: DependenciesBridge.shared.db)
-        Task {
+        Task { [self] in
             if CurrentAppContext().isMainApp {
                 do {
                     let jobRecords = try await jobRecordFinder.loadRunnableJobs(updateRunnableJobRecord: { jobRecord, tx in
