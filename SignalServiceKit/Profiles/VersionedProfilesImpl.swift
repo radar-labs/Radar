@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
+import CryptoKit
 import Foundation
 public import LibSignalClient
 
@@ -116,6 +117,35 @@ public class VersionedProfilesImpl: VersionedProfiles {
         let tsAccountManager = DependenciesBridge.shared.tsAccountManager
         let localAci = try tsAccountManager.localIdentifiersWithMaybeSneakyTransaction(authedAccount: authedAccount).aci
         let localProfileKey = try self.parseProfileKey(profileKey: profileKey)
+        let profileKeyVersionString = try localProfileKey.getProfileKeyVersion(userId: localAci).asHexadecimalString()
+
+        return try await updateProfileWithProfileKeyVersion(
+            profileKeyVersionString,
+            profileGivenName: profileGivenName,
+            profileFamilyName: profileFamilyName,
+            profileBio: profileBio,
+            profileBioEmoji: profileBioEmoji,
+            profileAvatarMutation: profileAvatarMutation,
+            visibleBadgeIds: visibleBadgeIds,
+            profileKey: profileKey,
+            authedAccount: authedAccount,
+        )
+    }
+
+    public func updateProfileWithProfileKeyVersion(
+        _ profileKeyVersion: String,
+        profileGivenName: OWSUserProfile.NameComponent?,
+        profileFamilyName: OWSUserProfile.NameComponent?,
+        profileBio: String?,
+        profileBioEmoji: String?,
+        profileAvatarMutation: VersionedProfileAvatarMutation,
+        visibleBadgeIds: [String],
+        profileKey: Aes256Key,
+        authedAccount: AuthedAccount,
+    ) async throws -> VersionedProfileUpdate {
+        let tsAccountManager = DependenciesBridge.shared.tsAccountManager
+        let localAci = try tsAccountManager.localIdentifiersWithMaybeSneakyTransaction(authedAccount: authedAccount).aci
+        let localProfileKey = try self.parseProfileKey(profileKey: profileKey)
         let commitment = try localProfileKey.getCommitment(userId: localAci)
         let commitmentData = commitment.serialize()
 
@@ -126,17 +156,19 @@ public class VersionedProfilesImpl: VersionedProfiles {
         }
 
         let profilePaymentAddressData: Data? = await {
-            guard
-                SSKEnvironment.shared.paymentsHelperRef.arePaymentsEnabled,
-                SSKEnvironment.shared.paymentsHelperRef.canUsePayments()
-            else {
+            // The cached payment address is the source of truth for what's on the
+            // server. If it's populated, the user has previously uploaded a payment
+            // address; preserve it across any unrelated profile upload (name change,
+            // profile-key rotation, etc.). The cache is cleared explicitly when the
+            // user disables payments, so an empty cache here means "drop it" — and
+            // the kill switch overrides regardless.
+            if !SSKEnvironment.shared.paymentsHelperRef.canUsePayments() {
                 return nil
             }
             guard
                 let addressProtoData = await fetchLocalPaymentAddressProtoData(),
                 addressProtoData.count > 0
             else {
-                owsFailDebug("Payments enabled, but paymentAddress is missing or empty.")
                 return nil
             }
             var result = Data()
@@ -184,9 +216,6 @@ public class VersionedProfilesImpl: VersionedProfiles {
             SSKEnvironment.shared.udManagerRef.phoneNumberSharingMode(tx: tx).orDefault == .everybody
         })
 
-        let profileKeyVersion = try localProfileKey.getProfileKeyVersion(userId: localAci)
-        let profileKeyVersionString = try profileKeyVersion.asHexadecimalString()
-
         let hasAvatar: Bool
         let sameAvatar: Bool
         switch profileAvatarMutation {
@@ -210,7 +239,7 @@ public class VersionedProfilesImpl: VersionedProfiles {
             paymentAddress: paymentAddressValue,
             phoneNumberSharing: phoneNumberSharingValue,
             visibleBadgeIds: visibleBadgeIds,
-            version: profileKeyVersionString,
+            version: profileKeyVersion,
             commitment: commitmentData,
             auth: authedAccount.chatServiceAuth,
         )
@@ -248,6 +277,7 @@ public class VersionedProfilesImpl: VersionedProfiles {
     public func versionedProfileRequest(
         for aci: Aci,
         profileKey: ProfileKey,
+        profileKeyVersion: String? = nil,
         shouldRequestCredential: Bool,
         udAccessKey: SMKUDAccessKey?,
         auth chatServiceAuth: ChatServiceAuth,
@@ -268,11 +298,17 @@ public class VersionedProfilesImpl: VersionedProfiles {
             auth = .identified(chatServiceAuth)
         }
 
+        let profileKeyVersion = if let profileKeyVersion {
+            profileKeyVersion
+        } else {
+            try profileKey.getProfileKeyVersion(userId: aci).asHexadecimalString()
+        }
+
         return VersionedProfileRequest(
             aci: aci,
             request: OWSRequestFactory.getVersionedProfileRequest(
                 aci: aci,
-                profileKeyVersion: try profileKey.getProfileKeyVersion(userId: aci).asHexadecimalString(),
+                profileKeyVersion: profileKeyVersion,
                 credentialRequest: try requestContext?.getRequest().serialize(),
                 auth: auth,
             ),

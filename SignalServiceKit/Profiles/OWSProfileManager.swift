@@ -38,7 +38,7 @@ public class OWSProfileManager: ProfileManagerProtocol {
             Task {
                 await self.rotateProfileKeyIfNecessary()
             }
-            self.updateProfileOnServiceIfNecessary(authedAccount: .implicit)
+            self.updateProfileOnServiceIfNecessary(authedAccount: .implicit, profileKeyVersion: nil)
             Self.updateStorageServiceIfNecessary()
         }
 
@@ -246,13 +246,13 @@ public class OWSProfileManager: ProfileManagerProtocol {
     @MainActor
     private func applicationDidBecomeActive(_ notification: NSNotification) {
         // TODO: Sync if necessary.
-        updateProfileOnServiceIfNecessary(authedAccount: .implicit)
+        updateProfileOnServiceIfNecessary(authedAccount: .implicit, profileKeyVersion: nil)
     }
 
     @objc
     @MainActor
     private func reachabilityChanged(_ notification: NSNotification) {
-        updateProfileOnServiceIfNecessary(authedAccount: .implicit)
+        updateProfileOnServiceIfNecessary(authedAccount: .implicit, profileKeyVersion: nil)
     }
 
     // MARK: - Clean Up
@@ -380,6 +380,7 @@ extension OWSProfileManager: ProfileManager {
     // (or in the unlikely fact that another error occurs) but this
     // manager will continue to retry until the update succeeds.
     public func updateLocalProfile(
+        profileKeyVersion: String?,
         profileGivenName: OptionalChange<OWSUserProfile.NameComponent>,
         profileFamilyName: OptionalChange<OWSUserProfile.NameComponent?>,
         profileBio: OptionalChange<String?>,
@@ -414,13 +415,21 @@ extension OWSProfileManager: ProfileManager {
         }
         tx.addSyncCompletion {
             Task { @MainActor in
-                self._updateProfileOnServiceIfNecessary()
+                self._updateProfileOnServiceIfNecessary(profileKeyVersion: profileKeyVersion)
             }
         }
         return promise
     }
 
     // This will re-upload the existing local profile state.
+    /// Posted after the local profile is successfully uploaded to the service at the standard
+    /// (profile-key-derived) version. The Bitcoin Lightning payment address lives at a separate fixed
+    /// profile version (`PaymentsConstants.bitcoinLightningProfileKeyVersion`) that the server only
+    /// serves while it is the account's *current* version; a standard upload makes the standard
+    /// version current and hides it. `PaymentsImpl` observes this to re-publish the payment profile at
+    /// the fixed version, making it current again.
+    public static let localProfileDidUpdateOnService = Notification.Name("localProfileDidUpdateOnService")
+
     public func reuploadLocalProfile(
         unsavedRotatedProfileKey: Aes256Key?,
         mustReuploadAvatar: Bool,
@@ -442,6 +451,65 @@ extension OWSProfileManager: ProfileManager {
             authedAccount: authedAccount,
             tx: tx,
         )
+    }
+
+    // Reupload local profile with provided special profile key version
+    public func reuploadLocalProfileWithProfileKeyVersion(
+        _ profileKeyVersion: String,
+        unsavedRotatedProfileKey: Aes256Key?,
+        mustReuploadAvatar: Bool,
+        authedAccount: AuthedAccount,
+        tx: DBWriteTransaction,
+    ) -> Promise<Void> {
+        Logger.info("")
+        return Promise.wrapAsync { [weak self] in
+            guard let self else {
+                return
+            }
+
+            let userProfile = SSKEnvironment.shared.databaseStorageRef.read(
+                block: SSKEnvironment.shared.profileManagerImplRef.localUserProfile(tx:),
+            )
+            guard let userProfile else {
+                throw OWSAssertionError("Can't upload profile without profile.")
+            }
+
+            let avatarUpdate = try await buildAvatarUpdate(
+                avatarChange: .noChange,
+                localUserProfile: userProfile,
+                authedAccount: authedAccount,
+            )
+
+            guard let profileKey = userProfile.profileKey else {
+                throw OWSAssertionError("Can't upload profile without profileKey.")
+            }
+
+            let givenName = userProfile.givenName.flatMap { OWSUserProfile.NameComponent(truncating: $0) }
+            let familyName = userProfile.familyName.flatMap { OWSUserProfile.NameComponent(truncating: $0) }
+            let bio = userProfile.bio
+            let bioEmoji = userProfile.bioEmoji
+            let visibleBadgeIds = userProfile.visibleBadges.map { $0.badgeId }
+
+            _ = try await SSKEnvironment.shared.versionedProfilesRef.updateProfileWithProfileKeyVersion(
+                profileKeyVersion,
+                profileGivenName: givenName,
+                profileFamilyName: familyName,
+                profileBio: bio,
+                profileBioEmoji: bioEmoji,
+                profileAvatarMutation: avatarUpdate.remoteMutation,
+                visibleBadgeIds: visibleBadgeIds,
+                profileKey: profileKey,
+                authedAccount: authedAccount,
+            )
+
+            await SSKEnvironment.shared.databaseStorageRef.awaitableWrite { tx in
+                // Notify all our devices that the profile has changed.
+                let tsRegistrationState = DependenciesBridge.shared.tsAccountManager.registrationState(tx: tx)
+                if tsRegistrationState.isRegistered {
+                    SSKEnvironment.shared.syncManagerRef.sendFetchLatestProfileSyncMessage(tx: tx)
+                }
+            }
+        }
     }
 
     // MARK: -
@@ -765,8 +833,8 @@ extension OWSProfileManager: ProfileManager {
     // MARK: -
 
     @MainActor
-    private func updateProfileOnServiceIfNecessary(authedAccount: AuthedAccount) {
-        switch _updateProfileOnServiceIfNecessary() {
+    private func updateProfileOnServiceIfNecessary(authedAccount: AuthedAccount, profileKeyVersion: String?) {
+        switch _updateProfileOnServiceIfNecessary(profileKeyVersion: profileKeyVersion) {
         case .notReady, .updating:
             return
         case .notNeeded:
@@ -793,7 +861,7 @@ extension OWSProfileManager: ProfileManager {
 
     @discardableResult
     @MainActor
-    private func _updateProfileOnServiceIfNecessary(retryDelay: TimeInterval = 1) -> UpdateProfileStatus {
+    private func _updateProfileOnServiceIfNecessary(retryDelay: TimeInterval = 1, profileKeyVersion: String?) -> UpdateProfileStatus {
         guard appReadiness.isAppReady else {
             return .notReady
         }
@@ -826,12 +894,13 @@ extension OWSProfileManager: ProfileManager {
                     profileChanges: profileChanges,
                     newProfileKey: parameters?.profileKey,
                     authedAccount: authedAccount,
+                    profileKeyVersion: profileKeyVersion,
                 )
                 DispatchQueue.global().async {
                     parameters?.future.resolve()
                 }
                 DispatchQueue.main.async {
-                    self._updateProfileOnServiceIfNecessary()
+                    self._updateProfileOnServiceIfNecessary(profileKeyVersion: profileKeyVersion)
                 }
             } catch {
                 DispatchQueue.global().async {
@@ -839,7 +908,7 @@ extension OWSProfileManager: ProfileManager {
                 }
                 Logger.warn("Retrying profile update after \(retryDelay)s due to error: \(error)")
                 DispatchQueue.main.asyncAfter(deadline: .now() + retryDelay) {
-                    self._updateProfileOnServiceIfNecessary(retryDelay: retryDelay * 2)
+                    self._updateProfileOnServiceIfNecessary(retryDelay: retryDelay * 2, profileKeyVersion: profileKeyVersion)
                 }
             }
         }
@@ -977,6 +1046,7 @@ extension OWSProfileManager: ProfileManager {
         profileChanges: PendingProfileUpdate,
         newProfileKey: Aes256Key?,
         authedAccount: AuthedAccount,
+        profileKeyVersion: String?,
     ) async throws {
         do {
             let userProfile = SSKEnvironment.shared.databaseStorageRef.read(
@@ -1018,16 +1088,30 @@ extension OWSProfileManager: ProfileManager {
             let newBioEmoji = profileChanges.profileBioEmoji.orExistingValue(userProfile.bioEmoji)
             let newVisibleBadgeIds = profileChanges.visibleBadgeIds.orExistingValue(userProfile.visibleBadges.map { $0.badgeId })
 
-            let versionedUpdate = try await SSKEnvironment.shared.versionedProfilesRef.updateProfile(
-                profileGivenName: newGivenName,
-                profileFamilyName: newFamilyName,
-                profileBio: newBio,
-                profileBioEmoji: newBioEmoji,
-                profileAvatarMutation: avatarUpdate.remoteMutation,
-                visibleBadgeIds: newVisibleBadgeIds,
-                profileKey: profileKey,
-                authedAccount: authedAccount,
-            )
+            let versionedUpdate = if let profileKeyVersion {
+                try await SSKEnvironment.shared.versionedProfilesRef.updateProfileWithProfileKeyVersion(
+                    profileKeyVersion,
+                    profileGivenName: newGivenName,
+                    profileFamilyName: newFamilyName,
+                    profileBio: newBio,
+                    profileBioEmoji: newBioEmoji,
+                    profileAvatarMutation: avatarUpdate.remoteMutation,
+                    visibleBadgeIds: newVisibleBadgeIds,
+                    profileKey: profileKey,
+                    authedAccount: authedAccount,
+                )
+            } else {
+                try await SSKEnvironment.shared.versionedProfilesRef.updateProfile(
+                    profileGivenName: newGivenName,
+                    profileFamilyName: newFamilyName,
+                    profileBio: newBio,
+                    profileBioEmoji: newBioEmoji,
+                    profileAvatarMutation: avatarUpdate.remoteMutation,
+                    visibleBadgeIds: newVisibleBadgeIds,
+                    profileKey: profileKey,
+                    authedAccount: authedAccount,
+                )
+            }
             await SSKEnvironment.shared.databaseStorageRef.awaitableWrite { tx in
                 self.tryToDequeueProfileChanges(profileChanges, tx: tx)
                 // Apply the changes to our local profile.
@@ -1056,6 +1140,17 @@ extension OWSProfileManager: ProfileManager {
             // method will fail because it will the just-obsoleted profile key.
             if newProfileKey == nil {
                 _ = try await fetchLocalUsersProfile(authedAccount: authedAccount)
+            }
+
+            // The upload above just became the account's current server profile, which hides the
+            // Lightning payment address stored at the fixed payment profile version. Let the payments
+            // layer re-publish at that version so senders can still read it. Skip when this WAS the
+            // payment-version upload, to avoid a redundant re-publish.
+            if profileKeyVersion != PaymentsConstants.bitcoinLightningProfileKeyVersion {
+                NotificationCenter.default.postOnMainThread(
+                    name: Self.localProfileDidUpdateOnService,
+                    object: nil,
+                )
             }
         } catch let error where error.isNetworkFailureOrTimeout {
             // We retry network errors forever (with exponential backoff).

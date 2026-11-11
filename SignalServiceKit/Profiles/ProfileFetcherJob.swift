@@ -37,6 +37,8 @@ public class ProfileFetcherJob {
     private let udManager: any OWSUDManager
     private let versionedProfiles: any VersionedProfiles
     private let userProfileWriter: UserProfileWriter
+    private let profileKeyVersion: String?
+    private let profileFullUpdateOnFetch: Bool
 
     init(
         serviceId: ServiceId,
@@ -59,6 +61,8 @@ public class ProfileFetcherJob {
         udManager: any OWSUDManager,
         versionedProfiles: any VersionedProfiles,
         userProfileWriter: UserProfileWriter,
+        profileKeyVersion: String?,
+        profileAutoUpdate: Bool,
     ) {
         self.serviceId = serviceId
         self.groupIdContext = groupIdContext
@@ -80,6 +84,8 @@ public class ProfileFetcherJob {
         self.udManager = udManager
         self.versionedProfiles = versionedProfiles
         self.userProfileWriter = userProfileWriter
+        self.profileKeyVersion = profileKeyVersion
+        self.profileFullUpdateOnFetch = profileAutoUpdate
     }
 
     // MARK: -
@@ -92,7 +98,7 @@ public class ProfileFetcherJob {
 
         let localIdentifiers = try tsAccountManager.localIdentifiersWithMaybeSneakyTransaction(authedAccount: authedAccount)
         do {
-            let fetchedProfile = try await requestProfile(localIdentifiers: localIdentifiers)
+            let fetchedProfile = try await requestProfile(localIdentifiers: localIdentifiers, profileKeyVersion: profileKeyVersion)
             try await updateProfile(
                 fetchedProfile: fetchedProfile,
                 localIdentifiers: localIdentifiers,
@@ -110,10 +116,10 @@ public class ProfileFetcherJob {
         }
     }
 
-    private func requestProfile(localIdentifiers: LocalIdentifiers) async throws -> FetchedProfile {
+    private func requestProfile(localIdentifiers: LocalIdentifiers, profileKeyVersion: String?) async throws -> FetchedProfile {
         do {
             return try await Retry.performWithBackoff(maxAttempts: 3) {
-                return try await requestProfileAttempt(localIdentifiers: localIdentifiers)
+                return try await requestProfileAttempt(localIdentifiers: localIdentifiers, profileKeyVersion: profileKeyVersion)
             }
         } catch where error.httpStatusCode == 401 {
             throw ProfileRequestError.notAuthorized
@@ -124,7 +130,7 @@ public class ProfileFetcherJob {
         }
     }
 
-    private func requestProfileAttempt(localIdentifiers: LocalIdentifiers) async throws -> FetchedProfile {
+    private func requestProfileAttempt(localIdentifiers: LocalIdentifiers, profileKeyVersion: String?) async throws -> FetchedProfile {
         let serviceId = self.serviceId
         let versionedProfiles = self.versionedProfiles
 
@@ -135,6 +141,7 @@ public class ProfileFetcherJob {
             let versionedProfileRequest = try versionedProfiles.versionedProfileRequest(
                 for: versionedFetchParameters.aci,
                 profileKey: versionedFetchParameters.profileKey,
+                profileKeyVersion: profileKeyVersion,
                 shouldRequestCredential: versionedFetchParameters.shouldRequestCredential,
                 udAccessKey: versionedFetchParameters.auth?.key,
                 auth: self.authedAccount.chatServiceAuth,
@@ -436,6 +443,28 @@ public class ProfileFetcherJob {
         let serviceId = profile.serviceId
 
         await db.awaitableWrite { transaction in
+            // Radar: always keep the contact's payment-address flag in sync with the
+            // profile we fetched, including the Lightning-address profile version
+            // (fetched with profileFullUpdateOnFetch == false). Upstream moved this flag
+            // from the "arePaymentsEnabledForUserStore" store to OWSUserProfile.
+            defer {
+                let hasPaymentAddress = (try? fetchedProfile.decryptedProfile?.paymentAddress()) != nil
+                let userProfile = OWSUserProfile.getOrBuildUserProfile(
+                    for: OWSUserProfile.insertableAddress(serviceId: serviceId, localIdentifiers: localIdentifiers),
+                    userProfileWriter: userProfileWriter,
+                    tx: transaction,
+                )
+                userProfile.update(
+                    hasPaymentAddress: .setTo(hasPaymentAddress),
+                    userProfileWriter: userProfileWriter,
+                    transaction: transaction,
+                )
+            }
+
+            guard profileFullUpdateOnFetch else {
+                return
+            }
+
             if let aci = serviceId as? Aci {
                 self.updateUnidentifiedAccess(
                     aci: aci,
