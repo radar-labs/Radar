@@ -604,6 +604,12 @@ class ExperienceUpgradeManager {
             return nil
         }
 
+        // Radar: without the paid plan, the only upsell is turning on (free)
+        // Backups; "back up your media" and "save space" sell the paid plan.
+        guard BuildFlags.Backups.showPaidPlan else {
+            return areBackupsEnabled ? nil : .neverLoseAMessage
+        }
+
         let attachmentsSize = attachmentStore.sumEncryptedByteCount(stopAfter: .gigabyte, tx: tx)
         if attachmentsSize < .gigabyte {
             if areBackupsEnabled {
@@ -625,6 +631,12 @@ class ExperienceUpgradeManager {
         now: Date,
         tx: DBReadTransaction,
     ) -> Bool {
+        // Radar: don't show Signal's remote megaphones, including any that an
+        // earlier version already fetched.
+        guard BuildFlags.remoteMegaphonesAndReleaseNotes else {
+            return false
+        }
+
         let manifest = remoteMegaphoneModel.manifest
         let translation = remoteMegaphoneModel.translation
 

@@ -50,6 +50,10 @@ class BackupSaveAndConfirmKeyCoordinator {
         let preconditionFilteredOptions = options.filter {
             switch $0 {
             case .showSaveKeyToPasswordManager:
+                // Radar: see BuildFlags.Backups.saveRecoveryKeyToPasswordManager.
+                guard BuildFlags.Backups.saveRecoveryKeyToPasswordManager else {
+                    return false
+                }
                 if #available(iOS 26.2, *) {
                     return true
                 }

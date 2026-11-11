@@ -49,6 +49,11 @@ public enum BuildFlags {
         /// Gates the paid Backups plan (the paid tier in the plan chooser and
         /// the upgrade button in Backup settings). Disabled.
         public static let showPaidPlan = false
+
+        /// Radar: gates "Save to Password Manager" for the Recovery Key. Upstream
+        /// saves it under signal.org (webcredentials) with Signal's app name,
+        /// which Radar can't use; users save their key manually instead.
+        public static let saveRecoveryKeyToPasswordManager = false
     }
 
     static let netBuildVariant: Net.BuildVariant = build <= .beta ? .beta : .production
@@ -105,6 +110,11 @@ public enum BuildFlags {
     /// Gates the donations feature (the "Donate" entry in app settings and the
     /// flows it leads to). Disabled.
     public static let donations = false
+
+    /// Radar: gates Signal's remote megaphones, release notes and announcements.
+    /// They come from Signal's update server and are written by Signal, so Radar
+    /// neither fetches nor shows them. Disabled.
+    public static let remoteMegaphonesAndReleaseNotes = false
 }
 
 // MARK: -

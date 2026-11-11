@@ -770,27 +770,30 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
             }
         }
 
-        let remoteReleaseNotesFetchingManager = RemoteReleaseNotesFetchingManager(
-            db: db,
-            attachmentContentValidator: DependenciesBridge.shared.attachmentContentValidator,
-            attachmentManager: DependenciesBridge.shared.attachmentManager,
-            blockingManager: SSKEnvironment.shared.blockingManagerRef,
-            tsAccountManager: DependenciesBridge.shared.tsAccountManager,
-            notificationPresenter: SSKEnvironment.shared.notificationPresenterRef,
-            threadStore: DependenciesBridge.shared.threadStore,
-            interactionStore: DependenciesBridge.shared.interactionStore,
-            appVersion: AppVersionImpl.shared,
-            dateProvider: { Date() },
-            remoteReleaseNotesService: DependenciesBridge.shared.remoteReleaseNotesService,
-            releaseNoteStore: ReleaseNoteStore(),
-        )
-        cron.schedulePeriodically(
-            uniqueKey: .fetchMegaphones,
-            approximateInterval: 3 * .day,
-            mustBeRegistered: true,
-            mustBeConnected: true,
-            operation: { try await remoteReleaseNotesFetchingManager.syncRemoteReleaseNotes() },
-        )
+        // Radar: Signal's remote megaphones/release notes are gated off.
+        if BuildFlags.remoteMegaphonesAndReleaseNotes {
+            let remoteReleaseNotesFetchingManager = RemoteReleaseNotesFetchingManager(
+                db: db,
+                attachmentContentValidator: DependenciesBridge.shared.attachmentContentValidator,
+                attachmentManager: DependenciesBridge.shared.attachmentManager,
+                blockingManager: SSKEnvironment.shared.blockingManagerRef,
+                tsAccountManager: DependenciesBridge.shared.tsAccountManager,
+                notificationPresenter: SSKEnvironment.shared.notificationPresenterRef,
+                threadStore: DependenciesBridge.shared.threadStore,
+                interactionStore: DependenciesBridge.shared.interactionStore,
+                appVersion: AppVersionImpl.shared,
+                dateProvider: { Date() },
+                remoteReleaseNotesService: DependenciesBridge.shared.remoteReleaseNotesService,
+                releaseNoteStore: ReleaseNoteStore(),
+            )
+            cron.schedulePeriodically(
+                uniqueKey: .fetchMegaphones,
+                approximateInterval: 3 * .day,
+                mustBeRegistered: true,
+                mustBeConnected: true,
+                operation: { try await remoteReleaseNotesFetchingManager.syncRemoteReleaseNotes() },
+            )
+        }
 
         appReadiness.runNowOrWhenAppDidBecomeReadyAsync {
             DependenciesBridge.shared.orphanedAttachmentCleaner.beginObserving()
