@@ -11,11 +11,20 @@
 		<string>LazyDatabaseMigratorTask</string>
 	</array>
 	<key>BuildDetails</key>
-	<dict/>
+	<dict>
+		<key>DateTime</key>
+		<string>Thu  5 Nov 2026 12:02:45 UTC</string>
+		<key>SignalCommit</key>
+		<string>1332feec234a8c441616f99513aaab6544b1d600 Build with Xcode 27 and adopt the UIScene life cycle</string>
+		<key>Timestamp</key>
+		<integer>1793880165</integer>
+		<key>XCodeVersion</key>
+		<string>2700.2720</string>
+	</dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-	<string>${PRODUCT_NAME}</string>
+	<string>Radar</string>
 	<key>CFBundleExecutable</key>
 	<string>${EXECUTABLE_NAME}</string>
 	<key>CFBundleGetInfoString</key>
@@ -27,7 +36,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>${PRODUCT_NAME}</string>
+	<string>Radar</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -48,11 +57,11 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>0</string>
+	<string>7</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>LOGS_EMAIL</key>
-	<string>support@signal.org</string>
+	<string>support@radar.chat</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.social-networking</string>
 	<key>LSApplicationQueriesSchemes</key>
@@ -77,27 +86,27 @@
 		</dict>
 	</dict>
 	<key>NSAppleMusicUsageDescription</key>
-	<string>Signal needs to use Apple Music to play media attachments.</string>
+	<string>Radar needs to use Apple Music to play media attachments.</string>
 	<key>NSBonjourServices</key>
 	<array>
 		<string>_sgnl-new-device._tcp</string>
 	</array>
 	<key>NSCameraUsageDescription</key>
-	<string>Signal uses your camera to take photos, start or join a video call and to scan QR codes.</string>
+	<string>Radar uses your camera to take photos, start or join a video call and to scan QR codes.</string>
 	<key>NSContactsUsageDescription</key>
-	<string>Signal uses your contacts to find users you know. We do not store your contacts on the server.</string>
+	<string>Radar uses your contacts to find users you know. We do not store your contacts on the server.</string>
 	<key>NSFaceIDUsageDescription</key>
-	<string>Signal uses Face ID to confirm it's you.</string>
+	<string>Radar uses Face ID to confirm it's you.</string>
 	<key>NSLocalNetworkUsageDescription</key>
-	<string>Signal uses the local network to allow you to directly transfer your account to a new phone. It will not be used unless you explicitly choose to initiate a transfer to a new device.</string>
+	<string>Radar uses the local network to allow you to directly transfer your account to a new phone. It will not be used unless you explicitly choose to initiate a transfer to a new device.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Signal needs access to your location in order to share your current location.</string>
+	<string>Radar needs access to your location in order to share your current location.</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>Signal needs access to your microphone to make and receive phone calls and record voice messages.</string>
+	<string>Radar needs access to your microphone to make and receive phone calls and record voice messages.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>Signal will save photos to your library.</string>
+	<string>Radar will save photos to your library.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Signal will let you choose which photos from your library to send.</string>
+	<string>Radar will let you choose which photos from your library to send.</string>
 	<key>NSUserActivityTypes</key>
 	<array>
 		<string>INSendMessageIntent</string>
@@ -132,6 +141,7 @@
 		<string>fetch</string>
 		<string>processing</string>
 		<string>remote-notification</string>
+		<string>push-to-talk</string>
 		<string>voip</string>
 	</array>
 	<key>UILaunchStoryboardName</key>

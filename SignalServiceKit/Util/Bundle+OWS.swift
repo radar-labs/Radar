@@ -24,7 +24,7 @@ extension Bundle {
             return prefix
         } else {
             owsFailDebug("Missing Info.plist entry for OWSBundleIDPrefix")
-            return "org.whispersystems"
+            return "com.cakelabs"
         }
     }
 
