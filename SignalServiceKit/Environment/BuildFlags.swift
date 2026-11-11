@@ -45,6 +45,10 @@ public enum BuildFlags {
         public static let useLowerDefaultListMediaRefreshInterval = build <= .beta
 
         public static let takeoutExport = true
+
+        /// Gates the paid Backups plan (the paid tier in the plan chooser and
+        /// the upgrade button in Backup settings). Disabled.
+        public static let showPaidPlan = false
     }
 
     static let netBuildVariant: Net.BuildVariant = build <= .beta ? .beta : .production
@@ -97,6 +101,10 @@ public enum BuildFlags {
     public static let stickerReply = true
 
     public static let screenshotBlocking = build <= .internal
+
+    /// Gates the donations feature (the "Donate" entry in app settings and the
+    /// flows it leads to). Disabled.
+    public static let donations = false
 }
 
 // MARK: -

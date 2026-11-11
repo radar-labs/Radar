@@ -219,24 +219,26 @@ struct ChooseBackupPlanView: View {
                 }
                 .buttonStyle(.plain)
 
-                Spacer().frame(height: 16)
+                if BuildFlags.Backups.showPaidPlan {
+                    Spacer().frame(height: 16)
 
-                Button {
-                    viewModel.planSelection = .paid
-                } label: {
-                    BackupPlanPaidOptionView(
-                        storeKitAvailability: viewModel.storeKitAvailability,
-                        storageAllowanceBytes: viewModel.storageAllowanceBytes,
-                        bulletIconTintColor: viewModel.planSelection == .paid ? .Signal.ultramarine : .Signal.label,
-                        isCurrentPlan: viewModel.initialPlanSelection == .paid,
-                        isSelected: viewModel.planSelection == .paid,
-                        showSelectionCircle: true,
-                    )
+                    Button {
+                        viewModel.planSelection = .paid
+                    } label: {
+                        BackupPlanPaidOptionView(
+                            storeKitAvailability: viewModel.storeKitAvailability,
+                            storageAllowanceBytes: viewModel.storageAllowanceBytes,
+                            bulletIconTintColor: viewModel.planSelection == .paid ? .Signal.ultramarine : .Signal.label,
+                            isCurrentPlan: viewModel.initialPlanSelection == .paid,
+                            isSelected: viewModel.planSelection == .paid,
+                            showSelectionCircle: true,
+                        )
+                    }
+                    .buttonStyle(.plain)
+
+                    BackupPlanTermsAndConditionsView()
+                        .padding(.vertical, 16)
                 }
-                .buttonStyle(.plain)
-
-                BackupPlanTermsAndConditionsView()
-                    .padding(.vertical, 16)
             }
             .padding(.horizontal, 16)
         } pinnedFooter: {

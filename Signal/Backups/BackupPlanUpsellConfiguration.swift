@@ -22,7 +22,11 @@ struct BackupPlanUpsellConfiguration {
         subscriptionConfigManager: SubscriptionConfigManager,
     ) async throws(SheetDisplayableError) -> BackupPlanUpsellConfiguration {
         let storeKitAvailability: StoreKitAvailability
-        if BuildFlags.Backups.avoidStoreKitForTesters {
+        if !BuildFlags.Backups.showPaidPlan {
+            // The paid plan is hidden, so its price is never shown; don't
+            // fetch it from StoreKit.
+            storeKitAvailability = .unavailableForTesters
+        } else if BuildFlags.Backups.avoidStoreKitForTesters {
             storeKitAvailability = .unavailableForTesters
         } else {
             do {
