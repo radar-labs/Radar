@@ -5,7 +5,7 @@
 
 import SignalServiceKit
 import UIKit
-import UserNotifications
+@preconcurrency import UserNotifications
 
 // The lifecycle of the NSE looks something like the following:
 //  1)  App receives notification
