@@ -286,6 +286,22 @@ class ConversationInputToolbar: UIView, AttachmentKeyboardDelegate, Conversation
             )
         }
 
+        static func paymentsButton(
+            primaryAction: UIAction,
+            accessibilityIdentifier: String?,
+        ) -> UIButton {
+            return compactButton(
+                buttonImage: UIImage(imageLiteralResourceName: "payment-28")
+                    .withTintColor(Theme.primaryIconColor),
+                primaryAction: primaryAction,
+                accessibilityLabel: OWSLocalizedString(
+                    "INPUT_TOOLBAR_PAYMENTS_BUTTON_ACCESSIBILITY_LABEL",
+                    comment: "accessibility label for the button which show up send payemnt screen",
+                ),
+                accessibilityIdentifier: accessibilityIdentifier,
+            )
+        }
+
         static func keyboardButton(
             primaryAction: UIAction,
             accessibilityIdentifier: String?,
@@ -474,6 +490,13 @@ class ConversationInputToolbar: UIView, AttachmentKeyboardDelegate, Conversation
             self?.stickerButtonPressed()
         },
         accessibilityIdentifier: UIView.accessibilityIdentifier(in: self, name: "stickerButton"),
+    )
+
+    private lazy var paymentsButton = Buttons.paymentsButton(
+        primaryAction: UIAction { [weak self] _ in
+            self?.inputToolbarDelegate?.paymentButtonPressed()
+        },
+        accessibilityIdentifier: UIView.accessibilityIdentifier(in: self, name: "paymentsButton"),
     )
 
     private lazy var keyboardButton = Buttons.keyboardButton(
@@ -781,46 +804,37 @@ class ConversationInputToolbar: UIView, AttachmentKeyboardDelegate, Conversation
             messageComponentsView.bottomAnchor.constraint(equalTo: backgroundView.bottomAnchor),
         ])
 
-        // iOS 26 has three in-field buttons: Sticker/Keyboard, Camera, Voice Note.
-        // iOS 15-18 only have Sticker/Keyboard.
+        // iOS 26 has three in-field buttons: Payments, Camera, Voice Note (sticker removed).
+        // iOS 15-18 only have Payments.
         if iOS26Layout {
             inputTextView.inFieldButtonsAreaWidth = 3 * LayoutMetrics.initialTextBoxHeight
 
-            inputTextViewContainer.addSubview(stickerButton)
-            inputTextViewContainer.addSubview(keyboardButton)
+            inputTextViewContainer.addSubview(paymentsButton)
             inputTextViewContainer.addSubview(cameraButton)
             inputTextViewContainer.addSubview(voiceNoteButton)
 
-            stickerButton.translatesAutoresizingMaskIntoConstraints = false
-            keyboardButton.translatesAutoresizingMaskIntoConstraints = false
+            paymentsButton.translatesAutoresizingMaskIntoConstraints = false
             cameraButton.translatesAutoresizingMaskIntoConstraints = false
             voiceNoteButton.translatesAutoresizingMaskIntoConstraints = false
 
             NSLayoutConstraint.activate([
                 voiceNoteButton.trailingAnchor.constraint(equalTo: backgroundView.trailingAnchor, constant: -4),
                 cameraButton.trailingAnchor.constraint(equalTo: voiceNoteButton.leadingAnchor),
-                stickerButton.trailingAnchor.constraint(equalTo: cameraButton.leadingAnchor),
-                keyboardButton.trailingAnchor.constraint(equalTo: cameraButton.leadingAnchor),
+                paymentsButton.trailingAnchor.constraint(equalTo: cameraButton.leadingAnchor),
 
                 voiceNoteButton.bottomAnchor.constraint(equalTo: inputTextViewContainer.bottomAnchor),
                 cameraButton.bottomAnchor.constraint(equalTo: inputTextViewContainer.bottomAnchor),
-                stickerButton.bottomAnchor.constraint(equalTo: inputTextViewContainer.bottomAnchor),
-                keyboardButton.bottomAnchor.constraint(equalTo: inputTextViewContainer.bottomAnchor),
+                paymentsButton.bottomAnchor.constraint(equalTo: inputTextViewContainer.bottomAnchor),
             ])
         } else {
             inputTextView.inFieldButtonsAreaWidth = 1 * LayoutMetrics.initialTextBoxHeight
 
-            inputTextViewContainer.addSubview(stickerButton)
-            inputTextViewContainer.addSubview(keyboardButton)
+            inputTextViewContainer.addSubview(paymentsButton)
 
-            stickerButton.translatesAutoresizingMaskIntoConstraints = false
-            keyboardButton.translatesAutoresizingMaskIntoConstraints = false
+            paymentsButton.translatesAutoresizingMaskIntoConstraints = false
             NSLayoutConstraint.activate([
-                stickerButton.centerYAnchor.constraint(equalTo: inputTextViewContainer.centerYAnchor),
-                keyboardButton.centerYAnchor.constraint(equalTo: inputTextViewContainer.centerYAnchor),
-
-                stickerButton.trailingAnchor.constraint(equalTo: messageContentView.trailingAnchor, constant: -4),
-                keyboardButton.trailingAnchor.constraint(equalTo: messageContentView.trailingAnchor, constant: -4),
+                paymentsButton.centerYAnchor.constraint(equalTo: inputTextViewContainer.centerYAnchor),
+                paymentsButton.trailingAnchor.constraint(equalTo: messageContentView.trailingAnchor, constant: -4),
             ])
         }
 
@@ -997,7 +1011,8 @@ class ConversationInputToolbar: UIView, AttachmentKeyboardDelegate, Conversation
 
         let hideStickerButton = hideInputMethodButtons || desiredKeyboardType == .sticker
         let hideKeyboardButton = hideInputMethodButtons || !hideStickerButton
-        ConversationInputToolbar.setView(stickerButton, hidden: hideStickerButton, usingAnimator: animator)
+        ConversationInputToolbar.setView(paymentsButton, hidden: hideAllTextFieldButtons, usingAnimator: animator)
+        ConversationInputToolbar.setView(stickerButton, hidden: true, usingAnimator: animator)
         ConversationInputToolbar.setView(keyboardButton, hidden: hideKeyboardButton, usingAnimator: animator)
         if iOS26Layout {
             ConversationInputToolbar.setView(cameraButton, hidden: hideAllTextFieldButtons, usingAnimator: animator)
