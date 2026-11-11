@@ -33,6 +33,7 @@ class NotificationSettingsViewController: OWSTableViewController2 {
         contents.add(buildContactJoinedSignalSection())
         contents.add(buildAppBadgeSection())
         contents.add(buildReregisterPushSection())
+        contents.add(buildPushRelaySection())
         contents.add(buildResetSection())
 
         self.contents = contents
@@ -263,6 +264,31 @@ class NotificationSettingsViewController: OWSTableViewController2 {
             },
         ))
         return reregisterPushSection
+    }
+
+    /// Radar: the push notification relay (APNs via push.radar.chat).
+    private func buildPushRelaySection() -> OWSTableSection {
+        let pushRelaySection = OWSTableSection()
+        pushRelaySection.headerTitle = OWSLocalizedString(
+            "RADAR_PUSH_RELAY_SECTION_HEADER",
+            comment: "Header for the Radar push notification relay setting section.",
+        )
+        pushRelaySection.footerTitle = OWSLocalizedString(
+            "RADAR_PUSH_RELAY_FOOTER",
+            comment: "Footer explaining what the Radar push relay does and the implications of disabling it.",
+        )
+        pushRelaySection.add(.switch(
+            withText: OWSLocalizedString(
+                "RADAR_PUSH_RELAY_TOGGLE_LABEL",
+                comment: "Label for the switch that enables/disables the Radar push notification relay.",
+            ),
+            isOn: { RadarPushRelay.isEnabled() },
+            actionBlock: { uiSwitch in
+                let newValue = uiSwitch.isOn
+                Task { await RadarPushRelay.setEnabled(newValue) }
+            },
+        ))
+        return pushRelaySection
     }
 
     private func buildResetSection() -> OWSTableSection {

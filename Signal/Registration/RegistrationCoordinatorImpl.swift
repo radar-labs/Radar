@@ -120,12 +120,13 @@ public class RegistrationCoordinatorImpl: RegistrationCoordinator {
         }
     }
 
-    public func requestPermissions() -> Guarantee<RegistrationStep> {
+    public func requestPermissions(betweenSteps: (@MainActor () async -> Void)?) -> Guarantee<RegistrationStep> {
         logger.info("")
 
         return Guarantee.wrapAsync { @MainActor in
             // Notifications first, then contacts if needed.
             await self.deps.pushRegistrationManager.registerUserNotificationSettings()
+            await betweenSteps?()
             await self.deps.contactsStore.requestContactsAuthorization()
             self.inMemoryState.needsSomePermissions = false
             return await self.nextStep()
@@ -1691,6 +1692,16 @@ public class RegistrationCoordinatorImpl: RegistrationCoordinator {
 
         // Start syncing system contacts now that we have set up tsAccountManager.
         deps.contactsManager.fetchSystemContactsOnceIfAlreadyAuthorized()
+
+        // Merge the server manifest into local state before rotating; otherwise
+        // the rotation below has no local manifestRecordIkm and wipes the
+        // server's records (including paymentsEntropy) on conflict-retry.
+        if persistedState.restoreMethod?.isBackup == true {
+            try? await deps.storageServiceManager.restoreOrCreateManifestIfNecessary(
+                authedDevice: accountIdentity.authedDevice,
+                masterKeySource: .explicit(accountEntropyPool.getMasterKey()),
+            ).awaitable()
+        }
 
         try? await deps.storageServiceManager.rotateManifest(
             mode: .preservingRecordsIfPossible,

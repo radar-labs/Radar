@@ -46,6 +46,7 @@ extension ProvisioningPermissionsViewController: RegistrationPermissionsPresente
         // If you request any additional permissions, make sure to add them to
         // `needsToAskForAnyPermissions`.
         await AppEnvironment.shared.pushRegistrationManagerRef.registerUserNotificationSettings()
+        await RadarPushRelay.askIfNeeded(from: self)
         provisioningController.provisioningPermissionsDidComplete(viewController: self)
     }
 }

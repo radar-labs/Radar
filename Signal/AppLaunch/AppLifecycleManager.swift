@@ -529,7 +529,7 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
             currentCallProvider: currentCall,
             notificationPresenter: NotificationPresenterImpl(),
         )
-        SUIEnvironment.shared.setUp(
+        await SUIEnvironment.shared.setUp(
             appReadiness: appReadiness,
             authCredentialManager: dataMigrationContinuation.authCredentialManager,
         )
@@ -954,6 +954,8 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
         if registeredState != nil {
             // This should happen at any launch, background or foreground.
             SyncPushTokensJob.run()
+            // Radar: keep the push relay registration in sync.
+            Task { await RadarPushRelay.ensure(apnsHexToken: nil) }
         }
 
         if registeredState != nil {
@@ -1581,6 +1583,15 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
                     // restart the app, so we check every activation for users who haven't yet registered.
                     SyncPushTokensJob.run()
                 }
+
+                // Radar: if the user skipped the relay prompt because OS notifications were
+                // denied, but has since enabled them in Settings, offer it now.
+                if !RadarPushRelay.hasAskedAboutRelay() {
+                    Task { @MainActor in
+                        guard let frontmost = UIApplication.shared.frontmostViewControllerIgnoringAlerts else { return }
+                        await RadarPushRelay.askIfNeeded(from: frontmost)
+                    }
+                }
             }
         }
 
@@ -2049,6 +2060,9 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
             if !self.activeConnectionTokens.isEmpty {
                 self.startCronTask()
             }
+        } else {
+            // Radar: stop relaying pushes for an account we're no longer registered to.
+            Task { await RadarPushRelay.unregister() }
         }
 
         Self.updateApplicationShortcutItems(isRegistered: registeredState != nil)

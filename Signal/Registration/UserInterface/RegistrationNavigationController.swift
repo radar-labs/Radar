@@ -478,6 +478,14 @@ public class RegistrationNavigationController: OWSNavigationController {
         case .done:
             logger.info("Finished with registration!")
             SignalApp.shared.showHomeTabBarController()
+            // Radar: continue into payments onboarding right after registration.
+            DispatchQueue.main.async {
+                guard let rootVC = CurrentAppContext().mainWindow?.rootViewController else { return }
+                let nav = OWSNavigationController()
+                let coordinator = PaymentsOnboardingCoordinator()
+                nav.viewControllers = [coordinator.prepareForPresentation(inNavController: nav)]
+                rootVC.presentFormSheet(nav, animated: true)
+            }
             return nil
         }
     }
@@ -545,6 +553,14 @@ extension RegistrationNavigationController: RegistrationSplashPresenter {
         let controller = RegistrationConfirmModeSwitchViewController(presenter: self)
         pushViewController(controller, animated: true)
     }
+
+    public func showRelinking() {
+        guard coordinator.switchToSecondaryDeviceLinking() else {
+            owsFailBeta("Can't switch to secondary device linking")
+            return
+        }
+        SignalApp.shared.showRelinking(appReadiness: appReadiness)
+    }
 }
 
 extension RegistrationNavigationController: RegistrationConfimModeSwitchPresenter {
@@ -570,7 +586,10 @@ extension RegistrationNavigationController: RegistrationChangeNumberSplashPresen
 
 extension RegistrationNavigationController: RegistrationPermissionsPresenter {
     func requestPermissions() async {
-        let guarantee = coordinator.requestPermissions()
+        let guarantee = coordinator.requestPermissions(betweenSteps: { [weak self] in
+            guard let self else { return }
+            await RadarPushRelay.askIfNeeded(from: self.topViewController ?? self)
+        })
         pushNextController(guarantee, loadingMode: nil)
         await guarantee.asVoid().awaitable()
     }

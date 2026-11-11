@@ -35,6 +35,11 @@ class NotificationService: UNNotificationServiceExtension {
     private let contentHandler = AtomicOptional<ContentHandler>(nil, lock: .init())
     private let fetchQueue = SerialTaskQueue()
 
+    /// Radar: captured from the incoming request so `serviceExtensionTimeWillExpire`
+    /// can mirror the sender's interruption level onto the timeout content and
+    /// clean the push relay's passive placeholder out of notification center.
+    private let pendingRequest = AtomicOptional<UNNotificationRequest>(nil, lock: .init())
+
     // MARK: -
 
     private static let unfairLock = UnfairLock()
@@ -87,9 +92,51 @@ class NotificationService: UNNotificationServiceExtension {
         let logger = NSELogger()
         _ = Self.nseDidStart()
         self.contentHandler.set(contentHandler)
+        self.pendingRequest.set(request)
         self.fetchQueue.enqueueCancellingPrevious {
             let content = await self._didReceive(request, logger: logger)
-            self.completeSilently(content: content, logger: logger)
+            // Radar: mirror the original push's interruption level onto our modified
+            // content, so a passive wake-up (the push relay's empty ping) isn't
+            // surfaced as an active empty banner. Real per-message notifications are
+            // scheduled separately with their own level.
+            let final = content.mirroringInterruptionLevel(of: request.content)
+            self.completeSilently(content: final, logger: logger)
+            await Self.removePlaceholderIfPassive(request: request, badge: final.badge)
+        }
+    }
+
+    /// Radar: after a passive wake-up has been "consumed" by the NSE, the modified
+    /// placeholder still sits in notification center as an empty entry. Strip it.
+    /// Real per-message notifications are scheduled by the message fetcher with
+    /// distinct identifiers and are not affected.
+    ///
+    /// We poll for the notification to actually appear in the delivered list
+    /// before removing it: iOS adds it asynchronously after `contentHandler`
+    /// returns, and removing it before it's added is a silent no-op.
+    ///
+    /// `badge` is the value we put on the modified content; iOS cancels the badge
+    /// update along with the notification when we remove it, so we re-apply it
+    /// explicitly via `setBadgeCount`.
+    fileprivate static func removePlaceholderIfPassive(request: UNNotificationRequest, badge: NSNumber?) async {
+        guard request.content.interruptionLevel == .passive else { return }
+        let center = UNUserNotificationCenter.current()
+        for _ in 0..<20 {
+            try? await Task.sleep(nanoseconds: 25_000_000) // 25ms
+            let isDelivered = await withCheckedContinuation { (cont: CheckedContinuation<Bool, Never>) in
+                center.getDeliveredNotifications { notifications in
+                    cont.resume(returning: notifications.contains { $0.request.identifier == request.identifier })
+                }
+            }
+            if isDelivered {
+                center.removeDeliveredNotifications(withIdentifiers: [request.identifier])
+                break
+            }
+        }
+        // Fallback if we never saw it in the delivered list: remove it anyway.
+        center.removeDeliveredNotifications(withIdentifiers: [request.identifier])
+
+        if #available(iOS 16.0, *), let badge {
+            try? await center.setBadgeCount(badge.intValue)
         }
     }
 
@@ -189,7 +236,19 @@ class NotificationService: UNNotificationServiceExtension {
         // We complete silently here so that nothing is presented to the user.
         // By default the OS will present whatever the raw content of the original
         // notification is to the user otherwise.
-        completeSilently(content: UNMutableNotificationContent(), logger: logger)
+        // Radar: keep the original interruption level and remove the relay's
+        // placeholder (it has been delivered for ~30s by now, so no polling needed).
+        let content = UNMutableNotificationContent()
+        let request = pendingRequest.swap(nil)
+        if let request {
+            content.interruptionLevel = request.content.interruptionLevel
+        }
+        completeSilently(content: content, logger: logger)
+        if let request {
+            UNUserNotificationCenter.current().removeDeliveredNotifications(
+                withIdentifiers: [request.identifier],
+            )
+        }
     }
 
     private func startProxyIfEnabled(logger: NSELogger) async throws(CancellationError) {
@@ -354,5 +413,20 @@ private func postNotification(
         try await UNUserNotificationCenter.current().add(request)
     } catch {
         owsFailDebug("Failed to post notification! \(error)")
+    }
+}
+
+// MARK: - Radar
+
+private extension UNNotificationContent {
+    /// Returns a copy of `self` whose `interruptionLevel` matches `original`. If
+    /// `self` can't be made mutable (shouldn't happen for our return paths) it is
+    /// returned unchanged.
+    func mirroringInterruptionLevel(of original: UNNotificationContent) -> UNNotificationContent {
+        guard let mutable = self.mutableCopy() as? UNMutableNotificationContent else {
+            return self
+        }
+        mutable.interruptionLevel = original.interruptionLevel
+        return mutable
     }
 }
