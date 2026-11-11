@@ -10,7 +10,7 @@ class PaymentsTransferInViewController: OWSViewController {
 
     // Radar brand accent (orange). Named `accentBlue` for historical reasons; now
     // points at the app-wide primary so this screen stays in sync with the theme.
-    private static let accentBlue = UIColor.ows_accentBlue
+    private static let accentBlue = UIColor.Signal.accent
     private static let grayFill = UIColor(red: 120 / 255, green: 120 / 255, blue: 128 / 255, alpha: 0.16)
 
     // A BOLT11 invoice is single-use and expires, unlike the permanent lightning address, so ask
@@ -82,7 +82,7 @@ class PaymentsTransferInViewController: OWSViewController {
             action: #selector(didTapShare),
         )
 
-        view.backgroundColor = OWSTableViewController2.tableBackgroundColor(isUsingPresentedStyle: true)
+        view.backgroundColor = OWSTableViewController2.tableBackgroundColor
 
         if isOnboarding {
             buildOnboardingLayout()
@@ -507,7 +507,7 @@ class PaymentsTransferInViewController: OWSViewController {
         }
         let attributed = NSMutableAttributedString()
         for (index, group) in groups.enumerated() {
-            let color = index.isMultiple(of: 2) ? Theme.primaryTextColor : Theme.ternaryTextColor
+            let color = index.isMultiple(of: 2) ? Theme.primaryTextColor : UIColor.Signal.tertiaryLabel
             if index > 0 {
                 attributed.append(NSAttributedString(string: " ", attributes: [.font: font]))
             }

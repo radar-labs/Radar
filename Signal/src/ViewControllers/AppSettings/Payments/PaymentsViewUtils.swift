@@ -185,7 +185,7 @@ struct PaymentsUI {
         font: UIFont,
     ) -> UITextView {
         let textView = LinkingTextView()
-        textView.backgroundColor = OWSTableViewController2.tableBackgroundColor(isUsingPresentedStyle: true)
+        textView.backgroundColor = OWSTableViewController2.tableBackgroundColor
         textView.textColor = .Signal.label
         textView.font = UIFont.dynamicTypeHeadlineClamped
         textView.attributedText = NSAttributedString.composed(of: [

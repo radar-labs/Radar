@@ -58,7 +58,7 @@ class LightningLogsViewController: OWSViewController {
             ),
             font: UIFont.dynamicTypeHeadline,
             titleColor: .white,
-            backgroundColor: .ows_accentBlue,
+            backgroundColor: .Signal.accent,
             target: self,
             selector: #selector(didTapExport),
         )

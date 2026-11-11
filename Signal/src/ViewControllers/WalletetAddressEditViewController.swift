@@ -46,7 +46,8 @@ class WalletAddressEditViewController: OWSTableViewController2 {
         self.isPresentedInSheet = true
         let navigationController = OWSNavigationController(rootViewController: self)
         if forceDarkMode {
-            self.forceDarkMode = true
+            // OWSTableViewController2 uses dynamic colors now (upstream 2e2ff241fc),
+            // so the interface style override alone makes it dark.
             navigationController.overrideUserInterfaceStyle = .dark
         }
         viewController.presentFormSheet(navigationController, animated: true)

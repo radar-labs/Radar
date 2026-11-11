@@ -41,12 +41,9 @@ public class PaymentsTransferOutViewController: OWSTableViewController2 {
             comment: "Title for the unified 'send to' payment view.",
         )
 
-        navigationItem.leftBarButtonItem = UIBarButtonItem(
-            barButtonSystemItem: .cancel,
-            target: self,
-            action: #selector(didTapDismiss),
-            accessibilityIdentifier: "dismiss",
-        )
+        navigationItem.leftBarButtonItem = .cancelButton { [weak self] in
+            self?.didTapDismiss()
+        }
 
         createViews()
 

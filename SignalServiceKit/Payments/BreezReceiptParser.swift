@@ -396,7 +396,7 @@ extension TSPaymentNotification {
             paymentState: .incomingUnverified,
             paymentAmount: receipt.tsPaymentAmount,
             createdDate: Date(timeIntervalSince1970: TimeInterval(receipt.timestampSeconds)),
-            senderOrRecipientAci: AciObjC(senderAci),
+            senderOrRecipientAci: senderAci,
             memoMessage: memoMessage?.nilIfEmpty,
             isUnread: isUnread,
             interactionUniqueId: nil,

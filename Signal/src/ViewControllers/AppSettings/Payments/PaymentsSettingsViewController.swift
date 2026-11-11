@@ -40,14 +40,18 @@ public class PaymentsSettingsViewController: OWSTableViewController2 {
         return result
     }()
 
+    override public func topHeader() -> UIView? {
+        // Do not enclose this stack view into a container view
+        // because ReminderView would have its content already aligned.
+        topHeaderStackView
+    }
+
     private var outdatedClientReminderView: ReminderView?
 
     public init(mode: PaymentsSettingsMode) {
         self.mode = mode
 
         super.init()
-
-        self.topHeader = topHeaderStackView
 
         // Add placeholder view to stackview so it always has an calculable height.
         let placeholderView = UIView()
@@ -166,8 +170,12 @@ public class PaymentsSettingsViewController: OWSTableViewController2 {
                 helpCards.append(.saveRecoveryPhrase)
             }
 
+            let databaseStorage = SSKEnvironment.shared.databaseStorageRef
+            let twoFactorManager = SSKEnvironment.shared.ows2FAManagerRef
+
             let hasShortOrMissingPin: Bool = {
-                guard let pinCode = SSKEnvironment.shared.ows2FAManagerRef.pinCodeWithSneakyTransaction else {
+                let pinCode = databaseStorage.read { tx in twoFactorManager.pinCode(transaction: tx) }
+                guard let pinCode else {
                     return true
                 }
                 let shortPinLength: UInt = 4
@@ -238,7 +246,7 @@ public class PaymentsSettingsViewController: OWSTableViewController2 {
     override public func viewDidLoad() {
         super.viewDidLoad()
 
-        view.backgroundColor = tableBackgroundColor
+        view.backgroundColor = Self.tableBackgroundColor
 
         title = OWSLocalizedString(
             "SETTINGS_PAYMENTS_VIEW_TITLE",
@@ -246,12 +254,9 @@ public class PaymentsSettingsViewController: OWSTableViewController2 {
         )
 
         if mode == .standalone {
-            navigationItem.leftBarButtonItem = UIBarButtonItem(
-                barButtonSystemItem: .done,
-                target: self,
-                action: #selector(didTapDismiss),
-                accessibilityIdentifier: "dismiss",
-            )
+            navigationItem.leftBarButtonItem = .doneButton { [weak self] in
+                self?.didTapDismiss()
+            }
         }
 
         addListeners()
@@ -314,7 +319,7 @@ public class PaymentsSettingsViewController: OWSTableViewController2 {
             isMovingFromParent,
             mode == .inAppSettings
         {
-            PaymentsViewUtils.markAllUnreadPaymentsAsReadWithSneakyTransaction()
+            PaymentUtils.markAllUnreadPaymentsAsReadWithSneakyTransaction()
         }
 
         stopUpdateBalanceTimer()
@@ -551,8 +556,8 @@ public class PaymentsSettingsViewController: OWSTableViewController2 {
 
         let container = UIView()
         container.backgroundColor = isPrimary
-            ? Theme.accentBlueColor
-            : OWSTableViewController2.cellBackgroundColor(isUsingPresentedStyle: true)
+            ? UIColor.Signal.accent
+            : OWSTableViewController2.defaultCellBackgroundColor
         container.layer.cornerRadius = 36
         container.clipsToBounds = true
         container.autoSetDimension(.height, toSize: 72)
@@ -748,7 +753,7 @@ public class PaymentsSettingsViewController: OWSTableViewController2 {
             title: buttonTitle,
             font: UIFont.dynamicTypeHeadline,
             titleColor: .white,
-            backgroundColor: .ows_accentBlue,
+            backgroundColor: .Signal.accent,
             target: self,
             selector: #selector(didTapEnablePaymentsButton),
         )
@@ -772,8 +777,8 @@ public class PaymentsSettingsViewController: OWSTableViewController2 {
             let restorePaymentsButton = OWSFlatButton.button(
                 title: buttonTitle,
                 font: UIFont.dynamicTypeHeadline,
-                titleColor: .ows_accentBlue,
-                backgroundColor: self.tableBackgroundColor,
+                titleColor: .Signal.accent,
+                backgroundColor: Self.tableBackgroundColor,
                 target: self,
                 selector: #selector(didTapRestorePaymentsButton),
             )
@@ -922,7 +927,7 @@ public class PaymentsSettingsViewController: OWSTableViewController2 {
 
                 let buttonLabel = UILabel()
                 buttonLabel.text = buttonText
-                buttonLabel.textColor = Theme.accentBlueColor
+                buttonLabel.textColor = UIColor.Signal.accent
                 buttonLabel.font = UIFont.dynamicTypeSubheadlineClamped
 
                 let animationView = LottieAnimationView(name: iconName)
@@ -1302,7 +1307,7 @@ extension PaymentsSettingsViewController: PaymentsViewPassphraseDelegate {
         }
     }
 
-    public func viewPassphraseDidCancel(viewController: PaymentsViewPassphraseSplashViewController) {
+    func viewPassphraseDidCancel(viewController: PaymentsViewPassphraseSplashViewController) {
         viewController.dismiss(animated: true)
         if viewController.style.shouldShowHelpCardAfterCancel {
             self.clearHelpCardEnabledFromDismissedList()

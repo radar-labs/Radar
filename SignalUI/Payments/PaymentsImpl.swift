@@ -231,7 +231,7 @@ public class PaymentsImpl: NSObject, PaymentsSwift {
                 PaymentsConstants.bitcoinLightningProfileKeyVersion,
                 unsavedRotatedProfileKey: nil,
                 mustReuploadAvatar: false,
-                authedAccount: .implicit(),
+                authedAccount: .implicit,
                 tx: transaction,
             )
         }
@@ -903,7 +903,7 @@ extension PaymentsImpl {
                     PaymentsConstants.bitcoinLightningProfileKeyVersion,
                     unsavedRotatedProfileKey: nil,
                     mustReuploadAvatar: false,
-                    authedAccount: .implicit(),
+                    authedAccount: .implicit,
                     tx: transaction,
                 )
         }

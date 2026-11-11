@@ -409,7 +409,7 @@ public class PaymentsHelperImpl: PaymentsHelperSwift, PaymentsHelper {
             tx: tx,
         )
 
-        transaction.addSyncCompletion {
+        tx.addSyncCompletion {
             Task {
                 await Self.fetchBitcoinLightningProfileWithRetry(for: senderAci)
             }
@@ -425,8 +425,7 @@ public class PaymentsHelperImpl: PaymentsHelperSwift, PaymentsHelper {
             do {
                 let fetched = try await SSKEnvironment.shared.profileFetcherRef
                     .fetchProfileWithLightningBitcoinAddress(for: senderAci)
-                let paymentAddress = fetched.decryptedProfile?
-                    .paymentAddress(identityKey: fetched.identityKey)
+                let paymentAddress = try? fetched.decryptedProfile?.paymentAddress()
                 if paymentAddress != nil {
                     NotificationCenter.default.postOnMainThread(
                         name: PaymentsConstants.paymentsActivatedForRecipient,

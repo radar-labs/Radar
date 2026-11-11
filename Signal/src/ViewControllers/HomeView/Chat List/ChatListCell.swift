@@ -516,7 +516,7 @@ class ChatListCell: UITableViewCell, ReusableTableViewCell {
             if pillConfig.isIncoming {
                 paymentPillIconView.tintColor = .white
                 paymentPillLabel.textColor = .white
-                paymentPillView.backgroundColor = UIColor.ows_accentGreen
+                paymentPillView.backgroundColor = UIColor(rgbHex: 0x4CAF50) // was .ows_accentGreen
             } else {
                 paymentPillIconView.tintColor = ChatListCell.snippetColor
                 paymentPillLabel.textColor = ChatListCell.snippetColor

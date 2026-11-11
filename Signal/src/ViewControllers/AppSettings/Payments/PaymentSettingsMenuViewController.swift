@@ -104,7 +104,7 @@ class PaymentSettingsMenuViewController: OWSTableViewController2 {
                 "SETTINGS_PAYMENTS_DEACTIVATE_PAYMENTS",
                 comment: "Label for 'deactivate payments' button in the app settings.",
             ),
-            textColor: .ows_accentRed,
+            textColor: UIColor(rgbHex: 0xF44336), // was .ows_accentRed
             actionBlock: { [weak self] in
                 self?.confirmDeactivatePayments()
             },
@@ -114,7 +114,7 @@ class PaymentSettingsMenuViewController: OWSTableViewController2 {
                 "SETTINGS_PAYMENTS_DELETE_WALLET",
                 comment: "Label for 'delete payment wallet' button in the app settings.",
             ),
-            textColor: .ows_accentRed,
+            textColor: UIColor(rgbHex: 0xF44336), // was .ows_accentRed
             actionBlock: { [weak self] in
                 self?.confirmDeletePaymentWallet()
             },

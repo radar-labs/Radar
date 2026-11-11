@@ -4,7 +4,7 @@
 //
 
 import BreezSdkSpark
-public import MobileCoin
+import MobileCoin
 public import SignalServiceKit
 
 @objc

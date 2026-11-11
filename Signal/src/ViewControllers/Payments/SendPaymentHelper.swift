@@ -98,7 +98,7 @@ class SendPaymentHelper {
             title: title,
             font: bottomButtonFont,
             titleColor: .white,
-            backgroundColor: .ows_accentBlue,
+            backgroundColor: .Signal.accent,
             target: target,
             selector: selector,
         )

@@ -374,7 +374,7 @@ public class SendPaymentCompletionActionSheet: ActionSheetController {
             row.axis = .horizontal
             row.alignment = .center
             row.spacing = 8
-            row.backgroundColor = Theme.tableCell2BackgroundColor
+            row.backgroundColor = UIColor.Signal.secondaryGroupedBackground
 
             let margin: CGFloat = 18
             row.translatesAutoresizingMaskIntoConstraints = false
@@ -786,7 +786,7 @@ private extension UIStackView {
         views.enumerated().forEach { offset, value in
             guard offset != views.count - 1 else { return }
             let separator = UIView()
-            separator.backgroundColor = Theme.hairlineColor
+            separator.backgroundColor = UIColor.Signal.opaqueSeparator
             separator.autoSetDimension(.height, toSize: 0.5)
             value.addSubview(separator)
 

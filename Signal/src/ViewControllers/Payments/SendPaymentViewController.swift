@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-public import LibSignalClient
+import LibSignalClient
 import Lottie
 public import SignalServiceKit
 public import SignalUI
@@ -280,7 +280,7 @@ public class SendPaymentViewController: OWSViewController {
     ) {
         guard
             let decryptedProfile = profile.decryptedProfile,
-            let paymentAddress = decryptedProfile.paymentAddress(identityKey: profile.identityKey),
+            let paymentAddress = try? decryptedProfile.paymentAddress(),
             paymentAddress.isValid,
             paymentAddress.currency == .bitcoin,
             (try? paymentAddress.asAddress())?.isEmpty == false
@@ -422,7 +422,7 @@ public class SendPaymentViewController: OWSViewController {
             else {
                 return
             }
-            let message = OWSPaymentActivationRequestMessage(thread: thread, transaction: transaction)
+            let message = OutgoingPaymentActivationRequestMessage(thread: thread, tx: transaction)
             // The request message isn't inserted or rendered in chat; thats done with an info message.
             let preparedMessage = PreparedOutgoingMessage.preprepared(
                 transientMessageWithoutAttachments: message,
@@ -484,7 +484,7 @@ public class SendPaymentViewController: OWSViewController {
     override open func viewDidLoad() {
         super.viewDidLoad()
 
-        view.backgroundColor = OWSTableViewController2.tableBackgroundColor(isUsingPresentedStyle: isUsingPresentedStyle)
+        view.backgroundColor = OWSTableViewController2.tableBackgroundColor
 
         addListeners()
 
@@ -543,7 +543,7 @@ public class SendPaymentViewController: OWSViewController {
     private func updateContents() {
         AssertIsOnMainThread()
 
-        view.backgroundColor = OWSTableViewController2.tableBackgroundColor(isUsingPresentedStyle: isUsingPresentedStyle)
+        view.backgroundColor = OWSTableViewController2.tableBackgroundColor
         navigationItem.title = nil
         if mode.isModalRootView {
             navigationItem.rightBarButtonItem = .doneButton(dismissingFrom: self)
@@ -583,7 +583,7 @@ public class SendPaymentViewController: OWSViewController {
         bigAmountRow.axis = .horizontal
         bigAmountRow.alignment = .center
 
-        noteContainer.backgroundColor = OWSTableViewController2.cellBackgroundColor(isUsingPresentedStyle: isUsingPresentedStyle)
+        noteContainer.backgroundColor = OWSTableViewController2.defaultCellBackgroundColor
         noteTextField.text = memoMessage
 
         balancePillView.backgroundColor = Theme.isDarkThemeEnabled
@@ -683,7 +683,7 @@ public class SendPaymentViewController: OWSViewController {
             label.font = buttonFont
             label.textColor = Theme.primaryTextColor
             button.addSubview(label)
-            button.backgroundColor = OWSTableViewController2.cellBackgroundColor(isUsingPresentedStyle: isUsingPresentedStyle)
+            button.backgroundColor = OWSTableViewController2.defaultCellBackgroundColor
             label.autoCenterInSuperview()
 
             return button
@@ -694,7 +694,7 @@ public class SendPaymentViewController: OWSViewController {
                 tintColor: Theme.primaryTextColor,
                 block: block,
             )
-            button.backgroundColor = OWSTableViewController2.cellBackgroundColor(isUsingPresentedStyle: isUsingPresentedStyle)
+            button.backgroundColor = OWSTableViewController2.defaultCellBackgroundColor
             return button
         }
         var keyboardRows = [UIView]()
@@ -905,7 +905,7 @@ public class SendPaymentViewController: OWSViewController {
                     )
                     : " ",
             )
-            smallAmountLabel.textColor = UIColor.ows_accentRed
+            smallAmountLabel.textColor = UIColor.Signal.red
             currencyConversionInfoView.tintColor = .clear
         }
 

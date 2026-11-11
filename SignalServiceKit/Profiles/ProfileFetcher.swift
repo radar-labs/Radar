@@ -65,7 +65,7 @@ extension ProfileFetcher {
             profileKeyVersion: PaymentsConstants.bitcoinLightningProfileKeyVersion,
             cache: false,
         ),
-        authedAccount: AuthedAccount = .implicit(),
+        authedAccount: AuthedAccount = .implicit,
     ) async throws -> FetchedProfile {
         return try await fetchProfileImpl(for: serviceId, context: context, authedAccount: authedAccount)
     }

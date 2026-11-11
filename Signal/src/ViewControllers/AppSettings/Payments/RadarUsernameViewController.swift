@@ -36,7 +36,7 @@ class RadarUsernameViewController: OWSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        view.backgroundColor = OWSTableViewController2.tableBackgroundColor(isUsingPresentedStyle: true)
+        view.backgroundColor = OWSTableViewController2.tableBackgroundColor
 
         let logoView = UIImageView(image: UIImage(named: "radar-logo"))
         logoView.contentMode = .scaleAspectFit
@@ -80,7 +80,7 @@ class RadarUsernameViewController: OWSViewController {
         let domainLabel = UILabel()
         domainLabel.text = "@radar.cash"
         domainLabel.font = UIFont.dynamicTypeBodyClamped.semibold()
-        domainLabel.textColor = Theme.accentBlueColor
+        domainLabel.textColor = UIColor.Signal.accent
         domainLabel.setContentHuggingHigh()
 
         let fieldRow = UIStackView(arrangedSubviews: [fieldContainer, domainLabel])
@@ -101,7 +101,7 @@ class RadarUsernameViewController: OWSViewController {
             title: "Confirm",
             font: UIFont.dynamicTypeHeadline.semibold(),
             titleColor: .white,
-            backgroundColor: .ows_accentBlue,
+            backgroundColor: .Signal.accent,
             target: self,
             selector: #selector(didTapConfirm),
             cornerRadius: 14,
@@ -112,7 +112,7 @@ class RadarUsernameViewController: OWSViewController {
         let skipButton = OWSFlatButton.button(
             title: "Cancel",
             font: .dynamicTypeSubheadlineClamped.semibold(),
-            titleColor: .ows_accentBlue,
+            titleColor: .Signal.accent,
             backgroundColor: .clear,
             target: self,
             selector: #selector(didTapSkip),
@@ -156,8 +156,11 @@ class RadarUsernameViewController: OWSViewController {
         scrollView.showsVerticalScrollIndicator = false
 
         view.addSubview(scrollView)
-        scrollView.autoPin(toTopLayoutGuideOf: self, withInset: 0)
-        scrollView.autoPin(toBottomLayoutGuideOf: self, withInset: 0)
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+        ])
         scrollView.autoPinWidthToSuperview()
 
         // Content view sized to exactly match the scroll view frame — no actual scrolling.
@@ -226,7 +229,7 @@ class RadarUsernameViewController: OWSViewController {
             confirmButton.setEnabled(true)
         } else {
             statusLabel.text = "✗ Username Unavailable"
-            statusLabel.textColor = .ows_accentRed
+            statusLabel.textColor = UIColor(rgbHex: 0xF44336) // was .ows_accentRed
             canConfirm = false
             confirmButton.setEnabled(false)
         }

@@ -25,7 +25,7 @@ public class SendPaymentConfirmViewController: OWSViewController {
         super.viewDidLoad()
 
         navigationItem.title = nil
-        view.backgroundColor = OWSTableViewController2.tableBackgroundColor(isUsingPresentedStyle: true)
+        view.backgroundColor = OWSTableViewController2.tableBackgroundColor
 
         buildContents()
         startOptimisticPreparation()
@@ -196,7 +196,7 @@ public class SendPaymentConfirmViewController: OWSViewController {
     private func buildCard(rows: [UIView]) -> UIView {
         rows.dropLast().forEach { row in
             let sep = UIView()
-            sep.backgroundColor = Theme.hairlineColor
+            sep.backgroundColor = UIColor.Signal.opaqueSeparator
             sep.translatesAutoresizingMaskIntoConstraints = false
             row.addSubview(sep)
             NSLayoutConstraint.activate([
@@ -211,7 +211,7 @@ public class SendPaymentConfirmViewController: OWSViewController {
         stack.axis = .vertical
         stack.alignment = .fill
         stack.spacing = 0
-        stack.backgroundColor = OWSTableViewController2.cellBackgroundColor(isUsingPresentedStyle: true)
+        stack.backgroundColor = OWSTableViewController2.defaultCellBackgroundColor
         stack.layer.cornerRadius = 16
         stack.clipsToBounds = true
         return stack
@@ -219,7 +219,7 @@ public class SendPaymentConfirmViewController: OWSViewController {
 
     private func buildPayButton() -> UIView {
         var config = UIButton.Configuration.filled()
-        config.baseBackgroundColor = .ows_accentBlue
+        config.baseBackgroundColor = .Signal.accent
         config.baseForegroundColor = .white
         config.title = OWSLocalizedString(
             "PAYMENTS_NEW_PAYMENT_PAY_BUTTON",

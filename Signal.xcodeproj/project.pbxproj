@@ -3765,6 +3765,7 @@
 		E1B628F62CCC59E600C4DC7F /* chat_item_view_once_09.binproto in Resources */ = {isa = PBXBuildFile; fileRef = E1B628CE2CCC59E600C4DC7F /* chat_item_view_once_09.binproto */; };
 		E1C2A54B2A8FCB0D00AEC4DA /* DeleteSystemContactViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1C2A54A2A8FCB0D00AEC4DA /* DeleteSystemContactViewController.swift */; };
 		E1D827DA2BDC1F7B0022C1AF /* ReactionBurstManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1D827D82BDC1F6B0022C1AF /* ReactionBurstManagerTests.swift */; };
+		E2D02657AB8F06EF703B15A6 /* RadarLegacyButtons.swift in Sources */ = {isa = PBXBuildFile; fileRef = 702F1922C9FF622278949016 /* RadarLegacyButtons.swift */; };
 		E44AD4E624E98F440035D7B8 /* PhotoCaptureDismiss.swift in Sources */ = {isa = PBXBuildFile; fileRef = E44AD4E524E98F430035D7B8 /* PhotoCaptureDismiss.swift */; };
 		E75DD3E02810CDBD00E32C36 /* SubscriptionModelsTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = E75DD3DF2810CDBD00E32C36 /* SubscriptionModelsTest.swift */; };
 		E7D7C93F28B580AC003F043B /* Bundle+OWS.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7D7C93E28B580AC003F043B /* Bundle+OWS.swift */; };
@@ -5974,6 +5975,7 @@
 		691923222A44D263F4F0084D /* ContactSharingSystemContactWrapperTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactSharingSystemContactWrapperTests.swift; sourceTree = "<group>"; };
 		6AA5EACC302E7D5800E5954E /* RingrtcSvcConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RingrtcSvcConfig.swift; sourceTree = "<group>"; };
 		6BB92957776B3173894CD3E9 /* Pods-SignalServiceKit.app store release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SignalServiceKit.app store release.xcconfig"; path = "Target Support Files/Pods-SignalServiceKit/Pods-SignalServiceKit.app store release.xcconfig"; sourceTree = "<group>"; };
+		702F1922C9FF622278949016 /* RadarLegacyButtons.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RadarLegacyButtons.swift; sourceTree = "<group>"; };
 		70377AAA1918450100CAF501 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
 		7203F5322D53B52900639949 /* UInt64+SSK.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UInt64+SSK.swift"; sourceTree = "<group>"; };
 		7203F5342D53B83000639949 /* TimeInterval+SSK.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimeInterval+SSK.swift"; sourceTree = "<group>"; };
@@ -9549,6 +9551,7 @@
 				3E8B73E5D23E27852A587BC6 /* PaymentsIntroViewController.swift */,
 				3EA0DA42445EE5237EEA9155 /* PaymentsOnboardingCoordinator.swift */,
 				B7185B3D93E2983871CFA071 /* SendPaymentConfirmViewController.swift */,
+				702F1922C9FF622278949016 /* RadarLegacyButtons.swift */,
 			);
 			path = Payments;
 			sourceTree = "<group>";
@@ -19845,6 +19848,7 @@
 				CC486CF52F5603E6D9838727 /* SendPaymentConfirmViewController.swift in Sources */,
 				0DA8C9A622971763C9E4589A /* WalletetAddressEditViewController.swift in Sources */,
 				B6250E45D23DCBCDA2222E79 /* UsernameOnboardingViewController.swift in Sources */,
+				E2D02657AB8F06EF703B15A6 /* RadarLegacyButtons.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

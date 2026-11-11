@@ -319,7 +319,7 @@ class PaymentsDetailViewController: OWSTableViewController2 {
 
                 let topLabel = UILabel()
                 topLabel.text = topText
-                topLabel.textColor = useFailedColor ? .ows_accentRed : Theme.primaryTextColor
+                topLabel.textColor = useFailedColor ? .Signal.red : Theme.primaryTextColor
                 topLabel.font = UIFont.dynamicTypeBodyClamped
 
                 let bottomLabel = UILabel()
@@ -372,7 +372,7 @@ class PaymentsDetailViewController: OWSTableViewController2 {
 
         stackViews.append(buildAmountView())
 
-        if let memoLabel = PaymentsViewUtils.buildMemoLabel(memoMessage: paymentItem.memoMessage) {
+        if let memoLabel = PaymentsUI.buildMemoLabel(memoMessage: paymentItem.memoMessage) {
             stackViews.append(UIView.spacer(withHeight: 12))
             stackViews.append(memoLabel)
         }
@@ -411,7 +411,7 @@ class PaymentsDetailViewController: OWSTableViewController2 {
         var stackViews = [UIView]()
 
         let avatarSize: UInt = 52
-        let avatarView = PaymentsViewUtils.buildUnidentifiedTransactionAvatar(avatarSize: avatarSize)
+        let avatarView = PaymentsUI.buildUnidentifiedTransactionAvatar(avatarSize: avatarSize)
         avatarView.autoSetDimensions(to: .square(CGFloat(avatarSize)))
         stackViews.append(avatarView)
         stackViews.append(UIView.spacer(withHeight: 12))
@@ -519,7 +519,7 @@ class PaymentsDetailViewController: OWSTableViewController2 {
 extension PaymentsDetailViewController: DatabaseChangeDelegate {
 
     func databaseChangesDidUpdate(databaseChanges: DatabaseChanges) {
-        guard databaseChanges.didUpdate(tableName: TSPaymentModel.table.tableName) else {
+        guard databaseChanges.didUpdate(tableName: TSPaymentModel.databaseTableName) else {
             return
         }
 

@@ -1158,7 +1158,7 @@ public class ChatListViewController: OWSViewController, HomeTabViewController {
 
         paymentsBannerView.dismissButton = dismissButton
         paymentsBannerView.dismissBlock = { [weak self, weak paymentsReminderView] in
-            PaymentsViewUtils.markAllUnreadPaymentsAsReadWithSneakyTransaction()
+            PaymentUtils.markAllUnreadPaymentsAsReadWithSneakyTransaction()
             paymentsReminderView?.isHidden = true
             self?.loadCoordinator.loadIfNecessary()
         }
