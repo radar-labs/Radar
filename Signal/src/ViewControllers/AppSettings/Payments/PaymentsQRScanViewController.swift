@@ -107,15 +107,15 @@ class PaymentsQRScanViewController: OWSViewController, QRCodeScanDelegate {
         // configurations than QRCodePayload, so the qrCodeString is
         // more reliable than qrCodeData.
         if let qrCodeString {
-            if nil != PaymentsImpl.parse(publicAddressBase58: qrCodeString) {
+            if nil != PaymentsImpl.parse(input: qrCodeString) {
                 delegate?.didScanPaymentAddressQRCode(publicAddressBase58: qrCodeString)
                 navigationController?.popViewController(animated: true)
                 return .stopScanning
             } else if
                 let publicAddressUrl = URL(string: qrCodeString),
-                let publicAddress = PaymentsImpl.parseAsPublicAddress(url: publicAddressUrl)
+                let inputType = PaymentsImpl.parse(url: publicAddressUrl)
             {
-                let publicAddressBase58 = PaymentsImpl.formatAsBase58(publicAddress: publicAddress)
+                let publicAddressBase58 = PaymentsImpl.format(inputType: inputType)
                 delegate?.didScanPaymentAddressQRCode(publicAddressBase58: publicAddressBase58)
                 navigationController?.popViewController(animated: true)
                 return .stopScanning

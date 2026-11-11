@@ -992,8 +992,8 @@ public class ChatListViewController: OWSViewController, HomeTabViewController {
         }
 
         let shortName = SSKEnvironment.shared.contactManagerRef.displayName(for: address, tx: transaction).resolvedValue(useShortNameIfAvailable: true)
-        let formattedAmount = PaymentsFormat.format(
-            paymentAmount: paymentAmount,
+        let formattedAmount = PaymentsFormat.formattedBalance(
+            paymentAmount,
             isShortForm: true,
             withCurrencyCode: true,
             withSpace: true,
@@ -1041,24 +1041,16 @@ public class ChatListViewController: OWSViewController, HomeTabViewController {
             title = String.nonPluralLocalizedStringWithFormat(format, OWSFormat.formatUInt(unreadCount))
         }
 
-        let iconView = UIImageView.withTemplateImageName(
-            "payment",
-            tintColor: Theme.isDarkThemeEnabled ? .ows_gray15 : .white,
-        )
-        iconView.autoSetDimensions(to: .square(24))
-        let iconCircleView = OWSLayerView.circleView(size: CGFloat(Self.paymentsBannerAvatarSize))
-        iconCircleView.backgroundColor = (
-            Theme.isDarkThemeEnabled
-                ? .ows_gray80
-                : .ows_gray95,
-        )
-        iconCircleView.addSubview(iconView)
-        iconView.autoCenterInSuperview()
+        let iconView = UIImageView()
+        iconView.image = UIImage(systemName: "bitcoinsign.circle.fill")
+        iconView.tintColor = Theme.isDarkThemeEnabled ? .ows_gray15 : Theme.primaryTextColor
+        iconView.contentMode = .scaleAspectFit
+        iconView.autoSetDimensions(to: .square(CGFloat(Self.paymentsBannerAvatarSize)))
 
         configureUnreadPaymentsBanner(
             paymentsReminderView,
             title: title,
-            avatarView: iconCircleView,
+            avatarView: iconView,
         ) { [weak self] in
             self?.showAppSettings(mode: .payments)
         }
@@ -1068,6 +1060,8 @@ public class ChatListViewController: OWSViewController, HomeTabViewController {
 
     private class PaymentsBannerView: UIView {
         let block: () -> Void
+        var dismissBlock: (() -> Void)?
+        weak var dismissButton: UIView?
 
         init(block: @escaping () -> Void) {
             self.block = block
@@ -1085,6 +1079,19 @@ public class ChatListViewController: OWSViewController, HomeTabViewController {
         @objc
         func didTap() {
             block()
+        }
+
+        @objc
+        func didTapDismiss() {
+            dismissBlock?()
+        }
+
+        override func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+            if let dismissButton {
+                let point = gestureRecognizer.location(in: self)
+                if dismissButton.frame.contains(point) { return false }
+            }
+            return true
         }
     }
 
@@ -1139,6 +1146,7 @@ public class ChatListViewController: OWSViewController, HomeTabViewController {
         )
         dismissButton.setCompressionResistanceHigh()
         dismissButton.setContentHuggingHigh()
+        dismissButton.isUserInteractionEnabled = true
 
         let dismissIcon = UIImageView.withTemplateImageName(
             "x-compact",
@@ -1147,6 +1155,15 @@ public class ChatListViewController: OWSViewController, HomeTabViewController {
         dismissIcon.autoSetDimensions(to: .square(16))
         dismissButton.addSubview(dismissIcon)
         dismissIcon.autoCenterInSuperview()
+
+        paymentsBannerView.dismissButton = dismissButton
+        paymentsBannerView.dismissBlock = { [weak self, weak paymentsReminderView] in
+            PaymentsViewUtils.markAllUnreadPaymentsAsReadWithSneakyTransaction()
+            paymentsReminderView?.isHidden = true
+            self?.loadCoordinator.loadIfNecessary()
+        }
+        let dismissTap = UITapGestureRecognizer(target: paymentsBannerView, action: #selector(PaymentsBannerView.didTapDismiss))
+        dismissButton.addGestureRecognizer(dismissTap)
 
         let stack = UIStackView(arrangedSubviews: [
             avatarView,
@@ -1310,26 +1327,18 @@ extension ChatListViewController {
         updateChatListFilter(.unread)
         updateBarButtonItems()
 
-        if filterControl?.isFiltering == true {
-            // No need to update the filter control if it's already in the
-            // filtering state.
-            loadCoordinator.loadIfNecessary()
-        } else {
-            tableView.performBatchUpdates {
-                filterControl?.startFiltering(animated: true)
-                loadCoordinator.loadIfNecessary()
-            }
+        if filterControl?.isFiltering != true {
+            filterControl?.startFiltering(animated: true)
         }
+        loadCoordinator.loadIfNecessary()
     }
 
     func disableChatListFilter(_ sender: AnyObject?) {
         updateChatListFilter(.unfiltered)
         updateBarButtonItems()
 
-        tableView.performBatchUpdates {
-            filterControl?.stopFiltering(animated: true)
-            loadCoordinator.loadIfNecessary()
-        }
+        filterControl?.stopFiltering(animated: true)
+        loadCoordinator.loadIfNecessary()
     }
 
     private func updateFilterControl(animated: Bool) {
@@ -1536,9 +1545,7 @@ extension ChatListViewController: ChatListFilterControlDelegate {
         // Because this happens in response to an interactive gesture, it feels
         // better to go a little slower than the default animation duration (0.25 sec).
         UIView.animate(withDuration: 0.4) { [self] in
-            tableView.performBatchUpdates {
-                loadCoordinator.loadIfNecessary()
-            }
+            loadCoordinator.loadIfNecessary()
         }
     }
 }

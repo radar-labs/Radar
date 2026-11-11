@@ -46,12 +46,7 @@ public struct PaymentsHistoryModelItem: PaymentsHistoryItem {
 
     public var formattedFeeAmount: String? {
         guard let fee = paymentModel.mobileCoin?.feeAmount else { return nil }
-        return PaymentsFormat.format(
-            paymentAmount: fee,
-            isShortForm: false,
-            withCurrencyCode: true,
-            withSpace: true,
-        )
+        return PaymentsFormat.formattedBalance(fee).string
     }
 
     public var paymentType: TSPaymentType {
@@ -92,11 +87,7 @@ public struct PaymentsHistoryModelItem: PaymentsHistoryItem {
             return nil
         }
 
-        return PaymentsFormat.attributedFormat(
-            paymentAmount: amount,
-            isShortForm: false,
-            paymentType: paymentType,
-        )
+        return PaymentsFormat.formattedBalance(amount, paymentType: paymentType, withSpace: true)
     }
 
     public var formattedPaymentAmount: String? {
@@ -110,13 +101,43 @@ public struct PaymentsHistoryModelItem: PaymentsHistoryItem {
         if let feeAmount = paymentModel.mobileCoin?.feeAmount {
             totalAmount = totalAmount.plus(feeAmount)
         }
-        return PaymentsFormat.format(
-            paymentAmount: totalAmount,
-            isShortForm: true,
-            withCurrencyCode: true,
-            withSpace: false,
-            withPaymentType: paymentModel.paymentType,
-        )
+        return PaymentsFormat.formattedBalance(totalAmount, isShortForm: true, paymentType: paymentModel.paymentType).string
+    }
+
+    public var formattedTotalPaymentAmount: String? {
+        guard
+            let paymentAmount = paymentModel.paymentAmount,
+            !paymentAmount.isZero
+        else {
+            return nil
+        }
+        var totalAmount = paymentAmount
+        if let feeAmount = paymentModel.mobileCoin?.feeAmount {
+            totalAmount = totalAmount.plus(feeAmount)
+        }
+        return PaymentsFormat.formattedBalance(totalAmount, withSpace: true).string
+    }
+
+    public var formattedFiatPaymentAmount: String? {
+        guard !PaymentsDisplayPreferences.shared.isBalanceHidden else {
+            return nil
+        }
+        let localCurrencyCode = SSKEnvironment.shared.paymentsCurrenciesRef.currentCurrencyCode
+        guard let currencyConversionInfo = SSKEnvironment.shared.paymentsCurrenciesRef.conversionInfo(forCurrencyCode: localCurrencyCode) else {
+            return nil
+        }
+
+        guard
+            let paymentAmount = self.paymentModel.paymentAmount,
+            let fiatAmountString = PaymentsFormat.formatAsFiatCurrency(
+                paymentAmount: paymentAmount,
+                currencyConversionInfo: currencyConversionInfo,
+            )
+        else {
+            return nil
+        }
+
+        return "\(fiatAmountString) \(localCurrencyCode)"
     }
 
     public func statusDescription(isLongForm: Bool) -> String? {

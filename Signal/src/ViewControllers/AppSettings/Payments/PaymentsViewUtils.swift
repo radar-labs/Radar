@@ -51,7 +51,7 @@ struct PaymentsUI {
 
         let iconColor: UIColor = (Theme.isDarkThemeEnabled ? .ows_gray05 : .ows_gray75)
         let iconView = UIImageView.withTemplateImageName(
-            "mobilecoin-24",
+            "lightning-in-gray",
             tintColor: iconColor,
         )
         circleView.addSubview(iconView)
@@ -177,6 +177,24 @@ struct PaymentsUI {
         )
         textView.linkTextAttributes = [.foregroundColor: UIColor.Signal.label]
         textView.textAlignment = .center
+        return textView
+    }
+
+    static func buildTextView(
+        text: String,
+        font: UIFont,
+    ) -> UITextView {
+        let textView = LinkingTextView()
+        textView.backgroundColor = OWSTableViewController2.tableBackgroundColor(isUsingPresentedStyle: true)
+        textView.textColor = .Signal.label
+        textView.font = UIFont.dynamicTypeHeadlineClamped
+        textView.attributedText = NSAttributedString.composed(of: [
+            text,
+        ]).styled(
+            with: .font(font),
+            .color(Theme.secondaryTextAndIconColor),
+        )
+        textView.linkTextAttributes = [.foregroundColor: Theme.primaryTextColor]
         return textView
     }
 }

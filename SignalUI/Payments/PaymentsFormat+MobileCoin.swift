@@ -8,28 +8,32 @@ public import SignalServiceKit
 
 public extension PaymentsFormat {
 
-    static func formatInChatSuccess(
-        paymentAmount: TSPaymentAmount,
-    ) -> NSAttributedString {
-        formatInChat(
-            paymentAmount: paymentAmount,
-            amountBuilder: inChatSuccessAmountBuilder(_:),
-        )
+    static var hiddenBalanceString: String { "••••••" }
+
+    // Single source of truth for amount display: returns nil when hidden, formatted string otherwise.
+    private static func resolvedAmountString(_ amount: TSPaymentAmount, isShortForm: Bool = false) -> String? {
+        guard !PaymentsDisplayPreferences.shared.isBalanceHidden else { return nil }
+        return PaymentsDisplayPreferences.shared.isSatoshiEnabled
+            ? formatSatoshi(amount.picoMob)
+            : format(picoMob: amount.picoMob, isShortForm: isShortForm)
     }
 
-    static func formatInChatFailure(
-        paymentAmount: TSPaymentAmount,
-    ) -> NSAttributedString {
-        formatInChat(
-            paymentAmount: paymentAmount,
-            amountBuilder: inChatFailureAmountBuilder(_:),
-        )
+    static func formatInChatSuccess(paymentAmount: TSPaymentAmount) -> NSAttributedString {
+        inChatSuccessAmountBuilder(resolvedAmountString(paymentAmount))
     }
 
-    static func inChatSuccessAmountBuilder(_ amount: String) -> NSAttributedString {
-        let firstAttributes: [NSAttributedString.Key: Any] = [.font: UIFont.dynamicTypeLargeTitle1Clamped.withSize(32)]
+    static func formatInChatFailure(paymentAmount: TSPaymentAmount) -> NSAttributedString {
+        inChatFailureAmountBuilder(resolvedAmountString(paymentAmount))
+    }
 
-        let startingFont = UIFont.dynamicTypeLargeTitle1Clamped.withSize(32)
+    static func inChatSuccessAmountBuilder(_ amount: String?) -> NSAttributedString {
+        let firstAttributes: [NSAttributedString.Key: Any] = [.font: UIFont.dynamicTypeLargeTitle1Clamped.withSize(20)]
+
+        guard let amount else {
+            return NSAttributedString(string: Self.hiddenBalanceString, attributes: firstAttributes)
+        }
+
+        let startingFont = UIFont.dynamicTypeLargeTitle1Clamped.withSize(20)
         let traits = [UIFontDescriptor.TraitKey.weight: UIFont.Weight.thin]
         let thinFontDescriptor = startingFont.fontDescriptor.addingAttributes(
             [UIFontDescriptor.AttributeName.traits: traits],
@@ -38,15 +42,17 @@ public extension PaymentsFormat {
         let newThinFont = UIFont(descriptor: thinFontDescriptor, size: startingFont.pointSize)
         let secondAttributes: [NSAttributedString.Key: Any] = [.font: newThinFont]
 
+        let currencyIdentifier = PaymentsDisplayPreferences.shared.isSatoshiEnabled ? "sats" : "BTC"
         let firstString = NSMutableAttributedString(string: amount, attributes: firstAttributes)
-        let secondString = NSMutableAttributedString(string: " MOB", attributes: secondAttributes)
+        let secondString = NSMutableAttributedString(string: " \(currencyIdentifier)", attributes: secondAttributes)
 
         // NOTE: not RTL-friendly. Maybe fix this if it comes up.
         firstString.append(secondString)
         return firstString
     }
 
-    static func inChatFailureAmountBuilder(_ amount: String) -> NSAttributedString {
+    static func inChatFailureAmountBuilder(_ amount: String?) -> NSAttributedString {
+        let displayAmount = amount ?? Self.hiddenBalanceString
         let firstAttributes: [NSAttributedString.Key: Any] = [.font: UIFont.dynamicTypeLargeTitle1Clamped.withSize(17)]
 
         let startingFont = UIFont.dynamicTypeLargeTitle1Clamped.withSize(15)
@@ -60,7 +66,7 @@ public extension PaymentsFormat {
             "PAYMENTS_IN_CHAT_FAILURE_MESSAGE_TOP",
             comment: "Payments in-chat message shown if a payment fails to send, top part. Embeds {{ number, amount of MOB coin not sent }}",
         )
-        let topPart = String.nonPluralLocalizedStringWithFormat(template, amount)
+        let topPart = String.nonPluralLocalizedStringWithFormat(template, displayAmount)
 
         let bottomPart = OWSLocalizedString(
             "PAYMENTS_IN_CHAT_FAILURE_MESSAGE_BOTTOM",
@@ -83,20 +89,74 @@ public extension PaymentsFormat {
         paymentType: TSPaymentType? = nil,
         withSpace: Bool = false,
     ) -> NSAttributedString {
-        guard paymentAmount.currency == .mobileCoin else {
+        switch paymentAmount.currency {
+        case .bitcoin:
+            let bitcoinString = if PaymentsDisplayPreferences.shared.isSatoshiEnabled {
+                (paymentType.map { $0.isIncoming ? "" : "-" } ?? "") + formatSatoshi(paymentAmount.picoMob)
+            } else {
+                format(
+                    paymentAmount: paymentAmount,
+                    isShortForm: isShortForm,
+                    withPaymentType: paymentType,
+                )
+            }
+
+            return attributedFormat(
+                bitcoinString: bitcoinString,
+                withSpace: withSpace,
+            )
+        case .mobileCoin:
+            return attributedFormat(
+                mobileCoinString: format(
+                    paymentAmount: paymentAmount,
+                    isShortForm: isShortForm,
+                    withPaymentType: paymentType,
+                ),
+                withSpace: withSpace,
+            )
+        default:
             owsFailDebug("Unknown currency.")
             return NSAttributedString(string: OWSLocalizedString(
                 "PAYMENTS_CURRENCY_UNKNOWN",
                 comment: "Indicator for unknown currency.",
             ))
         }
+    }
+
+    static func attributedFormat(
+        currency: TSPaymentCurrency,
+        input: String,
+        withSpace: Bool = false,
+    ) -> NSAttributedString? {
+        switch currency {
+        case .mobileCoin:
+            attributedFormat(
+                mobileCoinString: input,
+                withSpace: withSpace,
+            )
+        case .bitcoin:
+            attributedFormat(
+                bitcoinString: input,
+                withSpace: withSpace,
+            )
+        default:
+            nil
+        }
+    }
+
+    static func attributedFormat(
+        bitcoinString: String,
+        withSpace: Bool = false,
+    ) -> NSAttributedString {
+        let currencyCode = if PaymentsDisplayPreferences.shared.isSatoshiEnabled {
+            PaymentsConstants.satoshiCurrencyIdentifier
+        } else {
+            PaymentsConstants.bitcoinCurrencyIdentifier
+        }
 
         return attributedFormat(
-            mobileCoinString: format(
-                paymentAmount: paymentAmount,
-                isShortForm: isShortForm,
-                withPaymentType: paymentType,
-            ),
+            currencyString: bitcoinString,
+            currencyCode: currencyCode,
             withSpace: withSpace,
         )
     }
@@ -109,6 +169,49 @@ public extension PaymentsFormat {
             currencyString: mobileCoinString,
             currencyCode: PaymentsConstants.mobileCoinCurrencyIdentifier,
             withSpace: withSpace,
+        )
+    }
+
+    /// Returns the wallet balance formatted for display, respecting both the
+    /// hide/show preference and the sats/btc preference.
+    /// - Pass `nil` when the balance is still loading — returns a space to
+    ///   preserve layout height while a spinner overlays it.
+    static func formattedBalance(_ balance: PaymentBalance?, withSpace: Bool = false) -> NSAttributedString {
+        guard let balance else {
+            return PaymentsDisplayPreferences.shared.isBalanceHidden
+                ? NSAttributedString(string: Self.hiddenBalanceString)
+                : NSAttributedString(string: " ")
+        }
+        return formattedBalance(balance.amount, withSpace: withSpace)
+    }
+
+    static func formattedBalance(
+        _ amount: TSPaymentAmount,
+        isShortForm: Bool = false,
+        paymentType: TSPaymentType? = nil,
+        withSpace: Bool = false,
+    ) -> NSAttributedString {
+        guard !PaymentsDisplayPreferences.shared.isBalanceHidden else {
+            return NSAttributedString(string: Self.hiddenBalanceString)
+        }
+        return attributedFormat(paymentAmount: amount, isShortForm: isShortForm, paymentType: paymentType, withSpace: withSpace)
+    }
+
+    static func formattedBalance(
+        _ amount: TSPaymentAmount,
+        isShortForm: Bool,
+        withCurrencyCode: Bool,
+        withSpace: Bool,
+    ) -> String {
+        guard !PaymentsDisplayPreferences.shared.isBalanceHidden else {
+            return Self.hiddenBalanceString
+        }
+        return PaymentsFormat.format(
+            paymentAmount: amount,
+            isShortForm: isShortForm,
+            withCurrencyCode: withCurrencyCode,
+            withSpace: withSpace,
+            isSatoshi: PaymentsDisplayPreferences.shared.isSatoshiEnabled,
         )
     }
 
@@ -213,20 +316,33 @@ public extension PaymentsFormat {
         transaction: DBReadTransaction,
         type: OWSInteractionType,
     ) -> String? {
-        // Formatted Payment Amount
-        guard let formattedAmount = PaymentsFormat.format(picoMob: amount, isShortForm: true) else {
-            return OWSLocalizedString(
-                "PAYMENTS_PREVIEW_TEXT_UNKNOWN",
-                comment: "Payments Preview Text shown in quoted replies, for unknown payments.",
-            )
+        // Formatted Payment Amount.
+        //
+        // NOTE: the short form caps at 4 fraction digits, i.e. 10,000-sat resolution in
+        // BTC — it renders a 200 sat payment as "0.0". Use the long form (8 digits, a
+        // full sat), matching the in-chat payment bubble.
+        let isSatoshi = PaymentsDisplayPreferences.shared.isSatoshiEnabled
+        let formattedAmount: String
+        if isSatoshi {
+            formattedAmount = formatSatoshi(amount)
+        } else {
+            guard let bitcoinAmount = PaymentsFormat.format(picoMob: amount, isShortForm: false) else {
+                return OWSLocalizedString(
+                    "PAYMENTS_PREVIEW_TEXT_UNKNOWN",
+                    comment: "Payments Preview Text shown in quoted replies, for unknown payments.",
+                )
+            }
+            formattedAmount = bitcoinAmount
         }
 
         // Preview Text
         let template = OWSLocalizedString(
             "PAYMENTS_PREVIEW_TEXT_QUOTED_REPLY",
-            comment: "Payments Preview Text shown in quoted replies, for payments. Embeds {{ Amount sent (number), Currency (e.g. 'MOB') }}",
+            comment: "Payments Preview Text shown in quoted replies, for payments. Embeds {{ Amount sent (number), Currency (e.g. 'sats') }}",
         )
-        let currencyName = TokenId.MOB.name
+        let currencyName = isSatoshi
+            ? PaymentsConstants.satoshiCurrencyIdentifier
+            : PaymentsConstants.bitcoinCurrencyIdentifier
         return String.nonPluralLocalizedStringWithFormat(template, formattedAmount, currencyName)
     }
 }

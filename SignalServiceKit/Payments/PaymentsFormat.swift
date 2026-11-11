@@ -25,10 +25,24 @@ public enum PaymentsFormat {
                 : Int(PaymentsConstants.maxMobDecimalDigits),
         )
         numberFormatter.usesSignificantDigits = false
+        numberFormatter.usesGroupingSeparator = true
         if isShortForm {
             numberFormatter.roundingMode = .halfEven
         }
         return numberFormatter
+    }
+
+    private static let satoshiFormatter: NumberFormatter = {
+        let f = NumberFormatter()
+        f.locale = Locale.current
+        f.numberStyle = .decimal
+        f.usesGroupingSeparator = true
+        f.maximumFractionDigits = 0
+        return f
+    }()
+
+    public static func formatSatoshi(_ picoMob: UInt64) -> String {
+        satoshiFormatter.string(from: NSNumber(value: picoMob)) ?? "\(picoMob)"
     }
 
     // Used for formatting decimal numbers in the
@@ -56,7 +70,7 @@ public enum PaymentsFormat {
         amountBuilder: (String) -> NSAttributedString,
     ) -> NSAttributedString {
         let mob = PaymentsConstants.convertPicoMobToMob(paymentAmount.picoMob)
-        let mobFormat = buildMobFormatter(isShortForm: true)
+        let mobFormat = buildMobFormatter(isShortForm: false)
         guard let amount = mobFormat.string(from: NSNumber(value: mob)) else {
             owsFailDebug("Couldn't format currency.")
             return NSAttributedString(
@@ -76,40 +90,47 @@ public enum PaymentsFormat {
         withCurrencyCode: Bool = false,
         withSpace: Bool = false,
         withPaymentType paymentType: TSPaymentType? = nil,
+        isSatoshi: Bool = false,
     ) -> String {
-        guard paymentAmount.currency == .mobileCoin else {
+        switch paymentAmount.currency {
+        case .bitcoin, .mobileCoin:
+            guard
+                let amountString = format(
+                    picoMob: paymentAmount.picoMob,
+                    isShortForm: isShortForm,
+                )
+            else {
+                owsFailDebug("Couldn't format currency.")
+                return OWSLocalizedString(
+                    "PAYMENTS_CURRENCY_UNKNOWN",
+                    comment: "Indicator for unknown currency.",
+                )
+            }
+
+            let amount = isSatoshi ? formatSatoshi(paymentAmount.picoMob) : amountString
+
+            return format(
+                amountString: amount,
+                withCurrency: withCurrencyCode ? paymentAmount.currency : nil,
+                withSpace: withSpace,
+                isIncoming: paymentType?.isIncoming,
+                isSatoshi: isSatoshi,
+            )
+        default:
             owsFailDebug("Unknown currency.")
             return OWSLocalizedString(
                 "PAYMENTS_CURRENCY_UNKNOWN",
                 comment: "Indicator for unknown currency.",
             )
         }
-        guard
-            let amountString = format(
-                picoMob: paymentAmount.picoMob,
-                isShortForm: isShortForm,
-            )
-        else {
-            owsFailDebug("Couldn't format currency.")
-            return OWSLocalizedString(
-                "PAYMENTS_CURRENCY_UNKNOWN",
-                comment: "Indicator for unknown currency.",
-            )
-        }
-
-        return format(
-            amountString: amountString,
-            withCurrencyCode: withCurrencyCode,
-            withSpace: withSpace,
-            isIncoming: paymentType?.isIncoming,
-        )
     }
 
     public static func format(
         amountString: String,
-        withCurrencyCode: Bool = false,
+        withCurrency paymentCurrency: TSPaymentCurrency?,
         withSpace: Bool = false,
         isIncoming: Bool? = nil,
+        isSatoshi: Bool = false,
     ) -> String {
         var result = ""
 
@@ -119,11 +140,17 @@ public enum PaymentsFormat {
 
         result += amountString
 
-        if withCurrencyCode {
+        if
+            let paymentCurrency,
+            let currencyCode = isSatoshi
+            ? PaymentsConstants.satoshiCurrencyIdentifier
+            : identifierFor(currency: paymentCurrency)
+        {
             if withSpace {
                 result += " "
             }
-            result += PaymentsConstants.mobileCoinCurrencyIdentifier
+
+            result += currencyCode
         }
         return result
     }
@@ -211,4 +238,14 @@ public enum PaymentsFormat {
         return nil
     }
 
+    public static func identifierFor(currency: TSPaymentCurrency) -> String? {
+        switch currency {
+        case .bitcoin:
+            return PaymentsConstants.bitcoinCurrencyIdentifier
+        case .mobileCoin:
+            return PaymentsConstants.mobileCoinCurrencyIdentifier
+        default:
+            return nil
+        }
+    }
 }

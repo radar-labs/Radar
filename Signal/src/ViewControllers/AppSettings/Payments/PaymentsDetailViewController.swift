@@ -6,7 +6,7 @@
 import SignalServiceKit
 import SignalUI
 
-class PaymentsDetailViewController: OWSTableViewController2, DatabaseChangeDelegate {
+class PaymentsDetailViewController: OWSTableViewController2 {
 
     private var paymentItem: PaymentsHistoryItem
 
@@ -23,6 +23,15 @@ class PaymentsDetailViewController: OWSTableViewController2, DatabaseChangeDeleg
             "SETTINGS_PAYMENTS_DETAIL_VIEW_TITLE",
             comment: "Label for the 'payments details' view of the app settings.",
         )
+
+        if paymentItem.address != nil {
+            navigationItem.rightBarButtonItem = UIBarButtonItem(
+                image: UIImage(systemName: "bubble.left"),
+                style: .plain,
+                target: self,
+                action: #selector(didTapOpenChat),
+            )
+        }
 
         updateTableContents()
 
@@ -47,7 +56,15 @@ class PaymentsDetailViewController: OWSTableViewController2, DatabaseChangeDeleg
         }
     }
 
+    override func themeDidChange() {
+        super.themeDidChange()
+
+        updateTableContents()
+    }
+
     private func updateTableContents() {
+        AssertIsOnMainThread()
+
         let contents = OWSTableContents()
 
         let headerSection = OWSTableSection()
@@ -64,12 +81,12 @@ class PaymentsDetailViewController: OWSTableViewController2, DatabaseChangeDeleg
 
         contents.add(buildStatusSection())
 
-        if
-            DebugFlags.internalSettings,
-            let payment = paymentItem as? PaymentsHistoryModelItem
-        {
-            contents.add(buildInternalSection(paymentModel: payment.paymentModel))
-        }
+//        if
+//            DebugFlags.internalSettings,
+//            let payment = paymentItem as? PaymentsHistoryModelItem
+//        {
+//            contents.add(buildInternalSection(paymentModel: payment.paymentModel))
+//        }
 
         self.contents = contents
     }
@@ -82,16 +99,19 @@ class PaymentsDetailViewController: OWSTableViewController2, DatabaseChangeDeleg
             name: "paymentType",
             accessoryText: paymentModel.paymentType.formatted,
             accessibilityIdentifier: "paymentType",
+            actionBlock: nil,
         ))
         section.add(OWSTableItem.item(
             name: "paymentState",
             accessoryText: paymentModel.paymentState.formatted,
             accessibilityIdentifier: "paymentState",
+            actionBlock: nil,
         ))
         section.add(OWSTableItem.item(
             name: "paymentFailure",
             accessoryText: paymentModel.paymentFailure.formatted,
             accessibilityIdentifier: "paymentFailure",
+            actionBlock: nil,
         ))
 
         if let paymentAmount = paymentModel.paymentAmount {
@@ -99,6 +119,7 @@ class PaymentsDetailViewController: OWSTableViewController2, DatabaseChangeDeleg
                 name: "paymentAmount",
                 accessoryText: paymentAmount.formatted,
                 accessibilityIdentifier: "paymentAmount",
+                actionBlock: nil,
             ))
         }
 
@@ -203,73 +224,12 @@ class PaymentsDetailViewController: OWSTableViewController2, DatabaseChangeDeleg
         let section = OWSTableSection()
         section.customHeaderHeight = 16
 
-        // Block
-        if
-            paymentItem.isUnidentified,
-            let index = paymentItem.ledgerBlockIndex,
-            index > 0
-        {
-            section.add(buildStatusItem(
-                topText: OWSLocalizedString(
-                    "SETTINGS_PAYMENTS_PAYMENT_DETAILS_BLOCK_INDEX",
-                    comment: "Label for the 'MobileCoin block index' in the payment details view in the app settings.",
-                ),
-                bottomText: OWSFormat.formatUInt64(index),
-            ))
-        }
-
-        // Type/Amount
-        if
-            let value = paymentItem.formattedPaymentAmount,
-            !paymentItem.isFailed
-        {
-            let title: String
-            if let senderOrRecipientAddress = paymentItem.address {
-                let username = SSKEnvironment.shared.databaseStorageRef.read { tx in
-                    return SSKEnvironment.shared.contactManagerRef.displayName(for: senderOrRecipientAddress, tx: tx).resolvedValue()
-                }
-                let titleFormat: String = {
-                    switch paymentItem {
-                    case let item where item.isIncoming:
-                        return OWSLocalizedString(
-                            "SETTINGS_PAYMENTS_PAYMENT_DETAILS_RECEIVED_FORMAT",
-                            comment: "Format for indicator that you received a payment in the payment details view in the app settings. Embeds: {{ the user who sent you the payment }}.",
-                        )
-                    case let item where item.paymentState.messageReceiptStatus == .sending:
-                        return OWSLocalizedString(
-                            "SETTINGS_PAYMENTS_PAYMENT_DETAILS_SENDING_FORMAT",
-                            comment: "Format for indicator that you sent a payment in the payment details view in the app settings. Embeds: {{ the user who you sent the payment to }}.",
-                        )
-                    default:
-                        return OWSLocalizedString(
-                            "SETTINGS_PAYMENTS_PAYMENT_DETAILS_SENT_FORMAT",
-                            comment: "Format for indicator that you sent a payment in the payment details view in the app settings. Embeds: {{ the user who you sent the payment to }}.",
-                        )
-                    }
-                }()
-                title = String.nonPluralLocalizedStringWithFormat(titleFormat, username)
-            } else {
-                if paymentItem.isIncoming {
-                    title = OWSLocalizedString(
-                        "SETTINGS_PAYMENTS_PAYMENT_DETAILS_RECEIVED",
-                        comment: "Indicates that you received a payment in the payment details view in the app settings.",
-                    )
-                } else {
-                    title = OWSLocalizedString(
-                        "SETTINGS_PAYMENTS_PAYMENT_DETAILS_SENT",
-                        comment: "Indicates that you sent a payment in the payment details view in the app settings.",
-                    )
-                }
-            }
-
-            section.add(buildStatusItem(topText: title, bottomText: value))
-        }
+        let paymentItem = self.paymentItem
 
         // Fee
         if
             paymentItem.isOutgoing,
-            paymentItem.isFailed == false,
-            let feeAmount = paymentItem.formattedFeeAmount
+            let feeAmount = paymentItem.formattedFeeAmount, !paymentItem.isFailed
         {
             section.add(buildStatusItem(
                 topText: OWSLocalizedString(
@@ -315,8 +275,8 @@ class PaymentsDetailViewController: OWSTableViewController2, DatabaseChangeDeleg
                     "SETTINGS_PAYMENTS_PAYMENT_DETAILS_SENDER_FORMAT",
                     comment: "Format for the sender info in the payment details view in the app settings. Embeds {{ %1$@ the name of the sender of the payment, %2$@ the date the transaction was sent }}.",
                 )
-                value = String.nonPluralLocalizedStringWithFormat(
-                    senderFormat,
+                value = String(
+                    format: senderFormat,
                     sender,
                     TSPaymentModel.formatDate(mcLedgerBlockDate, isLongForm: true),
                 )
@@ -345,29 +305,6 @@ class PaymentsDetailViewController: OWSTableViewController2, DatabaseChangeDeleg
             )
         }
 
-        let footerText = (
-            paymentItem.isDefragmentation
-                ? OWSLocalizedString(
-                    "SETTINGS_PAYMENTS_PAYMENT_DETAILS_STATUS_FOOTER_DEFRAGMENTATION",
-                    comment: "Footer string for the status section of the payment details view in the app settings for defragmentation transactions.",
-                )
-                : OWSLocalizedString(
-                    "SETTINGS_PAYMENTS_PAYMENT_DETAILS_STATUS_FOOTER",
-                    comment: "Footer string for the status section of the payment details view in the app settings.",
-                ),
-        )
-        let footerLabel = PaymentsUI.buildTextWithLearnMoreLinkTextView(
-            text: footerText,
-            font: .dynamicTypeCaption1Clamped,
-            learnMoreUrl: URL.Support.Payments.details,
-        )
-        let footerStack = UIStackView(arrangedSubviews: [footerLabel])
-        footerStack.axis = .vertical
-        footerStack.alignment = .fill
-        footerStack.layoutMargins = .init(hMargin: Self.cellHInnerMargin, vMargin: 12)
-        footerStack.isLayoutMarginsRelativeArrangement = true
-        section.customFooterView = footerStack
-
         return section
     }
 
@@ -382,12 +319,12 @@ class PaymentsDetailViewController: OWSTableViewController2, DatabaseChangeDeleg
 
                 let topLabel = UILabel()
                 topLabel.text = topText
-                topLabel.textColor = useFailedColor ? .Signal.red : .Signal.label
+                topLabel.textColor = useFailedColor ? .ows_accentRed : Theme.primaryTextColor
                 topLabel.font = UIFont.dynamicTypeBodyClamped
 
                 let bottomLabel = UILabel()
                 bottomLabel.text = bottomText
-                bottomLabel.textColor = .Signal.secondaryLabel
+                bottomLabel.textColor = Theme.secondaryTextAndIconColor
                 bottomLabel.font = UIFont.dynamicTypeFootnoteClamped
                 bottomLabel.numberOfLines = 0
                 bottomLabel.lineBreakMode = .byWordWrapping
@@ -417,6 +354,7 @@ class PaymentsDetailViewController: OWSTableViewController2, DatabaseChangeDeleg
         cell: UITableViewCell,
         address: SignalServiceAddress,
     ) {
+
         var stackViews = [UIView]()
 
         let avatarView = ConversationAvatarView(sizeClass: .customDiameter(52), localUserDisplayMode: .asUser)
@@ -424,7 +362,7 @@ class PaymentsDetailViewController: OWSTableViewController2, DatabaseChangeDeleg
         stackViews.append(UIView.spacer(withHeight: 12))
 
         let usernameLabel = UILabel()
-        usernameLabel.textColor = .Signal.label
+        usernameLabel.textColor = Theme.primaryTextColor
         usernameLabel.font = UIFont.dynamicTypeSubheadlineClamped
         usernameLabel.textAlignment = .center
         usernameLabel.numberOfLines = 0
@@ -434,7 +372,7 @@ class PaymentsDetailViewController: OWSTableViewController2, DatabaseChangeDeleg
 
         stackViews.append(buildAmountView())
 
-        if let memoLabel = PaymentsUI.buildMemoLabel(memoMessage: paymentItem.memoMessage) {
+        if let memoLabel = PaymentsViewUtils.buildMemoLabel(memoMessage: paymentItem.memoMessage) {
             stackViews.append(UIView.spacer(withHeight: 12))
             stackViews.append(memoLabel)
         }
@@ -456,7 +394,7 @@ class PaymentsDetailViewController: OWSTableViewController2, DatabaseChangeDeleg
                         comment: "Format string for the recipient of an outgoing payment. Embeds: {{ the name of the recipient of the payment}}.",
                     ),
             )
-            usernameLabel.text = String.nonPluralLocalizedStringWithFormat(displayNameFormat, displayName)
+            usernameLabel.text = String(format: displayNameFormat, displayName)
         }
 
         let headerStack = UIStackView(arrangedSubviews: stackViews)
@@ -469,17 +407,18 @@ class PaymentsDetailViewController: OWSTableViewController2, DatabaseChangeDeleg
     }
 
     private func configureHeaderUnidentified(cell: UITableViewCell) {
+
         var stackViews = [UIView]()
 
         let avatarSize: UInt = 52
-        let avatarView = PaymentsUI.buildUnidentifiedTransactionAvatar(avatarSize: avatarSize)
+        let avatarView = PaymentsViewUtils.buildUnidentifiedTransactionAvatar(avatarSize: avatarSize)
         avatarView.autoSetDimensions(to: .square(CGFloat(avatarSize)))
         stackViews.append(avatarView)
         stackViews.append(UIView.spacer(withHeight: 12))
 
         let usernameLabel = UILabel()
         usernameLabel.text = paymentItem.displayName
-        usernameLabel.textColor = .Signal.label
+        usernameLabel.textColor = Theme.primaryTextColor
         usernameLabel.font = UIFont.dynamicTypeBodyClamped
         usernameLabel.textAlignment = .center
         usernameLabel.numberOfLines = 0
@@ -488,7 +427,7 @@ class PaymentsDetailViewController: OWSTableViewController2, DatabaseChangeDeleg
         stackViews.append(UIView.spacer(withHeight: 8))
 
         let amountLabel = UILabel()
-        amountLabel.textColor = .Signal.label
+        amountLabel.textColor = Theme.primaryTextColor
         amountLabel.font = UIFont.regularFont(ofSize: 54)
         amountLabel.textAlignment = .center
         amountLabel.adjustsFontSizeToFitWidth = true
@@ -505,20 +444,33 @@ class PaymentsDetailViewController: OWSTableViewController2, DatabaseChangeDeleg
     }
 
     private func buildAmountView() -> UIView {
+
         let amountLabel = UILabel()
-        amountLabel.textColor = .Signal.label
-        amountLabel.font = UIFont.systemFont(ofSize: 54)
+        amountLabel.textColor = Theme.primaryTextColor
+        amountLabel.font = UIFont.regularFont(ofSize: 54)
         amountLabel.textAlignment = .center
         amountLabel.adjustsFontSizeToFitWidth = true
 
+        let fiatAmountLabel = UILabel()
+        fiatAmountLabel.textColor = Theme.primaryTextColor
+        fiatAmountLabel.font = UIFont.regularFont(ofSize: 18)
+        fiatAmountLabel.textAlignment = .center
+        fiatAmountLabel.adjustsFontSizeToFitWidth = true
+
         let amountWrapper = UIView.container()
-        amountWrapper.addSubview(amountLabel)
-        amountLabel.autoPinEdgesToSuperviewEdges()
+        let stackView = UIStackView()
+        stackView.axis = .vertical
+        stackView.addArrangedSubview(amountLabel)
+        stackView.addArrangedSubview(fiatAmountLabel)
+        amountWrapper.addSubview(stackView)
+        stackView.autoPinEdgesToSuperviewEdges()
 
         if paymentItem.isFailed {
             amountLabel.alpha = 0.3
+            fiatAmountLabel.alpha = 0.3
         } else if !paymentItem.paymentState.isVerified {
             amountLabel.alpha = 0.5
+            fiatAmountLabel.alpha = 0.5
         }
 
         if let amount = paymentItem.attributedPaymentAmount {
@@ -532,10 +484,20 @@ class PaymentsDetailViewController: OWSTableViewController2, DatabaseChangeDeleg
             activityIndicator.startAnimating()
         }
 
+        if let fiatAmount = paymentItem.formattedFiatPaymentAmount {
+            fiatAmountLabel.text = fiatAmount
+        }
+
         return amountWrapper
     }
 
     // MARK: -
+
+    @objc
+    private func didTapOpenChat() {
+        guard let address = paymentItem.address else { return }
+        SignalApp.shared.presentConversationForAddress(address, animated: true)
+    }
 
     private func updateItem() {
         guard
@@ -550,12 +512,17 @@ class PaymentsDetailViewController: OWSTableViewController2, DatabaseChangeDeleg
         updateTableContents()
     }
 
-    // MARK: - DatabaseChangeDelegate
+}
+
+// MARK: -
+
+extension PaymentsDetailViewController: DatabaseChangeDelegate {
 
     func databaseChangesDidUpdate(databaseChanges: DatabaseChanges) {
-        guard databaseChanges.didUpdate(tableName: TSPaymentModel.databaseTableName) else {
+        guard databaseChanges.didUpdate(tableName: TSPaymentModel.table.tableName) else {
             return
         }
+
         updateItem()
     }
 

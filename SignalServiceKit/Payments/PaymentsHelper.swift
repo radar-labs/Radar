@@ -23,6 +23,7 @@ public protocol PaymentsHelper: AnyObject {
     func enablePayments(transaction: DBWriteTransaction)
     func enablePayments(withPaymentsEntropy: Data, transaction: DBWriteTransaction) -> Bool
     func disablePayments(transaction: DBWriteTransaction)
+    func resetPaymentsState(transaction: DBWriteTransaction)
 
     func setLastKnownLocalPaymentAddressProtoData(_ data: Data?, transaction: DBWriteTransaction)
     func lastKnownLocalPaymentAddressProtoData(transaction: DBWriteTransaction) -> Data?
@@ -100,8 +101,8 @@ public enum PaymentsState: Equatable {
         guard let paymentsEntropy else {
             return .disabled
         }
-        guard paymentsEntropy.count == PaymentsConstants.paymentsEntropyLength else {
-            owsFailDebug("paymentsEntropy has invalid length: \(paymentsEntropy.count) != \(PaymentsConstants.paymentsEntropyLength).")
+        guard PaymentsConstants.supportedPaymentsEntropyLengths.contains(paymentsEntropy.count) else {
+            owsFailDebug("paymentsEntropy has invalid length: \(paymentsEntropy.count); supported: \(PaymentsConstants.supportedPaymentsEntropyLengths).")
             return .disabled
         }
         if arePaymentsEnabled {
@@ -178,6 +179,10 @@ extension MockPaymentsHelper: PaymentsHelperSwift, PaymentsHelper {
     }
 
     public func disablePayments(transaction: DBWriteTransaction) {
+        owsFail("Not implemented.")
+    }
+
+    public func resetPaymentsState(transaction: DBWriteTransaction) {
         owsFail("Not implemented.")
     }
 

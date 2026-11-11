@@ -153,10 +153,7 @@ class PaymentsDeactivateViewController: OWSViewController {
     }
 
     private func updateBalance() {
-        balanceLabel.attributedText = PaymentsFormat.attributedFormat(
-            paymentAmount: paymentBalance.amount,
-            isShortForm: false,
-        )
+        balanceLabel.attributedText = PaymentsFormat.formattedBalance(paymentBalance.amount, isShortForm: false)
     }
 
     // MARK: - Events

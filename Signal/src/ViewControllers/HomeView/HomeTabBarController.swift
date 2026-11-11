@@ -22,8 +22,9 @@ class HomeTabBarController: UITabBarController, UINavigationControllerDelegate, 
 
     enum Tabs: Int {
         case chatList = 0
-        case calls = 1
-        case stories = 2
+        case payments = 1
+        case calls = 2
+        case stories = 3
 
         var title: String {
             switch self {
@@ -31,6 +32,11 @@ class HomeTabBarController: UITabBarController, UINavigationControllerDelegate, 
                 return OWSLocalizedString(
                     "CHAT_LIST_TITLE_INBOX",
                     comment: "Title for the chat list's default mode.",
+                )
+            case .payments:
+                return OWSLocalizedString(
+                    "SETTINGS_PAYMENTS_TITLE",
+                    comment: "Title for the payments.",
                 )
             case .calls:
                 return OWSLocalizedString(
@@ -49,6 +55,8 @@ class HomeTabBarController: UITabBarController, UINavigationControllerDelegate, 
             switch self {
             case .chatList:
                 return UIImage(imageLiteralResourceName: "tab-chats")
+            case .payments:
+                return UIImage(systemName: "bitcoinsign.circle.fill")
             case .calls:
                 return UIImage(named: "tab-calls")
             case .stories:
@@ -60,6 +68,8 @@ class HomeTabBarController: UITabBarController, UINavigationControllerDelegate, 
             switch self {
             case .chatList:
                 return UIImage(named: "tab-chats")
+            case .payments:
+                return UIImage(systemName: "bitcoinsign.circle.fill")
             case .calls:
                 return UIImage(named: "tab-calls")
             case .stories:
@@ -79,6 +89,8 @@ class HomeTabBarController: UITabBarController, UINavigationControllerDelegate, 
             switch self {
             case .chatList:
                 return "chats"
+            case .payments:
+                return "wallet"
             case .calls:
                 return "calls"
             case .stories:
@@ -91,6 +103,7 @@ class HomeTabBarController: UITabBarController, UINavigationControllerDelegate, 
         fileprivate var detailPlaceholderTitle: NSAttributedString {
             let symbol: SignalSymbol = switch self {
             case .chatList: .message
+            case .payments: .creditCard
             case .calls: .phone
             case .stories: .stories
             }
@@ -120,6 +133,15 @@ class HomeTabBarController: UITabBarController, UINavigationControllerDelegate, 
                     ),
                     callIcon,
                     baseAttributes: baseAttributes,
+                )
+
+            case .payments:
+                return NSAttributedString(
+                    string: OWSLocalizedString(
+                        "SETTINGS_PAYMENTS_TITLE",
+                        comment: "Title for the payments.",
+                    ),
+                    attributes: baseAttributes,
                 )
 
             case .stories:
@@ -164,6 +186,16 @@ class HomeTabBarController: UITabBarController, UINavigationControllerDelegate, 
         ),
     )
     lazy var chatListTabBarItem = Tabs.chatList.tabBarItem
+
+    // Radar: the Payments (wallet) tab.
+    lazy var walletViewController = PaymentsSettingsViewController(mode: .inAppSettings)
+    lazy var walletSplitViewController = makeSplit(
+        primary: walletViewController,
+        placeholder: SplitViewDetailPlaceholderViewController(
+            contentConfiguration: Tabs.payments.detailPlaceholderViewContentConfiguration,
+        ),
+    )
+    lazy var walletTabBarItem = Tabs.payments.tabBarItem
 
     lazy var callsListViewController = CallsListViewController()
     lazy var callsSplitViewController = makeSplit(
@@ -298,6 +330,8 @@ class HomeTabBarController: UITabBarController, UINavigationControllerDelegate, 
         switch tab {
         case .chatList:
             return (wrapIfNecessary(chatsSplitViewController), chatListTabBarItem)
+        case .payments:
+            return (wrapIfNecessary(walletSplitViewController), walletTabBarItem)
         case .calls:
             return (wrapIfNecessary(callsSplitViewController), callsListTabBarItem)
         case .stories:
@@ -306,7 +340,7 @@ class HomeTabBarController: UITabBarController, UINavigationControllerDelegate, 
     }
 
     private func tabsToShow(areStoriesEnabled: Bool) -> [Tabs] {
-        var tabs = [Tabs.chatList, Tabs.calls]
+        var tabs = [Tabs.chatList, Tabs.payments, Tabs.calls]
         if areStoriesEnabled {
             tabs.append(Tabs.stories)
         }
@@ -1047,6 +1081,8 @@ class HomeTabBarController: UITabBarController, UINavigationControllerDelegate, 
             switch selectedHomeTab {
             case .chatList:
                 tableView = chatListViewController.tableView
+            case .payments:
+                tableView = walletViewController.tableView
             case .stories:
                 tableView = storiesViewController.tableView
             case .calls:

@@ -501,22 +501,8 @@ extension ConversationViewController {
     // MARK: - SendPaymentViewDelegate
 
     func didSendPayment(success: Bool) {
-
-        func paymentSettingsNavigationController() -> OWSNavigationController {
-            let paymentSettingsView = PaymentsSettingsViewController(mode: .standalone)
-            return OWSNavigationController(rootViewController: paymentSettingsView)
-        }
-
-        // only prompt users to enable payments lock when successful.
-        guard success else {
-            // TODO - Remove when in-chat payment bubble implemented.
-            self.presentFormSheet(paymentSettingsNavigationController(), animated: true)
-            return
-        }
-
-        PaymentOnboarding.presentBiometricLockPromptIfNeeded { [weak self] in
-            // TODO - Remove when in-chat payment bubble implemented.
-            self?.presentFormSheet(paymentSettingsNavigationController(), animated: true)
-        }
+        // Radar shows the payment in the chat, so don't open payment settings afterwards.
+        guard success else { return }
+        PaymentOnboarding.presentBiometricLockPromptIfNeeded {}
     }
 }

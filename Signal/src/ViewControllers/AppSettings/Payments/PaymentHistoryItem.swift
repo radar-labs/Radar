@@ -42,6 +42,10 @@ public protocol PaymentsHistoryItem {
 
     var formattedPaymentAmount: String? { get }
 
+    var formattedTotalPaymentAmount: String? { get }
+
+    var formattedFiatPaymentAmount: String? { get }
+
     func statusDescription(isLongForm: Bool) -> String?
 
     func markAsRead(tx: DBWriteTransaction)
