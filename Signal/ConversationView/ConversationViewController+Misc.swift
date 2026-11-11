@@ -211,6 +211,7 @@ extension ConversationViewController {
 
     func showConversationSettings(mode: ConversationSettingsPresentationMode) {
         let settingsView = ConversationSettingsViewController(
+            appReadiness: appReadiness,
             threadViewModel: threadViewModel,
             isSystemContact: conversationViewModel.isSystemContact,
             spoilerState: viewState.spoilerState,
