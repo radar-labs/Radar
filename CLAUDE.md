@@ -9,12 +9,12 @@ Translation files are located at:
 Signal/translations/<lang>.lproj/Localizable.strings
 ```
 
-There are 45 language files:
-`ar`, `be`, `bn`, `ca`, `cs`, `da`, `de`, `el`, `en`, `es`, `fa`, `fi`, `fr`, `ga`, `gu`, `he`, `hi`, `hr`, `hu`, `id`, `it`, `ja`, `ko`, `mr`, `ms`, `nb`, `nl`, `pl`, `pt_BR`, `pt_PT`, `ro`, `ru`, `sk`, `sr`, `sv`, `th`, `tr`, `ug`, `uk`, `ur`, `vi`, `yue`, `zh_CN`, `zh_HK`, `zh_TW`
+There are 47 language files:
+`ar`, `be`, `bg`, `bn`, `ca`, `cs`, `da`, `de`, `el`, `en`, `es`, `fa`, `fi`, `fr`, `ga`, `gu`, `he`, `hi`, `hr`, `hu`, `id`, `it`, `ja`, `ko`, `lt`, `mr`, `ms`, `nb`, `nl`, `pl`, `pt_BR`, `pt_PT`, `ro`, `ru`, `sk`, `sr`, `sv`, `th`, `tr`, `ug`, `uk`, `ur`, `vi`, `yue`, `zh_CN`, `zh_HK`, `zh_TW`
 
 ### Rules
 
-- When adding a new `OWSLocalizedString` key, insert the entry into **all 45** `.strings` files, sorted alphabetically by key, with an appropriate translation for each language.
+- When adding a new `OWSLocalizedString` key, insert the entry into **all 47** `.strings` files, sorted alphabetically by key, with an appropriate translation for each language.
 - When changing the English value of an existing key, update the value in all language files accordingly.
 - If a proper translation is not available for a language, use the English value as a fallback — never leave a key missing from any file.
 - Use a script to apply changes across all files at once rather than editing them one by one.

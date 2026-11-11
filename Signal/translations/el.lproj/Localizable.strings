@@ -2,7 +2,7 @@
 "AB_PERMISSION_MISSING_ACTION_NOT_NOW" = "Όχι τώρα";
 
 /* Footer for the 'about' help section. For non-English languages, exclude the word '501c3'. */
-"ABOUT_SECTION_FOOTER" = "Πνευματική ιδιοκτησία Signal Messenger\nΥπό την άδεια AGPLv3\nΤο Signal είναι ένας μη κερδοσκοπικός οργανισμός.";
+"ABOUT_SECTION_FOOTER" = "Πνευματική ιδιοκτησία Signal Messenger\nCopyright 2026 Radar Chat, Inc.\nΥπό την άδεια AGPLv3";
 
 /* Title for the 'about' help section */
 "ABOUT_SECTION_TITLE" = "Σχετικά με το Radar";
@@ -215,7 +215,7 @@
 "APN_Message" = "Ίσως έχεις νέα μηνύματα";
 
 /* Shown in place of the text input box in a conversation when the app has expired and the user is no longer allowed to send messages. The embedded value is 'Update now' (translated via APP_EXPIRED_BOTTOM_UPDATE), and it will be formatted as a tappable link. */
-"APP_EXPIRED_BOTTOM" = "Αυτή η έκδοση Signal έχει λήξει. %1$@ για να στείλεις και να λάβεις μηνύματα.";
+"APP_EXPIRED_BOTTOM" = "Αυτή η έκδοση Radar έχει λήξει. %1$@ για να στείλεις και να λάβεις μηνύματα.";
 
 /* Shown in place of the text input box in a conversation when the app has expired and the user is no longer allowed to send messages. This value is a tappable link embedded in a larger sentence. */
 "APP_EXPIRED_BOTTOM_UPDATE" = "Αναβάθμιση τώρα";
@@ -236,7 +236,7 @@
 "APP_LAUNCH_FAILURE_COULD_NOT_LOAD_DATABASE" = "Δεν φορτώθηκε η βάση δεδομένων";
 
 /* Message for an action sheet explaining that Signal can't launch because the database is corrupted. */
-"APP_LAUNCH_FAILURE_DATABASE_CORRUPTED_MESSAGE" = "Δεν είναι δυνατή η εκκίνηση του Signal επειδή η βάση δεδομένων είναι κατεστραμμένη. Δεν υπήρξε καμία επίδραση στην ασφάλεια του λογαριασμού ή των μηνυμάτων σου.";
+"APP_LAUNCH_FAILURE_DATABASE_CORRUPTED_MESSAGE" = "Δεν είναι δυνατή η εκκίνηση του Radar επειδή η βάση δεδομένων είναι κατεστραμμένη. Δεν υπήρξε καμία επίδραση στην ασφάλεια του λογαριασμού ή των μηνυμάτων σου.";
 
 /* Title for an action sheet explaining that Signal can't launch because the database is corrupted. */
 "APP_LAUNCH_FAILURE_DATABASE_CORRUPTED_TITLE" = "Η βάση δεδομένων έχει καταστραφεί";
@@ -245,7 +245,7 @@
 "APP_LAUNCH_FAILURE_DATABASE_RECOVERY_ACTION_TITLE" = "Επιδιόρθωση";
 
 /* Action in an action sheet offering to exit the app. */
-"APP_LAUNCH_FAILURE_EXIT_APP_ACTION_TITLE" = "Έξοδος από Signal";
+"APP_LAUNCH_FAILURE_EXIT_APP_ACTION_TITLE" = "Έξοδος από Radar";
 
 /* Error indicating that the app could not launch without reverting unknown database migrations. */
 "APP_LAUNCH_FAILURE_INVALID_DATABASE_VERSION_MESSAGE" = "Παρακαλώ αναβάθμισε το Radar στην τελευταία έκδοση";
@@ -260,7 +260,7 @@
 "APP_LAUNCH_FAILURE_LAST_LAUNCH_CRASHED_TITLE" = "Αδυναμία ανοίγματος του Radar";
 
 /* Message for an error sheet shown when the app cannot launch because the device is out of storage space. Embeds 1:{{ the localized name of the user's device model, e.g. iPhone }}; 2:{{ an amount of storage space as a file size, e.g. 1 GB }}. */
-"APP_LAUNCH_FAILURE_NOT_ENOUGH_STORAGE_SPACE_MESSAGE_FORMAT" = "Το Signal δεν ανοίγει γιατί εξαντλήθηκε ο αποθηκευτικός χώρος στο %1$@ σου. Απελευθέρωσε τουλάχιστον %2$@ και άνοιξε ξανά το Signal.\n\nΠήγαινε στις Ρυθμίσεις iOS > Γενικά > Αποθηκευτικός χώρος και αφαίρεσε εφαρμογές που δεν χρησιμοποιείς, διάγραψε μεγάλα βίντεο από την εφαρμογή Φωτογραφιών ή άλλες εφαρμογές και διάγραψε μουσική και πολυμέσα που έχεις κατεβάσει.";
+"APP_LAUNCH_FAILURE_NOT_ENOUGH_STORAGE_SPACE_MESSAGE_FORMAT" = "Το Radar δεν ανοίγει γιατί εξαντλήθηκε ο αποθηκευτικός χώρος στο %1$@ σου. Απελευθέρωσε τουλάχιστον %2$@ και άνοιξε ξανά το Radar.\n\nΠήγαινε στις Ρυθμίσεις iOS > Γενικά > Αποθηκευτικός χώρος και αφαίρεσε εφαρμογές που δεν χρησιμοποιείς, διάγραψε μεγάλα βίντεο από την εφαρμογή Φωτογραφιών ή άλλες εφαρμογές και διάγραψε μουσική και πολυμέσα που έχεις κατεβάσει.";
 
 /* Title for an error sheet shown when the app cannot launch because the device is out of storage space. */
 "APP_LAUNCH_FAILURE_NOT_ENOUGH_STORAGE_SPACE_TITLE" = "Δεν υπάρχει αρκετός χώρος αποθήκευσης";
@@ -377,13 +377,13 @@
 "ATTACHMENT_APPROVAL_MEDIA_QUALITY_TITLE" = "Ποιότητα πολυμέσων";
 
 /* Notification body shown when media sync to a linked device is complete. */
-"ATTACHMENT_BACKFILL_FINISHED_NOTIFICATION" = "Ο συγχρονισμός με το Signal στη συνδεδεμένη συσκευή σου ολοκληρώθηκε.";
+"ATTACHMENT_BACKFILL_FINISHED_NOTIFICATION" = "Ο συγχρονισμός με το Radar στη συνδεδεμένη συσκευή σου ολοκληρώθηκε.";
 
 /* Notification body shown when media sync to a linked device was interrupted. */
-"ATTACHMENT_BACKFILL_INTERRUPTED_NOTIFICATION" = "Άνοιξε το Signal για να συνεχίσεις τον συγχρονισμό με τη συνδεδεμένη συσκευή σου";
+"ATTACHMENT_BACKFILL_INTERRUPTED_NOTIFICATION" = "Άνοιξε το Radar για να συνεχίσεις τον συγχρονισμό με τη συνδεδεμένη συσκευή σου";
 
 /* Notification body shown while syncing media to a linked device. */
-"ATTACHMENT_BACKFILL_SYNCING_NOTIFICATION" = "Συγχρονισμός με το Signal στη συνδεδεμένη συσκευή σου";
+"ATTACHMENT_BACKFILL_SYNCING_NOTIFICATION" = "Συγχρονισμός με το Radar στη συνδεδεμένη συσκευή σου";
 
 /* Generic filename for an attachment with no known name */
 "ATTACHMENT_DEFAULT_FILENAME" = "Συνημμένο";
@@ -632,7 +632,7 @@
 "BACKUP_KEY_SEE_FULL_KEY_BUTTON_TITLE" = "Προβολή πλήρους κλειδιού";
 
 /* Body for a warning sheet shown to discourage the user from sharing their 'Recovery Key', warning them not to share it with anyone. */
-"BACKUP_NEVER_SHARE_RECOVERY_KEY_SHEET_BODY" = "Μην κοινοποιήσεις το κλειδί ανάκτησής σου σε κανέναν. Αυτό θα τους επιτρέψει να αποκτήσουν πρόσβαση στον λογαριασμό σου. <bold>Το Signal δεν θα επικοινωνήσει ποτέ μαζί σου</bold> για το κλειδί ανάκτησής σου. Μην απαντάς ποτέ σε μηνύματα από το Signal.";
+"BACKUP_NEVER_SHARE_RECOVERY_KEY_SHEET_BODY" = "Μην κοινοποιήσεις το κλειδί ανάκτησής σου σε κανέναν. Αυτό θα τους επιτρέψει να αποκτήσουν πρόσβαση στον λογαριασμό σου. <bold>Το Radar δεν θα επικοινωνήσει ποτέ μαζί σου</bold> για το κλειδί ανάκτησής σου. Μην απαντάς ποτέ σε μηνύματα από το Radar.";
 
 /* Title for a warning sheet shown to discourage the user from sharing their 'Recovery Key'. */
 "BACKUP_NEVER_SHARE_RECOVERY_KEY_SHEET_TITLE" = "Μην κοινοποιήσεις το κλειδί ανάκτησης";
@@ -752,7 +752,7 @@
 "BACKUP_RESTORE_MODAL_TITLE" = "Επαναφορά μηνυμάτων...";
 
 /* Message for a confirmation sheet shown before saving the user's Recovery Key to their password manager. */
-"BACKUP_SAVE_KEY_PW_MGR_CONFIRM_SHEET_MESSAGE" = "Αποθήκευσε το κλειδί ανάκτησής σου μόνο σε κάποιο διαχειριστή κωδικών πρόσβασης που εμπιστεύεσαι ότι είναι ασφαλής. Το Signal δεν κάνει συστάσεις σχετικά με το ποιος διαχειριστής κωδικών πρόσβασης είναι κατάλληλος για σένα.";
+"BACKUP_SAVE_KEY_PW_MGR_CONFIRM_SHEET_MESSAGE" = "Αποθήκευσε το κλειδί ανάκτησής σου μόνο σε κάποιο διαχειριστή κωδικών πρόσβασης που εμπιστεύεσαι ότι είναι ασφαλής. Το Radar δεν κάνει συστάσεις σχετικά με το ποιος διαχειριστής κωδικών πρόσβασης είναι κατάλληλος για σένα.";
 
 /* Title for a confirmation sheet shown before saving the user's Recovery Key to their password manager. */
 "BACKUP_SAVE_KEY_PW_MGR_CONFIRM_SHEET_TITLE" = "Αποθήκευση στον διαχειριστή κωδικών πρόσβασης;";
@@ -1064,31 +1064,31 @@
 "BACKUP_SETTINGS_LANDING_OTHER_WAYS_HEADER" = "Άλλοι τρόποι δημιουργίας αντιγράφων ασφαλείας";
 
 /* Subtitle on the Backups settings landing page. */
-"BACKUP_SETTINGS_LANDING_PAGE_SUBTITLE" = "Δημιούργησε αντίγραφα ασφαλείας του ιστορικού μηνυμάτων σου, ώστε να μην χάνεις ποτέ δεδομένα αν αγοράσεις νέο τηλέφωνο ή επανεγκαταστήσεις το Signal.";
+"BACKUP_SETTINGS_LANDING_PAGE_SUBTITLE" = "Δημιούργησε αντίγραφα ασφαλείας του ιστορικού μηνυμάτων σου, ώστε να μην χάνεις ποτέ δεδομένα αν αγοράσεις νέο τηλέφωνο ή επανεγκαταστήσεις το Radar.";
 
 /* Button to begin setting up Signal Secure Backups on the Backups settings landing page. */
 "BACKUP_SETTINGS_LANDING_SET_UP_BUTTON" = "Ρύθμιση";
 
 /* Description of Signal Secure Backups on the Backups settings landing page. */
-"BACKUP_SETTINGS_LANDING_SIGNAL_BACKUPS_BODY" = "Τα αυτόματα αντίγραφα ασφαλείας του Signal διασφαλίζουν υπηρεσία κρυπτογραφημένης αποθήκευσης από άκρο σε άκρο.";
+"BACKUP_SETTINGS_LANDING_SIGNAL_BACKUPS_BODY" = "Τα αυτόματα αντίγραφα ασφαλείας του Radar διασφαλίζουν υπηρεσία κρυπτογραφημένης αποθήκευσης από άκρο σε άκρο.";
 
 /* Title for the Signal Secure Backups cell on the Backups settings landing page. */
-"BACKUP_SETTINGS_LANDING_SIGNAL_BACKUPS_TITLE" = "Ασφαλή αντίγραφα Signal";
+"BACKUP_SETTINGS_LANDING_SIGNAL_BACKUPS_TITLE" = "Ασφαλή αντίγραφα Radar";
 
 /* Button to view settings for remote backups on the Backups settings landing page. */
 "BACKUP_SETTINGS_LANDING_VIEW_SETTINGS_BUTTON" = "Προβολή ρυθμίσεων";
 
 /* Note on the linked-device Backups screen explaining that the Backups subscription can only be managed on the user's primary device. */
-"BACKUP_SETTINGS_LINKED_DEVICE_MANAGE_ON_PRIMARY_FOOTER" = "Μπορείς να διαχειριστείς ή να αναβαθμίσεις τη συνδρομή σου στα Ασφαλή αντίγραφα Signal στην κύρια συσκευή σου.";
+"BACKUP_SETTINGS_LINKED_DEVICE_MANAGE_ON_PRIMARY_FOOTER" = "Μπορείς να διαχειριστείς ή να αναβαθμίσεις τη συνδρομή σου στα Ασφαλή αντίγραφα Radar στην κύρια συσκευή σου.";
 
 /* Note on the linked-device Backups screen, shown on the paid tier, explaining that the Backups subscription can only be managed on the user's primary device. */
-"BACKUP_SETTINGS_LINKED_DEVICE_MANAGE_ON_PRIMARY_FOOTER_PAID" = "Μπορείς να διαχειριστείς ή να ακυρώσεις τη συνδρομή αντιγράφων ασφαλείας Signal στην κύρια συσκευή σου.";
+"BACKUP_SETTINGS_LINKED_DEVICE_MANAGE_ON_PRIMARY_FOOTER_PAID" = "Μπορείς να διαχειριστείς ή να ακυρώσεις τη συνδρομή αντιγράφων ασφαλείας Radar στην κύρια συσκευή σου.";
 
 /* Body text on the linked-device Backups screen, shown when Backups aren't set up, explaining the feature and that it can be enabled on the user's primary device. */
-"BACKUP_SETTINGS_LINKED_DEVICE_NO_BACKUP_FOOTER" = "Τα αυτόματα αντίγραφα ασφαλείας του Signal διασφαλίζουν υπηρεσία κρυπτογραφημένης αποθήκευσης από άκρο σε άκρο. Ξεκίνα στην κύρια συσκευή σου.";
+"BACKUP_SETTINGS_LINKED_DEVICE_NO_BACKUP_FOOTER" = "Τα αυτόματα αντίγραφα ασφαλείας του Radar διασφαλίζουν υπηρεσία κρυπτογραφημένης αποθήκευσης από άκρο σε άκρο. Ξεκίνα στην κύρια συσκευή σου.";
 
 /* Message on the linked-device Backups screen, shown when the user's paid subscription can't be found, prompting them to renew. */
-"BACKUP_SETTINGS_LINKED_DEVICE_SUBSCRIPTION_NOT_FOUND" = "Η συνδρομή σου δεν βρέθηκε. Ανανέωσε για να συνεχίσεις να χρησιμοποιείς τα Ασφαλή αντίγραφα Signal.";
+"BACKUP_SETTINGS_LINKED_DEVICE_SUBSCRIPTION_NOT_FOUND" = "Η συνδρομή σου δεν βρέθηκε. Ανανέωσε για να συνεχίσεις να χρησιμοποιείς τα Ασφαλή αντίγραφα Radar.";
 
 /* Title for a button allowing users to trigger a manual backup. */
 "BACKUP_SETTINGS_MANUAL_BACKUP_BUTTON_TITLE" = "Δημιουργία αντίγραφου τώρα";
@@ -1130,10 +1130,10 @@
 "BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_TOGGLE_FOOTER_UNAVAILABLE" = "Η βελτιστοποίηση αποθηκευτικού χώρου μπορεί να χρησιμοποιηθεί μόνο με την πληρωμένη βαθμίδα των Αντιγράφων Ασφαλείας Radar. Αναβάθμισε το πρόγραμμα δημιουργίας αντιγράφων ασφαλείας σου για να αρχίσεις να χρησιμοποιείς αυτήν τη λειτουργία.";
 
 /* Title for a toggle allowing users to change the Optimize Local Storage setting. */
-"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_TOGGLE_TITLE" = "Βελτιστοποίηση χώρου αποθήκευσης Signal";
+"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_TOGGLE_TITLE" = "Βελτιστοποίηση χώρου αποθήκευσης Radar";
 
 /* Body for a Backup plan upsell view encouraging users to subscribe to a paid Backup plan to use storage optimization. */
-"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_UPSELL_BODY" = "Η βελτιστοποίηση αποθηκευτικού χώρου μπορεί να χρησιμοποιηθεί μόνο με την πληρωμένη βαθμίδα των αντιγράφων ασφαλείας Signal Secure Backups. Αναβάθμισε το πρόγραμμα δημιουργίας αντιγράφων ασφαλείας σου για να αρχίσεις να χρησιμοποιείς αυτήν τη λειτουργία.";
+"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_UPSELL_BODY" = "Η βελτιστοποίηση αποθηκευτικού χώρου μπορεί να χρησιμοποιηθεί μόνο με την πληρωμένη βαθμίδα των αντιγράφων ασφαλείας Radar Secure Backups. Αναβάθμισε το πρόγραμμα δημιουργίας αντιγράφων ασφαλείας σου για να αρχίσεις να χρησιμοποιείς αυτήν τη λειτουργία.";
 
 /* Title for a Backup plan upsell view encouraging users to subscribe to a paid Backup plan to use storage optimization. */
 "BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_UPSELL_TITLE" = "Κάνε αναβάθμιση για να ενεργοποιήσεις τη βελτιστοποίηση αποθηκευτικού χώρου";
@@ -1217,7 +1217,7 @@
 "BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_OPTIMIZE_MEDIA_TOGGLE_FOOTER" = "Τα παλαιότερα αρχεία πολυμέσων θα διαγραφούν κατά την επόμενη δημιουργία αντιγράφου ασφαλείας, αλλά μπορείς να τα κατεβάσεις από το αντίγραφο ασφαλείας σας ανά πάσα στιγμή.";
 
 /* Title for a toggle shown after the user enables backups, letting them enable the Optimize Storage feature. */
-"BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_OPTIMIZE_MEDIA_TOGGLE_TITLE" = "Βελτιστοποίηση χώρου αποθήκευσης Signal";
+"BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_OPTIMIZE_MEDIA_TOGGLE_TITLE" = "Βελτιστοποίηση χώρου αποθήκευσης Radar";
 
 /* Title for a sheet shown after the user enables backups. */
 "BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_TITLE" = "Είσαι εντάξει. Ξεκίνα τη δημιουργία αντιγράφων ασφαλείας τώρα.";
@@ -1247,7 +1247,7 @@
 "BACKUP_SUBSCRIPTION_FAILED_TO_RENEW_SHEET_TITLE" = "Η συνδρομή σου για δημιουργία αντιγράφων ασφαλείας δεν ανανεώθηκε";
 
 /* Body for a megaphone shown on the chat list encouraging users to subscribe to a paid Backup plan to back up all their media. Embeds {{ the amount of storage included in the paid plan, preformatted as a localized byte count, e.g. '100 GB' }}. */
-"BACKUPS_BACK_UP_YOUR_MEDIA_MEGAPHONE_BODY" = "Τα Ασφαλή αντίγραφα Signal επί πληρωμή διατηρούν όλα τα πολυμέσα σου, έως και %1$@.";
+"BACKUPS_BACK_UP_YOUR_MEDIA_MEGAPHONE_BODY" = "Τα Ασφαλή αντίγραφα Radar επί πληρωμή διατηρούν όλα τα πολυμέσα σου, έως και %1$@.";
 
 /* Title for a button on a megaphone encouraging users to subscribe to a paid Backup plan to back up all their media. */
 "BACKUPS_BACK_UP_YOUR_MEDIA_MEGAPHONE_PRIMARY_ACTION" = "Αναβάθμιση";
@@ -1256,7 +1256,7 @@
 "BACKUPS_BACK_UP_YOUR_MEDIA_MEGAPHONE_TITLE" = "Δημιούργησε αντίγραφα ασφαλείας όλων των πολυμέσων σου";
 
 /* Body for a Backup plan upsell view encouraging users to subscribe to a paid Backup plan to back up all their media. Embeds {{ the amount of storage included in the paid plan, preformatted as a localized byte count, e.g. '100 GB' }}. */
-"BACKUPS_BACK_UP_YOUR_MEDIA_UPSELL_BODY" = "Τα Ασφαλή αντίγραφα Signal επί πληρωμή αποθηκεύουν όλα τα πολυμέσα σου, έως και %1$@. Δεν θα χάσεις ποτέ φωτογραφίες ή βίντεο όταν αγοράσεις ένα νέο τηλέφωνο ή επανεγκαταστήσεις το Signal.";
+"BACKUPS_BACK_UP_YOUR_MEDIA_UPSELL_BODY" = "Τα Ασφαλή αντίγραφα Radar επί πληρωμή αποθηκεύουν όλα τα πολυμέσα σου, έως και %1$@. Δεν θα χάσεις ποτέ φωτογραφίες ή βίντεο όταν αγοράσεις ένα νέο τηλέφωνο ή επανεγκαταστήσεις το Radar.";
 
 /* Title for a Backup plan upsell view encouraging users to subscribe to a paid Backup plan to back up all their media. */
 "BACKUPS_BACK_UP_YOUR_MEDIA_UPSELL_TITLE" = "Πραγματοποίησε αναβάθμιση για να αποθηκεύσεις όλα τα πολυμέσα";
@@ -1268,7 +1268,7 @@
 "BACKUPS_MEDIA_ERROR_NOTIFICATION_TITLE" = "Σφάλμα αντιγράφων ασφαλείας των πολυμέσων";
 
 /* Body for a megaphone shown on the chat list encouraging users to enable Signal Secure Backups. */
-"BACKUPS_NEVER_LOSE_A_MESSAGE_MEGAPHONE_BODY" = "Ενεργοποίησε τα Ασφαλή αντίγραφα Signal για να διατηρήσεις τα μηνύματα και τα πολυμέσα σου";
+"BACKUPS_NEVER_LOSE_A_MESSAGE_MEGAPHONE_BODY" = "Ενεργοποίησε τα Ασφαλή αντίγραφα Radar για να διατηρήσεις τα μηνύματα και τα πολυμέσα σου";
 
 /* Title for a button on a megaphone encouraging users to enable Signal Secure Backups. */
 "BACKUPS_NEVER_LOSE_A_MESSAGE_MEGAPHONE_PRIMARY_ACTION" = "Ενεργοποίηση";
@@ -1277,7 +1277,7 @@
 "BACKUPS_NEVER_LOSE_A_MESSAGE_MEGAPHONE_TITLE" = "Δεν θα χάσεις ποτέ μήνυμα";
 
 /* Body for a megaphone shown on the chat list encouraging users to subscribe to a paid Backup plan to save on-device storage space. */
-"BACKUPS_SAVE_SPACE_MEGAPHONE_BODY" = "Τα ασφαλή αντίγραφα Signal μπορούν να εξοικονομήσουν αποθηκευτικό χώρο, αφαιρώντας τα μέσα.";
+"BACKUPS_SAVE_SPACE_MEGAPHONE_BODY" = "Τα ασφαλή αντίγραφα Radar μπορούν να εξοικονομήσουν αποθηκευτικό χώρο, αφαιρώντας τα μέσα.";
 
 /* Title for a button on a megaphone encouraging users to subscribe to a paid Backup plan to save on-device storage space, when the user does not yet have Signal Secure Backups enabled. */
 "BACKUPS_SAVE_SPACE_MEGAPHONE_PRIMARY_ACTION_TURN_ON" = "Ενεργοποίηση";
@@ -1289,7 +1289,7 @@
 "BACKUPS_SAVE_SPACE_MEGAPHONE_TITLE" = "Εξοικονόμησε χώρο με αντίγραφα ασφαλείας επί πληρωμή";
 
 /* Body for a Backup plan upsell view encouraging users to subscribe to a paid Backup plan to save on-device storage space. Embeds {{ the amount of storage space being consumed on-device by media, preformatted as a localized byte count, e.g. '1.2 GB' }}. */
-"BACKUPS_SAVE_SPACE_UPSELL_BODY" = "Το Signal χρησιμοποιεί %1$@ αποθηκευτικού χώρου για πολυμέσα. Τα προγράμματα Ασφαλή αντίγραφα Signal επί πληρωμή του Signal μπορούν να εξοικονομήσουν αποθηκευτικό χώρο μεταφέροντας τα πολυμέσα σε εξωτερικό χώρο, διατηρώντας παράλληλα ολόκληρο το ιστορικό συνομιλιών σου στα αντίγραφα ασφαλείας σου.";
+"BACKUPS_SAVE_SPACE_UPSELL_BODY" = "Το Radar χρησιμοποιεί %1$@ αποθηκευτικού χώρου για πολυμέσα. Τα προγράμματα Ασφαλή αντίγραφα Radar επί πληρωμή του Radar μπορούν να εξοικονομήσουν αποθηκευτικό χώρο μεταφέροντας τα πολυμέσα σε εξωτερικό χώρο, διατηρώντας παράλληλα ολόκληρο το ιστορικό συνομιλιών σου στα αντίγραφα ασφαλείας σου.";
 
 /* Title for a Backup plan upsell view encouraging users to subscribe to a paid Backup plan to save on-device storage space. */
 "BACKUPS_SAVE_SPACE_UPSELL_TITLE" = "Εξοικονόμησε χώρο με αντίγραφα ασφαλείας επί πληρωμή";
@@ -1298,7 +1298,7 @@
 "BACKUPS_SETTINGS_TITLE" = "Ασφαλή αντίγραφα";
 
 /* Message for an action sheet shown on iPad saying you need to set up backups on your phone */
-"BACKUPS_SETUP_ON_PRIMARY_MESSAGE" = "Για να παραμετροποιήσεις τα αντίγραφα ασφαλείας, άνοιξε το Signal στην κύρια συσκευή σου iPhone ή Android και πήγε Ρυθμίσεις > Αντίγραφα ασφαλείας.";
+"BACKUPS_SETUP_ON_PRIMARY_MESSAGE" = "Για να παραμετροποιήσεις τα αντίγραφα ασφαλείας, άνοιξε το Radar στην κύρια συσκευή σου iPhone ή Android και πήγε Ρυθμίσεις > Αντίγραφα ασφαλείας.";
 
 /* Body for system notification or megaphone when backups is enabled. Embeds {{ time backups was enabled }} */
 "BACKUPS_TURNED_ON_NOTIFICATION_BODY_FORMAT" = "Τα αντίγραφα ασφαλείας σήματος ενεργοποιήθηκαν για αυτόν τον λογαριασμό στις %1$@. Πάτα για να δεις.";
@@ -1655,7 +1655,7 @@
 "CALL_QUALITY_SURVEY_COMPLETION_TOAST" = "Ευχαριστούμε για τα σχόλιά σου!";
 
 /* Footer text explaining custom issue descriptions in the call quality survey */
-"CALL_QUALITY_SURVEY_CUSTOM_ISSUE_FOOTER" = "Πρόσθεσε τυχόν λεπτομέρειες σχετικές με το πρόβλημα. Οτιδήποτε κοινοποιείς εδώ θα παραμείνει ιδιωτικό και θα χρησιμοποιηθεί μόνο για τη βελτίωση των κλήσεων στο Signal.";
+"CALL_QUALITY_SURVEY_CUSTOM_ISSUE_FOOTER" = "Πρόσθεσε τυχόν λεπτομέρειες σχετικές με το πρόβλημα. Οτιδήποτε κοινοποιείς εδώ θα παραμείνει ιδιωτικό και θα χρησιμοποιηθεί μόνο για τη βελτίωση των κλήσεων στο Radar.";
 
 /* Placeholder text for the custom issue entry in the call quality survey */
 "CALL_QUALITY_SURVEY_CUSTOM_ISSUE_PLACEHOLDER" = "Περίγραψε το πρόβλημά σου";
@@ -1724,7 +1724,7 @@
 "CALL_QUALITY_SURVEY_ISSUES_SHEET_TITLE" = "Τι προβλήματα αντιμετώπισες;";
 
 /* Header text explaining the purpose of the call quality survey */
-"CALL_QUALITY_SURVEY_RATING_HEADER" = "Αυτό μας βοηθά να βελτιώσουμε τις κλήσεις στο Signal. Δεν θα αποθηκευτούν προσωπικά αναγνωρίσιμες πληροφορίες.";
+"CALL_QUALITY_SURVEY_RATING_HEADER" = "Αυτό μας βοηθά να βελτιώσουμε τις κλήσεις στο Radar. Δεν θα αποθηκευτούν προσωπικά αναγνωρίσιμες πληροφορίες.";
 
 /* Title for the initial rating screen in the call quality survey */
 "CALL_QUALITY_SURVEY_RATING_TITLE" = "Πώς ήταν η κλήση σου;";
@@ -2111,7 +2111,7 @@
 "CHAT_LIST_BACKUP_PROGRESS_VIEW_RESUME_CELLULAR_DATA_BUTTON" = "Συνέχεια";
 
 /* Message shown in an action sheet when the user tries to resume backup using cellular data. */
-"CHAT_LIST_BACKUP_PROGRESS_VIEW_RESUME_CELLULAR_DATA_MESSAGE" = "Η δημιουργία αντιγράφων ασφαλείας των πολυμέσων σου με χρήση δεδομένων κινητής τηλεφωνίας ενδέχεται να οδηγήσει σε χρεώσεις δεδομένων. Η μεταφόρτωση των αντιγράφων ασφαλείας σου ενδέχεται να διαρκέσει πολύ, επομένως κράτα το Signal ανοιχτό για να αποφύγεις διακοπές.";
+"CHAT_LIST_BACKUP_PROGRESS_VIEW_RESUME_CELLULAR_DATA_MESSAGE" = "Η δημιουργία αντιγράφων ασφαλείας των πολυμέσων σου με χρήση δεδομένων κινητής τηλεφωνίας ενδέχεται να οδηγήσει σε χρεώσεις δεδομένων. Η μεταφόρτωση των αντιγράφων ασφαλείας σου ενδέχεται να διαρκέσει πολύ, επομένως κράτα το Radar ανοιχτό για να αποφύγεις διακοπές.";
 
 /* Title for the action sheet shown when the user tries to resume backup using cellular data. */
 "CHAT_LIST_BACKUP_PROGRESS_VIEW_RESUME_CELLULAR_DATA_TITLE" = "Συνέχιση χρήσης δεδομένων κινητής τηλεφωνίας;";
@@ -2243,7 +2243,7 @@
 "CLOCK_SKEW_APP_BLOCKING_DEVICE_TIME_FORMAT" = "Η ώρα στη συσκευή σου είναι %1$@ UTC.";
 
 /* Subtitle for a screen shown when the app can't be used until the user corrects their device's date and time. */
-"CLOCK_SKEW_APP_BLOCKING_SUBTITLE" = "Το Signal δεν μπορεί να χρησιμοποιείται όσο η ημερομηνία και η ώρα στη συσκευή σου είναι λανθασμένες. Άνοιξε τις Ρυθμίσεις για να τις διορθώσεις.";
+"CLOCK_SKEW_APP_BLOCKING_SUBTITLE" = "Το Radar δεν μπορεί να χρησιμοποιείται όσο η ημερομηνία και η ώρα στη συσκευή σου είναι λανθασμένες. Άνοιξε τις Ρυθμίσεις για να τις διορθώσεις.";
 
 /* Title for a screen shown when the app can't be used until the user corrects their device's date and time. */
 "CLOCK_SKEW_APP_BLOCKING_TITLE" = "Η ημερομηνία δεν είναι ακριβής";
@@ -2462,7 +2462,7 @@
 "CONTACT_SHARE_AVATAR_ROW_LABEL" = "Φωτογραφία";
 
 /* Name of the option to share a contact's Signal profile photo. Read by VoiceOver on the option, and as the current value of the photo row when it's selected. */
-"CONTACT_SHARE_AVATAR_SIGNAL_PHOTO" = "Φωτογραφία προφίλ Signal";
+"CONTACT_SHARE_AVATAR_SIGNAL_PHOTO" = "Φωτογραφία προφίλ Radar";
 
 /* Name of the option to share a contact's photo from the phone's contacts. Read by VoiceOver on the option, and as the current value of the photo row when it's selected. */
 "CONTACT_SHARE_AVATAR_SYSTEM_CONTACT_PHOTO" = "Φωτογραφία επαφών";
@@ -2477,7 +2477,7 @@
 "CONTACT_SHARE_MESSAGE_BUTTON" = "Μήνυμα";
 
 /* Notice at the top of the 'Share Contact' view when the shared contact includes their Signal account. Embeds {{ contact name }}. */
-"CONTACT_SHARE_SIGNAL_ACCOUNT_NOTICE_FORMAT" = "Με όποιον μοιραστείς αυτό το προφίλ, θα μπορεί να στείλει μήνυμα στον χρήστη %1$@ μέσω του Signal.";
+"CONTACT_SHARE_SIGNAL_ACCOUNT_NOTICE_FORMAT" = "Με όποιον μοιραστείς αυτό το προφίλ, θα μπορεί να στείλει μήνυμα στον χρήστη %1$@ μέσω του Radar.";
 
 /* Alert body when contacts disabled while trying to share a contact. */
 "CONTACT_SHARING_NO_ACCESS_BODY" = "Το Radar χρειάζεται πρόσβαση στις επαφές σου. Πήγαινε στις Ρυθμίσεις iOS και ενεργοποίησε τις επαφές. Οι επαφές σου είναι κρυπτογραφημένες και δεν είναι ορατές στην υπηρεσία Radar.";
@@ -4698,10 +4698,10 @@
 "GROUP_NAME_EDUCATION_SHEET_BULLET_1" = "Να προσέχεις για ομάδες που υποδύονται οργανισμούς και επιχειρήσεις";
 
 /* Second bullet point for the explainer sheet for group names */
-"GROUP_NAME_EDUCATION_SHEET_BULLET_2" = "Το Signal δεν μπορεί να επαληθεύσει ονόματα και φωτογραφίες";
+"GROUP_NAME_EDUCATION_SHEET_BULLET_2" = "Το Radar δεν μπορεί να επαληθεύσει ονόματα και φωτογραφίες";
 
 /* Third bullet point for the explainer sheet for group names */
-"GROUP_NAME_EDUCATION_SHEET_BULLET_3" = "Το Signal δεν θα επικοινωνήσει ποτέ μαζί σου για τον κωδικό εγγραφής, το PIN σου ή το κλειδί ανάκτησής σου";
+"GROUP_NAME_EDUCATION_SHEET_BULLET_3" = "Το Radar δεν θα επικοινωνήσει ποτέ μαζί σου για τον κωδικό εγγραφής, το PIN σου ή το κλειδί ανάκτησής σου";
 
 /* Fourth bullet point for the explainer sheet for group names */
 "GROUP_NAME_EDUCATION_SHEET_BULLET_4" = "Μην μοιράζεσαι προσωπικές πληροφορίες με άτομα που δεν γνωρίζεις";
@@ -5266,6 +5266,9 @@
 
 /* Placeholder text displayed in empty input box in chat screen. */
 "INPUT_TOOLBAR_MESSAGE_PLACEHOLDER" = "Μήνυμα";
+/* accessibility label for the button which show up send payemnt screen */
+"INPUT_TOOLBAR_PAYMENTS_BUTTON_ACCESSIBILITY_LABEL" = "Αποστολή πληρωμής";
+
 
 /* accessibility label for the button which shows the sticker picker */
 "INPUT_TOOLBAR_STICKER_BUTTON_ACCESSIBILITY_LABEL" = "Αυτοκόλλητα";
@@ -5490,7 +5493,7 @@
 "LINKED_DEVICE_INFO_SHEET_BULLET_3" = "Η διαχείριση ορισμένων ρυθμίσεων λογαριασμού πραγματοποιείται αποκλειστικά στην κύρια συσκευή σου, συμπεριλαμβανομένων των ρυθμίσεων λογαριασμού και των αντιγράφων ασφαλείας.";
 
 /* Lead paragraph for a sheet explaining linked devices. The text within the <bold></bold> tags is styled bold. */
-"LINKED_DEVICE_INFO_SHEET_HEADER" = "<bold>Οι συνδεδεμένες συσκευές</bold> σού επιτρέπουν να έχεις ασφαλή πρόσβαση στον λογαριασμό και στα μηνύματά σου στο Signal από οποιαδήποτε από τις επιπλέον συσκευές σου.";
+"LINKED_DEVICE_INFO_SHEET_HEADER" = "<bold>Οι συνδεδεμένες συσκευές</bold> σού επιτρέπουν να έχεις ασφαλή πρόσβαση στον λογαριασμό και στα μηνύματά σου στο Radar από οποιαδήποτε από τις επιπλέον συσκευές σου.";
 
 /* Shown in a banner when you tap the 'New Chat' icon at the top of the list of chats. */
 "LINKED_DEVICE_MANAGE_CONTACTS_BANNER" = "Η διαχείριση επαφών τηλεφώνου δεν υποστηρίζεται πλέον στις συνδεδεμένες συσκευές. Αυτή η συσκευή θα συνεχίσει να συγχρονίζει τυχόν αλλαγές στη λίστα επαφών σου από το Radar στην κύρια συσκευή σου.";
@@ -5556,7 +5559,7 @@
 "LINKING_DEVICE_FAILED_TITLE" = "Δεν ήταν δυνατή η σύνδεση της συσκευής";
 
 /* Shown when trying to link a device to an account but that device is out of date and must first update its version of Signal. */
-"LINKING_DEVICE_OUT_OF_DATE" = "Η άλλη συσκευή σου χρησιμοποιεί μια παλιά έκδοση του Signal. Πρέπει να ενημερώσεις το Signal σε αυτή τη συσκευή πριν μπορέσεις να το συνδέσεις.";
+"LINKING_DEVICE_OUT_OF_DATE" = "Η άλλη συσκευή σου χρησιμοποιεί μια παλιά έκδοση του Radar. Πρέπει να ενημερώσεις το Radar σε αυτή τη συσκευή πριν μπορέσεις να το συνδέσεις.";
 
 /* Progress label when the message loading has nearly completed during the device linking process */
 "LINKING_SYNCING_FINALIZING" = "Ολοκλήρωση μεταφοράς μηνύματος...";
@@ -5580,7 +5583,7 @@
 "LOCAL_BACKUP_SETTINGS_CREATE_NEW_KEY_WARNING_SHEET_BODY" = "Η δημιουργία ενός νέου κλειδιού είναι απαραίτητη μόνο εάν κάποιος άλλος γνωρίζει το κλειδί σου. Τα αντίγραφα ασφαλείας στη συσκευή πρέπει πρώτα να απενεργοποιηθούν για να δημιουργηθεί ένα νέο κλειδί.\n\nΑφού απενεργοποιήσεις τα αντίγραφα ασφαλείας στη συσκευή και δημιουργήσεις ένα νέο κλειδί, θα πρέπει να ενεργοποιήσεις ξανά τα αντίγραφα ασφαλείας στη συσκευή.";
 
 /* Body for an error sheet shown when the user's folder choice does not contain a backup file. */
-"LOCAL_BACKUPS_MISSING_BACKUP_ACTION_SHEET_BODY" = "Δεν βρέθηκε αντίγραφο ασφαλείας Signal στον επιλεγμένο φάκελο. Επίλεξε διαφορετικό φάκελο.";
+"LOCAL_BACKUPS_MISSING_BACKUP_ACTION_SHEET_BODY" = "Δεν βρέθηκε αντίγραφο ασφαλείας Radar στον επιλεγμένο φάκελο. Επίλεξε διαφορετικό φάκελο.";
 
 /* Title for an error sheet shown when the user's folder choice does not contain a backup file. */
 "LOCAL_BACKUPS_MISSING_BACKUP_ACTION_SHEET_TITLE" = "Δεν βρέθηκε αντίγραφο ασφαλείας";
@@ -5628,7 +5631,7 @@
 "LOCAL_FILE_BACKUP_ONBOARDING_INTRO_BULLET_3" = "Απενεργοποίηση αντιγράφων ασφαλείας ανά πάσα στιγμή";
 
 /* Subtitle for a view introducing local file backups during the onboarding flow. */
-"LOCAL_FILE_BACKUP_ONBOARDING_INTRO_SUBTITLE" = "Δημιούργησε αντίγραφα ασφαλείας των μηνυμάτων σου σε έναν φάκελο στη συσκευή σου. To αντίγραφo ασφαλείας σου είναι κρυπτογραφημένο από άκρο σε άκρο και μπορείς να το επαναφέρεις εγκαθιστώντας ένα νέο αντίγραφο του Signal και επιλέγοντας «Ανάκτηση ή Μεταφορά».";
+"LOCAL_FILE_BACKUP_ONBOARDING_INTRO_SUBTITLE" = "Δημιούργησε αντίγραφα ασφαλείας των μηνυμάτων σου σε έναν φάκελο στη συσκευή σου. To αντίγραφo ασφαλείας σου είναι κρυπτογραφημένο από άκρο σε άκρο και μπορείς να το επαναφέρεις εγκαθιστώντας ένα νέο αντίγραφο του Radar και επιλέγοντας «Ανάκτηση ή Μεταφορά».";
 
 /* Title for a view introducing local file backups during the onboarding flow. */
 "LOCAL_FILE_BACKUP_ONBOARDING_INTRO_TITLE" = "Αντίγραφα ασφαλείας στη συσκευή";
@@ -5643,10 +5646,10 @@
 "LOCAL_FILE_BACKUPS_CHOOSE_FOLDER_TITLE" = "Επιλογή φακέλου";
 
 /* Warning shown when a user tries to enable local file backups with optimize media enabled */
-"LOCAL_FILE_BACKUPS_OPTIMIZE_MEDIA_WARNING_ACTION_SHEET" = "Έχεις ενεργοποιήσει την επιλογή «Βελτιστοποίηση αποθηκευτικού χώρου Signal». Αν θέλεις να συμπεριλάβεις όλα τα αρχεία πολυμέσων στα αντίγραφο ασφαλείας της συσκευής σου, απενεργοποίησε τη ρύθμιση.";
+"LOCAL_FILE_BACKUPS_OPTIMIZE_MEDIA_WARNING_ACTION_SHEET" = "Έχεις ενεργοποιήσει την επιλογή «Βελτιστοποίηση αποθηκευτικού χώρου Radar». Αν θέλεις να συμπεριλάβεις όλα τα αρχεία πολυμέσων στα αντίγραφο ασφαλείας της συσκευής σου, απενεργοποίησε τη ρύθμιση.";
 
 /* Message for a sheet warning the user about enabling Optimize Storage with local backups enabled. */
-"LOCAL_FILE_BACKUPS_OPTIMIZE_MEDIA_WARNING_ACTION_SHEET_2_BODY" = "Η ενεργοποίηση της επιλογής «Βελτιστοποίηση αποθηκευτικού χώρου Signal» θα διαγράψει τα παλιά αρχεία πολυμέσων από τη συσκευή σου. Μπορείς να τα κατεβάσεις ξανά ανά πάσα στιγμή. Επίσης, θα διαγράψει τα παλιά αρχεία πολυμέσων από το αντίγραφο ασφαλείας στη συσκευή σου.";
+"LOCAL_FILE_BACKUPS_OPTIMIZE_MEDIA_WARNING_ACTION_SHEET_2_BODY" = "Η ενεργοποίηση της επιλογής «Βελτιστοποίηση αποθηκευτικού χώρου Radar» θα διαγράψει τα παλιά αρχεία πολυμέσων από τη συσκευή σου. Μπορείς να τα κατεβάσεις ξανά ανά πάσα στιγμή. Επίσης, θα διαγράψει τα παλιά αρχεία πολυμέσων από το αντίγραφο ασφαλείας στη συσκευή σου.";
 
 /* Title for a sheet warning the user about enabling Optimize Storage with local backups enabled. */
 "LOCAL_FILE_BACKUPS_OPTIMIZE_MEDIA_WARNING_ACTION_SHEET_2_TITLE" = "Τα αρχεία πολυμέσων θα διαγραφούν από το αντίγραφο ασφαλείας που βρίσκεται στη συσκευή σου";
@@ -5676,10 +5679,10 @@
 "LONG_TEXT_VIEW_TITLE" = "Μήνυμα";
 
 /* Message for a sheet warning the user that their device is low on storage space. Embeds 1:{{ the localized name of the user's device model, e.g. iPhone }}; 2:{{ an amount of storage space as a file size, e.g. 1 GB }}. */
-"LOW_DISK_SPACE_WARNING_SHEET_MESSAGE_FORMAT" = "Ο αποθηκευτικός χώρος εξαντλείται στο %1$@ σου. Αν γεμίσει, το Signal θα σταματήσει να λειτουργεί και ενδέχεται να χάσεις δεδομένα. Απελευθέρωσε τουλάχιστον %2$@ σε αυτή τη συσκευή.";
+"LOW_DISK_SPACE_WARNING_SHEET_MESSAGE_FORMAT" = "Ο αποθηκευτικός χώρος εξαντλείται στο %1$@ σου. Αν γεμίσει, το Radar θα σταματήσει να λειτουργεί και ενδέχεται να χάσεις δεδομένα. Απελευθέρωσε τουλάχιστον %2$@ σε αυτή τη συσκευή.";
 
 /* A suggestion for freeing up storage space, on a sheet warning the user that their device is low on storage space. */
-"LOW_DISK_SPACE_WARNING_SHEET_SUGGESTION_DELETE_CAMERA_ROLL_MEDIA" = "Διάγραψε μεγάλα βίντεο από την εφαρμογή Φωτογραφιών, το Signal ή άλλες εφαρμογές μηνυμάτων";
+"LOW_DISK_SPACE_WARNING_SHEET_SUGGESTION_DELETE_CAMERA_ROLL_MEDIA" = "Διάγραψε μεγάλα βίντεο από την εφαρμογή Φωτογραφιών, το Radar ή άλλες εφαρμογές μηνυμάτων";
 
 /* A suggestion for freeing up storage space, on a sheet warning the user that their device is low on storage space. */
 "LOW_DISK_SPACE_WARNING_SHEET_SUGGESTION_DELETE_DOWNLOADED_MEDIA" = "Διάγραψε μουσική που έχεις κατεβάσει ή άλλα πολυμέσα";
@@ -5844,7 +5847,7 @@
 "MEMBER_LABEL_VIEW_TITLE" = "Ετικέτα μέλους";
 
 /* A one-time confirmation that you, as an admin, want to delete for everyone */
-"MESSAGE_ACTION_ADMIN_DELETE_FOR_EVERYONE_CONFIRMATION" = "Τα μέλη της ομάδας που χρησιμοποιούν τις πιο πρόσφατες εκδόσεις του Signal θα δουν ότι διέγραψες αυτά τα μηνύματα.";
+"MESSAGE_ACTION_ADMIN_DELETE_FOR_EVERYONE_CONFIRMATION" = "Τα μέλη της ομάδας που χρησιμοποιούν τις πιο πρόσφατες εκδόσεις του Radar θα δουν ότι διέγραψες αυτά τα μηνύματα.";
 
 /* Action sheet button title */
 "MESSAGE_ACTION_COPY_TEXT" = "Αντιγραφή κειμένου μηνύματος";
@@ -6045,7 +6048,7 @@
 "MESSAGE_REQUEST_CONFIRM_ACCEPT_MESSAGE" = "Να αποδέχεσαι πληρωμές μόνο από άτομα που εμπιστεύεσαι. %1$@, να επικοινωνήσει μαζί σου για κωδικό εγγραφής, το PIN σου ή το κλειδί ανάκτησής σου.";
 
 /* Embedded text in the message for an action sheet asking the user to confirm if they want to accept a message request. */
-"MESSAGE_REQUEST_CONFIRM_ACCEPT_MESSAGE_EMBEDDED_BOLD_TEXT" = "Το Signal δεν θα το κάνει ποτέ";
+"MESSAGE_REQUEST_CONFIRM_ACCEPT_MESSAGE_EMBEDDED_BOLD_TEXT" = "Το Radar δεν θα το κάνει ποτέ";
 
 /* Title for an action sheet asking the user to confirm if they want to accept a message request */
 "MESSAGE_REQUEST_CONFIRM_ACCEPT_TITLE" = "Αποδοχή αιτήματος;";
@@ -6492,13 +6495,13 @@
 "NO_OTHER_GROUPS_IN_COMMON" = "Καμμία άλλη κοινή ομάδα";
 
 /* Shown in place of the text input box in a conversation when the user is no longer registered can't send messages. The embedded value is 'Re-link' (translated via NOT_LINKED_BOTTOM_RELINK), and it will be formatted as a tappable link. */
-"NOT_LINKED_BOTTOM" = "Αυτή η συσκευή δεν είναι πια συνδεδεμένη. %1$@ για να συνεχίσεις να χρησιμοποιείς το Signal σε αυτήν τη συσκευή.";
+"NOT_LINKED_BOTTOM" = "Αυτή η συσκευή δεν είναι πια συνδεδεμένη. %1$@ για να συνεχίσεις να χρησιμοποιείς το Radar σε αυτήν τη συσκευή.";
 
 /* Shown in place of the text input box in a conversation when the user is no longer registered can't send messages. This value is a tappable link embedded in a larger sentence. */
 "NOT_LINKED_BOTTOM_RELINK" = "Επανασύνδεση";
 
 /* Shown in place of the text input box in a conversation when the user is no longer registered can't send messages. The embedded value is 'Re-register' (translated via NOT_REGISTERED_BOTTOM_REREGISTER), and it will be formatted as a tappable link. */
-"NOT_REGISTERED_BOTTOM" = "Αυτή η συσκευή δεν είναι πλέον καταχωρημένη. %1$@ για να συνεχίσεις να χρησιμοποιείς το Signal.";
+"NOT_REGISTERED_BOTTOM" = "Αυτή η συσκευή δεν είναι πλέον καταχωρημένη. %1$@ για να συνεχίσεις να χρησιμοποιείς το Radar.";
 
 /* Shown in place of the text input box in a conversation when the user is no longer registered can't send messages. This value is a tappable link embedded in a larger sentence. */
 "NOT_REGISTERED_BOTTOM_REREGISTER" = "Επανεγγραφή";
@@ -6510,13 +6513,13 @@
 "NOTE_TO_SELF" = "Μήνυμα σε μένα";
 
 /* Body for a notification shown when Signal can't fetch messages because the device's date and time are incorrect. */
-"NOTIFICATION_BODY_CLOCK_SKEW" = "Το Signal δεν μπορεί να λαμβάνει μηνύματα όσο η ημερομηνία και η ώρα στη συσκευή σου είναι λανθασμένες. Άνοιξε τις Ρυθμίσεις για να τις διορθώσεις.";
+"NOTIFICATION_BODY_CLOCK_SKEW" = "Το Radar δεν μπορεί να λαμβάνει μηνύματα όσο η ημερομηνία και η ώρα στη συσκευή σου είναι λανθασμένες. Άνοιξε τις Ρυθμίσεις για να τις διορθώσεις.";
 
 /* Body for a notification representing a message request. */
 "NOTIFICATION_BODY_INCOMING_MESSAGE_REQUEST" = "Αίτημα μηνύματος";
 
 /* Body for a notification shown when Signal can't fetch messages because the device is low on storage space. */
-"NOTIFICATION_BODY_LOW_STORAGE_SPACE" = "Ίσως έχεις νέα μηνύματα, αλλά η συσκευή σου δεν διαθέτει αρκετό χώρο αποθήκευσης για να λειτουργήσει το Signal. Πάτα για περισσότερες πληροφορίες.";
+"NOTIFICATION_BODY_LOW_STORAGE_SPACE" = "Ίσως έχεις νέα μηνύματα, αλλά η συσκευή σου δεν διαθέτει αρκετό χώρο αποθήκευσης για να λειτουργήσει το Radar. Πάτα για περισσότερες πληροφορίες.";
 
 /* Lock screen notification text presented after user powers on their device without unlocking. Embeds {{device model}} (either 'iPad' or 'iPhone') */
 "NOTIFICATION_BODY_PHONE_LOCKED_FORMAT" = "Ίσως να έχεις λάβει μηνύματα κατά την επανεκκίνηση του %1$@ σου.";
@@ -6615,10 +6618,10 @@
 "ONBOARDING_CHOOSE_BACKUP_SHEET_TITLE" = "Επίλεξε ένα αντίγραφο ασφαλείας για επαναφορά";
 
 /* The body for the device transfer 'choice' view 'restore backup' option */
-"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_BODY" = "Επανάφερε τον λογαριασμό και τα μηνύματά σου από τα αντίγραφα ασφαλείας Radar/Radar";
+"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_BODY" = "Επανάφερε τον λογαριασμό και τα μηνύματά σου από τα αντίγραφα ασφαλείας Signal/Radar";
 
 /* The title for the device transfer 'choice' view 'restore backup' option */
-"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_TITLE" = "Επαναφορά: Ασφαλή αντίγραφα Radar/Radar";
+"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_TITLE" = "Επαναφορά: Ασφαλή αντίγραφα Signal/Radar";
 
 /* Body for a sheet warning users about skipping restore. */
 "ONBOARDING_CHOOSE_RESTORE_METHOD_CONFIRM_SKIP_RESTORE_BODY" = "Αν παραλείψεις την επαναφορά τώρα, δεν θα μπορείς να κάνεις επαναφορά αργότερα. Εάν ενεργοποιήσεις ξανά τα αντίγραφα ασφαλείας σε αυτή τη συσκευή, το τρέχον αντίγραφο ασφαλείας θα αντικατασταθεί από το νέο ιστορικό μηνυμάτων σου.";
@@ -6696,7 +6699,7 @@
 "ONBOARDING_MODE_SWITCH_EXPLANATION_PROVISIONING" = "Πατώντας \"Εγγραφή iPad\" θα μπορέσεις να δημιουργήσεις ένα καινούριο λογαριασμό Radar ή να μεταφέρεις ένα προϋπάρχοντα λογαριασμό σε αυτό το iPad. Αυτό θα απενεργοποιήσει το Radar σε οποιαδήποτε άλλη συσκευή εγγεγραμμένη με τον ίδιο αριθμό τηλεφώνου.";
 
 /* explanation to the user they're switching from registering to linking flow */
-"ONBOARDING_MODE_SWITCH_EXPLANATION_REGISTERING" = "Πατώντας «Σύνδεση αυτής της συσκευής» θα μπορείς να συνδέσεις αυτή τη συσκευή με έναν υπάρχοντα λογαριασμό στο Signal.";
+"ONBOARDING_MODE_SWITCH_EXPLANATION_REGISTERING" = "Πατώντας «Σύνδεση αυτής της συσκευής» θα μπορείς να συνδέσεις αυτή τη συσκευή με έναν υπάρχοντα λογαριασμό στο Radar.";
 
 /* header text indicating to the user they're switching from linking to registering flow */
 "ONBOARDING_MODE_SWITCH_TITLE_PROVISIONING" = "Εγγραφή του iPad";
@@ -6783,13 +6786,13 @@
 "ONBOARDING_SIGN_UP_USE_SIGNAL_ACCOUNT_BUTTON_TITLE" = "Use my Signal account";
 
 /* Explanation of 'do not have old device' flow for the 'Restore or Transfer' prompt */
-"ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_BODY" = "Ή επανεγκαθιστάς το Radar/Radar στην ίδια συσκευή";
+"ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_BODY" = "Ή επανεγκαθιστάς το Signal/Radar στην ίδια συσκευή";
 
 /* Title for the 'do not have my old device' choice of the 'Restore or Transfer' prompt */
 "ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_TITLE" = "Δεν έχω το παλιό μου τηλέφωνο";
 
 /* Explanation of 'have old device' flow for the 'Restore or Transfer' prompt */
-"ONBOARDING_SPLASH_HAVE_OLD_DEVICE_BODY" = "Σάρωσε έναν κωδικό QR από τον τρέχοντα λογαριασμό σου στο Radar/Radar για να ξεκινήσεις γρήγορα";
+"ONBOARDING_SPLASH_HAVE_OLD_DEVICE_BODY" = "Σάρωσε έναν κωδικό QR από τον τρέχοντα λογαριασμό σου στο Signal/Radar για να ξεκινήσεις γρήγορα";
 
 /* Title for the 'have my old device' choice of the 'Restore or Transfer' prompt */
 "ONBOARDING_SPLASH_HAVE_OLD_DEVICE_TITLE" = "Έχω το παλιό μου τηλέφωνο";
@@ -7033,7 +7036,7 @@ Send money securely.";
 "OVERSIZE_TEXT_UNAVAILABLE_SHEET_TITLE" = "Το πλήρες μήνυμα δεν είναι διαθέσιμο";
 
 /* The name of the Signal app, used as the title for an entry in a user's password manager for their Signal Recovery Key. Should be localized with the same value as the app's name in the iOS App Store. */
-"PASSWORD_MANAGER_SIGNAL_APP_NAME" = "Signal Private Messenger";
+"PASSWORD_MANAGER_SIGNAL_APP_NAME" = "Radar Private Messenger";
 
 /* Header title for bank payment details screen */
 "PAYMENT_DETAILS_BANK_TITLE" = "Τραπεζική μεταφορά";
@@ -7924,10 +7927,10 @@ Send money securely.";
 "PROFILE_NAME_CHANGE_SYSTEM_NONCONTACT_FORMAT" = "Ο/Η %1$@ άλλαξε το όνομα προφίλ του/-ης σε %2$@.";
 
 /* First bullet point for the explainer sheet for profile names */
-"PROFILE_NAME_EDUCATION_SHEET_BULLET_1" = "Το Signal δεν μπορεί να επαληθεύσει ονόματα και φωτογραφίες";
+"PROFILE_NAME_EDUCATION_SHEET_BULLET_1" = "Το Radar δεν μπορεί να επαληθεύσει ονόματα και φωτογραφίες";
 
 /* Second bullet point for the explainer sheet for profile names */
-"PROFILE_NAME_EDUCATION_SHEET_BULLET_2" = "Το Signal δεν θα επικοινωνήσει ποτέ μαζί σου για τον κωδικό εγγραφής, το PIN σου ή το κλειδί ανάκτησής σου";
+"PROFILE_NAME_EDUCATION_SHEET_BULLET_2" = "Το Radar δεν θα επικοινωνήσει ποτέ μαζί σου για τον κωδικό εγγραφής, το PIN σου ή το κλειδί ανάκτησής σου";
 
 /* Third bullet point for the explainer sheet for profile names */
 "PROFILE_NAME_EDUCATION_SHEET_BULLET_3" = "Να προσέχεις για λογαριασμούς που υποδύνται άλλους";
@@ -8035,7 +8038,7 @@ Send money securely.";
 "QUICK_RESTORE_URL_OPENED_ACTION_SHEET_EXTERNAL_URL_ACTION_TITLE" = "Σκανάρισμα κωδικού QR";
 
 /* Message for an action sheet telling users how to use quick restore, when trying to open an external quick restore URL. */
-"QUICK_RESTORE_URL_OPENED_ACTION_SHEET_EXTERNAL_URL_MESSAGE" = "Για να μεταφέρεις αυτόν τον λογαριασμό σε μια νέα συσκευή, πάτα «Συνέχεια» και σάρωσε ξανά τον κωδικό QR με την κάμερα Signal. Βεβαιώσου ότι σαρώνεις μόνο κωδικούς QR που προέρχονται απευθείας από το Signal.";
+"QUICK_RESTORE_URL_OPENED_ACTION_SHEET_EXTERNAL_URL_MESSAGE" = "Για να μεταφέρεις αυτόν τον λογαριασμό σε μια νέα συσκευή, πάτα «Συνέχεια» και σάρωσε ξανά τον κωδικό QR με την κάμερα Radar. Βεβαιώσου ότι σαρώνεις μόνο κωδικούς QR που προέρχονται απευθείας από το Radar.";
 
 /* Accessibility label stating the author of the message to which you are replying. Embeds: {{ the author of the message to which you are replying }} {{ original message }}. */
 "QUOTED_REPLY_ACCESSIBILITY_LABEL_FORMAT" = "Απάντηση προς %1$@. %2$@";
@@ -8203,7 +8206,7 @@ Send money securely.";
 "REGISTER_WITHOUT_NUMBER" = "Εγγραφή χωρίς αριθμό";
 
 /* Short description for a sheet warning users about an incorrect recovery key used for registration. */
-"REGISTRATION_BACKUP_REGISTRATION_ERROR_INCORRECT_KEY_BODY" = "Βεβαιώσου ότι εγγράφεσαι με τον ίδιο αριθμό τηλεφώνου και κλειδί ανάκτησης 64 χαρακτήρων που αποθήκευσες κατά την ενεργοποίηση των αντιγράφων ασφαλείας Signal. Τα Αντίγραφα ασφαλείας δεν μπορούν να ανακτηθούν χωρίς αυτό το κλειδί.";
+"REGISTRATION_BACKUP_REGISTRATION_ERROR_INCORRECT_KEY_BODY" = "Βεβαιώσου ότι εγγράφεσαι με τον ίδιο αριθμό τηλεφώνου και κλειδί ανάκτησης 64 χαρακτήρων που αποθήκευσες κατά την ενεργοποίηση των αντιγράφων ασφαλείας Radar. Τα Αντίγραφα ασφαλείας δεν μπορούν να ανακτηθούν χωρίς αυτό το κλειδί.";
 
 /* Title for a sheet warning users about an incorrect recovery key used for registration. */
 "REGISTRATION_BACKUP_REGISTRATION_ERROR_INCORRECT_KEY_TITLE" = "Λανθασμένο κλειδί ανάκτησης";
@@ -8212,7 +8215,7 @@ Send money securely.";
 "REGISTRATION_BACKUP_REGISTRATION_ERROR_INCORRECT_KEY_TRY_PIN_ACTION" = "Ενεργοποίηση με άλλον τρόπο";
 
 /* Message body for a sheet asking users if they would rather use PIN/SMS for registration. */
-"REGISTRATION_BACKUP_REGISTRATION_ERROR_INCORRECT_KEY_TRY_PIN_MESSAGE" = "Μπορείς να ενεργοποιήσεις τον λογαριασμό σου επαληθεύοντας τον μέσω ενός κωδικού SMS που θα σου στείλει η εφαρμογή Signal ή εισαγάγοντας το PIN σου. Αφού τον ενεργοποιήσεις, μπορείς να δοκιμάσεις ξανά να επαναφέρεις το αντίγραφο ασφαλείας σου χρησιμοποιώντας το κλειδί ανάκτησης.";
+"REGISTRATION_BACKUP_REGISTRATION_ERROR_INCORRECT_KEY_TRY_PIN_MESSAGE" = "Μπορείς να ενεργοποιήσεις τον λογαριασμό σου επαληθεύοντας τον μέσω ενός κωδικού SMS που θα σου στείλει η εφαρμογή Radar ή εισαγάγοντας το PIN σου. Αφού τον ενεργοποιήσεις, μπορείς να δοκιμάσεις ξανά να επαναφέρεις το αντίγραφο ασφαλείας σου χρησιμοποιώντας το κλειδί ανάκτησης.";
 
 /* Title for a sheet asking users if they would rather use PIN/SMS for registration. */
 "REGISTRATION_BACKUP_REGISTRATION_ERROR_INCORRECT_KEY_TRY_PIN_TITLE" = "Επαλήθευση με SMS ή PIN;";
@@ -8269,7 +8272,7 @@ Send money securely.";
 "REGISTRATION_BACKUP_RESTORE_ERROR_LOCAL_BACKUP_LOCATION_TITLE" = "Δεν είναι δυνατή η επαναφορά του αντιγράφου ασφαλείας";
 
 /* Message for a sheet telling the user that their phone number is mismatched with their recovery key used for making a local backup */
-"REGISTRATION_BACKUP_RESTORE_ERROR_MISMATCHED_LOCAL_BACKUP_MESSAGE" = "Το αντίγραφο ασφαλείας που προσπαθείς να επαναφέρεις δημιουργήθηκε χρησιμοποιώντας διαφορετικό λογαριασμό Signal. Για να επαναφέρεις αυτό το αντίγραφο ασφαλείας, πρέπει να χρησιμοποιήσεις τον ίδιο αριθμό τηλεφώνου και τον ίδιο κωδικό ανάκτησης που αποθηκεύσες κατά την ενεργοποίηση των αντιγράφων ασφαλείας στη συσκευή.";
+"REGISTRATION_BACKUP_RESTORE_ERROR_MISMATCHED_LOCAL_BACKUP_MESSAGE" = "Το αντίγραφο ασφαλείας που προσπαθείς να επαναφέρεις δημιουργήθηκε χρησιμοποιώντας διαφορετικό λογαριασμό Radar. Για να επαναφέρεις αυτό το αντίγραφο ασφαλείας, πρέπει να χρησιμοποιήσεις τον ίδιο αριθμό τηλεφώνου και τον ίδιο κωδικό ανάκτησης που αποθηκεύσες κατά την ενεργοποίηση των αντιγράφων ασφαλείας στη συσκευή.";
 
 /* Body for a sheet warning users about a network error during backup restore. */
 "REGISTRATION_BACKUP_RESTORE_ERROR_NETWORK_BODY" = "Δεν είναι δυνατή η επαναφορά του αντιγράφου ασφαλείας σου προς το παρόν. Έλεγξε τη σύνδεσή σου στο διαδίκτυο και ξαναδοκίμασε.";
@@ -8761,7 +8764,7 @@ Send money securely.";
 "RING_ON_CONFIRMATION_TOAST_LABEL" = "Κουδούνισμα ενεργό";
 
 /* Message shown in an action sheet when attempting to disable PIN, but Backups is enabled. */
-"ROTATE_AEP_ACTION_BACKUPS_DISABLE_REQUIRED" = "Πρέπει να απενεργοποιήσεις τα ασφαλή αντίγραφα Signal προτού συνεχίσεις.";
+"ROTATE_AEP_ACTION_BACKUPS_DISABLE_REQUIRED" = "Πρέπει να απενεργοποιήσεις τα ασφαλή αντίγραφα Radar προτού συνεχίσεις.";
 
 /* button title to confirm adding a recipient when their safety number has recently changed */
 "SAFETY_NUMBER_CHANGED_CONFIRM_ADD_MEMBER_ACTION" = "Προσθήκη παρ' όλα αυτά";
@@ -8803,13 +8806,13 @@ Send money securely.";
 "SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_BUTTON_VERIFYING" = "Επαλήθευση κρυπτογράφησης…";
 
 /* Body for a sheet introducing Key Transparency. */
-"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_EDUCATION_SHEET_BODY" = "Για τα άτομα με τα οποία έχεις συνδεθεί μέσω αριθμού τηλεφώνου, το Signal μπορεί να επιβεβαιώσει αυτόματα εάν η σύνδεση είναι ασφαλής χρησιμοποιώντας μια διαδικασία που ονομάζεται διαφάνεια κλειδιού. Για επιπλέον ασφάλεια, μπορείς ακόμα να επαληθεύσεις τις συνδέσεις χειροκίνητα χρησιμοποιώντας έναν κωδικό QR ή ή συγκρίνοντας τους αριθμούς ασφαλείας.";
+"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_EDUCATION_SHEET_BODY" = "Για τα άτομα με τα οποία έχεις συνδεθεί μέσω αριθμού τηλεφώνου, το Radar μπορεί να επιβεβαιώσει αυτόματα εάν η σύνδεση είναι ασφαλής χρησιμοποιώντας μια διαδικασία που ονομάζεται διαφάνεια κλειδιού. Για επιπλέον ασφάλεια, μπορείς ακόμα να επαληθεύσεις τις συνδέσεις χειροκίνητα χρησιμοποιώντας έναν κωδικό QR ή ή συγκρίνοντας τους αριθμούς ασφαλείας.";
 
 /* Title for a sheet introducing Key Transparency. */
-"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_EDUCATION_SHEET_TITLE" = "Το Signal μπορεί πλέον να επαληθεύει αυτόματα την κρυπτογράφηση";
+"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_EDUCATION_SHEET_TITLE" = "Το Radar μπορεί πλέον να επαληθεύει αυτόματα την κρυπτογράφηση";
 
 /* Body for a sheet explaining that encryption auto-verification did not succeed. Embeds {{ 1: the contact's name }}. */
-"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_FAILURE_SHEET_BODY_FORMAT" = "Το Signal δεν μπορεί να επαληθεύσει αυτόματα την κρυπτογράφηση για αυτήν τη συνομιλία. Αυτό πιθανότατα οφείλεται στο γεγονός ότι ο χρήστης %1$@ άλλαξε τον αριθμό τηλεφώνου του ή τις ρυθμίσεις απορρήτου του τηλεφώνου του. Επαλήθευσε την κρυπτογράφηση από άκρο σε άκρο χειροκίνητα συγκρίνοντας τους αριθμούς στην προηγούμενη οθόνη ή σαρώνοντας τον κωδικό στη συσκευή τους.";
+"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_FAILURE_SHEET_BODY_FORMAT" = "Το Radar δεν μπορεί να επαληθεύσει αυτόματα την κρυπτογράφηση για αυτήν τη συνομιλία. Αυτό πιθανότατα οφείλεται στο γεγονός ότι ο χρήστης %1$@ άλλαξε τον αριθμό τηλεφώνου του ή τις ρυθμίσεις απορρήτου του τηλεφώνου του. Επαλήθευσε την κρυπτογράφηση από άκρο σε άκρο χειροκίνητα συγκρίνοντας τους αριθμούς στην προηγούμενη οθόνη ή σαρώνοντας τον κωδικό στη συσκευή τους.";
 
 /* Title for a sheet explaining that encryption auto-verification did not succeed. */
 "SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_FAILURE_SHEET_TITLE" = "Η αυτόματη επαλήθευση δεν είναι πλέον διαθέσιμη για αυτήν τη συνομιλία";
@@ -8821,13 +8824,13 @@ Send money securely.";
 "SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_HEADER" = "Αυτόματη επαλήθευση κλειδιού";
 
 /* Body for a sheet explaining that encryption auto-verification is not available. */
-"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_NOT_AVAILABLE_SHEET_BODY" = "Το Signal μπορεί να επαληθεύσει αυτόματα την κρυπτογράφηση μόνο σε συνομιλίες όπου έχεις συνδεθεί με κάποιον χρήστη μέσω ενός αριθμού τηλεφώνου. Εάν η συνομιλία ξεκίνησε με όνομα χρήστη ή μια κοινή ομάδα, επαλήθευσε την κρυπτογράφηση από άκρο σε άκρο συγκρίνοντας τους αριθμούς στην προηγούμενη οθόνη ή σαρώνοντας τον κωδικό στη συσκευή τους.";
+"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_NOT_AVAILABLE_SHEET_BODY" = "Το Radar μπορεί να επαληθεύσει αυτόματα την κρυπτογράφηση μόνο σε συνομιλίες όπου έχεις συνδεθεί με κάποιον χρήστη μέσω ενός αριθμού τηλεφώνου. Εάν η συνομιλία ξεκίνησε με όνομα χρήστη ή μια κοινή ομάδα, επαλήθευσε την κρυπτογράφηση από άκρο σε άκρο συγκρίνοντας τους αριθμούς στην προηγούμενη οθόνη ή σαρώνοντας τον κωδικό στη συσκευή τους.";
 
 /* Title for a sheet explaining that encryption auto-verification is not available. */
 "SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_NOT_AVAILABLE_SHEET_TITLE" = "Η αυτόματη επαλήθευση δεν είναι διαθέσιμη για αυτήν τη συνομιλία";
 
 /* Body for a sheet explaining that encryption auto-verification succeeded. */
-"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_SUCCESS_SHEET_BODY" = "Για τις επαφές με τις οποίες έχεις συνδεθεί μέσω αριθμού τηλεφώνου, το Signal μπορεί να επιβεβαιώσει αυτόματα εάν η σύνδεση είναι ασφαλής χρησιμοποιώντας μια διαδικασία που ονομάζεται διαφάνεια κλειδιού. Για πρόσθετη ασφάλεια, επαλήθευσε την κρυπτογράφηση από άκρο σε άκρο χειροκίνητα συγκρίνοντας τους αριθμούς στην προηγούμενη οθόνη ή σαρώνοντας τον κωδικό στη συσκευή τους.";
+"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_SUCCESS_SHEET_BODY" = "Για τις επαφές με τις οποίες έχεις συνδεθεί μέσω αριθμού τηλεφώνου, το Radar μπορεί να επιβεβαιώσει αυτόματα εάν η σύνδεση είναι ασφαλής χρησιμοποιώντας μια διαδικασία που ονομάζεται διαφάνεια κλειδιού. Για πρόσθετη ασφάλεια, επαλήθευσε την κρυπτογράφηση από άκρο σε άκρο χειροκίνητα συγκρίνοντας τους αριθμούς στην προηγούμενη οθόνη ή σαρώνοντας τον κωδικό στη συσκευή τους.";
 
 /* Title for a sheet explaining that encryption auto-verification succeeded. */
 "SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_SUCCESS_SHEET_TITLE" = "Η κρυπτογράφηση επαληθεύτηκε αυτόματα για αυτήν τη συνομιλία";
@@ -8842,7 +8845,7 @@ Send money securely.";
 "SAFETY_TIPS_CRYPTO_TITLE" = "Απάτες κρυπτονομισμάτων ή χρημάτων";
 
 /* Message body describing the enable reglock safety tip. */
-"SAFETY_TIPS_ENABLE_REGLOCK_BODY" = "Προστάτεψε τον λογαριασμό σου ζητώντας τον κωδικό PIN του Signal, επιπρόσθετα του κωδικού επαλήθευσης, κατά την εγγραφή σου στο Signal.";
+"SAFETY_TIPS_ENABLE_REGLOCK_BODY" = "Προστάτεψε τον λογαριασμό σου ζητώντας τον κωδικό PIN του Radar, επιπρόσθετα του κωδικού επαλήθευσης, κατά την εγγραφή σου στο Radar.";
 
 /* Message title describing the enable reglock safety tip. */
 "SAFETY_TIPS_ENABLE_REGLOCK_TITLE" = "Ενεργοποίηση του κλειδώματος εγγραφής στις ρυθμίσεις λογαριασμού";
@@ -8875,22 +8878,22 @@ Send money securely.";
 "SAFETY_TIPS_MESSAGE_LINKS_TITLE" = "Μηνύματα με συνδέσμους ιστού";
 
 /* Message body describing the review names safety tip. */
-"SAFETY_TIPS_REVIEW_NAMES_BODY" = "Πρόσεξε την ένδειξη «Το όνομα δεν έχει επαληθευτεί». Ο καθένας ορίζει το δικό του όνομα προφίλ στο Signal.";
+"SAFETY_TIPS_REVIEW_NAMES_BODY" = "Πρόσεξε την ένδειξη «Το όνομα δεν έχει επαληθευτεί». Ο καθένας ορίζει το δικό του όνομα προφίλ στο Radar.";
 
 /* Message body describing the review names safety tip in the 'view more' flow. */
-"SAFETY_TIPS_REVIEW_NAMES_BODY_VIEW_MORE" = "Πρόσεξε την ένδειξη «Το όνομα δεν έχει επαληθευτεί». Ο καθένας ορίζει το δικό του όνομα προφίλ και τη δική του φωτογραφία στο Signal. Αν δεν γνωρίζεις σίγουρα από ποιον προέρχεται ένα νέο αίτημα, είναι ασφαλέστερο να το αγνοήσεις.";
+"SAFETY_TIPS_REVIEW_NAMES_BODY_VIEW_MORE" = "Πρόσεξε την ένδειξη «Το όνομα δεν έχει επαληθευτεί». Ο καθένας ορίζει το δικό του όνομα προφίλ και τη δική του φωτογραφία στο Radar. Αν δεν γνωρίζεις σίγουρα από ποιον προέρχεται ένα νέο αίτημα, είναι ασφαλέστερο να το αγνοήσεις.";
 
 /* Message title describing the review names safety tip. */
 "SAFETY_TIPS_REVIEW_NAMES_TITLE" = "Έλεγξε ονόματα και φωτογραφίες";
 
 /* Message body describing the signal chats tip. */
-"SAFETY_TIPS_SIGNAL_CHATS_BODY" = "Το Signal δεν θα επικοινωνήσει ποτέ μαζί σου για τον κωδικό εγγραφής, το PIN σου ή το κλειδί ανάκτησής σου. Μην απαντάς ποτέ σε μηνύματα από το Signal.";
+"SAFETY_TIPS_SIGNAL_CHATS_BODY" = "Το Radar δεν θα επικοινωνήσει ποτέ μαζί σου για τον κωδικό εγγραφής, το PIN σου ή το κλειδί ανάκτησής σου. Μην απαντάς ποτέ σε μηνύματα από το Radar.";
 
 /* Message body describing the signal chats tip in the 'view more' flow. */
-"SAFETY_TIPS_SIGNAL_CHATS_BODY_VIEW_MORE" = "Το Signal δεν θα επικοινωνήσει ποτέ μαζί σου για τον κωδικό εγγραφής, το PIN σου ή το κλειδί ανάκτησής σου. Μην απαντάς σε μηνύματα που προσποιούνται ότι προέρχονται από το Signal ή την Υποστήριξη Signal. Κακόβουλοι χρήστες δημιουργούν ψεύτικα ονόματα για να προσπαθήσουν να καταλάβουν τον λογαριασμό σου.";
+"SAFETY_TIPS_SIGNAL_CHATS_BODY_VIEW_MORE" = "Το Radar δεν θα επικοινωνήσει ποτέ μαζί σου για τον κωδικό εγγραφής, το PIN σου ή το κλειδί ανάκτησής σου. Μην απαντάς σε μηνύματα που προσποιούνται ότι προέρχονται από το Radar ή την Υποστήριξη Radar. Κακόβουλοι χρήστες δημιουργούν ψεύτικα ονόματα για να προσπαθήσουν να καταλάβουν τον λογαριασμό σου.";
 
 /* Message title describing the signal chats tip. */
-"SAFETY_TIPS_SIGNAL_CHATS_TITLE" = "Μην απαντάς σε μηνύματα από το Signal";
+"SAFETY_TIPS_SIGNAL_CHATS_TITLE" = "Μην απαντάς σε μηνύματα από το Radar";
 
 /* Message contents for the vague message safety tip. */
 "SAFETY_TIPS_VAGUE_MESSAGE_BODY" = "Οι spammer συχνά ξεκινούν με ένα απλό μήνυμα όπως «Γεια» για να σε προσελκύσουν. Εάν απαντήσεις, μπορεί να το συνεχίσουν.";
@@ -9025,10 +9028,10 @@ Send money securely.";
 "SECONDARY_ONBOARDING_SCAN_CODE_STEP_LINK_DEVICE" = "Πάτα «Συνδεδεμένες συσκευές» και «Σύνδεση νέας συσκευής»";
 
 /* First bullet point on the QR code screen for linking a device */
-"SECONDARY_ONBOARDING_SCAN_CODE_STEP_OPEN_PRIMARY" = "Άνοιξε το Signal στην κύρια συσκευή σου";
+"SECONDARY_ONBOARDING_SCAN_CODE_STEP_OPEN_PRIMARY" = "Άνοιξε το Radar στην κύρια συσκευή σου";
 
 /* Second bullet point on the QR code screen for linking a device */
-"SECONDARY_ONBOARDING_SCAN_CODE_STEP_OPEN_SETTINGS" = "Πάτα στη φωτογραφία προφίλ για να ανοίξεις τις Ρυθμίσεις Signal";
+"SECONDARY_ONBOARDING_SCAN_CODE_STEP_OPEN_SETTINGS" = "Πάτα στη φωτογραφία προφίλ για να ανοίξεις τις Ρυθμίσεις Radar";
 
 /* header text while displaying a QR code which, when scanned, will link this device. */
 "SECONDARY_ONBOARDING_SCAN_CODE_TITLE" = "Σάρωσε αυτόν τον κωδικό για να συνδέσεις τον λογαριασμό σου";
@@ -9067,13 +9070,13 @@ Send money securely.";
 "SELECT_CONTACT_FOR_SHARING_PERMISSION_PROMPT_ALLOW_BUTTON" = "Να δοθεί πρόσβαση";
 
 /* Body of the prompt on the 'Select Contact' view that asks the user to allow access to their contacts. */
-"SELECT_CONTACT_FOR_SHARING_PERMISSION_PROMPT_BODY" = "Να δοθεί πρόσβαση στις επαφές σου. Οι επαφές σου είναι κρυπτογραφημένες και δεν είναι ορατές στην υπηρεσία Signal.";
+"SELECT_CONTACT_FOR_SHARING_PERMISSION_PROMPT_BODY" = "Να δοθεί πρόσβαση στις επαφές σου. Οι επαφές σου είναι κρυπτογραφημένες και δεν είναι ορατές στην υπηρεσία Radar.";
 
 /* Button on the 'Select Contact' view's contacts permission prompt that hides the prompt. */
 "SELECT_CONTACT_FOR_SHARING_PERMISSION_PROMPT_DISMISS_BUTTON" = "Όχι, ευχαριστώ";
 
 /* Title of the prompt on the 'Select Contact' view that asks the user to allow access to their contacts. */
-"SELECT_CONTACT_FOR_SHARING_PERMISSION_PROMPT_TITLE" = "Βρες άτομα που γνωρίζεις στο Signal";
+"SELECT_CONTACT_FOR_SHARING_PERMISSION_PROMPT_TITLE" = "Βρες άτομα που γνωρίζεις στο Radar";
 
 /* Placeholder text for the search bar on the 'Select Contact' view */
 "SELECT_CONTACT_FOR_SHARING_SEARCH_BAR_PLACEHOLDER" = "Αναζήτηση";
@@ -9460,7 +9463,7 @@ Send money securely.";
 "SETTINGS_KEEP_MUTED_ARCHIVED_LABEL" = "Διατήρηση αρχειοθέτησης συνομιλιών σε σίγαση";
 
 /* Footer for settings section describing Key Transparency. */
-"SETTINGS_KEY_TRANSPARENCY_OPT_OUT_FOOTER" = "Όταν είναι ενεργοποιημένο, το Signal θα επιχειρήσει να επαληθεύσει αυτόματα την κρυπτογράφηση των προσωπικών συνομιλιών.";
+"SETTINGS_KEY_TRANSPARENCY_OPT_OUT_FOOTER" = "Όταν είναι ενεργοποιημένο, το Radar θα επιχειρήσει να επαληθεύσει αυτόματα την κρυπτογράφηση των προσωπικών συνομιλιών.";
 
 /* Title for for a settings option describing that Key Transparency is enabled. */
 "SETTINGS_KEY_TRANSPARENCY_OPT_OUT_SWITCH_TITLE" = "Αυτόματη επαλήθευση κλειδιού";
@@ -9475,7 +9478,7 @@ Send money securely.";
 "SETTINGS_LINK_PREVIEWS_FOOTER" = "Λάβε προεπισκόπεις συνδέσμων απ' ευθείας από σελίδες για τα μηνύματα που στέλνεις.";
 
 /* Subtitle of a card on a linked device's account settings, explaining that account settings are managed on the primary device. */
-"SETTINGS_LINKED_DEVICE_ACCOUNT_CARD_SUBTITLE" = "Για να διαχειριστείς τις ρυθμίσεις του λογαριασμού σου, άνοιξε την εφαρμογή Signal στην κύρια συσκευή σου.";
+"SETTINGS_LINKED_DEVICE_ACCOUNT_CARD_SUBTITLE" = "Για να διαχειριστείς τις ρυθμίσεις του λογαριασμού σου, άνοιξε την εφαρμογή Radar στην κύρια συσκευή σου.";
 
 /* Title of a card on a linked device's account settings, indicating that this is a linked device. */
 "SETTINGS_LINKED_DEVICE_ACCOUNT_CARD_TITLE" = "Αυτή είναι μια συνδεδεμένη συσκευή";
@@ -9484,7 +9487,7 @@ Send money securely.";
 "SETTINGS_LINKED_DEVICE_DELETE_DATA_BUTTON" = "Διαγραφή των δεδομένων της εφαρμογής";
 
 /* Footer below the 'delete app data' button, shown on a linked device's account settings. */
-"SETTINGS_LINKED_DEVICE_DELETE_DATA_FOOTER" = "Αυτή η ενέργεια θα διαγράψει όλα τα δεδομένα από την εφαρμογή Signal σε αυτή τη συσκευή.";
+"SETTINGS_LINKED_DEVICE_DELETE_DATA_FOOTER" = "Αυτή η ενέργεια θα διαγράψει όλα τα δεδομένα από την εφαρμογή Radar σε αυτή τη συσκευή.";
 
 /* Text for a toast confirming the user changed their local file backup location. */
 "SETTINGS_LOCAL_FILE_BACKUP_FOLDER_UPDATED" = "Ο φάκελος αντιγράφου ασφαλείας ενημερώθηκε";
@@ -9508,7 +9511,7 @@ Send money securely.";
 "SETTINGS_LOCAL_FILE_BACKUPS_LAST_BACKUP_DATE" = "Τελευταίο αντίγραφο ασφαλείας";
 
 /* Message for an action sheet when a user cannot perform a remote backup because a local backup is in progress */
-"SETTINGS_LOCAL_FILE_BACKUPS_LOCAL_BACKUP_IN_PROGRESS_MESSAGE" = "Δεν ήταν δυνατή η δημιουργία Ασφαλούς αντιγράφου Signal, καθώς δημιουργείται αντίγραφο ασφαλείας στη συσκευή. Δοκίμασε ξανά αργότερα.";
+"SETTINGS_LOCAL_FILE_BACKUPS_LOCAL_BACKUP_IN_PROGRESS_MESSAGE" = "Δεν ήταν δυνατή η δημιουργία Ασφαλούς αντιγράφου Radar, καθώς δημιουργείται αντίγραφο ασφαλείας στη συσκευή. Δοκίμασε ξανά αργότερα.";
 
 /* Label for a progress bar while attachments are being copied for an on-device backup. Embeds 1:{{%1$@ completed bytes copied, %2$@ total bytes to copy, %3$@ percentage complete }}. */
 "SETTINGS_LOCAL_FILE_BACKUPS_PROGRESS_COPYING_ATTACHMENTS" = "Δημιουργία αντιγράφων ασφαλείας στη συσκευή %1$@ από %2$@ (%3$@)";
@@ -9523,10 +9526,10 @@ Send money securely.";
 "SETTINGS_LOCAL_FILE_BACKUPS_PROGRESS_RESTORING_ATTACHMENTS" = "Επαναφορά αντιγράφων ασφαλείας στη συσκευή (%1$@ από %2$@)";
 
 /* Message for an action sheet when a user cannot perform a local backup because a remote backup is in progress */
-"SETTINGS_LOCAL_FILE_BACKUPS_REMOTE_BACKUP_IN_PROGRESS_MESSAGE" = "Δεν ήταν δυνατή η δημιουργία αντιγράφου ασφαλείας στη συσκευή, καθώς δημιουργείται Ασφαλές αντίγραφο Signal. Δοκίμασε ξανά αργότερα.";
+"SETTINGS_LOCAL_FILE_BACKUPS_REMOTE_BACKUP_IN_PROGRESS_MESSAGE" = "Δεν ήταν δυνατή η δημιουργία αντιγράφου ασφαλείας στη συσκευή, καθώς δημιουργείται Ασφαλές αντίγραφο Radar. Δοκίμασε ξανά αργότερα.";
 
 /* Footer text on the on-device backups settings page explaining how to restore a backup. */
-"SETTINGS_LOCAL_FILE_BACKUPS_RESTORE_FOOTER" = "Για να ανακτήσεις ένα αντίγραφο ασφαλείας, εγκατάστησε από την αρχή το Signal. Άνοιξε την εφαρμογή, πάτα «Επαναφορά ή μεταφορά» και επίλεξε «Δημιουργία αντιγράφου ασφαλείας στη συσκευή».";
+"SETTINGS_LOCAL_FILE_BACKUPS_RESTORE_FOOTER" = "Για να ανακτήσεις ένα αντίγραφο ασφαλείας, εγκατάστησε από την αρχή το Radar. Άνοιξε την εφαρμογή, πάτα «Επαναφορά ή μεταφορά» και επίλεξε «Δημιουργία αντιγράφου ασφαλείας στη συσκευή».";
 
 /* Label for the button that turns off on-device backups. */
 "SETTINGS_LOCAL_FILE_BACKUPS_TURN_OFF" = "Απενεργοποίηση και διαγραφή αντιγράφων ασφαλείας";
@@ -9616,7 +9619,7 @@ Send money securely.";
 "SETTINGS_NOTIFICATIONS_APP_BADGE_SECTION" = "Σήμα εφαρμογής";
 
 /* Explanation for the switch controlling whether a notification is shown when a phone contact joins Signal. */
-"SETTINGS_NOTIFICATIONS_CONTACT_JOINED_SIGNAL_FOOTER" = "Προβολή ειδοποίησης όταν μια επαφή σου έρχεται στο Signal.";
+"SETTINGS_NOTIFICATIONS_CONTACT_JOINED_SIGNAL_FOOTER" = "Προβολή ειδοποίησης όταν μια επαφή σου έρχεται στο Radar.";
 
 /* Label for a switch controlling whether reactions to your messages generate notifications. */
 "SETTINGS_NOTIFICATIONS_REACTIONS" = "Ειδοποιήσεις αντιδράσεων";
@@ -10394,7 +10397,7 @@ Send money securely.";
 "SHARE_ACTION_MESSAGE" = "Μήνυμα";
 
 /* Message for an action sheet shown when sharing fails because the device's date and time are incorrect. */
-"SHARE_EXTENSION_FAILED_SENDING_BECAUSE_CLOCK_SKEW_MESSAGE" = "Η ημερομηνία και η ώρα της συσκευής σου είναι λανθασμένες και το Signal ενδέχεται να μην έστειλε το μήνυμά σου. Άνοιξε τις Ρυθμίσεις για να διορθώσεις την ημερομηνία και την ώρα στη συσκευή σου.";
+"SHARE_EXTENSION_FAILED_SENDING_BECAUSE_CLOCK_SKEW_MESSAGE" = "Η ημερομηνία και η ώρα της συσκευής σου είναι λανθασμένες και το Radar ενδέχεται να μην έστειλε το μήνυμά σου. Άνοιξε τις Ρυθμίσεις για να διορθώσεις την ημερομηνία και την ώρα στη συσκευή σου.";
 
 /* alert body when sharing file failed because of untrusted/changed identity keys */
 "SHARE_EXTENSION_FAILED_SENDING_BECAUSE_UNTRUSTED_IDENTITY_FORMAT" = "Ο αριθμός ασφαλείας με τον/την %1$@ άλλαξε πρόσφατα. Ίσως θες να τον επιβεβαιώσεις πριν την επαναποστολή.";
@@ -10403,7 +10406,7 @@ Send money securely.";
 "SHARE_EXTENSION_LOADING" = "Φορτώνει…";
 
 /* Message for an error shown when the user tries to share to Signal but the device is too low on storage space. */
-"SHARE_EXTENSION_LOW_STORAGE_SPACE_MESSAGE" = "Δεν μπορείς να μοιραστείς το περιεχόμενο στο Signal, επειδή η συσκευή σου έχει λίγο ελεύθερο χώρο αποθήκευσης. Απελευθέρωσε χώρο με διαχείριση του αποθηκευτικού χώρου στις Ρυθμίσεις και δοκίμασε ξανά.";
+"SHARE_EXTENSION_LOW_STORAGE_SPACE_MESSAGE" = "Δεν μπορείς να μοιραστείς το περιεχόμενο στο Radar, επειδή η συσκευή σου έχει λίγο ελεύθερο χώρο αποθήκευσης. Απελευθέρωσε χώρο με διαχείριση του αποθηκευτικού χώρου στις Ρυθμίσεις και δοκίμασε ξανά.";
 
 /* Title for an error shown when the user tries to share to Signal but the device is too low on storage space. */
 "SHARE_EXTENSION_LOW_STORAGE_SPACE_TITLE" = "Περιορισμένος αποθηκευτικός χώρος";
@@ -10445,7 +10448,7 @@ Send money securely.";
 "SIGNAL_LOGIN_RECOVERY_KEY_PLACEHOLDER_TITLE" = "Κλειδί ανάκτησης";
 
 /* Title for the sheet presented when user taps on Signal Proxy link in chat. */
-"SIGNAL_PROXY" = "Διακομιστής proxy του Signal";
+"SIGNAL_PROXY" = "Διακομιστής proxy του Radar";
 
 /* body sent to contacts when inviting to Install Signal */
 "SMS_INVITE_BODY" = "Σε προσκαλώ να εγκαταστήσεις το Radar! Να ο σύνδεσμος:";
@@ -10488,6 +10491,10 @@ Send money securely.";
 
 /* Text for a toast confirming that the speakerphone has been turned on for a call. */
 "SPEAKERPHONE_ON_CONFIRMATION_TOAST_LABEL" = "Ηχείο ενεργό";
+
+"STAR" = "Star";
+
+"STARRED_MESSAGES" = "Starred messages";
 
 /* Title for a button to view a sticker pack */
 "STICKER_BUTTON_VIEW_PACK" = "Προβολή πακέτου";
@@ -10532,7 +10539,7 @@ Send money securely.";
 "STICKER_PACK_SHARE_SHEET_HEADER" = "Όποιος διαθέτει αυτόν τον σύνδεσμο μπορεί να προσθέσει και να μοιραστεί αυτό το πακέτο αυτοκόλλητων.";
 
 /* Label for a button on a sticker-pack share sheet that sends the pack in Signal. */
-"STICKER_PACK_SHARE_SHEET_SEND_IN_SIGNAL" = "Αποστολή στο Signal";
+"STICKER_PACK_SHARE_SHEET_SEND_IN_SIGNAL" = "Αποστολή στο Radar";
 
 /* Message when trying to show a sticker that has expired and is unavailable for download */
 "STICKER_UNAVAILABLE_MESSAGE_LABEL" = "Το αυτοκόλλητο δεν είναι διαθέσιμο";
@@ -11242,6 +11249,8 @@ Send money securely.";
 /* Notification body for unread reminders. First placeholder is unread messages, second is a summary of either unread mentions or replies */
 "UnreadReminderJob__unread_one_summary" = "Έχεις %1$@, συμπεριλαμβανομένων %2$@.";
 
+"UNSTAR" = "Unstar";
+
 /* No comment provided by engineer. */
 "UNSUPPORTED_ATTACHMENT" = "Λήψη συνημμένου του οποίου ο τύπος δεν υποστηρίζεται.";
 
@@ -11435,7 +11444,7 @@ Send money securely.";
 "VERIFICATION_CODE_REQUESTED_HERO_BODY_FIRST" = "Ζητήθηκε κωδικός επαλήθευσης";
 
 /* Second part of body for a hero sheet informing the user a verification code was requested. */
-"VERIFICATION_CODE_REQUESTED_HERO_BODY_SECOND" = "Μην κοινοποιείς τον κωδικό επαλήθευσής σου σε κανέναν. Το Signal δεν θα σου στείλει ποτέ μήνυμα γι αυτό. Αν έλαβες μήνυμα από κάποιον που προσποιείται ότι είναι το Signal, πρόκειται για απάτη.\nΜπορείς να αγνοήσεις αυτό το μήνυμα αν ζήτησες εσύ τον κωδικό.";
+"VERIFICATION_CODE_REQUESTED_HERO_BODY_SECOND" = "Μην κοινοποιείς τον κωδικό επαλήθευσής σου σε κανέναν. Το Radar δεν θα σου στείλει ποτέ μήνυμα γι αυτό. Αν έλαβες μήνυμα από κάποιον που προσποιείται ότι είναι το Radar, πρόκειται για απάτη.\nΜπορείς να αγνοήσεις αυτό το μήνυμα αν ζήτησες εσύ τον κωδικό.";
 
 /* Format for info message indicating that the verification state was unverified on this device. Embeds {{user's name or phone number}}. */
 "VERIFICATION_STATE_CHANGE_FORMAT_NOT_VERIFIED_LOCAL" = "Σημείωσες τον/την %1$@ ως μη επιβεβαιωμένο/η.";

@@ -823,13 +823,13 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Skupiny Signal fungují nejlépe s %1$d nebo méně členy. Přidáním více členů může docházet ke zpoždění při odesílání a přijímání zpráv.</string>
+			<string>Skupiny Radar fungují nejlépe s %1$d nebo méně členy. Přidáním více členů může docházet ke zpoždění při odesílání a přijímání zpráv.</string>
 			<key>few</key>
-			<string>Skupiny Signal fungují nejlépe s %1$d nebo méně členy. Přidáním více členů může docházet ke zpoždění při odesílání a přijímání zpráv.</string>
+			<string>Skupiny Radar fungují nejlépe s %1$d nebo méně členy. Přidáním více členů může docházet ke zpoždění při odesílání a přijímání zpráv.</string>
 			<key>many</key>
-			<string>Skupiny Signal fungují nejlépe s %1$d nebo méně členy. Přidáním více členů může docházet ke zpoždění při odesílání a přijímání zpráv.</string>
+			<string>Skupiny Radar fungují nejlépe s %1$d nebo méně členy. Přidáním více členů může docházet ke zpoždění při odesílání a přijímání zpráv.</string>
 			<key>other</key>
-			<string>Skupiny Signal fungují nejlépe s %1$d nebo méně členy. Přidáním více členů může docházet ke zpoždění při odesílání a přijímání zpráv.</string>
+			<string>Skupiny Radar fungují nejlépe s %1$d nebo méně členy. Přidáním více členů může docházet ke zpoždění při odesílání a přijímání zpráv.</string>
 		</dict>
 	</dict>
 	<key>GROUP_CALL_HAS_MAX_DEVICES_%d</key>
@@ -1023,13 +1023,13 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Signal zavolá %2$@ , %3$@ a %1$d dalšímu</string>
+			<string>Radar zavolá %2$@ , %3$@ a %1$d dalšímu</string>
 			<key>few</key>
-			<string>Signal zavolá uživatelům %2$@, %3$@ a %1$d dalším</string>
+			<string>Radar zavolá uživatelům %2$@, %3$@ a %1$d dalším</string>
 			<key>many</key>
-			<string>Signal zavolá uživatelům %2$@, %3$@ a %1$d dalším</string>
+			<string>Radar zavolá uživatelům %2$@, %3$@ a %1$d dalším</string>
 			<key>other</key>
-			<string>Signal zavolá uživatelům %2$@, %3$@ a %1$d dalším</string>
+			<string>Radar zavolá uživatelům %2$@, %3$@ a %1$d dalším</string>
 		</dict>
 	</dict>
 	<key>GROUP_INVITES_SENT_ALERT_TITLE_%d</key>
@@ -1383,13 +1383,13 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Pokud chcete, aby zařízení „%2$@“ zůstalo propojené, otevřete na tomto zařízení aplikaci Signal do jednoho dne.</string>
+			<string>Pokud chcete, aby zařízení „%2$@“ zůstalo propojené, otevřete na tomto zařízení aplikaci Radar do jednoho dne.</string>
 			<key>few</key>
-			<string>Pokud chcete, aby zařízení „%2$@“ zůstalo propojené, otevřete na tomto zařízení aplikaci Signal do %1$d dnů.</string>
+			<string>Pokud chcete, aby zařízení „%2$@“ zůstalo propojené, otevřete na tomto zařízení aplikaci Radar do %1$d dnů.</string>
 			<key>many</key>
-			<string>Pokud chcete, aby zařízení „%2$@“ zůstalo propojené, otevřete na tomto zařízení aplikaci Signal do %1$d dnů.</string>
+			<string>Pokud chcete, aby zařízení „%2$@“ zůstalo propojené, otevřete na tomto zařízení aplikaci Radar do %1$d dnů.</string>
 			<key>other</key>
-			<string>Pokud chcete, aby zařízení „%2$@“ zůstalo propojené, otevřete na tomto zařízení aplikaci Signal do %1$d dnů.</string>
+			<string>Pokud chcete, aby zařízení „%2$@“ zůstalo propojené, otevřete na tomto zařízení aplikaci Radar do %1$d dnů.</string>
 		</dict>
 	</dict>
 	<key>LINK_DEVICE_CONFIRMATION_ALERT_TRANSFER_SUBTITLE_%d</key>
@@ -1643,13 +1643,13 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Všechna spojení Signal · %1$d sledující</string>
+			<string>Všechna spojení Radar · %1$d sledující</string>
 			<key>few</key>
-			<string>Všechna spojení Signal · %1$d sledující</string>
+			<string>Všechna spojení Radar · %1$d sledující</string>
 			<key>many</key>
-			<string>Všechna spojení Signal · %1$d sledujících</string>
+			<string>Všechna spojení Radar · %1$d sledujících</string>
 			<key>other</key>
-			<string>Všechna spojení Signal · %1$d sledujících</string>
+			<string>Všechna spojení Radar · %1$d sledujících</string>
 		</dict>
 	</dict>
 	<key>MY_STORY_VIEWERS_ALL_CONNECTIONS_EXCLUDING_%d</key>
@@ -1663,13 +1663,13 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Všechna spojení Signal · %1$d vyloučené</string>
+			<string>Všechna spojení Radar · %1$d vyloučené</string>
 			<key>few</key>
-			<string>Všechna spojení Signal · %1$d vyloučená</string>
+			<string>Všechna spojení Radar · %1$d vyloučená</string>
 			<key>many</key>
-			<string>Všechna spojení Signal · %1$d vyloučených</string>
+			<string>Všechna spojení Radar · %1$d vyloučených</string>
 			<key>other</key>
-			<string>Všechna spojení Signal · %1$d vyloučených</string>
+			<string>Všechna spojení Radar · %1$d vyloučených</string>
 		</dict>
 	</dict>
 	<key>MY_STORY_VIEWERS_ONLY_%d</key>

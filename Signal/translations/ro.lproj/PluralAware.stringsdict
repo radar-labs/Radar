@@ -741,11 +741,11 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Grupurile Signal funcționează cel mai bine cu %1$d membru sau mai puțin. Adăugarea mai multor membri va cauza întârzieri la trimiterea și primirea mesajelor.</string>
+			<string>Grupurile Radar funcționează cel mai bine cu %1$d membru sau mai puțin. Adăugarea mai multor membri va cauza întârzieri la trimiterea și primirea mesajelor.</string>
 			<key>few</key>
-			<string>Grupurile Signal funcționează cel mai bine cu %1$d membri sau mai puțin. Adăugarea mai multor membri va cauza întârzieri la trimiterea și primirea mesajelor.</string>
+			<string>Grupurile Radar funcționează cel mai bine cu %1$d membri sau mai puțin. Adăugarea mai multor membri va cauza întârzieri la trimiterea și primirea mesajelor.</string>
 			<key>other</key>
-			<string>Grupurile Signal funcționează cel mai bine cu %1$d de membri sau mai puțin. Adăugarea mai multor membri va cauza întârzieri la trimiterea și primirea mesajelor.</string>
+			<string>Grupurile Radar funcționează cel mai bine cu %1$d de membri sau mai puțin. Adăugarea mai multor membri va cauza întârzieri la trimiterea și primirea mesajelor.</string>
 		</dict>
 	</dict>
 	<key>GROUP_CALL_HAS_MAX_DEVICES_%d</key>
@@ -921,11 +921,11 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Signal va suna pe %2$@, %3$@, și %1$d altul</string>
+			<string>Radar va suna pe %2$@, %3$@, și %1$d altul</string>
 			<key>few</key>
-			<string>Signal va apela %2$@, %3$@, și încă %1$d</string>
+			<string>Radar va apela %2$@, %3$@, și încă %1$d</string>
 			<key>other</key>
-			<string>Signal va apela %2$@, %3$@, și încă %1$d</string>
+			<string>Radar va apela %2$@, %3$@, și încă %1$d</string>
 		</dict>
 	</dict>
 	<key>GROUP_INVITES_SENT_ALERT_TITLE_%d</key>
@@ -1245,11 +1245,11 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Pentru a menține &quot;%2$@&quot; conectat, deschide Signal pe dispozitivul respectiv în termen de %1$d zi.</string>
+			<string>Pentru a menține &quot;%2$@&quot; conectat, deschide Radar pe dispozitivul respectiv în termen de %1$d zi.</string>
 			<key>few</key>
-			<string>Pentru a menține &quot;%2$@&quot; conectat, deschide Signal pe dispozitivul respectiv în termen de %1$d zile.</string>
+			<string>Pentru a menține &quot;%2$@&quot; conectat, deschide Radar pe dispozitivul respectiv în termen de %1$d zile.</string>
 			<key>other</key>
-			<string>Pentru a menține &quot;%2$@&quot; conectat, deschide Signal pe dispozitivul respectiv în termen de %1$d de zile.</string>
+			<string>Pentru a menține &quot;%2$@&quot; conectat, deschide Radar pe dispozitivul respectiv în termen de %1$d de zile.</string>
 		</dict>
 	</dict>
 	<key>LINK_DEVICE_CONFIRMATION_ALERT_TRANSFER_SUBTITLE_%d</key>
@@ -1479,11 +1479,11 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Toate conexiunile Signal · %1$d spectator</string>
+			<string>Toate conexiunile Radar · %1$d spectator</string>
 			<key>few</key>
-			<string>Toate conexiunile Signal · %1$d spectatori</string>
+			<string>Toate conexiunile Radar · %1$d spectatori</string>
 			<key>other</key>
-			<string>Toate conexiunile Signal · %1$d de spectatori</string>
+			<string>Toate conexiunile Radar · %1$d de spectatori</string>
 		</dict>
 	</dict>
 	<key>MY_STORY_VIEWERS_ALL_CONNECTIONS_EXCLUDING_%d</key>
@@ -1497,11 +1497,11 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Toate conexiunile Signal · %1$d exclusă</string>
+			<string>Toate conexiunile Radar · %1$d exclusă</string>
 			<key>few</key>
-			<string>Toate conexiunile Signal · %1$d excluse</string>
+			<string>Toate conexiunile Radar · %1$d excluse</string>
 			<key>other</key>
-			<string>Toate conexiunile Signal · %1$d excluse</string>
+			<string>Toate conexiunile Radar · %1$d excluse</string>
 		</dict>
 	</dict>
 	<key>MY_STORY_VIEWERS_ONLY_%d</key>

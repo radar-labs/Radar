@@ -905,15 +905,15 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Is fearr a fheidhmíonn grúpaí Signal ina bhfuil %1$d bhall nó níos lú. Má chuirtear tuilleadh ball leo cuirfear moill ar sheoladh agus ar fháil teachtaireachtaí.</string>
+			<string>Is fearr a fheidhmíonn grúpaí Radar ina bhfuil %1$d bhall nó níos lú. Má chuirtear tuilleadh ball leo cuirfear moill ar sheoladh agus ar fháil teachtaireachtaí.</string>
 			<key>two</key>
-			<string>Is fearr a fheidhmíonn grúpaí Signal ina bhfuil %1$d bhall nó níos lú. Má chuirtear tuilleadh ball leo cuirfear moill ar sheoladh agus ar fháil teachtaireachtaí.</string>
+			<string>Is fearr a fheidhmíonn grúpaí Radar ina bhfuil %1$d bhall nó níos lú. Má chuirtear tuilleadh ball leo cuirfear moill ar sheoladh agus ar fháil teachtaireachtaí.</string>
 			<key>few</key>
-			<string>Is fearr a fheidhmíonn grúpaí Signal ina bhfuil %1$d bhall nó níos lú. Má chuirtear tuilleadh ball leo cuirfear moill ar sheoladh agus ar fháil teachtaireachtaí.</string>
+			<string>Is fearr a fheidhmíonn grúpaí Radar ina bhfuil %1$d bhall nó níos lú. Má chuirtear tuilleadh ball leo cuirfear moill ar sheoladh agus ar fháil teachtaireachtaí.</string>
 			<key>many</key>
-			<string>Is fearr a fheidhmíonn grúpaí Signal ina bhfuil %1$d mball nó níos lú. Má chuirtear tuilleadh ball leo cuirfear moill ar sheoladh agus ar fháil teachtaireachtaí.</string>
+			<string>Is fearr a fheidhmíonn grúpaí Radar ina bhfuil %1$d mball nó níos lú. Má chuirtear tuilleadh ball leo cuirfear moill ar sheoladh agus ar fháil teachtaireachtaí.</string>
 			<key>other</key>
-			<string>Is fearr a fheidhmíonn grúpaí Signal ina bhfuil %1$d ball nó níos lú. Má chuirtear tuilleadh ball leo cuirfear moill ar sheoladh agus ar fháil teachtaireachtaí.</string>
+			<string>Is fearr a fheidhmíonn grúpaí Radar ina bhfuil %1$d ball nó níos lú. Má chuirtear tuilleadh ball leo cuirfear moill ar sheoladh agus ar fháil teachtaireachtaí.</string>
 		</dict>
 	</dict>
 	<key>GROUP_CALL_HAS_MAX_DEVICES_%d</key>
@@ -1125,15 +1125,15 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Cuirfidh Signal glao ar %2$@, %3$@, agus ar %1$d duine eile</string>
+			<string>Cuirfidh Radar glao ar %2$@, %3$@, agus ar %1$d duine eile</string>
 			<key>two</key>
-			<string>Cuirfidh Signal glao ar %2$@, %3$@, agus ar %1$d dhuine eile</string>
+			<string>Cuirfidh Radar glao ar %2$@, %3$@, agus ar %1$d dhuine eile</string>
 			<key>few</key>
-			<string>Cuirfidh Signal glao ar %2$@, %3$@, agus ar %1$d dhuine eile</string>
+			<string>Cuirfidh Radar glao ar %2$@, %3$@, agus ar %1$d dhuine eile</string>
 			<key>many</key>
-			<string>Cuirfidh Signal glao ar %2$@, %3$@, agus ar %1$d nduine eile</string>
+			<string>Cuirfidh Radar glao ar %2$@, %3$@, agus ar %1$d nduine eile</string>
 			<key>other</key>
-			<string>Cuirfidh Signal glao ar %2$@, %3$@, agus ar %1$d duine eile</string>
+			<string>Cuirfidh Radar glao ar %2$@, %3$@, agus ar %1$d duine eile</string>
 		</dict>
 	</dict>
 	<key>GROUP_INVITES_SENT_ALERT_TITLE_%d</key>
@@ -1521,15 +1521,15 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Chun &quot;%2$@&quot; a choinneáil nasctha, oscail Signal ar an ngléas sin laistigh de %1$d lá.</string>
+			<string>Chun &quot;%2$@&quot; a choinneáil nasctha, oscail Radar ar an ngléas sin laistigh de %1$d lá.</string>
 			<key>two</key>
-			<string>Chun &quot;%2$@&quot; a choinneáil nasctha, oscail Signal ar an ngléas sin laistigh de %1$d lá.</string>
+			<string>Chun &quot;%2$@&quot; a choinneáil nasctha, oscail Radar ar an ngléas sin laistigh de %1$d lá.</string>
 			<key>few</key>
-			<string>Chun &quot;%2$@&quot; a choinneáil nasctha, oscail Signal ar an ngléas sin laistigh de %1$d lá.</string>
+			<string>Chun &quot;%2$@&quot; a choinneáil nasctha, oscail Radar ar an ngléas sin laistigh de %1$d lá.</string>
 			<key>many</key>
-			<string>Chun &quot;%2$@&quot; a choinneáil nasctha, oscail Signal ar an ngléas sin laistigh de %1$d lá.</string>
+			<string>Chun &quot;%2$@&quot; a choinneáil nasctha, oscail Radar ar an ngléas sin laistigh de %1$d lá.</string>
 			<key>other</key>
-			<string>Chun &quot;%2$@&quot; a choinneáil nasctha, oscail Signal ar an ngléas sin laistigh de %1$d lá.</string>
+			<string>Chun &quot;%2$@&quot; a choinneáil nasctha, oscail Radar ar an ngléas sin laistigh de %1$d lá.</string>
 		</dict>
 	</dict>
 	<key>LINK_DEVICE_CONFIRMATION_ALERT_TRANSFER_SUBTITLE_%d</key>
@@ -1807,15 +1807,15 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Gach Teagmhálaí Signal · %1$d Amharcóir</string>
+			<string>Gach Teagmhálaí Radar · %1$d Amharcóir</string>
 			<key>two</key>
-			<string>Gach Teagmhálaí Signal · %1$d Amharcóir</string>
+			<string>Gach Teagmhálaí Radar · %1$d Amharcóir</string>
 			<key>few</key>
-			<string>Gach Teagmhálaí Signal · %1$d Amharcóir</string>
+			<string>Gach Teagmhálaí Radar · %1$d Amharcóir</string>
 			<key>many</key>
-			<string>Gach Teagmhálaí Signal · %1$d nAmharcóir</string>
+			<string>Gach Teagmhálaí Radar · %1$d nAmharcóir</string>
 			<key>other</key>
-			<string>Gach Teagmhálaí Signal · %1$d Amharcóir</string>
+			<string>Gach Teagmhálaí Radar · %1$d Amharcóir</string>
 		</dict>
 	</dict>
 	<key>MY_STORY_VIEWERS_ALL_CONNECTIONS_EXCLUDING_%d</key>
@@ -1829,15 +1829,15 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Gach Teagmhálaí Signal · %1$d as an áireamh</string>
+			<string>Gach Teagmhálaí Radar · %1$d as an áireamh</string>
 			<key>two</key>
-			<string>Gach Teagmhálaí Signal · %1$d as an áireamh</string>
+			<string>Gach Teagmhálaí Radar · %1$d as an áireamh</string>
 			<key>few</key>
-			<string>Gach Teagmhálaí Signal · %1$d as an áireamh</string>
+			<string>Gach Teagmhálaí Radar · %1$d as an áireamh</string>
 			<key>many</key>
-			<string>Gach Teagmhálaí Signal · %1$d as an áireamh</string>
+			<string>Gach Teagmhálaí Radar · %1$d as an áireamh</string>
 			<key>other</key>
-			<string>Gach Teagmhálaí Signal · %1$d as an áireamh</string>
+			<string>Gach Teagmhálaí Radar · %1$d as an áireamh</string>
 		</dict>
 	</dict>
 	<key>MY_STORY_VIEWERS_ONLY_%d</key>

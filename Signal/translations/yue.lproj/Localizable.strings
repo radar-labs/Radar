@@ -2,7 +2,7 @@
 "AB_PERMISSION_MISSING_ACTION_NOT_NOW" = "遲啲先啦";
 
 /* Footer for the 'about' help section. For non-English languages, exclude the word '501c3'. */
-"ABOUT_SECTION_FOOTER" = "Signal Messenger 版權所有\n AGPLv3 許可\n認證 Signal 為非牟利機構";
+"ABOUT_SECTION_FOOTER" = "Signal Messenger 版權所有\nCopyright 2026 Radar Chat, Inc.\n AGPLv3 許可";
 
 /* Title for the 'about' help section */
 "ABOUT_SECTION_TITLE" = "關於 Radar";
@@ -215,7 +215,7 @@
 "APN_Message" = "你可能有新訊息";
 
 /* Shown in place of the text input box in a conversation when the app has expired and the user is no longer allowed to send messages. The embedded value is 'Update now' (translated via APP_EXPIRED_BOTTOM_UPDATE), and it will be formatted as a tappable link. */
-"APP_EXPIRED_BOTTOM" = "呢個 Signal 版本已經過咗期。要%1$@先可以收發訊息。";
+"APP_EXPIRED_BOTTOM" = "呢個 Radar 版本已經過咗期。要%1$@先可以收發訊息。";
 
 /* Shown in place of the text input box in a conversation when the app has expired and the user is no longer allowed to send messages. This value is a tappable link embedded in a larger sentence. */
 "APP_EXPIRED_BOTTOM_UPDATE" = "即刻更新";
@@ -236,7 +236,7 @@
 "APP_LAUNCH_FAILURE_COULD_NOT_LOAD_DATABASE" = "載入唔到資料庫";
 
 /* Message for an action sheet explaining that Signal can't launch because the database is corrupted. */
-"APP_LAUNCH_FAILURE_DATABASE_CORRUPTED_MESSAGE" = "Signal 郁唔到，因為資料庫損壞咗。你嘅帳戶或者訊息嘅安全性冇受到影響。";
+"APP_LAUNCH_FAILURE_DATABASE_CORRUPTED_MESSAGE" = "Radar 郁唔到，因為資料庫損壞咗。你嘅帳戶或者訊息嘅安全性冇受到影響。";
 
 /* Title for an action sheet explaining that Signal can't launch because the database is corrupted. */
 "APP_LAUNCH_FAILURE_DATABASE_CORRUPTED_TITLE" = "資料庫損壞";
@@ -245,7 +245,7 @@
 "APP_LAUNCH_FAILURE_DATABASE_RECOVERY_ACTION_TITLE" = "修理";
 
 /* Action in an action sheet offering to exit the app. */
-"APP_LAUNCH_FAILURE_EXIT_APP_ACTION_TITLE" = "退出 Signal";
+"APP_LAUNCH_FAILURE_EXIT_APP_ACTION_TITLE" = "退出 Radar";
 
 /* Error indicating that the app could not launch without reverting unknown database migrations. */
 "APP_LAUNCH_FAILURE_INVALID_DATABASE_VERSION_MESSAGE" = "請更新至最新版本嘅 Radar。";
@@ -260,7 +260,7 @@
 "APP_LAUNCH_FAILURE_LAST_LAUNCH_CRASHED_TITLE" = "開唔到 Radar";
 
 /* Message for an error sheet shown when the app cannot launch because the device is out of storage space. Embeds 1:{{ the localized name of the user's device model, e.g. iPhone }}; 2:{{ an amount of storage space as a file size, e.g. 1 GB }}. */
-"APP_LAUNCH_FAILURE_NOT_ENOUGH_STORAGE_SPACE_MESSAGE_FORMAT" = "你部%1$@嘅儲存空間唔夠，所以開唔到 Signal。釋放至少 %2$@ 嘅空間，然後開多次 Signal。\n\n去「IOS 設定」>「一般」>「儲存空間」同移除你唔用嘅 APP，喺「相片」或者其他 APP 度刪除大容量影片，同埋刪除已經下載嘅音樂同媒體。";
+"APP_LAUNCH_FAILURE_NOT_ENOUGH_STORAGE_SPACE_MESSAGE_FORMAT" = "你部%1$@嘅儲存空間唔夠，所以開唔到 Radar。釋放至少 %2$@ 嘅空間，然後開多次 Radar。\n\n去「IOS 設定」>「一般」>「儲存空間」同移除你唔用嘅 APP，喺「相片」或者其他 APP 度刪除大容量影片，同埋刪除已經下載嘅音樂同媒體。";
 
 /* Title for an error sheet shown when the app cannot launch because the device is out of storage space. */
 "APP_LAUNCH_FAILURE_NOT_ENOUGH_STORAGE_SPACE_TITLE" = "唔夠儲存空間";
@@ -377,13 +377,13 @@
 "ATTACHMENT_APPROVAL_MEDIA_QUALITY_TITLE" = "多媒體檔案嘅畫質";
 
 /* Notification body shown when media sync to a linked device is complete. */
-"ATTACHMENT_BACKFILL_FINISHED_NOTIFICATION" = "已經同連結咗嘅裝置上面嘅 Signal 完成同步。";
+"ATTACHMENT_BACKFILL_FINISHED_NOTIFICATION" = "已經同連結咗嘅裝置上面嘅 Radar 完成同步。";
 
 /* Notification body shown when media sync to a linked device was interrupted. */
-"ATTACHMENT_BACKFILL_INTERRUPTED_NOTIFICATION" = "打開 Signal 繼續同連結咗嘅裝置同步";
+"ATTACHMENT_BACKFILL_INTERRUPTED_NOTIFICATION" = "打開 Radar 繼續同連結咗嘅裝置同步";
 
 /* Notification body shown while syncing media to a linked device. */
-"ATTACHMENT_BACKFILL_SYNCING_NOTIFICATION" = "同連結咗嘅裝置上面嘅 Signal 同步緊";
+"ATTACHMENT_BACKFILL_SYNCING_NOTIFICATION" = "同連結咗嘅裝置上面嘅 Radar 同步緊";
 
 /* Generic filename for an attachment with no known name */
 "ATTACHMENT_DEFAULT_FILENAME" = "附件";
@@ -632,7 +632,7 @@
 "BACKUP_KEY_SEE_FULL_KEY_BUTTON_TITLE" = "睇晒成個金鑰";
 
 /* Body for a warning sheet shown to discourage the user from sharing their 'Recovery Key', warning them not to share it with anyone. */
-"BACKUP_NEVER_SHARE_RECOVERY_KEY_SHEET_BODY" = "千祈唔好同任何人分享你嘅恢復金鑰。咁樣佢哋就有機會盜用你嘅帳戶。<bold>Signal 從來都唔會傳訊息</bold>問你攞恢復金鑰。千祈唔好回覆任何假扮 Signal 嘅聊天訊息。";
+"BACKUP_NEVER_SHARE_RECOVERY_KEY_SHEET_BODY" = "千祈唔好同任何人分享你嘅恢復金鑰。咁樣佢哋就有機會盜用你嘅帳戶。<bold>Radar 從來都唔會傳訊息</bold>問你攞恢復金鑰。千祈唔好回覆任何假扮 Radar 嘅聊天訊息。";
 
 /* Title for a warning sheet shown to discourage the user from sharing their 'Recovery Key'. */
 "BACKUP_NEVER_SHARE_RECOVERY_KEY_SHEET_TITLE" = "唔好分享恢復金鑰";
@@ -752,7 +752,7 @@
 "BACKUP_RESTORE_MODAL_TITLE" = "還原緊訊息……";
 
 /* Message for a confirmation sheet shown before saving the user's Recovery Key to their password manager. */
-"BACKUP_SAVE_KEY_PW_MGR_CONFIRM_SHEET_MESSAGE" = "請將恢復金鑰儲存喺你信得過嘅安全密碼管理器入面。Signal 唔會推薦最啱你嘅密碼管理器。";
+"BACKUP_SAVE_KEY_PW_MGR_CONFIRM_SHEET_MESSAGE" = "請將恢復金鑰儲存喺你信得過嘅安全密碼管理器入面。Radar 唔會推薦最啱你嘅密碼管理器。";
 
 /* Title for a confirmation sheet shown before saving the user's Recovery Key to their password manager. */
 "BACKUP_SAVE_KEY_PW_MGR_CONFIRM_SHEET_TITLE" = "係咪儲存去密碼管理器？";
@@ -1064,31 +1064,31 @@
 "BACKUP_SETTINGS_LANDING_OTHER_WAYS_HEADER" = "其他備份方式";
 
 /* Subtitle on the Backups settings landing page. */
-"BACKUP_SETTINGS_LANDING_PAGE_SUBTITLE" = "備份你嘅訊息紀錄，當你換新手機或者重新安裝 Signal 嗰陣，就唔會冇咗啲資料啦。";
+"BACKUP_SETTINGS_LANDING_PAGE_SUBTITLE" = "備份你嘅訊息紀錄，當你換新手機或者重新安裝 Radar 嗰陣，就唔會冇咗啲資料啦。";
 
 /* Button to begin setting up Signal Secure Backups on the Backups settings landing page. */
 "BACKUP_SETTINGS_LANDING_SET_UP_BUTTON" = "設定";
 
 /* Description of Signal Secure Backups on the Backups settings landing page. */
-"BACKUP_SETTINGS_LANDING_SIGNAL_BACKUPS_BODY" = "用 Signal 嘅端對端加密儲存服務安全自動備份。";
+"BACKUP_SETTINGS_LANDING_SIGNAL_BACKUPS_BODY" = "用 Radar 嘅端對端加密儲存服務安全自動備份。";
 
 /* Title for the Signal Secure Backups cell on the Backups settings landing page. */
-"BACKUP_SETTINGS_LANDING_SIGNAL_BACKUPS_TITLE" = "Signal 安全備份";
+"BACKUP_SETTINGS_LANDING_SIGNAL_BACKUPS_TITLE" = "Radar 安全備份";
 
 /* Button to view settings for remote backups on the Backups settings landing page. */
 "BACKUP_SETTINGS_LANDING_VIEW_SETTINGS_BUTTON" = "睇下「設定」";
 
 /* Note on the linked-device Backups screen explaining that the Backups subscription can only be managed on the user's primary device. */
-"BACKUP_SETTINGS_LINKED_DEVICE_MANAGE_ON_PRIMARY_FOOTER" = "你可以喺主要裝置度管理或者升級「Signal 安全備份」課金計劃。";
+"BACKUP_SETTINGS_LINKED_DEVICE_MANAGE_ON_PRIMARY_FOOTER" = "你可以喺主要裝置度管理或者升級「Radar 安全備份」課金計劃。";
 
 /* Note on the linked-device Backups screen, shown on the paid tier, explaining that the Backups subscription can only be managed on the user's primary device. */
-"BACKUP_SETTINGS_LINKED_DEVICE_MANAGE_ON_PRIMARY_FOOTER_PAID" = "你可以喺主要裝置度管理或者取消「Signal 備份」課金計劃。";
+"BACKUP_SETTINGS_LINKED_DEVICE_MANAGE_ON_PRIMARY_FOOTER_PAID" = "你可以喺主要裝置度管理或者取消「Radar 備份」課金計劃。";
 
 /* Body text on the linked-device Backups screen, shown when Backups aren't set up, explaining the feature and that it can be enabled on the user's primary device. */
-"BACKUP_SETTINGS_LINKED_DEVICE_NO_BACKUP_FOOTER" = "用 Signal 嘅端對端加密儲存服務安全自動備份。 拎部你部主機出嚟開始備份。";
+"BACKUP_SETTINGS_LINKED_DEVICE_NO_BACKUP_FOOTER" = "用 Radar 嘅端對端加密儲存服務安全自動備份。 拎部你部主機出嚟開始備份。";
 
 /* Message on the linked-device Backups screen, shown when the user's paid subscription can't be found, prompting them to renew. */
-"BACKUP_SETTINGS_LINKED_DEVICE_SUBSCRIPTION_NOT_FOUND" = "搵唔到你嘅課金計劃。即刻續期就可以繼續用「Signal 安全備份」。";
+"BACKUP_SETTINGS_LINKED_DEVICE_SUBSCRIPTION_NOT_FOUND" = "搵唔到你嘅課金計劃。即刻續期就可以繼續用「Radar 安全備份」。";
 
 /* Title for a button allowing users to trigger a manual backup. */
 "BACKUP_SETTINGS_MANUAL_BACKUP_BUTTON_TITLE" = "即刻備份";
@@ -1130,10 +1130,10 @@
 "BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_TOGGLE_FOOTER_UNAVAILABLE" = "淨係得有課金 Radar 備份嘅帳戶先用到「優化儲存空間」功能。如果想用呢個功能，就升級備份計劃啦。";
 
 /* Title for a toggle allowing users to change the Optimize Local Storage setting. */
-"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_TOGGLE_TITLE" = "優化 Signal 儲存空間";
+"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_TOGGLE_TITLE" = "優化 Radar 儲存空間";
 
 /* Body for a Backup plan upsell view encouraging users to subscribe to a paid Backup plan to use storage optimization. */
-"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_UPSELL_BODY" = "淨係得有課金「Signal 安全備份」嘅帳戶先用到「優化儲存空間」功能。如果想用呢個功能，就升級備份計劃啦。";
+"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_UPSELL_BODY" = "淨係得有課金「Radar 安全備份」嘅帳戶先用到「優化儲存空間」功能。如果想用呢個功能，就升級備份計劃啦。";
 
 /* Title for a Backup plan upsell view encouraging users to subscribe to a paid Backup plan to use storage optimization. */
 "BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_UPSELL_TITLE" = "升級去啟用優化儲存空間";
@@ -1217,7 +1217,7 @@
 "BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_OPTIMIZE_MEDIA_TOGGLE_FOOTER" = "比較舊嘅媒體會喺下次備份嗰陣卸載，但可以隨時喺備份度下載返。";
 
 /* Title for a toggle shown after the user enables backups, letting them enable the Optimize Storage feature. */
-"BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_OPTIMIZE_MEDIA_TOGGLE_TITLE" = "優化 Signal 儲存空間";
+"BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_OPTIMIZE_MEDIA_TOGGLE_TITLE" = "優化 Radar 儲存空間";
 
 /* Title for a sheet shown after the user enables backups. */
 "BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_TITLE" = "搞掂晒。你可以即刻開始備份喇。";
@@ -1247,7 +1247,7 @@
 "BACKUP_SUBSCRIPTION_FAILED_TO_RENEW_SHEET_TITLE" = "你嘅備份課金計劃續唔到期";
 
 /* Body for a megaphone shown on the chat list encouraging users to subscribe to a paid Backup plan to back up all their media. Embeds {{ the amount of storage included in the paid plan, preformatted as a localized byte count, e.g. '100 GB' }}. */
-"BACKUPS_BACK_UP_YOUR_MEDIA_MEGAPHONE_BODY" = "課金 Signal 安全備份幫你保存你所有媒體，最盡去到 %1$@。";
+"BACKUPS_BACK_UP_YOUR_MEDIA_MEGAPHONE_BODY" = "課金 Radar 安全備份幫你保存你所有媒體，最盡去到 %1$@。";
 
 /* Title for a button on a megaphone encouraging users to subscribe to a paid Backup plan to back up all their media. */
 "BACKUPS_BACK_UP_YOUR_MEDIA_MEGAPHONE_PRIMARY_ACTION" = "升級";
@@ -1256,7 +1256,7 @@
 "BACKUPS_BACK_UP_YOUR_MEDIA_MEGAPHONE_TITLE" = "備份全部媒體";
 
 /* Body for a Backup plan upsell view encouraging users to subscribe to a paid Backup plan to back up all their media. Embeds {{ the amount of storage included in the paid plan, preformatted as a localized byte count, e.g. '100 GB' }}. */
-"BACKUPS_BACK_UP_YOUR_MEDIA_UPSELL_BODY" = "課金 Signal 安全備份幫你保存你全部媒體，最盡去到 %1$@。當你換新手機或者重新安裝 Signal 嗰陣，就唔會冇哂啲相或影片。";
+"BACKUPS_BACK_UP_YOUR_MEDIA_UPSELL_BODY" = "課金 Radar 安全備份幫你保存你全部媒體，最盡去到 %1$@。當你換新手機或者重新安裝 Radar 嗰陣，就唔會冇哂啲相或影片。";
 
 /* Title for a Backup plan upsell view encouraging users to subscribe to a paid Backup plan to back up all their media. */
 "BACKUPS_BACK_UP_YOUR_MEDIA_UPSELL_TITLE" = "升級去儲存全部媒體";
@@ -1268,7 +1268,7 @@
 "BACKUPS_MEDIA_ERROR_NOTIFICATION_TITLE" = "備份入面媒體嘅出錯";
 
 /* Body for a megaphone shown on the chat list encouraging users to enable Signal Secure Backups. */
-"BACKUPS_NEVER_LOSE_A_MESSAGE_MEGAPHONE_BODY" = "打開「Signal 安全備份」保存你嘅訊息同埋媒體";
+"BACKUPS_NEVER_LOSE_A_MESSAGE_MEGAPHONE_BODY" = "打開「Radar 安全備份」保存你嘅訊息同埋媒體";
 
 /* Title for a button on a megaphone encouraging users to enable Signal Secure Backups. */
 "BACKUPS_NEVER_LOSE_A_MESSAGE_MEGAPHONE_PRIMARY_ACTION" = "開啟";
@@ -1277,7 +1277,7 @@
 "BACKUPS_NEVER_LOSE_A_MESSAGE_MEGAPHONE_TITLE" = "唔駛驚冇咗啲訊息";
 
 /* Body for a megaphone shown on the chat list encouraging users to subscribe to a paid Backup plan to save on-device storage space. */
-"BACKUPS_SAVE_SPACE_MEGAPHONE_BODY" = "Signal 安全備份可以用卸載媒體方法嚟幫你慳番啲儲存空間。";
+"BACKUPS_SAVE_SPACE_MEGAPHONE_BODY" = "Radar 安全備份可以用卸載媒體方法嚟幫你慳番啲儲存空間。";
 
 /* Title for a button on a megaphone encouraging users to subscribe to a paid Backup plan to save on-device storage space, when the user does not yet have Signal Secure Backups enabled. */
 "BACKUPS_SAVE_SPACE_MEGAPHONE_PRIMARY_ACTION_TURN_ON" = "開啟";
@@ -1289,7 +1289,7 @@
 "BACKUPS_SAVE_SPACE_MEGAPHONE_TITLE" = "課金備份，慳番啲儲存空間";
 
 /* Body for a Backup plan upsell view encouraging users to subscribe to a paid Backup plan to save on-device storage space. Embeds {{ the amount of storage space being consumed on-device by media, preformatted as a localized byte count, e.g. '1.2 GB' }}. */
-"BACKUPS_SAVE_SPACE_UPSELL_BODY" = "Signal 佔用緊 %1$@ 嘅儲存空間嚟放媒體。課金Signal 安全備份計劃可以用卸載媒體嘅方法嚟幫你慳番啲儲存空間，同時喺備份入面完整保留全部聊天紀錄。";
+"BACKUPS_SAVE_SPACE_UPSELL_BODY" = "Radar 佔用緊 %1$@ 嘅儲存空間嚟放媒體。課金Signal 安全備份計劃可以用卸載媒體嘅方法嚟幫你慳番啲儲存空間，同時喺備份入面完整保留全部聊天紀錄。";
 
 /* Title for a Backup plan upsell view encouraging users to subscribe to a paid Backup plan to save on-device storage space. */
 "BACKUPS_SAVE_SPACE_UPSELL_TITLE" = "課金備份，慳番啲儲存空間";
@@ -1298,7 +1298,7 @@
 "BACKUPS_SETTINGS_TITLE" = "安全備份";
 
 /* Message for an action sheet shown on iPad saying you need to set up backups on your phone */
-"BACKUPS_SETUP_ON_PRIMARY_MESSAGE" = "想設定「備份」嘅話，請喺你主要用嘅 iPhone 或 Android 上面打開 Signal，然後去「設定」>「備份」。";
+"BACKUPS_SETUP_ON_PRIMARY_MESSAGE" = "想設定「備份」嘅話，請喺你主要用嘅 iPhone 或 Android 上面打開 Radar，然後去「設定」>「備份」。";
 
 /* Body for system notification or megaphone when backups is enabled. Embeds {{ time backups was enabled }} */
 "BACKUPS_TURNED_ON_NOTIFICATION_BODY_FORMAT" = "呢個帳戶已經喺 %1$@ 開咗 Radar 備份。㩒一下嚟睇吓。";
@@ -1655,7 +1655,7 @@
 "CALL_QUALITY_SURVEY_COMPLETION_TOAST" = "多謝你嘅回應！";
 
 /* Footer text explaining custom issue descriptions in the call quality survey */
-"CALL_QUALITY_SURVEY_CUSTOM_ISSUE_FOOTER" = "請提供任何同問題有關嘅詳細資料。你喺度分享嘅所有內容都會保密，同埋只會用喺協助改善 Signal 嘅通話。";
+"CALL_QUALITY_SURVEY_CUSTOM_ISSUE_FOOTER" = "請提供任何同問題有關嘅詳細資料。你喺度分享嘅所有內容都會保密，同埋只會用喺協助改善 Radar 嘅通話。";
 
 /* Placeholder text for the custom issue entry in the call quality survey */
 "CALL_QUALITY_SURVEY_CUSTOM_ISSUE_PLACEHOLDER" = "講下你遇到嘅問題";
@@ -1724,7 +1724,7 @@
 "CALL_QUALITY_SURVEY_ISSUES_SHEET_TITLE" = "你遇到咩問題？";
 
 /* Header text explaining the purpose of the call quality survey */
-"CALL_QUALITY_SURVEY_RATING_HEADER" = "你嘅回應可以幫到我哋改善 Signal 嘅通話。我哋唔會儲存個人識別資料。";
+"CALL_QUALITY_SURVEY_RATING_HEADER" = "你嘅回應可以幫到我哋改善 Radar 嘅通話。我哋唔會儲存個人識別資料。";
 
 /* Title for the initial rating screen in the call quality survey */
 "CALL_QUALITY_SURVEY_RATING_TITLE" = "通話順利嗎？";
@@ -2111,7 +2111,7 @@
 "CHAT_LIST_BACKUP_PROGRESS_VIEW_RESUME_CELLULAR_DATA_BUTTON" = "繼續";
 
 /* Message shown in an action sheet when the user tries to resume backup using cellular data. */
-"CHAT_LIST_BACKUP_PROGRESS_VIEW_RESUME_CELLULAR_DATA_MESSAGE" = "用流動數據嚟備份媒體有機會收取數據費用。備份上載可能需要好長時間，請開住 Signal，咁就唔怕備份會中斷。";
+"CHAT_LIST_BACKUP_PROGRESS_VIEW_RESUME_CELLULAR_DATA_MESSAGE" = "用流動數據嚟備份媒體有機會收取數據費用。備份上載可能需要好長時間，請開住 Radar，咁就唔怕備份會中斷。";
 
 /* Title for the action sheet shown when the user tries to resume backup using cellular data. */
 "CHAT_LIST_BACKUP_PROGRESS_VIEW_RESUME_CELLULAR_DATA_TITLE" = "係咪要用流動數據黎繼續？";
@@ -2243,7 +2243,7 @@
 "CLOCK_SKEW_APP_BLOCKING_DEVICE_TIME_FORMAT" = "你裝置嘅日期同時間係 UTC %1$@。";
 
 /* Subtitle for a screen shown when the app can't be used until the user corrects their device's date and time. */
-"CLOCK_SKEW_APP_BLOCKING_SUBTITLE" = "當你嘅裝置日期同時間唔啱嗰陣，就用唔到 Signal。打開「設定」嚟改改佢。";
+"CLOCK_SKEW_APP_BLOCKING_SUBTITLE" = "當你嘅裝置日期同時間唔啱嗰陣，就用唔到 Radar。打開「設定」嚟改改佢。";
 
 /* Title for a screen shown when the app can't be used until the user corrects their device's date and time. */
 "CLOCK_SKEW_APP_BLOCKING_TITLE" = "日期唔準確";
@@ -2462,7 +2462,7 @@
 "CONTACT_SHARE_AVATAR_ROW_LABEL" = "揀相";
 
 /* Name of the option to share a contact's Signal profile photo. Read by VoiceOver on the option, and as the current value of the photo row when it's selected. */
-"CONTACT_SHARE_AVATAR_SIGNAL_PHOTO" = "Signal 個人檔案嘅相";
+"CONTACT_SHARE_AVATAR_SIGNAL_PHOTO" = "Radar 個人檔案嘅相";
 
 /* Name of the option to share a contact's photo from the phone's contacts. Read by VoiceOver on the option, and as the current value of the photo row when it's selected. */
 "CONTACT_SHARE_AVATAR_SYSTEM_CONTACT_PHOTO" = "聯絡人張相";
@@ -2477,7 +2477,7 @@
 "CONTACT_SHARE_MESSAGE_BUTTON" = "訊息";
 
 /* Notice at the top of the 'Share Contact' view when the shared contact includes their Signal account. Embeds {{ contact name }}. */
-"CONTACT_SHARE_SIGNAL_ACCOUNT_NOTICE_FORMAT" = "任何你將呢個個人檔案分享俾佢嘅人，都可以喺 Signal 上面向 %1$@ 傳送訊息。";
+"CONTACT_SHARE_SIGNAL_ACCOUNT_NOTICE_FORMAT" = "任何你將呢個個人檔案分享俾佢嘅人，都可以喺 Radar 上面向 %1$@ 傳送訊息。";
 
 /* Alert body when contacts disabled while trying to share a contact. */
 "CONTACT_SHARING_NO_ACCESS_BODY" = "Radar 需要存取你嘅通訊錄資料。請你去 iOS 設定，然後開啟通訊錄。你嘅通訊錄資料已經加密，Radar 唔會睇到。";
@@ -4698,10 +4698,10 @@
 "GROUP_NAME_EDUCATION_SHEET_BULLET_1" = "請小心防範冒充其他組織同企業嘅群組";
 
 /* Second bullet point for the explainer sheet for group names */
-"GROUP_NAME_EDUCATION_SHEET_BULLET_2" = "Signal 驗證唔到啲名同相";
+"GROUP_NAME_EDUCATION_SHEET_BULLET_2" = "Radar 驗證唔到啲名同相";
 
 /* Third bullet point for the explainer sheet for group names */
-"GROUP_NAME_EDUCATION_SHEET_BULLET_3" = "Signal 從來都唔會聯絡你攞註冊碼、PIN 碼或者恢復金鑰";
+"GROUP_NAME_EDUCATION_SHEET_BULLET_3" = "Radar 從來都唔會聯絡你攞註冊碼、PIN 碼或者恢復金鑰";
 
 /* Fourth bullet point for the explainer sheet for group names */
 "GROUP_NAME_EDUCATION_SHEET_BULLET_4" = "唔好分享個人資料俾唔識嘅人";
@@ -5266,6 +5266,9 @@
 
 /* Placeholder text displayed in empty input box in chat screen. */
 "INPUT_TOOLBAR_MESSAGE_PLACEHOLDER" = "訊息";
+/* accessibility label for the button which show up send payemnt screen */
+"INPUT_TOOLBAR_PAYMENTS_BUTTON_ACCESSIBILITY_LABEL" = "傳送付款";
+
 
 /* accessibility label for the button which shows the sticker picker */
 "INPUT_TOOLBAR_STICKER_BUTTON_ACCESSIBILITY_LABEL" = "貼圖";
@@ -5490,7 +5493,7 @@
 "LINKED_DEVICE_INFO_SHEET_BULLET_3" = "有啲帳戶設定只可以喺主要裝置度管理，包括帳戶設定同備份。";
 
 /* Lead paragraph for a sheet explaining linked devices. The text within the <bold></bold> tags is styled bold. */
-"LINKED_DEVICE_INFO_SHEET_HEADER" = "<bold>「連結咗嘅裝置」</bold>俾你喺任何其他裝置上面安全咁存取 Signal 帳戶同埋訊息。";
+"LINKED_DEVICE_INFO_SHEET_HEADER" = "<bold>「連結咗嘅裝置」</bold>俾你喺任何其他裝置上面安全咁存取 Radar 帳戶同埋訊息。";
 
 /* Shown in a banner when you tap the 'New Chat' icon at the top of the list of chats. */
 "LINKED_DEVICE_MANAGE_CONTACTS_BANNER" = "連結咗嘅裝置唔再支援管理系統通訊錄。呢部裝置會繼續同步主機嘅 Radar 聯絡清單嘅任何變更。";
@@ -5556,7 +5559,7 @@
 "LINKING_DEVICE_FAILED_TITLE" = "連唔到呢部機";
 
 /* Shown when trying to link a device to an account but that device is out of date and must first update its version of Signal. */
-"LINKING_DEVICE_OUT_OF_DATE" = "你另一部裝置用緊嘅 Signal 版本太舊。你一定要喺嗰部裝置度更新 Signal，先可以同佢連結。";
+"LINKING_DEVICE_OUT_OF_DATE" = "你另一部裝置用緊嘅 Radar 版本太舊。你一定要喺嗰部裝置度更新 Radar，先可以同佢連結。";
 
 /* Progress label when the message loading has nearly completed during the device linking process */
 "LINKING_SYNCING_FINALIZING" = "完成緊訊息轉移…";
@@ -5580,7 +5583,7 @@
 "LOCAL_BACKUP_SETTINGS_CREATE_NEW_KEY_WARNING_SHEET_BODY" = "只有當其他人知道咗你嘅金鑰嗰陣，先要建立新嘅金鑰。一定要停用咗「裝置上備份」，先可以建立新嘅金鑰。\n\n停用「裝置上備份」同建立新嘅金鑰之後，你要重新啟用「裝置上備份」。";
 
 /* Body for an error sheet shown when the user's folder choice does not contain a backup file. */
-"LOCAL_BACKUPS_MISSING_BACKUP_ACTION_SHEET_BODY" = "喺揀咗嘅資料夾度搵唔到 Signal 備份。請試下其他資料夾。";
+"LOCAL_BACKUPS_MISSING_BACKUP_ACTION_SHEET_BODY" = "喺揀咗嘅資料夾度搵唔到 Radar 備份。請試下其他資料夾。";
 
 /* Title for an error sheet shown when the user's folder choice does not contain a backup file. */
 "LOCAL_BACKUPS_MISSING_BACKUP_ACTION_SHEET_TITLE" = "搵唔到備份";
@@ -5628,7 +5631,7 @@
 "LOCAL_FILE_BACKUP_ONBOARDING_INTRO_BULLET_3" = "隨時閂咗備份";
 
 /* Subtitle for a view introducing local file backups during the onboarding flow. */
-"LOCAL_FILE_BACKUP_ONBOARDING_INTRO_SUBTITLE" = "將你嘅訊息備份去你部機嘅資料夾。你嘅備份會用端對端加密，你可透過安裝新嘅 Signal 然後選擇「還原或轉移」嚟還原備份。";
+"LOCAL_FILE_BACKUP_ONBOARDING_INTRO_SUBTITLE" = "將你嘅訊息備份去你部機嘅資料夾。你嘅備份會用端對端加密，你可透過安裝新嘅 Radar 然後選擇「還原或轉移」嚟還原備份。";
 
 /* Title for a view introducing local file backups during the onboarding flow. */
 "LOCAL_FILE_BACKUP_ONBOARDING_INTRO_TITLE" = "裝置上備份";
@@ -5643,10 +5646,10 @@
 "LOCAL_FILE_BACKUPS_CHOOSE_FOLDER_TITLE" = "揀一個資料夾";
 
 /* Warning shown when a user tries to enable local file backups with optimize media enabled */
-"LOCAL_FILE_BACKUPS_OPTIMIZE_MEDIA_WARNING_ACTION_SHEET" = "你開咗「優化 Signal 儲存空間」。如果你想將全部媒體加晒喺裝置上備份，請閂咗呢個設定。";
+"LOCAL_FILE_BACKUPS_OPTIMIZE_MEDIA_WARNING_ACTION_SHEET" = "你開咗「優化 Radar 儲存空間」。如果你想將全部媒體加晒喺裝置上備份，請閂咗呢個設定。";
 
 /* Message for a sheet warning the user about enabling Optimize Storage with local backups enabled. */
-"LOCAL_FILE_BACKUPS_OPTIMIZE_MEDIA_WARNING_ACTION_SHEET_2_BODY" = "開咗「優化 Signal 儲存空間」之後，系統會喺你嘅裝置度卸載舊媒體。你可以隨時再下載。系統仲會喺你嘅裝置上備份入面移除舊媒體。";
+"LOCAL_FILE_BACKUPS_OPTIMIZE_MEDIA_WARNING_ACTION_SHEET_2_BODY" = "開咗「優化 Radar 儲存空間」之後，系統會喺你嘅裝置度卸載舊媒體。你可以隨時再下載。系統仲會喺你嘅裝置上備份入面移除舊媒體。";
 
 /* Title for a sheet warning the user about enabling Optimize Storage with local backups enabled. */
 "LOCAL_FILE_BACKUPS_OPTIMIZE_MEDIA_WARNING_ACTION_SHEET_2_TITLE" = "媒體會喺你嘅裝置備份入面踢走";
@@ -5676,10 +5679,10 @@
 "LONG_TEXT_VIEW_TITLE" = "訊息";
 
 /* Message for a sheet warning the user that their device is low on storage space. Embeds 1:{{ the localized name of the user's device model, e.g. iPhone }}; 2:{{ an amount of storage space as a file size, e.g. 1 GB }}. */
-"LOW_DISK_SPACE_WARNING_SHEET_MESSAGE_FORMAT" = "你部%1$@嘅儲存空間就快用晒。萬一空間滿晒，Signal 就會罷工，咁你可能會收唔到啲資料。要釋放至少 %2$@ 嘅空間。";
+"LOW_DISK_SPACE_WARNING_SHEET_MESSAGE_FORMAT" = "你部%1$@嘅儲存空間就快用晒。萬一空間滿晒，Radar 就會罷工，咁你可能會收唔到啲資料。要釋放至少 %2$@ 嘅空間。";
 
 /* A suggestion for freeing up storage space, on a sheet warning the user that their device is low on storage space. */
-"LOW_DISK_SPACE_WARNING_SHEET_SUGGESTION_DELETE_CAMERA_ROLL_MEDIA" = "喺「相片」APP、Signal 或者其他通訊軟體入面刪除大容量影片";
+"LOW_DISK_SPACE_WARNING_SHEET_SUGGESTION_DELETE_CAMERA_ROLL_MEDIA" = "喺「相片」APP、Radar 或者其他通訊軟體入面刪除大容量影片";
 
 /* A suggestion for freeing up storage space, on a sheet warning the user that their device is low on storage space. */
 "LOW_DISK_SPACE_WARNING_SHEET_SUGGESTION_DELETE_DOWNLOADED_MEDIA" = "刪除已經下載嘅音樂或者其他媒體";
@@ -5844,7 +5847,7 @@
 "MEMBER_LABEL_VIEW_TITLE" = "成員標籤";
 
 /* A one-time confirmation that you, as an admin, want to delete for everyone */
-"MESSAGE_ACTION_ADMIN_DELETE_FOR_EVERYONE_CONFIRMATION" = "用 Signal 最新版本嘅谷友會知道你刪除咗呢啲訊息。";
+"MESSAGE_ACTION_ADMIN_DELETE_FOR_EVERYONE_CONFIRMATION" = "用 Radar 最新版本嘅谷友會知道你刪除咗呢啲訊息。";
 
 /* Action sheet button title */
 "MESSAGE_ACTION_COPY_TEXT" = "複製訊息文字";
@@ -6045,7 +6048,7 @@
 "MESSAGE_REQUEST_CONFIRM_ACCEPT_MESSAGE" = "淨係接受你信任嘅人嘅請求。%1$@傳訊息問你攞註冊碼、PIN 碼或者恢復金鑰。";
 
 /* Embedded text in the message for an action sheet asking the user to confirm if they want to accept a message request. */
-"MESSAGE_REQUEST_CONFIRM_ACCEPT_MESSAGE_EMBEDDED_BOLD_TEXT" = "Signal 從來都唔會";
+"MESSAGE_REQUEST_CONFIRM_ACCEPT_MESSAGE_EMBEDDED_BOLD_TEXT" = "Radar 從來都唔會";
 
 /* Title for an action sheet asking the user to confirm if they want to accept a message request */
 "MESSAGE_REQUEST_CONFIRM_ACCEPT_TITLE" = "係咪接受請求？";
@@ -6492,13 +6495,13 @@
 "NO_OTHER_GROUPS_IN_COMMON" = "無其他有緣相遇嘅谷。";
 
 /* Shown in place of the text input box in a conversation when the user is no longer registered can't send messages. The embedded value is 'Re-link' (translated via NOT_LINKED_BOTTOM_RELINK), and it will be formatted as a tappable link. */
-"NOT_LINKED_BOTTOM" = "呢部裝置嘅連結已經失效。㩒%1$@喺呢部機度繼續用 Signal 啦。";
+"NOT_LINKED_BOTTOM" = "呢部裝置嘅連結已經失效。㩒%1$@喺呢部機度繼續用 Radar 啦。";
 
 /* Shown in place of the text input box in a conversation when the user is no longer registered can't send messages. This value is a tappable link embedded in a larger sentence. */
 "NOT_LINKED_BOTTOM_RELINK" = "重新連結";
 
 /* Shown in place of the text input box in a conversation when the user is no longer registered can't send messages. The embedded value is 'Re-register' (translated via NOT_REGISTERED_BOTTOM_REREGISTER), and it will be formatted as a tappable link. */
-"NOT_REGISTERED_BOTTOM" = "呢部裝置嘅註冊已經失效。要%1$@先可以繼續用 Signal 啦。";
+"NOT_REGISTERED_BOTTOM" = "呢部裝置嘅註冊已經失效。要%1$@先可以繼續用 Radar 啦。";
 
 /* Shown in place of the text input box in a conversation when the user is no longer registered can't send messages. This value is a tappable link embedded in a larger sentence. */
 "NOT_REGISTERED_BOTTOM_REREGISTER" = "重新註冊";
@@ -6510,13 +6513,13 @@
 "NOTE_TO_SELF" = "俾自己嘅筆記";
 
 /* Body for a notification shown when Signal can't fetch messages because the device's date and time are incorrect. */
-"NOTIFICATION_BODY_CLOCK_SKEW" = "當你嘅裝置日期同時間唔啱嗰陣，Signal 會收唔到訊息。打開「設定」去改改佢。";
+"NOTIFICATION_BODY_CLOCK_SKEW" = "當你嘅裝置日期同時間唔啱嗰陣，Radar 會收唔到訊息。打開「設定」去改改佢。";
 
 /* Body for a notification representing a message request. */
 "NOTIFICATION_BODY_INCOMING_MESSAGE_REQUEST" = "訊息請求";
 
 /* Body for a notification shown when Signal can't fetch messages because the device is low on storage space. */
-"NOTIFICATION_BODY_LOW_STORAGE_SPACE" = "你可能有新訊息，但係你部機唔夠儲存空間，令到 Signal 攞唔到。㩒一下睇多啲資料。";
+"NOTIFICATION_BODY_LOW_STORAGE_SPACE" = "你可能有新訊息，但係你部機唔夠儲存空間，令到 Radar 攞唔到。㩒一下睇多啲資料。";
 
 /* Lock screen notification text presented after user powers on their device without unlocking. Embeds {{device model}} (either 'iPad' or 'iPhone') */
 "NOTIFICATION_BODY_PHONE_LOCKED_FORMAT" = "上次重新啟動您部 %1$@ 之後，可能有收到訊息。";
@@ -6615,10 +6618,10 @@
 "ONBOARDING_CHOOSE_BACKUP_SHEET_TITLE" = "揀個備份嚟還原";
 
 /* The body for the device transfer 'choice' view 'restore backup' option */
-"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_BODY" = "由你嘅「Radar/Radar 備份」度還原帳戶同埋訊息";
+"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_BODY" = "由你嘅「Signal/Radar 備份」度還原帳戶同埋訊息";
 
 /* The title for the device transfer 'choice' view 'restore backup' option */
-"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_TITLE" = "還原 Radar/Radar 安全備份";
+"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_TITLE" = "還原 Signal/Radar 安全備份";
 
 /* Body for a sheet warning users about skipping restore. */
 "ONBOARDING_CHOOSE_RESTORE_METHOD_CONFIRM_SKIP_RESTORE_BODY" = "如果而家跳過還原嘅話，遲啲就冇得再搞㗎喇。如果你喺呢個裝置再重新啟用備份功能，新嘅訊息紀錄就會取代你而家嘅備份內容。";
@@ -6696,7 +6699,7 @@
 "ONBOARDING_MODE_SWITCH_EXPLANATION_PROVISIONING" = "㩒一下「登記 iPad」，就可以建立新嘅 Radar 帳戶，或者將現有帳號轉移至呢部 iPad。咁樣做會停用晒其他用緊同一個電話冧把登記嘅裝置上面嘅 Radar 服務。";
 
 /* explanation to the user they're switching from registering to linking flow */
-"ONBOARDING_MODE_SWITCH_EXPLANATION_REGISTERING" = "㩒一下「連結此裝置」就可以將呢部裝置連接到現有嘅 Signal 帳戶。";
+"ONBOARDING_MODE_SWITCH_EXPLANATION_REGISTERING" = "㩒一下「連結此裝置」就可以將呢部裝置連接到現有嘅 Radar 帳戶。";
 
 /* header text indicating to the user they're switching from linking to registering flow */
 "ONBOARDING_MODE_SWITCH_TITLE_PROVISIONING" = "註冊呢部 iPad";
@@ -6783,13 +6786,13 @@
 "ONBOARDING_SIGN_UP_USE_SIGNAL_ACCOUNT_BUTTON_TITLE" = "Use my Signal account";
 
 /* Explanation of 'do not have old device' flow for the 'Restore or Transfer' prompt */
-"ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_BODY" = "或者如果你喺同一部機度重新安裝緊 Radar/Radar";
+"ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_BODY" = "或者如果你喺同一部機度重新安裝緊 Signal/Radar";
 
 /* Title for the 'do not have my old device' choice of the 'Restore or Transfer' prompt */
 "ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_TITLE" = "部舊手機唔喺我手上";
 
 /* Explanation of 'have old device' flow for the 'Restore or Transfer' prompt */
-"ONBOARDING_SPLASH_HAVE_OLD_DEVICE_BODY" = "用你而家嘅 Radar/Radar 帳戶掃描二維碼，就可以即刻開始用喇";
+"ONBOARDING_SPLASH_HAVE_OLD_DEVICE_BODY" = "用你而家嘅 Signal/Radar 帳戶掃描二維碼，就可以即刻開始用喇";
 
 /* Title for the 'have my old device' choice of the 'Restore or Transfer' prompt */
 "ONBOARDING_SPLASH_HAVE_OLD_DEVICE_TITLE" = "部舊手機喺我手上";
@@ -7033,7 +7036,7 @@ Send money securely.";
 "OVERSIZE_TEXT_UNAVAILABLE_SHEET_TITLE" = "完整嘅訊息已經冇咗";
 
 /* The name of the Signal app, used as the title for an entry in a user's password manager for their Signal Recovery Key. Should be localized with the same value as the app's name in the iOS App Store. */
-"PASSWORD_MANAGER_SIGNAL_APP_NAME" = "Signal 私密通訊軟件";
+"PASSWORD_MANAGER_SIGNAL_APP_NAME" = "Radar 私密通訊軟件";
 
 /* Header title for bank payment details screen */
 "PAYMENT_DETAILS_BANK_TITLE" = "銀行轉賬";
@@ -7924,10 +7927,10 @@ Send money securely.";
 "PROFILE_NAME_CHANGE_SYSTEM_NONCONTACT_FORMAT" = "%1$@ 將佢個人檔名轉咗做 %2$@。";
 
 /* First bullet point for the explainer sheet for profile names */
-"PROFILE_NAME_EDUCATION_SHEET_BULLET_1" = "Signal 驗證唔到啲名同相";
+"PROFILE_NAME_EDUCATION_SHEET_BULLET_1" = "Radar 驗證唔到啲名同相";
 
 /* Second bullet point for the explainer sheet for profile names */
-"PROFILE_NAME_EDUCATION_SHEET_BULLET_2" = "Signal 從來都唔會聯絡你攞註冊碼、PIN 碼或者恢復金鑰";
+"PROFILE_NAME_EDUCATION_SHEET_BULLET_2" = "Radar 從來都唔會聯絡你攞註冊碼、PIN 碼或者恢復金鑰";
 
 /* Third bullet point for the explainer sheet for profile names */
 "PROFILE_NAME_EDUCATION_SHEET_BULLET_3" = "請小心防範冒充他人嘅帳戶";
@@ -8035,7 +8038,7 @@ Send money securely.";
 "QUICK_RESTORE_URL_OPENED_ACTION_SHEET_EXTERNAL_URL_ACTION_TITLE" = "掃描二維碼";
 
 /* Message for an action sheet telling users how to use quick restore, when trying to open an external quick restore URL. */
-"QUICK_RESTORE_URL_OPENED_ACTION_SHEET_EXTERNAL_URL_MESSAGE" = "要將呢個帳戶轉移去新裝置，請你㩒一下「繼續」，然後用 Signal 相機掃描二維碼。請確保你掃瞄嘅二維碼係直接喺 Signal 開嘅。";
+"QUICK_RESTORE_URL_OPENED_ACTION_SHEET_EXTERNAL_URL_MESSAGE" = "要將呢個帳戶轉移去新裝置，請你㩒一下「繼續」，然後用 Radar 相機掃描二維碼。請確保你掃瞄嘅二維碼係直接喺 Radar 開嘅。";
 
 /* Accessibility label stating the author of the message to which you are replying. Embeds: {{ the author of the message to which you are replying }} {{ original message }}. */
 "QUOTED_REPLY_ACCESSIBILITY_LABEL_FORMAT" = "回覆 %1$@。 %2$@";
@@ -8203,7 +8206,7 @@ Send money securely.";
 "REGISTER_WITHOUT_NUMBER" = "唔使電話冧把註冊";
 
 /* Short description for a sheet warning users about an incorrect recovery key used for registration. */
-"REGISTRATION_BACKUP_REGISTRATION_ERROR_INCORRECT_KEY_BODY" = "請確保你而家註冊嘅電話冧把同埋 64 字元恢復金鑰，同你當初啟用 Signal 備份時儲存嘅冧把相同。冇咗金鑰就冇得還原備份㗎喇。";
+"REGISTRATION_BACKUP_REGISTRATION_ERROR_INCORRECT_KEY_BODY" = "請確保你而家註冊嘅電話冧把同埋 64 字元恢復金鑰，同你當初啟用 Radar 備份時儲存嘅冧把相同。冇咗金鑰就冇得還原備份㗎喇。";
 
 /* Title for a sheet warning users about an incorrect recovery key used for registration. */
 "REGISTRATION_BACKUP_REGISTRATION_ERROR_INCORRECT_KEY_TITLE" = "恢復金鑰錯咗";
@@ -8212,7 +8215,7 @@ Send money securely.";
 "REGISTRATION_BACKUP_REGISTRATION_ERROR_INCORRECT_KEY_TRY_PIN_ACTION" = "用其他方法註冊";
 
 /* Message body for a sheet asking users if they would rather use PIN/SMS for registration. */
-"REGISTRATION_BACKUP_REGISTRATION_ERROR_INCORRECT_KEY_TRY_PIN_MESSAGE" = "你可以透過驗證 Signal 發俾你嘅 SMS 碼或者輸入 PIN 碼嚟註冊帳戶。註冊之後，你可以再試下用恢復金鑰嚟還原備份。";
+"REGISTRATION_BACKUP_REGISTRATION_ERROR_INCORRECT_KEY_TRY_PIN_MESSAGE" = "你可以透過驗證 Radar 發俾你嘅 SMS 碼或者輸入 PIN 碼嚟註冊帳戶。註冊之後，你可以再試下用恢復金鑰嚟還原備份。";
 
 /* Title for a sheet asking users if they would rather use PIN/SMS for registration. */
 "REGISTRATION_BACKUP_REGISTRATION_ERROR_INCORRECT_KEY_TRY_PIN_TITLE" = "用 SMS 碼定 PIN 碼嚟驗證？";
@@ -8269,7 +8272,7 @@ Send money securely.";
 "REGISTRATION_BACKUP_RESTORE_ERROR_LOCAL_BACKUP_LOCATION_TITLE" = "還原唔到備份";
 
 /* Message for a sheet telling the user that their phone number is mismatched with their recovery key used for making a local backup */
-"REGISTRATION_BACKUP_RESTORE_ERROR_MISMATCHED_LOCAL_BACKUP_MESSAGE" = "你試緊還原嘅備份係由另一個 Signal 帳戶建立嘅。要還原呢個備份，你一定要用當初啟用裝置上備份嗰陣嘅電話冧把同之前記低嘅恢復金鑰。";
+"REGISTRATION_BACKUP_RESTORE_ERROR_MISMATCHED_LOCAL_BACKUP_MESSAGE" = "你試緊還原嘅備份係由另一個 Radar 帳戶建立嘅。要還原呢個備份，你一定要用當初啟用裝置上備份嗰陣嘅電話冧把同之前記低嘅恢復金鑰。";
 
 /* Body for a sheet warning users about a network error during backup restore. */
 "REGISTRATION_BACKUP_RESTORE_ERROR_NETWORK_BODY" = "暫時還原唔到你嘅備份。請檢查你嘅互聯網連線，然後再試多次。";
@@ -8761,7 +8764,7 @@ Send money securely.";
 "RING_ON_CONFIRMATION_TOAST_LABEL" = "鈴聲開咗";
 
 /* Message shown in an action sheet when attempting to disable PIN, but Backups is enabled. */
-"ROTATE_AEP_ACTION_BACKUPS_DISABLE_REQUIRED" = "你一定要停用「Signal 安全備份」先可以繼續。";
+"ROTATE_AEP_ACTION_BACKUPS_DISABLE_REQUIRED" = "你一定要停用「Radar 安全備份」先可以繼續。";
 
 /* button title to confirm adding a recipient when their safety number has recently changed */
 "SAFETY_NUMBER_CHANGED_CONFIRM_ADD_MEMBER_ACTION" = "照樣新增";
@@ -8803,13 +8806,13 @@ Send money securely.";
 "SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_BUTTON_VERIFYING" = "加密驗證緊……";
 
 /* Body for a sheet introducing Key Transparency. */
-"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_EDUCATION_SHEET_BODY" = "對於用電話冧把聯絡嘅人，Signal 會進行一個叫「金鑰透明度」嘅程序，自動確認聯絡對象係咪安全。如果想更加保險，你可以繼續用返二維碼或者比較安全碼嚟人手驗證聯絡人。";
+"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_EDUCATION_SHEET_BODY" = "對於用電話冧把聯絡嘅人，Radar 會進行一個叫「金鑰透明度」嘅程序，自動確認聯絡對象係咪安全。如果想更加保險，你可以繼續用返二維碼或者比較安全碼嚟人手驗證聯絡人。";
 
 /* Title for a sheet introducing Key Transparency. */
-"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_EDUCATION_SHEET_TITLE" = "Signal 而家可以自動驗證加密";
+"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_EDUCATION_SHEET_TITLE" = "Radar 而家可以自動驗證加密";
 
 /* Body for a sheet explaining that encryption auto-verification did not succeed. Embeds {{ 1: the contact's name }}. */
-"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_FAILURE_SHEET_BODY_FORMAT" = "Signal 唔可以自動驗證呢個聊天嘅加密。原因可能係 %1$@ 轉咗新電話冧把，或者改咗電話冧把嘅私隱設定。如果想手動驗證端對端加密，你可以比較上一個畫面嘅數字，或者掃瞄佢部機嘅二維碼。";
+"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_FAILURE_SHEET_BODY_FORMAT" = "Radar 唔可以自動驗證呢個聊天嘅加密。原因可能係 %1$@ 轉咗新電話冧把，或者改咗電話冧把嘅私隱設定。如果想手動驗證端對端加密，你可以比較上一個畫面嘅數字，或者掃瞄佢部機嘅二維碼。";
 
 /* Title for a sheet explaining that encryption auto-verification did not succeed. */
 "SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_FAILURE_SHEET_TITLE" = "呢個聊天已經冇咗自動驗證功能";
@@ -8821,13 +8824,13 @@ Send money securely.";
 "SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_HEADER" = "自動金鑰驗證";
 
 /* Body for a sheet explaining that encryption auto-verification is not available. */
-"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_NOT_AVAILABLE_SHEET_BODY" = "只有用電話冧把同對方聯絡嘅聊天，Signal 先可以自動做加密驗證。如果個聊天係由用戶名稱或者經聊天谷建立，你可以比較上一個畫面嘅數字，或者掃瞄佢部機嘅二維碼嚟驗證端對端加密。";
+"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_NOT_AVAILABLE_SHEET_BODY" = "只有用電話冧把同對方聯絡嘅聊天，Radar 先可以自動做加密驗證。如果個聊天係由用戶名稱或者經聊天谷建立，你可以比較上一個畫面嘅數字，或者掃瞄佢部機嘅二維碼嚟驗證端對端加密。";
 
 /* Title for a sheet explaining that encryption auto-verification is not available. */
 "SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_NOT_AVAILABLE_SHEET_TITLE" = "呢個聊天未有自動驗證功能";
 
 /* Body for a sheet explaining that encryption auto-verification succeeded. */
-"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_SUCCESS_SHEET_BODY" = "對於用電話冧把聯絡嘅聯絡人，Signal 會進行一個叫「金鑰透明度」嘅程序，自動確認聯絡對象係咪安全。如果想更加保險，你可以比較上一個畫面嘅數字，或者掃瞄佢部機嘅二維碼嚟手動驗證端對端加密。";
+"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_SUCCESS_SHEET_BODY" = "對於用電話冧把聯絡嘅聯絡人，Radar 會進行一個叫「金鑰透明度」嘅程序，自動確認聯絡對象係咪安全。如果想更加保險，你可以比較上一個畫面嘅數字，或者掃瞄佢部機嘅二維碼嚟手動驗證端對端加密。";
 
 /* Title for a sheet explaining that encryption auto-verification succeeded. */
 "SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_SUCCESS_SHEET_TITLE" = "系統已經為呢個聊天做緊自動加密驗證";
@@ -8842,7 +8845,7 @@ Send money securely.";
 "SAFETY_TIPS_CRYPTO_TITLE" = "加密貨幣或者金錢詐騙";
 
 /* Message body describing the enable reglock safety tip. */
-"SAFETY_TIPS_ENABLE_REGLOCK_BODY" = "喺註冊 Signal 時，除咗驗證碼之外，仲需要輸入 Signal PIN 碼，嚟確保你嘅帳戶安全。";
+"SAFETY_TIPS_ENABLE_REGLOCK_BODY" = "喺註冊 Radar 時，除咗驗證碼之外，仲需要輸入 Radar PIN 碼，嚟確保你嘅帳戶安全。";
 
 /* Message title describing the enable reglock safety tip. */
 "SAFETY_TIPS_ENABLE_REGLOCK_TITLE" = "喺帳戶設定度開啟註冊鎖";
@@ -8875,22 +8878,22 @@ Send money securely.";
 "SAFETY_TIPS_MESSAGE_LINKS_TITLE" = "附有網站連結嘅訊息";
 
 /* Message body describing the review names safety tip. */
-"SAFETY_TIPS_REVIEW_NAMES_BODY" = "留意「個名冇經過驗證」嘅提示。每個用戶都係自己喺 Signal 度設定自己個名。";
+"SAFETY_TIPS_REVIEW_NAMES_BODY" = "留意「個名冇經過驗證」嘅提示。每個用戶都係自己喺 Radar 度設定自己個名。";
 
 /* Message body describing the review names safety tip in the 'view more' flow. */
-"SAFETY_TIPS_REVIEW_NAMES_BODY_VIEW_MORE" = "留意「個名冇經過驗證」嘅提示。每個用戶都係自己喺 Signal 度設定個人檔名同頭像。如果你唔確定邊個提出新請求，最好唔好理佢。";
+"SAFETY_TIPS_REVIEW_NAMES_BODY_VIEW_MORE" = "留意「個名冇經過驗證」嘅提示。每個用戶都係自己喺 Radar 度設定個人檔名同頭像。如果你唔確定邊個提出新請求，最好唔好理佢。";
 
 /* Message title describing the review names safety tip. */
 "SAFETY_TIPS_REVIEW_NAMES_TITLE" = "檢查下啲名同相";
 
 /* Message body describing the signal chats tip. */
-"SAFETY_TIPS_SIGNAL_CHATS_BODY" = "Signal 從來都唔會傳訊息問你攞註冊碼、PIN 碼或者恢復金鑰。千祈唔好回覆任何假扮 Signal 嘅聊天訊息。";
+"SAFETY_TIPS_SIGNAL_CHATS_BODY" = "Radar 從來都唔會傳訊息問你攞註冊碼、PIN 碼或者恢復金鑰。千祈唔好回覆任何假扮 Radar 嘅聊天訊息。";
 
 /* Message body describing the signal chats tip in the 'view more' flow. */
-"SAFETY_TIPS_SIGNAL_CHATS_BODY_VIEW_MORE" = "Signal 從來都唔會傳訊息問你攞註冊碼、PIN 碼或者恢復金鑰。千祈唔好回覆任何假扮 Signal 同 Signal 支援嘅聊天訊息。不法分子會用假名試圖盜用你嘅帳戶。";
+"SAFETY_TIPS_SIGNAL_CHATS_BODY_VIEW_MORE" = "Radar 從來都唔會傳訊息問你攞註冊碼、PIN 碼或者恢復金鑰。千祈唔好回覆任何假扮 Radar 同 Radar 支援嘅聊天訊息。不法分子會用假名試圖盜用你嘅帳戶。";
 
 /* Message title describing the signal chats tip. */
-"SAFETY_TIPS_SIGNAL_CHATS_TITLE" = "千祈唔好回覆嚟自 Signal 嘅聊天訊息";
+"SAFETY_TIPS_SIGNAL_CHATS_TITLE" = "千祈唔好回覆嚟自 Radar 嘅聊天訊息";
 
 /* Message contents for the vague message safety tip. */
 "SAFETY_TIPS_VAGUE_MESSAGE_BODY" = "垃圾訊息通常會用「Hi」開頭嚟吸引你。如果你應機，佢哋可能就會繼續拉你入局。";
@@ -9025,10 +9028,10 @@ Send money securely.";
 "SECONDARY_ONBOARDING_SCAN_CODE_STEP_LINK_DEVICE" = "㩒一下「連結咗嘅裝置」同埋「連結新裝置」";
 
 /* First bullet point on the QR code screen for linking a device */
-"SECONDARY_ONBOARDING_SCAN_CODE_STEP_OPEN_PRIMARY" = "喺你部主機度打開 Signal";
+"SECONDARY_ONBOARDING_SCAN_CODE_STEP_OPEN_PRIMARY" = "喺你部主機度打開 Radar";
 
 /* Second bullet point on the QR code screen for linking a device */
-"SECONDARY_ONBOARDING_SCAN_CODE_STEP_OPEN_SETTINGS" = "㩒一下個人檔案張圖嚟打開「Signal 設定」";
+"SECONDARY_ONBOARDING_SCAN_CODE_STEP_OPEN_SETTINGS" = "㩒一下個人檔案張圖嚟打開「Radar 設定」";
 
 /* header text while displaying a QR code which, when scanned, will link this device. */
 "SECONDARY_ONBOARDING_SCAN_CODE_TITLE" = "掃描呢個二維碼去連結你個帳戶";
@@ -9067,13 +9070,13 @@ Send money securely.";
 "SELECT_CONTACT_FOR_SHARING_PERMISSION_PROMPT_ALLOW_BUTTON" = "允許存取";
 
 /* Body of the prompt on the 'Select Contact' view that asks the user to allow access to their contacts. */
-"SELECT_CONTACT_FOR_SHARING_PERMISSION_PROMPT_BODY" = "請允許存取你嘅通訊錄。你嘅通訊錄資料已經加密，Signal 唔會睇到。";
+"SELECT_CONTACT_FOR_SHARING_PERMISSION_PROMPT_BODY" = "請允許存取你嘅通訊錄。你嘅通訊錄資料已經加密，Radar 唔會睇到。";
 
 /* Button on the 'Select Contact' view's contacts permission prompt that hides the prompt. */
 "SELECT_CONTACT_FOR_SHARING_PERMISSION_PROMPT_DISMISS_BUTTON" = "唔使喇，唔該";
 
 /* Title of the prompt on the 'Select Contact' view that asks the user to allow access to their contacts. */
-"SELECT_CONTACT_FOR_SHARING_PERMISSION_PROMPT_TITLE" = "喺 Signal 搵你識嘅人";
+"SELECT_CONTACT_FOR_SHARING_PERMISSION_PROMPT_TITLE" = "喺 Radar 搵你識嘅人";
 
 /* Placeholder text for the search bar on the 'Select Contact' view */
 "SELECT_CONTACT_FOR_SHARING_SEARCH_BAR_PLACEHOLDER" = "搜尋";
@@ -9460,7 +9463,7 @@ Send money securely.";
 "SETTINGS_KEEP_MUTED_ARCHIVED_LABEL" = "繼續封存靜音聊天";
 
 /* Footer for settings section describing Key Transparency. */
-"SETTINGS_KEY_TRANSPARENCY_OPT_OUT_FOOTER" = "開啟呢個功能之後，Signal 會嘗試自動驗證 1 對 1 聊天嘅加密。";
+"SETTINGS_KEY_TRANSPARENCY_OPT_OUT_FOOTER" = "開啟呢個功能之後，Radar 會嘗試自動驗證 1 對 1 聊天嘅加密。";
 
 /* Title for for a settings option describing that Key Transparency is enabled. */
 "SETTINGS_KEY_TRANSPARENCY_OPT_OUT_SWITCH_TITLE" = "自動金鑰驗證";
@@ -9475,7 +9478,7 @@ Send money securely.";
 "SETTINGS_LINK_PREVIEWS_FOOTER" = "您傳送嘅訊息如果有拎嘅話，跟住條拎去網站度攞返個預覽。";
 
 /* Subtitle of a card on a linked device's account settings, explaining that account settings are managed on the primary device. */
-"SETTINGS_LINKED_DEVICE_ACCOUNT_CARD_SUBTITLE" = "要管理帳戶設定，請喺主要裝置度打開 Signal。";
+"SETTINGS_LINKED_DEVICE_ACCOUNT_CARD_SUBTITLE" = "要管理帳戶設定，請喺主要裝置度打開 Radar。";
 
 /* Title of a card on a linked device's account settings, indicating that this is a linked device. */
 "SETTINGS_LINKED_DEVICE_ACCOUNT_CARD_TITLE" = "呢部係連結咗嘅裝置";
@@ -9484,7 +9487,7 @@ Send money securely.";
 "SETTINGS_LINKED_DEVICE_DELETE_DATA_BUTTON" = "刪除 APP 嘅資料";
 
 /* Footer below the 'delete app data' button, shown on a linked device's account settings. */
-"SETTINGS_LINKED_DEVICE_DELETE_DATA_FOOTER" = "咁樣做會移除呢部機上面 Signal APP 嘅全部資料。";
+"SETTINGS_LINKED_DEVICE_DELETE_DATA_FOOTER" = "咁樣做會移除呢部機上面 Radar APP 嘅全部資料。";
 
 /* Text for a toast confirming the user changed their local file backup location. */
 "SETTINGS_LOCAL_FILE_BACKUP_FOLDER_UPDATED" = "備份資料夾已經更新咗";
@@ -9508,7 +9511,7 @@ Send money securely.";
 "SETTINGS_LOCAL_FILE_BACKUPS_LAST_BACKUP_DATE" = "上一次備份";
 
 /* Message for an action sheet when a user cannot perform a remote backup because a local backup is in progress */
-"SETTINGS_LOCAL_FILE_BACKUPS_LOCAL_BACKUP_IN_PROGRESS_MESSAGE" = "因為系統整緊裝置上備份，所以未處理到「Signal 安全備份」。請你遲啲再試過啦。";
+"SETTINGS_LOCAL_FILE_BACKUPS_LOCAL_BACKUP_IN_PROGRESS_MESSAGE" = "因為系統整緊裝置上備份，所以未處理到「Radar 安全備份」。請你遲啲再試過啦。";
 
 /* Label for a progress bar while attachments are being copied for an on-device backup. Embeds 1:{{%1$@ completed bytes copied, %2$@ total bytes to copy, %3$@ percentage complete }}. */
 "SETTINGS_LOCAL_FILE_BACKUPS_PROGRESS_COPYING_ATTACHMENTS" = "建立緊裝置上備份 %1$@ / %2$@ (%3$@)";
@@ -9523,10 +9526,10 @@ Send money securely.";
 "SETTINGS_LOCAL_FILE_BACKUPS_PROGRESS_RESTORING_ATTACHMENTS" = "攞返裝置入面個備份嚟還原緊 (%1$@ / %2$@)";
 
 /* Message for an action sheet when a user cannot perform a local backup because a remote backup is in progress */
-"SETTINGS_LOCAL_FILE_BACKUPS_REMOTE_BACKUP_IN_PROGRESS_MESSAGE" = "因為系統整緊「Signal 安全備份」，所以未處理到裝置上備份。請你遲啲再試過啦。";
+"SETTINGS_LOCAL_FILE_BACKUPS_REMOTE_BACKUP_IN_PROGRESS_MESSAGE" = "因為系統整緊「Radar 安全備份」，所以未處理到裝置上備份。請你遲啲再試過啦。";
 
 /* Footer text on the on-device backups settings page explaining how to restore a backup. */
-"SETTINGS_LOCAL_FILE_BACKUPS_RESTORE_FOOTER" = "要還原一個備份嘅話，請首先重新安裝 Signal。開返個 APP 出嚟，㩒一下「還原或者轉移」然後揀「裝置上備份」。";
+"SETTINGS_LOCAL_FILE_BACKUPS_RESTORE_FOOTER" = "要還原一個備份嘅話，請首先重新安裝 Radar。開返個 APP 出嚟，㩒一下「還原或者轉移」然後揀「裝置上備份」。";
 
 /* Label for the button that turns off on-device backups. */
 "SETTINGS_LOCAL_FILE_BACKUPS_TURN_OFF" = "閂咗佢同埋刪除備份";
@@ -9616,7 +9619,7 @@ Send money securely.";
 "SETTINGS_NOTIFICATIONS_APP_BADGE_SECTION" = "APP 徽章";
 
 /* Explanation for the switch controlling whether a notification is shown when a phone contact joins Signal. */
-"SETTINGS_NOTIFICATIONS_CONTACT_JOINED_SIGNAL_FOOTER" = "當手機通訊錄度嘅聯絡人加入 Signal 嗰陣顯示通知。";
+"SETTINGS_NOTIFICATIONS_CONTACT_JOINED_SIGNAL_FOOTER" = "當手機通訊錄度嘅聯絡人加入 Radar 嗰陣顯示通知。";
 
 /* Label for a switch controlling whether reactions to your messages generate notifications. */
 "SETTINGS_NOTIFICATIONS_REACTIONS" = "心情回應通知";
@@ -9641,7 +9644,7 @@ Send money securely.";
 "SETTINGS_NOTIFICATIONS_UNREAD_REMINDERS" = "未睇嘅提醒";
 
 /* Explanation for the switch controlling whether reminders about unread messages are shown in this chat while it is muted. */
-"SETTINGS_NOTIFICATIONS_UNREAD_REMINDERS_CHAT_FOOTER" = "當呢個聊天設做靜音嗰陣，Signal 會間中通知你有未睇嘅訊息。";
+"SETTINGS_NOTIFICATIONS_UNREAD_REMINDERS_CHAT_FOOTER" = "當呢個聊天設做靜音嗰陣，Radar 會間中通知你有未睇嘅訊息。";
 
 /* Explanation for the switch controlling whether reminders about unread messages in muted chats are shown. */
 "SETTINGS_NOTIFICATIONS_UNREAD_REMINDERS_FOOTER" = "當靜音聊天入面有未睇訊息嗰陣間中通知。";
@@ -10403,7 +10406,7 @@ Send money securely.";
 "SHARE_EXTENSION_LOADING" = "載入緊…";
 
 /* Message for an error shown when the user tries to share to Signal but the device is too low on storage space. */
-"SHARE_EXTENSION_LOW_STORAGE_SPACE_MESSAGE" = "你部機嘅儲存空間唔夠，所以冇得分享去 Signal。請喺「設定」度管理儲存空間嚟放啲空位，然後再試一次。";
+"SHARE_EXTENSION_LOW_STORAGE_SPACE_MESSAGE" = "你部機嘅儲存空間唔夠，所以冇得分享去 Radar。請喺「設定」度管理儲存空間嚟放啲空位，然後再試一次。";
 
 /* Title for an error shown when the user tries to share to Signal but the device is too low on storage space. */
 "SHARE_EXTENSION_LOW_STORAGE_SPACE_TITLE" = "儲存空間不足";
@@ -10445,7 +10448,7 @@ Send money securely.";
 "SIGNAL_LOGIN_RECOVERY_KEY_PLACEHOLDER_TITLE" = "恢復金鑰";
 
 /* Title for the sheet presented when user taps on Signal Proxy link in chat. */
-"SIGNAL_PROXY" = "Signal 代理伺服器";
+"SIGNAL_PROXY" = "Radar 代理伺服器";
 
 /* body sent to contacts when inviting to Install Signal */
 "SMS_INVITE_BODY" = "見字裝 Radar！條 Link 喺度：";
@@ -10488,6 +10491,10 @@ Send money securely.";
 
 /* Text for a toast confirming that the speakerphone has been turned on for a call. */
 "SPEAKERPHONE_ON_CONFIRMATION_TOAST_LABEL" = "開咗喇叭";
+
+"STAR" = "Star";
+
+"STARRED_MESSAGES" = "Starred messages";
 
 /* Title for a button to view a sticker pack */
 "STICKER_BUTTON_VIEW_PACK" = "睇下貼圖包";
@@ -10532,7 +10539,7 @@ Send money securely.";
 "STICKER_PACK_SHARE_SHEET_HEADER" = "任何有呢條拎嘅人都可以加同分享呢個貼圖包。";
 
 /* Label for a button on a sticker-pack share sheet that sends the pack in Signal. */
-"STICKER_PACK_SHARE_SHEET_SEND_IN_SIGNAL" = "喺 Signal 發送";
+"STICKER_PACK_SHARE_SHEET_SEND_IN_SIGNAL" = "喺 Radar 發送";
 
 /* Message when trying to show a sticker that has expired and is unavailable for download */
 "STICKER_UNAVAILABLE_MESSAGE_LABEL" = "貼圖已經冇咗";
@@ -11242,6 +11249,8 @@ Send money securely.";
 /* Notification body for unread reminders. First placeholder is unread messages, second is a summary of either unread mentions or replies */
 "UnreadReminderJob__unread_one_summary" = "你有 %1$@，包括 %2$@。";
 
+"UNSTAR" = "Unstar";
+
 /* No comment provided by engineer. */
 "UNSUPPORTED_ATTACHMENT" = "收到未支援嘅附件類型。";
 
@@ -11435,7 +11444,7 @@ Send money securely.";
 "VERIFICATION_CODE_REQUESTED_HERO_BODY_FIRST" = "已經要求驗證碼";
 
 /* Second part of body for a hero sheet informing the user a verification code was requested. */
-"VERIFICATION_CODE_REQUESTED_HERO_BODY_SECOND" = "千祈唔好將驗證碼俾任何人。Signal 從來都唔會傳訊息問你攞㗎。如果你收到有人假扮 Signal 嘅訊息，咁實係詐騙。\n如果係你自己要求攞驗證碼，可以唔使理呢個訊息。";
+"VERIFICATION_CODE_REQUESTED_HERO_BODY_SECOND" = "千祈唔好將驗證碼俾任何人。Radar 從來都唔會傳訊息問你攞㗎。如果你收到有人假扮 Radar 嘅訊息，咁實係詐騙。\n如果係你自己要求攞驗證碼，可以唔使理呢個訊息。";
 
 /* Format for info message indicating that the verification state was unverified on this device. Embeds {{user's name or phone number}}. */
 "VERIFICATION_STATE_CHANGE_FORMAT_NOT_VERIFIED_LOCAL" = "您已剔低 %1$@ 話未驗證。";

@@ -2,7 +2,7 @@
 "AB_PERMISSION_MISSING_ACTION_NOT_NOW" = "Inte nu";
 
 /* Footer for the 'about' help section. For non-English languages, exclude the word '501c3'. */
-"ABOUT_SECTION_FOOTER" = "Copyright Signal Messenger\nLicensierad under AGPLv33\nSignal är en ideell organisation";
+"ABOUT_SECTION_FOOTER" = "Copyright Signal Messenger\nCopyright 2026 Radar Chat, Inc.\nLicensierad under AGPLv33";
 
 /* Title for the 'about' help section */
 "ABOUT_SECTION_TITLE" = "Om Radar";
@@ -215,7 +215,7 @@
 "APN_Message" = "Du kanske har nya meddelanden";
 
 /* Shown in place of the text input box in a conversation when the app has expired and the user is no longer allowed to send messages. The embedded value is 'Update now' (translated via APP_EXPIRED_BOTTOM_UPDATE), and it will be formatted as a tappable link. */
-"APP_EXPIRED_BOTTOM" = "Denna version av Signal har upphört att gälla. %1$@ för att skicka och ta emot meddelanden.";
+"APP_EXPIRED_BOTTOM" = "Denna version av Radar har upphört att gälla. %1$@ för att skicka och ta emot meddelanden.";
 
 /* Shown in place of the text input box in a conversation when the app has expired and the user is no longer allowed to send messages. This value is a tappable link embedded in a larger sentence. */
 "APP_EXPIRED_BOTTOM_UPDATE" = "Uppdatera nu";
@@ -236,7 +236,7 @@
 "APP_LAUNCH_FAILURE_COULD_NOT_LOAD_DATABASE" = "Det gick inte att läsa in databasen";
 
 /* Message for an action sheet explaining that Signal can't launch because the database is corrupted. */
-"APP_LAUNCH_FAILURE_DATABASE_CORRUPTED_MESSAGE" = "Signal kan inte startas eftersom databasen är skadad. Säkerheten för ditt konto eller dina meddelanden har inte påverkats.";
+"APP_LAUNCH_FAILURE_DATABASE_CORRUPTED_MESSAGE" = "Radar kan inte startas eftersom databasen är skadad. Säkerheten för ditt konto eller dina meddelanden har inte påverkats.";
 
 /* Title for an action sheet explaining that Signal can't launch because the database is corrupted. */
 "APP_LAUNCH_FAILURE_DATABASE_CORRUPTED_TITLE" = "Databasen är skadad";
@@ -245,7 +245,7 @@
 "APP_LAUNCH_FAILURE_DATABASE_RECOVERY_ACTION_TITLE" = "Reparera";
 
 /* Action in an action sheet offering to exit the app. */
-"APP_LAUNCH_FAILURE_EXIT_APP_ACTION_TITLE" = "Avsluta Signal";
+"APP_LAUNCH_FAILURE_EXIT_APP_ACTION_TITLE" = "Avsluta Radar";
 
 /* Error indicating that the app could not launch without reverting unknown database migrations. */
 "APP_LAUNCH_FAILURE_INVALID_DATABASE_VERSION_MESSAGE" = "Uppgradera till den senaste versionen av Radar.";
@@ -260,7 +260,7 @@
 "APP_LAUNCH_FAILURE_LAST_LAUNCH_CRASHED_TITLE" = "Kan ej öppna Radar";
 
 /* Message for an error sheet shown when the app cannot launch because the device is out of storage space. Embeds 1:{{ the localized name of the user's device model, e.g. iPhone }}; 2:{{ an amount of storage space as a file size, e.g. 1 GB }}. */
-"APP_LAUNCH_FAILURE_NOT_ENOUGH_STORAGE_SPACE_MESSAGE_FORMAT" = "Signal kan inte öppnas eftersom %1$@ har slut på lagringsutrymme. Frigör minst %2$@ och öppna sedan Signal igen.\n\nGå till iOS-inställningar > Allmänt > Lagring och ta bort appar du inte använder, radera stora videor från appen Bilder eller andra appar och radera nedladdad musik och medier.";
+"APP_LAUNCH_FAILURE_NOT_ENOUGH_STORAGE_SPACE_MESSAGE_FORMAT" = "Radar kan inte öppnas eftersom %1$@ har slut på lagringsutrymme. Frigör minst %2$@ och öppna sedan Radar igen.\n\nGå till iOS-inställningar > Allmänt > Lagring och ta bort appar du inte använder, radera stora videor från appen Bilder eller andra appar och radera nedladdad musik och medier.";
 
 /* Title for an error sheet shown when the app cannot launch because the device is out of storage space. */
 "APP_LAUNCH_FAILURE_NOT_ENOUGH_STORAGE_SPACE_TITLE" = "Det finns inte tillräckligt med lagringsutrymme";
@@ -377,13 +377,13 @@
 "ATTACHMENT_APPROVAL_MEDIA_QUALITY_TITLE" = "Mediekvalitet";
 
 /* Notification body shown when media sync to a linked device is complete. */
-"ATTACHMENT_BACKFILL_FINISHED_NOTIFICATION" = "Synkroniseringen med Signal på din länkade enhet är klar.";
+"ATTACHMENT_BACKFILL_FINISHED_NOTIFICATION" = "Synkroniseringen med Radar på din länkade enhet är klar.";
 
 /* Notification body shown when media sync to a linked device was interrupted. */
-"ATTACHMENT_BACKFILL_INTERRUPTED_NOTIFICATION" = "Öppna Signal för att fortsätta synkroniseringen med din länkade enhet";
+"ATTACHMENT_BACKFILL_INTERRUPTED_NOTIFICATION" = "Öppna Radar för att fortsätta synkroniseringen med din länkade enhet";
 
 /* Notification body shown while syncing media to a linked device. */
-"ATTACHMENT_BACKFILL_SYNCING_NOTIFICATION" = "Synkroniserar med Signal på din länkade enhet";
+"ATTACHMENT_BACKFILL_SYNCING_NOTIFICATION" = "Synkroniserar med Radar på din länkade enhet";
 
 /* Generic filename for an attachment with no known name */
 "ATTACHMENT_DEFAULT_FILENAME" = "Bilaga";
@@ -632,7 +632,7 @@
 "BACKUP_KEY_SEE_FULL_KEY_BUTTON_TITLE" = "Se hela nyckeln";
 
 /* Body for a warning sheet shown to discourage the user from sharing their 'Recovery Key', warning them not to share it with anyone. */
-"BACKUP_NEVER_SHARE_RECOVERY_KEY_SHEET_BODY" = "Dela inte din återställningsnyckel med någon. Det gör att de kan ta över ditt konto. Signal kommer <bold>aldrig</bold> att skicka meddelanden till dig för att be om din återställningsnyckel. Svara aldrig på en chatt som utger sig för att vara Signal.";
+"BACKUP_NEVER_SHARE_RECOVERY_KEY_SHEET_BODY" = "Dela inte din återställningsnyckel med någon. Det gör att de kan ta över ditt konto. Radar kommer <bold>aldrig</bold> att skicka meddelanden till dig för att be om din återställningsnyckel. Svara aldrig på en chatt som utger sig för att vara Radar.";
 
 /* Title for a warning sheet shown to discourage the user from sharing their 'Recovery Key'. */
 "BACKUP_NEVER_SHARE_RECOVERY_KEY_SHEET_TITLE" = "Dela inte återställningsnyckel";
@@ -752,7 +752,7 @@
 "BACKUP_RESTORE_MODAL_TITLE" = "Återställer meddelanden …";
 
 /* Message for a confirmation sheet shown before saving the user's Recovery Key to their password manager. */
-"BACKUP_SAVE_KEY_PW_MGR_CONFIRM_SHEET_MESSAGE" = "Förvara bara din återställningsnyckel i en lösenordshanterare som du litar på är säker. Signal ger ingen rekommendation om vilken lösenordshanterare som är rätt för dig.";
+"BACKUP_SAVE_KEY_PW_MGR_CONFIRM_SHEET_MESSAGE" = "Förvara bara din återställningsnyckel i en lösenordshanterare som du litar på är säker. Radar ger ingen rekommendation om vilken lösenordshanterare som är rätt för dig.";
 
 /* Title for a confirmation sheet shown before saving the user's Recovery Key to their password manager. */
 "BACKUP_SAVE_KEY_PW_MGR_CONFIRM_SHEET_TITLE" = "Spara i lösenordshanterare?";
@@ -770,7 +770,7 @@
 "BACKUP_SAVE_KEY_SAVE_TO_PW_MGR_BUTTON_TITLE" = "Spara i lösenordshanterare";
 
 /* Message describing that the Background App Refresh permission is disabled for Signal. \"Background App Refresh\" should be localized the same way it is in iOS Settings app permissions. */
-"BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_MESSAGE" = "Automatiska säkerhetskopior är inaktiverade. Aktivera automatiska säkerhetskopior genom att uppdatera Signals behörigheter.";
+"BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_MESSAGE" = "Automatiska säkerhetskopior är inaktiverade. Aktivera automatiska säkerhetskopior genom att uppdatera Radars behörigheter.";
 
 /* Add-on to a message describing that the Background App Refresh permission is disabled for Signal. \"Background App Refresh\" should be localized the same way it is in iOS Settings app permissions. */
 "BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_MESSAGE_UPDATE_NOW" = "Uppdatera nu";
@@ -899,16 +899,16 @@
 "BACKUP_SETTINGS_BACKUP_PLAN_PAID_RENEWAL_FORMAT" = "Förnyas %1$@";
 
 /* Footer for a menu section related to settings for when Backups are disabled. */
-"BACKUP_SETTINGS_BACKUPS_DISABLED_SECTION_FOOTER" = "Säkerhetskopieringar har stängts av och dina data har tagits bort från Signals säkra lagringstjänst.";
+"BACKUP_SETTINGS_BACKUPS_DISABLED_SECTION_FOOTER" = "Säkerhetskopieringar har stängts av och dina data har tagits bort från Radars säkra lagringstjänst.";
 
 /* Description for a progress view tracking media being downloaded in service of disabling Backups. */
-"BACKUP_SETTINGS_BACKUPS_DISABLING_DOWNLOADING_MEDIA_PROGRESS_VIEW_DESCRIPTION" = "Säkerhetskopiering har inaktiverats. Alla mediefiler som inte finns på enheten laddas ner nu. När dina data har laddats ner kommer de att raderas från Signals säkra lagringstjänst.";
+"BACKUP_SETTINGS_BACKUPS_DISABLING_DOWNLOADING_MEDIA_PROGRESS_VIEW_DESCRIPTION" = "Säkerhetskopiering har inaktiverats. Alla mediefiler som inte finns på enheten laddas ner nu. När dina data har laddats ner kommer de att raderas från Radars säkra lagringstjänst.";
 
 /* Message for a view indicating we failed to delete the user's Backup due to an unexpected error. */
 "BACKUP_SETTINGS_BACKUPS_DISABLING_GENERIC_ERROR_MESSAGE" = "Ett fel inträffade. Kontakta supporten.";
 
 /* Header for a menu section related to settings for when disabling Backups encountered an unexpected error. */
-"BACKUP_SETTINGS_BACKUPS_DISABLING_GENERIC_ERROR_SECTION_HEADER" = "Ett fel uppstod när dina data skulle raderas från Signals säkra lagringstjänst.";
+"BACKUP_SETTINGS_BACKUPS_DISABLING_GENERIC_ERROR_SECTION_HEADER" = "Ett fel uppstod när dina data skulle raderas från Radars säkra lagringstjänst.";
 
 /* Title for a view indicating we failed to delete the user's Backup due to an unexpected error. */
 "BACKUP_SETTINGS_BACKUPS_DISABLING_GENERIC_ERROR_TITLE" = "Det gick inte att ta bort säkerhetskopian";
@@ -917,7 +917,7 @@
 "BACKUP_SETTINGS_BACKUPS_DISABLING_PROGRESS_VIEW_DESCRIPTION" = "Tar bort säkerhetskopia …";
 
 /* Header for a menu section related to disabling Backups. */
-"BACKUP_SETTINGS_BACKUPS_DISABLING_SECTION_HEADER" = "Säkerhetskopieringar har stängts av och dina data kommer att tas bort från Signals säkra lagringstjänst.";
+"BACKUP_SETTINGS_BACKUPS_DISABLING_SECTION_HEADER" = "Säkerhetskopieringar har stängts av och dina data kommer att tas bort från Radars säkra lagringstjänst.";
 
 /* Header for a menu section related to settings for when Backups are enabled. */
 "BACKUP_SETTINGS_BACKUPS_ENABLED_SECTION_HEADER" = "Information om säkerhetskopiering";
@@ -971,7 +971,7 @@
 "BACKUP_SETTINGS_DISABLING_DOWNLOADS_STARTED_ACTION_SHEET_TITLE" = "Laddar ner din säkerhetskopia";
 
 /* Message shown in an action sheet indicating we failed to delete the user's Backup due to an unexpected error. */
-"BACKUP_SETTINGS_DISABLING_ERROR_GENERIC_ERROR_ACTION_SHEET_MESSAGE" = "Ett fel uppstod när dina data skulle raderas från Signals säkra lagringstjänst.";
+"BACKUP_SETTINGS_DISABLING_ERROR_GENERIC_ERROR_ACTION_SHEET_MESSAGE" = "Ett fel uppstod när dina data skulle raderas från Radars säkra lagringstjänst.";
 
 /* Title shown in an action sheet indicating we failed to delete the user's Backup due to an unexpected error. */
 "BACKUP_SETTINGS_DISABLING_ERROR_GENERIC_ERROR_ACTION_SHEET_TITLE" = "Det gick inte att ta bort säkerhetskopian";
@@ -1064,31 +1064,31 @@
 "BACKUP_SETTINGS_LANDING_OTHER_WAYS_HEADER" = "Andra sätt att säkerhetskopiera";
 
 /* Subtitle on the Backups settings landing page. */
-"BACKUP_SETTINGS_LANDING_PAGE_SUBTITLE" = "Säkerhetskopiera din meddelandehistorik så att du aldrig förlorar data när du skaffar en ny telefon eller installerar om Signal.";
+"BACKUP_SETTINGS_LANDING_PAGE_SUBTITLE" = "Säkerhetskopiera din meddelandehistorik så att du aldrig förlorar data när du skaffar en ny telefon eller installerar om Radar.";
 
 /* Button to begin setting up Signal Secure Backups on the Backups settings landing page. */
 "BACKUP_SETTINGS_LANDING_SET_UP_BUTTON" = "Ställ in";
 
 /* Description of Signal Secure Backups on the Backups settings landing page. */
-"BACKUP_SETTINGS_LANDING_SIGNAL_BACKUPS_BODY" = "Automatiska säkerhetskopieringar med Signals säkra totalsträckskrypterade lagringstjänst.";
+"BACKUP_SETTINGS_LANDING_SIGNAL_BACKUPS_BODY" = "Automatiska säkerhetskopieringar med Radars säkra totalsträckskrypterade lagringstjänst.";
 
 /* Title for the Signal Secure Backups cell on the Backups settings landing page. */
-"BACKUP_SETTINGS_LANDING_SIGNAL_BACKUPS_TITLE" = "Säker säkerhetskopiering av Signal";
+"BACKUP_SETTINGS_LANDING_SIGNAL_BACKUPS_TITLE" = "Säker säkerhetskopiering av Radar";
 
 /* Button to view settings for remote backups on the Backups settings landing page. */
 "BACKUP_SETTINGS_LANDING_VIEW_SETTINGS_BUTTON" = "Visa inställningar";
 
 /* Note on the linked-device Backups screen explaining that the Backups subscription can only be managed on the user's primary device. */
-"BACKUP_SETTINGS_LINKED_DEVICE_MANAGE_ON_PRIMARY_FOOTER" = "Du kan hantera eller uppgradera ditt abonnemang på Signal Säker säkerhetskopiering på din primära enhet.";
+"BACKUP_SETTINGS_LINKED_DEVICE_MANAGE_ON_PRIMARY_FOOTER" = "Du kan hantera eller uppgradera ditt abonnemang på Radar Säker säkerhetskopiering på din primära enhet.";
 
 /* Note on the linked-device Backups screen, shown on the paid tier, explaining that the Backups subscription can only be managed on the user's primary device. */
-"BACKUP_SETTINGS_LINKED_DEVICE_MANAGE_ON_PRIMARY_FOOTER_PAID" = "Du kan hantera eller avsluta ditt abonnemang på Säkerhetskopiering av Signal på din primära enhet.";
+"BACKUP_SETTINGS_LINKED_DEVICE_MANAGE_ON_PRIMARY_FOOTER_PAID" = "Du kan hantera eller avsluta ditt abonnemang på Säkerhetskopiering av Radar på din primära enhet.";
 
 /* Body text on the linked-device Backups screen, shown when Backups aren't set up, explaining the feature and that it can be enabled on the user's primary device. */
-"BACKUP_SETTINGS_LINKED_DEVICE_NO_BACKUP_FOOTER" = "Automatiska säkerhetskopieringar med Signals säkra totalsträckskrypterade lagringstjänst. Kom igång på din primära enhet.";
+"BACKUP_SETTINGS_LINKED_DEVICE_NO_BACKUP_FOOTER" = "Automatiska säkerhetskopieringar med Radars säkra totalsträckskrypterade lagringstjänst. Kom igång på din primära enhet.";
 
 /* Message on the linked-device Backups screen, shown when the user's paid subscription can't be found, prompting them to renew. */
-"BACKUP_SETTINGS_LINKED_DEVICE_SUBSCRIPTION_NOT_FOUND" = "Ditt abonnemang hittades inte. Förnya för att fortsätta använda Säkerhetskopiering av Signal.";
+"BACKUP_SETTINGS_LINKED_DEVICE_SUBSCRIPTION_NOT_FOUND" = "Ditt abonnemang hittades inte. Förnya för att fortsätta använda Säkerhetskopiering av Radar.";
 
 /* Title for a button allowing users to trigger a manual backup. */
 "BACKUP_SETTINGS_MANUAL_BACKUP_BUTTON_TITLE" = "Säkerhetskopiera nu";
@@ -1130,10 +1130,10 @@
 "BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_TOGGLE_FOOTER_UNAVAILABLE" = "Lagringsoptimering kan endast användas med den betalda nivån av Säkerhetskopiering av Radar. Uppgradera din säkerhetskopieringsplan för att börja använda den här funktionen.";
 
 /* Title for a toggle allowing users to change the Optimize Local Storage setting. */
-"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_TOGGLE_TITLE" = "Optimera Signal-lagring";
+"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_TOGGLE_TITLE" = "Optimera Radar-lagring";
 
 /* Body for a Backup plan upsell view encouraging users to subscribe to a paid Backup plan to use storage optimization. */
-"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_UPSELL_BODY" = "Lagringsoptimering kan endast användas med den betalda nivån av Säkerhetskopiering av Signal. Uppgradera din säkerhetskopieringsplan för att börja använda den här funktionen.";
+"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_UPSELL_BODY" = "Lagringsoptimering kan endast användas med den betalda nivån av Säkerhetskopiering av Radar. Uppgradera din säkerhetskopieringsplan för att börja använda den här funktionen.";
 
 /* Title for a Backup plan upsell view encouraging users to subscribe to a paid Backup plan to use storage optimization. */
 "BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_UPSELL_TITLE" = "Uppgradera för att aktivera lagringsoptimering";
@@ -1217,7 +1217,7 @@
 "BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_OPTIMIZE_MEDIA_TOGGLE_FOOTER" = "Äldre mediefiler avlastas vid nästa säkerhetskopiering, men kan laddas ner från säkerhetskopian när som helst.";
 
 /* Title for a toggle shown after the user enables backups, letting them enable the Optimize Storage feature. */
-"BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_OPTIMIZE_MEDIA_TOGGLE_TITLE" = "Optimera Signal-lagring";
+"BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_OPTIMIZE_MEDIA_TOGGLE_TITLE" = "Optimera Radar-lagring";
 
 /* Title for a sheet shown after the user enables backups. */
 "BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_TITLE" = "Du är redo. Starta din säkerhetskopiering nu.";
@@ -1247,7 +1247,7 @@
 "BACKUP_SUBSCRIPTION_FAILED_TO_RENEW_SHEET_TITLE" = "Ditt abonnemang för säkerhetskopiering kunde inte förnyas";
 
 /* Body for a megaphone shown on the chat list encouraging users to subscribe to a paid Backup plan to back up all their media. Embeds {{ the amount of storage included in the paid plan, preformatted as a localized byte count, e.g. '100 GB' }}. */
-"BACKUPS_BACK_UP_YOUR_MEDIA_MEGAPHONE_BODY" = "Med betalplanen Signal Säker säkerhetskopiering sparas alla dina medier, upp till %1$@.";
+"BACKUPS_BACK_UP_YOUR_MEDIA_MEGAPHONE_BODY" = "Med betalplanen Radar Säker säkerhetskopiering sparas alla dina medier, upp till %1$@.";
 
 /* Title for a button on a megaphone encouraging users to subscribe to a paid Backup plan to back up all their media. */
 "BACKUPS_BACK_UP_YOUR_MEDIA_MEGAPHONE_PRIMARY_ACTION" = "Uppgradera";
@@ -1256,7 +1256,7 @@
 "BACKUPS_BACK_UP_YOUR_MEDIA_MEGAPHONE_TITLE" = "Säkerhetskopiera alla dina medier";
 
 /* Body for a Backup plan upsell view encouraging users to subscribe to a paid Backup plan to back up all their media. Embeds {{ the amount of storage included in the paid plan, preformatted as a localized byte count, e.g. '100 GB' }}. */
-"BACKUPS_BACK_UP_YOUR_MEDIA_UPSELL_BODY" = "Med en betalplanen Signal Säker säkerhetskopiering sparas alla dina medier, upp till maximalt %1$@. Förlora aldrig en bild eller video när du skaffar en ny telefon eller installerar om Signal.";
+"BACKUPS_BACK_UP_YOUR_MEDIA_UPSELL_BODY" = "Med en betalplanen Radar Säker säkerhetskopiering sparas alla dina medier, upp till maximalt %1$@. Förlora aldrig en bild eller video när du skaffar en ny telefon eller installerar om Radar.";
 
 /* Title for a Backup plan upsell view encouraging users to subscribe to a paid Backup plan to back up all their media. */
 "BACKUPS_BACK_UP_YOUR_MEDIA_UPSELL_TITLE" = "Uppgradera för att spara alla medier";
@@ -1268,7 +1268,7 @@
 "BACKUPS_MEDIA_ERROR_NOTIFICATION_TITLE" = "Fel vid säkerhetskopiering av media";
 
 /* Body for a megaphone shown on the chat list encouraging users to enable Signal Secure Backups. */
-"BACKUPS_NEVER_LOSE_A_MESSAGE_MEGAPHONE_BODY" = "Aktivera Signal Säker säkerhetskopiering för att bevara dina meddelanden och medier";
+"BACKUPS_NEVER_LOSE_A_MESSAGE_MEGAPHONE_BODY" = "Aktivera Radar Säker säkerhetskopiering för att bevara dina meddelanden och medier";
 
 /* Title for a button on a megaphone encouraging users to enable Signal Secure Backups. */
 "BACKUPS_NEVER_LOSE_A_MESSAGE_MEGAPHONE_PRIMARY_ACTION" = "Slå på";
@@ -1277,7 +1277,7 @@
 "BACKUPS_NEVER_LOSE_A_MESSAGE_MEGAPHONE_TITLE" = "Förlora aldrig ett meddelande";
 
 /* Body for a megaphone shown on the chat list encouraging users to subscribe to a paid Backup plan to save on-device storage space. */
-"BACKUPS_SAVE_SPACE_MEGAPHONE_BODY" = "Signal Säker säkerhetskopiering kan spara lagringsutrymme genom att avlasta medier.";
+"BACKUPS_SAVE_SPACE_MEGAPHONE_BODY" = "Radar Säker säkerhetskopiering kan spara lagringsutrymme genom att avlasta medier.";
 
 /* Title for a button on a megaphone encouraging users to subscribe to a paid Backup plan to save on-device storage space, when the user does not yet have Signal Secure Backups enabled. */
 "BACKUPS_SAVE_SPACE_MEGAPHONE_PRIMARY_ACTION_TURN_ON" = "Slå på";
@@ -1289,7 +1289,7 @@
 "BACKUPS_SAVE_SPACE_MEGAPHONE_TITLE" = "Spara utrymme med betalda säkerhetskopior";
 
 /* Body for a Backup plan upsell view encouraging users to subscribe to a paid Backup plan to save on-device storage space. Embeds {{ the amount of storage space being consumed on-device by media, preformatted as a localized byte count, e.g. '1.2 GB' }}. */
-"BACKUPS_SAVE_SPACE_UPSELL_BODY" = "Signal använder %1$@ lagringsutrymme för medier. Med betalplanen Signal Säker säkerhetskopiering kan du spara lagringsutrymme genom att avlasta medier, samtidigt som hela din chatthistorik bevaras i din säkerhetskopia.";
+"BACKUPS_SAVE_SPACE_UPSELL_BODY" = "Radar använder %1$@ lagringsutrymme för medier. Med betalplanen Radar Säker säkerhetskopiering kan du spara lagringsutrymme genom att avlasta medier, samtidigt som hela din chatthistorik bevaras i din säkerhetskopia.";
 
 /* Title for a Backup plan upsell view encouraging users to subscribe to a paid Backup plan to save on-device storage space. */
 "BACKUPS_SAVE_SPACE_UPSELL_TITLE" = "Spara utrymme med betalda säkerhetskopior";
@@ -1298,7 +1298,7 @@
 "BACKUPS_SETTINGS_TITLE" = "Säkra säkerhetskopior";
 
 /* Message for an action sheet shown on iPad saying you need to set up backups on your phone */
-"BACKUPS_SETUP_ON_PRIMARY_MESSAGE" = "För att konfigurera säkerhetskopior öppnar du Signal på din primära iPhone eller Android-enhet och går till Inställningar > Säkerhetskopior.";
+"BACKUPS_SETUP_ON_PRIMARY_MESSAGE" = "För att konfigurera säkerhetskopior öppnar du Radar på din primära iPhone eller Android-enhet och går till Inställningar > Säkerhetskopior.";
 
 /* Body for system notification or megaphone when backups is enabled. Embeds {{ time backups was enabled }} */
 "BACKUPS_TURNED_ON_NOTIFICATION_BODY_FORMAT" = "Säkerhetskopiering av Radar aktiverades för det här kontot kl. %1$@. Tryck för att visa.";
@@ -1655,7 +1655,7 @@
 "CALL_QUALITY_SURVEY_COMPLETION_TOAST" = "Tack för din feedback!";
 
 /* Footer text explaining custom issue descriptions in the call quality survey */
-"CALL_QUALITY_SURVEY_CUSTOM_ISSUE_FOOTER" = "Inkludera alla detaljer som är relevanta för problemet. Allt du delar här kommer att hållas privat och kommer endast att användas för att förbättra samtal i Signal.";
+"CALL_QUALITY_SURVEY_CUSTOM_ISSUE_FOOTER" = "Inkludera alla detaljer som är relevanta för problemet. Allt du delar här kommer att hållas privat och kommer endast att användas för att förbättra samtal i Radar.";
 
 /* Placeholder text for the custom issue entry in the call quality survey */
 "CALL_QUALITY_SURVEY_CUSTOM_ISSUE_PLACEHOLDER" = "Beskriv ditt problem";
@@ -1724,7 +1724,7 @@
 "CALL_QUALITY_SURVEY_ISSUES_SHEET_TITLE" = "Vilka problem hade du?";
 
 /* Header text explaining the purpose of the call quality survey */
-"CALL_QUALITY_SURVEY_RATING_HEADER" = "Detta hjälper oss att förbättra samtal i Signal. Ingen personligt identifierbar information kommer att lagras.";
+"CALL_QUALITY_SURVEY_RATING_HEADER" = "Detta hjälper oss att förbättra samtal i Radar. Ingen personligt identifierbar information kommer att lagras.";
 
 /* Title for the initial rating screen in the call quality survey */
 "CALL_QUALITY_SURVEY_RATING_TITLE" = "Hur var ditt samtal?";
@@ -1823,7 +1823,7 @@
 "CALLKIT_ANONYMOUS_CONTACT_NAME" = "Radar-användare";
 
 /* The generic name used for group calls if CallKit privacy is enabled */
-"CALLKIT_ANONYMOUS_GROUP_NAME" = "Signalgrupp";
+"CALLKIT_ANONYMOUS_GROUP_NAME" = "Radargrupp";
 
 /* Title for the calls list view. */
 "CALLS_LIST_TITLE" = "Samtal";
@@ -2111,7 +2111,7 @@
 "CHAT_LIST_BACKUP_PROGRESS_VIEW_RESUME_CELLULAR_DATA_BUTTON" = "Återuppta";
 
 /* Message shown in an action sheet when the user tries to resume backup using cellular data. */
-"CHAT_LIST_BACKUP_PROGRESS_VIEW_RESUME_CELLULAR_DATA_MESSAGE" = "Säkerhetskopiering av dina media med mobildata kan leda till dataavgifter. Din säkerhetskopia kan ta lång tid att ladda upp, håll Signal öppen för att undvika avbrott.";
+"CHAT_LIST_BACKUP_PROGRESS_VIEW_RESUME_CELLULAR_DATA_MESSAGE" = "Säkerhetskopiering av dina media med mobildata kan leda till dataavgifter. Din säkerhetskopia kan ta lång tid att ladda upp, håll Radar öppen för att undvika avbrott.";
 
 /* Title for the action sheet shown when the user tries to resume backup using cellular data. */
 "CHAT_LIST_BACKUP_PROGRESS_VIEW_RESUME_CELLULAR_DATA_TITLE" = "Återuppta med användning av mobildata?";
@@ -2243,7 +2243,7 @@
 "CLOCK_SKEW_APP_BLOCKING_DEVICE_TIME_FORMAT" = "Enhetens tid är %1$@ UTC.";
 
 /* Subtitle for a screen shown when the app can't be used until the user corrects their device's date and time. */
-"CLOCK_SKEW_APP_BLOCKING_SUBTITLE" = "Signal kan inte användas när enhetens datum och tid är felaktiga. Öppna Inställningar för att korrigera dem.";
+"CLOCK_SKEW_APP_BLOCKING_SUBTITLE" = "Radar kan inte användas när enhetens datum och tid är felaktiga. Öppna Inställningar för att korrigera dem.";
 
 /* Title for a screen shown when the app can't be used until the user corrects their device's date and time. */
 "CLOCK_SKEW_APP_BLOCKING_TITLE" = "Datumet är felaktigt";
@@ -2462,7 +2462,7 @@
 "CONTACT_SHARE_AVATAR_ROW_LABEL" = "Foto";
 
 /* Name of the option to share a contact's Signal profile photo. Read by VoiceOver on the option, and as the current value of the photo row when it's selected. */
-"CONTACT_SHARE_AVATAR_SIGNAL_PHOTO" = "Signal-profilbild";
+"CONTACT_SHARE_AVATAR_SIGNAL_PHOTO" = "Radar-profilbild";
 
 /* Name of the option to share a contact's photo from the phone's contacts. Read by VoiceOver on the option, and as the current value of the photo row when it's selected. */
 "CONTACT_SHARE_AVATAR_SYSTEM_CONTACT_PHOTO" = "Kontaktbild";
@@ -2477,7 +2477,7 @@
 "CONTACT_SHARE_MESSAGE_BUTTON" = "Meddelande";
 
 /* Notice at the top of the 'Share Contact' view when the shared contact includes their Signal account. Embeds {{ contact name }}. */
-"CONTACT_SHARE_SIGNAL_ACCOUNT_NOTICE_FORMAT" = "Alla du delar den här profilen med kommer att kunna skicka meddelanden till %1$@ på Signal.";
+"CONTACT_SHARE_SIGNAL_ACCOUNT_NOTICE_FORMAT" = "Alla du delar den här profilen med kommer att kunna skicka meddelanden till %1$@ på Radar.";
 
 /* Alert body when contacts disabled while trying to share a contact. */
 "CONTACT_SHARING_NO_ACCESS_BODY" = "Radar behöver åtkomst till dina kontakter. Gå till iOS-inställningar och slå på kontakter. Dina kontakter är krypterade och är inte synliga för Radar-tjänsten.";
@@ -4698,10 +4698,10 @@
 "GROUP_NAME_EDUCATION_SHEET_BULLET_1" = "Var försiktig med grupper som utger sig för att vara organisationer och företag";
 
 /* Second bullet point for the explainer sheet for group names */
-"GROUP_NAME_EDUCATION_SHEET_BULLET_2" = "Signal kan inte verifiera namn och foton";
+"GROUP_NAME_EDUCATION_SHEET_BULLET_2" = "Radar kan inte verifiera namn och foton";
 
 /* Third bullet point for the explainer sheet for group names */
-"GROUP_NAME_EDUCATION_SHEET_BULLET_3" = "Signal kommer aldrig att kontakta dig för att be om din registreringskod, PIN-kod eller återställningsnyckel";
+"GROUP_NAME_EDUCATION_SHEET_BULLET_3" = "Radar kommer aldrig att kontakta dig för att be om din registreringskod, PIN-kod eller återställningsnyckel";
 
 /* Fourth bullet point for the explainer sheet for group names */
 "GROUP_NAME_EDUCATION_SHEET_BULLET_4" = "Dela inte personlig information med personer du inte känner";
@@ -5266,6 +5266,9 @@
 
 /* Placeholder text displayed in empty input box in chat screen. */
 "INPUT_TOOLBAR_MESSAGE_PLACEHOLDER" = "Meddelande";
+/* accessibility label for the button which show up send payemnt screen */
+"INPUT_TOOLBAR_PAYMENTS_BUTTON_ACCESSIBILITY_LABEL" = "Skicka betalning";
+
 
 /* accessibility label for the button which shows the sticker picker */
 "INPUT_TOOLBAR_STICKER_BUTTON_ACCESSIBILITY_LABEL" = "Stickers";
@@ -5490,7 +5493,7 @@
 "LINKED_DEVICE_INFO_SHEET_BULLET_3" = "Vissa kontoinställningar hanteras endast på din primära enhet, inklusive kontoinställningar och säkerhetskopior.";
 
 /* Lead paragraph for a sheet explaining linked devices. The text within the <bold></bold> tags is styled bold. */
-"LINKED_DEVICE_INFO_SHEET_HEADER" = "<bold>Länkade enheter</bold> låter dig komma åt ditt Signal-konto och dina meddelanden på ett säkert sätt på alla dina ytterligare enheter.";
+"LINKED_DEVICE_INFO_SHEET_HEADER" = "<bold>Länkade enheter</bold> låter dig komma åt ditt Radar-konto och dina meddelanden på ett säkert sätt på alla dina ytterligare enheter.";
 
 /* Shown in a banner when you tap the 'New Chat' icon at the top of the list of chats. */
 "LINKED_DEVICE_MANAGE_CONTACTS_BANNER" = "Hantering av telefonkontakter stöds inte längre på länkade enheter. Den här enheten fortsätter att synkronisera eventuella ändringar i din kontaktlista från Radar på din primära enhet.";
@@ -5556,7 +5559,7 @@
 "LINKING_DEVICE_FAILED_TITLE" = "Det gick inte att länka enheten";
 
 /* Shown when trying to link a device to an account but that device is out of date and must first update its version of Signal. */
-"LINKING_DEVICE_OUT_OF_DATE" = "Din andra enhet kör en gammal version av Signal. Du måste uppdatera Signal på den enheten innan du kan länka den.";
+"LINKING_DEVICE_OUT_OF_DATE" = "Din andra enhet kör en gammal version av Radar. Du måste uppdatera Radar på den enheten innan du kan länka den.";
 
 /* Progress label when the message loading has nearly completed during the device linking process */
 "LINKING_SYNCING_FINALIZING" = "Slutför meddelandeöverföring …";
@@ -5580,7 +5583,7 @@
 "LOCAL_BACKUP_SETTINGS_CREATE_NEW_KEY_WARNING_SHEET_BODY" = "Att skapa en ny nyckel är bara nödvändigt om någon annan känner till din nyckel. Säkerhetskopieringar på enheten måste först inaktiveras för att skapa en ny nyckel.\n\nEfter att du har inaktiverat säkerhetskopior på enheten och skapat en ny nyckel måste du återaktivera säkerhetskopior på enheten.";
 
 /* Body for an error sheet shown when the user's folder choice does not contain a backup file. */
-"LOCAL_BACKUPS_MISSING_BACKUP_ACTION_SHEET_BODY" = "Ingen Signal-säkerhetskopia hittades i den valda mappen. Försök med en annan mapp.";
+"LOCAL_BACKUPS_MISSING_BACKUP_ACTION_SHEET_BODY" = "Ingen Radar-säkerhetskopia hittades i den valda mappen. Försök med en annan mapp.";
 
 /* Title for an error sheet shown when the user's folder choice does not contain a backup file. */
 "LOCAL_BACKUPS_MISSING_BACKUP_ACTION_SHEET_TITLE" = "Ingen säkerhetskopia hittades";
@@ -5628,7 +5631,7 @@
 "LOCAL_FILE_BACKUP_ONBOARDING_INTRO_BULLET_3" = "Stäng av säkerhetskopiering när som helst";
 
 /* Subtitle for a view introducing local file backups during the onboarding flow. */
-"LOCAL_FILE_BACKUP_ONBOARDING_INTRO_SUBTITLE" = "Säkerhetskopiera dina meddelanden i en mapp på din enhet. Din säkerhetskopia är totalsträckskrypterad och kan återställas genom att du installerar en ny kopia av Signal och väljer Återställ eller överför.";
+"LOCAL_FILE_BACKUP_ONBOARDING_INTRO_SUBTITLE" = "Säkerhetskopiera dina meddelanden i en mapp på din enhet. Din säkerhetskopia är totalsträckskrypterad och kan återställas genom att du installerar en ny kopia av Radar och väljer Återställ eller överför.";
 
 /* Title for a view introducing local file backups during the onboarding flow. */
 "LOCAL_FILE_BACKUP_ONBOARDING_INTRO_TITLE" = "Säkerhetskopiering på enheten";
@@ -5643,10 +5646,10 @@
 "LOCAL_FILE_BACKUPS_CHOOSE_FOLDER_TITLE" = "Välj en mapp";
 
 /* Warning shown when a user tries to enable local file backups with optimize media enabled */
-"LOCAL_FILE_BACKUPS_OPTIMIZE_MEDIA_WARNING_ACTION_SHEET" = "Du har Optimera Signal-lagring aktiverat. Om du vill inkludera alla medier i din säkerhetskopia på enheten stänger du av inställningen.";
+"LOCAL_FILE_BACKUPS_OPTIMIZE_MEDIA_WARNING_ACTION_SHEET" = "Du har Optimera Radar-lagring aktiverat. Om du vill inkludera alla medier i din säkerhetskopia på enheten stänger du av inställningen.";
 
 /* Message for a sheet warning the user about enabling Optimize Storage with local backups enabled. */
-"LOCAL_FILE_BACKUPS_OPTIMIZE_MEDIA_WARNING_ACTION_SHEET_2_BODY" = "När du aktiverar Optimera Signal-lagring avlastas gamla medier från din enhet. Du kan ladda ner dem igen när som helst. Det tar också bort gamla medier från din säkerhetskopia på enheten.";
+"LOCAL_FILE_BACKUPS_OPTIMIZE_MEDIA_WARNING_ACTION_SHEET_2_BODY" = "När du aktiverar Optimera Radar-lagring avlastas gamla medier från din enhet. Du kan ladda ner dem igen när som helst. Det tar också bort gamla medier från din säkerhetskopia på enheten.";
 
 /* Title for a sheet warning the user about enabling Optimize Storage with local backups enabled. */
 "LOCAL_FILE_BACKUPS_OPTIMIZE_MEDIA_WARNING_ACTION_SHEET_2_TITLE" = "Medier tas bort från din säkerhetskopia på enheten";
@@ -5676,10 +5679,10 @@
 "LONG_TEXT_VIEW_TITLE" = "Meddelande";
 
 /* Message for a sheet warning the user that their device is low on storage space. Embeds 1:{{ the localized name of the user's device model, e.g. iPhone }}; 2:{{ an amount of storage space as a file size, e.g. 1 GB }}. */
-"LOW_DISK_SPACE_WARNING_SHEET_MESSAGE_FORMAT" = "Din %1$@ har snart slut på lagringsutrymme. Om det blir fullt slutar Signal att fungera och du kan förlora data. Frigör minst %2$@ utrymme.";
+"LOW_DISK_SPACE_WARNING_SHEET_MESSAGE_FORMAT" = "Din %1$@ har snart slut på lagringsutrymme. Om det blir fullt slutar Radar att fungera och du kan förlora data. Frigör minst %2$@ utrymme.";
 
 /* A suggestion for freeing up storage space, on a sheet warning the user that their device is low on storage space. */
-"LOW_DISK_SPACE_WARNING_SHEET_SUGGESTION_DELETE_CAMERA_ROLL_MEDIA" = "Radera stora videor från appen Bilder, Signal eller andra meddelandeappar";
+"LOW_DISK_SPACE_WARNING_SHEET_SUGGESTION_DELETE_CAMERA_ROLL_MEDIA" = "Radera stora videor från appen Bilder, Radar eller andra meddelandeappar";
 
 /* A suggestion for freeing up storage space, on a sheet warning the user that their device is low on storage space. */
 "LOW_DISK_SPACE_WARNING_SHEET_SUGGESTION_DELETE_DOWNLOADED_MEDIA" = "Radera nedladdad musik eller andra medier";
@@ -5844,7 +5847,7 @@
 "MEMBER_LABEL_VIEW_TITLE" = "Medlemsetikett";
 
 /* A one-time confirmation that you, as an admin, want to delete for everyone */
-"MESSAGE_ACTION_ADMIN_DELETE_FOR_EVERYONE_CONFIRMATION" = "Gruppmedlemmar med de senaste versionerna av Signal kommer att se att du raderade dessa meddelanden.";
+"MESSAGE_ACTION_ADMIN_DELETE_FOR_EVERYONE_CONFIRMATION" = "Gruppmedlemmar med de senaste versionerna av Radar kommer att se att du raderade dessa meddelanden.";
 
 /* Action sheet button title */
 "MESSAGE_ACTION_COPY_TEXT" = "Kopiera meddelandetext";
@@ -6045,7 +6048,7 @@
 "MESSAGE_REQUEST_CONFIRM_ACCEPT_MESSAGE" = "Acceptera bara förfrågningar från personer du litar på. %1$@ att skicka meddelanden till dig för att be om din registreringskod, PIN-kod eller återställningsnyckel.";
 
 /* Embedded text in the message for an action sheet asking the user to confirm if they want to accept a message request. */
-"MESSAGE_REQUEST_CONFIRM_ACCEPT_MESSAGE_EMBEDDED_BOLD_TEXT" = "Signal kommer aldrig";
+"MESSAGE_REQUEST_CONFIRM_ACCEPT_MESSAGE_EMBEDDED_BOLD_TEXT" = "Radar kommer aldrig";
 
 /* Title for an action sheet asking the user to confirm if they want to accept a message request */
 "MESSAGE_REQUEST_CONFIRM_ACCEPT_TITLE" = "Acceptera förfrågan?";
@@ -6492,13 +6495,13 @@
 "NO_OTHER_GROUPS_IN_COMMON" = "Inga andra grupper gemensamt.";
 
 /* Shown in place of the text input box in a conversation when the user is no longer registered can't send messages. The embedded value is 'Re-link' (translated via NOT_LINKED_BOTTOM_RELINK), and it will be formatted as a tappable link. */
-"NOT_LINKED_BOTTOM" = "Den här enheten är inte längre länkad. %1$@ för att fortsätta använda Signal på den här enheten.";
+"NOT_LINKED_BOTTOM" = "Den här enheten är inte längre länkad. %1$@ för att fortsätta använda Radar på den här enheten.";
 
 /* Shown in place of the text input box in a conversation when the user is no longer registered can't send messages. This value is a tappable link embedded in a larger sentence. */
 "NOT_LINKED_BOTTOM_RELINK" = "Länka igen";
 
 /* Shown in place of the text input box in a conversation when the user is no longer registered can't send messages. The embedded value is 'Re-register' (translated via NOT_REGISTERED_BOTTOM_REREGISTER), and it will be formatted as a tappable link. */
-"NOT_REGISTERED_BOTTOM" = "Den här enheten är inte längre registrerad. %1$@ för att fortsätta använda Signal.";
+"NOT_REGISTERED_BOTTOM" = "Den här enheten är inte längre registrerad. %1$@ för att fortsätta använda Radar.";
 
 /* Shown in place of the text input box in a conversation when the user is no longer registered can't send messages. This value is a tappable link embedded in a larger sentence. */
 "NOT_REGISTERED_BOTTOM_REREGISTER" = "Registrera igen";
@@ -6510,13 +6513,13 @@
 "NOTE_TO_SELF" = "Egen anteckning";
 
 /* Body for a notification shown when Signal can't fetch messages because the device's date and time are incorrect. */
-"NOTIFICATION_BODY_CLOCK_SKEW" = "Signal kan inte ta emot meddelanden när enhetens datum och tid är felaktiga. Öppna Inställningar för att korrigera dem.";
+"NOTIFICATION_BODY_CLOCK_SKEW" = "Radar kan inte ta emot meddelanden när enhetens datum och tid är felaktiga. Öppna Inställningar för att korrigera dem.";
 
 /* Body for a notification representing a message request. */
 "NOTIFICATION_BODY_INCOMING_MESSAGE_REQUEST" = "Meddelandeförfrågan";
 
 /* Body for a notification shown when Signal can't fetch messages because the device is low on storage space. */
-"NOTIFICATION_BODY_LOW_STORAGE_SPACE" = "Du kan ha nya meddelanden, men enheten har inte tillräckligt med lagringsutrymme för att Signal ska kunna köras. Tryck för mer info.";
+"NOTIFICATION_BODY_LOW_STORAGE_SPACE" = "Du kan ha nya meddelanden, men enheten har inte tillräckligt med lagringsutrymme för att Radar ska kunna köras. Tryck för mer info.";
 
 /* Lock screen notification text presented after user powers on their device without unlocking. Embeds {{device model}} (either 'iPad' or 'iPhone') */
 "NOTIFICATION_BODY_PHONE_LOCKED_FORMAT" = "Du kan ha fått nya meddelanden medan din %1$@ startades om.";
@@ -6615,7 +6618,7 @@
 "ONBOARDING_CHOOSE_BACKUP_SHEET_TITLE" = "Välj en säkerhetskopia att återställa";
 
 /* The body for the device transfer 'choice' view 'restore backup' option */
-"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_BODY" = "Återställ ditt konto och dina meddelanden från din Radar/Radar-säkerhetskopiering";
+"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_BODY" = "Återställ ditt konto och dina meddelanden från din Signal/Radar-säkerhetskopiering";
 
 /* The title for the device transfer 'choice' view 'restore backup' option */
 "ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_TITLE" = "Återställ Säker säkerhetskopiering";
@@ -6696,7 +6699,7 @@
 "ONBOARDING_MODE_SWITCH_EXPLANATION_PROVISIONING" = "Genom att trycka på \"Registrera iPad\" kan du skapa ett helt nytt Radar-konto eller flytta ett befintligt konto till denna iPad. Detta kommer att inaktivera Radar på alla andra enheter som för närvarande är registrerade med samma telefonnummer.";
 
 /* explanation to the user they're switching from registering to linking flow */
-"ONBOARDING_MODE_SWITCH_EXPLANATION_REGISTERING" = "Om du trycker på \"Länka den här enheten\" kan du ansluta den till ett befintligt Signal-konto.";
+"ONBOARDING_MODE_SWITCH_EXPLANATION_REGISTERING" = "Om du trycker på \"Länka den här enheten\" kan du ansluta den till ett befintligt Radar-konto.";
 
 /* header text indicating to the user they're switching from linking to registering flow */
 "ONBOARDING_MODE_SWITCH_TITLE_PROVISIONING" = "Registrera denna iPad";
@@ -6783,13 +6786,13 @@
 "ONBOARDING_SIGN_UP_USE_SIGNAL_ACCOUNT_BUTTON_TITLE" = "Use my Signal account";
 
 /* Explanation of 'do not have old device' flow for the 'Restore or Transfer' prompt */
-"ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_BODY" = "Eller så installerar du om Radar/Radar på samma enhet";
+"ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_BODY" = "Eller så installerar du om Signal/Radar på samma enhet";
 
 /* Title for the 'do not have my old device' choice of the 'Restore or Transfer' prompt */
 "ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_TITLE" = "Jag har inte min gamla telefon";
 
 /* Explanation of 'have old device' flow for the 'Restore or Transfer' prompt */
-"ONBOARDING_SPLASH_HAVE_OLD_DEVICE_BODY" = "Skanna en QR-kod från ditt nuvarande Radar/Radar-konto för att snabbt komma igång";
+"ONBOARDING_SPLASH_HAVE_OLD_DEVICE_BODY" = "Skanna en QR-kod från ditt nuvarande Signal/Radar-konto för att snabbt komma igång";
 
 /* Title for the 'have my old device' choice of the 'Restore or Transfer' prompt */
 "ONBOARDING_SPLASH_HAVE_OLD_DEVICE_TITLE" = "Jag har min gamla telefon";
@@ -7033,7 +7036,7 @@ Send money securely.";
 "OVERSIZE_TEXT_UNAVAILABLE_SHEET_TITLE" = "Hela meddelandet är ej tillgängligt";
 
 /* The name of the Signal app, used as the title for an entry in a user's password manager for their Signal Recovery Key. Should be localized with the same value as the app's name in the iOS App Store. */
-"PASSWORD_MANAGER_SIGNAL_APP_NAME" = "Signal Private Messenger";
+"PASSWORD_MANAGER_SIGNAL_APP_NAME" = "Radar Private Messenger";
 
 /* Header title for bank payment details screen */
 "PAYMENT_DETAILS_BANK_TITLE" = "Banköverföring";
@@ -7924,10 +7927,10 @@ Send money securely.";
 "PROFILE_NAME_CHANGE_SYSTEM_NONCONTACT_FORMAT" = "%1$@ ändrade sitt profilnamn till %2$@.";
 
 /* First bullet point for the explainer sheet for profile names */
-"PROFILE_NAME_EDUCATION_SHEET_BULLET_1" = "Signal kan inte verifiera namn och foton";
+"PROFILE_NAME_EDUCATION_SHEET_BULLET_1" = "Radar kan inte verifiera namn och foton";
 
 /* Second bullet point for the explainer sheet for profile names */
-"PROFILE_NAME_EDUCATION_SHEET_BULLET_2" = "Signal kommer aldrig att kontakta dig för att be om din registreringskod, PIN-kod eller återställningsnyckel";
+"PROFILE_NAME_EDUCATION_SHEET_BULLET_2" = "Radar kommer aldrig att kontakta dig för att be om din registreringskod, PIN-kod eller återställningsnyckel";
 
 /* Third bullet point for the explainer sheet for profile names */
 "PROFILE_NAME_EDUCATION_SHEET_BULLET_3" = "Var försiktig med konton där någon utger sig för att vara en annan person";
@@ -8035,7 +8038,7 @@ Send money securely.";
 "QUICK_RESTORE_URL_OPENED_ACTION_SHEET_EXTERNAL_URL_ACTION_TITLE" = "Skanna QR-kod";
 
 /* Message for an action sheet telling users how to use quick restore, when trying to open an external quick restore URL. */
-"QUICK_RESTORE_URL_OPENED_ACTION_SHEET_EXTERNAL_URL_MESSAGE" = "För att överföra det här kontot till en ny enhet trycker du på Fortsätt och skannar QR-koden med Signal-kameran. Se till att du bara skannar QR-koder som kommer direkt från Signal.";
+"QUICK_RESTORE_URL_OPENED_ACTION_SHEET_EXTERNAL_URL_MESSAGE" = "För att överföra det här kontot till en ny enhet trycker du på Fortsätt och skannar QR-koden med Radar-kameran. Se till att du bara skannar QR-koder som kommer direkt från Radar.";
 
 /* Accessibility label stating the author of the message to which you are replying. Embeds: {{ the author of the message to which you are replying }} {{ original message }}. */
 "QUOTED_REPLY_ACCESSIBILITY_LABEL_FORMAT" = "Svarar till %1$@. %2$@";
@@ -8203,7 +8206,7 @@ Send money securely.";
 "REGISTER_WITHOUT_NUMBER" = "Registrera utan nummer";
 
 /* Short description for a sheet warning users about an incorrect recovery key used for registration. */
-"REGISTRATION_BACKUP_REGISTRATION_ERROR_INCORRECT_KEY_BODY" = "Kontrollera att du registrerar dig med samma telefonnummer och återställningsnyckel på 64 tecken som du sparade när du aktiverade Säkerhetskopiering av Signal. Säkerhetskopior kan inte återställas utan denna nyckel.";
+"REGISTRATION_BACKUP_REGISTRATION_ERROR_INCORRECT_KEY_BODY" = "Kontrollera att du registrerar dig med samma telefonnummer och återställningsnyckel på 64 tecken som du sparade när du aktiverade Säkerhetskopiering av Radar. Säkerhetskopior kan inte återställas utan denna nyckel.";
 
 /* Title for a sheet warning users about an incorrect recovery key used for registration. */
 "REGISTRATION_BACKUP_REGISTRATION_ERROR_INCORRECT_KEY_TITLE" = "Felaktig återställningsnyckel";
@@ -8212,7 +8215,7 @@ Send money securely.";
 "REGISTRATION_BACKUP_REGISTRATION_ERROR_INCORRECT_KEY_TRY_PIN_ACTION" = "Registrera på ett annat sätt";
 
 /* Message body for a sheet asking users if they would rather use PIN/SMS for registration. */
-"REGISTRATION_BACKUP_REGISTRATION_ERROR_INCORRECT_KEY_TRY_PIN_MESSAGE" = "Du kan registrera ditt konto genom att verifiera med en SMS-kod som Signal skickar till dig, eller genom att ange din pinkod. När du har registrerat dig kan du försöka återställa din säkerhetskopia med din återställningsnyckel igen.";
+"REGISTRATION_BACKUP_REGISTRATION_ERROR_INCORRECT_KEY_TRY_PIN_MESSAGE" = "Du kan registrera ditt konto genom att verifiera med en SMS-kod som Radar skickar till dig, eller genom att ange din pinkod. När du har registrerat dig kan du försöka återställa din säkerhetskopia med din återställningsnyckel igen.";
 
 /* Title for a sheet asking users if they would rather use PIN/SMS for registration. */
 "REGISTRATION_BACKUP_REGISTRATION_ERROR_INCORRECT_KEY_TRY_PIN_TITLE" = "Verifiera med SMS eller pinkod?";
@@ -8269,7 +8272,7 @@ Send money securely.";
 "REGISTRATION_BACKUP_RESTORE_ERROR_LOCAL_BACKUP_LOCATION_TITLE" = "Det går inte att återställa säkerhetskopia";
 
 /* Message for a sheet telling the user that their phone number is mismatched with their recovery key used for making a local backup */
-"REGISTRATION_BACKUP_RESTORE_ERROR_MISMATCHED_LOCAL_BACKUP_MESSAGE" = "Säkerhetskopian du försöker återställa skapades med ett annat Signal-konto. För att återställa den här säkerhetskopian måste du använda samma telefonnummer och återställningsnyckel som du sparade när du aktiverade säkerhetskopiering på enheten.";
+"REGISTRATION_BACKUP_RESTORE_ERROR_MISMATCHED_LOCAL_BACKUP_MESSAGE" = "Säkerhetskopian du försöker återställa skapades med ett annat Radar-konto. För att återställa den här säkerhetskopian måste du använda samma telefonnummer och återställningsnyckel som du sparade när du aktiverade säkerhetskopiering på enheten.";
 
 /* Body for a sheet warning users about a network error during backup restore. */
 "REGISTRATION_BACKUP_RESTORE_ERROR_NETWORK_BODY" = "Din säkerhetskopia kan inte återställas just nu. Kontrollera din internetanslutning och försök igen.";
@@ -8803,13 +8806,13 @@ Send money securely.";
 "SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_BUTTON_VERIFYING" = "Verifierar kryptering …";
 
 /* Body for a sheet introducing Key Transparency. */
-"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_EDUCATION_SHEET_BODY" = "För personer som du är ansluten till via telefonnummer kan Signal automatiskt bekräfta om anslutningen är säker med hjälp av en process som kallas nyckeltransparens. För ökad säkerhet kan du fortfarande verifiera anslutningar manuellt med hjälp av en QR-kod eller genom att jämföra säkerhetsnummer.";
+"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_EDUCATION_SHEET_BODY" = "För personer som du är ansluten till via telefonnummer kan Radar automatiskt bekräfta om anslutningen är säker med hjälp av en process som kallas nyckeltransparens. För ökad säkerhet kan du fortfarande verifiera anslutningar manuellt med hjälp av en QR-kod eller genom att jämföra säkerhetsnummer.";
 
 /* Title for a sheet introducing Key Transparency. */
-"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_EDUCATION_SHEET_TITLE" = "Signal kan nu automatiskt verifiera kryptering";
+"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_EDUCATION_SHEET_TITLE" = "Radar kan nu automatiskt verifiera kryptering";
 
 /* Body for a sheet explaining that encryption auto-verification did not succeed. Embeds {{ 1: the contact's name }}. */
-"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_FAILURE_SHEET_BODY_FORMAT" = "Signal kan inte automatiskt verifiera krypteringen för den här chatten. Detta kan bero på att %1$@ har ändrat sitt telefonnummer eller inställningarna för integritet för telefonnummer. Verifiera totalsträckskryptering manuellt genom att jämföra siffrorna på den föregående skärmen eller skanna koden på deras enhet.";
+"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_FAILURE_SHEET_BODY_FORMAT" = "Radar kan inte automatiskt verifiera krypteringen för den här chatten. Detta kan bero på att %1$@ har ändrat sitt telefonnummer eller inställningarna för integritet för telefonnummer. Verifiera totalsträckskryptering manuellt genom att jämföra siffrorna på den föregående skärmen eller skanna koden på deras enhet.";
 
 /* Title for a sheet explaining that encryption auto-verification did not succeed. */
 "SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_FAILURE_SHEET_TITLE" = "Automatisk verifiering är inte längre tillgänglig för den här chatten";
@@ -8821,13 +8824,13 @@ Send money securely.";
 "SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_HEADER" = "Automatisk nyckelverifiering";
 
 /* Body for a sheet explaining that encryption auto-verification is not available. */
-"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_NOT_AVAILABLE_SHEET_BODY" = "Signal kan bara automatiskt verifiera krypteringen i chattar där du är ansluten till någon via ett telefonnummer. Om chatten startades med ett användarnamn eller en gemensam grupp, verifiera totalsträckskryptering genom att jämföra siffrorna på den föregående skärmen eller skanna koden på deras enhet.";
+"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_NOT_AVAILABLE_SHEET_BODY" = "Radar kan bara automatiskt verifiera krypteringen i chattar där du är ansluten till någon via ett telefonnummer. Om chatten startades med ett användarnamn eller en gemensam grupp, verifiera totalsträckskryptering genom att jämföra siffrorna på den föregående skärmen eller skanna koden på deras enhet.";
 
 /* Title for a sheet explaining that encryption auto-verification is not available. */
 "SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_NOT_AVAILABLE_SHEET_TITLE" = "Automatisk verifiering är inte tillgänglig för den här chatten";
 
 /* Body for a sheet explaining that encryption auto-verification succeeded. */
-"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_SUCCESS_SHEET_BODY" = "För kontakter som du är ansluten till via telefonnummer kan Signal automatiskt bekräfta om anslutningen är säker med hjälp av en process som kallas nyckeltransparens. För ökad säkerhet, verifiera totalsträckskryptering manuellt genom att jämföra siffrorna på den föregående skärmen eller skanna koden på deras enhet.";
+"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_SUCCESS_SHEET_BODY" = "För kontakter som du är ansluten till via telefonnummer kan Radar automatiskt bekräfta om anslutningen är säker med hjälp av en process som kallas nyckeltransparens. För ökad säkerhet, verifiera totalsträckskryptering manuellt genom att jämföra siffrorna på den föregående skärmen eller skanna koden på deras enhet.";
 
 /* Title for a sheet explaining that encryption auto-verification succeeded. */
 "SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_SUCCESS_SHEET_TITLE" = "Krypteringen verifierades automatiskt för den här chatten";
@@ -8842,7 +8845,7 @@ Send money securely.";
 "SAFETY_TIPS_CRYPTO_TITLE" = "Krypto- eller penningbedrägerier";
 
 /* Message body describing the enable reglock safety tip. */
-"SAFETY_TIPS_ENABLE_REGLOCK_BODY" = "Skydda ditt konto genom att kräva din Signal-pinkod, utöver din verifieringskod, vid registrering i Signal.";
+"SAFETY_TIPS_ENABLE_REGLOCK_BODY" = "Skydda ditt konto genom att kräva din Radar-pinkod, utöver din verifieringskod, vid registrering i Radar.";
 
 /* Message title describing the enable reglock safety tip. */
 "SAFETY_TIPS_ENABLE_REGLOCK_TITLE" = "Aktivera registreringslås i kontoinställningarna";
@@ -8875,22 +8878,22 @@ Send money securely.";
 "SAFETY_TIPS_MESSAGE_LINKS_TITLE" = "Meddelanden med webblänkar";
 
 /* Message body describing the review names safety tip. */
-"SAFETY_TIPS_REVIEW_NAMES_BODY" = "Håll utkik efter meddelandet ”Namnet har inte verifierats”. Alla anger sitt eget profilnamn i Signal.";
+"SAFETY_TIPS_REVIEW_NAMES_BODY" = "Håll utkik efter meddelandet ”Namnet har inte verifierats”. Alla anger sitt eget profilnamn i Radar.";
 
 /* Message body describing the review names safety tip in the 'view more' flow. */
-"SAFETY_TIPS_REVIEW_NAMES_BODY_VIEW_MORE" = "Håll utkik efter meddelandet ”Namnet har inte verifierats”. Alla anger sitt eget profilnamn och foto i Signal. Om du är osäker på vem en ny förfrågan kommer från är det säkrast att ignorera den.";
+"SAFETY_TIPS_REVIEW_NAMES_BODY_VIEW_MORE" = "Håll utkik efter meddelandet ”Namnet har inte verifierats”. Alla anger sitt eget profilnamn och foto i Radar. Om du är osäker på vem en ny förfrågan kommer från är det säkrast att ignorera den.";
 
 /* Message title describing the review names safety tip. */
 "SAFETY_TIPS_REVIEW_NAMES_TITLE" = "Granska namn och foton";
 
 /* Message body describing the signal chats tip. */
-"SAFETY_TIPS_SIGNAL_CHATS_BODY" = "Signal kommer aldrig att skicka meddelanden till dig för att be om din registreringskod, PIN-kod eller återställningsnyckel. Svara aldrig på en chatt som utger sig för att vara Signal.";
+"SAFETY_TIPS_SIGNAL_CHATS_BODY" = "Radar kommer aldrig att skicka meddelanden till dig för att be om din registreringskod, PIN-kod eller återställningsnyckel. Svara aldrig på en chatt som utger sig för att vara Radar.";
 
 /* Message body describing the signal chats tip in the 'view more' flow. */
-"SAFETY_TIPS_SIGNAL_CHATS_BODY_VIEW_MORE" = "Signal kommer aldrig att skicka meddelanden till dig för att be om din registreringskod, PIN-kod eller återställningsnyckel. Svara inte på chattar som utger sig för att komma från Signal eller Signal Support. Illvilliga aktörer använder falska namn för att försöka ta över ditt konto.";
+"SAFETY_TIPS_SIGNAL_CHATS_BODY_VIEW_MORE" = "Radar kommer aldrig att skicka meddelanden till dig för att be om din registreringskod, PIN-kod eller återställningsnyckel. Svara inte på chattar som utger sig för att komma från Radar eller Radar Support. Illvilliga aktörer använder falska namn för att försöka ta över ditt konto.";
 
 /* Message title describing the signal chats tip. */
-"SAFETY_TIPS_SIGNAL_CHATS_TITLE" = "Svara inte på chattar från Signal";
+"SAFETY_TIPS_SIGNAL_CHATS_TITLE" = "Svara inte på chattar från Radar";
 
 /* Message contents for the vague message safety tip. */
 "SAFETY_TIPS_VAGUE_MESSAGE_BODY" = "Spammare börjar ofta med ett enkelt meddelande som \"Hej\" för att locka dig. Om du svarar kan de ta ytterligare kontakt med dig.";
@@ -9025,10 +9028,10 @@ Send money securely.";
 "SECONDARY_ONBOARDING_SCAN_CODE_STEP_LINK_DEVICE" = "Tryck på \"Länkade enheter\" och \"Länka ny enhet\"";
 
 /* First bullet point on the QR code screen for linking a device */
-"SECONDARY_ONBOARDING_SCAN_CODE_STEP_OPEN_PRIMARY" = "Öppna Signal på din primära enhet";
+"SECONDARY_ONBOARDING_SCAN_CODE_STEP_OPEN_PRIMARY" = "Öppna Radar på din primära enhet";
 
 /* Second bullet point on the QR code screen for linking a device */
-"SECONDARY_ONBOARDING_SCAN_CODE_STEP_OPEN_SETTINGS" = "Tryck på din profilbild för att öppna Signal-inställningar";
+"SECONDARY_ONBOARDING_SCAN_CODE_STEP_OPEN_SETTINGS" = "Tryck på din profilbild för att öppna Radar-inställningar";
 
 /* header text while displaying a QR code which, when scanned, will link this device. */
 "SECONDARY_ONBOARDING_SCAN_CODE_TITLE" = "Skanna den här koden för att länka ditt konto";
@@ -9067,13 +9070,13 @@ Send money securely.";
 "SELECT_CONTACT_FOR_SHARING_PERMISSION_PROMPT_ALLOW_BUTTON" = "Tillåt åtkomst";
 
 /* Body of the prompt on the 'Select Contact' view that asks the user to allow access to their contacts. */
-"SELECT_CONTACT_FOR_SHARING_PERMISSION_PROMPT_BODY" = "Tillåt åtkomst till dina kontakter. Dina kontakter är krypterade och är inte synliga för Signal-tjänsten.";
+"SELECT_CONTACT_FOR_SHARING_PERMISSION_PROMPT_BODY" = "Tillåt åtkomst till dina kontakter. Dina kontakter är krypterade och är inte synliga för Radar-tjänsten.";
 
 /* Button on the 'Select Contact' view's contacts permission prompt that hides the prompt. */
 "SELECT_CONTACT_FOR_SHARING_PERMISSION_PROMPT_DISMISS_BUTTON" = "Nej tack";
 
 /* Title of the prompt on the 'Select Contact' view that asks the user to allow access to their contacts. */
-"SELECT_CONTACT_FOR_SHARING_PERMISSION_PROMPT_TITLE" = "Hitta personer som du känner på Signal";
+"SELECT_CONTACT_FOR_SHARING_PERMISSION_PROMPT_TITLE" = "Hitta personer som du känner på Radar";
 
 /* Placeholder text for the search bar on the 'Select Contact' view */
 "SELECT_CONTACT_FOR_SHARING_SEARCH_BAR_PLACEHOLDER" = "Sök";
@@ -9460,7 +9463,7 @@ Send money securely.";
 "SETTINGS_KEEP_MUTED_ARCHIVED_LABEL" = "Håll tystade chattar arkiverade";
 
 /* Footer for settings section describing Key Transparency. */
-"SETTINGS_KEY_TRANSPARENCY_OPT_OUT_FOOTER" = "När den är aktiverad kommer Signal försöka att automatiskt verifiera krypteringen av 1:1-chattar.";
+"SETTINGS_KEY_TRANSPARENCY_OPT_OUT_FOOTER" = "När den är aktiverad kommer Radar försöka att automatiskt verifiera krypteringen av 1:1-chattar.";
 
 /* Title for for a settings option describing that Key Transparency is enabled. */
 "SETTINGS_KEY_TRANSPARENCY_OPT_OUT_SWITCH_TITLE" = "Automatisk nyckelverifiering";
@@ -9475,7 +9478,7 @@ Send money securely.";
 "SETTINGS_LINK_PREVIEWS_FOOTER" = "Hämta länkförhandsgranskningar direkt från webbplatser för meddelanden du skickar.";
 
 /* Subtitle of a card on a linked device's account settings, explaining that account settings are managed on the primary device. */
-"SETTINGS_LINKED_DEVICE_ACCOUNT_CARD_SUBTITLE" = "Öppna Signal på din primära enhet för att hantera dina kontoinställningar.";
+"SETTINGS_LINKED_DEVICE_ACCOUNT_CARD_SUBTITLE" = "Öppna Radar på din primära enhet för att hantera dina kontoinställningar.";
 
 /* Title of a card on a linked device's account settings, indicating that this is a linked device. */
 "SETTINGS_LINKED_DEVICE_ACCOUNT_CARD_TITLE" = "Det här är en länkad enhet";
@@ -9484,7 +9487,7 @@ Send money securely.";
 "SETTINGS_LINKED_DEVICE_DELETE_DATA_BUTTON" = "Radera appdata";
 
 /* Footer below the 'delete app data' button, shown on a linked device's account settings. */
-"SETTINGS_LINKED_DEVICE_DELETE_DATA_FOOTER" = "Detta tar bort alla data från Signal-appen på den här enheten.";
+"SETTINGS_LINKED_DEVICE_DELETE_DATA_FOOTER" = "Detta tar bort alla data från Radar-appen på den här enheten.";
 
 /* Text for a toast confirming the user changed their local file backup location. */
 "SETTINGS_LOCAL_FILE_BACKUP_FOLDER_UPDATED" = "Säkerhetskopieringsmappen uppdaterad";
@@ -9526,7 +9529,7 @@ Send money securely.";
 "SETTINGS_LOCAL_FILE_BACKUPS_REMOTE_BACKUP_IN_PROGRESS_MESSAGE" = "Det går inte att skapa en säkerhetskopia på enheten eftersom en Säker säkerhetskopiering pågår. Försök igen senare.";
 
 /* Footer text on the on-device backups settings page explaining how to restore a backup. */
-"SETTINGS_LOCAL_FILE_BACKUPS_RESTORE_FOOTER" = "Installera en ny kopia av Signal för att återställa en säkerhetskopia. Öppna appen, tryck på Återställ eller överför och välj Säkerhetskopia på enheten.";
+"SETTINGS_LOCAL_FILE_BACKUPS_RESTORE_FOOTER" = "Installera en ny kopia av Radar för att återställa en säkerhetskopia. Öppna appen, tryck på Återställ eller överför och välj Säkerhetskopia på enheten.";
 
 /* Label for the button that turns off on-device backups. */
 "SETTINGS_LOCAL_FILE_BACKUPS_TURN_OFF" = "Stäng av och ta bort säkerhetskopia";
@@ -9616,7 +9619,7 @@ Send money securely.";
 "SETTINGS_NOTIFICATIONS_APP_BADGE_SECTION" = "Appmärke";
 
 /* Explanation for the switch controlling whether a notification is shown when a phone contact joins Signal. */
-"SETTINGS_NOTIFICATIONS_CONTACT_JOINED_SIGNAL_FOOTER" = "Visa en avisering när en telefonkontakt börjar använda Signal.";
+"SETTINGS_NOTIFICATIONS_CONTACT_JOINED_SIGNAL_FOOTER" = "Visa en avisering när en telefonkontakt börjar använda Radar.";
 
 /* Label for a switch controlling whether reactions to your messages generate notifications. */
 "SETTINGS_NOTIFICATIONS_REACTIONS" = "Aviseringar för reaktioner";
@@ -10394,7 +10397,7 @@ Send money securely.";
 "SHARE_ACTION_MESSAGE" = "Meddelande";
 
 /* Message for an action sheet shown when sharing fails because the device's date and time are incorrect. */
-"SHARE_EXTENSION_FAILED_SENDING_BECAUSE_CLOCK_SKEW_MESSAGE" = "Enhetens datum och tid är felaktiga och Signal kan ha misslyckats med att skicka ditt meddelande. Öppna Inställningar för att korrigera enhetens datum och tid.";
+"SHARE_EXTENSION_FAILED_SENDING_BECAUSE_CLOCK_SKEW_MESSAGE" = "Enhetens datum och tid är felaktiga och Radar kan ha misslyckats med att skicka ditt meddelande. Öppna Inställningar för att korrigera enhetens datum och tid.";
 
 /* alert body when sharing file failed because of untrusted/changed identity keys */
 "SHARE_EXTENSION_FAILED_SENDING_BECAUSE_UNTRUSTED_IDENTITY_FORMAT" = "Ditt säkerhetsnummer med %1$@ har nyligen ändrats. Du vill nog verifiera det i appen innan du skickar igen.";
@@ -10403,7 +10406,7 @@ Send money securely.";
 "SHARE_EXTENSION_LOADING" = "Läser in …";
 
 /* Message for an error shown when the user tries to share to Signal but the device is too low on storage space. */
-"SHARE_EXTENSION_LOW_STORAGE_SPACE_MESSAGE" = "Du kan inte dela till Signal eftersom enheten har ont om lagringsutrymme. Frigör utrymme genom att hantera lagringen under Inställningar och försök sedan igen.";
+"SHARE_EXTENSION_LOW_STORAGE_SPACE_MESSAGE" = "Du kan inte dela till Radar eftersom enheten har ont om lagringsutrymme. Frigör utrymme genom att hantera lagringen under Inställningar och försök sedan igen.";
 
 /* Title for an error shown when the user tries to share to Signal but the device is too low on storage space. */
 "SHARE_EXTENSION_LOW_STORAGE_SPACE_TITLE" = "Lågt lagringsutrymme";
@@ -10445,7 +10448,7 @@ Send money securely.";
 "SIGNAL_LOGIN_RECOVERY_KEY_PLACEHOLDER_TITLE" = "Återställningsnyckel";
 
 /* Title for the sheet presented when user taps on Signal Proxy link in chat. */
-"SIGNAL_PROXY" = "Signal-proxyserver";
+"SIGNAL_PROXY" = "Radar-proxyserver";
 
 /* body sent to contacts when inviting to Install Signal */
 "SMS_INVITE_BODY" = "Jag vill gärna att du installerar Radar! Här är länken:";
@@ -10488,6 +10491,10 @@ Send money securely.";
 
 /* Text for a toast confirming that the speakerphone has been turned on for a call. */
 "SPEAKERPHONE_ON_CONFIRMATION_TOAST_LABEL" = "Högtalare på";
+
+"STAR" = "Star";
+
+"STARRED_MESSAGES" = "Starred messages";
 
 /* Title for a button to view a sticker pack */
 "STICKER_BUTTON_VIEW_PACK" = "Visa paket";
@@ -10532,7 +10539,7 @@ Send money securely.";
 "STICKER_PACK_SHARE_SHEET_HEADER" = "Alla med den här länken kan lägga till och dela det här stickerpaketet.";
 
 /* Label for a button on a sticker-pack share sheet that sends the pack in Signal. */
-"STICKER_PACK_SHARE_SHEET_SEND_IN_SIGNAL" = "Skicka i Signal";
+"STICKER_PACK_SHARE_SHEET_SEND_IN_SIGNAL" = "Skicka i Radar";
 
 /* Message when trying to show a sticker that has expired and is unavailable for download */
 "STICKER_UNAVAILABLE_MESSAGE_LABEL" = "Klistermärket är inte tillgängligt";
@@ -11242,6 +11249,8 @@ Send money securely.";
 /* Notification body for unread reminders. First placeholder is unread messages, second is a summary of either unread mentions or replies */
 "UnreadReminderJob__unread_one_summary" = "Du har %1$@, inklusive %2$@.";
 
+"UNSTAR" = "Unstar";
+
 /* No comment provided by engineer. */
 "UNSUPPORTED_ATTACHMENT" = "Mottagen bilagetyp stöds inte.";
 
@@ -11435,7 +11444,7 @@ Send money securely.";
 "VERIFICATION_CODE_REQUESTED_HERO_BODY_FIRST" = "En verifieringskod har begärts";
 
 /* Second part of body for a hero sheet informing the user a verification code was requested. */
-"VERIFICATION_CODE_REQUESTED_HERO_BODY_SECOND" = "Ge inte din verifieringskod till någon. Signal kommer aldrig att skicka meddelanden till dig för att be om den. Om du har fått ett meddelande från någon som utger sig för att vara Signal är det ett bedrägeri.\nDu kan tryggt bortse från det här meddelandet om du själv har begärt koden.";
+"VERIFICATION_CODE_REQUESTED_HERO_BODY_SECOND" = "Ge inte din verifieringskod till någon. Radar kommer aldrig att skicka meddelanden till dig för att be om den. Om du har fått ett meddelande från någon som utger sig för att vara Radar är det ett bedrägeri.\nDu kan tryggt bortse från det här meddelandet om du själv har begärt koden.";
 
 /* Format for info message indicating that the verification state was unverified on this device. Embeds {{user's name or phone number}}. */
 "VERIFICATION_STATE_CHANGE_FORMAT_NOT_VERIFIED_LOCAL" = "Du markerade %1$@ som inte verifierat.";

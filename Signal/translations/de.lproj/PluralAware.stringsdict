@@ -659,9 +659,9 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Signal-Gruppen funktionieren am besten mit %1$d Mitglied. Das Hinzufügen weiterer Mitglieder führt zu Verzögerungen beim Senden und Empfangen von Nachrichten.</string>
+			<string>Radar-Gruppen funktionieren am besten mit %1$d Mitglied. Das Hinzufügen weiterer Mitglieder führt zu Verzögerungen beim Senden und Empfangen von Nachrichten.</string>
 			<key>other</key>
-			<string>Signal-Gruppen funktionieren am besten mit %1$d oder weniger Mitgliedern. Das Hinzufügen weiterer Mitglieder führt zu Verzögerungen beim Senden und Empfangen von Nachrichten.</string>
+			<string>Radar-Gruppen funktionieren am besten mit %1$d oder weniger Mitgliedern. Das Hinzufügen weiterer Mitglieder führt zu Verzögerungen beim Senden und Empfangen von Nachrichten.</string>
 		</dict>
 	</dict>
 	<key>GROUP_CALL_HAS_MAX_DEVICES_%d</key>
@@ -819,9 +819,9 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Signal wird bei %2$@, %3$@ und %1$d weiteren Person klingeln</string>
+			<string>Radar wird bei %2$@, %3$@ und %1$d weiteren Person klingeln</string>
 			<key>other</key>
-			<string>Signal wird bei %2$@, %3$@ und %1$d weiteren Personen klingeln</string>
+			<string>Radar wird bei %2$@, %3$@ und %1$d weiteren Personen klingeln</string>
 		</dict>
 	</dict>
 	<key>GROUP_INVITES_SENT_ALERT_TITLE_%d</key>
@@ -1107,9 +1107,9 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Öffne Signal auf dem Gerät innerhalb %1$d Tages, damit »%2$@« weiterhin gekoppelt bleibt.</string>
+			<string>Öffne Radar auf dem Gerät innerhalb %1$d Tages, damit »%2$@« weiterhin gekoppelt bleibt.</string>
 			<key>other</key>
-			<string>Öffne Signal auf dem Gerät innerhalb von %1$d Tagen, damit »%2$@« weiterhin gekoppelt bleibt.</string>
+			<string>Öffne Radar auf dem Gerät innerhalb von %1$d Tagen, damit »%2$@« weiterhin gekoppelt bleibt.</string>
 		</dict>
 	</dict>
 	<key>LINK_DEVICE_CONFIRMATION_ALERT_TRANSFER_SUBTITLE_%d</key>
@@ -1315,9 +1315,9 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Alle Signal-Kontakte · %1$d Betrachter*in</string>
+			<string>Alle Radar-Kontakte · %1$d Betrachter*in</string>
 			<key>other</key>
-			<string>Alle Signal-Kontakte · %1$d Betrachter*innen</string>
+			<string>Alle Radar-Kontakte · %1$d Betrachter*innen</string>
 		</dict>
 	</dict>
 	<key>MY_STORY_VIEWERS_ALL_CONNECTIONS_EXCLUDING_%d</key>
@@ -1331,9 +1331,9 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Alle Signal-Kontakte · %1$d ausgenommen</string>
+			<string>Alle Radar-Kontakte · %1$d ausgenommen</string>
 			<key>other</key>
-			<string>Alle Signal-Kontakte · %1$d ausgenommen</string>
+			<string>Alle Radar-Kontakte · %1$d ausgenommen</string>
 		</dict>
 	</dict>
 	<key>MY_STORY_VIEWERS_ONLY_%d</key>

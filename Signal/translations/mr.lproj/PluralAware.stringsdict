@@ -659,9 +659,9 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>%1$d किंवा त्यापेक्षा कमी सदस्यांसह Signal ग्रुप्स सर्वोत्कृष्ट कार्य करतात. अधिक सदस्य जोडल्यामुळे संदेश पाठवणे आणि प्राप्त करणे यात विलंब होईल.</string>
+			<string>%1$d किंवा त्यापेक्षा कमी सदस्यांसह Radar ग्रुप्स सर्वोत्कृष्ट कार्य करतात. अधिक सदस्य जोडल्यामुळे संदेश पाठवणे आणि प्राप्त करणे यात विलंब होईल.</string>
 			<key>other</key>
-			<string>%1$d किंवा त्यापेक्षा कमी सदस्यांसह Signal ग्रुप्स सर्वोत्कृष्ट कार्य करतात. अधिक सदस्य जोडल्यामुळे संदेश पाठवणे आणि प्राप्त करणे यात विलंब होईल.</string>
+			<string>%1$d किंवा त्यापेक्षा कमी सदस्यांसह Radar ग्रुप्स सर्वोत्कृष्ट कार्य करतात. अधिक सदस्य जोडल्यामुळे संदेश पाठवणे आणि प्राप्त करणे यात विलंब होईल.</string>
 		</dict>
 	</dict>
 	<key>GROUP_CALL_HAS_MAX_DEVICES_%d</key>
@@ -819,9 +819,9 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Signal %2$@, %3$@ आणि इतर %1$d जणांना रिंग देईल</string>
+			<string>Radar %2$@, %3$@ आणि इतर %1$d जणांना रिंग देईल</string>
 			<key>other</key>
-			<string>Signal %2$@, %3$@, आणि %1$d इतरांना रिंग देईल</string>
+			<string>Radar %2$@, %3$@, आणि %1$d इतरांना रिंग देईल</string>
 		</dict>
 	</dict>
 	<key>GROUP_INVITES_SENT_ALERT_TITLE_%d</key>
@@ -1107,9 +1107,9 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>&quot;%2$@&quot; ला लिंक केलेले ठेवण्यासाठी, दिवसामध्ये एकदा त्या डिव्हाइसवर Signal उघडा.</string>
+			<string>&quot;%2$@&quot; ला लिंक केलेले ठेवण्यासाठी, दिवसामध्ये एकदा त्या डिव्हाइसवर Radar उघडा.</string>
 			<key>other</key>
-			<string>&quot;%2$@&quot; ला लिंक केलेले ठेवण्यासाठी, %1$d दिवसांमध्ये त्या डिव्हाइसवर Signal उघडा.</string>
+			<string>&quot;%2$@&quot; ला लिंक केलेले ठेवण्यासाठी, %1$d दिवसांमध्ये त्या डिव्हाइसवर Radar उघडा.</string>
 		</dict>
 	</dict>
 	<key>LINK_DEVICE_CONFIRMATION_ALERT_TRANSFER_SUBTITLE_%d</key>
@@ -1315,9 +1315,9 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>सर्व Signal कनेक्शन्स · %1$d दर्शक</string>
+			<string>सर्व Radar कनेक्शन्स · %1$d दर्शक</string>
 			<key>other</key>
-			<string>सर्व Signal कनेक्शन्स · %1$d दर्शक</string>
+			<string>सर्व Radar कनेक्शन्स · %1$d दर्शक</string>
 		</dict>
 	</dict>
 	<key>MY_STORY_VIEWERS_ALL_CONNECTIONS_EXCLUDING_%d</key>
@@ -1331,9 +1331,9 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>सर्व Signal कनेक्शन्स · %1$d वगळले</string>
+			<string>सर्व Radar कनेक्शन्स · %1$d वगळले</string>
 			<key>other</key>
-			<string>सर्व Signal कनेक्शन्स · %1$d वगळले</string>
+			<string>सर्व Radar कनेक्शन्स · %1$d वगळले</string>
 		</dict>
 	</dict>
 	<key>MY_STORY_VIEWERS_ONLY_%d</key>

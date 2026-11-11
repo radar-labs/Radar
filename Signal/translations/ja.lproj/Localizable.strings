@@ -2,10 +2,10 @@
 "AB_PERMISSION_MISSING_ACTION_NOT_NOW" = "今はしない";
 
 /* Footer for the 'about' help section. For non-English languages, exclude the word '501c3'. */
-"ABOUT_SECTION_FOOTER" = "©Signal Messenger\nAGPLv3ライセンスに基づいて提供\nSignalは非営利団体です";
+"ABOUT_SECTION_FOOTER" = "©Signal Messenger\nCopyright 2026 Radar Chat, Inc.\nAGPLv3ライセンスに基づいて提供";
 
 /* Title for the 'about' help section */
-"ABOUT_SECTION_TITLE" = "Signalについて";
+"ABOUT_SECTION_TITLE" = "Radarについて";
 
 /* Label for forward button in media control panel */
 "ACCESSIBILITY_FORWARD_BUTTON_LABEL" = "転送";
@@ -71,7 +71,7 @@
 "ACCOUNT_DATA_REPORT_TITLE" = "あなたのアカウントデータ";
 
 /* Label for 'invite' button in contact view. */
-"ACTION_INVITE" = "Signalへ招待";
+"ACTION_INVITE" = "Radarへ招待";
 
 /* Label for button that lets you send a message to a contact. */
 "ACTION_SEND_MESSAGE" = "メッセージ送信";
@@ -89,7 +89,7 @@
 "ACTION_VIDEO_CALL" = "ビデオ通話";
 
 /* Label for 'voice call' button in contact view. */
-"ACTION_VOICE_CALL" = "Signal通話";
+"ACTION_VOICE_CALL" = "Radar通話";
 
 /* The title for the 'add group members' view. */
 "ADD_GROUP_MEMBERS_VIEW_TITLE" = "メンバーを追加";
@@ -221,7 +221,7 @@
 "APP_EXPIRED_BOTTOM_UPDATE" = "今すぐアップデート";
 
 /* Default message for the 'app launch failed' alert. */
-"APP_LAUNCH_FAILURE_ALERT_MESSAGE" = "Signalを起動できません。解決のため、デバッグログを support@radar.chat にお送りください。";
+"APP_LAUNCH_FAILURE_ALERT_MESSAGE" = "Radarを起動できません。解決のため、デバッグログを support@radar.chat にお送りください。";
 
 /* Button to try launching the app even though the last launch failed */
 "APP_LAUNCH_FAILURE_CONTINUE" = "Open Radar Instead";
@@ -236,7 +236,7 @@
 "APP_LAUNCH_FAILURE_COULD_NOT_LOAD_DATABASE" = "データベースを読み込めませんでした";
 
 /* Message for an action sheet explaining that Signal can't launch because the database is corrupted. */
-"APP_LAUNCH_FAILURE_DATABASE_CORRUPTED_MESSAGE" = "データベースが破損しているため、Signalを起動できません。アカウントやメッセージのセキュリティーに影響はありません。";
+"APP_LAUNCH_FAILURE_DATABASE_CORRUPTED_MESSAGE" = "データベースが破損しているため、Radarを起動できません。アカウントやメッセージのセキュリティーに影響はありません。";
 
 /* Title for an action sheet explaining that Signal can't launch because the database is corrupted. */
 "APP_LAUNCH_FAILURE_DATABASE_CORRUPTED_TITLE" = "データベースが破損しています";
@@ -245,7 +245,7 @@
 "APP_LAUNCH_FAILURE_DATABASE_RECOVERY_ACTION_TITLE" = "修復";
 
 /* Action in an action sheet offering to exit the app. */
-"APP_LAUNCH_FAILURE_EXIT_APP_ACTION_TITLE" = "Signalを停止する";
+"APP_LAUNCH_FAILURE_EXIT_APP_ACTION_TITLE" = "Radarを停止する";
 
 /* Error indicating that the app could not launch without reverting unknown database migrations. */
 "APP_LAUNCH_FAILURE_INVALID_DATABASE_VERSION_MESSAGE" = "最新バージョンのSignalにアップグレードしてください。";
@@ -254,19 +254,19 @@
 "APP_LAUNCH_FAILURE_INVALID_DATABASE_VERSION_TITLE" = "データベースのバージョンが不明です。";
 
 /* Error indicating that the app crashed during the previous launch. */
-"APP_LAUNCH_FAILURE_LAST_LAUNCH_CRASHED_MESSAGE" = "Signalの起動時に問題が発生しました。解決のためにデバッグログをsupport@radar.chatにお送りください。";
+"APP_LAUNCH_FAILURE_LAST_LAUNCH_CRASHED_MESSAGE" = "Radarの起動時に問題が発生しました。解決のためにデバッグログをsupport@radar.chatにお送りください。";
 
 /* Error indicating that the app crashed during the previous launch. */
 "APP_LAUNCH_FAILURE_LAST_LAUNCH_CRASHED_TITLE" = "前回起動時にSignalがクラッシュしました";
 
 /* Message for an error sheet shown when the app cannot launch because the device is out of storage space. Embeds 1:{{ the localized name of the user's device model, e.g. iPhone }}; 2:{{ an amount of storage space as a file size, e.g. 1 GB }}. */
-"APP_LAUNCH_FAILURE_NOT_ENOUGH_STORAGE_SPACE_MESSAGE_FORMAT" = "ご利用の%1$@には十分なストレージ容量がないためSignalを開けません。少なくとも%2$@を確保してから、Signalをもう一度開いてください。\n\niOS設定 > 一般 > ストレージへ移動してください。使用していないアプリの削除、写真アプリまたは他のアプリから容量の大きい動画、ダウンロードした音楽、メディアなどを消去してください。";
+"APP_LAUNCH_FAILURE_NOT_ENOUGH_STORAGE_SPACE_MESSAGE_FORMAT" = "ご利用の%1$@には十分なストレージ容量がないためSignalを開けません。少なくとも%2$@を確保してから、Radarをもう一度開いてください。\n\niOS設定 > 一般 > ストレージへ移動してください。使用していないアプリの削除、写真アプリまたは他のアプリから容量の大きい動画、ダウンロードした音楽、メディアなどを消去してください。";
 
 /* Title for an error sheet shown when the app cannot launch because the device is out of storage space. */
 "APP_LAUNCH_FAILURE_NOT_ENOUGH_STORAGE_SPACE_TITLE" = "ストレージ容量が不足しています";
 
 /* Error indicating that the app could not restore transferred data. */
-"APP_LAUNCH_FAILURE_RESTORE_FAILED_MESSAGE" = "旧端末から移行したデータを復元できませんでした。原因を調査するため、デバッグログを support@radar.chat に送ってください。Signalを再インストールすると、メッセージ履歴が消える可能性があります。";
+"APP_LAUNCH_FAILURE_RESTORE_FAILED_MESSAGE" = "旧端末から移行したデータを復元できませんでした。原因を調査するため、デバッグログを support@radar.chat に送ってください。Radarを再インストールすると、メッセージ履歴が消える可能性があります。";
 
 /* Error indicating that the app could not restore transferred data. */
 "APP_LAUNCH_FAILURE_RESTORE_FAILED_TITLE" = "移行を完了できませんでした";
@@ -440,7 +440,7 @@
 "ATTACHMENT_KEYBOARD_GIF" = "GIF";
 
 /* Text in chat attachment panel when Signal only has access to some photos/videos. This string is in a compact horizontal space, so it should be short if possible. */
-"ATTACHMENT_KEYBOARD_LIMITED_ACCESS" = "Signalの、写真へのアクセスが制限されています";
+"ATTACHMENT_KEYBOARD_LIMITED_ACCESS" = "Radarの、写真へのアクセスが制限されています";
 
 /* A button to select a location from the Attachment Keyboard */
 "ATTACHMENT_KEYBOARD_LOCATION" = "場所";
@@ -452,7 +452,7 @@
 "ATTACHMENT_KEYBOARD_NO_MEDIA_TITLE" = "写真や動画はありません";
 
 /* Text in chat attachment panel explaining that user needs to give Signal permission to access photos. */
-"ATTACHMENT_KEYBOARD_NO_PHOTO_ACCESS" = "Signalはユーザーの写真と動画にアクセスすることはできません。 アクセスを許可するには「設定」を開いて「写真」をタップします";
+"ATTACHMENT_KEYBOARD_NO_PHOTO_ACCESS" = "Radarはユーザーの写真と動画にアクセスすることはできません。 アクセスを許可するには「設定」を開いて「写真」をタップします";
 
 /* Button in chat attachment panel to let user open Settings app and give Signal persmission to access photos. */
 "ATTACHMENT_KEYBOARD_OPEN_SETTINGS" = "設定を開く";
@@ -632,7 +632,7 @@
 "BACKUP_KEY_SEE_FULL_KEY_BUTTON_TITLE" = "キー全部を表示";
 
 /* Body for a warning sheet shown to discourage the user from sharing their 'Recovery Key', warning them not to share it with anyone. */
-"BACKUP_NEVER_SHARE_RECOVERY_KEY_SHEET_BODY" = "回復キーは誰とも共有しないでください。共有するとアカウントが乗っ取られる可能性があります。回復キーについて、<bold>Signalは決して皆さんにメッセージしません</bold>。Signalを装ったチャットには返信しないでください。";
+"BACKUP_NEVER_SHARE_RECOVERY_KEY_SHEET_BODY" = "回復キーは誰とも共有しないでください。共有するとアカウントが乗っ取られる可能性があります。回復キーについて、<bold>Radarは決して皆さんにメッセージしません</bold>。Radarを装ったチャットには返信しないでください。";
 
 /* Title for a warning sheet shown to discourage the user from sharing their 'Recovery Key'. */
 "BACKUP_NEVER_SHARE_RECOVERY_KEY_SHEET_TITLE" = "回復キーは共有しないでください";
@@ -647,7 +647,7 @@
 "BACKUP_ONBOARDING_CANCEL_SHEET_TITLE" = "バックアップの設定を終了しますか？";
 
 /* Body for a sheet warning users to their 'Recovery Key' safe. */
-"BACKUP_ONBOARDING_CONFIRM_KEY_KEEP_KEY_SAFE_SHEET_BODY" = "キーを紛失した場合、Signalはバックアップの復元をサポートできません。保管は安全な場所でおこない、第三者と共有しないでください。";
+"BACKUP_ONBOARDING_CONFIRM_KEY_KEEP_KEY_SAFE_SHEET_BODY" = "キーを紛失した場合、Radarはバックアップの復元をサポートできません。保管は安全な場所でおこない、第三者と共有しないでください。";
 
 /* Title for a sheet warning users to their 'Recovery Key' safe. */
 "BACKUP_ONBOARDING_CONFIRM_KEY_KEEP_KEY_SAFE_SHEET_TITLE" = "キーの取り扱いは厳重にしてください";
@@ -752,7 +752,7 @@
 "BACKUP_RESTORE_MODAL_TITLE" = "メッセージを復元しています…";
 
 /* Message for a confirmation sheet shown before saving the user's Recovery Key to their password manager. */
-"BACKUP_SAVE_KEY_PW_MGR_CONFIRM_SHEET_MESSAGE" = "回復キーは、安全だと信頼できるパスワードマネージャーにのみ保管してください。Signalは、どのパスワードマネージャーがお客様に適しているかの推奨はいたしません。";
+"BACKUP_SAVE_KEY_PW_MGR_CONFIRM_SHEET_MESSAGE" = "回復キーは、安全だと信頼できるパスワードマネージャーにのみ保管してください。Radarは、どのパスワードマネージャーがお客様に適しているかの推奨はいたしません。";
 
 /* Title for a confirmation sheet shown before saving the user's Recovery Key to their password manager. */
 "BACKUP_SAVE_KEY_PW_MGR_CONFIRM_SHEET_TITLE" = "パスワードマネージャーに保存しますか？";
@@ -770,7 +770,7 @@
 "BACKUP_SAVE_KEY_SAVE_TO_PW_MGR_BUTTON_TITLE" = "パスワードマネージャーに保存する";
 
 /* Message describing that the Background App Refresh permission is disabled for Signal. \"Background App Refresh\" should be localized the same way it is in iOS Settings app permissions. */
-"BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_MESSAGE" = "自動バックアップが無効になっています。Signalの権限設定をアップデートして自動バックアップを有効にしてください。";
+"BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_MESSAGE" = "自動バックアップが無効になっています。Radarの権限設定をアップデートして自動バックアップを有効にしてください。";
 
 /* Add-on to a message describing that the Background App Refresh permission is disabled for Signal. \"Background App Refresh\" should be localized the same way it is in iOS Settings app permissions. */
 "BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_MESSAGE_UPDATE_NOW" = "アップデートする";
@@ -779,7 +779,7 @@
 "BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_SHEET_GO_TO_SETTINGS_BUTTON" = "設定へ";
 
 /* Message for a sheet warning the user about the Background App Refresh permission. \"Background App Refresh\" should be localized the same way it is in iOS Settings app permissions. */
-"BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_SHEET_MESSAGE" = "Signalがメッセージを自動的にバックアップできるようにするには、下の「設定に移動」をタップし、「アプリのバックグラウンド更新」を有効にしてください。";
+"BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_SHEET_MESSAGE" = "Radarがメッセージを自動的にバックアップできるようにするには、下の「設定に移動」をタップし、「アプリのバックグラウンド更新」を有効にしてください。";
 
 /* Title for a sheet warning the user about the Background App Refresh permission. \"Background App Refresh\" should be localized the same way it is in iOS Settings app permissions. */
 "BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_SHEET_TITLE" = "自動バックアップが無効になっています";
@@ -884,7 +884,7 @@
 "BACKUP_SETTINGS_BACKUP_PLAN_PAID_BUT_IAP_NOT_FOUND_LOCALLY_ACTION_BUTTON_TITLE" = "更新";
 
 /* Text describing that the user's paid backup plan did not correspond to a App Store subscription on this device. */
-"BACKUP_SETTINGS_BACKUP_PLAN_PAID_BUT_IAP_NOT_FOUND_LOCALLY_DESCRIPTION" = "この端末上でご利用中のサブスクリプションは確認できませんでした。Signalバックアップを引き続き使用するには、更新手続きをしてください。";
+"BACKUP_SETTINGS_BACKUP_PLAN_PAID_BUT_IAP_NOT_FOUND_LOCALLY_DESCRIPTION" = "この端末上でご利用中のサブスクリプションは確認できませんでした。Radarバックアップを引き続き使用するには、更新手続きをしてください。";
 
 /* Text on the landing page describing that the user's backup plan is paid, but free for them as a tester. */
 "BACKUP_SETTINGS_BACKUP_PLAN_PAID_COMPLIMENTARY_DESCRIPTION" = "ご利用中のバックアッププランは有料です（TestFlightユーザーの方は無料）";
@@ -908,7 +908,7 @@
 "BACKUP_SETTINGS_BACKUPS_DISABLING_GENERIC_ERROR_MESSAGE" = "エラーが発生しました。サポートにお問い合わせください。";
 
 /* Header for a menu section related to settings for when disabling Backups encountered an unexpected error. */
-"BACKUP_SETTINGS_BACKUPS_DISABLING_GENERIC_ERROR_SECTION_HEADER" = "Signalの安全なストレージサービスからデータを消去する際にエラーが発生しました。";
+"BACKUP_SETTINGS_BACKUPS_DISABLING_GENERIC_ERROR_SECTION_HEADER" = "Radarの安全なストレージサービスからデータを消去する際にエラーが発生しました。";
 
 /* Title for a view indicating we failed to delete the user's Backup due to an unexpected error. */
 "BACKUP_SETTINGS_BACKUPS_DISABLING_GENERIC_ERROR_TITLE" = "バックアップを消去できませんでした";
@@ -971,7 +971,7 @@
 "BACKUP_SETTINGS_DISABLING_DOWNLOADS_STARTED_ACTION_SHEET_TITLE" = "バックアップをダウンロードしています";
 
 /* Message shown in an action sheet indicating we failed to delete the user's Backup due to an unexpected error. */
-"BACKUP_SETTINGS_DISABLING_ERROR_GENERIC_ERROR_ACTION_SHEET_MESSAGE" = "Signalの安全なストレージサービスからデータを消去する際にエラーが発生しました。";
+"BACKUP_SETTINGS_DISABLING_ERROR_GENERIC_ERROR_ACTION_SHEET_MESSAGE" = "Radarの安全なストレージサービスからデータを消去する際にエラーが発生しました。";
 
 /* Title shown in an action sheet indicating we failed to delete the user's Backup due to an unexpected error. */
 "BACKUP_SETTINGS_DISABLING_ERROR_GENERIC_ERROR_ACTION_SHEET_TITLE" = "バックアップを消去できませんでした";
@@ -1064,31 +1064,31 @@
 "BACKUP_SETTINGS_LANDING_OTHER_WAYS_HEADER" = "その他のバックアップ方法";
 
 /* Subtitle on the Backups settings landing page. */
-"BACKUP_SETTINGS_LANDING_PAGE_SUBTITLE" = "メッセージ履歴をバックアップしておくと、電話を買い替えたり、Signalを再インストールしたりしてもデータが失われることはありません。";
+"BACKUP_SETTINGS_LANDING_PAGE_SUBTITLE" = "メッセージ履歴をバックアップしておくと、電話を買い替えたり、Radarを再インストールしたりしてもデータが失われることはありません。";
 
 /* Button to begin setting up Signal Secure Backups on the Backups settings landing page. */
 "BACKUP_SETTINGS_LANDING_SET_UP_BUTTON" = "設定";
 
 /* Description of Signal Secure Backups on the Backups settings landing page. */
-"BACKUP_SETTINGS_LANDING_SIGNAL_BACKUPS_BODY" = "Signalによる、安全なエンドツーエンドの暗号化ストレージサービスによる自動バックアップです。";
+"BACKUP_SETTINGS_LANDING_SIGNAL_BACKUPS_BODY" = "Radarによる、安全なエンドツーエンドの暗号化ストレージサービスによる自動バックアップです。";
 
 /* Title for the Signal Secure Backups cell on the Backups settings landing page. */
-"BACKUP_SETTINGS_LANDING_SIGNAL_BACKUPS_TITLE" = "Signalセキュアバックアップ";
+"BACKUP_SETTINGS_LANDING_SIGNAL_BACKUPS_TITLE" = "Radarセキュアバックアップ";
 
 /* Button to view settings for remote backups on the Backups settings landing page. */
 "BACKUP_SETTINGS_LANDING_VIEW_SETTINGS_BUTTON" = "設定を表示";
 
 /* Note on the linked-device Backups screen explaining that the Backups subscription can only be managed on the user's primary device. */
-"BACKUP_SETTINGS_LINKED_DEVICE_MANAGE_ON_PRIMARY_FOOTER" = "Signalセキュアバックアップのサブスクリプションは、メイン端末のスマートフォンから管理またはアップグレード手続きが行えます。";
+"BACKUP_SETTINGS_LINKED_DEVICE_MANAGE_ON_PRIMARY_FOOTER" = "Radarセキュアバックアップのサブスクリプションは、メイン端末のスマートフォンから管理またはアップグレード手続きが行えます。";
 
 /* Note on the linked-device Backups screen, shown on the paid tier, explaining that the Backups subscription can only be managed on the user's primary device. */
-"BACKUP_SETTINGS_LINKED_DEVICE_MANAGE_ON_PRIMARY_FOOTER_PAID" = "Signalバックアップ用サブスクリプションは、メイン端末のスマートフォンから管理または解約手続きが行えます。";
+"BACKUP_SETTINGS_LINKED_DEVICE_MANAGE_ON_PRIMARY_FOOTER_PAID" = "Radarバックアップ用サブスクリプションは、メイン端末のスマートフォンから管理または解約手続きが行えます。";
 
 /* Body text on the linked-device Backups screen, shown when Backups aren't set up, explaining the feature and that it can be enabled on the user's primary device. */
-"BACKUP_SETTINGS_LINKED_DEVICE_NO_BACKUP_FOOTER" = "Signalによる、安全なエンドツーエンドの暗号化ストレージサービスによる自動バックアップです。ご利用の端末で設定しましょう。";
+"BACKUP_SETTINGS_LINKED_DEVICE_NO_BACKUP_FOOTER" = "Radarによる、安全なエンドツーエンドの暗号化ストレージサービスによる自動バックアップです。ご利用の端末で設定しましょう。";
 
 /* Message on the linked-device Backups screen, shown when the user's paid subscription can't be found, prompting them to renew. */
-"BACKUP_SETTINGS_LINKED_DEVICE_SUBSCRIPTION_NOT_FOUND" = "ご利用のサブスクリプションは確認できませんでした。Signalセキュアバックアップを引き続き使用するには、更新してください。";
+"BACKUP_SETTINGS_LINKED_DEVICE_SUBSCRIPTION_NOT_FOUND" = "ご利用のサブスクリプションは確認できませんでした。Radarセキュアバックアップを引き続き使用するには、更新してください。";
 
 /* Title for a button allowing users to trigger a manual backup. */
 "BACKUP_SETTINGS_MANUAL_BACKUP_BUTTON_TITLE" = "いますぐバックアップ";
@@ -1127,19 +1127,19 @@
 "BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_TOGGLE_FOOTER_AVAILABLE" = "過去のメディアは次回バックアップの際にオフロードされますが、バックアップからいつでもダウンロードできます。";
 
 /* Footer for a toggle allowing users to change the Optimize Local Storage setting, if the toggle is unavailable. */
-"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_TOGGLE_FOOTER_UNAVAILABLE" = "ストレージの最適化は、Signalバックアップの有料版でのみご利用いただけます。この機能をご利用になるには、バックアッププランをアップグレードしてください。";
+"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_TOGGLE_FOOTER_UNAVAILABLE" = "ストレージの最適化は、Radarバックアップの有料版でのみご利用いただけます。この機能をご利用になるには、バックアッププランをアップグレードしてください。";
 
 /* Title for a toggle allowing users to change the Optimize Local Storage setting. */
-"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_TOGGLE_TITLE" = "Signalのストレージの最適化";
+"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_TOGGLE_TITLE" = "Radarのストレージの最適化";
 
 /* Body for a Backup plan upsell view encouraging users to subscribe to a paid Backup plan to use storage optimization. */
-"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_UPSELL_BODY" = "ストレージの最適化は、Signalセキュアバックアップの有料版でのみご利用いただけます。この機能をご利用になるには、バックアッププランをアップグレードしてください。";
+"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_UPSELL_BODY" = "ストレージの最適化は、Radarセキュアバックアップの有料版でのみご利用いただけます。この機能をご利用になるには、バックアッププランをアップグレードしてください。";
 
 /* Title for a Backup plan upsell view encouraging users to subscribe to a paid Backup plan to use storage optimization. */
 "BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_UPSELL_TITLE" = "アップグレードしてストレージの最適化をオンにしましょう";
 
 /* Subtitle for a notification telling the user they are out of remote storage space. */
-"BACKUP_SETTINGS_OUT_OF_STORAGE_SPACE_NOTIFICATION_SUBTITLE" = "バックアップストレージの上限に達しました。チャットやメディアのバックアップを続けるには、Signalの空き容量を増やしてください。";
+"BACKUP_SETTINGS_OUT_OF_STORAGE_SPACE_NOTIFICATION_SUBTITLE" = "バックアップストレージの上限に達しました。チャットやメディアのバックアップを続けるには、Radarの空き容量を増やしてください。";
 
 /* Title for a notification telling the user they are out of remote storage space. */
 "BACKUP_SETTINGS_OUT_OF_STORAGE_SPACE_NOTIFICATION_TITLE" = "バックアップストレージがいっぱいです";
@@ -1199,7 +1199,7 @@
 "BACKUP_SETTINGS_UPLOAD_PROGRESS_SUBTITLE_PAUSED_NEEDS_WIFI" = "メディアのアップロードを一時停止しました：Wi-Fi接続の待機中です";
 
 /* Subtitle for a progress bar tracking uploads that are paused because the user is out of remote storage space. Embeds 1:{{ total storage space provided, e.g. 100 GB }}; 2:{{ space the user needs to free up by deleting media, e.g. 1 GB }}. */
-"BACKUP_SETTINGS_UPLOAD_PROGRESS_SUBTITLE_PAUSED_OUT_OF_STORAGE_SPACE_FORMAT" = "ご利用中のバックアッププランに設定された、%1$@ストレージ容量の上限に達しました。新しいチャットやメディアをバックアップするには、Signalの%2$@の空き容量を増やしてから、「今すぐバックアップする」をタップしてください。";
+"BACKUP_SETTINGS_UPLOAD_PROGRESS_SUBTITLE_PAUSED_OUT_OF_STORAGE_SPACE_FORMAT" = "ご利用中のバックアッププランに設定された、%1$@ストレージ容量の上限に達しました。新しいチャットやメディアをバックアップするには、Radarの%2$@の空き容量を増やしてから、「今すぐバックアップする」をタップしてください。";
 
 /* Subtitle for a progress bar tracking active uploading. Embeds 1:{{ the amount uploaded as a file size, e.g. 100 MB }}; 2:{{ the total amount to upload as a file size, e.g. 1 GB }}; 3:{{ the percentage uploaded as a percent, e.g. 40% }}. */
 "BACKUP_SETTINGS_UPLOAD_PROGRESS_SUBTITLE_RUNNING" = "アップロード中：%2$@のうち%1$@（%3$@）";
@@ -1217,7 +1217,7 @@
 "BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_OPTIMIZE_MEDIA_TOGGLE_FOOTER" = "過去のメディアは次回バックアップの際にオフロードされますが、バックアップからいつでもダウンロードできます。";
 
 /* Title for a toggle shown after the user enables backups, letting them enable the Optimize Storage feature. */
-"BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_OPTIMIZE_MEDIA_TOGGLE_TITLE" = "Signalのストレージの最適化";
+"BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_OPTIMIZE_MEDIA_TOGGLE_TITLE" = "Radarのストレージの最適化";
 
 /* Title for a sheet shown after the user enables backups. */
 "BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_TITLE" = "すべての設定が完了しています。今すぐバックアップを開始しましょう。";
@@ -1268,7 +1268,7 @@
 "BACKUPS_MEDIA_ERROR_NOTIFICATION_TITLE" = "メディアのバックアップにエラーが発生しました";
 
 /* Body for a megaphone shown on the chat list encouraging users to enable Signal Secure Backups. */
-"BACKUPS_NEVER_LOSE_A_MESSAGE_MEGAPHONE_BODY" = "メッセージとメディアを保存するために、Signalセキュアバックアップをオンにしましょう";
+"BACKUPS_NEVER_LOSE_A_MESSAGE_MEGAPHONE_BODY" = "メッセージとメディアを保存するために、Radarセキュアバックアップをオンにしましょう";
 
 /* Title for a button on a megaphone encouraging users to enable Signal Secure Backups. */
 "BACKUPS_NEVER_LOSE_A_MESSAGE_MEGAPHONE_PRIMARY_ACTION" = "有効にする";
@@ -1277,7 +1277,7 @@
 "BACKUPS_NEVER_LOSE_A_MESSAGE_MEGAPHONE_TITLE" = "メッセージを失わないために";
 
 /* Body for a megaphone shown on the chat list encouraging users to subscribe to a paid Backup plan to save on-device storage space. */
-"BACKUPS_SAVE_SPACE_MEGAPHONE_BODY" = "Signalセキュアバックアップを使えば、メディアをオフロードすることでストレージを節約できます。";
+"BACKUPS_SAVE_SPACE_MEGAPHONE_BODY" = "Radarセキュアバックアップを使えば、メディアをオフロードすることでストレージを節約できます。";
 
 /* Title for a button on a megaphone encouraging users to subscribe to a paid Backup plan to save on-device storage space, when the user does not yet have Signal Secure Backups enabled. */
 "BACKUPS_SAVE_SPACE_MEGAPHONE_PRIMARY_ACTION_TURN_ON" = "有効にする";
@@ -1289,7 +1289,7 @@
 "BACKUPS_SAVE_SPACE_MEGAPHONE_TITLE" = "有料バックアップでストレージを節約しましょう";
 
 /* Body for a Backup plan upsell view encouraging users to subscribe to a paid Backup plan to save on-device storage space. Embeds {{ the amount of storage space being consumed on-device by media, preformatted as a localized byte count, e.g. '1.2 GB' }}. */
-"BACKUPS_SAVE_SPACE_UPSELL_BODY" = "Signalは、メディアの保存のために%1$@のストレージ容量を使用しています。有料のSignalセキュアバックアップなら、メディアをオフロードすることでストレージ容量を節約しながらチャット履歴すべてをバックアップに保存できます。";
+"BACKUPS_SAVE_SPACE_UPSELL_BODY" = "Radarは、メディアの保存のために%1$@のストレージ容量を使用しています。有料のSignalセキュアバックアップなら、メディアをオフロードすることでストレージ容量を節約しながらチャット履歴すべてをバックアップに保存できます。";
 
 /* Title for a Backup plan upsell view encouraging users to subscribe to a paid Backup plan to save on-device storage space. */
 "BACKUPS_SAVE_SPACE_UPSELL_TITLE" = "有料バックアップでストレージを節約しましょう";
@@ -1301,7 +1301,7 @@
 "BACKUPS_SETUP_ON_PRIMARY_MESSAGE" = "バックアップを設定するには、メインで使っているiPhoneまたはAndroidでSignalを開き、設定 > バックアップに移動してください。";
 
 /* Body for system notification or megaphone when backups is enabled. Embeds {{ time backups was enabled }} */
-"BACKUPS_TURNED_ON_NOTIFICATION_BODY_FORMAT" = "このアカウントで、Signalバックアップは%1$@に有効になりました。タップして確認できます。";
+"BACKUPS_TURNED_ON_NOTIFICATION_BODY_FORMAT" = "このアカウントで、Radarバックアップは%1$@に有効になりました。タップして確認できます。";
 
 /* Title for system notification or megaphone when backups is enabled */
 "BACKUPS_TURNED_ON_TITLE" = "バックアップを有効にしました";
@@ -1367,7 +1367,7 @@
 "BANK_DONATION_FOOTER_FIND_ACCOUNT_INFO" = "アカウント情報を確認";
 
 /* On the bank transfer donation screen, a small amount of information text is shown. This is that text. It should (1) instruct users to enter their bank information (2) tell them that Signal does not collect or store their personal information. */
-"BANK_DONATION_SUBHEADER_TEXT" = "口座情報を入力してください。Signalがお客様の個人情報を収集したり保存したりすることはありません。";
+"BANK_DONATION_SUBHEADER_TEXT" = "口座情報を入力してください。Radarがお客様の個人情報を収集したり保存したりすることはありません。";
 
 /* Users can donate to Signal with a bank account. We are required to show them a mandate with information about bank transfers. This is a label for a button to agree to the mandate. */
 "BANK_MANDATE_AGREE" = "同意";
@@ -1376,7 +1376,7 @@
 "BANK_MANDATE_READ_MORE" = "さらに表示";
 
 /* Users can donate to Signal with a bank account. We are required to show them a mandate with information about bank transfers. This is a subtitle about the payment processor Stripe above that mandate. */
-"BANK_MANDATE_SUBTITLE" = "StripeがSignalへの寄付を処理します。Signalがお客様の個人情報を収集したり保存したりすることはありません。";
+"BANK_MANDATE_SUBTITLE" = "StripeがSignalへの寄付を処理します。Radarがお客様の個人情報を収集したり保存したりすることはありません。";
 
 /* Users can donate to Signal with a bank account. We are required to show them a mandate with information about bank transfers. This is the title above that mandate. */
 "BANK_MANDATE_TITLE" = "銀行振り込み";
@@ -1541,7 +1541,7 @@
 "CALL_AUDIO_MISSED_WEEK_NOTIFICATION_BODY_FORMAT" = "📞 不在着信 %1$@";
 
 /* Alert message when calling and permissions for microphone are missing */
-"CALL_AUDIO_PERMISSION_MESSAGE" = "iOSの設定でマイクへのアクセスを有効にすると、Signalで通話や音声メッセージの録音ができます。";
+"CALL_AUDIO_PERMISSION_MESSAGE" = "iOSの設定でマイクへのアクセスを有効にすると、Radarで通話や音声メッセージの録音ができます。";
 
 /* Alert title when calling and permissions for microphone are missing */
 "CALL_AUDIO_PERMISSION_TITLE" = "マイクへのアクセス許可が必要です";
@@ -1655,7 +1655,7 @@
 "CALL_QUALITY_SURVEY_COMPLETION_TOAST" = "フィードバックをありがとうございます！";
 
 /* Footer text explaining custom issue descriptions in the call quality survey */
-"CALL_QUALITY_SURVEY_CUSTOM_ISSUE_FOOTER" = "問題に関して、できるだけ詳細にご記入ください。ここで共有いただいた内容はすべて非公開であり、Signalでの通話品質の改善の為のみに使用されます。";
+"CALL_QUALITY_SURVEY_CUSTOM_ISSUE_FOOTER" = "問題に関して、できるだけ詳細にご記入ください。ここで共有いただいた内容はすべて非公開であり、Radarでの通話品質の改善の為のみに使用されます。";
 
 /* Placeholder text for the custom issue entry in the call quality survey */
 "CALL_QUALITY_SURVEY_CUSTOM_ISSUE_PLACEHOLDER" = "問題について記入してください";
@@ -1724,7 +1724,7 @@
 "CALL_QUALITY_SURVEY_ISSUES_SHEET_TITLE" = "どのような問題がありますか?";
 
 /* Header text explaining the purpose of the call quality survey */
-"CALL_QUALITY_SURVEY_RATING_HEADER" = "Signalの通話品質改善にご協力をお願いいたします。個人情報は一切保存されません。";
+"CALL_QUALITY_SURVEY_RATING_HEADER" = "Radarの通話品質改善にご協力をお願いいたします。個人情報は一切保存されません。";
 
 /* Title for the initial rating screen in the call quality survey */
 "CALL_QUALITY_SURVEY_RATING_TITLE" = "通話状態はいかがでしたか？";
@@ -1820,10 +1820,10 @@
 "CALLING_MEMBER_VIEW_YOUR_CAMERA_IS_OFF" = "カメラがオフになっています";
 
 /* The generic name used for calls if CallKit privacy is enabled */
-"CALLKIT_ANONYMOUS_CONTACT_NAME" = "Signalユーザ";
+"CALLKIT_ANONYMOUS_CONTACT_NAME" = "Radarユーザ";
 
 /* The generic name used for group calls if CallKit privacy is enabled */
-"CALLKIT_ANONYMOUS_GROUP_NAME" = "Signalグループ";
+"CALLKIT_ANONYMOUS_GROUP_NAME" = "Radarグループ";
 
 /* Title for the calls list view. */
 "CALLS_LIST_TITLE" = "通話";
@@ -2000,7 +2000,7 @@
 "CARD_DONATION_EXPIRATION_DATE_PLACEHOLDER" = "月／年";
 
 /* Users can choose to learn more about their credit/debit card donations, which will open a sheet with additional information. This is the body text of that sheet. */
-"CARD_DONATION_READ_MORE_SHEET_BODY" = "Signalは、寄付を受ける際に、お客様のいかなる個人情報も収集したり保存したりすることはありません。\n\nSignalでは寄付を受け取る決済処理にStripeを使用しています。Signalは、お客様から提供されたいかなる情報にもアクセスすることはありません。また保管・保存したりすることもありません。\n\nSignalは、寄付からお客様のSignalアカウントを特定することはありません。特定はできない仕組みになっています。ご支援ありがとうございます！";
+"CARD_DONATION_READ_MORE_SHEET_BODY" = "Radarは、寄付を受ける際に、お客様のいかなる個人情報も収集したり保存したりすることはありません。\n\nSignalでは寄付を受け取る決済処理にStripeを使用しています。Radarは、お客様から提供されたいかなる情報にもアクセスすることはありません。また保管・保存したりすることもありません。\n\nSignalは、寄付からお客様のSignalアカウントを特定することはありません。特定はできない仕組みになっています。ご支援ありがとうございます！";
 
 /* Users can choose to learn more about their credit/debit card donations, which will open a sheet with additional information. This is the title of that sheet. */
 "CARD_DONATION_READ_MORE_SHEET_TITLE" = "お客様の個人情報は保護されています";
@@ -2009,7 +2009,7 @@
 "CARD_DONATION_SUBHEADER_LEARN_MORE" = "さらに詳しく";
 
 /* On the credit/debit card donation screen, a small amount of information text is shown. This is that text. It should (1) instruct users to enter their credit/debit card information (2) tell them that Signal does not collect or store their personal information. */
-"CARD_DONATION_SUBHEADER_TEXT" = "以下にカード情報を入力してください。Signalがお客様の個人情報を収集したり保存したりすることはありません。";
+"CARD_DONATION_SUBHEADER_TEXT" = "以下にカード情報を入力してください。Radarがお客様の個人情報を収集したり保存したりすることはありません。";
 
 /* Title for the 'censorship circumvention country' view. */
 "CENSORSHIP_CIRCUMVENTION_COUNTRY_VIEW_TITLE" = "国の選択";
@@ -2243,7 +2243,7 @@
 "CLOCK_SKEW_APP_BLOCKING_DEVICE_TIME_FORMAT" = "端末の日時は%1$@（UTC）です。";
 
 /* Subtitle for a screen shown when the app can't be used until the user corrects their device's date and time. */
-"CLOCK_SKEW_APP_BLOCKING_SUBTITLE" = "Signalは、ユーザーの端末の日時が不正確な間は使用できません。設定を開いて日時を修正してください。";
+"CLOCK_SKEW_APP_BLOCKING_SUBTITLE" = "Radarは、ユーザーの端末の日時が不正確な間は使用できません。設定を開いて日時を修正してください。";
 
 /* Title for a screen shown when the app can't be used until the user corrects their device's date and time. */
 "CLOCK_SKEW_APP_BLOCKING_TITLE" = "日時が正しくありません";
@@ -2291,7 +2291,7 @@
 "COMPOSE_SCREEN_LIMITED_CONTACTS_CTA" = "管理";
 
 /* Multi-line label explaining why compose-screen contact picker is empty. */
-"COMPOSE_SCREEN_LIMITED_CONTACTS_PERMISSION" = "Signalは、システムの連絡先へのアクセスが制限されています";
+"COMPOSE_SCREEN_LIMITED_CONTACTS_PERMISSION" = "Radarは、システムの連絡先へのアクセスが制限されています";
 
 /* Button to open settings from an empty compose-screen contact picker. */
 "COMPOSE_SCREEN_MISSING_CONTACTS_CTA" = "設定を開く";
@@ -2342,7 +2342,7 @@
 "CONTACT_ABOUT_SHEET_SECONDARY_NAME_TOOLTIP_MESSAGE" = "「%1$@」は、相手が自分で設定したプロフィールネームです。";
 
 /* A label indicating a user is a signal connection. */
-"CONTACT_ABOUT_SHEET_SIGNAL_CONNECTION_LABEL" = "Signalコネクション";
+"CONTACT_ABOUT_SHEET_SIGNAL_CONNECTION_LABEL" = "Radarコネクション";
 
 /* The title for a contact 'about' sheet. */
 "CONTACT_ABOUT_SHEET_TITLE" = "自己紹介";
@@ -2390,7 +2390,7 @@
 "CONTACT_NOTE_TITLE" = "メモ";
 
 /* Body for contact permission action sheet */
-"CONTACT_PERMISSION_ACTION_SHEET_2_BODY" = "Signalで知り合いを探すには：";
+"CONTACT_PERMISSION_ACTION_SHEET_2_BODY" = "Radarで知り合いを探すには：";
 
 /* First step for contact permission action sheet */
 "CONTACT_PERMISSION_ACTION_SHEET_2_STEP_ONE" = "以下の「設定へ」をタップ";
@@ -2423,10 +2423,10 @@
 "CONTACT_PERMISSION_REMINDER_MEGAPHONE_ACTION" = "アクセスを許可する";
 
 /* Body for contact permission reminder megaphone */
-"CONTACT_PERMISSION_REMINDER_MEGAPHONE_BODY" = "連絡先へのアクセスを許可すると、Signalのユーザーをすぐに見つけることができます。";
+"CONTACT_PERMISSION_REMINDER_MEGAPHONE_BODY" = "連絡先へのアクセスを許可すると、Radarのユーザーをすぐに見つけることができます。";
 
 /* Title for contact permission reminder megaphone */
-"CONTACT_PERMISSION_REMINDER_MEGAPHONE_TITLE" = "Signal上で連絡先を検索する";
+"CONTACT_PERMISSION_REMINDER_MEGAPHONE_TITLE" = "Radar上で連絡先を検索する";
 
 /* Label for a contact's phone number. */
 "CONTACT_PHONE" = "電話番号";
@@ -2462,7 +2462,7 @@
 "CONTACT_SHARE_AVATAR_ROW_LABEL" = "写真";
 
 /* Name of the option to share a contact's Signal profile photo. Read by VoiceOver on the option, and as the current value of the photo row when it's selected. */
-"CONTACT_SHARE_AVATAR_SIGNAL_PHOTO" = "Signalプロフィール写真";
+"CONTACT_SHARE_AVATAR_SIGNAL_PHOTO" = "Radarプロフィール写真";
 
 /* Name of the option to share a contact's photo from the phone's contacts. Read by VoiceOver on the option, and as the current value of the photo row when it's selected. */
 "CONTACT_SHARE_AVATAR_SYSTEM_CONTACT_PHOTO" = "連絡先の写真";
@@ -2480,7 +2480,7 @@
 "CONTACT_SHARE_SIGNAL_ACCOUNT_NOTICE_FORMAT" = "このプロフィールを共有した相手は、誰でもSignalでメッセージを%1$@に送れるようになります。";
 
 /* Alert body when contacts disabled while trying to share a contact. */
-"CONTACT_SHARING_NO_ACCESS_BODY" = "Signalに連絡先へのアクセスが必要です。iOSの設定へ移動し、連絡先をオンにします。連絡先は暗号化され、私たちSignalからは見えません。";
+"CONTACT_SHARING_NO_ACCESS_BODY" = "Radarに連絡先へのアクセスが必要です。iOSの設定へ移動し、連絡先をオンにします。連絡先は暗号化され、私たちSignalからは見えません。";
 
 /* Alert title when contacts disabled while trying to share a contact. */
 "CONTACT_SHARING_NO_ACCESS_TITLE" = "連絡先へのアクセス許可";
@@ -2534,7 +2534,7 @@
 "CONTACT_SUPPORT_FILTER_SOMETHING_NOT_WORKING_SHORT" = "動作しないものがある";
 
 /* Alert body */
-"CONTACT_SUPPORT_PROMPT_ERROR_ALERT_BODY" = "Signalは、サポートリクエストを完了できませんでした。";
+"CONTACT_SUPPORT_PROMPT_ERROR_ALERT_BODY" = "Radarは、サポートリクエストを完了できませんでした。";
 
 /* Alert body */
 "CONTACT_SUPPORT_PROMPT_TO_INCLUDE_DEBUG_LOG_MESSAGE" = "デバッグログがあると、問題の早い解決に役立ちます。ログの提出は任意です。";
@@ -2654,7 +2654,7 @@
 "CONVERSATION_SETTINGS_ATTRIBUTES_ACCESS_SECTION_FOOTER_V2" = "グループ名、写真、説明、消えるメッセージのタイマー、ピン留めされたメッセージなどの編集権限を設定します。";
 
 /* Footer string for a contact's badges in conversation settings */
-"CONVERSATION_SETTINGS_BADGES_FOOTER" = "Signalをサポートすると、あなたのプロフィールにバッジが表示されます。バッジをタップすると詳細が表示されます。";
+"CONVERSATION_SETTINGS_BADGES_FOOTER" = "Radarをサポートすると、あなたのプロフィールにバッジが表示されます。バッジをタップすると詳細が表示されます。";
 
 /* Header title for a contact's badges in conversation settings */
 "CONVERSATION_SETTINGS_BADGES_HEADER" = "バッジ";
@@ -2966,7 +2966,7 @@
 "DATABASE_RECOVERY_RECOVERY_FAILED_DESCRIPTION" = "メッセージ履歴を復元できませんでした。再インストール後も引き続きSignalをご利用いただけます。原因究明のためにデバッグログを送信してください。";
 
 /* The user has tried to recover their data after it was lost due to corruption. (They have not been hacked.) This button lets them delete all of their data. */
-"DATABASE_RECOVERY_RECOVERY_FAILED_RESET_APP_BUTTON" = "Signalをリセットする";
+"DATABASE_RECOVERY_RECOVERY_FAILED_RESET_APP_BUTTON" = "Radarをリセットする";
 
 /* The user has tried to recover their data after it was lost due to corruption. (They have not been hacked.) If they want to delete the app and restart, they will be presented with a confirmation dialog. This is the final button they will press before their data is reset. */
 "DATABASE_RECOVERY_RECOVERY_FAILED_RESET_APP_CONFIRMATION_CONFIRM" = "リセット";
@@ -2975,7 +2975,7 @@
 "DATABASE_RECOVERY_RECOVERY_FAILED_RESET_APP_CONFIRMATION_DESCRIPTION" = "アカウント情報、プロフィール、メッセージはすべて消去されます。この処理が完了するとアプリは終了します。";
 
 /* The user has tried to recover their data after it was lost due to corruption. (They have not been hacked.) If they want to delete the app and restart, they will be presented with a confirmation dialog. This is the title of that dialog. */
-"DATABASE_RECOVERY_RECOVERY_FAILED_RESET_APP_CONFIRMATION_TITLE" = "Signalをリセットする";
+"DATABASE_RECOVERY_RECOVERY_FAILED_RESET_APP_CONFIRMATION_TITLE" = "Radarをリセットする";
 
 /* The user has tried to recover their data after it was lost due to corruption. (They have not been hacked.) They were asked to submit a debug log. This is the button that submits this log. */
 "DATABASE_RECOVERY_RECOVERY_FAILED_SUBMIT_DEBUG_LOG_BUTTON" = "デバッグログを送信する";
@@ -3083,7 +3083,7 @@
 "DELETE_ACCOUNT_CONFIRMATION_PHONE_NUMBER_TITLE" = "電話番号";
 
 /* Section header */
-"DELETE_ACCOUNT_CONFIRMATION_SECTION_TITLE" = "Signal番号の確認";
+"DELETE_ACCOUNT_CONFIRMATION_SECTION_TITLE" = "Radar番号の確認";
 
 /* Title for the 'delete account' confirmation view. */
 "DELETE_ACCOUNT_CONFIRMATION_TITLE" = "アカウントを消去する";
@@ -3216,7 +3216,7 @@
 "DEVICE_TRANSFER_ERROR_NOT_ENOUGH_SPACE" = "移行のための空き領域が不足しています";
 
 /* An error indicating the user must update their device before trying to transfer. */
-"DEVICE_TRANSFER_ERROR_UNSUPPORTED_VERSION" = "Signalを最新版にアップデートしてから再度試してください";
+"DEVICE_TRANSFER_ERROR_UNSUPPORTED_VERSION" = "Radarを最新版にアップデートしてから再度試してください";
 
 /* Body of the device transfer screen for pairing a new device, from the new device */
 "DEVICE_TRANSFER_PAIR_NEW_DEVICE_MESSAGE" = "アカウントを移行するには、この端末と以前の端末を連携してください";
@@ -3231,7 +3231,7 @@
 "DEVICE_TRANSFER_PAIR_OLD_DEVICE_TITLE" = "以前の端末を連携する";
 
 /* The explanation on the view that shows receiving progress */
-"DEVICE_TRANSFER_RECEIVING_EXPLANATION" = "端末同士を近づけてください。どちらの端末も電源を切らず、Signalを開いたままにしてください。転送はエンドツーエンドで暗号化されます。";
+"DEVICE_TRANSFER_RECEIVING_EXPLANATION" = "端末同士を近づけてください。どちらの端末も電源を切らず、Radarを開いたままにしてください。転送はエンドツーエンドで暗号化されます。";
 
 /* The title on the view that shows receiving progress */
 "DEVICE_TRANSFER_RECEIVING_TITLE" = "データ受信中";
@@ -3267,7 +3267,7 @@
 "DEVICE_TRANSFER_STATUS_NEW_DEVICE_TRANSFERRING" = "移行中です";
 
 /* Description in the progress view displayed during device transfer. */
-"DEVICE_TRANSFER_STATUS_NEW_DEVICE_TRANSFERRING_DESCRIPTION" = "端末同士を近づけてください。どちらの端末も電源を切らず、Signalを開いたままにしてください。転送はエンドツーエンドで暗号化されます。";
+"DEVICE_TRANSFER_STATUS_NEW_DEVICE_TRANSFERRING_DESCRIPTION" = "端末同士を近づけてください。どちらの端末も電源を切らず、Radarを開いたままにしてください。転送はエンドツーエンドで暗号化されます。";
 
 /* Status message on old device when cancelling transfer. */
 "DEVICE_TRANSFER_STATUS_OLD_DEVICE_CANCELLING" = "新しいiPhoneへの接続をキャンセルしています…";
@@ -3399,10 +3399,10 @@
 "DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_DONATION_ON_BEHALF_OF_A_FRIEND" = "%1$@ をSignalに寄付";
 
 /* When users make monthly donations, they see a sheet that lets them pick a payment method. This is the title on that sheet. Embeds {{amount of money per month}}, such as \"$5/month\". */
-"DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_MONTHLY_DONATION" = "Signalに %1$@を寄付する";
+"DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_MONTHLY_DONATION" = "Radarに %1$@を寄付する";
 
 /* When users make one-time donations, they see a sheet that lets them pick a payment method. This is the title on that sheet. Embeds {{amount of money}}, such as \"$5\". */
-"DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_ONE_TIME_DONATION" = "Signalに %1$@を寄付する";
+"DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_ONE_TIME_DONATION" = "Radarに %1$@を寄付する";
 
 /* Users can donate on a friend's behalf and can optionally add a message. This is tells users about that optional message. */
 "DONATE_ON_BEHALF_OF_A_FRIEND_ADDITIONAL_MESSAGE_INFO" = "受取人には、1対1のメッセージで寄付が通知されます。以下にご自身のメッセージを追加してください。";
@@ -3516,7 +3516,7 @@
 "DONATION_ON_BEHALF_OF_A_FRIEND_BADGE_REDEEMED" = "引換え済";
 
 /* Users can donate on behalf of a friend, and the friend will receive a badge. This is a short paragraph on the screen where users choose the badge their friend will receive. */
-"DONATION_ON_BEHALF_OF_A_FRIEND_CHOOSE_BADGE_DESCRIPTION" = "Signalを利用している友人や家族に代わって寄付をし、Signalをサポートすることができます。その友人や家族には、サポートしていることをプロフィールに表示するオプションが付与されます。";
+"DONATION_ON_BEHALF_OF_A_FRIEND_CHOOSE_BADGE_DESCRIPTION" = "Radarを利用している友人や家族に代わって寄付をし、Radarをサポートすることができます。その友人や家族には、サポートしていることをプロフィールに表示するオプションが付与されます。";
 
 /* Users can donate on behalf of a friend, and the friend will receive a badge. This is the title on the screen where users choose the badge their friend will receive. */
 "DONATION_ON_BEHALF_OF_A_FRIEND_CHOOSE_BADGE_TITLE" = "友達に代わって寄付する";
@@ -3633,7 +3633,7 @@
 "DONATION_RECEIPTS" = "寄付の領収書";
 
 /* Text at the bottom of the donation receipts list, telling users that receipts might not be available */
-"DONATION_RECEIPTS_MIGHT_BE_MISSING_IF_YOU_REINSTALLED" = "Signalをインストールし直すと、過去の寄付の領収書を表示できなくなります。";
+"DONATION_RECEIPTS_MIGHT_BE_MISSING_IF_YOU_REINSTALLED" = "Radarをインストールし直すと、過去の寄付の領収書を表示できなくなります。";
 
 /* Error message displayed if something goes wrong with 3DSecure/iDEAL payment authorization.  This will be encountered if the user cancels the webview before authrizing the payment. */
 "DONATION_REDIRECT_ERROR_CANCELLED_MESSAGE" = "決済がキャンセルされました。もう一度お試しください。";
@@ -3648,7 +3648,7 @@
 "DONATION_SCREEN_DONATE_BUTTON" = "寄付する";
 
 /* On donation screens, a small amount of information text is shown. This is the subtitle for that text. */
-"DONATION_SCREENS_HEADER_DESCRIPTION" = "メッセージのやりとりをプライベートに保つためにご寄付をお願いします。Signalが独立性を保ち、広告なしで運営するためには皆様のご協力が必要です。";
+"DONATION_SCREENS_HEADER_DESCRIPTION" = "メッセージのやりとりをプライベートに保つためにご寄付をお願いします。Radarが独立性を保ち、広告なしで運営するためには皆様のご協力が必要です。";
 
 /* On donation screens, a small amount of information text is shown. Users can click this link to learn more information. */
 "DONATION_SCREENS_HEADER_READ_MORE" = "続きを読む";
@@ -3723,7 +3723,7 @@
 "DONATION_VIEW_DONATE_ON_BEHALF_OF_A_FRIEND" = "友達に代わって寄付する";
 
 /* Text describing to the user that they're going to pay a donation to Signal */
-"DONATION_VIEW_DONATION_TO_SIGNAL" = "Signalへの寄付";
+"DONATION_VIEW_DONATION_TO_SIGNAL" = "Radarへの寄付";
 
 /* Title for the 'Donor FAQ' button on the donation screen */
 "DONATION_VIEW_DONOR_FAQ" = "寄付についてのよくある質問";
@@ -3735,13 +3735,13 @@
 "DONATION_VIEW_MANAGE_BADGES" = "バッジ";
 
 /* Text describing to the user that they're going to pay a monthly donation to Signal */
-"DONATION_VIEW_MONTHLY_DONATION_TO_SIGNAL" = "Signalへの月々の寄付";
+"DONATION_VIEW_MONTHLY_DONATION_TO_SIGNAL" = "Radarへの月々の寄付";
 
 /* Title for the 'my support' section in the donation view */
 "DONATION_VIEW_MY_SUPPORT_TITLE" = "マイサポート";
 
 /* Title on the 'Donate to Signal' screen */
-"DONATION_VIEW_TITLE" = "Signalへの寄付";
+"DONATION_VIEW_TITLE" = "Radarへの寄付";
 
 /* Label for the currency picker button in donation views */
 "DONATIONS_CURRENCY_PICKER_LABEL" = "通貨";
@@ -3759,7 +3759,7 @@
 "EDIT_CONTACT_WITHOUT_CONTACTS_PERMISSION_ALERT_BODY" = "iOSの設定でアクセス権限を制御できます。";
 
 /* Alert title for when the user has just tried to edit a contacts after declining to give Signal contacts permissions */
-"EDIT_CONTACT_WITHOUT_CONTACTS_PERMISSION_ALERT_TITLE" = "連絡先を編集するには、Signalに連絡先へのアクセス権限が必要です。";
+"EDIT_CONTACT_WITHOUT_CONTACTS_PERMISSION_ALERT_TITLE" = "連絡先を編集するには、Radarに連絡先へのアクセス権限が必要です。";
 
 /* The navbar title for the 'update group' view. */
 "EDIT_GROUP_DEFAULT_TITLE" = "グループを編集";
@@ -3792,7 +3792,7 @@
 "EDIT_MESSAGE_SEND_MESSAGE_UNKNOWN_ERROR" = "EDIT_MESSAGE_SEND_MESSAGE_UNKNOWN_ERROR";
 
 /* body of email sent to contacts when inviting to install Signal. Embeds {{link to install Signal}} and {{link to the Signal home page}} */
-"EMAIL_INVITE_BODY" = "こんにちは\n\n最近、私はiPhoneでのチャットのプライベートを保つためにSignalを使っています。よかったら、あなたにもインストールしませんか？そうすれば、他の人が私たちのメッセージを読んだり聞いたりできないので安心です。\n\nSignalは、iPhone、Android、Desktopのどれでも使えます。ここからインストールできます： %1$@\n\nSignalの使い方は、今使っているメッセージアプリと同じです。写真や動画も送れるし、通話やグループチャットもできます。一番すごいところは、Signalの開発者であってもユーザーのやりとりを見られないところです！\n\nSignalの詳細についてはこちらをご覧ください：%2$@";
+"EMAIL_INVITE_BODY" = "こんにちは\n\n最近、私はiPhoneでのチャットのプライベートを保つためにSignalを使っています。よかったら、あなたにもインストールしませんか？そうすれば、他の人が私たちのメッセージを読んだり聞いたりできないので安心です。\n\nSignalは、iPhone、Android、Desktopのどれでも使えます。ここからインストールできます： %1$@\n\nSignalの使い方は、今使っているメッセージアプリと同じです。写真や動画も送れるし、通話やグループチャットもできます。一番すごいところは、Radarの開発者であってもユーザーのやりとりを見られないところです！\n\nSignalの詳細についてはこちらをご覧ください：%2$@";
 
 /* subject of email sent to contacts when inviting to install Signal */
 "EMAIL_INVITE_SUBJECT" = "メッセージアプリをSignalにしましょう";
@@ -3975,7 +3975,7 @@
 "ERROR_NETWORK_FAILURE" = "ネットワークエラー";
 
 /* Format string for an error alert notification message. Embeds {{ error string }} */
-"ERROR_NOTIFICATION_MESSAGE_FORMAT" = "このエラーとあなたの端末のデバッグログを support@radar.chat に報告して、Signalの改善にご協力ください; %1$@";
+"ERROR_NOTIFICATION_MESSAGE_FORMAT" = "このエラーとあなたの端末のデバッグログを support@radar.chat に報告して、Radarの改善にご協力ください; %1$@";
 
 /* Format string for an error alert notification title. */
 "ERROR_NOTIFICATION_TITLE" = "Radar Beta: エラーが発生しました";
@@ -4353,10 +4353,10 @@
 "GROUP_CALL_WILL_NOTIFY_TWO_PEOPLE_FORMAT" = "%1$@ と %2$@ に通知されます";
 
 /* Text shown before the user starts a group call if the user has enabled ringing and there is one other person in the group. Embeds {member name} */
-"GROUP_CALL_WILL_RING_ONE_PERSON_FORMAT" = "Signalは %1$@ を呼び出します";
+"GROUP_CALL_WILL_RING_ONE_PERSON_FORMAT" = "Radarは %1$@ を呼び出します";
 
 /* Text shown before the user starts a group call if the user has enabled ringing and there are two other people in the group. Embeds {{ %1$@ participant1, %2$@ participant2 }} */
-"GROUP_CALL_WILL_RING_TWO_PEOPLE_FORMAT" = "Signalは %1$@ と %2$@ を呼び出します";
+"GROUP_CALL_WILL_RING_TWO_PEOPLE_FORMAT" = "Radarは %1$@ と %2$@ を呼び出します";
 
 /* Text explaining that you are in the group call. */
 "GROUP_CALL_YOU_ARE_HERE" = "グループ通話中です";
@@ -4575,7 +4575,7 @@
 "GROUP_LINK_VIEW_SHARE_LINK_VIA_QR_CODE" = "QRコード";
 
 /* Label for the 'share group link via Signal' button in the 'group link' view. */
-"GROUP_LINK_VIEW_SHARE_LINK_VIA_SIGNAL" = "Signal経由で共有する";
+"GROUP_LINK_VIEW_SHARE_LINK_VIA_SIGNAL" = "Radar経由で共有する";
 
 /* Message for the 'share group link' action sheet in the 'group link' view. */
 "GROUP_LINK_VIEW_SHARE_SHEET_MESSAGE" = "誰でもこのリンクから、グループの名前とメンバーを見たり、参加を申請できます。信頼できる人と共有してください。";
@@ -4698,10 +4698,10 @@
 "GROUP_NAME_EDUCATION_SHEET_BULLET_1" = "組織や企業になりすましたグループにはご注意ください";
 
 /* Second bullet point for the explainer sheet for group names */
-"GROUP_NAME_EDUCATION_SHEET_BULLET_2" = "Signalは名前や写真を確認することはできません";
+"GROUP_NAME_EDUCATION_SHEET_BULLET_2" = "Radarは名前や写真を確認することはできません";
 
 /* Third bullet point for the explainer sheet for group names */
-"GROUP_NAME_EDUCATION_SHEET_BULLET_3" = "Signalは決して、登録コード、PIN、回復キーについて皆さんに連絡しません";
+"GROUP_NAME_EDUCATION_SHEET_BULLET_3" = "Radarは決して、登録コード、PIN、回復キーについて皆さんに連絡しません";
 
 /* Fourth bullet point for the explainer sheet for group names */
 "GROUP_NAME_EDUCATION_SHEET_BULLET_4" = "知らない人とは個人情報を共有しないでください";
@@ -5217,7 +5217,7 @@
 "INFO_MESSAGE_CONTACT_REINSTATED" = "以前削除したユーザーがSignalの連絡先に再度追加されました。";
 
 /* Indicates that the recipient has been removed from the current user's contacts and that messaging them will re-add them. */
-"INFO_MESSAGE_CONTACT_REMOVED" = "Signalの連絡先リストから削除した相手にメッセージを送ると、その相手は自動的に連絡先に再追加されます。";
+"INFO_MESSAGE_CONTACT_REMOVED" = "Radarの連絡先リストから削除した相手にメッセージを送ると、その相手は自動的に連絡先に再追加されます。";
 
 /* When you start a chat with someone and then later learn their profile name, we insert an in-chat message with this string to record the identifier you originally used to contact them. Embeds {{ the identifier, either a phone number, a username, or a name someone else shared }}. */
 "INFO_MESSAGE_LEARNED_PROFILE_KEY" = "これは%1$@と始めたチャットです。";
@@ -5238,7 +5238,7 @@
 "INFO_MESSAGE_REPORTED_SPAM" = "スパムとして報告する";
 
 /* Body message of the alert shown when a user taps on 'learn more' via the spam info message. */
-"INFO_MESSAGE_REPORTED_SPAM_LEARN_MORE_MESSAGE" = "この人物がスパムを送信している可能性がSignalに通知されました。Signalはチャットの内容を見ることはできません。";
+"INFO_MESSAGE_REPORTED_SPAM_LEARN_MORE_MESSAGE" = "この人物がスパムを送信している可能性がSignalに通知されました。Radarはチャットの内容を見ることはできません。";
 
 /* Title of the alert shown when a user taps on 'learn more' via the spam info message. */
 "INFO_MESSAGE_REPORTED_SPAM_LEARN_MORE_TITLE" = "スパムとして報告する";
@@ -5266,6 +5266,9 @@
 
 /* Placeholder text displayed in empty input box in chat screen. */
 "INPUT_TOOLBAR_MESSAGE_PLACEHOLDER" = "メッセージ";
+/* accessibility label for the button which show up send payemnt screen */
+"INPUT_TOOLBAR_PAYMENTS_BUTTON_ACCESSIBILITY_LABEL" = "送金";
+
 
 /* accessibility label for the button which shows the sticker picker */
 "INPUT_TOOLBAR_STICKER_BUTTON_ACCESSIBILITY_LABEL" = "ステッカー";
@@ -5508,10 +5511,10 @@
 "LINKED_DEVICE_NOTIFICATION_TITLE" = "新しい端末をリンクしました";
 
 /* Message for an action sheet telling users how to link a device, when trying to open an external device-linking URL. */
-"LINKED_DEVICE_URL_OPENED_ACTION_SHEET_EXTERNAL_URL_MESSAGE" = "デスクトップまたはiPadをこのSignalアカウントにリンクするには、［リンク済み端末］→［新しい端末をリンクする］をタップし、もう一度QRコードをスキャンしてください。Signalに直接表示されたQRコードのみをスキャンしてください。";
+"LINKED_DEVICE_URL_OPENED_ACTION_SHEET_EXTERNAL_URL_MESSAGE" = "デスクトップまたはiPadをこのSignalアカウントにリンクするには、［リンク済み端末］→［新しい端末をリンクする］をタップし、もう一度QRコードをスキャンしてください。Radarに直接表示されたQRコードのみをスキャンしてください。";
 
 /* Message for an action sheet telling users how to link a device, when trying to open a device-linking URL from the in-app camera. */
-"LINKED_DEVICE_URL_OPENED_ACTION_SHEET_IN_APP_CAMERA_MESSAGE" = "Signalの端末をリンクするには、［続ける］→［新しい端末をリンクする］をタップし、もう一度QRコードをスキャンしてください。";
+"LINKED_DEVICE_URL_OPENED_ACTION_SHEET_IN_APP_CAMERA_MESSAGE" = "Radarの端末をリンクするには、［続ける］→［新しい端末をリンクする］をタップし、もう一度QRコードをスキャンしてください。";
 
 /* Bullet point about a download link on the linked devices education sheet. Embeds {{ %1$@ download link }} */
 "LINKED_DEVICES_EDUCATION_POINT_DOWNLOADS" = "リンクさせたい端末で%1$@にアクセスしてSignalをインストールします";
@@ -5574,7 +5577,7 @@
 "LINKING_SYNCING_TIMING_INFO" = "これには数分かかる場合があります";
 
 /* Shown to users while the app is loading, asking them not to close the app. */
-"LOADING_VIEW_CONTROLLER_DONT_CLOSE_APP" = "Signalを閉じないでください。";
+"LOADING_VIEW_CONTROLLER_DONT_CLOSE_APP" = "Radarを閉じないでください。";
 
 /* Body for a sheet warning users about creating a new Recovery Key. */
 "LOCAL_BACKUP_SETTINGS_CREATE_NEW_KEY_WARNING_SHEET_BODY" = "新しいキーを作成する必要があるのは、第三者にあなたのキーを知られた場合だけです。新しいキーを作成するには、まず端末内バックアップを無効にする必要があります。\n\n端末内バックアップを無効にして新しいキーを作成した後、端末内バックアップを再度有効にしてください。";
@@ -5628,7 +5631,7 @@
 "LOCAL_FILE_BACKUP_ONBOARDING_INTRO_BULLET_3" = "バックアップはいつでもオフにできます";
 
 /* Subtitle for a view introducing local file backups during the onboarding flow. */
-"LOCAL_FILE_BACKUP_ONBOARDING_INTRO_SUBTITLE" = "メッセージを端末内のフォルダにバックアップします。バックアップはエンドツーエンドで暗号化されており、Signalを新しくインストールして「復元または移行」を選択するとことで復元できます。";
+"LOCAL_FILE_BACKUP_ONBOARDING_INTRO_SUBTITLE" = "メッセージを端末内のフォルダにバックアップします。バックアップはエンドツーエンドで暗号化されており、Radarを新しくインストールして「復元または移行」を選択するとことで復元できます。";
 
 /* Title for a view introducing local file backups during the onboarding flow. */
 "LOCAL_FILE_BACKUP_ONBOARDING_INTRO_TITLE" = "端末にバックアップする";
@@ -5643,10 +5646,10 @@
 "LOCAL_FILE_BACKUPS_CHOOSE_FOLDER_TITLE" = "フォルダを選択";
 
 /* Warning shown when a user tries to enable local file backups with optimize media enabled */
-"LOCAL_FILE_BACKUPS_OPTIMIZE_MEDIA_WARNING_ACTION_SHEET" = "「Signalのストレージの最適化」がオンになっています。端末内バックアップのすべてのメディアを含めたい場合は、この設定をオフにしてください。";
+"LOCAL_FILE_BACKUPS_OPTIMIZE_MEDIA_WARNING_ACTION_SHEET" = "「Radarのストレージの最適化」がオンになっています。端末内バックアップのすべてのメディアを含めたい場合は、この設定をオフにしてください。";
 
 /* Message for a sheet warning the user about enabling Optimize Storage with local backups enabled. */
-"LOCAL_FILE_BACKUPS_OPTIMIZE_MEDIA_WARNING_ACTION_SHEET_2_BODY" = "「Signalのストレージを最適化」をオンにすると、端末上の以前のメディアはオフロードされます。オフロードされたメディアはいつでも再ダウンロードできますが、端末内バックアップからも削除されます。";
+"LOCAL_FILE_BACKUPS_OPTIMIZE_MEDIA_WARNING_ACTION_SHEET_2_BODY" = "「Radarのストレージを最適化」をオンにすると、端末上の以前のメディアはオフロードされます。オフロードされたメディアはいつでも再ダウンロードできますが、端末内バックアップからも削除されます。";
 
 /* Title for a sheet warning the user about enabling Optimize Storage with local backups enabled. */
 "LOCAL_FILE_BACKUPS_OPTIMIZE_MEDIA_WARNING_ACTION_SHEET_2_TITLE" = "端末内バックアップからメディアが削除されます";
@@ -5670,16 +5673,16 @@
 "LOGGING_SECTION" = "デバッグログ";
 
 /* Footer for the 'logging' help section. */
-"LOGGING_SECTION_FOOTER" = "デバッグログは、Signalのバグとクラッシュの修正に役立ちます。";
+"LOGGING_SECTION_FOOTER" = "デバッグログは、Radarのバグとクラッシュの修正に役立ちます。";
 
 /* Title for the 'long text message' view. */
 "LONG_TEXT_VIEW_TITLE" = "メッセージ";
 
 /* Message for a sheet warning the user that their device is low on storage space. Embeds 1:{{ the localized name of the user's device model, e.g. iPhone }}; 2:{{ an amount of storage space as a file size, e.g. 1 GB }}. */
-"LOW_DISK_SPACE_WARNING_SHEET_MESSAGE_FORMAT" = "%1$@のストレージが不足しています。容量がなくなると、Signalは動作しなくなりデータを失う恐れがあります。少なくとも%2$@の空き容量を確保してください。";
+"LOW_DISK_SPACE_WARNING_SHEET_MESSAGE_FORMAT" = "%1$@のストレージが不足しています。容量がなくなると、Radarは動作しなくなりデータを失う恐れがあります。少なくとも%2$@の空き容量を確保してください。";
 
 /* A suggestion for freeing up storage space, on a sheet warning the user that their device is low on storage space. */
-"LOW_DISK_SPACE_WARNING_SHEET_SUGGESTION_DELETE_CAMERA_ROLL_MEDIA" = "ご利用の写真アプリ、Signalや他のメッセージアプリから容量の大きい動画を消去してください。";
+"LOW_DISK_SPACE_WARNING_SHEET_SUGGESTION_DELETE_CAMERA_ROLL_MEDIA" = "ご利用の写真アプリ、Radarや他のメッセージアプリから容量の大きい動画を消去してください。";
 
 /* A suggestion for freeing up storage space, on a sheet warning the user that their device is low on storage space. */
 "LOW_DISK_SPACE_WARNING_SHEET_SUGGESTION_DELETE_DOWNLOADED_MEDIA" = "ダウンロードした音楽やその他メディアを消去してください";
@@ -5844,7 +5847,7 @@
 "MEMBER_LABEL_VIEW_TITLE" = "メンバーラベル";
 
 /* A one-time confirmation that you, as an admin, want to delete for everyone */
-"MESSAGE_ACTION_ADMIN_DELETE_FOR_EVERYONE_CONFIRMATION" = "Signalの最新版を使用しているグループメンバーは、あなたがこれらのメッセージを消去したことを確認できます。";
+"MESSAGE_ACTION_ADMIN_DELETE_FOR_EVERYONE_CONFIRMATION" = "Radarの最新版を使用しているグループメンバーは、あなたがこれらのメッセージを消去したことを確認できます。";
 
 /* Action sheet button title */
 "MESSAGE_ACTION_COPY_TEXT" = "メッセージテキストをコピー";
@@ -5898,7 +5901,7 @@
 "MESSAGE_ACTION_LINK_OPEN_LINK" = "リンクを開く";
 
 /* Label for button to open a signal proxy. */
-"MESSAGE_ACTION_LINK_OPEN_PROXY" = "Signalプロキシを開きます";
+"MESSAGE_ACTION_LINK_OPEN_PROXY" = "Radarプロキシを開きます";
 
 /* Label for button to open a sticker pack. */
 "MESSAGE_ACTION_LINK_OPEN_STICKER_PACK" = "ステッカーパックを表示";
@@ -6045,7 +6048,7 @@
 "MESSAGE_REQUEST_CONFIRM_ACCEPT_MESSAGE" = "信頼できる相手からのリクエストのみ承認してください。%1$@ 、登録コード、PIN、回復キーについて皆さんにメッセージしません。";
 
 /* Embedded text in the message for an action sheet asking the user to confirm if they want to accept a message request. */
-"MESSAGE_REQUEST_CONFIRM_ACCEPT_MESSAGE_EMBEDDED_BOLD_TEXT" = "Signalは決して";
+"MESSAGE_REQUEST_CONFIRM_ACCEPT_MESSAGE_EMBEDDED_BOLD_TEXT" = "Radarは決して";
 
 /* Title for an action sheet asking the user to confirm if they want to accept a message request */
 "MESSAGE_REQUEST_CONFIRM_ACCEPT_TITLE" = "申請を承認しますか？";
@@ -6081,7 +6084,7 @@
 "MESSAGE_REQUEST_NAME_COLLISON_UPDATE_CONTACT_ACTION" = "連絡先を更新する";
 
 /* Action sheet message to confirm reporting a conversation as spam via a message request. */
-"MESSAGE_REQUEST_REPORT_CONVERSATION_MESSAGE" = "この人物がスパムを送信している可能性をSignalに通知します。Signalはチャットの内容を見ることはできません。";
+"MESSAGE_REQUEST_REPORT_CONVERSATION_MESSAGE" = "この人物がスパムを送信している可能性をSignalに通知します。Radarはチャットの内容を見ることはできません。";
 
 /* Action sheet title to confirm reporting a conversation as spam via a message request. */
 "MESSAGE_REQUEST_REPORT_CONVERSATION_TITLE" = "スパムとして報告しますか？";
@@ -6225,7 +6228,7 @@
 "MISSED_CALL_BLOCKED_SYSTEM_CONTACT" = "電話の設定で着信拒否設定した連絡先からの不在着信";
 
 /* Action to block contact in Signal for sheet shown when the user taps a missed call from a contact blocked in iOS settings. */
-"MISSED_CALL_BLOCKED_SYSTEM_SETTINGS_SHEET_BLOCK_ACTION" = "Signalでのコンタクトも拒否する";
+"MISSED_CALL_BLOCKED_SYSTEM_SETTINGS_SHEET_BLOCK_ACTION" = "Radarでのコンタクトも拒否する";
 
 /* Message for sheet shown when the user taps a missed call from a contact blocked in iOS settings. */
 "MISSED_CALL_BLOCKED_SYSTEM_SETTINGS_SHEET_MESSAGE" = "不在着信がありました。着信拒否設定している相手からなので呼び出し音は鳴りませんでした。設定 > 電話に移動して、着信拒否した連絡先をタップし、必要に応じて設定を変えます。";
@@ -6246,19 +6249,19 @@
 "MISSING_CAMERA_PERMISSION_MESSAGE" = "iOSの設定アプリでカメラアクセスを有効にできます。";
 
 /* Alert title */
-"MISSING_CAMERA_PERMISSION_TITLE" = "Signalにカメラへのアクセス権限が必要です。";
+"MISSING_CAMERA_PERMISSION_TITLE" = "Radarにカメラへのアクセス権限が必要です。";
 
 /* Alert body indicating the user has denied location permissions */
 "MISSING_LOCATION_PERMISSION_MESSAGE" = "iOSの設定でアクセス権限を設定できます。";
 
 /* Alert title indicating the user has denied location permissions */
-"MISSING_LOCATION_PERMISSION_TITLE" = "この機能を使うためには、Signalに位置情報のアクセスを許可する必要があります。";
+"MISSING_LOCATION_PERMISSION_TITLE" = "この機能を使うためには、Radarに位置情報のアクセスを許可する必要があります。";
 
 /* Alert body when user has previously denied media library access */
 "MISSING_MEDIA_LIBRARY_PERMISSION_MESSAGE" = "iOSの設定でアクセス権限を設定できます。";
 
 /* Alert title when user has previously denied media library access */
-"MISSING_MEDIA_LIBRARY_PERMISSION_TITLE" = "この機能を使用するには、Signalに写真へのアクセス権限が必要です。";
+"MISSING_MEDIA_LIBRARY_PERMISSION_TITLE" = "この機能を使用するには、Radarに写真へのアクセス権限が必要です。";
 
 /* Title for a progress modal shown after the user taps Cancel, while the work is being cancelled. */
 "MODAL_CIRCULAR_PROGRESS_CANCELLING_TITLE" = "キャンセル中…";
@@ -6465,7 +6468,7 @@
 "NICKNAME_EDITOR_DELETE_CONFIRMATION_TITLE" = "ニックネームを消去しますか？";
 
 /* The description below the title on the profile nickname editor view. */
-"NICKNAME_EDITOR_DESCRIPTION" = "ニックネームとメモは、Signalのエンドツーエンドの暗号化ストレージサービスによって保存されます。これらはあなただけに表示されます。";
+"NICKNAME_EDITOR_DESCRIPTION" = "ニックネームとメモは、Radarのエンドツーエンドの暗号化ストレージサービスによって保存されます。これらはあなただけに表示されます。";
 
 /* Placeholder text it the text field for the family name in the profile nickname editor. */
 "NICKNAME_EDITOR_FAMILY_NAME_PLACEHOLDER" = "姓";
@@ -6498,7 +6501,7 @@
 "NOT_LINKED_BOTTOM_RELINK" = "再リンク";
 
 /* Shown in place of the text input box in a conversation when the user is no longer registered can't send messages. The embedded value is 'Re-register' (translated via NOT_REGISTERED_BOTTOM_REREGISTER), and it will be formatted as a tappable link. */
-"NOT_REGISTERED_BOTTOM" = "この端末は登録されていません。Signalを引き続きご利用になるには、%1$@が必要です。";
+"NOT_REGISTERED_BOTTOM" = "この端末は登録されていません。Radarを引き続きご利用になるには、%1$@が必要です。";
 
 /* Shown in place of the text input box in a conversation when the user is no longer registered can't send messages. This value is a tappable link embedded in a larger sentence. */
 "NOT_REGISTERED_BOTTOM_REREGISTER" = "再登録";
@@ -6510,7 +6513,7 @@
 "NOTE_TO_SELF" = "自分用メモ";
 
 /* Body for a notification shown when Signal can't fetch messages because the device's date and time are incorrect. */
-"NOTIFICATION_BODY_CLOCK_SKEW" = "Signalは、端末の日時が不正確な場合はメッセージを受信できません。設定を開いて日時を修正してください。";
+"NOTIFICATION_BODY_CLOCK_SKEW" = "Radarは、端末の日時が不正確な場合はメッセージを受信できません。設定を開いて日時を修正してください。";
 
 /* Body for a notification representing a message request. */
 "NOTIFICATION_BODY_INCOMING_MESSAGE_REQUEST" = "メッセージリクエスト";
@@ -6549,7 +6552,7 @@
 "NOTIFICATION_PERMISSION_REMINDER_MEGAPHONE_TITLE" = "通知を有効にしますか？";
 
 /* Shown as the body of an alert when notifications can't be shown due to an error. */
-"NOTIFICATIONS_ERROR_MESSAGE" = "Signalからの通知が届かない場合は、%1$@を再起動してください。";
+"NOTIFICATIONS_ERROR_MESSAGE" = "Radarからの通知が届かない場合は、%1$@を再起動してください。";
 
 /* Shown as the title of an alert when notifications can't be shown due to an error. */
 "NOTIFICATIONS_ERROR_TITLE" = "通知を表示できませんでした";
@@ -6615,10 +6618,10 @@
 "ONBOARDING_CHOOSE_BACKUP_SHEET_TITLE" = "バックアップを選択して復元";
 
 /* The body for the device transfer 'choice' view 'restore backup' option */
-"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_BODY" = "Radar/Signalバックアップからアカウントとメッセージを復元します";
+"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_BODY" = "Signal/Radarバックアップからアカウントとメッセージを復元します";
 
 /* The title for the device transfer 'choice' view 'restore backup' option */
-"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_TITLE" = "Radar/Signalセキュアバックアップを復元する";
+"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_TITLE" = "Signal/Radarセキュアバックアップを復元する";
 
 /* Body for a sheet warning users about skipping restore. */
 "ONBOARDING_CHOOSE_RESTORE_METHOD_CONFIRM_SKIP_RESTORE_BODY" = "復元を今スキップすると、後で復元することはできません。この端末でバックアップを再度有効にすると、現在のバックアップが新しいメッセージ履歴に置き換えられます。";
@@ -6693,7 +6696,7 @@
 "ONBOARDING_MODE_SWITCH_BUTTON_REGISTERING" = "この端末をリンク";
 
 /* explanation to the user they're switching from linking to registering flow */
-"ONBOARDING_MODE_SWITCH_EXPLANATION_PROVISIONING" = "「このiPadを登録する」をタップすると、Signalの新しいアカウントを作るか、このiPadに既存のアカウントを移行できます。これにより、現在同じ電話番号で登録されている、他の端末のSignalが無効化されます。";
+"ONBOARDING_MODE_SWITCH_EXPLANATION_PROVISIONING" = "「このiPadを登録する」をタップすると、Radarの新しいアカウントを作るか、このiPadに既存のアカウントを移行できます。これにより、現在同じ電話番号で登録されている、他の端末のSignalが無効化されます。";
 
 /* explanation to the user they're switching from registering to linking flow */
 "ONBOARDING_MODE_SWITCH_EXPLANATION_REGISTERING" = "「この端末をリンク」をタップすると、該当の端末を既存のSignalアカウントと接続させることができます。";
@@ -6732,7 +6735,7 @@
 "ONBOARDING_PERMISSIONS_TITLE" = "アクセス許可";
 
 /* Explanation of the 'onboarding phone number discoverability' view. Embeds {user phone number} */
-"ONBOARDING_PHONE_NUMBER_DISCOVERABILITY_EXPLANATION_FORMAT" = "Signalであなたを電話番号 %1$@ から検索できる人を選択してください";
+"ONBOARDING_PHONE_NUMBER_DISCOVERABILITY_EXPLANATION_FORMAT" = "Radarであなたを電話番号 %1$@ から検索できる人を選択してください";
 
 /* Title of the 'onboarding phone number discoverability' view. */
 "ONBOARDING_PHONE_NUMBER_DISCOVERABILITY_TITLE" = "あなたを電話番号から検索できる人は？";
@@ -6783,13 +6786,13 @@
 "ONBOARDING_SIGN_UP_USE_SIGNAL_ACCOUNT_BUTTON_TITLE" = "Use my Signal account";
 
 /* Explanation of 'do not have old device' flow for the 'Restore or Transfer' prompt */
-"ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_BODY" = "または、Radar/Signalを同じ端末に再インストールする場合";
+"ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_BODY" = "または、Signal/Radarを同じ端末に再インストールする場合";
 
 /* Title for the 'do not have my old device' choice of the 'Restore or Transfer' prompt */
 "ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_TITLE" = "以前利用していた端末がない場合";
 
 /* Explanation of 'have old device' flow for the 'Restore or Transfer' prompt */
-"ONBOARDING_SPLASH_HAVE_OLD_DEVICE_BODY" = "新しいRadar/SignalアカウントからQRコードをスキャンすれば、すぐに再開できます";
+"ONBOARDING_SPLASH_HAVE_OLD_DEVICE_BODY" = "新しいSignal/RadarアカウントからQRコードをスキャンすれば、すぐに再開できます";
 
 /* Title for the 'have my old device' choice of the 'Restore or Transfer' prompt */
 "ONBOARDING_SPLASH_HAVE_OLD_DEVICE_TITLE" = "以前利用していた端末がある場合";
@@ -6913,13 +6916,13 @@ Send money securely.";
 "OTHER_UPDATED_DISAPPEARING_MESSAGES_CONFIGURATION" = "%1$@ が消えるメッセージのタイマーを%2$@に設定しました。";
 
 /* Label warning the user that the Signal service may be down. */
-"OUTAGE_WARNING" = "Signalは技術的な問題を抱えています。私たちは、これをできるだけ早く解決するよう対応しています。";
+"OUTAGE_WARNING" = "Radarは技術的な問題を抱えています。私たちは、これをできるだけ早く解決するよう対応しています。";
 
 /* Label for action link when the user has an outdated payment client */
 "OUTDATED_PAYMENT_CLIENT_ACTION_TITLE" = "アップデートする";
 
 /* Label warning the user that they should update Signal to continue using payments. */
-"OUTDATED_PAYMENT_CLIENT_REMINDER_TEXT" = "決済機能を引き続きご利用いただくために、Signalをアップデートしてください。残高が最新の状態ではない可能性があります。";
+"OUTDATED_PAYMENT_CLIENT_REMINDER_TEXT" = "決済機能を引き続きご利用いただくために、Radarをアップデートしてください。残高が最新の状態ではない可能性があります。";
 
 /* Body of prompt notifying restore was cancelled. */
 "OUTGOING_DEVICE_REGISTRATION_CANCELLED_RESTORE_BODY" = "復元はキャンセルされました。もう一度お試しください。";
@@ -6928,7 +6931,7 @@ Send money securely.";
 "OUTGOING_DEVICE_REGISTRATION_CANCELLED_RESTORE_TITLE" = "復元をキャンセルしました";
 
 /* Body of prompt notifying registration without restore completed on the new device. */
-"OUTGOING_DEVICE_REGISTRATION_COMPLETE_BODY" = "Signalアカウントが他の端末で有効化されました。この端末上でSignalはご利用できなくなりました。";
+"OUTGOING_DEVICE_REGISTRATION_COMPLETE_BODY" = "Radarアカウントが他の端末で有効化されました。この端末上でSignalはご利用できなくなりました。";
 
 /* Title of prompt notifying registration without restore completed on the new device. */
 "OUTGOING_DEVICE_REGISTRATION_COMPLETE_TITLE" = "登録が完了しました";
@@ -6967,7 +6970,7 @@ Send money securely.";
 "OUTGOING_DEVICE_RESTORE_BACKUP_RESTORE_DESCRIPTION" = "最終バックアップは%1$@の%2$@です。";
 
 /* Body of prompt notifying device restore started on the new device. */
-"OUTGOING_DEVICE_RESTORE_COMPLETE_BODY" = "Signalアカウントとメッセージは他の端末への移行を開始しました。この端末上でSignalはご利用できなくなりました。";
+"OUTGOING_DEVICE_RESTORE_COMPLETE_BODY" = "Radarアカウントとメッセージは他の端末への移行を開始しました。この端末上でSignalはご利用できなくなりました。";
 
 /* Title of prompt notifying device restore started on the new device. */
 "OUTGOING_DEVICE_RESTORE_COMPLETE_TITLE" = "復元が完了しました";
@@ -6991,7 +6994,7 @@ Send money securely.";
 "OUTGOING_DEVICE_RESTORE_INITIAL_VIEW_TITLE" = "アカウントの移行";
 
 /* Body of prompt notifying device transfer completed. */
-"OUTGOING_DEVICE_TRANSFER_COMPLETE_BODY" = "Signalアカウントとメッセージは他の端末に移行されました。この端末上でSignalはご利用できなくなりました。";
+"OUTGOING_DEVICE_TRANSFER_COMPLETE_BODY" = "Radarアカウントとメッセージは他の端末に移行されました。この端末上でSignalはご利用できなくなりました。";
 
 /* Title of prompt notifying device transfer completed. */
 "OUTGOING_DEVICE_TRANSFER_COMPLETE_TITLE" = "移行が完了しました";
@@ -7012,7 +7015,7 @@ Send money securely.";
 "OUTGOING_MISSED_VOICE_CALL" = "音声通話応答なし";
 
 /* Button for action sheet shown when device transfer completes; quits the Signal app immediately (does not automatically relaunch, but the user may choose to relaunch). */
-"OUTGOING_TRANSFER_COMPLETE_EXIT_ACTION" = "Signalを停止する";
+"OUTGOING_TRANSFER_COMPLETE_EXIT_ACTION" = "Radarを停止する";
 
 /* Message for action sheet shown when device transfer completes */
 "OUTGOING_TRANSFER_COMPLETE_MESSAGE" = "このデバイスでSignalは停止します";
@@ -7033,7 +7036,7 @@ Send money securely.";
 "OVERSIZE_TEXT_UNAVAILABLE_SHEET_TITLE" = "完全なメッセージがダウンロードできません";
 
 /* The name of the Signal app, used as the title for an entry in a user's password manager for their Signal Recovery Key. Should be localized with the same value as the app's name in the iOS App Store. */
-"PASSWORD_MANAGER_SIGNAL_APP_NAME" = "Signalプライベートメッセンジャー";
+"PASSWORD_MANAGER_SIGNAL_APP_NAME" = "Radarプライベートメッセンジャー";
 
 /* Header title for bank payment details screen */
 "PAYMENT_DETAILS_BANK_TITLE" = "銀行振り込み";
@@ -7200,7 +7203,7 @@ Send money securely.";
 "PAYMENTS_NEW_PAYMENT_ERROR_INVALID_TRANSACTION" = "無効な取引です";
 
 /* Indicates that a payment failed due to an outdated client. */
-"PAYMENTS_NEW_PAYMENT_ERROR_OUTDATED_CLIENT" = "決済機能を利用するには、Signalをアップデートしてください。";
+"PAYMENTS_NEW_PAYMENT_ERROR_OUTDATED_CLIENT" = "決済機能を利用するには、Radarをアップデートしてください。";
 
 /* Indicates that an outgoing payment could not be verified in a timely way. */
 "PAYMENTS_NEW_PAYMENT_ERROR_OUTGOING_VERIFICATION_TAKING_TOO_LONG" = "決済はまだ確認されていません";
@@ -7558,13 +7561,13 @@ Send money securely.";
 "PIN_CREATION_DISABLE_CONFIRMATION_ACTION" = "PINを無効化";
 
 /* Message of the 'pin disable' action sheet. */
-"PIN_CREATION_DISABLE_CONFIRMATION_MESSAGE" = "PINを無効にすると、他のiOS端末から移行しない限り、Signalに再登録する際すべてのデータが失われます。PINを無効にしている間は登録ロックは使用できません。";
+"PIN_CREATION_DISABLE_CONFIRMATION_MESSAGE" = "PINを無効にすると、他のiOS端末から移行しない限り、Radarに再登録する際すべてのデータが失われます。PINを無効にしている間は登録ロックは使用できません。";
 
 /* Title of the 'pin disable' action sheet. */
 "PIN_CREATION_DISABLE_CONFIRMATION_TITLE" = "ご注意ください";
 
 /* The explanation in the 'pin creation' view. */
-"PIN_CREATION_EXPLANATION" = "Signal内に保存された情報は、PINにより暗号化を保持されるため、あなたのみアクセスできます。PINを使うことで、Signalの再インストール時にあなたのプロフィール、設定および連絡先が復元されます。アプリを開く際にはPINは必要はありません。";
+"PIN_CREATION_EXPLANATION" = "Radar内に保存された情報は、PINにより暗号化を保持されるため、あなたのみアクセスできます。PINを使うことで、Radarの再インストール時にあなたのプロフィール、設定および連絡先が復元されます。アプリを開く際にはPINは必要はありません。";
 
 /* Message when a generic error occurs while creating a PIN. */
 "PIN_CREATION_GENERIC_ERROR_MESSAGE" = "PINの作成中に問題が発生しました。サポートにお問い合わせください。";
@@ -7606,7 +7609,7 @@ Send money securely.";
 "PIN_CREATION_WEAK_ERROR" = "もっと強力なPINを選択してください";
 
 /* If your attempted PIN is too weak, you'll see an error message. This is the text on the error dialog. */
-"PIN_CREATION_WEAK_ERROR_MESSAGE" = "Signal内に保存された情報は、PINにより暗号化を保持されるため、あなたのみアクセスできます。アカウント保護のために、より強力なPINを選択しましょう。";
+"PIN_CREATION_WEAK_ERROR_MESSAGE" = "Radar内に保存された情報は、PINにより暗号化を保持されるため、あなたのみアクセスできます。アカウント保護のために、より強力なPINを選択しましょう。";
 
 /* If the user is re-registering, they need to enter their PIN to restore all their data. In some cases, they can skip this entry and lose some data. This text is shown on a button that lets them begin to do this. */
 "PIN_ENTER_EXISTING_SKIP" = "PIN を使用しない";
@@ -7924,10 +7927,10 @@ Send money securely.";
 "PROFILE_NAME_CHANGE_SYSTEM_NONCONTACT_FORMAT" = "%1$@ がプロフィールネームを %2$@ に変更しました。";
 
 /* First bullet point for the explainer sheet for profile names */
-"PROFILE_NAME_EDUCATION_SHEET_BULLET_1" = "Signalは名前や写真を確認することはできません";
+"PROFILE_NAME_EDUCATION_SHEET_BULLET_1" = "Radarは名前や写真を確認することはできません";
 
 /* Second bullet point for the explainer sheet for profile names */
-"PROFILE_NAME_EDUCATION_SHEET_BULLET_2" = "Signalは決して、登録コード、PIN、回復キーについて皆さんに連絡しません";
+"PROFILE_NAME_EDUCATION_SHEET_BULLET_2" = "Radarは決して、登録コード、PIN、回復キーについて皆さんに連絡しません";
 
 /* Third bullet point for the explainer sheet for profile names */
 "PROFILE_NAME_EDUCATION_SHEET_BULLET_3" = "なりすましの可能性のあるアカウントにはご注意ください";
@@ -7936,7 +7939,7 @@ Send money securely.";
 "PROFILE_NAME_EDUCATION_SHEET_BULLET_4" = "知らない人とは個人情報を共有しないでください";
 
 /* Header for the explainer sheet for profile names */
-"PROFILE_NAME_EDUCATION_SHEET_HEADER_FORMAT" = "Signal上の<bold>プロフィールネーム</bold>は、アカウント所有者によって選択されます。";
+"PROFILE_NAME_EDUCATION_SHEET_HEADER_FORMAT" = "Radar上の<bold>プロフィールネーム</bold>は、アカウント所有者によって選択されます。";
 
 /* Title for the profile name view. */
 "PROFILE_NAME_VIEW_TITLE" = "あなたの名前";
@@ -8035,7 +8038,7 @@ Send money securely.";
 "QUICK_RESTORE_URL_OPENED_ACTION_SHEET_EXTERNAL_URL_ACTION_TITLE" = "QRコードをスキャン";
 
 /* Message for an action sheet telling users how to use quick restore, when trying to open an external quick restore URL. */
-"QUICK_RESTORE_URL_OPENED_ACTION_SHEET_EXTERNAL_URL_MESSAGE" = "新しい端末へこのアカウントを移行するには、「続ける」をタップしてから、SignalカメラでQRコードをスキャンしてください。その際は必ず、Signalに直接表示されたQRコードのみをスキャンしてください。";
+"QUICK_RESTORE_URL_OPENED_ACTION_SHEET_EXTERNAL_URL_MESSAGE" = "新しい端末へこのアカウントを移行するには、「続ける」をタップしてから、RadarカメラでQRコードをスキャンしてください。その際は必ず、Radarに直接表示されたQRコードのみをスキャンしてください。";
 
 /* Accessibility label stating the author of the message to which you are replying. Embeds: {{ the author of the message to which you are replying }} {{ original message }}. */
 "QUOTED_REPLY_ACCESSIBILITY_LABEL_FORMAT" = "%1$@への返信 %2$@";
@@ -8170,7 +8173,7 @@ Send money securely.";
 "RECIPIENT_PICKER_INVITE_MESSAGE" = "%1$@さんはSignalユーザーではありません。この番号をSignalに招待しますか？";
 
 /* Alert title. Shown after selecting a phone number that isn't a Signal user. */
-"RECIPIENT_PICKER_INVITE_TITLE" = "Signalへ招待する";
+"RECIPIENT_PICKER_INVITE_TITLE" = "Radarへ招待する";
 
 /* Description of how and why Signal iOS uses Touch ID/Face ID/Phone Passcode during a periodic reminder to record your recovery key. */
 "RECOVERY_KEY_REMINDER_AUTHENTICATION_REASON" = "回復キーを表示するには認証してください";
@@ -8179,13 +8182,13 @@ Send money securely.";
 "REGISTER_2FA_FORGOT_PIN_ALERT_TITLE" = "お困りですか？";
 
 /* Alert body for a forgotten SVR (V2) PIN */
-"REGISTER_2FA_FORGOT_SVR_PIN_ALERT_MESSAGE" = "PINは4桁以上のコードで、数字または英数字のいずれかです。もしPINを覚えていない場合、アカウントを再登録するまで7日間の待機期間が発生します。Signalセキュアバックアップが有効になっている場合は、回復キーを使用して続行できます。";
+"REGISTER_2FA_FORGOT_SVR_PIN_ALERT_MESSAGE" = "PINは4桁以上のコードで、数字または英数字のいずれかです。もしPINを覚えていない場合、アカウントを再登録するまで7日間の待機期間が発生します。Radarセキュアバックアップが有効になっている場合は、回復キーを使用して続行できます。";
 
 /* Alert body for a forgotten SVR (V2) PIN when the user doesn't have reglock and they cannot necessarily create a new PIN */
-"REGISTER_2FA_FORGOT_SVR_PIN_WITHOUT_REGLOCK_ALERT_MESSAGE" = "PINは4桁以上のコードで、数字または英数字のいずれかです。もしPINを覚えていない場合、アカウントを登録して使用することもできますが、プロフィールなどの保存されている設定情報は失われます。Signalセキュアバックアップが有効になっている場合は、回復キーを使用して続行できます。";
+"REGISTER_2FA_FORGOT_SVR_PIN_WITHOUT_REGLOCK_ALERT_MESSAGE" = "PINは4桁以上のコードで、数字または英数字のいずれかです。もしPINを覚えていない場合、アカウントを登録して使用することもできますが、プロフィールなどの保存されている設定情報は失われます。Radarセキュアバックアップが有効になっている場合は、回復キーを使用して続行できます。";
 
 /* Alert body for a forgotten SVR (V2) PIN when the user doesn't have reglock and they can create a new PIN */
-"REGISTER_2FA_FORGOT_SVR_PIN_WITHOUT_REGLOCK_AND_CAN_CREATE_NEW_PIN_ALERT_MESSAGE" = "PINは4桁以上のコードで、数字または英数字のいずれかです。PINを忘れた場合は、新しいPINを作成できます。アカウントの登録と使用は可能ですが、プロフィール情報など保存された設定の一部が失われる可能性があります。Signalセキュアバックアップが有効になっている場合は、回復キーを使用して続行できます。";
+"REGISTER_2FA_FORGOT_SVR_PIN_WITHOUT_REGLOCK_AND_CAN_CREATE_NEW_PIN_ALERT_MESSAGE" = "PINは4桁以上のコードで、数字または英数字のいずれかです。PINを忘れた場合は、新しいPINを作成できます。アカウントの登録と使用は可能ですが、プロフィール情報など保存された設定の一部が失われる可能性があります。Radarセキュアバックアップが有効になっている場合は、回復キーを使用して続行できます。";
 
 /* Alert title explaining what happens if you forget your 'two-factor auth pin'. */
 "REGISTER_2FA_INVALID_PIN_ALERT_TITLE" = "PINが違います";
@@ -8203,7 +8206,7 @@ Send money securely.";
 "REGISTER_WITHOUT_NUMBER" = "電話番号無しで登録";
 
 /* Short description for a sheet warning users about an incorrect recovery key used for registration. */
-"REGISTRATION_BACKUP_REGISTRATION_ERROR_INCORRECT_KEY_BODY" = "Signalバックアップを有効にした際に保存したのと同じ電話番号と64文字の回復キーで登録していることを確認してください。このキーがないとバックアップを復元できません。";
+"REGISTRATION_BACKUP_REGISTRATION_ERROR_INCORRECT_KEY_BODY" = "Radarバックアップを有効にした際に保存したのと同じ電話番号と64文字の回復キーで登録していることを確認してください。このキーがないとバックアップを復元できません。";
 
 /* Title for a sheet warning users about an incorrect recovery key used for registration. */
 "REGISTRATION_BACKUP_REGISTRATION_ERROR_INCORRECT_KEY_TITLE" = "回復キーが正しくありません";
@@ -8212,7 +8215,7 @@ Send money securely.";
 "REGISTRATION_BACKUP_REGISTRATION_ERROR_INCORRECT_KEY_TRY_PIN_ACTION" = "他の方法で登録";
 
 /* Message body for a sheet asking users if they would rather use PIN/SMS for registration. */
-"REGISTRATION_BACKUP_REGISTRATION_ERROR_INCORRECT_KEY_TRY_PIN_MESSAGE" = "Signalが送信するSMSコードまたはPINの入力で認証すれば、アカウントを登録できます。登録した後で、回復キーを使ってバックアップの復元をもう一度試すことができます。";
+"REGISTRATION_BACKUP_REGISTRATION_ERROR_INCORRECT_KEY_TRY_PIN_MESSAGE" = "Radarが送信するSMSコードまたはPINの入力で認証すれば、アカウントを登録できます。登録した後で、回復キーを使ってバックアップの復元をもう一度試すことができます。";
 
 /* Title for a sheet asking users if they would rather use PIN/SMS for registration. */
 "REGISTRATION_BACKUP_REGISTRATION_ERROR_INCORRECT_KEY_TRY_PIN_TITLE" = "SMSまたはPINで確認しますか？";
@@ -8293,7 +8296,7 @@ Send money securely.";
 "REGISTRATION_BACKUP_RESTORE_ERROR_UNRETRYABLE_SERVER_ERROR_TITLE" = "バックアップを復元できません";
 
 /* Body for a sheet warning users about an incompatible backup version. */
-"REGISTRATION_BACKUP_RESTORE_ERROR_UNSUPPORTED_BACKUP_VERSION_BODY" = "バックアップを復元するには、Signalが最新バージョンであることを確認してから、もう一度お試しください。この問題が解決しない場合は、サポートにお問い合わせください。";
+"REGISTRATION_BACKUP_RESTORE_ERROR_UNSUPPORTED_BACKUP_VERSION_BODY" = "バックアップを復元するには、Radarが最新バージョンであることを確認してから、もう一度お試しください。この問題が解決しない場合は、サポートにお問い合わせください。";
 
 /* Title for a sheet warning users about an incompatible backup version. */
 "REGISTRATION_BACKUP_RESTORE_ERROR_UNSUPPORTED_BACKUP_VERSION_TITLE" = "アップデートが必要です";
@@ -8347,7 +8350,7 @@ Send money securely.";
 "REGISTRATION_NO_BACKUP_KEY_BUTTON_TITLE" = "回復キーをお持ちでない場合";
 
 /* Body text on a sheet with info for what to do if you don't have a recovery key */
-"REGISTRATION_NO_BACKUP_KEY_SHEET_BODY" = "バックアップは、64桁の回復キーがないと復元できません。回復キーを忘れた場合、Signalはバックアップの復元対応はできません。\n\n以前利用していた端末をお持ちの場合は、設定 >「バックアップ」で回復キーを確認できます。「回復キーを表示する」をタップします。";
+"REGISTRATION_NO_BACKUP_KEY_SHEET_BODY" = "バックアップは、64桁の回復キーがないと復元できません。回復キーを忘れた場合、Radarはバックアップの復元対応はできません。\n\n以前利用していた端末をお持ちの場合は、設定 >「バックアップ」で回復キーを確認できます。「回復キーを表示する」をタップします。";
 
 /* Title for sheet with info for what to do if you don't have a recovery key */
 "REGISTRATION_NO_BACKUP_KEY_SHEET_TITLE" = "回復キーをお持ちでない場合";
@@ -8761,7 +8764,7 @@ Send money securely.";
 "RING_ON_CONFIRMATION_TOAST_LABEL" = "呼び出し音が鳴っています";
 
 /* Message shown in an action sheet when attempting to disable PIN, but Backups is enabled. */
-"ROTATE_AEP_ACTION_BACKUPS_DISABLE_REQUIRED" = "Signalセキュアバックアップを無効にしないと先に進めません。";
+"ROTATE_AEP_ACTION_BACKUPS_DISABLE_REQUIRED" = "Radarセキュアバックアップを無効にしないと先に進めません。";
 
 /* button title to confirm adding a recipient when their safety number has recently changed */
 "SAFETY_NUMBER_CHANGED_CONFIRM_ADD_MEMBER_ACTION" = "とりあえず追加する";
@@ -8803,13 +8806,13 @@ Send money securely.";
 "SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_BUTTON_VERIFYING" = "暗号化を確認しています…";
 
 /* Body for a sheet introducing Key Transparency. */
-"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_EDUCATION_SHEET_BODY" = "電話番号を介して繋がっている相手の場合、Signalはkey transparencyと呼ばれるプロセスを使用して、接続の安全性を自動的に確認します。セキュリティをさらに強化したい場合は、QRコードを使う、安全番号を見比べるなど、手動で接続を確認することもできます。";
+"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_EDUCATION_SHEET_BODY" = "電話番号を介して繋がっている相手の場合、Radarはkey transparencyと呼ばれるプロセスを使用して、接続の安全性を自動的に確認します。セキュリティをさらに強化したい場合は、QRコードを使う、安全番号を見比べるなど、手動で接続を確認することもできます。";
 
 /* Title for a sheet introducing Key Transparency. */
-"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_EDUCATION_SHEET_TITLE" = "Signalは、暗号化を自動的に確認するようになりました";
+"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_EDUCATION_SHEET_TITLE" = "Radarは、暗号化を自動的に確認するようになりました";
 
 /* Body for a sheet explaining that encryption auto-verification did not succeed. Embeds {{ 1: the contact's name }}. */
-"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_FAILURE_SHEET_BODY_FORMAT" = "Signalは、このチャットの暗号化を自動で確認できません。%1$@ が電話番号を変更したか、電話番号のプライバシー設定を変更した可能性があります。前の画面の番号を相手と比較するか、相手の端末のコードをスキャンして、エンドツーエンドの暗号化を手動で確認してください。";
+"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_FAILURE_SHEET_BODY_FORMAT" = "Radarは、このチャットの暗号化を自動で確認できません。%1$@ が電話番号を変更したか、電話番号のプライバシー設定を変更した可能性があります。前の画面の番号を相手と比較するか、相手の端末のコードをスキャンして、エンドツーエンドの暗号化を手動で確認してください。";
 
 /* Title for a sheet explaining that encryption auto-verification did not succeed. */
 "SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_FAILURE_SHEET_TITLE" = "このチャットで自動確認ができなくなりました";
@@ -8821,13 +8824,13 @@ Send money securely.";
 "SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_HEADER" = "自動キー確認";
 
 /* Body for a sheet explaining that encryption auto-verification is not available. */
-"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_NOT_AVAILABLE_SHEET_BODY" = "Signalが暗号化を自動で確認できるのは、相手の電話番号を通じて接続しているチャットのみです。ユーザーネームまたは共通のグループを通じてチャットが開始された場合は、前の画面の番号を相手と比較するか、相手の端末のコードをスキャンして、エンドツーエンドの暗号化を確認してください。";
+"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_NOT_AVAILABLE_SHEET_BODY" = "Radarが暗号化を自動で確認できるのは、相手の電話番号を通じて接続しているチャットのみです。ユーザーネームまたは共通のグループを通じてチャットが開始された場合は、前の画面の番号を相手と比較するか、相手の端末のコードをスキャンして、エンドツーエンドの暗号化を確認してください。";
 
 /* Title for a sheet explaining that encryption auto-verification is not available. */
 "SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_NOT_AVAILABLE_SHEET_TITLE" = "このチャットの自動確認ができません";
 
 /* Body for a sheet explaining that encryption auto-verification succeeded. */
-"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_SUCCESS_SHEET_BODY" = "電話番号を通じて接続している連絡先の場合、Signalはkey transparencyと呼ばれるプロセスを使用して、接続の安全性を自動的に確認します。安全性を強化するには、前の画面の番号を相手と比較するか、相手の端末のコードをスキャンして、エンドツーエンドの暗号化を手動で確認してください。";
+"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_SUCCESS_SHEET_BODY" = "電話番号を通じて接続している連絡先の場合、Radarはkey transparencyと呼ばれるプロセスを使用して、接続の安全性を自動的に確認します。安全性を強化するには、前の画面の番号を相手と比較するか、相手の端末のコードをスキャンして、エンドツーエンドの暗号化を手動で確認してください。";
 
 /* Title for a sheet explaining that encryption auto-verification succeeded. */
 "SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_SUCCESS_SHEET_TITLE" = "このチャットの暗号化は自動確認されました";
@@ -8842,7 +8845,7 @@ Send money securely.";
 "SAFETY_TIPS_CRYPTO_TITLE" = "暗号通貨または金銭詐欺";
 
 /* Message body describing the enable reglock safety tip. */
-"SAFETY_TIPS_ENABLE_REGLOCK_BODY" = "Signalの登録時に、確認コードに加えてSignal PINの入力も必須とすることで、アカウントを保護できます。";
+"SAFETY_TIPS_ENABLE_REGLOCK_BODY" = "Radarの登録時に、確認コードに加えてSignal PINの入力も必須とすることで、アカウントを保護できます。";
 
 /* Message title describing the enable reglock safety tip. */
 "SAFETY_TIPS_ENABLE_REGLOCK_TITLE" = "アカウント設定で登録ロックを有効にしてください";
@@ -8875,22 +8878,22 @@ Send money securely.";
 "SAFETY_TIPS_MESSAGE_LINKS_TITLE" = "ウェブリンクを含むメッセージ";
 
 /* Message body describing the review names safety tip. */
-"SAFETY_TIPS_REVIEW_NAMES_BODY" = "「未確認の名前です」という表示に注意してください。Signalでは、プロフィールの名前を自由に設定できます。";
+"SAFETY_TIPS_REVIEW_NAMES_BODY" = "「未確認の名前です」という表示に注意してください。Radarでは、プロフィールの名前を自由に設定できます。";
 
 /* Message body describing the review names safety tip in the 'view more' flow. */
-"SAFETY_TIPS_REVIEW_NAMES_BODY_VIEW_MORE" = "「未確認の名前です」という表示に注意してください。Signalでは、プロフィールの名前や写真を自由に設定できます。知らない相手から突然リクエストが来たら、無視するのが安全です。";
+"SAFETY_TIPS_REVIEW_NAMES_BODY_VIEW_MORE" = "「未確認の名前です」という表示に注意してください。Radarでは、プロフィールの名前や写真を自由に設定できます。知らない相手から突然リクエストが来たら、無視するのが安全です。";
 
 /* Message title describing the review names safety tip. */
 "SAFETY_TIPS_REVIEW_NAMES_TITLE" = "名前や写真を確認してください";
 
 /* Message body describing the signal chats tip. */
-"SAFETY_TIPS_SIGNAL_CHATS_BODY" = "Signalは決して、登録コード、PIN、回復キーについて皆さんにメッセージしません。Signalを装ったチャットには返信しないでください。";
+"SAFETY_TIPS_SIGNAL_CHATS_BODY" = "Radarは決して、登録コード、PIN、回復キーについて皆さんにメッセージしません。Radarを装ったチャットには返信しないでください。";
 
 /* Message body describing the signal chats tip in the 'view more' flow. */
-"SAFETY_TIPS_SIGNAL_CHATS_BODY_VIEW_MORE" = "Signalは決して、登録コード、PIN、回復キーについて皆さんにメッセージしません。SignalやSignalサポートを装ったチャットには返信しないでください。悪意のある相手は、あなたのアカウントを乗っ取ろうと偽名を設定します。";
+"SAFETY_TIPS_SIGNAL_CHATS_BODY_VIEW_MORE" = "Radarは決して、登録コード、PIN、回復キーについて皆さんにメッセージしません。RadarやSignalサポートを装ったチャットには返信しないでください。悪意のある相手は、あなたのアカウントを乗っ取ろうと偽名を設定します。";
 
 /* Message title describing the signal chats tip. */
-"SAFETY_TIPS_SIGNAL_CHATS_TITLE" = "Signalからのチャットに返信しないでください";
+"SAFETY_TIPS_SIGNAL_CHATS_TITLE" = "Radarからのチャットに返信しないでください";
 
 /* Message contents for the vague message safety tip. */
 "SAFETY_TIPS_VAGUE_MESSAGE_BODY" = "スパマーは、大抵の場合「こんにちは」などのシンプルなメッセージであなたの気を引きます。返信すると、彼らはさらにあなたの注意を引こうとするでしょう。";
@@ -8929,13 +8932,13 @@ Send money securely.";
 "SCREEN_LOCK_REASON_CHANGE_SCREEN_LOCK_SETTINGS" = "画面ロック設定を変更するには、認証してください。";
 
 /* Description of how and why Signal iOS uses Touch ID/Face ID/Phone Passcode to unlock 'screen lock'. */
-"SCREEN_LOCK_REASON_UNLOCK_SCREEN_LOCK" = "Signalを開く際に認証します。";
+"SCREEN_LOCK_REASON_UNLOCK_SCREEN_LOCK" = "Radarを開く際に認証します。";
 
 /* Title for alert indicating that screen lock could not be unlocked. */
 "SCREEN_LOCK_UNLOCK_FAILED" = "認証失敗";
 
 /* Label for button on lock screen that lets users unlock Signal. */
-"SCREEN_LOCK_UNLOCK_SIGNAL" = "Signalのロックを解除する";
+"SCREEN_LOCK_UNLOCK_SIGNAL" = "Radarのロックを解除する";
 
 /* Placeholder text indicating the user can search for contacts by name, username, or phone number. */
 "SEARCH_BY_NAME_OR_USERNAME_OR_NUMBER_PLACEHOLDER_TEXT" = "名前、ユーザーネーム、電話番号";
@@ -8995,7 +8998,7 @@ Send money securely.";
 "SECONDARY_LINKING_SYNCING_UPDATE_REQUIRED_CHECK_FOR_UPDATE_BUTTON" = "アップデートを確認する";
 
 /* Message for action sheet when the secondary device fails to sync messages due to an app update being required. */
-"SECONDARY_LINKING_SYNCING_UPDATE_REQUIRED_ERROR_MESSAGE" = "メッセージの同期を完了するには、Signalを今すぐアップデートしてください。";
+"SECONDARY_LINKING_SYNCING_UPDATE_REQUIRED_ERROR_MESSAGE" = "メッセージの同期を完了するには、Radarを今すぐアップデートしてください。";
 
 /* Title for action sheet when the secondary device fails to sync messages due to an app update being required. */
 "SECONDARY_LINKING_SYNCING_UPDATE_REQUIRED_ERROR_TITLE" = "アップデートが必要です";
@@ -9013,7 +9016,7 @@ Send money securely.";
 "SECONDARY_ONBOARDING_INSTALL_PRIMARY_FIRST_BODY" = "App StoreからSignalをインストールし、登録すると、同じアカウントにiPadをリンクできます。";
 
 /* alert title */
-"SECONDARY_ONBOARDING_INSTALL_PRIMARY_FIRST_TITLE" = "Signalのインストール";
+"SECONDARY_ONBOARDING_INSTALL_PRIMARY_FIRST_TITLE" = "Radarのインストール";
 
 /* Link text for page with troubleshooting info shown on the QR scanning screen */
 "SECONDARY_ONBOARDING_SCAN_CODE_HELP_TEXT" = "手順に関するヘルプを見る";
@@ -9073,7 +9076,7 @@ Send money securely.";
 "SELECT_CONTACT_FOR_SHARING_PERMISSION_PROMPT_DISMISS_BUTTON" = "今はしない";
 
 /* Title of the prompt on the 'Select Contact' view that asks the user to allow access to their contacts. */
-"SELECT_CONTACT_FOR_SHARING_PERMISSION_PROMPT_TITLE" = "Signalで知り合いを探しましょう";
+"SELECT_CONTACT_FOR_SHARING_PERMISSION_PROMPT_TITLE" = "Radarで知り合いを探しましょう";
 
 /* Placeholder text for the search bar on the 'Select Contact' view */
 "SELECT_CONTACT_FOR_SHARING_SEARCH_BAR_PLACEHOLDER" = "検索";
@@ -9163,7 +9166,7 @@ Send money securely.";
 "SEPA_DONATION_NAME_PLACEHOLDER" = "口座名義人";
 
 /* Description for the session refresh alert */
-"SESSION_REFRESH_ALERT_MESSAGE" = "Signalはエンドツーエンドの暗号化を使用しており、時々セッションの更新が必要な場合があります。これはチャットのセキュリティには影響しませんが、この連絡先からのメッセージを失った可能性があるため、再送を依頼することができます。";
+"SESSION_REFRESH_ALERT_MESSAGE" = "Radarはエンドツーエンドの暗号化を使用しており、時々セッションの更新が必要な場合があります。これはチャットのセキュリティには影響しませんが、この連絡先からのメッセージを失った可能性があるため、再送を依頼することができます。";
 
 /* Title for the session refresh alert */
 "SESSION_REFRESH_ALERT_TITLE" = "セッションが更新されました";
@@ -9199,7 +9202,7 @@ Send money securely.";
 "SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_COUNTRY" = "場所";
 
 /* Table footer for the 'censorship circumvention' section when censorship circumvention can be manually enabled. */
-"SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_FOOTER" = "有効にすると、Signalは検閲回避を試行します。Signalが検閲される場所にいない場合は、有効にしないでください。";
+"SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_FOOTER" = "有効にすると、Radarは検閲回避を試行します。Radarが検閲される場所にいない場合は、有効にしないでください。";
 
 /* Table footer for the 'censorship circumvention' section shown when censorship circumvention has been auto-enabled based on local phone number. */
 "SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_FOOTER_AUTO_ENABLED" = "アカウントの電話番号に基づいた、検閲回避が有効になりました。";
@@ -9268,7 +9271,7 @@ Send money securely.";
 "SETTINGS_BLOCK_LIST_ADD_BUTTON" = "ブロックするユーザーを追加";
 
 /* A label that indicates the user has no Signal contacts that they haven't blocked. */
-"SETTINGS_BLOCK_LIST_NO_CONTACTS" = "Signal上に連絡先がいません。";
+"SETTINGS_BLOCK_LIST_NO_CONTACTS" = "Radar上に連絡先がいません。";
 
 /* A label that indicates the user's search has no matching results. */
 "SETTINGS_BLOCK_LIST_NO_SEARCH_RESULTS" = "該当なし";
@@ -9439,7 +9442,7 @@ Send money securely.";
 "SETTINGS_DISAPPEARING_MESSAGES_FOOTER" = "あなたによる新規チャットでの、消えるメッセージの既定タイマーを設定します。";
 
 /* Title for the 'donate to signal' link in settings. */
-"SETTINGS_DONATE" = "Signalへの寄付";
+"SETTINGS_DONATE" = "Radarへの寄付";
 
 /* Title for help button and help pages in app settings. */
 "SETTINGS_HELP" = "ヘルプ";
@@ -9460,7 +9463,7 @@ Send money securely.";
 "SETTINGS_KEEP_MUTED_ARCHIVED_LABEL" = "ミュートしたチャットをアーカイブしたままにします";
 
 /* Footer for settings section describing Key Transparency. */
-"SETTINGS_KEY_TRANSPARENCY_OPT_OUT_FOOTER" = "有効にすると、Signalは1対1のチャットの暗号化を自動的に確認します。";
+"SETTINGS_KEY_TRANSPARENCY_OPT_OUT_FOOTER" = "有効にすると、Radarは1対1のチャットの暗号化を自動的に確認します。";
 
 /* Title for for a settings option describing that Key Transparency is enabled. */
 "SETTINGS_KEY_TRANSPARENCY_OPT_OUT_SWITCH_TITLE" = "自動キー確認";
@@ -9523,7 +9526,7 @@ Send money securely.";
 "SETTINGS_LOCAL_FILE_BACKUPS_PROGRESS_RESTORING_ATTACHMENTS" = "端末内バックアップの復元中（%1$@ / %2$@）";
 
 /* Message for an action sheet when a user cannot perform a local backup because a remote backup is in progress */
-"SETTINGS_LOCAL_FILE_BACKUPS_REMOTE_BACKUP_IN_PROGRESS_MESSAGE" = "Signalセキュアバックアップが進行中のため端末内バックアップを実行できません。あとでもう一度お試しください。";
+"SETTINGS_LOCAL_FILE_BACKUPS_REMOTE_BACKUP_IN_PROGRESS_MESSAGE" = "Radarセキュアバックアップが進行中のため端末内バックアップを実行できません。あとでもう一度お試しください。";
 
 /* Footer text on the on-device backups settings page explaining how to restore a backup. */
 "SETTINGS_LOCAL_FILE_BACKUPS_RESTORE_FOOTER" = "バックアップを復元するには、新規でSignalをインストールしてください。その後アプリを開き、「復元または移行」をタップして「端末内バックアップ」を選択します。";
@@ -9714,10 +9717,10 @@ Send money securely.";
 "SETTINGS_PAYMENTS_DEACTIVATE_TITLE" = "決済機能を停止";
 
 /* Explanation of the 'deactivate payments with balance' process in the 'deactivate payments' settings. */
-"SETTINGS_PAYMENTS_DEACTIVATE_WITH_BALANCE_EXPLANATION" = "決済機能を停止する前に、別のウォレットアドレスに残高を振り替えることをお勧めします。振り替えない残高は、決済機能を再開する場合、Signalにリンクされたウォレットに残ります。";
+"SETTINGS_PAYMENTS_DEACTIVATE_WITH_BALANCE_EXPLANATION" = "決済機能を停止する前に、別のウォレットアドレスに残高を振り替えることをお勧めします。振り替えない残高は、決済機能を再開する場合、Radarにリンクされたウォレットに残ります。";
 
 /* Description for the 'deactivate payments confirmation' UI in the payment settings. */
-"SETTINGS_PAYMENTS_DEACTIVATE_WITHOUT_TRANSFER_CONFIRM_DESCRIPTION" = "残高は、決済機能を再開する場合、Signalにリンクされたウォレットに残ります。";
+"SETTINGS_PAYMENTS_DEACTIVATE_WITHOUT_TRANSFER_CONFIRM_DESCRIPTION" = "残高は、決済機能を再開する場合、Radarにリンクされたウォレットに残ります。";
 
 /* Title for the 'deactivate payments confirmation' UI in the payment settings. */
 "SETTINGS_PAYMENTS_DEACTIVATE_WITHOUT_TRANSFER_CONFIRM_TITLE" = "振り替えずに停止しますか？";
@@ -9958,7 +9961,7 @@ Send money securely.";
 "SETTINGS_PAYMENTS_PAYMENTS_LOCK_PROMPT_EXPLANATION_TOUCHID" = "Touch IDを有効化することで、第三者があなたの携帯電話を使用して資金にアクセスすることを防ぎます。このオプションは設定で無効にできます。";
 
 /* Button for payments outdated sheet. */
-"SETTINGS_PAYMENTS_PAYMENTS_OUTDATED_BUTTON" = "Signalをアップデートする";
+"SETTINGS_PAYMENTS_PAYMENTS_OUTDATED_BUTTON" = "Radarをアップデートする";
 
 /* Message for payments outdated sheet. */
 "SETTINGS_PAYMENTS_PAYMENTS_OUTDATED_MESSAGE" = "送金や受け取りを継続し、最新の決済残高を表示するためにはアップデートが必要です。";
@@ -10193,7 +10196,7 @@ Send money securely.";
 "SETTINGS_PHONE_NUMBER_DISCOVERABILITY_DISABLED_TOAST" = "この設定を変更するには、「自分の番号を閲覧できる人」を「誰も閲覧できない」に設定します。";
 
 /* The description for a sheet asking for confirmation that the user wants to set their phone number discoverability to 'nobody'. */
-"SETTINGS_PHONE_NUMBER_DISCOVERABILITY_NOBODY_CONFIRMATION_DESCRIPTION" = "「私を電話番号から検索できる人」を「なし」に設定すると、Signal上で他のユーザーはあなたを見つけにくくなります。";
+"SETTINGS_PHONE_NUMBER_DISCOVERABILITY_NOBODY_CONFIRMATION_DESCRIPTION" = "「私を電話番号から検索できる人」を「なし」に設定すると、Radar上で他のユーザーはあなたを見つけにくくなります。";
 
 /* The title for a sheet asking for confirmation that the user wants to set their phone number discoverability to 'nobody'. */
 "SETTINGS_PHONE_NUMBER_DISCOVERABILITY_NOBODY_CONFIRMATION_TITLE" = "本当に変更しますか？";
@@ -10202,7 +10205,7 @@ Send money securely.";
 "SETTINGS_PHONE_NUMBER_DISCOVERABILITY_TITLE" = "私を電話番号から検索できる人は？";
 
 /* Description label for Phone Number Privacy */
-"SETTINGS_PHONE_NUMBER_PRIVACY_DESCRIPTION_LABEL" = "あなたの電話番号を見ることができる人と、Signalであなたに連絡できる人を選択してください。";
+"SETTINGS_PHONE_NUMBER_PRIVACY_DESCRIPTION_LABEL" = "あなたの電話番号を見ることができる人と、Radarであなたに連絡できる人を選択してください。";
 
 /* The title for phone number privacy settings. */
 "SETTINGS_PHONE_NUMBER_PRIVACY_TITLE" = "電話番号";
@@ -10214,7 +10217,7 @@ Send money securely.";
 "SETTINGS_PIN_REMINDER_DISABLE_CONFIRMATION_ACTION" = "リマインダーを無効にする";
 
 /* The explanation for the dialog asking user to confirm their PIN to disable reminders */
-"SETTINGS_PIN_REMINDER_DISABLE_CONFIRMATION_EXPLANATION" = "PINは復元できないため、記憶するか安全に保管してください。PINを忘れると、Signalアカウントの再登録時にデータが失われる可能性があります。";
+"SETTINGS_PIN_REMINDER_DISABLE_CONFIRMATION_EXPLANATION" = "PINは復元できないため、記憶するか安全に保管してください。PINを忘れると、Radarアカウントの再登録時にデータが失われる可能性があります。";
 
 /* The title for the dialog asking user to confirm their PIN to disable reminders */
 "SETTINGS_PIN_REMINDER_DISABLE_CONFIRMATION_TITLE" = "Radar PINの確認";
@@ -10274,7 +10277,7 @@ Send money securely.";
 "SETTINGS_REGISTRATION_LOCK_TURN_ON_ERROR_PIN_REQUIRED" = "登録ロックを使用するにはPINを作成してください。";
 
 /* Body for the alert confirming that the user wants to turn on registration lock. */
-"SETTINGS_REGISTRATION_LOCK_TURN_ON_MESSAGE" = "Signalに再登録する際にPINを忘れると、アカウントが7日間ロックされます。";
+"SETTINGS_REGISTRATION_LOCK_TURN_ON_MESSAGE" = "Radarに再登録する際にPINを忘れると、アカウントが7日間ロックされます。";
 
 /* Title for the alert confirming that the user wants to turn on registration lock. */
 "SETTINGS_REGISTRATION_LOCK_TURN_ON_TITLE" = "登録ロックを有効にしますか？";
@@ -10304,7 +10307,7 @@ Send money securely.";
 "SETTINGS_SECTION_TITLE_CALLING" = "通話";
 
 /* Section footer */
-"SETTINGS_SECURITY_DETAIL" = "Touch ID、Face IDまたはiOS端末のパスコードを使用して、Signalのロックを解除します。";
+"SETTINGS_SECURITY_DETAIL" = "Touch ID、Face IDまたはiOS端末のパスコードを使用して、Radarのロックを解除します。";
 
 /* Section footer */
 "SETTINGS_SECURITY_DETAIL_FACEID" = "Face IDでSignalのロックを解除します。";
@@ -10394,7 +10397,7 @@ Send money securely.";
 "SHARE_ACTION_MESSAGE" = "メッセージ";
 
 /* Message for an action sheet shown when sharing fails because the device's date and time are incorrect. */
-"SHARE_EXTENSION_FAILED_SENDING_BECAUSE_CLOCK_SKEW_MESSAGE" = "端末の日時が不正確です。Signalでメッセージを送信できないことがあります。設定を開いて端末の日時を修正してください。";
+"SHARE_EXTENSION_FAILED_SENDING_BECAUSE_CLOCK_SKEW_MESSAGE" = "端末の日時が不正確です。Radarでメッセージを送信できないことがあります。設定を開いて端末の日時を修正してください。";
 
 /* alert body when sharing file failed because of untrusted/changed identity keys */
 "SHARE_EXTENSION_FAILED_SENDING_BECAUSE_UNTRUSTED_IDENTITY_FORMAT" = "最近 %1$@ に対する安全番号が変わりました。再送する前に、メインのアプリで検証した方が良いかも知れません。";
@@ -10427,7 +10430,7 @@ Send money securely.";
 "SHARE_EXTENSION_UNABLE_TO_BUILD_ATTACHMENT_ALERT_TITLE" = "添付ファイルを準備できません";
 
 /* Title for the 'share extension' view. */
-"SHARE_EXTENSION_VIEW_TITLE" = "Signalと共有";
+"SHARE_EXTENSION_VIEW_TITLE" = "Radarと共有";
 
 /* Title of alert indicating sharing suggestions failed to deactivate */
 "SHARING_SUGGESTIONS_DISABLE_ERROR" = "共有時の提案を無効にできませんでした。";
@@ -10436,7 +10439,7 @@ Send money securely.";
 "SHOW_THREAD_BUTTON_TITLE" = "チャットを表示";
 
 /* Shown in the header when the user hasn't provided a custom name for a call. */
-"SIGNAL_CALL" = "Signal通話";
+"SIGNAL_CALL" = "Radar通話";
 
 /* Placeholder of the 'Account ID' username field. */
 "SIGNAL_LOGIN_ACCOUNT_ID_PLACEHOLDER_TITLE" = "アカウントID";
@@ -10445,10 +10448,10 @@ Send money securely.";
 "SIGNAL_LOGIN_RECOVERY_KEY_PLACEHOLDER_TITLE" = "回復キー";
 
 /* Title for the sheet presented when user taps on Signal Proxy link in chat. */
-"SIGNAL_PROXY" = "Signalプロキシサーバ";
+"SIGNAL_PROXY" = "Radarプロキシサーバ";
 
 /* body sent to contacts when inviting to Install Signal */
-"SMS_INVITE_BODY" = "Signalのインストールをお勧めします！このリンクから入手してください:";
+"SMS_INVITE_BODY" = "Radarのインストールをお勧めします！このリンクから入手してください:";
 
 /* An error message generically indicating that something went wrong. */
 "SOMETHING_WENT_WRONG_ERROR" = "エラーが発生しました！";
@@ -10472,7 +10475,7 @@ Send money securely.";
 "SPAM_CAPTCHA_DISMISS_CONFIRMATION_TITLE" = "認証せずに続けますか？";
 
 /* Body for action sheet explaining captcha requirement. */
-"SPAM_CAPTCHA_SHEET_BODY" = "Signalがスパムを回避するために、認証を完了していください。\n\n認証後は、メッセージの送受信を再開できます。保留中のメッセージは、自動で送信されます。";
+"SPAM_CAPTCHA_SHEET_BODY" = "Radarがスパムを回避するために、認証を完了していください。\n\n認証後は、メッセージの送受信を再開できます。保留中のメッセージは、自動で送信されます。";
 
 /* Title for action sheet explaining captcha requirement. */
 "SPAM_CAPTCHA_SHEET_TITLE" = "メッセージ送受信のため認証してください";
@@ -10488,6 +10491,10 @@ Send money securely.";
 
 /* Text for a toast confirming that the speakerphone has been turned on for a call. */
 "SPEAKERPHONE_ON_CONFIRMATION_TOAST_LABEL" = "スピーカーはオンになっています";
+
+"STAR" = "Star";
+
+"STARRED_MESSAGES" = "Starred messages";
 
 /* Title for a button to view a sticker pack */
 "STICKER_BUTTON_VIEW_PACK" = "パック内容を表示する";
@@ -10532,7 +10539,7 @@ Send money securely.";
 "STICKER_PACK_SHARE_SHEET_HEADER" = "このリンクを使えば、誰でもこのステッカーパックを追加して共有できます。";
 
 /* Label for a button on a sticker-pack share sheet that sends the pack in Signal. */
-"STICKER_PACK_SHARE_SHEET_SEND_IN_SIGNAL" = "Signalで送信";
+"STICKER_PACK_SHARE_SHEET_SEND_IN_SIGNAL" = "Radarで送信";
 
 /* Message when trying to show a sticker that has expired and is unavailable for download */
 "STICKER_UNAVAILABLE_MESSAGE_LABEL" = "ステッカーはご利用になれません";
@@ -10544,7 +10551,7 @@ Send money securely.";
 "STICKERS_INSTALL_BUTTON" = "ステッカーを追加";
 
 /* Title for the 'available built-in stickers' section of the 'manage stickers' view. */
-"STICKERS_MANAGE_VIEW_AVAILABLE_BUILT_IN_PACKS_SECTION_TITLE" = "Signalアーティストシリーズ";
+"STICKERS_MANAGE_VIEW_AVAILABLE_BUILT_IN_PACKS_SECTION_TITLE" = "Radarアーティストシリーズ";
 
 /* Subtitle for the section of known stickers in the manage stickers view */
 "STICKERS_MANAGE_VIEW_AVAILABLE_KNOWN_PACKS_SECTION_SUBTITLE" = "誰かからステッカーを受け取ると、ステッカーパックの内容がここに表示されます。";
@@ -10820,7 +10827,7 @@ Send money securely.";
 "STORY_SETTINGS_LEARN_MORE_SHEET_FOOTER" = "あなたのネットワークにいる人たちは、あなたの名前や写真を見ることができ、あなたが非表示にしない限り「マイストーリー」への送信内容を見ることができます。";
 
 /* Header for the explainer sheet for signal connections */
-"STORY_SETTINGS_LEARN_MORE_SHEET_HEADER_FORMAT" = "<bold>Signalコネクション</bold>は、次のいずれかによってあなたが信頼できると判断した人達です。";
+"STORY_SETTINGS_LEARN_MORE_SHEET_HEADER_FORMAT" = "<bold>Radarコネクション</bold>は、次のいずれかによってあなたが信頼できると判断した人達です。";
 
 /* Label for the stories section of the settings view */
 "STORY_SETTINGS_TITLE" = "ストーリー";
@@ -11114,16 +11121,16 @@ Send money securely.";
 "TRANSFER_ACCOUNT_AUTHENTICATION_REASON" = "アカウントを移行するには認証してください";
 
 /* Button for bottom sheet shown when device transfer completes on the receiving device. Tapping will terminate the Signal app and trigger a notification to relaunch. */
-"TRANSFER_COMPLETE_SHEET_BUTTON" = "Signalを閉じる";
+"TRANSFER_COMPLETE_SHEET_BUTTON" = "Radarを閉じる";
 
 /* Subtitle for bottom sheet shown when device transfer completes on the receiving device. */
-"TRANSFER_COMPLETE_SHEET_SUBTITLE" = "この端末でアカウントの使用を開始するには、Signalを一度閉じて開き直してください。";
+"TRANSFER_COMPLETE_SHEET_SUBTITLE" = "この端末でアカウントの使用を開始するには、Radarを一度閉じて開き直してください。";
 
 /* Title for bottom sheet shown when device transfer completes on the receiving device. */
 "TRANSFER_COMPLETE_SHEET_TITLE" = "移行が完了しました";
 
 /* Notification prompting the user to relaunch Signal after a device transfer completed. */
-"TRANSFER_RELAUNCH_NOTIFICATION" = "Signalを開いてメッセージのやりとりを開始しましょう";
+"TRANSFER_RELAUNCH_NOTIFICATION" = "Radarを開いてメッセージのやりとりを開始しましょう";
 
 /* Label for a button that says 'Try Again'. */
 "TRY_AGAIN_BUTTON_TITLE" = "再度試す";
@@ -11153,13 +11160,13 @@ Send money securely.";
 "UNKNOWN_GROUP" = "不明なグループ";
 
 /* Info message recorded in conversation history when local user receives an unknown message from a linked device and needs to upgrade. */
-"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_FROM_LINKED_DEVICE" = "あなたの端末の1つが、Signalの新機能を使用してメッセージを送信したため、ここでは処理または表示できません。";
+"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_FROM_LINKED_DEVICE" = "あなたの端末の1つが、Radarの新機能を使用してメッセージを送信したため、ここでは処理または表示できません。";
 
 /* Info message recorded in conversation history when local user receives an unknown message and needs to upgrade. Embeds {{user's name or phone number}}. */
-"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_WITH_NAME_FORMAT" = "%1$@ からメッセージが届きましたが、Signalの新機能が使用されているため、処理または表示できませんでした。";
+"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_WITH_NAME_FORMAT" = "%1$@ からメッセージが届きましたが、Radarの新機能が使用されているため、処理または表示できませんでした。";
 
 /* Info message recorded in conversation history when local user receives an unknown message and needs to upgrade. */
-"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_WITHOUT_NAME" = "メッセージが届きましたが、Signalの新機能が使用されているため、処理または表示できませんでした。";
+"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_WITHOUT_NAME" = "メッセージが届きましたが、Radarの新機能が使用されているため、処理または表示できませんでした。";
 
 /* Label for button that lets users upgrade the app. */
 "UNKNOWN_PROTOCOL_VERSION_UPGRADE_BUTTON" = "いますぐSignalをアップデートする";
@@ -11168,10 +11175,10 @@ Send money securely.";
 "UNKNOWN_PROTOCOL_VERSION_UPGRADE_COMPLETE_FROM_LINKED_DEVICE" = "最新版のSignalにアップデートしました。この端末でもこのタイプのメッセージを受信できます。";
 
 /* Info message recorded in conversation history when local user has received an unknown message and has upgraded. Embeds {{user's name or phone number}}. */
-"UNKNOWN_PROTOCOL_VERSION_UPGRADE_COMPLETE_WITH_NAME_FORMAT" = "Signalを最新版にアップデートしたため、このメッセージの再送を %1$@ に依頼できます。";
+"UNKNOWN_PROTOCOL_VERSION_UPGRADE_COMPLETE_WITH_NAME_FORMAT" = "Radarを最新版にアップデートしたため、このメッセージの再送を %1$@ に依頼できます。";
 
 /* Info message recorded in conversation history when local user has received an unknown message and has upgraded. */
-"UNKNOWN_PROTOCOL_VERSION_UPGRADE_COMPLETE_WITHOUT_NAME" = "Signalをアップデートしたので、メッセージの再送を依頼してください。";
+"UNKNOWN_PROTOCOL_VERSION_UPGRADE_COMPLETE_WITHOUT_NAME" = "Radarをアップデートしたので、メッセージの再送を依頼してください。";
 
 /* Label indicating an unknown user. */
 "UNKNOWN_USER" = "不明";
@@ -11241,6 +11248,8 @@ Send money securely.";
 
 /* Notification body for unread reminders. First placeholder is unread messages, second is a summary of either unread mentions or replies */
 "UnreadReminderJob__unread_one_summary" = "%2$@を含め、%1$@があります。";
+
+"UNSTAR" = "Unstar";
 
 /* No comment provided by engineer. */
 "UNSUPPORTED_ATTACHMENT" = "サポートされていない種類の添付ファイルを受信しました。";
@@ -11384,7 +11393,7 @@ Send money securely.";
 "USERNAME_ONBOARDING_TITLE" = "Your Username";
 
 /* Instructions that appear below the username QR code on a sharable exported image. */
-"USERNAME_QR_CODE_EXPORT_INSTRUCTIONS" = "このQRコードをお使いの携帯電話でスキャンして、Signalで私とチャットしましょう。";
+"USERNAME_QR_CODE_EXPORT_INSTRUCTIONS" = "このQRコードをお使いの携帯電話でスキャンして、Radarで私とチャットしましょう。";
 
 /* A message in a toast informing the user their username, link, and QR code have successfully been reset. Embeds {{ the user's new username }}. */
 "USERNAME_RESET_SUCCESSFUL_TOAST" = "QRコードとリンクはリセットされ、ユーザーネームは%1$@です";
@@ -11435,7 +11444,7 @@ Send money securely.";
 "VERIFICATION_CODE_REQUESTED_HERO_BODY_FIRST" = "確認コードがリクエストされました";
 
 /* Second part of body for a hero sheet informing the user a verification code was requested. */
-"VERIFICATION_CODE_REQUESTED_HERO_BODY_SECOND" = "確認コードは誰にも教えないでください。Signalが確認コードをメッセージでリクエストする事はありません。Signalを名乗るメッセージを受けとったら、それは詐欺です。\nご自身でコードをリクエストした場合は、このメッセージは無視してください。";
+"VERIFICATION_CODE_REQUESTED_HERO_BODY_SECOND" = "確認コードは誰にも教えないでください。Radarが確認コードをメッセージでリクエストする事はありません。Radarを名乗るメッセージを受けとったら、それは詐欺です。\nご自身でコードをリクエストした場合は、このメッセージは無視してください。";
 
 /* Format for info message indicating that the verification state was unverified on this device. Embeds {{user's name or phone number}}. */
 "VERIFICATION_STATE_CHANGE_FORMAT_NOT_VERIFIED_LOCAL" = "%1$@を未検証にしました。";

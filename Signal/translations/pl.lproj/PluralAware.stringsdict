@@ -823,13 +823,13 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Grupy Signal działają najlepiej, gdy należy do nich nie więcej niż %1$d osoba. Dodanie kolejnych członków spowoduje opóźnienia w wysyłaniu i odbieraniu wiadomości.</string>
+			<string>Grupy Radar działają najlepiej, gdy należy do nich nie więcej niż %1$d osoba. Dodanie kolejnych członków spowoduje opóźnienia w wysyłaniu i odbieraniu wiadomości.</string>
 			<key>few</key>
-			<string>Grupy Signal działają najlepiej, gdy należą do nich nie więcej niż %1$d osoby. Dodanie kolejnych członków spowoduje opóźnienia w wysyłaniu i odbieraniu wiadomości.</string>
+			<string>Grupy Radar działają najlepiej, gdy należą do nich nie więcej niż %1$d osoby. Dodanie kolejnych członków spowoduje opóźnienia w wysyłaniu i odbieraniu wiadomości.</string>
 			<key>many</key>
-			<string>Grupy Signal działają najlepiej, gdy należy do nich nie więcej niż %1$d osób. Dodanie kolejnych członków spowoduje opóźnienia w wysyłaniu i odbieraniu wiadomości.</string>
+			<string>Grupy Radar działają najlepiej, gdy należy do nich nie więcej niż %1$d osób. Dodanie kolejnych członków spowoduje opóźnienia w wysyłaniu i odbieraniu wiadomości.</string>
 			<key>other</key>
-			<string>Grupy Signal działają najlepiej, gdy należy do nich nie więcej niż %1$d osoby. Dodanie kolejnych członków spowoduje opóźnienia w wysyłaniu i odbieraniu wiadomości.</string>
+			<string>Grupy Radar działają najlepiej, gdy należy do nich nie więcej niż %1$d osoby. Dodanie kolejnych członków spowoduje opóźnienia w wysyłaniu i odbieraniu wiadomości.</string>
 		</dict>
 	</dict>
 	<key>GROUP_CALL_HAS_MAX_DEVICES_%d</key>
@@ -1023,13 +1023,13 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Signal zadzowni do tych osób: %2$@, %3$@ i jeszcze do %1$d osoby</string>
+			<string>Radar zadzowni do tych osób: %2$@, %3$@ i jeszcze do %1$d osoby</string>
 			<key>few</key>
-			<string>Signal zadzowni do tych osób: %2$@, %3$@ i jeszcze do %1$d osób</string>
+			<string>Radar zadzowni do tych osób: %2$@, %3$@ i jeszcze do %1$d osób</string>
 			<key>many</key>
-			<string>Signal zadzowni do tych osób: %2$@, %3$@ i jeszcze do %1$d osób</string>
+			<string>Radar zadzowni do tych osób: %2$@, %3$@ i jeszcze do %1$d osób</string>
 			<key>other</key>
-			<string>Signal zadzowni do tych osób: %2$@, %3$@ i jeszcze do %1$d osoby</string>
+			<string>Radar zadzowni do tych osób: %2$@, %3$@ i jeszcze do %1$d osoby</string>
 		</dict>
 	</dict>
 	<key>GROUP_INVITES_SENT_ALERT_TITLE_%d</key>
@@ -1383,13 +1383,13 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Aby zachować połączenie z urządzeniem %2$@, otwórz na nim Signal w ciągu %1$d dnia.</string>
+			<string>Aby zachować połączenie z urządzeniem %2$@, otwórz na nim Radar w ciągu %1$d dnia.</string>
 			<key>few</key>
-			<string>Aby zachować połączenie z urządzeniem %2$@, otwórz na nim Signal w ciągu %1$d dni.</string>
+			<string>Aby zachować połączenie z urządzeniem %2$@, otwórz na nim Radar w ciągu %1$d dni.</string>
 			<key>many</key>
-			<string>Aby zachować połączenie z urządzeniem %2$@, otwórz na nim Signal w ciągu %1$d dni.</string>
+			<string>Aby zachować połączenie z urządzeniem %2$@, otwórz na nim Radar w ciągu %1$d dni.</string>
 			<key>other</key>
-			<string>Aby zachować połączenie z urządzeniem %2$@, otwórz na nim Signal w ciągu %1$d dnia.</string>
+			<string>Aby zachować połączenie z urządzeniem %2$@, otwórz na nim Radar w ciągu %1$d dnia.</string>
 		</dict>
 	</dict>
 	<key>LINK_DEVICE_CONFIRMATION_ALERT_TRANSFER_SUBTITLE_%d</key>
@@ -1643,13 +1643,13 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Wszystkie kontakty Signal · %1$d odbiorca</string>
+			<string>Wszystkie kontakty Radar · %1$d odbiorca</string>
 			<key>few</key>
-			<string>Wszystkie kontakty Signal · %1$d odbiorców</string>
+			<string>Wszystkie kontakty Radar · %1$d odbiorców</string>
 			<key>many</key>
-			<string>Wszystkie kontakty Signal · %1$d odbiorców</string>
+			<string>Wszystkie kontakty Radar · %1$d odbiorców</string>
 			<key>other</key>
-			<string>Wszystkie kontakty Signal · %1$d odbiorcy</string>
+			<string>Wszystkie kontakty Radar · %1$d odbiorcy</string>
 		</dict>
 	</dict>
 	<key>MY_STORY_VIEWERS_ALL_CONNECTIONS_EXCLUDING_%d</key>
@@ -1663,13 +1663,13 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Wszystkie kontakty Signal · %1$d pominięta osoba</string>
+			<string>Wszystkie kontakty Radar · %1$d pominięta osoba</string>
 			<key>few</key>
-			<string>Wszystkie kontakty Signal · %1$d pominięte osoby</string>
+			<string>Wszystkie kontakty Radar · %1$d pominięte osoby</string>
 			<key>many</key>
-			<string>Wszystkie kontakty Signal · %1$d pominiętych osób</string>
+			<string>Wszystkie kontakty Radar · %1$d pominiętych osób</string>
 			<key>other</key>
-			<string>Wszystkie kontakty Signal · %1$d pominiętej osoby</string>
+			<string>Wszystkie kontakty Radar · %1$d pominiętej osoby</string>
 		</dict>
 	</dict>
 	<key>MY_STORY_VIEWERS_ONLY_%d</key>

@@ -659,9 +659,9 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Os grupos do Signal funcionam melhor com %1$d membro. Adicionar mais membros irá causar atrasos nos envios e receção de mensagens.</string>
+			<string>Os grupos do Radar funcionam melhor com %1$d membro. Adicionar mais membros irá causar atrasos nos envios e receção de mensagens.</string>
 			<key>other</key>
-			<string>Os grupos do Signal funcionam melhor com %1$d membros ou menos. Adicionar mais membros irá causar atrasos nos envios e receção de mensagens.</string>
+			<string>Os grupos do Radar funcionam melhor com %1$d membros ou menos. Adicionar mais membros irá causar atrasos nos envios e receção de mensagens.</string>
 		</dict>
 	</dict>
 	<key>GROUP_CALL_HAS_MAX_DEVICES_%d</key>
@@ -819,9 +819,9 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>O Signal irá ligar a %2$@, %3$@, e %1$d outro</string>
+			<string>O Radar irá ligar a %2$@, %3$@, e %1$d outro</string>
 			<key>other</key>
-			<string>O Signal irá ligar a %2$@, %3$@, e outros %1$d</string>
+			<string>O Radar irá ligar a %2$@, %3$@, e outros %1$d</string>
 		</dict>
 	</dict>
 	<key>GROUP_INVITES_SENT_ALERT_TITLE_%d</key>
@@ -1107,9 +1107,9 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Para manter &quot;%2$@&quot; conectado, abra o Signal nesse dispositivo dentro de %1$d dia.</string>
+			<string>Para manter &quot;%2$@&quot; conectado, abra o Radar nesse dispositivo dentro de %1$d dia.</string>
 			<key>other</key>
-			<string>Para manter &quot;%2$@&quot; conectado, abra o Signal nesse dispositivo dentro de %1$d dias.</string>
+			<string>Para manter &quot;%2$@&quot; conectado, abra o Radar nesse dispositivo dentro de %1$d dias.</string>
 		</dict>
 	</dict>
 	<key>LINK_DEVICE_CONFIRMATION_ALERT_TRANSFER_SUBTITLE_%d</key>
@@ -1315,9 +1315,9 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Todos os contactos do Signal · %1$d visualizador</string>
+			<string>Todos os contactos do Radar · %1$d visualizador</string>
 			<key>other</key>
-			<string>Todos os contactos do Signal · %1$d visualizadores</string>
+			<string>Todos os contactos do Radar · %1$d visualizadores</string>
 		</dict>
 	</dict>
 	<key>MY_STORY_VIEWERS_ALL_CONNECTIONS_EXCLUDING_%d</key>
@@ -1331,9 +1331,9 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Todos os contactos do Signal · %1$d excluído</string>
+			<string>Todos os contactos do Radar · %1$d excluído</string>
 			<key>other</key>
-			<string>Todos os contactos do Signal · %1$d excluídos</string>
+			<string>Todos os contactos do Radar · %1$d excluídos</string>
 		</dict>
 	</dict>
 	<key>MY_STORY_VIEWERS_ONLY_%d</key>

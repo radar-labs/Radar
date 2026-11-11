@@ -2,7 +2,7 @@
 "AB_PERMISSION_MISSING_ACTION_NOT_NOW" = "Nu Acum";
 
 /* Footer for the 'about' help section. For non-English languages, exclude the word '501c3'. */
-"ABOUT_SECTION_FOOTER" = "Drepturi de autor Signal Messenger\nSub licența GPLv3\nSignal este o organizație non-profit";
+"ABOUT_SECTION_FOOTER" = "Drepturi de autor Signal Messenger\nCopyright 2026 Radar Chat, Inc.\nSub licența GPLv3";
 
 /* Title for the 'about' help section */
 "ABOUT_SECTION_TITLE" = "Despre Radar";
@@ -215,7 +215,7 @@
 "APN_Message" = "S-ar putea să ai mesaje noi";
 
 /* Shown in place of the text input box in a conversation when the app has expired and the user is no longer allowed to send messages. The embedded value is 'Update now' (translated via APP_EXPIRED_BOTTOM_UPDATE), and it will be formatted as a tappable link. */
-"APP_EXPIRED_BOTTOM" = "Această versiune a Signal a expirat. %1$@ pentru a trimite și a primi mesaje.";
+"APP_EXPIRED_BOTTOM" = "Această versiune a Radar a expirat. %1$@ pentru a trimite și a primi mesaje.";
 
 /* Shown in place of the text input box in a conversation when the app has expired and the user is no longer allowed to send messages. This value is a tappable link embedded in a larger sentence. */
 "APP_EXPIRED_BOTTOM_UPDATE" = "Actualizează acum";
@@ -236,7 +236,7 @@
 "APP_LAUNCH_FAILURE_COULD_NOT_LOAD_DATABASE" = "Baza de date nu a putut fi încărcată";
 
 /* Message for an action sheet explaining that Signal can't launch because the database is corrupted. */
-"APP_LAUNCH_FAILURE_DATABASE_CORRUPTED_MESSAGE" = "Signal nu se poate lansa deoarece baza de date este coruptă. Nu a existat impact asupra securității contului sau mesajelor tale.";
+"APP_LAUNCH_FAILURE_DATABASE_CORRUPTED_MESSAGE" = "Radar nu se poate lansa deoarece baza de date este coruptă. Nu a existat impact asupra securității contului sau mesajelor tale.";
 
 /* Title for an action sheet explaining that Signal can't launch because the database is corrupted. */
 "APP_LAUNCH_FAILURE_DATABASE_CORRUPTED_TITLE" = "Bază de date coruptă";
@@ -245,7 +245,7 @@
 "APP_LAUNCH_FAILURE_DATABASE_RECOVERY_ACTION_TITLE" = "Repară";
 
 /* Action in an action sheet offering to exit the app. */
-"APP_LAUNCH_FAILURE_EXIT_APP_ACTION_TITLE" = "Ieșire din Signal";
+"APP_LAUNCH_FAILURE_EXIT_APP_ACTION_TITLE" = "Ieșire din Radar";
 
 /* Error indicating that the app could not launch without reverting unknown database migrations. */
 "APP_LAUNCH_FAILURE_INVALID_DATABASE_VERSION_MESSAGE" = "Te rog să actualizezi Radar la ultima versiune.";
@@ -260,7 +260,7 @@
 "APP_LAUNCH_FAILURE_LAST_LAUNCH_CRASHED_TITLE" = "Radar nu a putut fi deschis";
 
 /* Message for an error sheet shown when the app cannot launch because the device is out of storage space. Embeds 1:{{ the localized name of the user's device model, e.g. iPhone }}; 2:{{ an amount of storage space as a file size, e.g. 1 GB }}. */
-"APP_LAUNCH_FAILURE_NOT_ENOUGH_STORAGE_SPACE_MESSAGE_FORMAT" = "Signal nu poate deschide pentru că ai un %1$@ fără spațiu de stocare. Eliberează cel puțin %2$@, apoi redeschide Signal.\n\nAccesează Setări iOS > General > Spațiu de stocare și elimină aplicațiile pe care nu le folosești, șterge videoclipurile de dimensiuni mari din aplicația „Fotografii” sau din alte aplicații și șterge muzica și fișierele media descărcate.";
+"APP_LAUNCH_FAILURE_NOT_ENOUGH_STORAGE_SPACE_MESSAGE_FORMAT" = "Radar nu poate deschide pentru că ai un %1$@ fără spațiu de stocare. Eliberează cel puțin %2$@, apoi redeschide Radar.\n\nAccesează Setări iOS > General > Spațiu de stocare și elimină aplicațiile pe care nu le folosești, șterge videoclipurile de dimensiuni mari din aplicația „Fotografii” sau din alte aplicații și șterge muzica și fișierele media descărcate.";
 
 /* Title for an error sheet shown when the app cannot launch because the device is out of storage space. */
 "APP_LAUNCH_FAILURE_NOT_ENOUGH_STORAGE_SPACE_TITLE" = "Nu este suficient spațiu de stocare";
@@ -377,13 +377,13 @@
 "ATTACHMENT_APPROVAL_MEDIA_QUALITY_TITLE" = "Calitate Media";
 
 /* Notification body shown when media sync to a linked device is complete. */
-"ATTACHMENT_BACKFILL_FINISHED_NOTIFICATION" = "Se termină sincronizarea cu Signal pe dispozitivul asociat.";
+"ATTACHMENT_BACKFILL_FINISHED_NOTIFICATION" = "Se termină sincronizarea cu Radar pe dispozitivul asociat.";
 
 /* Notification body shown when media sync to a linked device was interrupted. */
-"ATTACHMENT_BACKFILL_INTERRUPTED_NOTIFICATION" = "Deschide Signal, ca să continui sincronizarea cu dispozitivul asociat";
+"ATTACHMENT_BACKFILL_INTERRUPTED_NOTIFICATION" = "Deschide Radar, ca să continui sincronizarea cu dispozitivul asociat";
 
 /* Notification body shown while syncing media to a linked device. */
-"ATTACHMENT_BACKFILL_SYNCING_NOTIFICATION" = "Se sincronizează cu Signal pe dispozitivul asociat";
+"ATTACHMENT_BACKFILL_SYNCING_NOTIFICATION" = "Se sincronizează cu Radar pe dispozitivul asociat";
 
 /* Generic filename for an attachment with no known name */
 "ATTACHMENT_DEFAULT_FILENAME" = "Atașament";
@@ -632,7 +632,7 @@
 "BACKUP_KEY_SEE_FULL_KEY_BUTTON_TITLE" = "Vezi codul complet";
 
 /* Body for a warning sheet shown to discourage the user from sharing their 'Recovery Key', warning them not to share it with anyone. */
-"BACKUP_NEVER_SHARE_RECOVERY_KEY_SHEET_BODY" = "Nu transmite codul tău de recuperare nimănui. Altfel, vor putea să îți preia contul. Signal nu îți va cere <bold>niciodată</bold> codul de recuperare printr-un mesaj. Nu răspunde niciodată la o conversație în care persoana pretinde că e Signal.";
+"BACKUP_NEVER_SHARE_RECOVERY_KEY_SHEET_BODY" = "Nu transmite codul tău de recuperare nimănui. Altfel, vor putea să îți preia contul. Radar nu îți va cere <bold>niciodată</bold> codul de recuperare printr-un mesaj. Nu răspunde niciodată la o conversație în care persoana pretinde că e Radar.";
 
 /* Title for a warning sheet shown to discourage the user from sharing their 'Recovery Key'. */
 "BACKUP_NEVER_SHARE_RECOVERY_KEY_SHEET_TITLE" = "Nu transmite codul de recuperare";
@@ -752,7 +752,7 @@
 "BACKUP_RESTORE_MODAL_TITLE" = "Se restaurează mesajele…";
 
 /* Message for a confirmation sheet shown before saving the user's Recovery Key to their password manager. */
-"BACKUP_SAVE_KEY_PW_MGR_CONFIRM_SHEET_MESSAGE" = "Salvează codul de recuperare doar într-un manager de parole în care ai încredere că este sigur. Signal nu oferă recomandări cu privire la managerul de parole potrivit pentru tine.";
+"BACKUP_SAVE_KEY_PW_MGR_CONFIRM_SHEET_MESSAGE" = "Salvează codul de recuperare doar într-un manager de parole în care ai încredere că este sigur. Radar nu oferă recomandări cu privire la managerul de parole potrivit pentru tine.";
 
 /* Title for a confirmation sheet shown before saving the user's Recovery Key to their password manager. */
 "BACKUP_SAVE_KEY_PW_MGR_CONFIRM_SHEET_TITLE" = "Salvezi în managerul de parole?";
@@ -1064,31 +1064,31 @@
 "BACKUP_SETTINGS_LANDING_OTHER_WAYS_HEADER" = "Alte moduri de backup";
 
 /* Subtitle on the Backups settings landing page. */
-"BACKUP_SETTINGS_LANDING_PAGE_SUBTITLE" = "Fă back-up pentru istoricul mesajelor, astfel încât niciodată să nu pierzi date, atunci când îți iei un telefon nou sau reinstalezi Signal.";
+"BACKUP_SETTINGS_LANDING_PAGE_SUBTITLE" = "Fă back-up pentru istoricul mesajelor, astfel încât niciodată să nu pierzi date, atunci când îți iei un telefon nou sau reinstalezi Radar.";
 
 /* Button to begin setting up Signal Secure Backups on the Backups settings landing page. */
 "BACKUP_SETTINGS_LANDING_SET_UP_BUTTON" = "Stabilește";
 
 /* Description of Signal Secure Backups on the Backups settings landing page. */
-"BACKUP_SETTINGS_LANDING_SIGNAL_BACKUPS_BODY" = "Backup-uri automate cu serviciul de stocare criptat complet de la Signal.";
+"BACKUP_SETTINGS_LANDING_SIGNAL_BACKUPS_BODY" = "Backup-uri automate cu serviciul de stocare criptat complet de la Radar.";
 
 /* Title for the Signal Secure Backups cell on the Backups settings landing page. */
-"BACKUP_SETTINGS_LANDING_SIGNAL_BACKUPS_TITLE" = "Backup-uri securizate Signal";
+"BACKUP_SETTINGS_LANDING_SIGNAL_BACKUPS_TITLE" = "Backup-uri securizate Radar";
 
 /* Button to view settings for remote backups on the Backups settings landing page. */
 "BACKUP_SETTINGS_LANDING_VIEW_SETTINGS_BUTTON" = "Afișează setările";
 
 /* Note on the linked-device Backups screen explaining that the Backups subscription can only be managed on the user's primary device. */
-"BACKUP_SETTINGS_LINKED_DEVICE_MANAGE_ON_PRIMARY_FOOTER" = "Poți să gestionezi sau să faci upgrade la abonamentul Backup-uri securizate Signal pe dispozitivul principal.";
+"BACKUP_SETTINGS_LINKED_DEVICE_MANAGE_ON_PRIMARY_FOOTER" = "Poți să gestionezi sau să faci upgrade la abonamentul Backup-uri securizate Radar pe dispozitivul principal.";
 
 /* Note on the linked-device Backups screen, shown on the paid tier, explaining that the Backups subscription can only be managed on the user's primary device. */
-"BACKUP_SETTINGS_LINKED_DEVICE_MANAGE_ON_PRIMARY_FOOTER_PAID" = "Poți gestiona sau anula abonamentul Backup-uri Signal de pe dispozitivul principal.";
+"BACKUP_SETTINGS_LINKED_DEVICE_MANAGE_ON_PRIMARY_FOOTER_PAID" = "Poți gestiona sau anula abonamentul Backup-uri Radar de pe dispozitivul principal.";
 
 /* Body text on the linked-device Backups screen, shown when Backups aren't set up, explaining the feature and that it can be enabled on the user's primary device. */
-"BACKUP_SETTINGS_LINKED_DEVICE_NO_BACKUP_FOOTER" = "Backup-uri automate cu serviciul de stocare criptat complet de la Signal. Începe pe dispozitivul tău principal.";
+"BACKUP_SETTINGS_LINKED_DEVICE_NO_BACKUP_FOOTER" = "Backup-uri automate cu serviciul de stocare criptat complet de la Radar. Începe pe dispozitivul tău principal.";
 
 /* Message on the linked-device Backups screen, shown when the user's paid subscription can't be found, prompting them to renew. */
-"BACKUP_SETTINGS_LINKED_DEVICE_SUBSCRIPTION_NOT_FOUND" = "Abonamentul tău nu a fost găsit. Reînnoiește abonamentul, pentru a continua să utilizezi Backup-uri securizate Signal.";
+"BACKUP_SETTINGS_LINKED_DEVICE_SUBSCRIPTION_NOT_FOUND" = "Abonamentul tău nu a fost găsit. Reînnoiește abonamentul, pentru a continua să utilizezi Backup-uri securizate Radar.";
 
 /* Title for a button allowing users to trigger a manual backup. */
 "BACKUP_SETTINGS_MANUAL_BACKUP_BUTTON_TITLE" = "Fă un backup acum";
@@ -1130,10 +1130,10 @@
 "BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_TOGGLE_FOOTER_UNAVAILABLE" = "Optimizarea stocării poate fi utilizată numai cu nivelul plătit de Backup-uri Radar. Actualizează-ți planul de backup pentru a începe să folosești această funcție.";
 
 /* Title for a toggle allowing users to change the Optimize Local Storage setting. */
-"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_TOGGLE_TITLE" = "Optimizează stocarea Signal";
+"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_TOGGLE_TITLE" = "Optimizează stocarea Radar";
 
 /* Body for a Backup plan upsell view encouraging users to subscribe to a paid Backup plan to use storage optimization. */
-"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_UPSELL_BODY" = "Optimizarea stocării poate fi utilizată numai cu nivelul plătit de Backup-uri securizate Signal. Actualizează-ți planul de backup pentru a începe să folosești această funcție.";
+"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_UPSELL_BODY" = "Optimizarea stocării poate fi utilizată numai cu nivelul plătit de Backup-uri securizate Radar. Actualizează-ți planul de backup pentru a începe să folosești această funcție.";
 
 /* Title for a Backup plan upsell view encouraging users to subscribe to a paid Backup plan to use storage optimization. */
 "BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_UPSELL_TITLE" = "Fă upgrade ca să activezi optimizarea stocării";
@@ -1217,7 +1217,7 @@
 "BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_OPTIMIZE_MEDIA_TOGGLE_FOOTER" = "Fișierele mai vechi vor fi mutate când faci următorul backup, dar pot fi descărcate oricând din backup.";
 
 /* Title for a toggle shown after the user enables backups, letting them enable the Optimize Storage feature. */
-"BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_OPTIMIZE_MEDIA_TOGGLE_TITLE" = "Optimizează stocarea Signal";
+"BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_OPTIMIZE_MEDIA_TOGGLE_TITLE" = "Optimizează stocarea Radar";
 
 /* Title for a sheet shown after the user enables backups. */
 "BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_TITLE" = "Ești gata. Începe backup-ul acum.";
@@ -1247,7 +1247,7 @@
 "BACKUP_SUBSCRIPTION_FAILED_TO_RENEW_SHEET_TITLE" = "Abonamentul tău pentru backup nu s-a reînnoit";
 
 /* Body for a megaphone shown on the chat list encouraging users to subscribe to a paid Backup plan to back up all their media. Embeds {{ the amount of storage included in the paid plan, preformatted as a localized byte count, e.g. '100 GB' }}. */
-"BACKUPS_BACK_UP_YOUR_MEDIA_MEGAPHONE_BODY" = "Planurile plătite de Backup-uri securizate Signal păstrează toate fișierele media, până la %1$@.";
+"BACKUPS_BACK_UP_YOUR_MEDIA_MEGAPHONE_BODY" = "Planurile plătite de Backup-uri securizate Radar păstrează toate fișierele media, până la %1$@.";
 
 /* Title for a button on a megaphone encouraging users to subscribe to a paid Backup plan to back up all their media. */
 "BACKUPS_BACK_UP_YOUR_MEDIA_MEGAPHONE_PRIMARY_ACTION" = "Îmbunătățește";
@@ -1256,7 +1256,7 @@
 "BACKUPS_BACK_UP_YOUR_MEDIA_MEGAPHONE_TITLE" = "Fă backup pentru toate fișierele media";
 
 /* Body for a Backup plan upsell view encouraging users to subscribe to a paid Backup plan to back up all their media. Embeds {{ the amount of storage included in the paid plan, preformatted as a localized byte count, e.g. '100 GB' }}. */
-"BACKUPS_BACK_UP_YOUR_MEDIA_UPSELL_BODY" = "Abonamentele plătite de Backup-uri securizate Signal îți salvează toate fișierele media până la maximum %1$@. Nu pierde niciodată o imagine sau un videoclip atunci când îți iei un telefon nou sau reinstalezi Signal.";
+"BACKUPS_BACK_UP_YOUR_MEDIA_UPSELL_BODY" = "Abonamentele plătite de Backup-uri securizate Radar îți salvează toate fișierele media până la maximum %1$@. Nu pierde niciodată o imagine sau un videoclip atunci când îți iei un telefon nou sau reinstalezi Radar.";
 
 /* Title for a Backup plan upsell view encouraging users to subscribe to a paid Backup plan to back up all their media. */
 "BACKUPS_BACK_UP_YOUR_MEDIA_UPSELL_TITLE" = "Fă upgrade ca să salvezi toate fișierele";
@@ -1268,7 +1268,7 @@
 "BACKUPS_MEDIA_ERROR_NOTIFICATION_TITLE" = "Eroare la backup-urile media";
 
 /* Body for a megaphone shown on the chat list encouraging users to enable Signal Secure Backups. */
-"BACKUPS_NEVER_LOSE_A_MESSAGE_MEGAPHONE_BODY" = "Activează Backup-uri securizate Signal pentru a păstra mesajele și fișierele media";
+"BACKUPS_NEVER_LOSE_A_MESSAGE_MEGAPHONE_BODY" = "Activează Backup-uri securizate Radar pentru a păstra mesajele și fișierele media";
 
 /* Title for a button on a megaphone encouraging users to enable Signal Secure Backups. */
 "BACKUPS_NEVER_LOSE_A_MESSAGE_MEGAPHONE_PRIMARY_ACTION" = "Activare";
@@ -1277,7 +1277,7 @@
 "BACKUPS_NEVER_LOSE_A_MESSAGE_MEGAPHONE_TITLE" = "Nu pierde niciodată un mesaj";
 
 /* Body for a megaphone shown on the chat list encouraging users to subscribe to a paid Backup plan to save on-device storage space. */
-"BACKUPS_SAVE_SPACE_MEGAPHONE_BODY" = "Backup-uri securizate Signal poate salva spațiu stocare descărcând media.";
+"BACKUPS_SAVE_SPACE_MEGAPHONE_BODY" = "Backup-uri securizate Radar poate salva spațiu stocare descărcând media.";
 
 /* Title for a button on a megaphone encouraging users to subscribe to a paid Backup plan to save on-device storage space, when the user does not yet have Signal Secure Backups enabled. */
 "BACKUPS_SAVE_SPACE_MEGAPHONE_PRIMARY_ACTION_TURN_ON" = "Activare";
@@ -1289,7 +1289,7 @@
 "BACKUPS_SAVE_SPACE_MEGAPHONE_TITLE" = "Economisește spațiu cu backup-uri plătite";
 
 /* Body for a Backup plan upsell view encouraging users to subscribe to a paid Backup plan to save on-device storage space. Embeds {{ the amount of storage space being consumed on-device by media, preformatted as a localized byte count, e.g. '1.2 GB' }}. */
-"BACKUPS_SAVE_SPACE_UPSELL_BODY" = "Signal folosește %1$@ de spațiu de stocare pentru fișiere media. Abonamentele de Backup-uri securizate Signal pot salva spațiu de stocare prin descărcarea fișierelor, în timp ce îți păstrează istoricul conversațiilor în backup.";
+"BACKUPS_SAVE_SPACE_UPSELL_BODY" = "Radar folosește %1$@ de spațiu de stocare pentru fișiere media. Abonamentele de Backup-uri securizate Radar pot salva spațiu de stocare prin descărcarea fișierelor, în timp ce îți păstrează istoricul conversațiilor în backup.";
 
 /* Title for a Backup plan upsell view encouraging users to subscribe to a paid Backup plan to save on-device storage space. */
 "BACKUPS_SAVE_SPACE_UPSELL_TITLE" = "Economisește spațiu cu backup-uri plătite";
@@ -1298,7 +1298,7 @@
 "BACKUPS_SETTINGS_TITLE" = "Backup-uri securizate";
 
 /* Message for an action sheet shown on iPad saying you need to set up backups on your phone */
-"BACKUPS_SETUP_ON_PRIMARY_MESSAGE" = "Pentru a configura backup-urile, deschide aplicația Signal pe iPhone-ul sau dispozitivul Android principal și accesează Setări > Backup-uri.";
+"BACKUPS_SETUP_ON_PRIMARY_MESSAGE" = "Pentru a configura backup-urile, deschide aplicația Radar pe iPhone-ul sau dispozitivul Android principal și accesează Setări > Backup-uri.";
 
 /* Body for system notification or megaphone when backups is enabled. Embeds {{ time backups was enabled }} */
 "BACKUPS_TURNED_ON_NOTIFICATION_BODY_FORMAT" = "Backup-urile Radar au fost activate pentru acest cont la %1$@. Atinge ca să vezi.";
@@ -1655,7 +1655,7 @@
 "CALL_QUALITY_SURVEY_COMPLETION_TOAST" = "Mulțumesc pentru feedback!";
 
 /* Footer text explaining custom issue descriptions in the call quality survey */
-"CALL_QUALITY_SURVEY_CUSTOM_ISSUE_FOOTER" = "Include orice detalii relevante pentru problemă. Orice informații trimiți aici vor rămâne private și vor fi folosite doar pentru a îmbunătăți apelurile în Signal.";
+"CALL_QUALITY_SURVEY_CUSTOM_ISSUE_FOOTER" = "Include orice detalii relevante pentru problemă. Orice informații trimiți aici vor rămâne private și vor fi folosite doar pentru a îmbunătăți apelurile în Radar.";
 
 /* Placeholder text for the custom issue entry in the call quality survey */
 "CALL_QUALITY_SURVEY_CUSTOM_ISSUE_PLACEHOLDER" = "Descrie problema ta";
@@ -1724,7 +1724,7 @@
 "CALL_QUALITY_SURVEY_ISSUES_SHEET_TITLE" = "Ce probleme ai avut?";
 
 /* Header text explaining the purpose of the call quality survey */
-"CALL_QUALITY_SURVEY_RATING_HEADER" = "Acest lucru ne ajută să îmbunătățim apelurile în Signal. Nu vor fi stocate informații personale identificabile.";
+"CALL_QUALITY_SURVEY_RATING_HEADER" = "Acest lucru ne ajută să îmbunătățim apelurile în Radar. Nu vor fi stocate informații personale identificabile.";
 
 /* Title for the initial rating screen in the call quality survey */
 "CALL_QUALITY_SURVEY_RATING_TITLE" = "Cum a fost apelul tău?";
@@ -2111,7 +2111,7 @@
 "CHAT_LIST_BACKUP_PROGRESS_VIEW_RESUME_CELLULAR_DATA_BUTTON" = "Reia";
 
 /* Message shown in an action sheet when the user tries to resume backup using cellular data. */
-"CHAT_LIST_BACKUP_PROGRESS_VIEW_RESUME_CELLULAR_DATA_MESSAGE" = "Dacă faci backup fișierelor media folosind datele mobile poate duce la costuri legate de date. Descărcarea backup-ului poate dura mult timp, așa că menține Signal deschis pentru a evita întreruperile.";
+"CHAT_LIST_BACKUP_PROGRESS_VIEW_RESUME_CELLULAR_DATA_MESSAGE" = "Dacă faci backup fișierelor media folosind datele mobile poate duce la costuri legate de date. Descărcarea backup-ului poate dura mult timp, așa că menține Radar deschis pentru a evita întreruperile.";
 
 /* Title for the action sheet shown when the user tries to resume backup using cellular data. */
 "CHAT_LIST_BACKUP_PROGRESS_VIEW_RESUME_CELLULAR_DATA_TITLE" = "Reiei utilizarea datelor mobile?";
@@ -2243,7 +2243,7 @@
 "CLOCK_SKEW_APP_BLOCKING_DEVICE_TIME_FORMAT" = "Ora dispozitivului tău este %1$@ UTC.";
 
 /* Subtitle for a screen shown when the app can't be used until the user corrects their device's date and time. */
-"CLOCK_SKEW_APP_BLOCKING_SUBTITLE" = "Signal nu poate fi folosit în timp ce data și ora dispozitivului tău sunt incorecte. Deschide Setările pentru a le corecta.";
+"CLOCK_SKEW_APP_BLOCKING_SUBTITLE" = "Radar nu poate fi folosit în timp ce data și ora dispozitivului tău sunt incorecte. Deschide Setările pentru a le corecta.";
 
 /* Title for a screen shown when the app can't be used until the user corrects their device's date and time. */
 "CLOCK_SKEW_APP_BLOCKING_TITLE" = "Data nu este corectă";
@@ -2462,7 +2462,7 @@
 "CONTACT_SHARE_AVATAR_ROW_LABEL" = "Poză";
 
 /* Name of the option to share a contact's Signal profile photo. Read by VoiceOver on the option, and as the current value of the photo row when it's selected. */
-"CONTACT_SHARE_AVATAR_SIGNAL_PHOTO" = "Poză de profil Signal";
+"CONTACT_SHARE_AVATAR_SIGNAL_PHOTO" = "Poză de profil Radar";
 
 /* Name of the option to share a contact's photo from the phone's contacts. Read by VoiceOver on the option, and as the current value of the photo row when it's selected. */
 "CONTACT_SHARE_AVATAR_SYSTEM_CONTACT_PHOTO" = "Poză contacte";
@@ -2477,7 +2477,7 @@
 "CONTACT_SHARE_MESSAGE_BUTTON" = "Mesaj";
 
 /* Notice at the top of the 'Share Contact' view when the shared contact includes their Signal account. Embeds {{ contact name }}. */
-"CONTACT_SHARE_SIGNAL_ACCOUNT_NOTICE_FORMAT" = "Orice persoană cu care partajezi acest profil va putea să-i trimită mesaje lui %1$@ pe Signal.";
+"CONTACT_SHARE_SIGNAL_ACCOUNT_NOTICE_FORMAT" = "Orice persoană cu care partajezi acest profil va putea să-i trimită mesaje lui %1$@ pe Radar.";
 
 /* Alert body when contacts disabled while trying to share a contact. */
 "CONTACT_SHARING_NO_ACCESS_BODY" = "Radar are nevoie de acces la contactele tale. Accesează Setările iOS și activează Contacte. Contactele tale sunt criptate și nu sunt vizibile pentru serviciul Radar.";
@@ -4698,10 +4698,10 @@
 "GROUP_NAME_EDUCATION_SHEET_BULLET_1" = "Ai grijă la grupurile care uzurpă identitatea organizațiilor și companiilor";
 
 /* Second bullet point for the explainer sheet for group names */
-"GROUP_NAME_EDUCATION_SHEET_BULLET_2" = "Signal nu poate verifica numele și pozele";
+"GROUP_NAME_EDUCATION_SHEET_BULLET_2" = "Radar nu poate verifica numele și pozele";
 
 /* Third bullet point for the explainer sheet for group names */
-"GROUP_NAME_EDUCATION_SHEET_BULLET_3" = "Signal nu te va contacta niciodată pentru a-ți cere codul de înregistrare, PIN-ul sau codul de recuperare.";
+"GROUP_NAME_EDUCATION_SHEET_BULLET_3" = "Radar nu te va contacta niciodată pentru a-ți cere codul de înregistrare, PIN-ul sau codul de recuperare.";
 
 /* Fourth bullet point for the explainer sheet for group names */
 "GROUP_NAME_EDUCATION_SHEET_BULLET_4" = "Nu împărtăși informații personale cu persoane pe care nu le cunoști";
@@ -5266,6 +5266,9 @@
 
 /* Placeholder text displayed in empty input box in chat screen. */
 "INPUT_TOOLBAR_MESSAGE_PLACEHOLDER" = "Mesaj";
+/* accessibility label for the button which show up send payemnt screen */
+"INPUT_TOOLBAR_PAYMENTS_BUTTON_ACCESSIBILITY_LABEL" = "Trimite plata";
+
 
 /* accessibility label for the button which shows the sticker picker */
 "INPUT_TOOLBAR_STICKER_BUTTON_ACCESSIBILITY_LABEL" = "Autocolante";
@@ -5490,7 +5493,7 @@
 "LINKED_DEVICE_INFO_SHEET_BULLET_3" = "Anumite setări ale contului sunt gestionate exclusiv pe dispozitivul principal, inclusiv setările contului și copiile de rezervă.";
 
 /* Lead paragraph for a sheet explaining linked devices. The text within the <bold></bold> tags is styled bold. */
-"LINKED_DEVICE_INFO_SHEET_HEADER" = "Funcția <bold>Dispozitive conectate</bold> te lasă să accesezi mesajele și contul Signal în siguranță pe oricare dintre dispozitivele tale suplimentare.";
+"LINKED_DEVICE_INFO_SHEET_HEADER" = "Funcția <bold>Dispozitive conectate</bold> te lasă să accesezi mesajele și contul Radar în siguranță pe oricare dintre dispozitivele tale suplimentare.";
 
 /* Shown in a banner when you tap the 'New Chat' icon at the top of the list of chats. */
 "LINKED_DEVICE_MANAGE_CONTACTS_BANNER" = "Gestionarea contactelor din telefon nu mai este acceptată pe dispozitivele conectate. Acest dispozitiv va continua să sincronizeze orice modificare adusă listei de contacte din aplicația Radar de pe dispozitivul tău principal.";
@@ -5556,7 +5559,7 @@
 "LINKING_DEVICE_FAILED_TITLE" = "Nu s-a putut asocia dispozitivul";
 
 /* Shown when trying to link a device to an account but that device is out of date and must first update its version of Signal. */
-"LINKING_DEVICE_OUT_OF_DATE" = "Celălalt dispozitiv al tău rulează o versiune veche a aplicației Signal. Trebuie să actualizezi aplicația Signal pe dispozitivul respectiv înainte de a-l putea conecta.";
+"LINKING_DEVICE_OUT_OF_DATE" = "Celălalt dispozitiv al tău rulează o versiune veche a aplicației Radar. Trebuie să actualizezi aplicația Radar pe dispozitivul respectiv înainte de a-l putea conecta.";
 
 /* Progress label when the message loading has nearly completed during the device linking process */
 "LINKING_SYNCING_FINALIZING" = "Se finalizează transferul mesajelor…";
@@ -5580,7 +5583,7 @@
 "LOCAL_BACKUP_SETTINGS_CREATE_NEW_KEY_WARNING_SHEET_BODY" = "Crearea unui nou cod este necesară numai dacă l-a aflat altcineva. Backup-urile pe dispozitiv trebuie să fie dezactivate înainte de a crea un nou cod.\n\nDupă dezactivarea Backup-urilor pe dispozitiv și crearea unui cod nou, va trebui să reactivezi Backup-urile pe dispozitiv.";
 
 /* Body for an error sheet shown when the user's folder choice does not contain a backup file. */
-"LOCAL_BACKUPS_MISSING_BACKUP_ACTION_SHEET_BODY" = "Nu a fost găsit niciun backup Signal în folderul selectat. Încearcă un folder diferit.";
+"LOCAL_BACKUPS_MISSING_BACKUP_ACTION_SHEET_BODY" = "Nu a fost găsit niciun backup Radar în folderul selectat. Încearcă un folder diferit.";
 
 /* Title for an error sheet shown when the user's folder choice does not contain a backup file. */
 "LOCAL_BACKUPS_MISSING_BACKUP_ACTION_SHEET_TITLE" = "Nu s-a găsit backup";
@@ -5628,7 +5631,7 @@
 "LOCAL_FILE_BACKUP_ONBOARDING_INTRO_BULLET_3" = "Dezactivează backup-urile oricând";
 
 /* Subtitle for a view introducing local file backups during the onboarding flow. */
-"LOCAL_FILE_BACKUP_ONBOARDING_INTRO_SUBTITLE" = "Fă un backup al mesajelor într-un dosar de pe dispozitiv. Backup-ul tău este criptat end-to-end și poate fi restaurat dacă instalezi o nouă copie Signal și alegi Restaurează sau transferă.";
+"LOCAL_FILE_BACKUP_ONBOARDING_INTRO_SUBTITLE" = "Fă un backup al mesajelor într-un dosar de pe dispozitiv. Backup-ul tău este criptat end-to-end și poate fi restaurat dacă instalezi o nouă copie Radar și alegi Restaurează sau transferă.";
 
 /* Title for a view introducing local file backups during the onboarding flow. */
 "LOCAL_FILE_BACKUP_ONBOARDING_INTRO_TITLE" = "Backup-uri pe dispozitiv";
@@ -5643,10 +5646,10 @@
 "LOCAL_FILE_BACKUPS_CHOOSE_FOLDER_TITLE" = "Alege dosarul";
 
 /* Warning shown when a user tries to enable local file backups with optimize media enabled */
-"LOCAL_FILE_BACKUPS_OPTIMIZE_MEDIA_WARNING_ACTION_SHEET" = "Opțiunea „Optimizare stocare Signal” este activată. Dacă dorești să incluzi toate fișierele media în copia de rezervă de pe dispozitiv, dezactivează această setare.";
+"LOCAL_FILE_BACKUPS_OPTIMIZE_MEDIA_WARNING_ACTION_SHEET" = "Opțiunea „Optimizare stocare Radar” este activată. Dacă dorești să incluzi toate fișierele media în copia de rezervă de pe dispozitiv, dezactivează această setare.";
 
 /* Message for a sheet warning the user about enabling Optimize Storage with local backups enabled. */
-"LOCAL_FILE_BACKUPS_OPTIMIZE_MEDIA_WARNING_ACTION_SHEET_2_BODY" = "Activarea opțiunii „Optimizare stocare Signal” va elimina fișierele media vechi de pe dispozitivul tău. Îl poți descărca din nou oricând. În plus, va elimina fișierele media vechi din backup-ul de pe dispozitiv.";
+"LOCAL_FILE_BACKUPS_OPTIMIZE_MEDIA_WARNING_ACTION_SHEET_2_BODY" = "Activarea opțiunii „Optimizare stocare Radar” va elimina fișierele media vechi de pe dispozitivul tău. Îl poți descărca din nou oricând. În plus, va elimina fișierele media vechi din backup-ul de pe dispozitiv.";
 
 /* Title for a sheet warning the user about enabling Optimize Storage with local backups enabled. */
 "LOCAL_FILE_BACKUPS_OPTIMIZE_MEDIA_WARNING_ACTION_SHEET_2_TITLE" = "Fișierele media vor fi eliminate din backupul de pe dispozitiv";
@@ -5676,10 +5679,10 @@
 "LONG_TEXT_VIEW_TITLE" = "Mesaj";
 
 /* Message for a sheet warning the user that their device is low on storage space. Embeds 1:{{ the localized name of the user's device model, e.g. iPhone }}; 2:{{ an amount of storage space as a file size, e.g. 1 GB }}. */
-"LOW_DISK_SPACE_WARNING_SHEET_MESSAGE_FORMAT" = "%1$@ tău nu mai are prea mult spațiu de stocare. Dacă se ocupă, Signal nu va mai funcționa și ai putea pierde datele. Eliberează cel puțin %2$@ de spațiu.";
+"LOW_DISK_SPACE_WARNING_SHEET_MESSAGE_FORMAT" = "%1$@ tău nu mai are prea mult spațiu de stocare. Dacă se ocupă, Radar nu va mai funcționa și ai putea pierde datele. Eliberează cel puțin %2$@ de spațiu.";
 
 /* A suggestion for freeing up storage space, on a sheet warning the user that their device is low on storage space. */
-"LOW_DISK_SPACE_WARNING_SHEET_SUGGESTION_DELETE_CAMERA_ROLL_MEDIA" = "Elimină videoclipuri de dimensiuni mari din aplicația „Fotografii”, din Signal sau din alte aplicații de mesagerie";
+"LOW_DISK_SPACE_WARNING_SHEET_SUGGESTION_DELETE_CAMERA_ROLL_MEDIA" = "Elimină videoclipuri de dimensiuni mari din aplicația „Fotografii”, din Radar sau din alte aplicații de mesagerie";
 
 /* A suggestion for freeing up storage space, on a sheet warning the user that their device is low on storage space. */
 "LOW_DISK_SPACE_WARNING_SHEET_SUGGESTION_DELETE_DOWNLOADED_MEDIA" = "Șterge muzica descărcată sau alte fișiere";
@@ -5844,7 +5847,7 @@
 "MEMBER_LABEL_VIEW_TITLE" = "Etichetă de membru";
 
 /* A one-time confirmation that you, as an admin, want to delete for everyone */
-"MESSAGE_ACTION_ADMIN_DELETE_FOR_EVERYONE_CONFIRMATION" = "Membrii grupurilor cu cele mai recente versiuni Signal vor vedea că ai eliminat aceste mesaje.";
+"MESSAGE_ACTION_ADMIN_DELETE_FOR_EVERYONE_CONFIRMATION" = "Membrii grupurilor cu cele mai recente versiuni Radar vor vedea că ai eliminat aceste mesaje.";
 
 /* Action sheet button title */
 "MESSAGE_ACTION_COPY_TEXT" = "Copiază textul mesajului";
@@ -6045,7 +6048,7 @@
 "MESSAGE_REQUEST_CONFIRM_ACCEPT_MESSAGE" = "Acceptă cereri doar de la persoane în care ai încredere. %1$@ ți-a cerut în mesaj un code de înregistrare, PIN sau cod de recuperare.";
 
 /* Embedded text in the message for an action sheet asking the user to confirm if they want to accept a message request. */
-"MESSAGE_REQUEST_CONFIRM_ACCEPT_MESSAGE_EMBEDDED_BOLD_TEXT" = "Signal nu ar face asta niciodată";
+"MESSAGE_REQUEST_CONFIRM_ACCEPT_MESSAGE_EMBEDDED_BOLD_TEXT" = "Radar nu ar face asta niciodată";
 
 /* Title for an action sheet asking the user to confirm if they want to accept a message request */
 "MESSAGE_REQUEST_CONFIRM_ACCEPT_TITLE" = "Accepți cererea?";
@@ -6492,13 +6495,13 @@
 "NO_OTHER_GROUPS_IN_COMMON" = "Nu există alte grupuri în comun.";
 
 /* Shown in place of the text input box in a conversation when the user is no longer registered can't send messages. The embedded value is 'Re-link' (translated via NOT_LINKED_BOTTOM_RELINK), and it will be formatted as a tappable link. */
-"NOT_LINKED_BOTTOM" = "Dispozitivul nu mai este asociat. %1$@ pentru a continua să utilizezi Signal pe acest dispozitiv.";
+"NOT_LINKED_BOTTOM" = "Dispozitivul nu mai este asociat. %1$@ pentru a continua să utilizezi Radar pe acest dispozitiv.";
 
 /* Shown in place of the text input box in a conversation when the user is no longer registered can't send messages. This value is a tappable link embedded in a larger sentence. */
 "NOT_LINKED_BOTTOM_RELINK" = "Asociază din nou";
 
 /* Shown in place of the text input box in a conversation when the user is no longer registered can't send messages. The embedded value is 'Re-register' (translated via NOT_REGISTERED_BOTTOM_REREGISTER), and it will be formatted as a tappable link. */
-"NOT_REGISTERED_BOTTOM" = "Acest dispozitiv nu mai este înregistrat. %1$@ pentru a continua să utilizezi Signal.";
+"NOT_REGISTERED_BOTTOM" = "Acest dispozitiv nu mai este înregistrat. %1$@ pentru a continua să utilizezi Radar.";
 
 /* Shown in place of the text input box in a conversation when the user is no longer registered can't send messages. This value is a tappable link embedded in a larger sentence. */
 "NOT_REGISTERED_BOTTOM_REREGISTER" = "Înregistrează din nou";
@@ -6510,13 +6513,13 @@
 "NOTE_TO_SELF" = "Notă personală";
 
 /* Body for a notification shown when Signal can't fetch messages because the device's date and time are incorrect. */
-"NOTIFICATION_BODY_CLOCK_SKEW" = "Signal nu poate primi mesaje în timp ce data și ora dispozitivului este incorect. Deschide Setări ca să le corectezi.";
+"NOTIFICATION_BODY_CLOCK_SKEW" = "Radar nu poate primi mesaje în timp ce data și ora dispozitivului este incorect. Deschide Setări ca să le corectezi.";
 
 /* Body for a notification representing a message request. */
 "NOTIFICATION_BODY_INCOMING_MESSAGE_REQUEST" = "Solicitare mesaj";
 
 /* Body for a notification shown when Signal can't fetch messages because the device is low on storage space. */
-"NOTIFICATION_BODY_LOW_STORAGE_SPACE" = "Este posibil să ai mesaje noi, dar dispozitivul tău nu dispune de suficient spațiu de stocare pentru ca aplicația Signal să funcționeze. Apasă pentru mai multe informații.";
+"NOTIFICATION_BODY_LOW_STORAGE_SPACE" = "Este posibil să ai mesaje noi, dar dispozitivul tău nu dispune de suficient spațiu de stocare pentru ca aplicația Radar să funcționeze. Apasă pentru mai multe informații.";
 
 /* Lock screen notification text presented after user powers on their device without unlocking. Embeds {{device model}} (either 'iPad' or 'iPhone') */
 "NOTIFICATION_BODY_PHONE_LOCKED_FORMAT" = "Este posibil să fi primit mesaje în timp ce %1$@-ul se repornea.";
@@ -6615,10 +6618,10 @@
 "ONBOARDING_CHOOSE_BACKUP_SHEET_TITLE" = "Alege un backup de restaurat";
 
 /* The body for the device transfer 'choice' view 'restore backup' option */
-"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_BODY" = "Restaurează contul și mesajele din Radar/Radar Backup";
+"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_BODY" = "Restaurează contul și mesajele din Signal/Radar Backup";
 
 /* The title for the device transfer 'choice' view 'restore backup' option */
-"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_TITLE" = "Restaurare Backup-uri securizate Radar/Radar";
+"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_TITLE" = "Restaurare Backup-uri securizate Signal/Radar";
 
 /* Body for a sheet warning users about skipping restore. */
 "ONBOARDING_CHOOSE_RESTORE_METHOD_CONFIRM_SKIP_RESTORE_BODY" = "Dacă sari peste restaurare acum, nu vei putea restabili mai târziu. Dacă reactivezi backup-urile pe acest dispozitiv, backup-ul actual va fi înlocuit cu noul istoric de mesaje.";
@@ -6696,7 +6699,7 @@
 "ONBOARDING_MODE_SWITCH_EXPLANATION_PROVISIONING" = "Apăsând pe \"Înregistrare iPad\" poți crea un nou cont Radar sau poți muta un cont existent pe acest iPad. Acest lucru va dezactiva Radar pe orice alt dispozitiv înregistrat în prezent cu același număr de telefon.";
 
 /* explanation to the user they're switching from registering to linking flow */
-"ONBOARDING_MODE_SWITCH_EXPLANATION_REGISTERING" = "Dacă atingi „Conectează acest dispozitiv” vei conecta dispozitivul la un cont existent Signal.";
+"ONBOARDING_MODE_SWITCH_EXPLANATION_REGISTERING" = "Dacă atingi „Conectează acest dispozitiv” vei conecta dispozitivul la un cont existent Radar.";
 
 /* header text indicating to the user they're switching from linking to registering flow */
 "ONBOARDING_MODE_SWITCH_TITLE_PROVISIONING" = "Înregistrează acest iPad";
@@ -6783,13 +6786,13 @@
 "ONBOARDING_SIGN_UP_USE_SIGNAL_ACCOUNT_BUTTON_TITLE" = "Use my Signal account";
 
 /* Explanation of 'do not have old device' flow for the 'Restore or Transfer' prompt */
-"ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_BODY" = "Sau reinstalează Radar/Radar pe același dispozitiv";
+"ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_BODY" = "Sau reinstalează Signal/Radar pe același dispozitiv";
 
 /* Title for the 'do not have my old device' choice of the 'Restore or Transfer' prompt */
 "ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_TITLE" = "Nu am telefonul meu vechi";
 
 /* Explanation of 'have old device' flow for the 'Restore or Transfer' prompt */
-"ONBOARDING_SPLASH_HAVE_OLD_DEVICE_BODY" = "Scanează un cod QR din contul tău Radar/Radar curent pentru a începe rapid";
+"ONBOARDING_SPLASH_HAVE_OLD_DEVICE_BODY" = "Scanează un cod QR din contul tău Signal/Radar curent pentru a începe rapid";
 
 /* Title for the 'have my old device' choice of the 'Restore or Transfer' prompt */
 "ONBOARDING_SPLASH_HAVE_OLD_DEVICE_TITLE" = "Am vechiul meu telefon";
@@ -7033,7 +7036,7 @@ Send money securely.";
 "OVERSIZE_TEXT_UNAVAILABLE_SHEET_TITLE" = "Mesaj complet nu este disponibil";
 
 /* The name of the Signal app, used as the title for an entry in a user's password manager for their Signal Recovery Key. Should be localized with the same value as the app's name in the iOS App Store. */
-"PASSWORD_MANAGER_SIGNAL_APP_NAME" = "Signal - Mesaje Private";
+"PASSWORD_MANAGER_SIGNAL_APP_NAME" = "Radar - Mesaje Private";
 
 /* Header title for bank payment details screen */
 "PAYMENT_DETAILS_BANK_TITLE" = "Transfer bancar";
@@ -7924,10 +7927,10 @@ Send money securely.";
 "PROFILE_NAME_CHANGE_SYSTEM_NONCONTACT_FORMAT" = "%1$@ și-a schimbat numele profilului în %2$@.";
 
 /* First bullet point for the explainer sheet for profile names */
-"PROFILE_NAME_EDUCATION_SHEET_BULLET_1" = "Signal nu poate verifica numele și pozele";
+"PROFILE_NAME_EDUCATION_SHEET_BULLET_1" = "Radar nu poate verifica numele și pozele";
 
 /* Second bullet point for the explainer sheet for profile names */
-"PROFILE_NAME_EDUCATION_SHEET_BULLET_2" = "Signal nu te va contacta niciodată pentru a-ți cere codul de înregistrare, PIN-ul sau codul de recuperare.";
+"PROFILE_NAME_EDUCATION_SHEET_BULLET_2" = "Radar nu te va contacta niciodată pentru a-ți cere codul de înregistrare, PIN-ul sau codul de recuperare.";
 
 /* Third bullet point for the explainer sheet for profile names */
 "PROFILE_NAME_EDUCATION_SHEET_BULLET_3" = "Ai grijă la conturile care uzurpă identitatea altora";
@@ -8035,7 +8038,7 @@ Send money securely.";
 "QUICK_RESTORE_URL_OPENED_ACTION_SHEET_EXTERNAL_URL_ACTION_TITLE" = "Scanează Codul QR";
 
 /* Message for an action sheet telling users how to use quick restore, when trying to open an external quick restore URL. */
-"QUICK_RESTORE_URL_OPENED_ACTION_SHEET_EXTERNAL_URL_MESSAGE" = "Pentru a transfera acest cont pe un dispozitiv nou, atinge „Continuare” și scanează codul QR cu camera Signal. Asigură-te că scanezi doar codurile QR care vin direct de la Signal.";
+"QUICK_RESTORE_URL_OPENED_ACTION_SHEET_EXTERNAL_URL_MESSAGE" = "Pentru a transfera acest cont pe un dispozitiv nou, atinge „Continuare” și scanează codul QR cu camera Radar. Asigură-te că scanezi doar codurile QR care vin direct de la Radar.";
 
 /* Accessibility label stating the author of the message to which you are replying. Embeds: {{ the author of the message to which you are replying }} {{ original message }}. */
 "QUOTED_REPLY_ACCESSIBILITY_LABEL_FORMAT" = "Îi răspunzi lui %1$@. %2$@";
@@ -8203,7 +8206,7 @@ Send money securely.";
 "REGISTER_WITHOUT_NUMBER" = "Înregistrează-te fără număr";
 
 /* Short description for a sheet warning users about an incorrect recovery key used for registration. */
-"REGISTRATION_BACKUP_REGISTRATION_ERROR_INCORRECT_KEY_BODY" = "Asigură-te că te înregistrezi cu același număr de telefon și cod de recuperare de 64 de caractere pe care le-ai salvat când ai activat backup-urile Signal. Backup-urile nu pot fi recuperate fără acest cod.";
+"REGISTRATION_BACKUP_REGISTRATION_ERROR_INCORRECT_KEY_BODY" = "Asigură-te că te înregistrezi cu același număr de telefon și cod de recuperare de 64 de caractere pe care le-ai salvat când ai activat backup-urile Radar. Backup-urile nu pot fi recuperate fără acest cod.";
 
 /* Title for a sheet warning users about an incorrect recovery key used for registration. */
 "REGISTRATION_BACKUP_REGISTRATION_ERROR_INCORRECT_KEY_TITLE" = "Cod de recuperare incorect";
@@ -8212,7 +8215,7 @@ Send money securely.";
 "REGISTRATION_BACKUP_REGISTRATION_ERROR_INCORRECT_KEY_TRY_PIN_ACTION" = "Înregistrează altă metodă";
 
 /* Message body for a sheet asking users if they would rather use PIN/SMS for registration. */
-"REGISTRATION_BACKUP_REGISTRATION_ERROR_INCORRECT_KEY_TRY_PIN_MESSAGE" = "Poți să-ți înregistrezi contul prin verificare printr-un cod SMS pe care Signal ți-l va trimite sau introducându-ți PIN-ul. După înregistrare, poți încerca din nou să îți restaurezi backup-ul cu codul de recuperare.";
+"REGISTRATION_BACKUP_REGISTRATION_ERROR_INCORRECT_KEY_TRY_PIN_MESSAGE" = "Poți să-ți înregistrezi contul prin verificare printr-un cod SMS pe care Radar ți-l va trimite sau introducându-ți PIN-ul. După înregistrare, poți încerca din nou să îți restaurezi backup-ul cu codul de recuperare.";
 
 /* Title for a sheet asking users if they would rather use PIN/SMS for registration. */
 "REGISTRATION_BACKUP_REGISTRATION_ERROR_INCORRECT_KEY_TRY_PIN_TITLE" = "Verifici cu SMS sau cu PIN?";
@@ -8269,7 +8272,7 @@ Send money securely.";
 "REGISTRATION_BACKUP_RESTORE_ERROR_LOCAL_BACKUP_LOCATION_TITLE" = "Nu se poate restabili backup-ul";
 
 /* Message for a sheet telling the user that their phone number is mismatched with their recovery key used for making a local backup */
-"REGISTRATION_BACKUP_RESTORE_ERROR_MISMATCHED_LOCAL_BACKUP_MESSAGE" = "Backup-ul pe care încerci să-l restaurezi a fost creat folosind un alt cont Signal. Ca să restaurezi backup-ul, trebuie să folosești același număr de telefon și cod de recuperare pe care le-ai salvat când ai activat backup-urile pe dispozitiv.";
+"REGISTRATION_BACKUP_RESTORE_ERROR_MISMATCHED_LOCAL_BACKUP_MESSAGE" = "Backup-ul pe care încerci să-l restaurezi a fost creat folosind un alt cont Radar. Ca să restaurezi backup-ul, trebuie să folosești același număr de telefon și cod de recuperare pe care le-ai salvat când ai activat backup-urile pe dispozitiv.";
 
 /* Body for a sheet warning users about a network error during backup restore. */
 "REGISTRATION_BACKUP_RESTORE_ERROR_NETWORK_BODY" = "Backup-ul tău nu poate fi restaurat acum. Verifică conexiunea la internet a telefonului și încearcă din nou.";
@@ -8761,7 +8764,7 @@ Send money securely.";
 "RING_ON_CONFIRMATION_TOAST_LABEL" = "Sunet de apel activat";
 
 /* Message shown in an action sheet when attempting to disable PIN, but Backups is enabled. */
-"ROTATE_AEP_ACTION_BACKUPS_DISABLE_REQUIRED" = "Trebuie să dezactivezi Backup-uri securizate Signal înainte să continui.";
+"ROTATE_AEP_ACTION_BACKUPS_DISABLE_REQUIRED" = "Trebuie să dezactivezi Backup-uri securizate Radar înainte să continui.";
 
 /* button title to confirm adding a recipient when their safety number has recently changed */
 "SAFETY_NUMBER_CHANGED_CONFIRM_ADD_MEMBER_ACTION" = "Adaugă Oricum";
@@ -8803,13 +8806,13 @@ Send money securely.";
 "SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_BUTTON_VERIFYING" = "Se verifică criptarea…";
 
 /* Body for a sheet introducing Key Transparency. */
-"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_EDUCATION_SHEET_BODY" = "Pentru persoanele cu care te-ai conectat prin numărul de telefon, Signal poate confirma automat dacă conexiunea este sigură folosind un proces numit transparență privind codurile. Pentru o securitate sporită, poți verifica în continuare conexiunile manual folosind un cod QR sau comparând numerele de siguranță.";
+"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_EDUCATION_SHEET_BODY" = "Pentru persoanele cu care te-ai conectat prin numărul de telefon, Radar poate confirma automat dacă conexiunea este sigură folosind un proces numit transparență privind codurile. Pentru o securitate sporită, poți verifica în continuare conexiunile manual folosind un cod QR sau comparând numerele de siguranță.";
 
 /* Title for a sheet introducing Key Transparency. */
-"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_EDUCATION_SHEET_TITLE" = "Signal poate acum verifica automat criptarea";
+"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_EDUCATION_SHEET_TITLE" = "Radar poate acum verifica automat criptarea";
 
 /* Body for a sheet explaining that encryption auto-verification did not succeed. Embeds {{ 1: the contact's name }}. */
-"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_FAILURE_SHEET_BODY_FORMAT" = "Signal nu mai poate verifica automat criptarea pentru acest chat. Probabil acest lucru se datorează faptului că %1$@ și-a schimbat numărul de telefon sau setările de confidențialitate a numărului de telefon. Verifică manual criptarea end-to-end comparând numerele de pe ecranul anterior sau scanând codul de pe dispozitivul său.";
+"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_FAILURE_SHEET_BODY_FORMAT" = "Radar nu mai poate verifica automat criptarea pentru acest chat. Probabil acest lucru se datorează faptului că %1$@ și-a schimbat numărul de telefon sau setările de confidențialitate a numărului de telefon. Verifică manual criptarea end-to-end comparând numerele de pe ecranul anterior sau scanând codul de pe dispozitivul său.";
 
 /* Title for a sheet explaining that encryption auto-verification did not succeed. */
 "SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_FAILURE_SHEET_TITLE" = "Verificarea automată nu mai este disponibilă pentru acest chat";
@@ -8821,13 +8824,13 @@ Send money securely.";
 "SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_HEADER" = "Verificare automată a codului";
 
 /* Body for a sheet explaining that encryption auto-verification is not available. */
-"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_NOT_AVAILABLE_SHEET_BODY" = "Signal poate verifica automat criptarea doar în conversațiile în care ești conectat cu cineva prin intermediul unui număr de telefon. Dacă chatul a fost inițiat cu un nume de utilizator sau un grup comun, verifică criptarea end-to-end comparând numerele de pe ecranul anterior sau scanând codul pe dispozitivul utilizatorului.";
+"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_NOT_AVAILABLE_SHEET_BODY" = "Radar poate verifica automat criptarea doar în conversațiile în care ești conectat cu cineva prin intermediul unui număr de telefon. Dacă chatul a fost inițiat cu un nume de utilizator sau un grup comun, verifică criptarea end-to-end comparând numerele de pe ecranul anterior sau scanând codul pe dispozitivul utilizatorului.";
 
 /* Title for a sheet explaining that encryption auto-verification is not available. */
 "SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_NOT_AVAILABLE_SHEET_TITLE" = "Verificarea automată nu este disponibilă pentru acest chat";
 
 /* Body for a sheet explaining that encryption auto-verification succeeded. */
-"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_SUCCESS_SHEET_BODY" = "Pentru contactele la care ești conectat prin numărul de telefon, Signal poate confirma automat dacă conexiunea este sigură folosind un proces numit transparență a cheilor. Pentru o securitate sporită, verifică manual criptarea end-to-end comparând numerele de pe ecranul anterior sau scanând codul de pe dispozitivul utilizatorului.";
+"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_SUCCESS_SHEET_BODY" = "Pentru contactele la care ești conectat prin numărul de telefon, Radar poate confirma automat dacă conexiunea este sigură folosind un proces numit transparență a cheilor. Pentru o securitate sporită, verifică manual criptarea end-to-end comparând numerele de pe ecranul anterior sau scanând codul de pe dispozitivul utilizatorului.";
 
 /* Title for a sheet explaining that encryption auto-verification succeeded. */
 "SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_SUCCESS_SHEET_TITLE" = "Criptarea a fost verificată automat pentru acest chat";
@@ -8842,7 +8845,7 @@ Send money securely.";
 "SAFETY_TIPS_CRYPTO_TITLE" = "Escrocherii cu cripto sau bani";
 
 /* Message body describing the enable reglock safety tip. */
-"SAFETY_TIPS_ENABLE_REGLOCK_BODY" = "Protejează-ți contul cerând PIN-ul Signal, în plus pe lângă codul de verificare, la înregistrarea pe Signal.";
+"SAFETY_TIPS_ENABLE_REGLOCK_BODY" = "Protejează-ți contul cerând PIN-ul Radar, în plus pe lângă codul de verificare, la înregistrarea pe Radar.";
 
 /* Message title describing the enable reglock safety tip. */
 "SAFETY_TIPS_ENABLE_REGLOCK_TITLE" = "Activează blocarea înregistrării din setările de cont";
@@ -8875,22 +8878,22 @@ Send money securely.";
 "SAFETY_TIPS_MESSAGE_LINKS_TITLE" = "Mesaje cu linkuri web";
 
 /* Message body describing the review names safety tip. */
-"SAFETY_TIPS_REVIEW_NAMES_BODY" = "Ai grijă la mesajul Numele nu a fost verificat. Fiecare își stabilește propriul nume de profil în Signal.";
+"SAFETY_TIPS_REVIEW_NAMES_BODY" = "Ai grijă la mesajul Numele nu a fost verificat. Fiecare își stabilește propriul nume de profil în Radar.";
 
 /* Message body describing the review names safety tip in the 'view more' flow. */
-"SAFETY_TIPS_REVIEW_NAMES_BODY_VIEW_MORE" = "Ai grijă la mesajul Numele nu a fost verificat. Toată lumea își alege numele de profil și poza în Signal. Dacă îți e clar de la cine e o nouă cerere, e mai sigur să o ignori.";
+"SAFETY_TIPS_REVIEW_NAMES_BODY_VIEW_MORE" = "Ai grijă la mesajul Numele nu a fost verificat. Toată lumea își alege numele de profil și poza în Radar. Dacă îți e clar de la cine e o nouă cerere, e mai sigur să o ignori.";
 
 /* Message title describing the review names safety tip. */
 "SAFETY_TIPS_REVIEW_NAMES_TITLE" = "Verifică numele și fotografiile";
 
 /* Message body describing the signal chats tip. */
-"SAFETY_TIPS_SIGNAL_CHATS_BODY" = "Signal nu îți va da niciodată mesaj în care să îți ceară codul de înregistrare, PIN-ul sau codul de recuperare. Nu răspunde niciodată la o conversație de la cineva care pretinde că e Signal.";
+"SAFETY_TIPS_SIGNAL_CHATS_BODY" = "Radar nu îți va da niciodată mesaj în care să îți ceară codul de înregistrare, PIN-ul sau codul de recuperare. Nu răspunde niciodată la o conversație de la cineva care pretinde că e Radar.";
 
 /* Message body describing the signal chats tip in the 'view more' flow. */
-"SAFETY_TIPS_SIGNAL_CHATS_BODY_VIEW_MORE" = "Signal nu îți va da niciodată mesaj în care să îți ceară codul de înregistrare, PIN-ul sau codul de recuperare. Nu răspunde mesajelor care pretind că sunt de la Signal sau de la Asistența Signal. Cei care înșală aranjează conversații false ca să încerce să îți preia contul.";
+"SAFETY_TIPS_SIGNAL_CHATS_BODY_VIEW_MORE" = "Radar nu îți va da niciodată mesaj în care să îți ceară codul de înregistrare, PIN-ul sau codul de recuperare. Nu răspunde mesajelor care pretind că sunt de la Radar sau de la Asistența Radar. Cei care înșală aranjează conversații false ca să încerce să îți preia contul.";
 
 /* Message title describing the signal chats tip. */
-"SAFETY_TIPS_SIGNAL_CHATS_TITLE" = "Nu răspunde la conversații de la Signal";
+"SAFETY_TIPS_SIGNAL_CHATS_TITLE" = "Nu răspunde la conversații de la Radar";
 
 /* Message contents for the vague message safety tip. */
 "SAFETY_TIPS_VAGUE_MESSAGE_BODY" = "Spammerii încep adesea cu un mesaj simplu, cum ar fi \"Bună\", pentru a te atrage. Dacă răspunzi, este posibil să te apeleze în continuare.";
@@ -9025,10 +9028,10 @@ Send money securely.";
 "SECONDARY_ONBOARDING_SCAN_CODE_STEP_LINK_DEVICE" = "Atinge „Dispozitive conectate”";
 
 /* First bullet point on the QR code screen for linking a device */
-"SECONDARY_ONBOARDING_SCAN_CODE_STEP_OPEN_PRIMARY" = "Deschide Signal pe dispozitivul principal";
+"SECONDARY_ONBOARDING_SCAN_CODE_STEP_OPEN_PRIMARY" = "Deschide Radar pe dispozitivul principal";
 
 /* Second bullet point on the QR code screen for linking a device */
-"SECONDARY_ONBOARDING_SCAN_CODE_STEP_OPEN_SETTINGS" = "Atinge imaginea de profil ca să deschizi Setări Signal";
+"SECONDARY_ONBOARDING_SCAN_CODE_STEP_OPEN_SETTINGS" = "Atinge imaginea de profil ca să deschizi Setări Radar";
 
 /* header text while displaying a QR code which, when scanned, will link this device. */
 "SECONDARY_ONBOARDING_SCAN_CODE_TITLE" = "Scanează acest cod pentru a-ți conecta contul";
@@ -9067,13 +9070,13 @@ Send money securely.";
 "SELECT_CONTACT_FOR_SHARING_PERMISSION_PROMPT_ALLOW_BUTTON" = "Permite accesul";
 
 /* Body of the prompt on the 'Select Contact' view that asks the user to allow access to their contacts. */
-"SELECT_CONTACT_FOR_SHARING_PERMISSION_PROMPT_BODY" = "Permite accesul la contacte. Contactele tale sunt criptate și nu sunt vizibile pentru serviciul Signal.";
+"SELECT_CONTACT_FOR_SHARING_PERMISSION_PROMPT_BODY" = "Permite accesul la contacte. Contactele tale sunt criptate și nu sunt vizibile pentru serviciul Radar.";
 
 /* Button on the 'Select Contact' view's contacts permission prompt that hides the prompt. */
 "SELECT_CONTACT_FOR_SHARING_PERMISSION_PROMPT_DISMISS_BUTTON" = "Nu, mulțumesc";
 
 /* Title of the prompt on the 'Select Contact' view that asks the user to allow access to their contacts. */
-"SELECT_CONTACT_FOR_SHARING_PERMISSION_PROMPT_TITLE" = "Găsește persoane pe care le cunoști pe Signal";
+"SELECT_CONTACT_FOR_SHARING_PERMISSION_PROMPT_TITLE" = "Găsește persoane pe care le cunoști pe Radar";
 
 /* Placeholder text for the search bar on the 'Select Contact' view */
 "SELECT_CONTACT_FOR_SHARING_SEARCH_BAR_PLACEHOLDER" = "Caută";
@@ -9460,7 +9463,7 @@ Send money securely.";
 "SETTINGS_KEEP_MUTED_ARCHIVED_LABEL" = "Păstrează arhivate conversațiile pe silențios";
 
 /* Footer for settings section describing Key Transparency. */
-"SETTINGS_KEY_TRANSPARENCY_OPT_OUT_FOOTER" = "Când este activat, Signal va încerca să verifice automat criptarea conversațiilor 1:1.";
+"SETTINGS_KEY_TRANSPARENCY_OPT_OUT_FOOTER" = "Când este activat, Radar va încerca să verifice automat criptarea conversațiilor 1:1.";
 
 /* Title for for a settings option describing that Key Transparency is enabled. */
 "SETTINGS_KEY_TRANSPARENCY_OPT_OUT_SWITCH_TITLE" = "Verificare automată a codului";
@@ -9475,7 +9478,7 @@ Send money securely.";
 "SETTINGS_LINK_PREVIEWS_FOOTER" = "Obține previzualizările link-urilor direct de pe site-urile web pentru mesajele pe care le trimiți.";
 
 /* Subtitle of a card on a linked device's account settings, explaining that account settings are managed on the primary device. */
-"SETTINGS_LINKED_DEVICE_ACCOUNT_CARD_SUBTITLE" = "Ca să-ți gestionezi setările contului, deschide Signal pe dispozitivul principal.";
+"SETTINGS_LINKED_DEVICE_ACCOUNT_CARD_SUBTITLE" = "Ca să-ți gestionezi setările contului, deschide Radar pe dispozitivul principal.";
 
 /* Title of a card on a linked device's account settings, indicating that this is a linked device. */
 "SETTINGS_LINKED_DEVICE_ACCOUNT_CARD_TITLE" = "Acesta este un dispozitiv asociat";
@@ -9484,7 +9487,7 @@ Send money securely.";
 "SETTINGS_LINKED_DEVICE_DELETE_DATA_BUTTON" = "Elimină datele aplicației";
 
 /* Footer below the 'delete app data' button, shown on a linked device's account settings. */
-"SETTINGS_LINKED_DEVICE_DELETE_DATA_FOOTER" = "Această acțiune va șterge toate datele din aplicația Signal de pe acest dispozitiv.";
+"SETTINGS_LINKED_DEVICE_DELETE_DATA_FOOTER" = "Această acțiune va șterge toate datele din aplicația Radar de pe acest dispozitiv.";
 
 /* Text for a toast confirming the user changed their local file backup location. */
 "SETTINGS_LOCAL_FILE_BACKUP_FOLDER_UPDATED" = "Dosarul de backup actualizat";
@@ -9508,7 +9511,7 @@ Send money securely.";
 "SETTINGS_LOCAL_FILE_BACKUPS_LAST_BACKUP_DATE" = "Ultimul backup";
 
 /* Message for an action sheet when a user cannot perform a remote backup because a local backup is in progress */
-"SETTINGS_LOCAL_FILE_BACKUPS_LOCAL_BACKUP_IN_PROGRESS_MESSAGE" = "Nu s-a putut realiza un Backup securizat Signal deoarece un backup pe dispozitiv este în desfășurare. Încearcă mai târziu.";
+"SETTINGS_LOCAL_FILE_BACKUPS_LOCAL_BACKUP_IN_PROGRESS_MESSAGE" = "Nu s-a putut realiza un Backup securizat Radar deoarece un backup pe dispozitiv este în desfășurare. Încearcă mai târziu.";
 
 /* Label for a progress bar while attachments are being copied for an on-device backup. Embeds 1:{{%1$@ completed bytes copied, %2$@ total bytes to copy, %3$@ percentage complete }}. */
 "SETTINGS_LOCAL_FILE_BACKUPS_PROGRESS_COPYING_ATTACHMENTS" = "Se creează un backup pe dispozitiv %1$@ din %2$@ (%3$@)";
@@ -9523,10 +9526,10 @@ Send money securely.";
 "SETTINGS_LOCAL_FILE_BACKUPS_PROGRESS_RESTORING_ATTACHMENTS" = "Se restaurează backup-ul de pe dispozitiv (%1$@ din %2$@)";
 
 /* Message for an action sheet when a user cannot perform a local backup because a remote backup is in progress */
-"SETTINGS_LOCAL_FILE_BACKUPS_REMOTE_BACKUP_IN_PROGRESS_MESSAGE" = "Nu s-a putut realiza un backup pe dispozitiv pentru că un Backup securizat Signal este în desfășurare. Încearcă mai târziu.";
+"SETTINGS_LOCAL_FILE_BACKUPS_REMOTE_BACKUP_IN_PROGRESS_MESSAGE" = "Nu s-a putut realiza un backup pe dispozitiv pentru că un Backup securizat Radar este în desfășurare. Încearcă mai târziu.";
 
 /* Footer text on the on-device backups settings page explaining how to restore a backup. */
-"SETTINGS_LOCAL_FILE_BACKUPS_RESTORE_FOOTER" = "Pentru a restaura un backup, instalează o copie nouă a Signal. Deschide aplicația, atinge „Restaurează sau transferă“ și selectează „Backup pe dispozitiv“.";
+"SETTINGS_LOCAL_FILE_BACKUPS_RESTORE_FOOTER" = "Pentru a restaura un backup, instalează o copie nouă a Radar. Deschide aplicația, atinge „Restaurează sau transferă“ și selectează „Backup pe dispozitiv“.";
 
 /* Label for the button that turns off on-device backups. */
 "SETTINGS_LOCAL_FILE_BACKUPS_TURN_OFF" = "Dezactivează și șterge backup-ul";
@@ -9616,7 +9619,7 @@ Send money securely.";
 "SETTINGS_NOTIFICATIONS_APP_BADGE_SECTION" = "Insigna aplicației";
 
 /* Explanation for the switch controlling whether a notification is shown when a phone contact joins Signal. */
-"SETTINGS_NOTIFICATIONS_CONTACT_JOINED_SIGNAL_FOOTER" = "Arată o notificare când un contact de pe telefon se alătură pe Signal.";
+"SETTINGS_NOTIFICATIONS_CONTACT_JOINED_SIGNAL_FOOTER" = "Arată o notificare când un contact de pe telefon se alătură pe Radar.";
 
 /* Label for a switch controlling whether reactions to your messages generate notifications. */
 "SETTINGS_NOTIFICATIONS_REACTIONS" = "Notificări privind reacțiile";
@@ -10394,7 +10397,7 @@ Send money securely.";
 "SHARE_ACTION_MESSAGE" = "Mesaj";
 
 /* Message for an action sheet shown when sharing fails because the device's date and time are incorrect. */
-"SHARE_EXTENSION_FAILED_SENDING_BECAUSE_CLOCK_SKEW_MESSAGE" = "Data și ora dispozitivului sunt incorecte, iar Signal este posibil să nu îți fi trimis mesajul. Deschide Setări ca să-ți corectezi data și ora dispozitivului.";
+"SHARE_EXTENSION_FAILED_SENDING_BECAUSE_CLOCK_SKEW_MESSAGE" = "Data și ora dispozitivului sunt incorecte, iar Radar este posibil să nu îți fi trimis mesajul. Deschide Setări ca să-ți corectezi data și ora dispozitivului.";
 
 /* alert body when sharing file failed because of untrusted/changed identity keys */
 "SHARE_EXTENSION_FAILED_SENDING_BECAUSE_UNTRUSTED_IDENTITY_FORMAT" = "Numărul tău de siguranță pentru %1$@ s-a schimbat recent. S-ar putea să dorești să-l verifici în aplicație înainte de a retrimite.";
@@ -10403,7 +10406,7 @@ Send money securely.";
 "SHARE_EXTENSION_LOADING" = "Se încarcă…";
 
 /* Message for an error shown when the user tries to share to Signal but the device is too low on storage space. */
-"SHARE_EXTENSION_LOW_STORAGE_SPACE_MESSAGE" = "Nu poți partaja pe Signal deoarece dispozitivul tău are puțin spațiu de stocare disponibil. Eliberează spațiu gestionând spațiul de stocare din Setări, apoi încearcă din nou.";
+"SHARE_EXTENSION_LOW_STORAGE_SPACE_MESSAGE" = "Nu poți partaja pe Radar deoarece dispozitivul tău are puțin spațiu de stocare disponibil. Eliberează spațiu gestionând spațiul de stocare din Setări, apoi încearcă din nou.";
 
 /* Title for an error shown when the user tries to share to Signal but the device is too low on storage space. */
 "SHARE_EXTENSION_LOW_STORAGE_SPACE_TITLE" = "Spațiu de stocare redus";
@@ -10445,7 +10448,7 @@ Send money securely.";
 "SIGNAL_LOGIN_RECOVERY_KEY_PLACEHOLDER_TITLE" = "Cod de recuperare";
 
 /* Title for the sheet presented when user taps on Signal Proxy link in chat. */
-"SIGNAL_PROXY" = "Server proxy Signal";
+"SIGNAL_PROXY" = "Server proxy Radar";
 
 /* body sent to contacts when inviting to Install Signal */
 "SMS_INVITE_BODY" = "Te invit să instalezi Radar! Uite linkul:";
@@ -10488,6 +10491,10 @@ Send money securely.";
 
 /* Text for a toast confirming that the speakerphone has been turned on for a call. */
 "SPEAKERPHONE_ON_CONFIRMATION_TOAST_LABEL" = "Difuzor pornit";
+
+"STAR" = "Star";
+
+"STARRED_MESSAGES" = "Starred messages";
 
 /* Title for a button to view a sticker pack */
 "STICKER_BUTTON_VIEW_PACK" = "Vezi pachetul";
@@ -10532,7 +10539,7 @@ Send money securely.";
 "STICKER_PACK_SHARE_SHEET_HEADER" = "Oricine cu acest link poate adăuga și partaja pachetul de abțibilduri.";
 
 /* Label for a button on a sticker-pack share sheet that sends the pack in Signal. */
-"STICKER_PACK_SHARE_SHEET_SEND_IN_SIGNAL" = "Trimite pe Signal";
+"STICKER_PACK_SHARE_SHEET_SEND_IN_SIGNAL" = "Trimite pe Radar";
 
 /* Message when trying to show a sticker that has expired and is unavailable for download */
 "STICKER_UNAVAILABLE_MESSAGE_LABEL" = "Autocolantul nu este disponibil";
@@ -11242,6 +11249,8 @@ Send money securely.";
 /* Notification body for unread reminders. First placeholder is unread messages, second is a summary of either unread mentions or replies */
 "UnreadReminderJob__unread_one_summary" = "Ai %1$@, inclusiv %2$@.";
 
+"UNSTAR" = "Unstar";
+
 /* No comment provided by engineer. */
 "UNSUPPORTED_ATTACHMENT" = "A fost primit un tip de atașament care nu e suportat.";
 
@@ -11435,7 +11444,7 @@ Send money securely.";
 "VERIFICATION_CODE_REQUESTED_HERO_BODY_FIRST" = "Un cod de verificare a fost cerut";
 
 /* Second part of body for a hero sheet informing the user a verification code was requested. */
-"VERIFICATION_CODE_REQUESTED_HERO_BODY_SECOND" = "Nu-ți da codul de verificare nimănui. Signal nu îți va da niciodată mesaj să-ți ceară codul. Dacă primești un mesaj de la cineva care se dă drept Singal, este o înșelăciune.Poți să ignori mesajul, dacă ai cerut tu codul.";
+"VERIFICATION_CODE_REQUESTED_HERO_BODY_SECOND" = "Nu-ți da codul de verificare nimănui. Radar nu îți va da niciodată mesaj să-ți ceară codul. Dacă primești un mesaj de la cineva care se dă drept Singal, este o înșelăciune.Poți să ignori mesajul, dacă ai cerut tu codul.";
 
 /* Format for info message indicating that the verification state was unverified on this device. Embeds {{user's name or phone number}}. */
 "VERIFICATION_STATE_CHANGE_FORMAT_NOT_VERIFIED_LOCAL" = "Ai marcat pe %1$@ ca neverificat.";

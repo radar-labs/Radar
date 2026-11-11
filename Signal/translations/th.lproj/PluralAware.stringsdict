@@ -577,7 +577,7 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>other</key>
-			<string>กลุ่มของ Signal จะทำงานได้ดีที่สุดเมื่อมีสมาชิกไม่เกิน %1$d คน การเพิ่มสมาชิกอีกจะทำให้การรับและส่งข้อความล่าช้า</string>
+			<string>กลุ่มของ Radar จะทำงานได้ดีที่สุดเมื่อมีสมาชิกไม่เกิน %1$d คน การเพิ่มสมาชิกอีกจะทำให้การรับและส่งข้อความล่าช้า</string>
 		</dict>
 	</dict>
 	<key>GROUP_CALL_HAS_MAX_DEVICES_%d</key>
@@ -717,7 +717,7 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>other</key>
-			<string>Signal จะโทรหา %2$@, %3$@ และอีก %1$d คน</string>
+			<string>Radar จะโทรหา %2$@, %3$@ และอีก %1$d คน</string>
 		</dict>
 	</dict>
 	<key>GROUP_INVITES_SENT_ALERT_TITLE_%d</key>
@@ -969,7 +969,7 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>other</key>
-			<string>หากยังต้องการเชื่อมโยง &quot;%2$@&quot; ต่อไป ให้เปิด Signal บนอุปกรณ์เครื่องนั้นภายใน %1$d วัน</string>
+			<string>หากยังต้องการเชื่อมโยง &quot;%2$@&quot; ต่อไป ให้เปิด Radar บนอุปกรณ์เครื่องนั้นภายใน %1$d วัน</string>
 		</dict>
 	</dict>
 	<key>LINK_DEVICE_CONFIRMATION_ALERT_TRANSFER_SUBTITLE_%d</key>
@@ -1151,7 +1151,7 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>other</key>
-			<string>เครือข่าย Signal ทั้งหมด · ผู้ชม %1$d คน</string>
+			<string>เครือข่าย Radar ทั้งหมด · ผู้ชม %1$d คน</string>
 		</dict>
 	</dict>
 	<key>MY_STORY_VIEWERS_ALL_CONNECTIONS_EXCLUDING_%d</key>
@@ -1165,7 +1165,7 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>other</key>
-			<string>เครือข่าย Signal ทั้งหมด · ซ่อนจาก %1$d คน</string>
+			<string>เครือข่าย Radar ทั้งหมด · ซ่อนจาก %1$d คน</string>
 		</dict>
 	</dict>
 	<key>MY_STORY_VIEWERS_ONLY_%d</key>

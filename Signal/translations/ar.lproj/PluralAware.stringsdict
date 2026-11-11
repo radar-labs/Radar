@@ -987,17 +987,17 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>zero</key>
-			<string>تعمل مجموعات سيجنال بشكلٍ أفضل مع %1$d عضو أو أقل. سيؤدي إضافة المزيد من الأعضاء إلى تأخر في إرسال الرسائل واستلامها.</string>
+			<string>تعمل مجموعات Radar بشكلٍ أفضل مع %1$d عضو أو أقل. سيؤدي إضافة المزيد من الأعضاء إلى تأخر في إرسال الرسائل واستلامها.</string>
 			<key>one</key>
-			<string>تعمل مجموعات سيجنال بشكلٍ أفضل مع %1$d عضو أو أقل. سيؤدي إضافة المزيد من الأعضاء إلى تأخر في إرسال الرسائل واستلامها.</string>
+			<string>تعمل مجموعات Radar بشكلٍ أفضل مع %1$d عضو أو أقل. سيؤدي إضافة المزيد من الأعضاء إلى تأخر في إرسال الرسائل واستلامها.</string>
 			<key>two</key>
-			<string>تعمل مجموعات سيجنال بشكلٍ أفضل مع عضوين %1$d أو أقل. سيؤدي إضافة المزيد من الأعضاء إلى تأخر في إرسال الرسائل واستلامها.</string>
+			<string>تعمل مجموعات Radar بشكلٍ أفضل مع عضوين %1$d أو أقل. سيؤدي إضافة المزيد من الأعضاء إلى تأخر في إرسال الرسائل واستلامها.</string>
 			<key>few</key>
-			<string>تعمل مجموعات سيجنال بشكلٍ أفضل مع %1$d أعضاء أو أقل. سيؤدي إضافة المزيد من الأعضاء إلى تأخر في إرسال الرسائل واستلامها.</string>
+			<string>تعمل مجموعات Radar بشكلٍ أفضل مع %1$d أعضاء أو أقل. سيؤدي إضافة المزيد من الأعضاء إلى تأخر في إرسال الرسائل واستلامها.</string>
 			<key>many</key>
-			<string>تعمل مجموعات سيجنال بشكلٍ أفضل مع %1$d عضوًا أو أقل. سيؤدي إضافة المزيد من الأعضاء إلى تأخر في إرسال الرسائل واستلامها.</string>
+			<string>تعمل مجموعات Radar بشكلٍ أفضل مع %1$d عضوًا أو أقل. سيؤدي إضافة المزيد من الأعضاء إلى تأخر في إرسال الرسائل واستلامها.</string>
 			<key>other</key>
-			<string>تعمل مجموعات سيجنال بشكلٍ أفضل مع %1$d عضوٍ أو أقل. سيؤدي إضافة المزيد من الأعضاء إلى تأخر في إرسال الرسائل واستلامها.</string>
+			<string>تعمل مجموعات Radar بشكلٍ أفضل مع %1$d عضوٍ أو أقل. سيؤدي إضافة المزيد من الأعضاء إلى تأخر في إرسال الرسائل واستلامها.</string>
 		</dict>
 	</dict>
 	<key>GROUP_CALL_HAS_MAX_DEVICES_%d</key>
@@ -1227,17 +1227,17 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>zero</key>
-			<string>سَيتصل سيجنال بـ %2$@ و%3$@ و%1$d آخرين</string>
+			<string>سَيتصل Radar بـ %2$@ و%3$@ و%1$d آخرين</string>
 			<key>one</key>
-			<string>سَيتصل سيجنال على %2$@ و%3$@ و%1$d آخر</string>
+			<string>سَيتصل Radar على %2$@ و%3$@ و%1$d آخر</string>
 			<key>two</key>
-			<string>سَيتصل سيجنال بـ %2$@ و%3$@ و%1$d آخرين</string>
+			<string>سَيتصل Radar بـ %2$@ و%3$@ و%1$d آخرين</string>
 			<key>few</key>
-			<string>سَيتصل سيجنال بـ %2$@ و%3$@ و%1$d آخرين</string>
+			<string>سَيتصل Radar بـ %2$@ و%3$@ و%1$d آخرين</string>
 			<key>many</key>
-			<string>سَيتصل سيجنال بـ %2$@ و%3$@ و%1$d آخرين</string>
+			<string>سَيتصل Radar بـ %2$@ و%3$@ و%1$d آخرين</string>
 			<key>other</key>
-			<string>سَيتصل سيجنال بـ %2$@ و%3$@ و%1$d آخرين</string>
+			<string>سَيتصل Radar بـ %2$@ و%3$@ و%1$d آخرين</string>
 		</dict>
 	</dict>
 	<key>GROUP_INVITES_SENT_ALERT_TITLE_%d</key>
@@ -1659,17 +1659,17 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>zero</key>
-			<string>لتُبقي &quot;%2$@&quot; مُرتبِطًا، افتح تطبيق سيجنال على ذلك الجهاز في غضون %1$d أيام.</string>
+			<string>لتُبقي &quot;%2$@&quot; مُرتبِطًا، افتح تطبيق Radar على ذلك الجهاز في غضون %1$d أيام.</string>
 			<key>one</key>
-			<string>لتُبقي &quot;%2$@&quot; مُرتبِطًا، افتح تطبيق سيجنال على ذلك الجهاز في غضون %1$d يوم.</string>
+			<string>لتُبقي &quot;%2$@&quot; مُرتبِطًا، افتح تطبيق Radar على ذلك الجهاز في غضون %1$d يوم.</string>
 			<key>two</key>
-			<string>لتُبقي &quot;%2$@&quot; مُرتبِطًا، افتح تطبيق سيجنال على ذلك الجهاز في غضون %1$d يومين.</string>
+			<string>لتُبقي &quot;%2$@&quot; مُرتبِطًا، افتح تطبيق Radar على ذلك الجهاز في غضون %1$d يومين.</string>
 			<key>few</key>
-			<string>لتُبقي &quot;%2$@&quot; مُرتبِطًا، افتح تطبيق سيجنال على ذلك الجهاز في غضون %1$d أيام.</string>
+			<string>لتُبقي &quot;%2$@&quot; مُرتبِطًا، افتح تطبيق Radar على ذلك الجهاز في غضون %1$d أيام.</string>
 			<key>many</key>
-			<string>لتُبقي &quot;%2$@&quot; مُرتبِطًا، افتح تطبيق سيجنال على ذلك الجهاز في غضون %1$d يومًا.</string>
+			<string>لتُبقي &quot;%2$@&quot; مُرتبِطًا، افتح تطبيق Radar على ذلك الجهاز في غضون %1$d يومًا.</string>
 			<key>other</key>
-			<string>لتُبقي &quot;%2$@&quot; مُرتبِطًا، افتح تطبيق سيجنال على ذلك الجهاز في غضون %1$d يومٍ.</string>
+			<string>لتُبقي &quot;%2$@&quot; مُرتبِطًا، افتح تطبيق Radar على ذلك الجهاز في غضون %1$d يومٍ.</string>
 		</dict>
 	</dict>
 	<key>LINK_DEVICE_CONFIRMATION_ALERT_TRANSFER_SUBTITLE_%d</key>
@@ -1971,17 +1971,17 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>zero</key>
-			<string>جميع جهات اتصال سيجنال · %1$d مُشاهدين</string>
+			<string>جميع جهات اتصال Radar · %1$d مُشاهدين</string>
 			<key>one</key>
-			<string>جميع جهات اتصال سيجنال · %1$d مُشاهِد</string>
+			<string>جميع جهات اتصال Radar · %1$d مُشاهِد</string>
 			<key>two</key>
-			<string>جميع جهات اتصال سيجنال · %1$d مُشاهِدين</string>
+			<string>جميع جهات اتصال Radar · %1$d مُشاهِدين</string>
 			<key>few</key>
-			<string>جميع جهات اتصال سيجنال · %1$d مُشاهِدين</string>
+			<string>جميع جهات اتصال Radar · %1$d مُشاهِدين</string>
 			<key>many</key>
-			<string>جميع جهات اتصال سيجنال · %1$d مُشاهِدًا</string>
+			<string>جميع جهات اتصال Radar · %1$d مُشاهِدًا</string>
 			<key>other</key>
-			<string>جميع جهات اتصال سيجنال · %1$d مُشاهِد</string>
+			<string>جميع جهات اتصال Radar · %1$d مُشاهِد</string>
 		</dict>
 	</dict>
 	<key>MY_STORY_VIEWERS_ALL_CONNECTIONS_EXCLUDING_%d</key>
@@ -1995,17 +1995,17 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>zero</key>
-			<string>جميع جهات اتصال سيجنال · %1$d مُستبعَد</string>
+			<string>جميع جهات اتصال Radar · %1$d مُستبعَد</string>
 			<key>one</key>
-			<string>جميع جهات اتصال سيجنال · %1$d مُستبعَد</string>
+			<string>جميع جهات اتصال Radar · %1$d مُستبعَد</string>
 			<key>two</key>
-			<string>جميع جهات اتصال سيجنال · %1$d مُستَبعَدَيْن</string>
+			<string>جميع جهات اتصال Radar · %1$d مُستَبعَدَيْن</string>
 			<key>few</key>
-			<string>جميع جهات اتصال سيجنال · %1$d مُستبعَدين</string>
+			<string>جميع جهات اتصال Radar · %1$d مُستبعَدين</string>
 			<key>many</key>
-			<string>جميع جهات اتصال سيجنال · %1$d مُستبعدًا</string>
+			<string>جميع جهات اتصال Radar · %1$d مُستبعدًا</string>
 			<key>other</key>
-			<string>جميع جهات اتصال سيجنال · %1$d مُستبعَد</string>
+			<string>جميع جهات اتصال Radar · %1$d مُستبعَد</string>
 		</dict>
 	</dict>
 	<key>MY_STORY_VIEWERS_ONLY_%d</key>

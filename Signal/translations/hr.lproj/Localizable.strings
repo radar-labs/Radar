@@ -2,10 +2,10 @@
 "AB_PERMISSION_MISSING_ACTION_NOT_NOW" = "Ne sada";
 
 /* Footer for the 'about' help section. For non-English languages, exclude the word '501c3'. */
-"ABOUT_SECTION_FOOTER" = "Copyright Signal Messenger\nLicenca AGPLv3\nSignal je neprofitna organizacija";
+"ABOUT_SECTION_FOOTER" = "Copyright Signal Messenger\nCopyright 2026 Radar Chat, Inc.\nLicenca AGPLv3";
 
 /* Title for the 'about' help section */
-"ABOUT_SECTION_TITLE" = "O Signalu";
+"ABOUT_SECTION_TITLE" = "O Radaru";
 
 /* Label for forward button in media control panel */
 "ACCESSIBILITY_FORWARD_BUTTON_LABEL" = "Proslijedi";
@@ -215,7 +215,7 @@
 "APN_Message" = "Možda imate nove poruke";
 
 /* Shown in place of the text input box in a conversation when the app has expired and the user is no longer allowed to send messages. The embedded value is 'Update now' (translated via APP_EXPIRED_BOTTOM_UPDATE), and it will be formatted as a tappable link. */
-"APP_EXPIRED_BOTTOM" = "Ova verzija Signala je zastarjela. %1$@ da biste ponovno mogli slati i primati poruke.";
+"APP_EXPIRED_BOTTOM" = "Ova verzija Radara je zastarjela. %1$@ da biste ponovno mogli slati i primati poruke.";
 
 /* Shown in place of the text input box in a conversation when the app has expired and the user is no longer allowed to send messages. This value is a tappable link embedded in a larger sentence. */
 "APP_EXPIRED_BOTTOM_UPDATE" = "Ažurirajte ga sada";
@@ -236,7 +236,7 @@
 "APP_LAUNCH_FAILURE_COULD_NOT_LOAD_DATABASE" = "Učitavanje baze podataka nije uspjelo";
 
 /* Message for an action sheet explaining that Signal can't launch because the database is corrupted. */
-"APP_LAUNCH_FAILURE_DATABASE_CORRUPTED_MESSAGE" = "Signal se ne može pokrenuti jer je baza podataka oštećena. To ne utječe na sigurnost vašeg računa ili vaših poruka.";
+"APP_LAUNCH_FAILURE_DATABASE_CORRUPTED_MESSAGE" = "Radar se ne može pokrenuti jer je baza podataka oštećena. To ne utječe na sigurnost vašeg računa ili vaših poruka.";
 
 /* Title for an action sheet explaining that Signal can't launch because the database is corrupted. */
 "APP_LAUNCH_FAILURE_DATABASE_CORRUPTED_TITLE" = "Baza podataka je oštećena";
@@ -245,7 +245,7 @@
 "APP_LAUNCH_FAILURE_DATABASE_RECOVERY_ACTION_TITLE" = "Popravi";
 
 /* Action in an action sheet offering to exit the app. */
-"APP_LAUNCH_FAILURE_EXIT_APP_ACTION_TITLE" = "Izađi iz Signala";
+"APP_LAUNCH_FAILURE_EXIT_APP_ACTION_TITLE" = "Izađi iz Radara";
 
 /* Error indicating that the app could not launch without reverting unknown database migrations. */
 "APP_LAUNCH_FAILURE_INVALID_DATABASE_VERSION_MESSAGE" = "Molimo nadogradite Radar na najnoviju verziju.";
@@ -260,7 +260,7 @@
 "APP_LAUNCH_FAILURE_LAST_LAUNCH_CRASHED_TITLE" = "Nije moguće otvoriti Radar";
 
 /* Message for an error sheet shown when the app cannot launch because the device is out of storage space. Embeds 1:{{ the localized name of the user's device model, e.g. iPhone }}; 2:{{ an amount of storage space as a file size, e.g. 1 GB }}. */
-"APP_LAUNCH_FAILURE_NOT_ENOUGH_STORAGE_SPACE_MESSAGE_FORMAT" = "Nije moguće podijeliti sa Signalom jer nemate dovoljno slobodnog prostora za pohranu na vašem %1$@ uređaju. Oslobodite najmanje %2$@ prostora za pohranu, a zatim pokrenite Signal.\n\nIdite na postavke iOS sustava > Općenito > Memorija i izbrišite nekorištene aplikacije, velike videozapise iz aplikacije Fotografije ili drugih sličnih aplikacija i preuzetu glazbu i medijske zapise.";
+"APP_LAUNCH_FAILURE_NOT_ENOUGH_STORAGE_SPACE_MESSAGE_FORMAT" = "Nije moguće podijeliti sa Radarom jer nemate dovoljno slobodnog prostora za pohranu na vašem %1$@ uređaju. Oslobodite najmanje %2$@ prostora za pohranu, a zatim pokrenite Radar.\n\nIdite na postavke iOS sustava > Općenito > Memorija i izbrišite nekorištene aplikacije, velike videozapise iz aplikacije Fotografije ili drugih sličnih aplikacija i preuzetu glazbu i medijske zapise.";
 
 /* Title for an error sheet shown when the app cannot launch because the device is out of storage space. */
 "APP_LAUNCH_FAILURE_NOT_ENOUGH_STORAGE_SPACE_TITLE" = "Nema dovoljno prostora za pohranu";
@@ -377,13 +377,13 @@
 "ATTACHMENT_APPROVAL_MEDIA_QUALITY_TITLE" = "Kvaliteta medija";
 
 /* Notification body shown when media sync to a linked device is complete. */
-"ATTACHMENT_BACKFILL_FINISHED_NOTIFICATION" = "Sinkronizacija sa Signalom na povezanom uređaju je dovršena.";
+"ATTACHMENT_BACKFILL_FINISHED_NOTIFICATION" = "Sinkronizacija sa Radarom na povezanom uređaju je dovršena.";
 
 /* Notification body shown when media sync to a linked device was interrupted. */
-"ATTACHMENT_BACKFILL_INTERRUPTED_NOTIFICATION" = "Otvori Signal za nastavak sinkronizacije s povezanim uređajem";
+"ATTACHMENT_BACKFILL_INTERRUPTED_NOTIFICATION" = "Otvori Radar za nastavak sinkronizacije s povezanim uređajem";
 
 /* Notification body shown while syncing media to a linked device. */
-"ATTACHMENT_BACKFILL_SYNCING_NOTIFICATION" = "Sinkronizacija sa Signalom na povezanom uređaju";
+"ATTACHMENT_BACKFILL_SYNCING_NOTIFICATION" = "Sinkronizacija sa Radarom na povezanom uređaju";
 
 /* Generic filename for an attachment with no known name */
 "ATTACHMENT_DEFAULT_FILENAME" = "Privitak";
@@ -602,7 +602,7 @@
 "BACKUP_ENABLEMENT_REMINDER_MEGAPHONE_BODY" = "Nećete izgubiti nijednu poruku kada kupite novi telefon ili ponovno instalirate Radar.";
 
 /* Title for Backup enablement reminder megaphone */
-"BACKUP_ENABLEMENT_REMINDER_MEGAPHONE_TITLE" = "Uključite šifrirane sigurnosne kopije Signala";
+"BACKUP_ENABLEMENT_REMINDER_MEGAPHONE_TITLE" = "Uključite šifrirane sigurnosne kopije Radara";
 
 /* Snooze text for Backup enablement reminder megaphone */
 "BACKUP_ENABLEMENT_REMINDER_NOT_NOW_ACTION" = "Ne sada";
@@ -632,7 +632,7 @@
 "BACKUP_KEY_SEE_FULL_KEY_BUTTON_TITLE" = "Prikaži cijeli ključ";
 
 /* Body for a warning sheet shown to discourage the user from sharing their 'Recovery Key', warning them not to share it with anyone. */
-"BACKUP_NEVER_SHARE_RECOVERY_KEY_SHEET_BODY" = "Ne dijelite svoj ključ za oporavak ni s kim. Dijeljenjem ključa omogućit ćete drugima da preuzmu vaš račun. <bold>Signal vas nikada neće kontaktirati putem poruke</bold> da pita za vaš ključ za oporavak. Nikada ne odgovarajte na poruke koje se predstavljaju kao da su od Signala.";
+"BACKUP_NEVER_SHARE_RECOVERY_KEY_SHEET_BODY" = "Ne dijelite svoj ključ za oporavak ni s kim. Dijeljenjem ključa omogućit ćete drugima da preuzmu vaš račun. <bold>Radar vas nikada neće kontaktirati putem poruke</bold> da pita za vaš ključ za oporavak. Nikada ne odgovarajte na poruke koje se predstavljaju kao da su od Radara.";
 
 /* Title for a warning sheet shown to discourage the user from sharing their 'Recovery Key'. */
 "BACKUP_NEVER_SHARE_RECOVERY_KEY_SHEET_TITLE" = "Nemojte dijeliti ključ za oporavak";
@@ -695,10 +695,10 @@
 "BACKUP_ONBOARDING_KEY_INTRO_TITLE" = "Ključ za oporavak";
 
 /* Body for a sheet shown when your Backup plan is downgraded. */
-"BACKUP_PLAN_DOWNGRADED_SHEET_BODY" = "Vaša je pretplata na sigurnosno kopiranje istekla jer je nije bilo moguće obnoviti odabranim načinom plaćanja.\n\nZa nastavak sigurnosnog kopiranja medijskih zapisa obnovite pretplatu. I dalje ćete imati pristup besplatnom planu za sigurnosne kopije Signala.";
+"BACKUP_PLAN_DOWNGRADED_SHEET_BODY" = "Vaša je pretplata na sigurnosno kopiranje istekla jer je nije bilo moguće obnoviti odabranim načinom plaćanja.\n\nZa nastavak sigurnosnog kopiranja medijskih zapisa obnovite pretplatu. I dalje ćete imati pristup besplatnom planu za sigurnosne kopije Radara.";
 
 /* Body for a sheet shown when your Backup plan is downgraded because you stopped using TestFlight. */
-"BACKUP_PLAN_DOWNGRADED_SHEET_BODY_TESTFLIGHT" = "Vaša pretplata na sigurnosno kopiranje je istekla jer više ne koristite TestFlight.\n\nZa nastavak sigurnosnog kopiranja medijskih zapisa obnovite pretplatu. I dalje ćete imati pristup besplatnom planu za sigurnosne kopije Signala.";
+"BACKUP_PLAN_DOWNGRADED_SHEET_BODY_TESTFLIGHT" = "Vaša pretplata na sigurnosno kopiranje je istekla jer više ne koristite TestFlight.\n\nZa nastavak sigurnosnog kopiranja medijskih zapisa obnovite pretplatu. I dalje ćete imati pristup besplatnom planu za sigurnosne kopije Radara.";
 
 /* Primary button for a sheet shown when your Backup plan is downgraded. */
 "BACKUP_PLAN_DOWNGRADED_SHEET_PRIMARY_BUTTON" = "Postavke sigurnosnog kopiranja";
@@ -752,13 +752,13 @@
 "BACKUP_RESTORE_MODAL_TITLE" = "Vraćanje poruka…";
 
 /* Message for a confirmation sheet shown before saving the user's Recovery Key to their password manager. */
-"BACKUP_SAVE_KEY_PW_MGR_CONFIRM_SHEET_MESSAGE" = "Rezervnu kopiju ključa za oporavak spremite isključivo u upravitelju lozinki kojemu vjerujete i koji smatrate sigurnim. Signal ne daje preporuke o tome koji je upravitelj lozinki pravi za vas.";
+"BACKUP_SAVE_KEY_PW_MGR_CONFIRM_SHEET_MESSAGE" = "Rezervnu kopiju ključa za oporavak spremite isključivo u upravitelju lozinki kojemu vjerujete i koji smatrate sigurnim. Radar ne daje preporuke o tome koji je upravitelj lozinki pravi za vas.";
 
 /* Title for a confirmation sheet shown before saving the user's Recovery Key to their password manager. */
 "BACKUP_SAVE_KEY_PW_MGR_CONFIRM_SHEET_TITLE" = "Spremiti u upravitelju lozinki?";
 
 /* Message for an error sheet shown when saving the user's Recovery Key to their password manager fails. */
-"BACKUP_SAVE_KEY_PW_MGR_ERROR_SHEET_MESSAGE" = "Možda nije postavljen upravitelj lozinki ili onaj koji koristite nije kompatibilan sa Signalom. Možete odabrati onaj koji vam odgovara u postavkama svog telefona.";
+"BACKUP_SAVE_KEY_PW_MGR_ERROR_SHEET_MESSAGE" = "Možda nije postavljen upravitelj lozinki ili onaj koji koristite nije kompatibilan sa Radarom. Možete odabrati onaj koji vam odgovara u postavkama svog telefona.";
 
 /* Title for an error sheet shown when saving the user's Recovery Key to their password manager fails. */
 "BACKUP_SAVE_KEY_PW_MGR_ERROR_SHEET_TITLE" = "Spremanje u upravitelju lozinki nije uspjelo";
@@ -770,7 +770,7 @@
 "BACKUP_SAVE_KEY_SAVE_TO_PW_MGR_BUTTON_TITLE" = "Spremi u upravitelju lozinki";
 
 /* Message describing that the Background App Refresh permission is disabled for Signal. \"Background App Refresh\" should be localized the same way it is in iOS Settings app permissions. */
-"BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_MESSAGE" = "Automatsko sigurnosno kopiranje je onemogućeno. Omogućite sigurnosno kopiranje ažuriranjem dopuštenja Signala.";
+"BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_MESSAGE" = "Automatsko sigurnosno kopiranje je onemogućeno. Omogućite sigurnosno kopiranje ažuriranjem dopuštenja Radara.";
 
 /* Add-on to a message describing that the Background App Refresh permission is disabled for Signal. \"Background App Refresh\" should be localized the same way it is in iOS Settings app permissions. */
 "BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_MESSAGE_UPDATE_NOW" = "Ažuriraj sada";
@@ -779,7 +779,7 @@
 "BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_SHEET_GO_TO_SETTINGS_BUTTON" = "Idi na postavke";
 
 /* Message for a sheet warning the user about the Background App Refresh permission. \"Background App Refresh\" should be localized the same way it is in iOS Settings app permissions. */
-"BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_SHEET_MESSAGE" = "Želite li omogućili Signalu da automatski izrađuje sigurnosne kopije vaših poruka, dodirnite „Otvori postavke“ ispod i omogućite „Osvježavanje aplikacija u pozadini“";
+"BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_SHEET_MESSAGE" = "Želite li omogućili Radaru da automatski izrađuje sigurnosne kopije vaših poruka, dodirnite „Otvori postavke“ ispod i omogućite „Osvježavanje aplikacija u pozadini“";
 
 /* Title for a sheet warning the user about the Background App Refresh permission. \"Background App Refresh\" should be localized the same way it is in iOS Settings app permissions. */
 "BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_SHEET_TITLE" = "Automatsko sigurnosno kopiranje je onemogućeno";
@@ -884,7 +884,7 @@
 "BACKUP_SETTINGS_BACKUP_PLAN_PAID_BUT_IAP_NOT_FOUND_LOCALLY_ACTION_BUTTON_TITLE" = "Obnovi";
 
 /* Text describing that the user's paid backup plan did not correspond to a App Store subscription on this device. */
-"BACKUP_SETTINGS_BACKUP_PLAN_PAID_BUT_IAP_NOT_FOUND_LOCALLY_DESCRIPTION" = "Nije pronađena pretplata na ovom uređaju. Obnovite je odmah kako biste nastavili koristiti sigurnosne kopije Signala.";
+"BACKUP_SETTINGS_BACKUP_PLAN_PAID_BUT_IAP_NOT_FOUND_LOCALLY_DESCRIPTION" = "Nije pronađena pretplata na ovom uređaju. Obnovite je odmah kako biste nastavili koristiti sigurnosne kopije Radara.";
 
 /* Text on the landing page describing that the user's backup plan is paid, but free for them as a tester. */
 "BACKUP_SETTINGS_BACKUP_PLAN_PAID_COMPLIMENTARY_DESCRIPTION" = "Plan za sigurnosno kopiranje je plaćen (besplatno za korisnike TestFlight-a)";
@@ -899,16 +899,16 @@
 "BACKUP_SETTINGS_BACKUP_PLAN_PAID_RENEWAL_FORMAT" = "Obnavlja se %1$@";
 
 /* Footer for a menu section related to settings for when Backups are disabled. */
-"BACKUP_SETTINGS_BACKUPS_DISABLED_SECTION_FOOTER" = "Sigurnosno kopiranje je isključeno te su vaši podaci izbrisani iz Signalovog zaštićenog sustava pohrane.";
+"BACKUP_SETTINGS_BACKUPS_DISABLED_SECTION_FOOTER" = "Sigurnosno kopiranje je isključeno te su vaši podaci izbrisani iz Radarovog zaštićenog sustava pohrane.";
 
 /* Description for a progress view tracking media being downloaded in service of disabling Backups. */
-"BACKUP_SETTINGS_BACKUPS_DISABLING_DOWNLOADING_MEDIA_PROGRESS_VIEW_DESCRIPTION" = "Sigurnosno kopiranje je isključeno. Medijski zapisi koji se ne nalaze na ovom uređaju sada se preuzimaju. Kad preuzimanje bude dovršeno, vaši će podaci biti izbrisani iz Signalovog zaštićenog sustava pohrane.";
+"BACKUP_SETTINGS_BACKUPS_DISABLING_DOWNLOADING_MEDIA_PROGRESS_VIEW_DESCRIPTION" = "Sigurnosno kopiranje je isključeno. Medijski zapisi koji se ne nalaze na ovom uređaju sada se preuzimaju. Kad preuzimanje bude dovršeno, vaši će podaci biti izbrisani iz Radarovog zaštićenog sustava pohrane.";
 
 /* Message for a view indicating we failed to delete the user's Backup due to an unexpected error. */
 "BACKUP_SETTINGS_BACKUPS_DISABLING_GENERIC_ERROR_MESSAGE" = "Došlo je do pogreške. Molimo, kontaktirajte podršku.";
 
 /* Header for a menu section related to settings for when disabling Backups encountered an unexpected error. */
-"BACKUP_SETTINGS_BACKUPS_DISABLING_GENERIC_ERROR_SECTION_HEADER" = "Došlo je do pogreške prilikom brisanja vaših podataka iz Signalovog zaštićenog sustava pohrane.";
+"BACKUP_SETTINGS_BACKUPS_DISABLING_GENERIC_ERROR_SECTION_HEADER" = "Došlo je do pogreške prilikom brisanja vaših podataka iz Radarovog zaštićenog sustava pohrane.";
 
 /* Title for a view indicating we failed to delete the user's Backup due to an unexpected error. */
 "BACKUP_SETTINGS_BACKUPS_DISABLING_GENERIC_ERROR_TITLE" = "Brisanje sigurnosne kopije nije uspjelo";
@@ -917,7 +917,7 @@
 "BACKUP_SETTINGS_BACKUPS_DISABLING_PROGRESS_VIEW_DESCRIPTION" = "Brisanje sigurnosne kopije…";
 
 /* Header for a menu section related to disabling Backups. */
-"BACKUP_SETTINGS_BACKUPS_DISABLING_SECTION_HEADER" = "Sigurnosno kopiranje je isključeno te su vaši podaci izbrisani iz Signalovog zaštićenog sustava pohrane.";
+"BACKUP_SETTINGS_BACKUPS_DISABLING_SECTION_HEADER" = "Sigurnosno kopiranje je isključeno te su vaši podaci izbrisani iz Radarovog zaštićenog sustava pohrane.";
 
 /* Header for a menu section related to settings for when Backups are enabled. */
 "BACKUP_SETTINGS_BACKUPS_ENABLED_SECTION_HEADER" = "Pojedinosti sigurnosne kopije";
@@ -971,7 +971,7 @@
 "BACKUP_SETTINGS_DISABLING_DOWNLOADS_STARTED_ACTION_SHEET_TITLE" = "Preuzimanje sigurnosne kopije";
 
 /* Message shown in an action sheet indicating we failed to delete the user's Backup due to an unexpected error. */
-"BACKUP_SETTINGS_DISABLING_ERROR_GENERIC_ERROR_ACTION_SHEET_MESSAGE" = "Došlo je do pogreške prilikom brisanja vaših podataka iz Signalovog zaštićenog sustava pohrane.";
+"BACKUP_SETTINGS_DISABLING_ERROR_GENERIC_ERROR_ACTION_SHEET_MESSAGE" = "Došlo je do pogreške prilikom brisanja vaših podataka iz Radarovog zaštićenog sustava pohrane.";
 
 /* Title shown in an action sheet indicating we failed to delete the user's Backup due to an unexpected error. */
 "BACKUP_SETTINGS_DISABLING_ERROR_GENERIC_ERROR_ACTION_SHEET_TITLE" = "Brisanje sigurnosne kopije nije uspjelo";
@@ -1064,16 +1064,16 @@
 "BACKUP_SETTINGS_LANDING_OTHER_WAYS_HEADER" = "Druge opcije sigurnosnog kopiranja";
 
 /* Subtitle on the Backups settings landing page. */
-"BACKUP_SETTINGS_LANDING_PAGE_SUBTITLE" = "Stvorite sigurnosnu kopiju svojih razgovora kako ih ne biste izgubili prilikom zamjene telefona ili ponovne instalacije Signala.";
+"BACKUP_SETTINGS_LANDING_PAGE_SUBTITLE" = "Stvorite sigurnosnu kopiju svojih razgovora kako ih ne biste izgubili prilikom zamjene telefona ili ponovne instalacije Radara.";
 
 /* Button to begin setting up Signal Secure Backups on the Backups settings landing page. */
 "BACKUP_SETTINGS_LANDING_SET_UP_BUTTON" = "Postavi";
 
 /* Description of Signal Secure Backups on the Backups settings landing page. */
-"BACKUP_SETTINGS_LANDING_SIGNAL_BACKUPS_BODY" = "Automatsko sigurnosno kopiranje pomoću Signalovog sustava pohrane koji je zaštićen sveobuhvatnim šifriranjem.";
+"BACKUP_SETTINGS_LANDING_SIGNAL_BACKUPS_BODY" = "Automatsko sigurnosno kopiranje pomoću Radarovog sustava pohrane koji je zaštićen sveobuhvatnim šifriranjem.";
 
 /* Title for the Signal Secure Backups cell on the Backups settings landing page. */
-"BACKUP_SETTINGS_LANDING_SIGNAL_BACKUPS_TITLE" = "Zaštićene sigurnosne kopije Signala";
+"BACKUP_SETTINGS_LANDING_SIGNAL_BACKUPS_TITLE" = "Zaštićene sigurnosne kopije Radara";
 
 /* Button to view settings for remote backups on the Backups settings landing page. */
 "BACKUP_SETTINGS_LANDING_VIEW_SETTINGS_BUTTON" = "Vidi postavke";
@@ -1082,10 +1082,10 @@
 "BACKUP_SETTINGS_LINKED_DEVICE_MANAGE_ON_PRIMARY_FOOTER" = "Sada možete upravljati svojom pretplatom na zaštićene kopije podataka ili je nadograditi na svom glavnom uređaju.";
 
 /* Note on the linked-device Backups screen, shown on the paid tier, explaining that the Backups subscription can only be managed on the user's primary device. */
-"BACKUP_SETTINGS_LINKED_DEVICE_MANAGE_ON_PRIMARY_FOOTER_PAID" = "Sada možete upravljati svojom pretplatom na sigurnosne kopije Signala ili je otkazati na svom glavnom uređaju.";
+"BACKUP_SETTINGS_LINKED_DEVICE_MANAGE_ON_PRIMARY_FOOTER_PAID" = "Sada možete upravljati svojom pretplatom na sigurnosne kopije Radara ili je otkazati na svom glavnom uređaju.";
 
 /* Body text on the linked-device Backups screen, shown when Backups aren't set up, explaining the feature and that it can be enabled on the user's primary device. */
-"BACKUP_SETTINGS_LINKED_DEVICE_NO_BACKUP_FOOTER" = "Automatsko sigurnosno kopiranje pomoću Signalovog sustava pohrane koji je zaštićen sveobuhvatnim šifriranjem. Za početak otvorite Signal na svom glavnom uređaju.";
+"BACKUP_SETTINGS_LINKED_DEVICE_NO_BACKUP_FOOTER" = "Automatsko sigurnosno kopiranje pomoću Radarovog sustava pohrane koji je zaštićen sveobuhvatnim šifriranjem. Za početak otvorite Radar na svom glavnom uređaju.";
 
 /* Message on the linked-device Backups screen, shown when the user's paid subscription can't be found, prompting them to renew. */
 "BACKUP_SETTINGS_LINKED_DEVICE_SUBSCRIPTION_NOT_FOUND" = "Vaša pretplata nije pronađena. Obnovite je odmah kako biste nastavili koristiti zaštićene kopije podataka.";
@@ -1127,19 +1127,19 @@
 "BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_TOGGLE_FOOTER_AVAILABLE" = "Stariji medijski zapisi bit će premješteni prilikom sljedećeg sigurnosnog kopiranja, ali moguće ih je vratiti iz sigurnosne kopije u bilo kojem trenutku.";
 
 /* Footer for a toggle allowing users to change the Optimize Local Storage setting, if the toggle is unavailable. */
-"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_TOGGLE_FOOTER_UNAVAILABLE" = "Optimizacija pohrane dostupna je samo uz plaćenu pretplatu na sigurnosno kopiranje Signala. Pretplatite se na sigurnosno kopiranje kako biste koristili ovu značajku.";
+"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_TOGGLE_FOOTER_UNAVAILABLE" = "Optimizacija pohrane dostupna je samo uz plaćenu pretplatu na sigurnosno kopiranje Radara. Pretplatite se na sigurnosno kopiranje kako biste koristili ovu značajku.";
 
 /* Title for a toggle allowing users to change the Optimize Local Storage setting. */
-"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_TOGGLE_TITLE" = "Optimizirajte Signalovu pohranu";
+"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_TOGGLE_TITLE" = "Optimizirajte Radarovu pohranu";
 
 /* Body for a Backup plan upsell view encouraging users to subscribe to a paid Backup plan to use storage optimization. */
-"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_UPSELL_BODY" = "Optimizacija pohrane dostupna je samo uz plaćenu pretplatu na zaštićeno sigurnosno kopiranje Signala. Pretplatite se na sigurnosno kopiranje kako biste koristili ovu značajku.";
+"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_UPSELL_BODY" = "Optimizacija pohrane dostupna je samo uz plaćenu pretplatu na zaštićeno sigurnosno kopiranje Radara. Pretplatite se na sigurnosno kopiranje kako biste koristili ovu značajku.";
 
 /* Title for a Backup plan upsell view encouraging users to subscribe to a paid Backup plan to use storage optimization. */
 "BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_UPSELL_TITLE" = "Nadogradite svoj plan da biste uključili optimizaciju pohrane";
 
 /* Subtitle for a notification telling the user they are out of remote storage space. */
-"BACKUP_SETTINGS_OUT_OF_STORAGE_SPACE_NOTIFICATION_SUBTITLE" = "Dosegli ste ograničenje pohrane sigurnosnih kopija. Oslobodite prostor u Signalu kako biste mogli nastaviti sigurnosno kopirati razgovore i medijske zapise.";
+"BACKUP_SETTINGS_OUT_OF_STORAGE_SPACE_NOTIFICATION_SUBTITLE" = "Dosegli ste ograničenje pohrane sigurnosnih kopija. Oslobodite prostor u Radaru kako biste mogli nastaviti sigurnosno kopirati razgovore i medijske zapise.";
 
 /* Title for a notification telling the user they are out of remote storage space. */
 "BACKUP_SETTINGS_OUT_OF_STORAGE_SPACE_NOTIFICATION_TITLE" = "Prostor za pohranu sigurnosne kopije je popunjen";
@@ -1199,7 +1199,7 @@
 "BACKUP_SETTINGS_UPLOAD_PROGRESS_SUBTITLE_PAUSED_NEEDS_WIFI" = "Prijenos medijskih zapisa je pauziran: čeka se Wi-Fi";
 
 /* Subtitle for a progress bar tracking uploads that are paused because the user is out of remote storage space. Embeds 1:{{ total storage space provided, e.g. 100 GB }}; 2:{{ space the user needs to free up by deleting media, e.g. 1 GB }}. */
-"BACKUP_SETTINGS_UPLOAD_PROGRESS_SUBTITLE_PAUSED_OUT_OF_STORAGE_SPACE_FORMAT" = "Dosegli ste ograničenje pohrane od %1$@ koje je uključeno u vaš plan sigurnosnog kopiranja. Za sigurnosno kopiranje novih razgovora i medijskih zapisa oslobodite %2$@ prostora u Signalu i dodirnite „Sigurnosno kopiraj sada“.";
+"BACKUP_SETTINGS_UPLOAD_PROGRESS_SUBTITLE_PAUSED_OUT_OF_STORAGE_SPACE_FORMAT" = "Dosegli ste ograničenje pohrane od %1$@ koje je uključeno u vaš plan sigurnosnog kopiranja. Za sigurnosno kopiranje novih razgovora i medijskih zapisa oslobodite %2$@ prostora u Radaru i dodirnite „Sigurnosno kopiraj sada“.";
 
 /* Subtitle for a progress bar tracking active uploading. Embeds 1:{{ the amount uploaded as a file size, e.g. 100 MB }}; 2:{{ the total amount to upload as a file size, e.g. 1 GB }}; 3:{{ the percentage uploaded as a percent, e.g. 40% }}. */
 "BACKUP_SETTINGS_UPLOAD_PROGRESS_SUBTITLE_RUNNING" = "Prijenos: %1$@ od %2$@ (%3$@)";
@@ -1217,7 +1217,7 @@
 "BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_OPTIMIZE_MEDIA_TOGGLE_FOOTER" = "Stariji medijski zapisi bit će premješteni prilikom sljedećeg sigurnosnog kopiranja, ali moguće ih je vratiti iz sigurnosne kopije u bilo kojem trenutku.";
 
 /* Title for a toggle shown after the user enables backups, letting them enable the Optimize Storage feature. */
-"BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_OPTIMIZE_MEDIA_TOGGLE_TITLE" = "Optimizirajte Signalovu pohranu";
+"BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_OPTIMIZE_MEDIA_TOGGLE_TITLE" = "Optimizirajte Radarovu pohranu";
 
 /* Title for a sheet shown after the user enables backups. */
 "BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_TITLE" = "Sve je spremno. Započnite sigurnosno kopiranje.";
@@ -1247,7 +1247,7 @@
 "BACKUP_SUBSCRIPTION_FAILED_TO_RENEW_SHEET_TITLE" = "Obnova vaše pretplate na sigurnosno kopiranje nije uspjela";
 
 /* Body for a megaphone shown on the chat list encouraging users to subscribe to a paid Backup plan to back up all their media. Embeds {{ the amount of storage included in the paid plan, preformatted as a localized byte count, e.g. '100 GB' }}. */
-"BACKUPS_BACK_UP_YOUR_MEDIA_MEGAPHONE_BODY" = "Plaćeni Signal planovi za zaštićene sigurnosne kopije čuvaju sve vaše medijske zapise do %1$@.";
+"BACKUPS_BACK_UP_YOUR_MEDIA_MEGAPHONE_BODY" = "Plaćeni Radar planovi za zaštićene sigurnosne kopije čuvaju sve vaše medijske zapise do %1$@.";
 
 /* Title for a button on a megaphone encouraging users to subscribe to a paid Backup plan to back up all their media. */
 "BACKUPS_BACK_UP_YOUR_MEDIA_MEGAPHONE_PRIMARY_ACTION" = "Ažuriraj";
@@ -1256,7 +1256,7 @@
 "BACKUPS_BACK_UP_YOUR_MEDIA_MEGAPHONE_TITLE" = "Sigurnosno kopiraj sve medijske zapise";
 
 /* Body for a Backup plan upsell view encouraging users to subscribe to a paid Backup plan to back up all their media. Embeds {{ the amount of storage included in the paid plan, preformatted as a localized byte count, e.g. '100 GB' }}. */
-"BACKUPS_BACK_UP_YOUR_MEDIA_UPSELL_BODY" = "Plaćeni Signal planovi za zaštićene sigurnosne kopije Signala spremaju sve vaše poslane i primljene medijske zapise do %1$@. Nemojte izgubiti nijednu fotografiju ili videozapis prilikom kupnje novog telefona ili ponovnog instaliranja Signala.";
+"BACKUPS_BACK_UP_YOUR_MEDIA_UPSELL_BODY" = "Plaćeni Radar planovi za zaštićene sigurnosne kopije Radara spremaju sve vaše poslane i primljene medijske zapise do %1$@. Nemojte izgubiti nijednu fotografiju ili videozapis prilikom kupnje novog telefona ili ponovnog instaliranja Radara.";
 
 /* Title for a Backup plan upsell view encouraging users to subscribe to a paid Backup plan to back up all their media. */
 "BACKUPS_BACK_UP_YOUR_MEDIA_UPSELL_TITLE" = "Nadogradite svoj plan za spremanje svih medijskih zapisa";
@@ -1268,7 +1268,7 @@
 "BACKUPS_MEDIA_ERROR_NOTIFICATION_TITLE" = "Pogreška sigurnosne kopije medijskih zapisa";
 
 /* Body for a megaphone shown on the chat list encouraging users to enable Signal Secure Backups. */
-"BACKUPS_NEVER_LOSE_A_MESSAGE_MEGAPHONE_BODY" = "Uključite zaštićene sigurnosne kopije Signala kako biste sačuvali svoje poruke i medijske zapise";
+"BACKUPS_NEVER_LOSE_A_MESSAGE_MEGAPHONE_BODY" = "Uključite zaštićene sigurnosne kopije Radara kako biste sačuvali svoje poruke i medijske zapise";
 
 /* Title for a button on a megaphone encouraging users to enable Signal Secure Backups. */
 "BACKUPS_NEVER_LOSE_A_MESSAGE_MEGAPHONE_PRIMARY_ACTION" = "Uključi";
@@ -1277,7 +1277,7 @@
 "BACKUPS_NEVER_LOSE_A_MESSAGE_MEGAPHONE_TITLE" = "Ne propusti nijednu poruku";
 
 /* Body for a megaphone shown on the chat list encouraging users to subscribe to a paid Backup plan to save on-device storage space. */
-"BACKUPS_SAVE_SPACE_MEGAPHONE_BODY" = "Zaštićene sigurnosne kopije Signala mogu uštedjeti prostor za pohranu premještanjem medijskih zapisa.";
+"BACKUPS_SAVE_SPACE_MEGAPHONE_BODY" = "Zaštićene sigurnosne kopije Radara mogu uštedjeti prostor za pohranu premještanjem medijskih zapisa.";
 
 /* Title for a button on a megaphone encouraging users to subscribe to a paid Backup plan to save on-device storage space, when the user does not yet have Signal Secure Backups enabled. */
 "BACKUPS_SAVE_SPACE_MEGAPHONE_PRIMARY_ACTION_TURN_ON" = "Uključi";
@@ -1289,7 +1289,7 @@
 "BACKUPS_SAVE_SPACE_MEGAPHONE_TITLE" = "Uštedite prostor uz plaćeni plan za sigurnosno kopiranje";
 
 /* Body for a Backup plan upsell view encouraging users to subscribe to a paid Backup plan to save on-device storage space. Embeds {{ the amount of storage space being consumed on-device by media, preformatted as a localized byte count, e.g. '1.2 GB' }}. */
-"BACKUPS_SAVE_SPACE_UPSELL_BODY" = "Signal koristi %1$@ prostora za pohranu za medijske zapise. Plaćeni planovi za sigurnosno kopiranje Signala mogu vam uštedjeti prostor za pohranu premještanjem medijskih zapisa uz istovremeno čuvanje sigurnosne kopije cijele povijesti razgovora.";
+"BACKUPS_SAVE_SPACE_UPSELL_BODY" = "Radar koristi %1$@ prostora za pohranu za medijske zapise. Plaćeni planovi za sigurnosno kopiranje Radara mogu vam uštedjeti prostor za pohranu premještanjem medijskih zapisa uz istovremeno čuvanje sigurnosne kopije cijele povijesti razgovora.";
 
 /* Title for a Backup plan upsell view encouraging users to subscribe to a paid Backup plan to save on-device storage space. */
 "BACKUPS_SAVE_SPACE_UPSELL_TITLE" = "Uštedite prostor uz plaćeni plan za sigurnosno kopiranje";
@@ -1298,10 +1298,10 @@
 "BACKUPS_SETTINGS_TITLE" = "Zaštićene sigurnosne kopije";
 
 /* Message for an action sheet shown on iPad saying you need to set up backups on your phone */
-"BACKUPS_SETUP_ON_PRIMARY_MESSAGE" = "Za postavljanje sigurnosnog kopiranja, otvorite Signal na vašem primarnom iPhone ili Android uređaju te idite na Postavke > Sigurnosne kopije.";
+"BACKUPS_SETUP_ON_PRIMARY_MESSAGE" = "Za postavljanje sigurnosnog kopiranja, otvorite Radar na vašem primarnom iPhone ili Android uređaju te idite na Postavke > Sigurnosne kopije.";
 
 /* Body for system notification or megaphone when backups is enabled. Embeds {{ time backups was enabled }} */
-"BACKUPS_TURNED_ON_NOTIFICATION_BODY_FORMAT" = "Sigurnosne kopije Signala uključene su za ovaj račun u %1$@. Dodirnite za pregled.";
+"BACKUPS_TURNED_ON_NOTIFICATION_BODY_FORMAT" = "Sigurnosne kopije Radara uključene su za ovaj račun u %1$@. Dodirnite za pregled.";
 
 /* Title for system notification or megaphone when backups is enabled */
 "BACKUPS_TURNED_ON_TITLE" = "Uključili ste sigurnosno kopiranje";
@@ -1376,7 +1376,7 @@
 "BANK_MANDATE_READ_MORE" = "Pročitaj više";
 
 /* Users can donate to Signal with a bank account. We are required to show them a mandate with information about bank transfers. This is a subtitle about the payment processor Stripe above that mandate. */
-"BANK_MANDATE_SUBTITLE" = "Stripe obrađuje donacije u korist Signala. Radar ne prikuplja niti pohranjuje vaše osobne podatke.";
+"BANK_MANDATE_SUBTITLE" = "Stripe obrađuje donacije u korist Radara. Radar ne prikuplja niti pohranjuje vaše osobne podatke.";
 
 /* Users can donate to Signal with a bank account. We are required to show them a mandate with information about bank transfers. This is the title above that mandate. */
 "BANK_MANDATE_TITLE" = "Bankovni transfer";
@@ -1541,7 +1541,7 @@
 "CALL_AUDIO_MISSED_WEEK_NOTIFICATION_BODY_FORMAT" = "📞 Propušten glasovni poziv u %1$@";
 
 /* Alert message when calling and permissions for microphone are missing */
-"CALL_AUDIO_PERMISSION_MESSAGE" = "Za upućivanje poziva i snimanje glasovnih poruka u Signalu, možete omogućiti pristup mikrofonu u postavkama iOS-a.";
+"CALL_AUDIO_PERMISSION_MESSAGE" = "Za upućivanje poziva i snimanje glasovnih poruka u Radaru, možete omogućiti pristup mikrofonu u postavkama iOS-a.";
 
 /* Alert title when calling and permissions for microphone are missing */
 "CALL_AUDIO_PERMISSION_TITLE" = "Potreban je pristup mikrofonu";
@@ -1634,7 +1634,7 @@
 "CALL_LINK_REQUIRE_APPROVAL" = "Zatraži odobrenje administratora";
 
 /* Button to open UI to share a Call Link with someone on Signal. */
-"CALL_LINK_SHARE_VIA_SIGNAL" = "Podijeli poveznicu putem Signala";
+"CALL_LINK_SHARE_VIA_SIGNAL" = "Podijeli poveznicu putem Radara";
 
 /* Button to open the system share sheet to share a Call Link. */
 "CALL_LINK_SHARE_VIA_SYSTEM" = "Podijeli poveznicu";
@@ -1655,7 +1655,7 @@
 "CALL_QUALITY_SURVEY_COMPLETION_TOAST" = "Hvala na povratnim informacijama!";
 
 /* Footer text explaining custom issue descriptions in the call quality survey */
-"CALL_QUALITY_SURVEY_CUSTOM_ISSUE_FOOTER" = "Molimo navedite sve relevantne detalje o vašem problemu. Sve što ovdje podijelite ostat će privatno i koristit će se samo u svrhu poboljšanja poziva na Signalu.";
+"CALL_QUALITY_SURVEY_CUSTOM_ISSUE_FOOTER" = "Molimo navedite sve relevantne detalje o vašem problemu. Sve što ovdje podijelite ostat će privatno i koristit će se samo u svrhu poboljšanja poziva na Radaru.";
 
 /* Placeholder text for the custom issue entry in the call quality survey */
 "CALL_QUALITY_SURVEY_CUSTOM_ISSUE_PLACEHOLDER" = "Opišite problem";
@@ -1670,7 +1670,7 @@
 "CALL_QUALITY_SURVEY_DEBUG_LOG_PREVIEW_LINK" = "Prikaži zapisnik otklanjanja pogreške";
 
 /* Title for the debug log sharing screen in the call quality survey */
-"CALL_QUALITY_SURVEY_DEBUG_LOG_TITLE" = "Pomozite nam poboljšati Signal";
+"CALL_QUALITY_SURVEY_DEBUG_LOG_TITLE" = "Pomozite nam poboljšati Radar";
 
 /* Label for the toggle to share debug log in the call quality survey */
 "CALL_QUALITY_SURVEY_DEBUG_LOG_TOGGLE" = "Podijeli zapisnik otklanjanja pogreške";
@@ -1724,7 +1724,7 @@
 "CALL_QUALITY_SURVEY_ISSUES_SHEET_TITLE" = "Koje ste probleme imali?";
 
 /* Header text explaining the purpose of the call quality survey */
-"CALL_QUALITY_SURVEY_RATING_HEADER" = "Vaše povratne informacije pomažu nam poboljšati pozive na Signalu. Osobni identifikacijski podaci neće biti pohranjeni.";
+"CALL_QUALITY_SURVEY_RATING_HEADER" = "Vaše povratne informacije pomažu nam poboljšati pozive na Radaru. Osobni identifikacijski podaci neće biti pohranjeni.";
 
 /* Title for the initial rating screen in the call quality survey */
 "CALL_QUALITY_SURVEY_RATING_TITLE" = "Kakav je bio poziv?";
@@ -2111,7 +2111,7 @@
 "CHAT_LIST_BACKUP_PROGRESS_VIEW_RESUME_CELLULAR_DATA_BUTTON" = "Nastavi";
 
 /* Message shown in an action sheet when the user tries to resume backup using cellular data. */
-"CHAT_LIST_BACKUP_PROGRESS_VIEW_RESUME_CELLULAR_DATA_MESSAGE" = "Upotreba mobilnih podataka za sigurnosno kopiranje medijskih zapisa može uzrokovati dodatne troškove. Izrada sigurnosne kopije može dugo potrajati, stoga držite Signal otvorenim kako biste izbjegli prekide u preuzimanju.";
+"CHAT_LIST_BACKUP_PROGRESS_VIEW_RESUME_CELLULAR_DATA_MESSAGE" = "Upotreba mobilnih podataka za sigurnosno kopiranje medijskih zapisa može uzrokovati dodatne troškove. Izrada sigurnosne kopije može dugo potrajati, stoga držite Radar otvorenim kako biste izbjegli prekide u preuzimanju.";
 
 /* Title for the action sheet shown when the user tries to resume backup using cellular data. */
 "CHAT_LIST_BACKUP_PROGRESS_VIEW_RESUME_CELLULAR_DATA_TITLE" = "Želite li nastaviti s korištenjem mobilnih podataka?";
@@ -2243,7 +2243,7 @@
 "CLOCK_SKEW_APP_BLOCKING_DEVICE_TIME_FORMAT" = "Vrijeme na vašem uređaju je %1$@ UTC.";
 
 /* Subtitle for a screen shown when the app can't be used until the user corrects their device's date and time. */
-"CLOCK_SKEW_APP_BLOCKING_SUBTITLE" = "Signal nije moguće koristiti ako su datum i vrijeme na vašem uređaju netočni. Otvorite postavke i ažurirajte ih.";
+"CLOCK_SKEW_APP_BLOCKING_SUBTITLE" = "Radar nije moguće koristiti ako su datum i vrijeme na vašem uređaju netočni. Otvorite postavke i ažurirajte ih.";
 
 /* Title for a screen shown when the app can't be used until the user corrects their device's date and time. */
 "CLOCK_SKEW_APP_BLOCKING_TITLE" = "Datum je netočan";
@@ -2297,7 +2297,7 @@
 "COMPOSE_SCREEN_MISSING_CONTACTS_CTA" = "Otvori postavke";
 
 /* Multi-line label explaining why compose-screen contact picker is empty. */
-"COMPOSE_SCREEN_MISSING_CONTACTS_PERMISSION" = "Možete omogućiti pristup kontaktima u postavkama iOS-a kako biste vidjeli koji od vaših kontakata su korisnici Signala.";
+"COMPOSE_SCREEN_MISSING_CONTACTS_PERMISSION" = "Možete omogućiti pristup kontaktima u postavkama iOS-a kako biste vidjeli koji od vaših kontakata su korisnici Radara.";
 
 /* Configure reactions title text */
 "CONFIGURE_REACTIONS" = "Prilagodite postavke reakcija";
@@ -2339,7 +2339,7 @@
 "CONTACT_ABOUT_SHEET_PROFILE_NAMES_EDUCATION" = "Imena profila nisu potvrđena";
 
 /* Message for a tooltip that appears above a parenthesized name for another user, indicating that that name is the name the other user set for themself. Embeds {{name}} */
-"CONTACT_ABOUT_SHEET_SECONDARY_NAME_TOOLTIP_MESSAGE" = "\"%1$@\" je ime profila koje je ova osoba postavila za sebe na Signalu.";
+"CONTACT_ABOUT_SHEET_SECONDARY_NAME_TOOLTIP_MESSAGE" = "\"%1$@\" je ime profila koje je ova osoba postavila za sebe na Radaru.";
 
 /* A label indicating a user is a signal connection. */
 "CONTACT_ABOUT_SHEET_SIGNAL_CONNECTION_LABEL" = "Radar kontakt";
@@ -2390,7 +2390,7 @@
 "CONTACT_NOTE_TITLE" = "Bilješka";
 
 /* Body for contact permission action sheet */
-"CONTACT_PERMISSION_ACTION_SHEET_2_BODY" = "Da biste pronašli ljude koje poznajete na Signalu:";
+"CONTACT_PERMISSION_ACTION_SHEET_2_BODY" = "Da biste pronašli ljude koje poznajete na Radaru:";
 
 /* First step for contact permission action sheet */
 "CONTACT_PERMISSION_ACTION_SHEET_2_STEP_ONE" = "Pritisnite \"Idi na postavke\"";
@@ -2423,10 +2423,10 @@
 "CONTACT_PERMISSION_REMINDER_MEGAPHONE_ACTION" = "Omogući pristup";
 
 /* Body for contact permission reminder megaphone */
-"CONTACT_PERMISSION_REMINDER_MEGAPHONE_BODY" = "Dopustite pristup svojim kontaktima kako biste ih brzo pronašli na Signalu.";
+"CONTACT_PERMISSION_REMINDER_MEGAPHONE_BODY" = "Dopustite pristup svojim kontaktima kako biste ih brzo pronašli na Radaru.";
 
 /* Title for contact permission reminder megaphone */
-"CONTACT_PERMISSION_REMINDER_MEGAPHONE_TITLE" = "Pronađite kontakte na Signalu";
+"CONTACT_PERMISSION_REMINDER_MEGAPHONE_TITLE" = "Pronađite kontakte na Radaru";
 
 /* Label for a contact's phone number. */
 "CONTACT_PHONE" = "Telefon";
@@ -2462,7 +2462,7 @@
 "CONTACT_SHARE_AVATAR_ROW_LABEL" = "Fotografija";
 
 /* Name of the option to share a contact's Signal profile photo. Read by VoiceOver on the option, and as the current value of the photo row when it's selected. */
-"CONTACT_SHARE_AVATAR_SIGNAL_PHOTO" = "Slika profila na Signalu";
+"CONTACT_SHARE_AVATAR_SIGNAL_PHOTO" = "Slika profila na Radaru";
 
 /* Name of the option to share a contact's photo from the phone's contacts. Read by VoiceOver on the option, and as the current value of the photo row when it's selected. */
 "CONTACT_SHARE_AVATAR_SYSTEM_CONTACT_PHOTO" = "Slika kontakta";
@@ -2477,7 +2477,7 @@
 "CONTACT_SHARE_MESSAGE_BUTTON" = "Poruka";
 
 /* Notice at the top of the 'Share Contact' view when the shared contact includes their Signal account. Embeds {{ contact name }}. */
-"CONTACT_SHARE_SIGNAL_ACCOUNT_NOTICE_FORMAT" = "Svatko s kim podijelite ovaj profil moći će poslati poruku korisniku %1$@ na Signalu.";
+"CONTACT_SHARE_SIGNAL_ACCOUNT_NOTICE_FORMAT" = "Svatko s kim podijelite ovaj profil moći će poslati poruku korisniku %1$@ na Radaru.";
 
 /* Alert body when contacts disabled while trying to share a contact. */
 "CONTACT_SHARING_NO_ACCESS_BODY" = "Radar treba pristup vašim kontaktima. Idite u postavke iOS-a i omogućite pristup kontaktima. Vaši kontakti su šifrirani i nisu vidljivi usluzi Radar.";
@@ -3135,7 +3135,7 @@
 "DEPOSIT_RECEIVED_TITLE" = "Deposit Received";
 
 /* Notification warning the user that they have been de-registered. */
-"DEREGISTRATION_NOTIFICATION" = "Odjavljeni ste sa Signala na ovom uređaju.";
+"DEREGISTRATION_NOTIFICATION" = "Odjavljeni ste sa Radara na ovom uređaju.";
 
 /* Button that lets users re-register using the same phone number. */
 "DEREGISTRATION_REREGISTER_BUTTON" = "Ponovno registriraj";
@@ -3144,7 +3144,7 @@
 "DEREGISTRATION_REREGISTER_PROMPT_TITLE" = "Želite li ponovno registrirati ovaj broj telefona?";
 
 /* Label warning the user that they have been de-registered. */
-"DEREGISTRATION_WARNING" = "Ovaj uređaj više nije registriran. To je vjerojatno zato što ste svoj broj telefona na Signalu registrirali na drugom uređaju.";
+"DEREGISTRATION_WARNING" = "Ovaj uređaj više nije registriran. To je vjerojatno zato što ste svoj broj telefona na Radaru registrirali na drugom uređaju.";
 
 /* If the user has been deregistered, they'll see a warning. This is This is the call to action on that warning. */
 "DEREGISTRATION_WARNING_ACTION_TITLE" = "Ponovno registrirajte uređaj";
@@ -3216,7 +3216,7 @@
 "DEVICE_TRANSFER_ERROR_NOT_ENOUGH_SPACE" = "Nema dovoljno slobodnog prostora za dovršetak prijenosa";
 
 /* An error indicating the user must update their device before trying to transfer. */
-"DEVICE_TRANSFER_ERROR_UNSUPPORTED_VERSION" = "Ažurirajte na najnoviju verziju Signala i pokušajte ponovno";
+"DEVICE_TRANSFER_ERROR_UNSUPPORTED_VERSION" = "Ažurirajte na najnoviju verziju Radara i pokušajte ponovno";
 
 /* Body of the device transfer screen for pairing a new device, from the new device */
 "DEVICE_TRANSFER_PAIR_NEW_DEVICE_MESSAGE" = "Za prijenos računa, povežite ovaj uređaj sa svojim starim uređajem";
@@ -3396,13 +3396,13 @@
 "DONATE_CHOOSE_PAYMENT_METHOD_SHEET_SUBTITLE_FOR_ONE_TIME_DONATION" = "Osvojite značku %1$@ na 30 dana";
 
 /* When users make donations on a friend's behalf, they see a sheet that lets them pick a payment method. This is the title on that sheet. Embeds {{amount of money}}, such as \"$5\". */
-"DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_DONATION_ON_BEHALF_OF_A_FRIEND" = "%1$@ Donacija Signalu";
+"DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_DONATION_ON_BEHALF_OF_A_FRIEND" = "%1$@ Donacija Radaru";
 
 /* When users make monthly donations, they see a sheet that lets them pick a payment method. This is the title on that sheet. Embeds {{amount of money per month}}, such as \"$5/month\". */
-"DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_MONTHLY_DONATION" = "Donirajte %1$@ Signalu";
+"DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_MONTHLY_DONATION" = "Donirajte %1$@ Radaru";
 
 /* When users make one-time donations, they see a sheet that lets them pick a payment method. This is the title on that sheet. Embeds {{amount of money}}, such as \"$5\". */
-"DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_ONE_TIME_DONATION" = "Donirajte %1$@ Signalu";
+"DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_ONE_TIME_DONATION" = "Donirajte %1$@ Radaru";
 
 /* Users can donate on a friend's behalf and can optionally add a message. This is tells users about that optional message. */
 "DONATE_ON_BEHALF_OF_A_FRIEND_ADDITIONAL_MESSAGE_INFO" = "Primatelj će biti obaviješten o donaciji u privatnoj poruci. U nastavku napišite poruku.";
@@ -3552,7 +3552,7 @@
 "DONATION_ON_BEHALF_OF_A_FRIEND_PREVIEW_OUTGOING" = "✨ Izvršili ste donaciju u ime korisnika %1$@";
 
 /* You received a donation from a friend. This is the title of that message in the chat. Embeds {{short contact name}}. */
-"DONATION_ON_BEHALF_OF_A_FRIEND_RECEIVED_TITLE_FORMAT" = "Korisnik %1$@ donirao je Signalu u vaše ime";
+"DONATION_ON_BEHALF_OF_A_FRIEND_RECEIVED_TITLE_FORMAT" = "Korisnik %1$@ donirao je Radaru u vaše ime";
 
 /* Users can donate on a friend's behalf. This is the error message that appears if the try to do this, but the recipient is blocked. */
 "DONATION_ON_BEHALF_OF_A_FRIEND_RECIPIENT_IS_BLOCKED_ERROR_BODY" = "Nije moguće donirati u ime korisnika kojega ste blokirali.";
@@ -3576,7 +3576,7 @@
 "DONATION_ON_BEHALF_OF_A_FRIEND_SENT_TITLE_FORMAT" = "Donacija u ime korisnika %1$@";
 
 /* When you donate on behalf of a friend, a thank-you sheet will appear. This is the text on that sheet. Embeds {{recipient name}}. */
-"DONATION_ON_BEHALF_OF_A_FRIEND_THANKS_BODY_FORMAT" = "Izvršili ste donaciju Signalu u ime korisnika %1$@. Korisnik će moći izabrati hoće li iskazati podršku na svom profilu.";
+"DONATION_ON_BEHALF_OF_A_FRIEND_THANKS_BODY_FORMAT" = "Izvršili ste donaciju Radaru u ime korisnika %1$@. Korisnik će moći izabrati hoće li iskazati podršku na svom profilu.";
 
 /* When you donate on behalf of a friend, a thank-you sheet will appear. This is the title on that sheet. */
 "DONATION_ON_BEHALF_OF_A_FRIEND_THANKS_TITLE" = "Hvala vam na podršci!";
@@ -3585,7 +3585,7 @@
 "DONATION_ON_BEHALF_OF_A_FRIEND_VIEW" = "Pregledaj";
 
 /* A friend has donated on your behalf and you received a badge. This text says that you received a badge, and from whom. Embeds {{contact's short name, such as a first name}}. */
-"DONATION_ON_BEHALF_OF_A_FRIEND_YOU_RECEIVED_A_BADGE_FORMAT" = "Korisnik %1$@ donirao je Signalu u vaše ime! Pokažite svoju podršku Signalu na svom profilu.";
+"DONATION_ON_BEHALF_OF_A_FRIEND_YOU_RECEIVED_A_BADGE_FORMAT" = "Korisnik %1$@ donirao je Radaru u vaše ime! Pokažite svoju podršku Radaru na svom profilu.";
 
 /* Body text for a sheet discussing donating to Signal. */
 "DONATION_READ_MORE_SHEET_BODY" = "Kao nezavisna neprofitna organizacija, Signal garantira privatnost vaših poruka i poziva. Bez oglasa, bez pratitelja i bez nadzora. Donirajte već danas i podržite Signal.";
@@ -3735,13 +3735,13 @@
 "DONATION_VIEW_MANAGE_BADGES" = "Značke";
 
 /* Text describing to the user that they're going to pay a monthly donation to Signal */
-"DONATION_VIEW_MONTHLY_DONATION_TO_SIGNAL" = "Mjesečna donacija Signalu";
+"DONATION_VIEW_MONTHLY_DONATION_TO_SIGNAL" = "Mjesečna donacija Radaru";
 
 /* Title for the 'my support' section in the donation view */
 "DONATION_VIEW_MY_SUPPORT_TITLE" = "Moja podrška";
 
 /* Title on the 'Donate to Signal' screen */
-"DONATION_VIEW_TITLE" = "Donirajte Signalu";
+"DONATION_VIEW_TITLE" = "Donirajte Radaru";
 
 /* Label for the currency picker button in donation views */
 "DONATIONS_CURRENCY_PICKER_LABEL" = "Valuta";
@@ -3759,7 +3759,7 @@
 "EDIT_CONTACT_WITHOUT_CONTACTS_PERMISSION_ALERT_BODY" = "Možete omogućiti pristup u postavkama iOS-a.";
 
 /* Alert title for when the user has just tried to edit a contacts after declining to give Signal contacts permissions */
-"EDIT_CONTACT_WITHOUT_CONTACTS_PERMISSION_ALERT_TITLE" = "Za uređivanje informacija o kontaktima, Signalu je potreban pristup kontaktima";
+"EDIT_CONTACT_WITHOUT_CONTACTS_PERMISSION_ALERT_TITLE" = "Za uređivanje informacija o kontaktima, Radaru je potreban pristup kontaktima";
 
 /* The navbar title for the 'update group' view. */
 "EDIT_GROUP_DEFAULT_TITLE" = "Uredi grupu";
@@ -3792,7 +3792,7 @@
 "EDIT_MESSAGE_SEND_MESSAGE_UNKNOWN_ERROR" = "EDIT_MESSAGE_SEND_MESSAGE_UNKNOWN_ERROR";
 
 /* body of email sent to contacts when inviting to install Signal. Embeds {{link to install Signal}} and {{link to the Signal home page}} */
-"EMAIL_INVITE_BODY" = "Hej,\n\nu posljednje vrijeme koristim Radar kako bi razgovori na mom iPhone-u ostali privatni. Ako ga i ti instaliraš, bit ćemo sigurni da nitko osim nas ne može čitati naše poruke ili slušati naše razgovore.\n\nSignal je dostupan za iPhone i Android uređaje te za računala. Preuzmi ga ovdje: %1$@\n\nSignal funkcionira poput drugih aplikacija za razmjenu poruka. Možeš slati fotografije i videozapise, pozivati i stvarati grupne razgovore. Najbolji dio je to što nitko osim tebe ne može vidjeti ništa od toga, čak ni osobe koje su stvorile Radar!\n\nOvdje možeš pročitati više o Signalu: %2$@";
+"EMAIL_INVITE_BODY" = "Hej,\n\nu posljednje vrijeme koristim Radar kako bi razgovori na mom iPhone-u ostali privatni. Ako ga i ti instaliraš, bit ćemo sigurni da nitko osim nas ne može čitati naše poruke ili slušati naše razgovore.\n\nSignal je dostupan za iPhone i Android uređaje te za računala. Preuzmi ga ovdje: %1$@\n\nSignal funkcionira poput drugih aplikacija za razmjenu poruka. Možeš slati fotografije i videozapise, pozivati i stvarati grupne razgovore. Najbolji dio je to što nitko osim tebe ne može vidjeti ništa od toga, čak ni osobe koje su stvorile Radar!\n\nOvdje možeš pročitati više o Radaru: %2$@";
 
 /* subject of email sent to contacts when inviting to install Signal */
 "EMAIL_INVITE_SUBJECT" = "Prebacimo se na Radar";
@@ -3987,7 +3987,7 @@
 "ERROR_SENDING_DEREGISTERED" = "Vaš uređaj više nije povezan. Ponovno ga povežite kako biste nastavili slati poruke.";
 
 /* Error indicating a send failure due to an expired application. */
-"ERROR_SENDING_EXPIRED" = "Vaša verzija Signala je istekla. Ažurirajte kako bi nastavili slati poruke.";
+"ERROR_SENDING_EXPIRED" = "Vaša verzija Radara je istekla. Ažurirajte kako bi nastavili slati poruke.";
 
 /* Format string for 'unregistered user' error. Embeds {{the unregistered user's name or signal id}}. */
 "ERROR_UNREGISTERED_USER_FORMAT" = "Neregistrirani korisnik: %1$@";
@@ -3999,16 +3999,16 @@
 "EXIT_REREGISTRATION" = "Izađi iz registracije";
 
 /* Label notifying the user that the app has expired. */
-"EXPIRATION_ERROR" = "Ova verzija Signala je istekla. Ažurirajte da biste ponovno slali i primali poruke.";
+"EXPIRATION_ERROR" = "Ova verzija Radara je istekla. Ažurirajte da biste ponovno slali i primali poruke.";
 
 /* If the user's app is too old, they'll be shown a warning asking them to upgrade. This is the text on the warning, and tapping it will open the App Store page for Signal. */
 "EXPIRATION_WARNING_ACTION_TITLE" = "Ažuriraj sada";
 
 /* Label warning the user that the app will expire soon. Embeds {{date}}. */
-"EXPIRATION_WARNING_SOON" = "Ova verzija Signala istječe za %1$@. Ažurirajte za daljnje korištenje aplikacije.";
+"EXPIRATION_WARNING_SOON" = "Ova verzija Radara istječe za %1$@. Ažurirajte za daljnje korištenje aplikacije.";
 
 /* Label warning the user that the app will expire today. */
-"EXPIRATION_WARNING_TODAY" = "Ova verzija Signala istječe danas. Ažurirajte za daljnje korištenje aplikacije.";
+"EXPIRATION_WARNING_TODAY" = "Ova verzija Radara istječe danas. Ažurirajte za daljnje korištenje aplikacije.";
 
 /* Description of how and why Signal iOS uses Touch ID/Face ID/Phone Passcode to export your chat history. */
 "EXPORT_CHATS_AUTHENTICATION_REASON" = "Za izvoz povijesti razgovora potrebna je provjera autentičnosti";
@@ -4575,7 +4575,7 @@
 "GROUP_LINK_VIEW_SHARE_LINK_VIA_QR_CODE" = "QR kôd";
 
 /* Label for the 'share group link via Signal' button in the 'group link' view. */
-"GROUP_LINK_VIEW_SHARE_LINK_VIA_SIGNAL" = "Podijeli putem Signala";
+"GROUP_LINK_VIEW_SHARE_LINK_VIA_SIGNAL" = "Podijeli putem Radara";
 
 /* Message for the 'share group link' action sheet in the 'group link' view. */
 "GROUP_LINK_VIEW_SHARE_SHEET_MESSAGE" = "Bilo tko s ovom poveznicom može vidjeti naziv grupe i članove kao i poslati zahtjev za pridruživanje. Podijelite s osobama kojima vjerujete.";
@@ -4698,10 +4698,10 @@
 "GROUP_NAME_EDUCATION_SHEET_BULLET_1" = "Budite oprezni s grupama koje se lažno predstavljaju kao organizacije i tvrtke";
 
 /* Second bullet point for the explainer sheet for group names */
-"GROUP_NAME_EDUCATION_SHEET_BULLET_2" = "Signal ne može potvrditi imena ni fotografije korisnika";
+"GROUP_NAME_EDUCATION_SHEET_BULLET_2" = "Radar ne može potvrditi imena ni fotografije korisnika";
 
 /* Third bullet point for the explainer sheet for group names */
-"GROUP_NAME_EDUCATION_SHEET_BULLET_3" = "Signal vas nikada neće kontaktirati da pita vaš kôd za registraciju, PIN ili ključ za oporavak";
+"GROUP_NAME_EDUCATION_SHEET_BULLET_3" = "Radar vas nikada neće kontaktirati da pita vaš kôd za registraciju, PIN ili ključ za oporavak";
 
 /* Fourth bullet point for the explainer sheet for group names */
 "GROUP_NAME_EDUCATION_SHEET_BULLET_4" = "Ne dijelite osobne podatke s osobama koje ne poznajete";
@@ -5214,10 +5214,10 @@
 "INFO_MESSAGE_BLOCKED_OTHER_USER" = "Blokirali ste ovu osobu.";
 
 /* Indicates that a previously-removed recipient has been added back to the current user's contacts. */
-"INFO_MESSAGE_CONTACT_REINSTATED" = "Ovaj korisnik je vraćen u vaš popis kontakata na Signalu.";
+"INFO_MESSAGE_CONTACT_REINSTATED" = "Ovaj korisnik je vraćen u vaš popis kontakata na Radaru.";
 
 /* Indicates that the recipient has been removed from the current user's contacts and that messaging them will re-add them. */
-"INFO_MESSAGE_CONTACT_REMOVED" = "Uklonili ste ovu osobu s vašeg popisa kontakata na Signalu. Ako joj pošaljete poruku, ponovno će biti dodana kontaktima.";
+"INFO_MESSAGE_CONTACT_REMOVED" = "Uklonili ste ovu osobu s vašeg popisa kontakata na Radaru. Ako joj pošaljete poruku, ponovno će biti dodana kontaktima.";
 
 /* When you start a chat with someone and then later learn their profile name, we insert an in-chat message with this string to record the identifier you originally used to contact them. Embeds {{ the identifier, either a phone number, a username, or a name someone else shared }}. */
 "INFO_MESSAGE_LEARNED_PROFILE_KEY" = "Započeli ste razgovor s korisnikom %1$@.";
@@ -5256,7 +5256,7 @@
 "INFO_MESSAGE_USER_CHANGED_PHONE_NUMBER_FORMAT" = "%1$@ je promijenio/la svoj broj telefona.";
 
 /* Shown in inbox and conversation when a user joins Signal, embeds the new user's {{contact name}} */
-"INFO_MESSAGE_USER_JOINED_SIGNAL_BODY_FORMAT" = "%1$@ je na Signalu!";
+"INFO_MESSAGE_USER_JOINED_SIGNAL_BODY_FORMAT" = "%1$@ je na Radaru!";
 
 /* Label at the top of the input text when editing a message */
 "INPUT_TOOLBAR_EDIT_MESSAGE_LABEL" = "Uredi poruku";
@@ -5266,6 +5266,9 @@
 
 /* Placeholder text displayed in empty input box in chat screen. */
 "INPUT_TOOLBAR_MESSAGE_PLACEHOLDER" = "Poruka";
+/* accessibility label for the button which show up send payemnt screen */
+"INPUT_TOOLBAR_PAYMENTS_BUTTON_ACCESSIBILITY_LABEL" = "Pošalji uplatu";
+
 
 /* accessibility label for the button which shows the sticker picker */
 "INPUT_TOOLBAR_STICKER_BUTTON_ACCESSIBILITY_LABEL" = "Naljepnice";
@@ -5283,7 +5286,7 @@
 "INVALID_PROXY_HOST_ERROR" = "Proxy adresa koju ste unijeli nije valjana. Provjerite adresu i pokušajte ponovno.";
 
 /* Alert body when contacts disabled while trying to invite contacts to signal */
-"INVITE_FLOW_REQUIRES_CONTACT_ACCESS_BODY" = "Možete omogućiti pristup kontaktima u postavkama iOS-a za pozivanje svojih prijatelja da se pridruže Signalu.";
+"INVITE_FLOW_REQUIRES_CONTACT_ACCESS_BODY" = "Možete omogućiti pristup kontaktima u postavkama iOS-a za pozivanje svojih prijatelja da se pridruže Radaru.";
 
 /* Alert title when contacts disabled while trying to invite contacts to signal */
 "INVITE_FLOW_REQUIRES_CONTACT_ACCESS_TITLE" = "Dozvoli pristup kontaktima";
@@ -5436,7 +5439,7 @@
 "LINK_NEW_DEVICE_AUTHENTICATION_REASON" = "Za povezivanje uređaja nastavite s provjerom autentičnosti";
 
 /* Body text for a sheet when a user has started linking a device informing them to finish the process on that other device */
-"LINK_NEW_DEVICE_FINISH_ON_OTHER_DEVICE_SHEET_BODY" = "Dovršite povezivanje sa Signalom na drugom uređaju.";
+"LINK_NEW_DEVICE_FINISH_ON_OTHER_DEVICE_SHEET_BODY" = "Dovršite povezivanje sa Radarom na drugom uređaju.";
 
 /* Title for a sheet when a user has started linking a device informing them to finish the process on that other device */
 "LINK_NEW_DEVICE_FINISH_ON_OTHER_DEVICE_SHEET_TITLE" = "Dovršite povezivanje na drugom uređaju";
@@ -5490,7 +5493,7 @@
 "LINKED_DEVICE_INFO_SHEET_BULLET_3" = "Određenim postavkama možete upravljati samo na glavnom uređaju, uključujući postavke korisničkog računa i sigurnosno kopiranje.";
 
 /* Lead paragraph for a sheet explaining linked devices. The text within the <bold></bold> tags is styled bold. */
-"LINKED_DEVICE_INFO_SHEET_HEADER" = "<bold>Povezani uređaji</bold> vam omogućavaju da na siguran način pristupite svom računu i porukama na Signalu na bilo kojem uređaju koji ste odlučili povezati.";
+"LINKED_DEVICE_INFO_SHEET_HEADER" = "<bold>Povezani uređaji</bold> vam omogućavaju da na siguran način pristupite svom računu i porukama na Radaru na bilo kojem uređaju koji ste odlučili povezati.";
 
 /* Shown in a banner when you tap the 'New Chat' icon at the top of the list of chats. */
 "LINKED_DEVICE_MANAGE_CONTACTS_BANNER" = "Upravljanje kontaktima telefona nije više moguće na povezanim uređajima. Ovaj će uređaj nastaviti sinkronizirati sve promjene na vašem popisu Radar kontakata na vašem glavnom uređaju.";
@@ -5508,16 +5511,16 @@
 "LINKED_DEVICE_NOTIFICATION_TITLE" = "Novi uređaj je povezan";
 
 /* Message for an action sheet telling users how to link a device, when trying to open an external device-linking URL. */
-"LINKED_DEVICE_URL_OPENED_ACTION_SHEET_EXTERNAL_URL_MESSAGE" = "Da biste povezali računalo ili iPad sa svojim Radar računom, idite na „Povezani uređaji“, zatim dodirnite „Poveži novi uređaj“ i ponovno skenirajte QR kôd. Skenirajte samo QR kodove koji dolaze izravno od Signala.";
+"LINKED_DEVICE_URL_OPENED_ACTION_SHEET_EXTERNAL_URL_MESSAGE" = "Da biste povezali računalo ili iPad sa svojim Radar računom, idite na „Povezani uređaji“, zatim dodirnite „Poveži novi uređaj“ i ponovno skenirajte QR kôd. Skenirajte samo QR kodove koji dolaze izravno od Radara.";
 
 /* Message for an action sheet telling users how to link a device, when trying to open a device-linking URL from the in-app camera. */
-"LINKED_DEVICE_URL_OPENED_ACTION_SHEET_IN_APP_CAMERA_MESSAGE" = "Čini se da pokušavate povezati uređaj sa Signalom. Dodirnite „Nastavi“, zatim „Poveži novi uređaj“ i ponovno skenirajte QR kôd.";
+"LINKED_DEVICE_URL_OPENED_ACTION_SHEET_IN_APP_CAMERA_MESSAGE" = "Čini se da pokušavate povezati uređaj sa Radarom. Dodirnite „Nastavi“, zatim „Poveži novi uređaj“ i ponovno skenirajte QR kôd.";
 
 /* Bullet point about a download link on the linked devices education sheet. Embeds {{ %1$@ download link }} */
 "LINKED_DEVICES_EDUCATION_POINT_DOWNLOADS" = "Posjetite %1$@ na uređaju koji želite povezati kako biste instalirali Radar";
 
 /* Bullet point about message sync on the linked devices education sheet */
-"LINKED_DEVICES_EDUCATION_POINT_MESSAGES" = "Radar poruke sinkronizirat će se sa Signalom na vašem mobilnom uređaju nakon što ga povežete.";
+"LINKED_DEVICES_EDUCATION_POINT_MESSAGES" = "Radar poruke sinkronizirat će se sa Radarom na vašem mobilnom uređaju nakon što ga povežete.";
 
 /* Bullet point about privacy on the linked devices education sheet */
 "LINKED_DEVICES_EDUCATION_POINT_PRIVACY" = "Sve poruke na povezanim uređajima su privatne";
@@ -5556,7 +5559,7 @@
 "LINKING_DEVICE_FAILED_TITLE" = "Povezivanje uređaja nije uspjelo";
 
 /* Shown when trying to link a device to an account but that device is out of date and must first update its version of Signal. */
-"LINKING_DEVICE_OUT_OF_DATE" = "Vaš drugi uređaj koristi staru verziju Signala. Potrebno je ažurirati Signal na tom uređaju kako bi ga bilo moguće povezati.";
+"LINKING_DEVICE_OUT_OF_DATE" = "Vaš drugi uređaj koristi staru verziju Radara. Potrebno je ažurirati Radar na tom uređaju kako bi ga bilo moguće povezati.";
 
 /* Progress label when the message loading has nearly completed during the device linking process */
 "LINKING_SYNCING_FINALIZING" = "Prijenos poruka je pri kraju…";
@@ -5580,7 +5583,7 @@
 "LOCAL_BACKUP_SETTINGS_CREATE_NEW_KEY_WARNING_SHEET_BODY" = "Stvaranje novog ključa potrebno je samo ako je netko drugi saznao vaš ključ. Za stvaranje novog ključa, sigurnosne kopije na uređaju moraju biti onemogućene.\n\nNakon što onemogućite sigurnosno kopiranje na uređaju i stvorite novi ključ, morat ćete ponovno omogućiti sigurnosno kopiranje na uređaju.";
 
 /* Body for an error sheet shown when the user's folder choice does not contain a backup file. */
-"LOCAL_BACKUPS_MISSING_BACKUP_ACTION_SHEET_BODY" = "Sigurnosna kopija Signala nije pronađena u odabranoj mapi. Molimo odaberite drugu mapu.";
+"LOCAL_BACKUPS_MISSING_BACKUP_ACTION_SHEET_BODY" = "Sigurnosna kopija Radara nije pronađena u odabranoj mapi. Molimo odaberite drugu mapu.";
 
 /* Title for an error sheet shown when the user's folder choice does not contain a backup file. */
 "LOCAL_BACKUPS_MISSING_BACKUP_ACTION_SHEET_TITLE" = "Nije pronađena sigurnosna kopija";
@@ -5628,7 +5631,7 @@
 "LOCAL_FILE_BACKUP_ONBOARDING_INTRO_BULLET_3" = "Isključite sigurnosno kopiranje bilo kada";
 
 /* Subtitle for a view introducing local file backups during the onboarding flow. */
-"LOCAL_FILE_BACKUP_ONBOARDING_INTRO_SUBTITLE" = "Spremite svoje poruke u mapi na svom uređaju. Sigurnosne kopije zaštićene su sveobuhvatnim šifriranjem i mogu se oporaviti instaliranjem nove kopije Signala i odabirom opcije „Vrati ili prenesi“.";
+"LOCAL_FILE_BACKUP_ONBOARDING_INTRO_SUBTITLE" = "Spremite svoje poruke u mapi na svom uređaju. Sigurnosne kopije zaštićene su sveobuhvatnim šifriranjem i mogu se oporaviti instaliranjem nove kopije Radara i odabirom opcije „Vrati ili prenesi“.";
 
 /* Title for a view introducing local file backups during the onboarding flow. */
 "LOCAL_FILE_BACKUP_ONBOARDING_INTRO_TITLE" = "Sigurnosne kopije na uređaju";
@@ -5643,10 +5646,10 @@
 "LOCAL_FILE_BACKUPS_CHOOSE_FOLDER_TITLE" = "Odaberite mapu";
 
 /* Warning shown when a user tries to enable local file backups with optimize media enabled */
-"LOCAL_FILE_BACKUPS_OPTIMIZE_MEDIA_WARNING_ACTION_SHEET" = "Trenutno koristite optimizaciju Signalove pohrane. Ako želite da se svi medijski zapisi sigurnosno kopiraju na vašem uređaju, morate isključiti optimizaciju.";
+"LOCAL_FILE_BACKUPS_OPTIMIZE_MEDIA_WARNING_ACTION_SHEET" = "Trenutno koristite optimizaciju Radarove pohrane. Ako želite da se svi medijski zapisi sigurnosno kopiraju na vašem uređaju, morate isključiti optimizaciju.";
 
 /* Message for a sheet warning the user about enabling Optimize Storage with local backups enabled. */
-"LOCAL_FILE_BACKUPS_OPTIMIZE_MEDIA_WARNING_ACTION_SHEET_2_BODY" = "Optimizacija Signalove pohrane premjestit će vaše medijske zapise s vašeg uređaja. Moći ćete ponovno preuzeti svoje datoteke u bilo kojem trenutku. Također, stariji medijski zapisi bit će uklonjeni iz sigurnosne kopije na uređaju.";
+"LOCAL_FILE_BACKUPS_OPTIMIZE_MEDIA_WARNING_ACTION_SHEET_2_BODY" = "Optimizacija Radarove pohrane premjestit će vaše medijske zapise s vašeg uređaja. Moći ćete ponovno preuzeti svoje datoteke u bilo kojem trenutku. Također, stariji medijski zapisi bit će uklonjeni iz sigurnosne kopije na uređaju.";
 
 /* Title for a sheet warning the user about enabling Optimize Storage with local backups enabled. */
 "LOCAL_FILE_BACKUPS_OPTIMIZE_MEDIA_WARNING_ACTION_SHEET_2_TITLE" = "Medijski zapisi bit će uklonjeni iz sigurnosne kopije na uređaju";
@@ -5670,16 +5673,16 @@
 "LOGGING_SECTION" = "Zapisnici";
 
 /* Footer for the 'logging' help section. */
-"LOGGING_SECTION_FOOTER" = "Zapisnici pogreške pomažu Signalu popraviti probleme i rušenja aplikacije.";
+"LOGGING_SECTION_FOOTER" = "Zapisnici pogreške pomažu Radaru popraviti probleme i rušenja aplikacije.";
 
 /* Title for the 'long text message' view. */
 "LONG_TEXT_VIEW_TITLE" = "Poruka";
 
 /* Message for a sheet warning the user that their device is low on storage space. Embeds 1:{{ the localized name of the user's device model, e.g. iPhone }}; 2:{{ an amount of storage space as a file size, e.g. 1 GB }}. */
-"LOW_DISK_SPACE_WARNING_SHEET_MESSAGE_FORMAT" = "Na vašem %1$@ uređaju nema dovoljno slobodnog prostora za pohranu. Ako se napuni, Signal više neće raditi i možete izgubiti sve svoje podatke. Oslobodite najmanje %2$@ prostora za pohranu.";
+"LOW_DISK_SPACE_WARNING_SHEET_MESSAGE_FORMAT" = "Na vašem %1$@ uređaju nema dovoljno slobodnog prostora za pohranu. Ako se napuni, Radar više neće raditi i možete izgubiti sve svoje podatke. Oslobodite najmanje %2$@ prostora za pohranu.";
 
 /* A suggestion for freeing up storage space, on a sheet warning the user that their device is low on storage space. */
-"LOW_DISK_SPACE_WARNING_SHEET_SUGGESTION_DELETE_CAMERA_ROLL_MEDIA" = "Izbrišite velike videozapise iz aplikacije Fotografije, Signala ili drugih aplikacija za razmjenu poruka";
+"LOW_DISK_SPACE_WARNING_SHEET_SUGGESTION_DELETE_CAMERA_ROLL_MEDIA" = "Izbrišite velike videozapise iz aplikacije Fotografije, Radara ili drugih aplikacija za razmjenu poruka";
 
 /* A suggestion for freeing up storage space, on a sheet warning the user that their device is low on storage space. */
 "LOW_DISK_SPACE_WARNING_SHEET_SUGGESTION_DELETE_DOWNLOADED_MEDIA" = "Izbrišite preuzetu glazbu ili druge medijske zapise";
@@ -5844,7 +5847,7 @@
 "MEMBER_LABEL_VIEW_TITLE" = "Uloga člana";
 
 /* A one-time confirmation that you, as an admin, want to delete for everyone */
-"MESSAGE_ACTION_ADMIN_DELETE_FOR_EVERYONE_CONFIRMATION" = "Članovi grupe koji koriste najnoviju verziju Signala vidjet će da ste izbrisali ove poruke.";
+"MESSAGE_ACTION_ADMIN_DELETE_FOR_EVERYONE_CONFIRMATION" = "Članovi grupe koji koriste najnoviju verziju Radara vidjet će da ste izbrisali ove poruke.";
 
 /* Action sheet button title */
 "MESSAGE_ACTION_COPY_TEXT" = "Kopiraj tekst poruke";
@@ -5853,7 +5856,7 @@
 "MESSAGE_ACTION_DELETE_FOR_EVERYONE" = "Izbriši za sve";
 
 /* A one-time confirmation that you want to delete for everyone */
-"MESSAGE_ACTION_DELETE_FOR_EVERYONE_CONFIRMATION" = "Ova poruka će biti trajno izbrisana za sve osobe u razgovoru ako su na najnovijoj verziji Signala. Moći će vidjeti da ste izbrisali poruku.";
+"MESSAGE_ACTION_DELETE_FOR_EVERYONE_CONFIRMATION" = "Ova poruka će biti trajno izbrisana za sve osobe u razgovoru ako su na najnovijoj verziji Radara. Moći će vidjeti da ste izbrisali poruku.";
 
 /* The title for the action sheet asking who the user wants to delete the message for. */
 "MESSAGE_ACTION_DELETE_FOR_TITLE" = "Za koga želite izbrisati ovu poruku?";
@@ -6045,7 +6048,7 @@
 "MESSAGE_REQUEST_CONFIRM_ACCEPT_MESSAGE" = "Prihvatite samo zahtjeve koje vam šalju ljudi kojima vjerujete. %1$@ kontaktirati da pita vaš kôd za registraciju, PIN ili ključ za oporavak.";
 
 /* Embedded text in the message for an action sheet asking the user to confirm if they want to accept a message request. */
-"MESSAGE_REQUEST_CONFIRM_ACCEPT_MESSAGE_EMBEDDED_BOLD_TEXT" = "Signal vas nikada neće";
+"MESSAGE_REQUEST_CONFIRM_ACCEPT_MESSAGE_EMBEDDED_BOLD_TEXT" = "Radar vas nikada neće";
 
 /* Title for an action sheet asking the user to confirm if they want to accept a message request */
 "MESSAGE_REQUEST_CONFIRM_ACCEPT_TITLE" = "Sigurno želite prihvatiti zahtjev?";
@@ -6225,7 +6228,7 @@
 "MISSED_CALL_BLOCKED_SYSTEM_CONTACT" = "Propušteni poziv od kontakta blokiranog u postavkama telefona";
 
 /* Action to block contact in Signal for sheet shown when the user taps a missed call from a contact blocked in iOS settings. */
-"MISSED_CALL_BLOCKED_SYSTEM_SETTINGS_SHEET_BLOCK_ACTION" = "Blokiraj kontakt i na Signalu";
+"MISSED_CALL_BLOCKED_SYSTEM_SETTINGS_SHEET_BLOCK_ACTION" = "Blokiraj kontakt i na Radaru";
 
 /* Message for sheet shown when the user taps a missed call from a contact blocked in iOS settings. */
 "MISSED_CALL_BLOCKED_SYSTEM_SETTINGS_SHEET_MESSAGE" = "Propustili ste poziv jer je broj blokiran u postavkama vašeg telefona. Idite na Postavke > Telefon i dodirnite Blokirani kontakti za upravljanje postavkama.";
@@ -6465,7 +6468,7 @@
 "NICKNAME_EDITOR_DELETE_CONFIRMATION_TITLE" = "Izbrisati nadimak?";
 
 /* The description below the title on the profile nickname editor view. */
-"NICKNAME_EDITOR_DESCRIPTION" = "Nadimci i bilješke spremaju se pomoću Signala, a zaštićeni su sveobuhvatnim šifriranjem. Vidljivi su samo vama.";
+"NICKNAME_EDITOR_DESCRIPTION" = "Nadimci i bilješke spremaju se pomoću Radara, a zaštićeni su sveobuhvatnim šifriranjem. Vidljivi su samo vama.";
 
 /* Placeholder text it the text field for the family name in the profile nickname editor. */
 "NICKNAME_EDITOR_FAMILY_NAME_PLACEHOLDER" = "Prezime";
@@ -6492,13 +6495,13 @@
 "NO_OTHER_GROUPS_IN_COMMON" = "Nema drugih zajedničkih grupa.";
 
 /* Shown in place of the text input box in a conversation when the user is no longer registered can't send messages. The embedded value is 'Re-link' (translated via NOT_LINKED_BOTTOM_RELINK), and it will be formatted as a tappable link. */
-"NOT_LINKED_BOTTOM" = "Ovaj uređaj više nije povezan. %1$@ da biste nastavili koristiti Signal na ovom uređaju.";
+"NOT_LINKED_BOTTOM" = "Ovaj uređaj više nije povezan. %1$@ da biste nastavili koristiti Radar na ovom uređaju.";
 
 /* Shown in place of the text input box in a conversation when the user is no longer registered can't send messages. This value is a tappable link embedded in a larger sentence. */
 "NOT_LINKED_BOTTOM_RELINK" = "Ponovno ga povežite";
 
 /* Shown in place of the text input box in a conversation when the user is no longer registered can't send messages. The embedded value is 'Re-register' (translated via NOT_REGISTERED_BOTTOM_REREGISTER), and it will be formatted as a tappable link. */
-"NOT_REGISTERED_BOTTOM" = "Ovaj uređaj više nije registriran. %1$@ da biste nastavili koristiti Signal.";
+"NOT_REGISTERED_BOTTOM" = "Ovaj uređaj više nije registriran. %1$@ da biste nastavili koristiti Radar.";
 
 /* Shown in place of the text input box in a conversation when the user is no longer registered can't send messages. This value is a tappable link embedded in a larger sentence. */
 "NOT_REGISTERED_BOTTOM_REREGISTER" = "Ponovno ga registrirajte";
@@ -6510,13 +6513,13 @@
 "NOTE_TO_SELF" = "Osobna bilješka";
 
 /* Body for a notification shown when Signal can't fetch messages because the device's date and time are incorrect. */
-"NOTIFICATION_BODY_CLOCK_SKEW" = "Signal ne može primati poruke ako su datum i vrijeme na vašem uređaju netočni. Otvorite postavke i ažurirajte ih.";
+"NOTIFICATION_BODY_CLOCK_SKEW" = "Radar ne može primati poruke ako su datum i vrijeme na vašem uređaju netočni. Otvorite postavke i ažurirajte ih.";
 
 /* Body for a notification representing a message request. */
 "NOTIFICATION_BODY_INCOMING_MESSAGE_REQUEST" = "Zahtjev za razgovorom";
 
 /* Body for a notification shown when Signal can't fetch messages because the device is low on storage space. */
-"NOTIFICATION_BODY_LOW_STORAGE_SPACE" = "Možda imate nove poruke, ali na vašem uređaju nema dovoljno slobodnog prostora za pokretanje Signala. Dodirnite za više informacija.";
+"NOTIFICATION_BODY_LOW_STORAGE_SPACE" = "Možda imate nove poruke, ali na vašem uređaju nema dovoljno slobodnog prostora za pokretanje Radara. Dodirnite za više informacija.";
 
 /* Lock screen notification text presented after user powers on their device without unlocking. Embeds {{device model}} (either 'iPad' or 'iPhone') */
 "NOTIFICATION_BODY_PHONE_LOCKED_FORMAT" = "Možda ste primili poruke dok se vaš %1$@ ponovno pokretao.";
@@ -6549,7 +6552,7 @@
 "NOTIFICATION_PERMISSION_REMINDER_MEGAPHONE_TITLE" = "Uključiti obavijesti?";
 
 /* Shown as the body of an alert when notifications can't be shown due to an error. */
-"NOTIFICATIONS_ERROR_MESSAGE" = "Ponovno pokrenite svoj %1$@ ako ne primate obavijesti od Signala.";
+"NOTIFICATIONS_ERROR_MESSAGE" = "Ponovno pokrenite svoj %1$@ ako ne primate obavijesti od Radara.";
 
 /* Shown as the title of an alert when notifications can't be shown due to an error. */
 "NOTIFICATIONS_ERROR_TITLE" = "Nije moguće prikazati obavijesti";
@@ -6615,7 +6618,7 @@
 "ONBOARDING_CHOOSE_BACKUP_SHEET_TITLE" = "Odaberite sigurnosnu kopiju za vraćanje";
 
 /* The body for the device transfer 'choice' view 'restore backup' option */
-"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_BODY" = "Oporavite svoj račun i poruke iz sigurnosne kopije Radar/Signala";
+"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_BODY" = "Oporavite svoj račun i poruke iz sigurnosne kopije Signal/Radara";
 
 /* The title for the device transfer 'choice' view 'restore backup' option */
 "ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_TITLE" = "Vratite podatke iz zaštićene kopije podataka";
@@ -6630,7 +6633,7 @@
 "ONBOARDING_CHOOSE_RESTORE_METHOD_DESCRIPTION" = "Odaberite kako želite vratiti svoju povijest poruka i podatke o vašem računu.";
 
 /* Message body displayed to a user during registration if there are no restore options available. */
-"ONBOARDING_CHOOSE_RESTORE_METHOD_NONE_AVAILABLE_BODY" = "Prelaskom s Androida na iOS, jedina mogućnost prijenosa vaših poruka i medijskih zapisa je omogućavanje sigurnosne kopije Signala na vašem starom uređaju.";
+"ONBOARDING_CHOOSE_RESTORE_METHOD_NONE_AVAILABLE_BODY" = "Prelaskom s Androida na iOS, jedina mogućnost prijenosa vaših poruka i medijskih zapisa je omogućavanje sigurnosne kopije Radara na vašem starom uređaju.";
 
 /* Title displayed to a user during registration if there are no restore options available. */
 "ONBOARDING_CHOOSE_RESTORE_METHOD_NONE_AVAILABLE_TITLE" = "Nema sigurnosne kopije za vraćanje";
@@ -6696,7 +6699,7 @@
 "ONBOARDING_MODE_SWITCH_EXPLANATION_PROVISIONING" = "Pritiskom na \"Registriraj iPad\" možete stvoriti potpuno novi Radar račun ili prebaciti postojeći račun na ovaj iPad. To će onemogućiti Radar na bilo kojem drugom uređaju koji je trenutno registriran s istim brojem telefona.";
 
 /* explanation to the user they're switching from registering to linking flow */
-"ONBOARDING_MODE_SWITCH_EXPLANATION_REGISTERING" = "Dodirom na „Poveži ovaj uređaj“ povezat ćete ovaj uređaj s postojećim Signal računom.";
+"ONBOARDING_MODE_SWITCH_EXPLANATION_REGISTERING" = "Dodirom na „Poveži ovaj uređaj“ povezat ćete ovaj uređaj s postojećim Radar računom.";
 
 /* header text indicating to the user they're switching from linking to registering flow */
 "ONBOARDING_MODE_SWITCH_TITLE_PROVISIONING" = "Registriraj ovaj iPad";
@@ -6732,7 +6735,7 @@
 "ONBOARDING_PERMISSIONS_TITLE" = "Omogući dozvole";
 
 /* Explanation of the 'onboarding phone number discoverability' view. Embeds {user phone number} */
-"ONBOARDING_PHONE_NUMBER_DISCOVERABILITY_EXPLANATION_FORMAT" = "Odaberite tko vas može pronaći na Signalu s vašim brojem telefona %1$@";
+"ONBOARDING_PHONE_NUMBER_DISCOVERABILITY_EXPLANATION_FORMAT" = "Odaberite tko vas može pronaći na Radaru s vašim brojem telefona %1$@";
 
 /* Title of the 'onboarding phone number discoverability' view. */
 "ONBOARDING_PHONE_NUMBER_DISCOVERABILITY_TITLE" = "Tko vas može pronaći s vašim brojem telefona?";
@@ -6783,13 +6786,13 @@
 "ONBOARDING_SIGN_UP_USE_SIGNAL_ACCOUNT_BUTTON_TITLE" = "Use my Signal account";
 
 /* Explanation of 'do not have old device' flow for the 'Restore or Transfer' prompt */
-"ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_BODY" = "Ili ako želite ponovno instalirati Radar/Radar na isti uređaj";
+"ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_BODY" = "Ili ako želite ponovno instalirati Signal/Radar na isti uređaj";
 
 /* Title for the 'do not have my old device' choice of the 'Restore or Transfer' prompt */
 "ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_TITLE" = "Nemam svoj stari telefon";
 
 /* Explanation of 'have old device' flow for the 'Restore or Transfer' prompt */
-"ONBOARDING_SPLASH_HAVE_OLD_DEVICE_BODY" = "Skenirajte QR kôd sa svog trenutnog Radar/Radar računa za brzi početak";
+"ONBOARDING_SPLASH_HAVE_OLD_DEVICE_BODY" = "Skenirajte QR kôd sa svog trenutnog Signal/Radar računa za brzi početak";
 
 /* Title for the 'have my old device' choice of the 'Restore or Transfer' prompt */
 "ONBOARDING_SPLASH_HAVE_OLD_DEVICE_TITLE" = "Imam svoj stari telefon";
@@ -7012,10 +7015,10 @@ Send money securely.";
 "OUTGOING_MISSED_VOICE_CALL" = "Propušteni glasovni poziv";
 
 /* Button for action sheet shown when device transfer completes; quits the Signal app immediately (does not automatically relaunch, but the user may choose to relaunch). */
-"OUTGOING_TRANSFER_COMPLETE_EXIT_ACTION" = "Izađi iz Signala";
+"OUTGOING_TRANSFER_COMPLETE_EXIT_ACTION" = "Izađi iz Radara";
 
 /* Message for action sheet shown when device transfer completes */
-"OUTGOING_TRANSFER_COMPLETE_MESSAGE" = "Bit ćete odjavljeni sa Signala na ovome uređaju";
+"OUTGOING_TRANSFER_COMPLETE_MESSAGE" = "Bit ćete odjavljeni sa Radara na ovome uređaju";
 
 /* Title for action sheet shown when device transfer completes */
 "OUTGOING_TRANSFER_COMPLETE_TITLE" = "Prijenos je dovršen!";
@@ -7033,7 +7036,7 @@ Send money securely.";
 "OVERSIZE_TEXT_UNAVAILABLE_SHEET_TITLE" = "Cijela poruka nije dostupna";
 
 /* The name of the Signal app, used as the title for an entry in a user's password manager for their Signal Recovery Key. Should be localized with the same value as the app's name in the iOS App Store. */
-"PASSWORD_MANAGER_SIGNAL_APP_NAME" = "Signal – Privatni razgovori";
+"PASSWORD_MANAGER_SIGNAL_APP_NAME" = "Radar – Privatni razgovori";
 
 /* Header title for bank payment details screen */
 "PAYMENT_DETAILS_BANK_TITLE" = "Bankovni transfer";
@@ -7462,13 +7465,13 @@ Send money securely.";
 "PHONE_NUMBER_DISCOVERABILITY_EVERYBODY" = "Svi";
 
 /* A user friendly description of the 'everybody' phone number discoverability mode. */
-"PHONE_NUMBER_DISCOVERABILITY_EVERYBODY_DESCRIPTION" = "Svi korisnici koji imaju vaš broj telefona vidjet će da ste na Signalu i moći će započeti razgovor s vama.";
+"PHONE_NUMBER_DISCOVERABILITY_EVERYBODY_DESCRIPTION" = "Svi korisnici koji imaju vaš broj telefona vidjet će da ste na Radaru i moći će započeti razgovor s vama.";
 
 /* A user friendly name for the 'nobody' phone number discoverability mode. */
 "PHONE_NUMBER_DISCOVERABILITY_NOBODY" = "Nitko";
 
 /* A user friendly description of the 'nobody' phone number discoverability mode. */
-"PHONE_NUMBER_DISCOVERABILITY_NOBODY_DESCRIPTION" = "Nitko neće moći vidjeti da ste na Signalu, osim ako nekome ne pošaljete poruku ili ako već imate postojeći razgovor s nekime.";
+"PHONE_NUMBER_DISCOVERABILITY_NOBODY_DESCRIPTION" = "Nitko neće moći vidjeti da ste na Radaru, osim ako nekome ne pošaljete poruku ili ako već imate postojeći razgovor s nekime.";
 
 /* A format for a label showing an example phone number. Embeds {{the example phone number}}. */
 "PHONE_NUMBER_EXAMPLE_FORMAT" = "Primjer: %1$@";
@@ -7564,7 +7567,7 @@ Send money securely.";
 "PIN_CREATION_DISABLE_CONFIRMATION_TITLE" = "Upozorenje";
 
 /* The explanation in the 'pin creation' view. */
-"PIN_CREATION_EXPLANATION" = "PIN-ovi čuvaju šifrirane podatke spremljenima na Signalu tako da im samo vi možete pristupiti. Vaš profil, postavke i kontakti će biti vraćeni nakon ponovne instalacije. Neće vam trebati PIN kako biste otvorili aplikaciju.";
+"PIN_CREATION_EXPLANATION" = "PIN-ovi čuvaju šifrirane podatke spremljenima na Radaru tako da im samo vi možete pristupiti. Vaš profil, postavke i kontakti će biti vraćeni nakon ponovne instalacije. Neće vam trebati PIN kako biste otvorili aplikaciju.";
 
 /* Message when a generic error occurs while creating a PIN. */
 "PIN_CREATION_GENERIC_ERROR_MESSAGE" = "Došlo je do pogreške prilikom izrade PIN-a. Molimo kontaktirajte podršku.";
@@ -7573,7 +7576,7 @@ Send money securely.";
 "PIN_CREATION_LEARN_MORE" = "Više o PIN-ovima";
 
 /* Users can create PINs to restore their account data later. They can learn more about this on a sheet. This is the text on that sheet. */
-"PIN_CREATION_LEARN_MORE_TEXT" = "PIN-ovi omogućavaju šifriranje vaših podataka na Signalu tako da im samo vi možete pristupiti. Vaš profil, postavke i kontakti će biti vraćeni nakon ponovne instalacije.";
+"PIN_CREATION_LEARN_MORE_TEXT" = "PIN-ovi omogućavaju šifriranje vaših podataka na Radaru tako da im samo vi možete pristupiti. Vaš profil, postavke i kontakti će biti vraćeni nakon ponovne instalacije.";
 
 /* Users can create PINs to restore their account data later. They can learn more about this on a sheet. This is the title on that sheet. */
 "PIN_CREATION_LEARN_MORE_TITLE" = "O Radar PIN-ovima";
@@ -7606,7 +7609,7 @@ Send money securely.";
 "PIN_CREATION_WEAK_ERROR" = "Odaberite snažniji PIN";
 
 /* If your attempted PIN is too weak, you'll see an error message. This is the text on the error dialog. */
-"PIN_CREATION_WEAK_ERROR_MESSAGE" = "PIN-ovi omogućavaju šifriranje vaših podataka na Signalu tako da im samo vi možete pristupiti. Odaberite jači PIN kako biste zaštitili svoj račun.";
+"PIN_CREATION_WEAK_ERROR_MESSAGE" = "PIN-ovi omogućavaju šifriranje vaših podataka na Radaru tako da im samo vi možete pristupiti. Odaberite jači PIN kako biste zaštitili svoj račun.";
 
 /* If the user is re-registering, they need to enter their PIN to restore all their data. In some cases, they can skip this entry and lose some data. This text is shown on a button that lets them begin to do this. */
 "PIN_ENTER_EXISTING_SKIP" = "Preskoči PIN";
@@ -7852,13 +7855,13 @@ Send money securely.";
 "PRIVACY_VERIFICATION_FAILED_THEY_HAVE_WRONG_KEY_FOR_ME" = "Svaki par Radar korisnika ima poseban sigurnosni broj. Dvaput provjerite da %1$@ prikazuje *vaš* jedinstveni sigurnosni broj.";
 
 /* alert body */
-"PRIVACY_VERIFICATION_FAILED_WITH_OLD_LOCAL_VERSION" = "Imate staru verziju Signala. Prije potvrde morate ažurirati aplikaciju.";
+"PRIVACY_VERIFICATION_FAILED_WITH_OLD_LOCAL_VERSION" = "Imate staru verziju Radara. Prije potvrde morate ažurirati aplikaciju.";
 
 /* alert body */
-"PRIVACY_VERIFICATION_FAILED_WITH_OLD_REMOTE_VERSION" = "Vaš partner koristi staru verziju Signala. Nužno je da ažurira aplikaciju prije nego što možete potvrditi.";
+"PRIVACY_VERIFICATION_FAILED_WITH_OLD_REMOTE_VERSION" = "Vaš partner koristi staru verziju Radara. Nužno je da ažurira aplikaciju prije nego što možete potvrditi.";
 
 /* alert body */
-"PRIVACY_VERIFICATION_FAILURE_INVALID_QRCODE" = "Skenirani kôd ne izgleda kao sigurnosni broj. Koristite li oboje najnoviju verziju Signala?";
+"PRIVACY_VERIFICATION_FAILURE_INVALID_QRCODE" = "Skenirani kôd ne izgleda kao sigurnosni broj. Koristite li oboje najnoviju verziju Radara?";
 
 /* Navbar title */
 "PRIVACY_VERIFICATION_TITLE" = "Provjerite sigurnosni broj";
@@ -7924,10 +7927,10 @@ Send money securely.";
 "PROFILE_NAME_CHANGE_SYSTEM_NONCONTACT_FORMAT" = "%1$@ je promijenio/la svoje ime profila u %2$@.";
 
 /* First bullet point for the explainer sheet for profile names */
-"PROFILE_NAME_EDUCATION_SHEET_BULLET_1" = "Signal ne može potvrditi imena ni fotografije korisnika";
+"PROFILE_NAME_EDUCATION_SHEET_BULLET_1" = "Radar ne može potvrditi imena ni fotografije korisnika";
 
 /* Second bullet point for the explainer sheet for profile names */
-"PROFILE_NAME_EDUCATION_SHEET_BULLET_2" = "Signal vas nikada neće kontaktirati da pita vaš kôd za registraciju, PIN ili ključ za oporavak";
+"PROFILE_NAME_EDUCATION_SHEET_BULLET_2" = "Radar vas nikada neće kontaktirati da pita vaš kôd za registraciju, PIN ili ključ za oporavak";
 
 /* Third bullet point for the explainer sheet for profile names */
 "PROFILE_NAME_EDUCATION_SHEET_BULLET_3" = "Budite oprezni s računima koje ljudi koriste kako bi se lažno predstavljali";
@@ -7936,7 +7939,7 @@ Send money securely.";
 "PROFILE_NAME_EDUCATION_SHEET_BULLET_4" = "Ne dijelite osobne podatke s osobama koje ne poznajete";
 
 /* Header for the explainer sheet for profile names */
-"PROFILE_NAME_EDUCATION_SHEET_HEADER_FORMAT" = "<bold>Imena profila</bold> na Signalu biraju vlasnici računa.";
+"PROFILE_NAME_EDUCATION_SHEET_HEADER_FORMAT" = "<bold>Imena profila</bold> na Radaru biraju vlasnici računa.";
 
 /* Title for the profile name view. */
 "PROFILE_NAME_VIEW_TITLE" = "Vaše ime";
@@ -8035,7 +8038,7 @@ Send money securely.";
 "QUICK_RESTORE_URL_OPENED_ACTION_SHEET_EXTERNAL_URL_ACTION_TITLE" = "Skeniraj QR kôd";
 
 /* Message for an action sheet telling users how to use quick restore, when trying to open an external quick restore URL. */
-"QUICK_RESTORE_URL_OPENED_ACTION_SHEET_EXTERNAL_URL_MESSAGE" = "Da biste prenijeli ovaj račun na novi uređaj, dodirnite „Nastavi“ i skenirajte QR kôd Signal kamerom. Skenirajte samo QR kodove koji dolaze izravno od Signala.";
+"QUICK_RESTORE_URL_OPENED_ACTION_SHEET_EXTERNAL_URL_MESSAGE" = "Da biste prenijeli ovaj račun na novi uređaj, dodirnite „Nastavi“ i skenirajte QR kôd Radar kamerom. Skenirajte samo QR kodove koji dolaze izravno od Radara.";
 
 /* Accessibility label stating the author of the message to which you are replying. Embeds: {{ the author of the message to which you are replying }} {{ original message }}. */
 "QUOTED_REPLY_ACCESSIBILITY_LABEL_FORMAT" = "Odgovarate na poruku korisnika %1$@. %2$@";
@@ -8158,7 +8161,7 @@ Send money securely.";
 "RECIPIENT_PICKER_ERROR_USER_CANNOT_BE_SELECTED" = "Korisnika nije moguće odabrati.";
 
 /* Alert text. Shown after selecting a phone number that isn't valid. */
-"RECIPIENT_PICKER_INVALID_NUMBER_MESSAGE" = "%1$@ nije korisnik Signala. Pokušajte ponovo s važećim brojem telefona.";
+"RECIPIENT_PICKER_INVALID_NUMBER_MESSAGE" = "%1$@ nije korisnik Radara. Pokušajte ponovo s važećim brojem telefona.";
 
 /* Alert title. Shown after selecting a phone number that isn't valid. */
 "RECIPIENT_PICKER_INVALID_NUMBER_TITLE" = "Nevažeći broj telefona";
@@ -8167,7 +8170,7 @@ Send money securely.";
 "RECIPIENT_PICKER_INVITE_ACTION" = "Pozovi";
 
 /* Alert text. Shown after selecting a phone number that isn't a Signal user. */
-"RECIPIENT_PICKER_INVITE_MESSAGE" = "%1$@ nije korisnik Signala. Želite li pozvati sljedeći broj da se pridruži Signalu?";
+"RECIPIENT_PICKER_INVITE_MESSAGE" = "%1$@ nije korisnik Radara. Želite li pozvati sljedeći broj da se pridruži Radaru?";
 
 /* Alert title. Shown after selecting a phone number that isn't a Signal user. */
 "RECIPIENT_PICKER_INVITE_TITLE" = "Pozovi u Radar";
@@ -8179,13 +8182,13 @@ Send money securely.";
 "REGISTER_2FA_FORGOT_PIN_ALERT_TITLE" = "Trebate pomoć?";
 
 /* Alert body for a forgotten SVR (V2) PIN */
-"REGISTER_2FA_FORGOT_SVR_PIN_ALERT_MESSAGE" = "Vaš PIN je numerički ili alfanumerički kôd od minimalno 4 znamenke koji ste sami postavili. Ako se ne možete sjetiti svog PIN-a, morat ćete pričekati 7 dana za ponovno registriranje računa. Ukoliko su zaštićene sigurnosne kopije Signala omogućene, možete nastaviti sa svojim ključem za oporavak.";
+"REGISTER_2FA_FORGOT_SVR_PIN_ALERT_MESSAGE" = "Vaš PIN je numerički ili alfanumerički kôd od minimalno 4 znamenke koji ste sami postavili. Ako se ne možete sjetiti svog PIN-a, morat ćete pričekati 7 dana za ponovno registriranje računa. Ukoliko su zaštićene sigurnosne kopije Radara omogućene, možete nastaviti sa svojim ključem za oporavak.";
 
 /* Alert body for a forgotten SVR (V2) PIN when the user doesn't have reglock and they cannot necessarily create a new PIN */
-"REGISTER_2FA_FORGOT_SVR_PIN_WITHOUT_REGLOCK_ALERT_MESSAGE" = "Vaš PIN je numerički ili alfanumerički kôd od minimalno 4 znamenke koji ste sami postavili. Ako se ne možete sjetiti svog PIN-a, i dalje ćete se moći registrirati i koristiti svoj račun, ali ćete izgubiti spremljene postavke poput podataka o vašem profilu. Ukoliko su zaštićene sigurnosne kopije Signala omogućene, možete nastaviti sa svojim ključem za oporavak.";
+"REGISTER_2FA_FORGOT_SVR_PIN_WITHOUT_REGLOCK_ALERT_MESSAGE" = "Vaš PIN je numerički ili alfanumerički kôd od minimalno 4 znamenke koji ste sami postavili. Ako se ne možete sjetiti svog PIN-a, i dalje ćete se moći registrirati i koristiti svoj račun, ali ćete izgubiti spremljene postavke poput podataka o vašem profilu. Ukoliko su zaštićene sigurnosne kopije Radara omogućene, možete nastaviti sa svojim ključem za oporavak.";
 
 /* Alert body for a forgotten SVR (V2) PIN when the user doesn't have reglock and they can create a new PIN */
-"REGISTER_2FA_FORGOT_SVR_PIN_WITHOUT_REGLOCK_AND_CAN_CREATE_NEW_PIN_ALERT_MESSAGE" = "Vaš PIN je numerički ili alfanumerički kôd od minimalno 4 znamenke koji ste sami postavili. U slučaju da ste zaboravili svoj PIN, možete stvoriti novi. Možete se registrirati i koristiti svoj račun, ali ćete izgubiti neke spremljene postavke poput podataka o profilu. Ukoliko su zaštićene sigurnosne kopije Signala omogućene, možete nastaviti sa svojim ključem za oporavak.";
+"REGISTER_2FA_FORGOT_SVR_PIN_WITHOUT_REGLOCK_AND_CAN_CREATE_NEW_PIN_ALERT_MESSAGE" = "Vaš PIN je numerički ili alfanumerički kôd od minimalno 4 znamenke koji ste sami postavili. U slučaju da ste zaboravili svoj PIN, možete stvoriti novi. Možete se registrirati i koristiti svoj račun, ali ćete izgubiti neke spremljene postavke poput podataka o profilu. Ukoliko su zaštićene sigurnosne kopije Radara omogućene, možete nastaviti sa svojim ključem za oporavak.";
 
 /* Alert title explaining what happens if you forget your 'two-factor auth pin'. */
 "REGISTER_2FA_INVALID_PIN_ALERT_TITLE" = "Nevažeći PIN";
@@ -8203,7 +8206,7 @@ Send money securely.";
 "REGISTER_WITHOUT_NUMBER" = "Registriraj se bez broja";
 
 /* Short description for a sheet warning users about an incorrect recovery key used for registration. */
-"REGISTRATION_BACKUP_REGISTRATION_ERROR_INCORRECT_KEY_BODY" = "Provjerite jeste li se registrirali s istim brojem telefona i 64-znamenkastim ključem za oporavak koji ste postavili kada ste omogućili sigurnosne kopije Signala. Sigurnosne kopije nije moguće oporaviti bez tog ključa.";
+"REGISTRATION_BACKUP_REGISTRATION_ERROR_INCORRECT_KEY_BODY" = "Provjerite jeste li se registrirali s istim brojem telefona i 64-znamenkastim ključem za oporavak koji ste postavili kada ste omogućili sigurnosne kopije Radara. Sigurnosne kopije nije moguće oporaviti bez tog ključa.";
 
 /* Title for a sheet warning users about an incorrect recovery key used for registration. */
 "REGISTRATION_BACKUP_REGISTRATION_ERROR_INCORRECT_KEY_TITLE" = "Netočan ključ za oporavak";
@@ -8212,7 +8215,7 @@ Send money securely.";
 "REGISTRATION_BACKUP_REGISTRATION_ERROR_INCORRECT_KEY_TRY_PIN_ACTION" = "Registriraj se na drugi način";
 
 /* Message body for a sheet asking users if they would rather use PIN/SMS for registration. */
-"REGISTRATION_BACKUP_REGISTRATION_ERROR_INCORRECT_KEY_TRY_PIN_MESSAGE" = "Račun možete registrirati potvrdom putem SMS koda koji šalje Signal ili unosom PIN-a. Nakon registracije možete ponovno pokušati oporaviti sigurnosnu kopiju koristeći ključ za oporavak.";
+"REGISTRATION_BACKUP_REGISTRATION_ERROR_INCORRECT_KEY_TRY_PIN_MESSAGE" = "Račun možete registrirati potvrdom putem SMS koda koji šalje Radar ili unosom PIN-a. Nakon registracije možete ponovno pokušati oporaviti sigurnosnu kopiju koristeći ključ za oporavak.";
 
 /* Title for a sheet asking users if they would rather use PIN/SMS for registration. */
 "REGISTRATION_BACKUP_REGISTRATION_ERROR_INCORRECT_KEY_TRY_PIN_TITLE" = "Potvrditi identitet putem SMS ili PIN koda?";
@@ -8269,7 +8272,7 @@ Send money securely.";
 "REGISTRATION_BACKUP_RESTORE_ERROR_LOCAL_BACKUP_LOCATION_TITLE" = "Nije moguće vratiti podatke iz sigurnosne kopije";
 
 /* Message for a sheet telling the user that their phone number is mismatched with their recovery key used for making a local backup */
-"REGISTRATION_BACKUP_RESTORE_ERROR_MISMATCHED_LOCAL_BACKUP_MESSAGE" = "Sigurnosna kopija koju pokušavate oporaviti stvorena je pomoću drugog računa na Signalu. Za oporavak podataka bit će potrebno koristiti isti broj telefona i ključ za oporavak koji ste postavili kada ste omogućili sigurnosno kopiranje na uređaju.";
+"REGISTRATION_BACKUP_RESTORE_ERROR_MISMATCHED_LOCAL_BACKUP_MESSAGE" = "Sigurnosna kopija koju pokušavate oporaviti stvorena je pomoću drugog računa na Radaru. Za oporavak podataka bit će potrebno koristiti isti broj telefona i ključ za oporavak koji ste postavili kada ste omogućili sigurnosno kopiranje na uređaju.";
 
 /* Body for a sheet warning users about a network error during backup restore. */
 "REGISTRATION_BACKUP_RESTORE_ERROR_NETWORK_BODY" = "Vaša se sigurnosna kopija trenutačno ne može vratiti. Provjerite svoju internetsku vezu i pokušajte ponovno.";
@@ -8293,7 +8296,7 @@ Send money securely.";
 "REGISTRATION_BACKUP_RESTORE_ERROR_UNRETRYABLE_SERVER_ERROR_TITLE" = "Nije moguće vratiti podatke iz sigurnosne kopije";
 
 /* Body for a sheet warning users about an incompatible backup version. */
-"REGISTRATION_BACKUP_RESTORE_ERROR_UNSUPPORTED_BACKUP_VERSION_BODY" = "Za vraćanje podataka iz sigurnosne kopije provjerite imate li najnoviju verziju Signala i pokušajte ponovno. Ako se problem i dalje pojavljuje, obratite se korisničkoj podršci.";
+"REGISTRATION_BACKUP_RESTORE_ERROR_UNSUPPORTED_BACKUP_VERSION_BODY" = "Za vraćanje podataka iz sigurnosne kopije provjerite imate li najnoviju verziju Radara i pokušajte ponovno. Ako se problem i dalje pojavljuje, obratite se korisničkoj podršci.";
 
 /* Title for a sheet warning users about an incompatible backup version. */
 "REGISTRATION_BACKUP_RESTORE_ERROR_UNSUPPORTED_BACKUP_VERSION_TITLE" = "Potrebno je ažuriranje";
@@ -8761,7 +8764,7 @@ Send money securely.";
 "RING_ON_CONFIRMATION_TOAST_LABEL" = "Zvono uključeno";
 
 /* Message shown in an action sheet when attempting to disable PIN, but Backups is enabled. */
-"ROTATE_AEP_ACTION_BACKUPS_DISABLE_REQUIRED" = "Morate onemogućiti zaštićene kopije podataka Signala za nastavak.";
+"ROTATE_AEP_ACTION_BACKUPS_DISABLE_REQUIRED" = "Morate onemogućiti zaštićene kopije podataka Radara za nastavak.";
 
 /* button title to confirm adding a recipient when their safety number has recently changed */
 "SAFETY_NUMBER_CHANGED_CONFIRM_ADD_MEMBER_ACTION" = "Svejedno dodaj";
@@ -8803,13 +8806,13 @@ Send money securely.";
 "SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_BUTTON_VERIFYING" = "Provjera šifriranja…";
 
 /* Body for a sheet introducing Key Transparency. */
-"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_EDUCATION_SHEET_BODY" = "Za osobe s kojima ste povezani putem broja telefona, Signal može automatski potvrditi je li veza sigurna pomoću postupka koji se naziva transparentnost ključa. Radi dodatne sigurnosti, veze i dalje možete provjeriti ručno pomoću QR koda ili usporedbom sigurnosnih brojeva.";
+"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_EDUCATION_SHEET_BODY" = "Za osobe s kojima ste povezani putem broja telefona, Radar može automatski potvrditi je li veza sigurna pomoću postupka koji se naziva transparentnost ključa. Radi dodatne sigurnosti, veze i dalje možete provjeriti ručno pomoću QR koda ili usporedbom sigurnosnih brojeva.";
 
 /* Title for a sheet introducing Key Transparency. */
-"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_EDUCATION_SHEET_TITLE" = "Signal sada može automatski provjeriti sveobuhvatno šifriranje";
+"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_EDUCATION_SHEET_TITLE" = "Radar sada može automatski provjeriti sveobuhvatno šifriranje";
 
 /* Body for a sheet explaining that encryption auto-verification did not succeed. Embeds {{ 1: the contact's name }}. */
-"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_FAILURE_SHEET_BODY_FORMAT" = "Signal ne može automatski provjeriti šifriranje ovog razgovora. Razlog tome može biti to što je %1$@ promijenio/la svoj broj telefona ili postavke privatnosti broja telefona.  Sveobuhvatno šifriranje može se provjeriti ručno, usporedbom brojeva na prethodnom zaslonu, ili skeniranjem koda na uređaju tog korisnika.";
+"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_FAILURE_SHEET_BODY_FORMAT" = "Radar ne može automatski provjeriti šifriranje ovog razgovora. Razlog tome može biti to što je %1$@ promijenio/la svoj broj telefona ili postavke privatnosti broja telefona.  Sveobuhvatno šifriranje može se provjeriti ručno, usporedbom brojeva na prethodnom zaslonu, ili skeniranjem koda na uređaju tog korisnika.";
 
 /* Title for a sheet explaining that encryption auto-verification did not succeed. */
 "SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_FAILURE_SHEET_TITLE" = "Automatska provjera nije više dostupna za ovaj razgovor";
@@ -8821,13 +8824,13 @@ Send money securely.";
 "SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_HEADER" = "Automatska provjera ključa";
 
 /* Body for a sheet explaining that encryption auto-verification is not available. */
-"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_NOT_AVAILABLE_SHEET_BODY" = "Signal može automatski provjeriti šifriranje samo za razgovore u kojima ste povezani s nekim putem broja telefona. Ako je razgovor započet s korisničkim imenom ili zajedničkom grupom, provjerite sveobuhvatno šifriranje usporedbom brojeva na prethodnom zaslonu ili skeniranjem koda na uređaju tog korisnika.";
+"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_NOT_AVAILABLE_SHEET_BODY" = "Radar može automatski provjeriti šifriranje samo za razgovore u kojima ste povezani s nekim putem broja telefona. Ako je razgovor započet s korisničkim imenom ili zajedničkom grupom, provjerite sveobuhvatno šifriranje usporedbom brojeva na prethodnom zaslonu ili skeniranjem koda na uređaju tog korisnika.";
 
 /* Title for a sheet explaining that encryption auto-verification is not available. */
 "SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_NOT_AVAILABLE_SHEET_TITLE" = "Automatska provjera nije dostupna za ovaj razgovor";
 
 /* Body for a sheet explaining that encryption auto-verification succeeded. */
-"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_SUCCESS_SHEET_BODY" = "Za kontakte s kojima ste povezani putem broja telefona, Signal može automatski potvrditi je li veza sigurna pomoću postupka koji se naziva transparentnost ključa. Radi dodatne sigurnosti, ručno provjerite sveobuhvatno šifriranje usporedbom brojeva na prethodnom zaslonu ili skeniranjem koda na uređaju određenog korisnika.";
+"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_SUCCESS_SHEET_BODY" = "Za kontakte s kojima ste povezani putem broja telefona, Radar može automatski potvrditi je li veza sigurna pomoću postupka koji se naziva transparentnost ključa. Radi dodatne sigurnosti, ručno provjerite sveobuhvatno šifriranje usporedbom brojeva na prethodnom zaslonu ili skeniranjem koda na uređaju određenog korisnika.";
 
 /* Title for a sheet explaining that encryption auto-verification succeeded. */
 "SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_SUCCESS_SHEET_TITLE" = "Šifriranje je automatski provjereno za ovaj razgovor";
@@ -8842,7 +8845,7 @@ Send money securely.";
 "SAFETY_TIPS_CRYPTO_TITLE" = "Prijevare s kriptovalutama ili novčane prijevare";
 
 /* Message body describing the enable reglock safety tip. */
-"SAFETY_TIPS_ENABLE_REGLOCK_BODY" = "Zaštitite svoj račun korištenjem Signal PIN-a uz potvrdni kôd prilikom registracije na Signal.";
+"SAFETY_TIPS_ENABLE_REGLOCK_BODY" = "Zaštitite svoj račun korištenjem Radar PIN-a uz potvrdni kôd prilikom registracije na Radar.";
 
 /* Message title describing the enable reglock safety tip. */
 "SAFETY_TIPS_ENABLE_REGLOCK_TITLE" = "Uključite zaključavanje registracije u postavkama računa";
@@ -8875,22 +8878,22 @@ Send money securely.";
 "SAFETY_TIPS_MESSAGE_LINKS_TITLE" = "Poruke koje sadrže poveznice";
 
 /* Message body describing the review names safety tip. */
-"SAFETY_TIPS_REVIEW_NAMES_BODY" = "Obratite pozornost na obavijest „Ime nije potvrđeno“. Na Signalu svatko sam postavlja ime profila.";
+"SAFETY_TIPS_REVIEW_NAMES_BODY" = "Obratite pozornost na obavijest „Ime nije potvrđeno“. Na Radaru svatko sam postavlja ime profila.";
 
 /* Message body describing the review names safety tip in the 'view more' flow. */
-"SAFETY_TIPS_REVIEW_NAMES_BODY_VIEW_MORE" = "Obratite pozornost na obavijest „Ime nije potvrđeno“. Na Signalu svatko sam postavlja ime profila i fotografiju. Ako niste sigurni tko vam šalje zahtjev, sigurnije ga je ignorirati.";
+"SAFETY_TIPS_REVIEW_NAMES_BODY_VIEW_MORE" = "Obratite pozornost na obavijest „Ime nije potvrđeno“. Na Radaru svatko sam postavlja ime profila i fotografiju. Ako niste sigurni tko vam šalje zahtjev, sigurnije ga je ignorirati.";
 
 /* Message title describing the review names safety tip. */
 "SAFETY_TIPS_REVIEW_NAMES_TITLE" = "Pregledajte imena i fotografije";
 
 /* Message body describing the signal chats tip. */
-"SAFETY_TIPS_SIGNAL_CHATS_BODY" = "Signal vas nikada neće kontaktirati da pita vaš kôd za registraciju, PIN ili ključ za oporavak. Nikada ne odgovarajte na poruke koje se predstavljaju kao da su od Signala.";
+"SAFETY_TIPS_SIGNAL_CHATS_BODY" = "Radar vas nikada neće kontaktirati da pita vaš kôd za registraciju, PIN ili ključ za oporavak. Nikada ne odgovarajte na poruke koje se predstavljaju kao da su od Radara.";
 
 /* Message body describing the signal chats tip in the 'view more' flow. */
-"SAFETY_TIPS_SIGNAL_CHATS_BODY_VIEW_MORE" = "Signal vas nikada neće kontaktirati da pita vaš kôd za registraciju, PIN ili ključ za oporavak. Ne odgovarajte na poruke koje se predstavljaju kao da su od Signala ili od korisničke podrške Signala. Zlonamjerni akteri postavljaju lažna imena kako bi pokušali preuzeti vaš račun.";
+"SAFETY_TIPS_SIGNAL_CHATS_BODY_VIEW_MORE" = "Radar vas nikada neće kontaktirati da pita vaš kôd za registraciju, PIN ili ključ za oporavak. Ne odgovarajte na poruke koje se predstavljaju kao da su od Radara ili od korisničke podrške Radara. Zlonamjerni akteri postavljaju lažna imena kako bi pokušali preuzeti vaš račun.";
 
 /* Message title describing the signal chats tip. */
-"SAFETY_TIPS_SIGNAL_CHATS_TITLE" = "Ne odgovarajte porukama koje šalje Signal";
+"SAFETY_TIPS_SIGNAL_CHATS_TITLE" = "Ne odgovarajte porukama koje šalje Radar";
 
 /* Message contents for the vague message safety tip. */
 "SAFETY_TIPS_VAGUE_MESSAGE_BODY" = "Pošiljatelji neželjene pošte često započinju razgovor jednostavnom porukom poput \"Bok\" kako bi privukli vašu pažnju. Ako im odgovorite, mogli bi nastaviti sa slanjem poruka.";
@@ -8929,7 +8932,7 @@ Send money securely.";
 "SCREEN_LOCK_REASON_CHANGE_SCREEN_LOCK_SETTINGS" = "Provjerite autentičnost za promjenu postavki zaključavanja zaslona.";
 
 /* Description of how and why Signal iOS uses Touch ID/Face ID/Phone Passcode to unlock 'screen lock'. */
-"SCREEN_LOCK_REASON_UNLOCK_SCREEN_LOCK" = "Potvrdite za otvaranje Signala.";
+"SCREEN_LOCK_REASON_UNLOCK_SCREEN_LOCK" = "Potvrdite za otvaranje Radara.";
 
 /* Title for alert indicating that screen lock could not be unlocked. */
 "SCREEN_LOCK_UNLOCK_FAILED" = "Provjera autentičnosti nije uspjela";
@@ -8974,7 +8977,7 @@ Send money securely.";
 "SECONDARY_LINKING_ERROR_OBSOLETE_LINKED_DEVICE_TITLE" = "Nepodržana verzija";
 
 /* alert message for outdated linking device */
-"SECONDARY_LINKING_ERROR_OLD_VERSION_MESSAGE" = "Na vašem drugom uređaju nalazi se starija verzija Signala koja ne podržava skeniranje iPad QR kôdova. Instalirajte najnoviju verziju Signala i pokušajte ponovo.";
+"SECONDARY_LINKING_ERROR_OLD_VERSION_MESSAGE" = "Na vašem drugom uređaju nalazi se starija verzija Radara koja ne podržava skeniranje iPad QR kôdova. Instalirajte najnoviju verziju Radara i pokušajte ponovo.";
 
 /* alert title for outdated linking device */
 "SECONDARY_LINKING_ERROR_OLD_VERSION_TITLE" = "Ažurirajte uređaj za skeniranje";
@@ -9025,10 +9028,10 @@ Send money securely.";
 "SECONDARY_ONBOARDING_SCAN_CODE_STEP_LINK_DEVICE" = "Dodirnite „Povezani uređaji“, a zatim „Poveži novi uređaj“";
 
 /* First bullet point on the QR code screen for linking a device */
-"SECONDARY_ONBOARDING_SCAN_CODE_STEP_OPEN_PRIMARY" = "Otvorite Signal na svom glavnom uređaju";
+"SECONDARY_ONBOARDING_SCAN_CODE_STEP_OPEN_PRIMARY" = "Otvorite Radar na svom glavnom uređaju";
 
 /* Second bullet point on the QR code screen for linking a device */
-"SECONDARY_ONBOARDING_SCAN_CODE_STEP_OPEN_SETTINGS" = "Dodirnite svoju sliku profila kako biste otvorili postavke Signala";
+"SECONDARY_ONBOARDING_SCAN_CODE_STEP_OPEN_SETTINGS" = "Dodirnite svoju sliku profila kako biste otvorili postavke Radara";
 
 /* header text while displaying a QR code which, when scanned, will link this device. */
 "SECONDARY_ONBOARDING_SCAN_CODE_TITLE" = "Skenirajte ovaj kôd za povezivanje računa";
@@ -9067,13 +9070,13 @@ Send money securely.";
 "SELECT_CONTACT_FOR_SHARING_PERMISSION_PROMPT_ALLOW_BUTTON" = "Omogući pristup";
 
 /* Body of the prompt on the 'Select Contact' view that asks the user to allow access to their contacts. */
-"SELECT_CONTACT_FOR_SHARING_PERMISSION_PROMPT_BODY" = "Omogućite pristup vašim kontaktima. Vaši kontakti su šifrirani i nisu vidljivi usluzi Signal.";
+"SELECT_CONTACT_FOR_SHARING_PERMISSION_PROMPT_BODY" = "Omogućite pristup vašim kontaktima. Vaši kontakti su šifrirani i nisu vidljivi usluzi Radar.";
 
 /* Button on the 'Select Contact' view's contacts permission prompt that hides the prompt. */
 "SELECT_CONTACT_FOR_SHARING_PERMISSION_PROMPT_DISMISS_BUTTON" = "Ne, hvala";
 
 /* Title of the prompt on the 'Select Contact' view that asks the user to allow access to their contacts. */
-"SELECT_CONTACT_FOR_SHARING_PERMISSION_PROMPT_TITLE" = "Pronađite ljude koje poznajete na Signalu";
+"SELECT_CONTACT_FOR_SHARING_PERMISSION_PROMPT_TITLE" = "Pronađite ljude koje poznajete na Radaru";
 
 /* Placeholder text for the search bar on the 'Select Contact' view */
 "SELECT_CONTACT_FOR_SHARING_SEARCH_BAR_PLACEHOLDER" = "Pretraži";
@@ -9211,7 +9214,7 @@ Send money securely.";
 "SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_FOOTER_NO_CONNECTION" = "Zaobilaženje cenzure se može aktivirati samo ako ste povezani na Internet.";
 
 /* Table footer for the 'censorship circumvention' section shown when the app is connected to the Signal service. */
-"SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_FOOTER_WEBSOCKET_CONNECTED" = "Zaobilaženje cenzure nije potrebno. Već ste povezani s Signalom.";
+"SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_FOOTER_WEBSOCKET_CONNECTED" = "Zaobilaženje cenzure nije potrebno. Već ste povezani s Radarom.";
 
 /* Label for the 'advanced pin settings' button. */
 "SETTINGS_ADVANCED_PIN_SETTINGS" = "Napredne postavke PIN-a";
@@ -9268,7 +9271,7 @@ Send money securely.";
 "SETTINGS_BLOCK_LIST_ADD_BUTTON" = "Dodaj kontakt na listu blokiranih";
 
 /* A label that indicates the user has no Signal contacts that they haven't blocked. */
-"SETTINGS_BLOCK_LIST_NO_CONTACTS" = "Nemate kontakte na Signalu.";
+"SETTINGS_BLOCK_LIST_NO_CONTACTS" = "Nemate kontakte na Radaru.";
 
 /* A label that indicates the user's search has no matching results. */
 "SETTINGS_BLOCK_LIST_NO_SEARCH_RESULTS" = "Nema rezultata";
@@ -9280,7 +9283,7 @@ Send money securely.";
 "SETTINGS_CALLING_HIDES_IP_ADDRESS_PREFERENCE_TITLE" = "Uvijek preusmjeri pozive";
 
 /* User settings section footer, a detailed explanation */
-"SETTINGS_CALLING_HIDES_IP_ADDRESS_PREFERENCE_TITLE_DETAIL" = "Preusmjerite sve pozive putem Signalnog poslužitelja kako biste izbjegli otkrivanje vaše IP adrese vašim kontaktima. Omogućavanje opcije će smanjiti kvalitetu poziva.";
+"SETTINGS_CALLING_HIDES_IP_ADDRESS_PREFERENCE_TITLE_DETAIL" = "Preusmjerite sve pozive putem Radarnog poslužitelja kako biste izbjegli otkrivanje vaše IP adrese vašim kontaktima. Omogućavanje opcije će smanjiti kvalitetu poziva.";
 
 /* Label for the 'edit phone number' button in the 'change phone number' views. */
 "SETTINGS_CHANGE_PHONE_NUMBER_BACK_TO_EDIT_BUTTON" = "Uredi broj";
@@ -9439,7 +9442,7 @@ Send money securely.";
 "SETTINGS_DISAPPEARING_MESSAGES_FOOTER" = "Postavite zadani vremenski period za poruke koje nestaju za sve nove razgovore koje započnete.";
 
 /* Title for the 'donate to signal' link in settings. */
-"SETTINGS_DONATE" = "Donirajte Signalu";
+"SETTINGS_DONATE" = "Donirajte Radaru";
 
 /* Title for help button and help pages in app settings. */
 "SETTINGS_HELP" = "Pomoć";
@@ -9460,7 +9463,7 @@ Send money securely.";
 "SETTINGS_KEEP_MUTED_ARCHIVED_LABEL" = "Zadrži utišane razgovore arhiviranima";
 
 /* Footer for settings section describing Key Transparency. */
-"SETTINGS_KEY_TRANSPARENCY_OPT_OUT_FOOTER" = "Ako omogućite ovu postavku, Signal će pokušati automatski provjeriti šifriranje privatnih razgovora.";
+"SETTINGS_KEY_TRANSPARENCY_OPT_OUT_FOOTER" = "Ako omogućite ovu postavku, Radar će pokušati automatski provjeriti šifriranje privatnih razgovora.";
 
 /* Title for for a settings option describing that Key Transparency is enabled. */
 "SETTINGS_KEY_TRANSPARENCY_OPT_OUT_SWITCH_TITLE" = "Automatska provjera ključa";
@@ -9475,7 +9478,7 @@ Send money securely.";
 "SETTINGS_LINK_PREVIEWS_FOOTER" = "Preuzmite preglede poveznica izravno s web stranica za poruke koje šaljete.";
 
 /* Subtitle of a card on a linked device's account settings, explaining that account settings are managed on the primary device. */
-"SETTINGS_LINKED_DEVICE_ACCOUNT_CARD_SUBTITLE" = "Otvorite Signal na svom glavnom uređaju za upravljanje postavkama računa.";
+"SETTINGS_LINKED_DEVICE_ACCOUNT_CARD_SUBTITLE" = "Otvorite Radar na svom glavnom uređaju za upravljanje postavkama računa.";
 
 /* Title of a card on a linked device's account settings, indicating that this is a linked device. */
 "SETTINGS_LINKED_DEVICE_ACCOUNT_CARD_TITLE" = "Ovo je povezani uređaj";
@@ -9484,7 +9487,7 @@ Send money securely.";
 "SETTINGS_LINKED_DEVICE_DELETE_DATA_BUTTON" = "Izbriši podatke aplikacije";
 
 /* Footer below the 'delete app data' button, shown on a linked device's account settings. */
-"SETTINGS_LINKED_DEVICE_DELETE_DATA_FOOTER" = "Ovime ćete izbrisati sve podatke iz Signal aplikacije koje se nalaze na ovom uređaju.";
+"SETTINGS_LINKED_DEVICE_DELETE_DATA_FOOTER" = "Ovime ćete izbrisati sve podatke iz Radar aplikacije koje se nalaze na ovom uređaju.";
 
 /* Text for a toast confirming the user changed their local file backup location. */
 "SETTINGS_LOCAL_FILE_BACKUP_FOLDER_UPDATED" = "Mapa sigurnosne kopije je ažurirana";
@@ -9508,7 +9511,7 @@ Send money securely.";
 "SETTINGS_LOCAL_FILE_BACKUPS_LAST_BACKUP_DATE" = "Posljednje sigurnosno kopiranje";
 
 /* Message for an action sheet when a user cannot perform a remote backup because a local backup is in progress */
-"SETTINGS_LOCAL_FILE_BACKUPS_LOCAL_BACKUP_IN_PROGRESS_MESSAGE" = "Zaštićeno sigurnosno kopiranje Signala trenutačno nije moguće izvršiti jer je u tijeku sigurnosno kopiranje na uređaju. Pokušajte ponovno kasnije.";
+"SETTINGS_LOCAL_FILE_BACKUPS_LOCAL_BACKUP_IN_PROGRESS_MESSAGE" = "Zaštićeno sigurnosno kopiranje Radara trenutačno nije moguće izvršiti jer je u tijeku sigurnosno kopiranje na uređaju. Pokušajte ponovno kasnije.";
 
 /* Label for a progress bar while attachments are being copied for an on-device backup. Embeds 1:{{%1$@ completed bytes copied, %2$@ total bytes to copy, %3$@ percentage complete }}. */
 "SETTINGS_LOCAL_FILE_BACKUPS_PROGRESS_COPYING_ATTACHMENTS" = "Stvaranje sigurnosne kopije na uređaju: %1$@ od %2$@ (%3$@)";
@@ -9523,10 +9526,10 @@ Send money securely.";
 "SETTINGS_LOCAL_FILE_BACKUPS_PROGRESS_RESTORING_ATTACHMENTS" = "Oporavak podataka iz sigurnosne kopije na uređaju (%1$@ od %2$@)";
 
 /* Message for an action sheet when a user cannot perform a local backup because a remote backup is in progress */
-"SETTINGS_LOCAL_FILE_BACKUPS_REMOTE_BACKUP_IN_PROGRESS_MESSAGE" = "Sigurnosno kopiranje na uređaju trenutačno nije moguće izvršiti jer je u tijeku zaštićeno sigurnosno kopiranje Signala. Pokušajte ponovno kasnije.";
+"SETTINGS_LOCAL_FILE_BACKUPS_REMOTE_BACKUP_IN_PROGRESS_MESSAGE" = "Sigurnosno kopiranje na uređaju trenutačno nije moguće izvršiti jer je u tijeku zaštićeno sigurnosno kopiranje Radara. Pokušajte ponovno kasnije.";
 
 /* Footer text on the on-device backups settings page explaining how to restore a backup. */
-"SETTINGS_LOCAL_FILE_BACKUPS_RESTORE_FOOTER" = "Da biste preuzeli sigurnosnu kopiju, instalirajte novu kopiju Signala. Otvorite aplikaciju, dodirnite „Vrati ili prenesi“ i odaberite „Sigurnosne kopije na uređaju“.";
+"SETTINGS_LOCAL_FILE_BACKUPS_RESTORE_FOOTER" = "Da biste preuzeli sigurnosnu kopiju, instalirajte novu kopiju Radara. Otvorite aplikaciju, dodirnite „Vrati ili prenesi“ i odaberite „Sigurnosne kopije na uređaju“.";
 
 /* Label for the button that turns off on-device backups. */
 "SETTINGS_LOCAL_FILE_BACKUPS_TURN_OFF" = "Isključi i izbriši sigurnosnu kopiju";
@@ -9616,7 +9619,7 @@ Send money securely.";
 "SETTINGS_NOTIFICATIONS_APP_BADGE_SECTION" = "Značka aplikacije";
 
 /* Explanation for the switch controlling whether a notification is shown when a phone contact joins Signal. */
-"SETTINGS_NOTIFICATIONS_CONTACT_JOINED_SIGNAL_FOOTER" = "Primite obavijest kada se novi kontakt iz imenika pridruži Signalu.";
+"SETTINGS_NOTIFICATIONS_CONTACT_JOINED_SIGNAL_FOOTER" = "Primite obavijest kada se novi kontakt iz imenika pridruži Radaru.";
 
 /* Label for a switch controlling whether reactions to your messages generate notifications. */
 "SETTINGS_NOTIFICATIONS_REACTIONS" = "Obavijesti o reakcijama";
@@ -9714,10 +9717,10 @@ Send money securely.";
 "SETTINGS_PAYMENTS_DEACTIVATE_TITLE" = "Onemogući plaćanja";
 
 /* Explanation of the 'deactivate payments with balance' process in the 'deactivate payments' settings. */
-"SETTINGS_PAYMENTS_DEACTIVATE_WITH_BALANCE_EXPLANATION" = "Prije onemogućavanja plaćanja, preporučujemo vam da sredstva prebacite na drugu adresu novčanika. Ako odlučite ne prenijeti svoja sredstva sada, ona će ostati u vašem novčaniku povezana sa Signalom sve dok ponovno ne aktivirate plaćanja.";
+"SETTINGS_PAYMENTS_DEACTIVATE_WITH_BALANCE_EXPLANATION" = "Prije onemogućavanja plaćanja, preporučujemo vam da sredstva prebacite na drugu adresu novčanika. Ako odlučite ne prenijeti svoja sredstva sada, ona će ostati u vašem novčaniku povezana sa Radarom sve dok ponovno ne aktivirate plaćanja.";
 
 /* Description for the 'deactivate payments confirmation' UI in the payment settings. */
-"SETTINGS_PAYMENTS_DEACTIVATE_WITHOUT_TRANSFER_CONFIRM_DESCRIPTION" = "Vaše će stanje ostati u novčaniku povezanim sa Signalom ako odlučite ponovno omogućiti plaćanja.";
+"SETTINGS_PAYMENTS_DEACTIVATE_WITHOUT_TRANSFER_CONFIRM_DESCRIPTION" = "Vaše će stanje ostati u novčaniku povezanim sa Radarom ako odlučite ponovno omogućiti plaćanja.";
 
 /* Title for the 'deactivate payments confirmation' UI in the payment settings. */
 "SETTINGS_PAYMENTS_DEACTIVATE_WITHOUT_TRANSFER_CONFIRM_TITLE" = "Onemogući bez prijenosa?";
@@ -10193,7 +10196,7 @@ Send money securely.";
 "SETTINGS_PHONE_NUMBER_DISCOVERABILITY_DISABLED_TOAST" = "Za promjenu ove postavke, postavite opciju \"Tko može vidjeti moj broj\" na \"Nitko\".";
 
 /* The description for a sheet asking for confirmation that the user wants to set their phone number discoverability to 'nobody'. */
-"SETTINGS_PHONE_NUMBER_DISCOVERABILITY_NOBODY_CONFIRMATION_DESCRIPTION" = "Ako za postavku \"Tko me može pronaći po broju telefona\" odaberete opciju \"Nitko\", drugi će vas korisnici teže pronaći na Signalu.";
+"SETTINGS_PHONE_NUMBER_DISCOVERABILITY_NOBODY_CONFIRMATION_DESCRIPTION" = "Ako za postavku \"Tko me može pronaći po broju telefona\" odaberete opciju \"Nitko\", drugi će vas korisnici teže pronaći na Radaru.";
 
 /* The title for a sheet asking for confirmation that the user wants to set their phone number discoverability to 'nobody'. */
 "SETTINGS_PHONE_NUMBER_DISCOVERABILITY_NOBODY_CONFIRMATION_TITLE" = "Sigurno želite nastaviti?";
@@ -10202,7 +10205,7 @@ Send money securely.";
 "SETTINGS_PHONE_NUMBER_DISCOVERABILITY_TITLE" = "Tko me može pronaći po broju telefona";
 
 /* Description label for Phone Number Privacy */
-"SETTINGS_PHONE_NUMBER_PRIVACY_DESCRIPTION_LABEL" = "Odaberite tko može vidjeti vaš broj telefona i tko vas može kontaktirati putem njega na Signalu.";
+"SETTINGS_PHONE_NUMBER_PRIVACY_DESCRIPTION_LABEL" = "Odaberite tko može vidjeti vaš broj telefona i tko vas može kontaktirati putem njega na Radaru.";
 
 /* The title for phone number privacy settings. */
 "SETTINGS_PHONE_NUMBER_PRIVACY_TITLE" = "Broj telefona";
@@ -10274,7 +10277,7 @@ Send money securely.";
 "SETTINGS_REGISTRATION_LOCK_TURN_ON_ERROR_PIN_REQUIRED" = "Za korištenje zaključavanja registracije morate stvoriti PIN.";
 
 /* Body for the alert confirming that the user wants to turn on registration lock. */
-"SETTINGS_REGISTRATION_LOCK_TURN_ON_MESSAGE" = "Ako zaboravite svoj PIN za Radar prilikom ponovne registracije na Signalu, biti ćete zaključani iz svog računa na 7 dana.";
+"SETTINGS_REGISTRATION_LOCK_TURN_ON_MESSAGE" = "Ako zaboravite svoj PIN za Radar prilikom ponovne registracije na Radaru, biti ćete zaključani iz svog računa na 7 dana.";
 
 /* Title for the alert confirming that the user wants to turn on registration lock. */
 "SETTINGS_REGISTRATION_LOCK_TURN_ON_TITLE" = "Omogući Zaključavanje registracije?";
@@ -10304,19 +10307,19 @@ Send money securely.";
 "SETTINGS_SECTION_TITLE_CALLING" = "Uspostava poziva";
 
 /* Section footer */
-"SETTINGS_SECURITY_DETAIL" = "Koristite Touch ID, Face ID ili šifru vašeg iOS uređaja za otključavanje Signala.";
+"SETTINGS_SECURITY_DETAIL" = "Koristite Touch ID, Face ID ili šifru vašeg iOS uređaja za otključavanje Radara.";
 
 /* Section footer */
-"SETTINGS_SECURITY_DETAIL_FACEID" = "Koristite Face ID za otključavanje Signala.";
+"SETTINGS_SECURITY_DETAIL_FACEID" = "Koristite Face ID za otključavanje Radara.";
 
 /* Section footer */
-"SETTINGS_SECURITY_DETAIL_OPTICID" = "Koristite značajku Optic ID za otključavanje Signala.";
+"SETTINGS_SECURITY_DETAIL_OPTICID" = "Koristite značajku Optic ID za otključavanje Radara.";
 
 /* Section footer */
-"SETTINGS_SECURITY_DETAIL_PASSCODE" = "Koristite šifru vašeg iOS uređaja za otključavanje Signala.";
+"SETTINGS_SECURITY_DETAIL_PASSCODE" = "Koristite šifru vašeg iOS uređaja za otključavanje Radara.";
 
 /* Section footer */
-"SETTINGS_SECURITY_DETAIL_TOUCHID" = "Koristite Touch ID za otključavanje Signala.";
+"SETTINGS_SECURITY_DETAIL_TOUCHID" = "Koristite Touch ID za otključavanje Radara.";
 
 /* Section header */
 "SETTINGS_SECURITY_TITLE" = "Sigurnost aplikacije";
@@ -10394,7 +10397,7 @@ Send money securely.";
 "SHARE_ACTION_MESSAGE" = "Poruka";
 
 /* Message for an action sheet shown when sharing fails because the device's date and time are incorrect. */
-"SHARE_EXTENSION_FAILED_SENDING_BECAUSE_CLOCK_SKEW_MESSAGE" = "S obzirom na to da su datum i vrijeme na vašem uređaju netočni, Signal možda nije poslao vašu poruku. Ispravite datum i vrijeme vašeg uređaja u postavkama.";
+"SHARE_EXTENSION_FAILED_SENDING_BECAUSE_CLOCK_SKEW_MESSAGE" = "S obzirom na to da su datum i vrijeme na vašem uređaju netočni, Radar možda nije poslao vašu poruku. Ispravite datum i vrijeme vašeg uređaja u postavkama.";
 
 /* alert body when sharing file failed because of untrusted/changed identity keys */
 "SHARE_EXTENSION_FAILED_SENDING_BECAUSE_UNTRUSTED_IDENTITY_FORMAT" = "Vaš sigurnosni broj s %1$@ je nedavno promijenjen. Možda ga želite provjeriti u glavnoj aplikaciji prije ponovnog slanja poruka.";
@@ -10403,7 +10406,7 @@ Send money securely.";
 "SHARE_EXTENSION_LOADING" = "Učitavanje…";
 
 /* Message for an error shown when the user tries to share to Signal but the device is too low on storage space. */
-"SHARE_EXTENSION_LOW_STORAGE_SPACE_MESSAGE" = "Nije moguće podijeliti sa Signalom jer nemate dovoljno slobodnog prostora za pohranu na uređaju. Oslobodite prostor u postavkama i pokušajte ponovno.";
+"SHARE_EXTENSION_LOW_STORAGE_SPACE_MESSAGE" = "Nije moguće podijeliti sa Radarom jer nemate dovoljno slobodnog prostora za pohranu na uređaju. Oslobodite prostor u postavkama i pokušajte ponovno.";
 
 /* Title for an error shown when the user tries to share to Signal but the device is too low on storage space. */
 "SHARE_EXTENSION_LOW_STORAGE_SPACE_TITLE" = "Malo prostora za pohranu";
@@ -10427,7 +10430,7 @@ Send money securely.";
 "SHARE_EXTENSION_UNABLE_TO_BUILD_ATTACHMENT_ALERT_TITLE" = "Nije moguće pripremiti privitak";
 
 /* Title for the 'share extension' view. */
-"SHARE_EXTENSION_VIEW_TITLE" = "Podijeli na Signalu";
+"SHARE_EXTENSION_VIEW_TITLE" = "Podijeli na Radaru";
 
 /* Title of alert indicating sharing suggestions failed to deactivate */
 "SHARING_SUGGESTIONS_DISABLE_ERROR" = "Onemogućavanje prijedloga prilikom dijeljenja nije uspjelo.";
@@ -10445,7 +10448,7 @@ Send money securely.";
 "SIGNAL_LOGIN_RECOVERY_KEY_PLACEHOLDER_TITLE" = "Ključ za oporavak";
 
 /* Title for the sheet presented when user taps on Signal Proxy link in chat. */
-"SIGNAL_PROXY" = "Signal proxy poslužitelj";
+"SIGNAL_PROXY" = "Radar proxy poslužitelj";
 
 /* body sent to contacts when inviting to Install Signal */
 "SMS_INVITE_BODY" = "Pozivam te da instaliraš Radar! Ovdje je poveznica:";
@@ -10472,7 +10475,7 @@ Send money securely.";
 "SPAM_CAPTCHA_DISMISS_CONFIRMATION_TITLE" = "Nastavi bez provjere?";
 
 /* Body for action sheet explaining captcha requirement. */
-"SPAM_CAPTCHA_SHEET_BODY" = "Da bismo spriječili neželjene poruke na Signalu, molimo dovršite provjeru.\n\nNakon provjere možete nastaviti s razmjenom poruka. Sve pauzirane poruke automatski će biti poslane.";
+"SPAM_CAPTCHA_SHEET_BODY" = "Da bismo spriječili neželjene poruke na Radaru, molimo dovršite provjeru.\n\nNakon provjere možete nastaviti s razmjenom poruka. Sve pauzirane poruke automatski će biti poslane.";
 
 /* Title for action sheet explaining captcha requirement. */
 "SPAM_CAPTCHA_SHEET_TITLE" = "Provjeri za nastavak razmjene poruka";
@@ -10488,6 +10491,10 @@ Send money securely.";
 
 /* Text for a toast confirming that the speakerphone has been turned on for a call. */
 "SPEAKERPHONE_ON_CONFIRMATION_TOAST_LABEL" = "Uključen zvučnik";
+
+"STAR" = "Star";
+
+"STARRED_MESSAGES" = "Starred messages";
 
 /* Title for a button to view a sticker pack */
 "STICKER_BUTTON_VIEW_PACK" = "Prikaži paket";
@@ -10532,7 +10539,7 @@ Send money securely.";
 "STICKER_PACK_SHARE_SHEET_HEADER" = "Svatko tko ima pristup ovoj poveznici moći će dodati i dijeliti ovaj paket naljepnica.";
 
 /* Label for a button on a sticker-pack share sheet that sends the pack in Signal. */
-"STICKER_PACK_SHARE_SHEET_SEND_IN_SIGNAL" = "Pošalji unutar Signala";
+"STICKER_PACK_SHARE_SHEET_SEND_IN_SIGNAL" = "Pošalji unutar Radara";
 
 /* Message when trying to show a sticker that has expired and is unavailable for download */
 "STICKER_UNAVAILABLE_MESSAGE_LABEL" = "Naljepnica nije dostupna";
@@ -10544,7 +10551,7 @@ Send money securely.";
 "STICKERS_INSTALL_BUTTON" = "Dodaj naljepnice";
 
 /* Title for the 'available built-in stickers' section of the 'manage stickers' view. */
-"STICKERS_MANAGE_VIEW_AVAILABLE_BUILT_IN_PACKS_SECTION_TITLE" = "Signalova umjetnička serija";
+"STICKERS_MANAGE_VIEW_AVAILABLE_BUILT_IN_PACKS_SECTION_TITLE" = "Radarova umjetnička serija";
 
 /* Subtitle for the section of known stickers in the manage stickers view */
 "STICKERS_MANAGE_VIEW_AVAILABLE_KNOWN_PACKS_SECTION_SUBTITLE" = "Kad vam netko pošalje naljepnicu, paket naljepnica pojavit će se ovdje.";
@@ -11153,25 +11160,25 @@ Send money securely.";
 "UNKNOWN_GROUP" = "Nepoznata grupa";
 
 /* Info message recorded in conversation history when local user receives an unknown message from a linked device and needs to upgrade. */
-"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_FROM_LINKED_DEVICE" = "Jedan od vaših uređaja je poslao poruku koja se ne može obraditi niti prikazati ovdje jer koristi novu značajku Signala.";
+"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_FROM_LINKED_DEVICE" = "Jedan od vaših uređaja je poslao poruku koja se ne može obraditi niti prikazati ovdje jer koristi novu značajku Radara.";
 
 /* Info message recorded in conversation history when local user receives an unknown message and needs to upgrade. Embeds {{user's name or phone number}}. */
-"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_WITH_NAME_FORMAT" = "%1$@ vam je poslao poruku koja se ne može obraditi niti prikazati jer koristi novu značajku Signala.";
+"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_WITH_NAME_FORMAT" = "%1$@ vam je poslao poruku koja se ne može obraditi niti prikazati jer koristi novu značajku Radara.";
 
 /* Info message recorded in conversation history when local user receives an unknown message and needs to upgrade. */
-"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_WITHOUT_NAME" = "Primili ste poruku koja se ne može obraditi niti prikazati jer koristi novu značajku Signala.";
+"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_WITHOUT_NAME" = "Primili ste poruku koja se ne može obraditi niti prikazati jer koristi novu značajku Radara.";
 
 /* Label for button that lets users upgrade the app. */
 "UNKNOWN_PROTOCOL_VERSION_UPGRADE_BUTTON" = "Ažurirajte Radar sada";
 
 /* Info message recorded in conversation history when local user has received an unknown unknown message from a linked device and has upgraded. */
-"UNKNOWN_PROTOCOL_VERSION_UPGRADE_COMPLETE_FROM_LINKED_DEVICE" = "Ažurirano na najnoviju verziju Signala. Sada možete primati ovu vrstu poruke na svoj uređaj.";
+"UNKNOWN_PROTOCOL_VERSION_UPGRADE_COMPLETE_FROM_LINKED_DEVICE" = "Ažurirano na najnoviju verziju Radara. Sada možete primati ovu vrstu poruke na svoj uređaj.";
 
 /* Info message recorded in conversation history when local user has received an unknown message and has upgraded. Embeds {{user's name or phone number}}. */
-"UNKNOWN_PROTOCOL_VERSION_UPGRADE_COMPLETE_WITH_NAME_FORMAT" = "Možete zatražiti od %1$@ da ponovo pošalje ovu poruku sada kada koristite najnoviju verziju Signala.";
+"UNKNOWN_PROTOCOL_VERSION_UPGRADE_COMPLETE_WITH_NAME_FORMAT" = "Možete zatražiti od %1$@ da ponovo pošalje ovu poruku sada kada koristite najnoviju verziju Radara.";
 
 /* Info message recorded in conversation history when local user has received an unknown message and has upgraded. */
-"UNKNOWN_PROTOCOL_VERSION_UPGRADE_COMPLETE_WITHOUT_NAME" = "Možete zatražiti od pošiljatelja da ponovo pošalje ovu poruku sada kada koristite najnoviju verziju Signala.";
+"UNKNOWN_PROTOCOL_VERSION_UPGRADE_COMPLETE_WITHOUT_NAME" = "Možete zatražiti od pošiljatelja da ponovo pošalje ovu poruku sada kada koristite najnoviju verziju Radara.";
 
 /* Label indicating an unknown user. */
 "UNKNOWN_USER" = "Nepoznato";
@@ -11241,6 +11248,8 @@ Send money securely.";
 
 /* Notification body for unread reminders. First placeholder is unread messages, second is a summary of either unread mentions or replies */
 "UnreadReminderJob__unread_one_summary" = "Imate %1$@, uključujući %2$@.";
+
+"UNSTAR" = "Unstar";
 
 /* No comment provided by engineer. */
 "UNSUPPORTED_ATTACHMENT" = "Primljena je nepodržana vrsta privitka.";
@@ -11360,7 +11369,7 @@ Send money securely.";
 "USERNAME_LOOKUP_LINK_NO_LONGER_VALID_MESSAGE" = "Poveznica s korisničkim imenom više nije važeća.";
 
 /* A message indicating that the given username is not associated with a registered Signal account. Embeds {{ a username }}. */
-"USERNAME_LOOKUP_NOT_FOUND_MESSAGE_FORMAT" = "%1$@ nije korisnik Signala. Provjerite jeste li unijeli potpuno korisničko ime.";
+"USERNAME_LOOKUP_NOT_FOUND_MESSAGE_FORMAT" = "%1$@ nije korisnik Radara. Provjerite jeste li unijeli potpuno korisničko ime.";
 
 /* Title for an action sheet indicating that the given username is not associated with a registered Signal account. */
 "USERNAME_LOOKUP_NOT_FOUND_TITLE" = "Korisnik nije pronađen";
@@ -11384,7 +11393,7 @@ Send money securely.";
 "USERNAME_ONBOARDING_TITLE" = "Your Username";
 
 /* Instructions that appear below the username QR code on a sharable exported image. */
-"USERNAME_QR_CODE_EXPORT_INSTRUCTIONS" = "Skeniraj ovaj QR kôd svojim uređajem i započni razgovor sa mnom na Signalu.";
+"USERNAME_QR_CODE_EXPORT_INSTRUCTIONS" = "Skeniraj ovaj QR kôd svojim uređajem i započni razgovor sa mnom na Radaru.";
 
 /* A message in a toast informing the user their username, link, and QR code have successfully been reset. Embeds {{ the user's new username }}. */
 "USERNAME_RESET_SUCCESSFUL_TOAST" = "Vaš QR kôd i poveznica su poništeni, a vaše korisničko ime je %1$@";
@@ -11435,7 +11444,7 @@ Send money securely.";
 "VERIFICATION_CODE_REQUESTED_HERO_BODY_FIRST" = "Zatražen je potvrdni kôd";
 
 /* Second part of body for a hero sheet informing the user a verification code was requested. */
-"VERIFICATION_CODE_REQUESTED_HERO_BODY_SECOND" = "Nemojte dijeliti svoj potvrdni kôd ni s kim. Signal vas nikad neće pitati za kôd putem poruke. Ako ste primili poruku od nekoga tko se predstavlja kao Signal, radi se o prijevari.\nSlobodno ignorirajte ovu poruku ako ste vi zatražili potvrdni kôd.";
+"VERIFICATION_CODE_REQUESTED_HERO_BODY_SECOND" = "Nemojte dijeliti svoj potvrdni kôd ni s kim. Radar vas nikad neće pitati za kôd putem poruke. Ako ste primili poruku od nekoga tko se predstavlja kao Radar, radi se o prijevari.\nSlobodno ignorirajte ovu poruku ako ste vi zatražili potvrdni kôd.";
 
 /* Format for info message indicating that the verification state was unverified on this device. Embeds {{user's name or phone number}}. */
 "VERIFICATION_STATE_CHANGE_FORMAT_NOT_VERIFIED_LOCAL" = "Označili ste da %1$@ nije provjeren/a.";

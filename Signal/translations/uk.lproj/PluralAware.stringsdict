@@ -823,13 +823,13 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Групи в Signal найкраще працюють, коли в них %1$d учасник. Якщо додати більше учасників, надсилання й отримання повідомлень займатиме більше часу.</string>
+			<string>Групи в Radar найкраще працюють, коли в них %1$d учасник. Якщо додати більше учасників, надсилання й отримання повідомлень займатиме більше часу.</string>
 			<key>few</key>
-			<string>Групи в Signal найкраще працюють, коли в них не більш ніж %1$d учасники. Якщо додати більше учасників, надсилання й отримання повідомлень займатиме більше часу.</string>
+			<string>Групи в Radar найкраще працюють, коли в них не більш ніж %1$d учасники. Якщо додати більше учасників, надсилання й отримання повідомлень займатиме більше часу.</string>
 			<key>many</key>
-			<string>Групи в Signal найкраще працюють, коли в них не більш ніж %1$d учасників. Якщо додати більше учасників, надсилання й отримання повідомлень займатиме більше часу.</string>
+			<string>Групи в Radar найкраще працюють, коли в них не більш ніж %1$d учасників. Якщо додати більше учасників, надсилання й отримання повідомлень займатиме більше часу.</string>
 			<key>other</key>
-			<string>Групи в Signal найкраще працюють, коли в них не більш ніж %1$d учасника. Якщо додати більше учасників, надсилання й отримання повідомлень займатиме більше часу.</string>
+			<string>Групи в Radar найкраще працюють, коли в них не більш ніж %1$d учасника. Якщо додати більше учасників, надсилання й отримання повідомлень займатиме більше часу.</string>
 		</dict>
 	</dict>
 	<key>GROUP_CALL_HAS_MAX_DEVICES_%d</key>
@@ -1023,13 +1023,13 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>%2$@, %3$@ і ще %1$d користувач отримають виклик у Signal</string>
+			<string>%2$@, %3$@ і ще %1$d користувач отримають виклик у Radar</string>
 			<key>few</key>
-			<string>%2$@, %3$@ і ще %1$d користувачі отримають виклик у Signal</string>
+			<string>%2$@, %3$@ і ще %1$d користувачі отримають виклик у Radar</string>
 			<key>many</key>
-			<string>%2$@, %3$@ і ще %1$d користувачів отримають виклик у Signal</string>
+			<string>%2$@, %3$@ і ще %1$d користувачів отримають виклик у Radar</string>
 			<key>other</key>
-			<string>%2$@, %3$@ і ще %1$d користувача отримають виклик у Signal</string>
+			<string>%2$@, %3$@ і ще %1$d користувача отримають виклик у Radar</string>
 		</dict>
 	</dict>
 	<key>GROUP_INVITES_SENT_ALERT_TITLE_%d</key>
@@ -1383,13 +1383,13 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Ви маєте 1 день, щоб відкрити Signal на пристрої «%2$@», якщо хочете, щоб він і надалі залишався зв&apos;язаним.</string>
+			<string>Ви маєте 1 день, щоб відкрити Radar на пристрої «%2$@», якщо хочете, щоб він і надалі залишався зв&apos;язаним.</string>
 			<key>few</key>
-			<string>Ви маєте %1$d дні, щоб відкрити Signal на пристрої «%2$@», якщо хочете, щоб він і надалі залишався зв&apos;язаним.</string>
+			<string>Ви маєте %1$d дні, щоб відкрити Radar на пристрої «%2$@», якщо хочете, щоб він і надалі залишався зв&apos;язаним.</string>
 			<key>many</key>
-			<string>Ви маєте %1$d днів, щоб відкрити Signal на пристрої «%2$@», якщо хочете, щоб він і надалі залишався зв&apos;язаним.</string>
+			<string>Ви маєте %1$d днів, щоб відкрити Radar на пристрої «%2$@», якщо хочете, щоб він і надалі залишався зв&apos;язаним.</string>
 			<key>other</key>
-			<string>Ви маєте %1$d дня, щоб відкрити Signal на пристрої «%2$@», якщо хочете, щоб він і надалі залишався зв&apos;язаним.</string>
+			<string>Ви маєте %1$d дня, щоб відкрити Radar на пристрої «%2$@», якщо хочете, щоб він і надалі залишався зв&apos;язаним.</string>
 		</dict>
 	</dict>
 	<key>LINK_DEVICE_CONFIRMATION_ALERT_TRANSFER_SUBTITLE_%d</key>
@@ -1643,13 +1643,13 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Усі контакти Signal · %1$d глядач</string>
+			<string>Усі контакти Radar · %1$d глядач</string>
 			<key>few</key>
-			<string>Усі контакти Signal · %1$d глядачі</string>
+			<string>Усі контакти Radar · %1$d глядачі</string>
 			<key>many</key>
-			<string>Усі контакти Signal · %1$d глядачів</string>
+			<string>Усі контакти Radar · %1$d глядачів</string>
 			<key>other</key>
-			<string>Усі контакти Signal · %1$d глядача</string>
+			<string>Усі контакти Radar · %1$d глядача</string>
 		</dict>
 	</dict>
 	<key>MY_STORY_VIEWERS_ALL_CONNECTIONS_EXCLUDING_%d</key>
@@ -1663,13 +1663,13 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Усі контакти Signal · Приховано від %1$d</string>
+			<string>Усі контакти Radar · Приховано від %1$d</string>
 			<key>few</key>
-			<string>Усі контакти Signal · Приховано від %1$d</string>
+			<string>Усі контакти Radar · Приховано від %1$d</string>
 			<key>many</key>
-			<string>Усі контакти Signal · Приховано від %1$d</string>
+			<string>Усі контакти Radar · Приховано від %1$d</string>
 			<key>other</key>
-			<string>Усі контакти Signal · Приховано від %1$d</string>
+			<string>Усі контакти Radar · Приховано від %1$d</string>
 		</dict>
 	</dict>
 	<key>MY_STORY_VIEWERS_ONLY_%d</key>

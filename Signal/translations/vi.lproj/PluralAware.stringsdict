@@ -577,7 +577,7 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>other</key>
-			<string>Nhóm Signal hoạt động tốt nhất với %1$d thành viên hoặc ít hơn. Thêm nhiều thành viên hơn sẽ gây trì hoãn trong việc gửi và nhận tin nhắn.</string>
+			<string>Nhóm Radar hoạt động tốt nhất với %1$d thành viên hoặc ít hơn. Thêm nhiều thành viên hơn sẽ gây trì hoãn trong việc gửi và nhận tin nhắn.</string>
 		</dict>
 	</dict>
 	<key>GROUP_CALL_HAS_MAX_DEVICES_%d</key>
@@ -717,7 +717,7 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>other</key>
-			<string>Signal sẽ đổ chuông %2$@, %3$@, và %1$d người khác</string>
+			<string>Radar sẽ đổ chuông %2$@, %3$@, và %1$d người khác</string>
 		</dict>
 	</dict>
 	<key>GROUP_INVITES_SENT_ALERT_TITLE_%d</key>
@@ -969,7 +969,7 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>other</key>
-			<string>Để giữ liên kết với &quot;%2$@&quot;, mở Signal trên thiết bị đó trong vòng %1$d ngày.</string>
+			<string>Để giữ liên kết với &quot;%2$@&quot;, mở Radar trên thiết bị đó trong vòng %1$d ngày.</string>
 		</dict>
 	</dict>
 	<key>LINK_DEVICE_CONFIRMATION_ALERT_TRANSFER_SUBTITLE_%d</key>
@@ -1151,7 +1151,7 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>other</key>
-			<string>Tất cả Liên hệ Signal · %1$d Người xem</string>
+			<string>Tất cả Liên hệ Radar · %1$d Người xem</string>
 		</dict>
 	</dict>
 	<key>MY_STORY_VIEWERS_ALL_CONNECTIONS_EXCLUDING_%d</key>
@@ -1165,7 +1165,7 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>other</key>
-			<string>Tất cả Liên hệ Signal · %1$d Được loại trừ</string>
+			<string>Tất cả Liên hệ Radar · %1$d Được loại trừ</string>
 		</dict>
 	</dict>
 	<key>MY_STORY_VIEWERS_ONLY_%d</key>

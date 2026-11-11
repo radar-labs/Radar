@@ -577,7 +577,7 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>other</key>
-			<string>ئەزا سانى %1$d ياكى ئاز بولغاندا Signal نىڭ گۇرۇپپا ئىقتىدارى ئەڭ ياخشى ئىشلەيدۇ. ئەزا كۆپەيگەندە ئۇچۇر يوللاش ۋە تاپشۇرۇۋېلىش سەل كېچىكىدۇ.</string>
+			<string>ئەزا سانى %1$d ياكى ئاز بولغاندا Radar نىڭ گۇرۇپپا ئىقتىدارى ئەڭ ياخشى ئىشلەيدۇ. ئەزا كۆپەيگەندە ئۇچۇر يوللاش ۋە تاپشۇرۇۋېلىش سەل كېچىكىدۇ.</string>
 		</dict>
 	</dict>
 	<key>GROUP_CALL_HAS_MAX_DEVICES_%d</key>
@@ -717,7 +717,7 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>other</key>
-			<string>Signal %2$@، %3$@ ۋە %1$d قاتارلىقلارنى چاقىرىدۇ</string>
+			<string>Radar %2$@، %3$@ ۋە %1$d قاتارلىقلارنى چاقىرىدۇ</string>
 		</dict>
 	</dict>
 	<key>GROUP_INVITES_SENT_ALERT_TITLE_%d</key>
@@ -969,7 +969,7 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>other</key>
-			<string>«%2$@» نى ئۇلانغان ھالەتتە ساقلاش ئۈچۈن %1$d كۈن ئىچىدە Signal نى ئۇ ئۈسكۈنىدە ئېچىڭ.</string>
+			<string>«%2$@» نى ئۇلانغان ھالەتتە ساقلاش ئۈچۈن %1$d كۈن ئىچىدە Radar نى ئۇ ئۈسكۈنىدە ئېچىڭ.</string>
 		</dict>
 	</dict>
 	<key>LINK_DEVICE_CONFIRMATION_ALERT_TRANSFER_SUBTITLE_%d</key>
@@ -1151,7 +1151,7 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>other</key>
-			<string>بارلىق Signal ئالاقىداشلىرى · %1$d كۆرۈرمەن</string>
+			<string>بارلىق Radar ئالاقىداشلىرى · %1$d كۆرۈرمەن</string>
 		</dict>
 	</dict>
 	<key>MY_STORY_VIEWERS_ALL_CONNECTIONS_EXCLUDING_%d</key>
@@ -1165,7 +1165,7 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>other</key>
-			<string>بارلىق Signal ئالاقىداشلىرى· %1$d چىقىرىۋېتىلگەن</string>
+			<string>بارلىق Radar ئالاقىداشلىرى· %1$d چىقىرىۋېتىلگەن</string>
 		</dict>
 	</dict>
 	<key>MY_STORY_VIEWERS_ONLY_%d</key>

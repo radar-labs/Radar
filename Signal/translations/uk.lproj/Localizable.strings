@@ -2,7 +2,7 @@
 "AB_PERMISSION_MISSING_ACTION_NOT_NOW" = "Не зараз";
 
 /* Footer for the 'about' help section. For non-English languages, exclude the word '501c3'. */
-"ABOUT_SECTION_FOOTER" = "Авторські права належать Signal Messenger\nЛіцензія: AGPLv3\nSignal є неприбутковою організацією";
+"ABOUT_SECTION_FOOTER" = "Авторські права належать Signal Messenger\nCopyright 2026 Radar Chat, Inc.\nЛіцензія: AGPLv3";
 
 /* Title for the 'about' help section */
 "ABOUT_SECTION_TITLE" = "Про Radar";
@@ -215,7 +215,7 @@
 "APN_Message" = "Можливо, у вас є нові повідомлення";
 
 /* Shown in place of the text input box in a conversation when the app has expired and the user is no longer allowed to send messages. The embedded value is 'Update now' (translated via APP_EXPIRED_BOTTOM_UPDATE), and it will be formatted as a tappable link. */
-"APP_EXPIRED_BOTTOM" = "Ця версія Signal застаріла. %1$@, щоб надсилати й отримувати повідомлення.";
+"APP_EXPIRED_BOTTOM" = "Ця версія Radar застаріла. %1$@, щоб надсилати й отримувати повідомлення.";
 
 /* Shown in place of the text input box in a conversation when the app has expired and the user is no longer allowed to send messages. This value is a tappable link embedded in a larger sentence. */
 "APP_EXPIRED_BOTTOM_UPDATE" = "Оновіть застосунок";
@@ -236,7 +236,7 @@
 "APP_LAUNCH_FAILURE_COULD_NOT_LOAD_DATABASE" = "Не вдалося завантажити базу даних";
 
 /* Message for an action sheet explaining that Signal can't launch because the database is corrupted. */
-"APP_LAUNCH_FAILURE_DATABASE_CORRUPTED_MESSAGE" = "Signal не може запуститися через пошкодження бази даних. Небезпеки для вашого акаунту й повідомлень немає.";
+"APP_LAUNCH_FAILURE_DATABASE_CORRUPTED_MESSAGE" = "Radar не може запуститися через пошкодження бази даних. Небезпеки для вашого акаунту й повідомлень немає.";
 
 /* Title for an action sheet explaining that Signal can't launch because the database is corrupted. */
 "APP_LAUNCH_FAILURE_DATABASE_CORRUPTED_TITLE" = "Пошкоджено базу даних";
@@ -245,7 +245,7 @@
 "APP_LAUNCH_FAILURE_DATABASE_RECOVERY_ACTION_TITLE" = "Відновити";
 
 /* Action in an action sheet offering to exit the app. */
-"APP_LAUNCH_FAILURE_EXIT_APP_ACTION_TITLE" = "Вийти з Signal";
+"APP_LAUNCH_FAILURE_EXIT_APP_ACTION_TITLE" = "Вийти з Radar";
 
 /* Error indicating that the app could not launch without reverting unknown database migrations. */
 "APP_LAUNCH_FAILURE_INVALID_DATABASE_VERSION_MESSAGE" = "Будь ласка, оновіть Radar до останньої версії.";
@@ -260,7 +260,7 @@
 "APP_LAUNCH_FAILURE_LAST_LAUNCH_CRASHED_TITLE" = "Не вдається відкрити Radar";
 
 /* Message for an error sheet shown when the app cannot launch because the device is out of storage space. Embeds 1:{{ the localized name of the user's device model, e.g. iPhone }}; 2:{{ an amount of storage space as a file size, e.g. 1 GB }}. */
-"APP_LAUNCH_FAILURE_NOT_ENOUGH_STORAGE_SPACE_MESSAGE_FORMAT" = "Неможливо відкрити Signal, тому що на вашому %1$@ не вистачає пам'яті. Звільніть принаймні %2$@, а потім знову відкрийте Signal.\n\nПерейдіть у параметри iOS > Загальні > Сховище й усуньте застосунки, які ви не використовуєте, видаліть великі відео із «Фотографій» або інших застосунків, а також видаліть завантажену музику чи інші медіафайли.";
+"APP_LAUNCH_FAILURE_NOT_ENOUGH_STORAGE_SPACE_MESSAGE_FORMAT" = "Неможливо відкрити Radar, тому що на вашому %1$@ не вистачає пам'яті. Звільніть принаймні %2$@, а потім знову відкрийте Radar.\n\nПерейдіть у параметри iOS > Загальні > Сховище й усуньте застосунки, які ви не використовуєте, видаліть великі відео із «Фотографій» або інших застосунків, а також видаліть завантажену музику чи інші медіафайли.";
 
 /* Title for an error sheet shown when the app cannot launch because the device is out of storage space. */
 "APP_LAUNCH_FAILURE_NOT_ENOUGH_STORAGE_SPACE_TITLE" = "На пристрої недостатньо місця";
@@ -377,13 +377,13 @@
 "ATTACHMENT_APPROVAL_MEDIA_QUALITY_TITLE" = "Якість медіафайлів";
 
 /* Notification body shown when media sync to a linked device is complete. */
-"ATTACHMENT_BACKFILL_FINISHED_NOTIFICATION" = "Синхронізацію із Signal на зв'язаному пристрої завершено";
+"ATTACHMENT_BACKFILL_FINISHED_NOTIFICATION" = "Синхронізацію із Radar на зв'язаному пристрої завершено";
 
 /* Notification body shown when media sync to a linked device was interrupted. */
-"ATTACHMENT_BACKFILL_INTERRUPTED_NOTIFICATION" = "Відкрийте Signal, щоб продовжити синхронізацію на зв'язаному пристрої";
+"ATTACHMENT_BACKFILL_INTERRUPTED_NOTIFICATION" = "Відкрийте Radar, щоб продовжити синхронізацію на зв'язаному пристрої";
 
 /* Notification body shown while syncing media to a linked device. */
-"ATTACHMENT_BACKFILL_SYNCING_NOTIFICATION" = "Синхронізація із Signal на зв'язаному пристрої";
+"ATTACHMENT_BACKFILL_SYNCING_NOTIFICATION" = "Синхронізація із Radar на зв'язаному пристрої";
 
 /* Generic filename for an attachment with no known name */
 "ATTACHMENT_DEFAULT_FILENAME" = "Вкладення";
@@ -632,7 +632,7 @@
 "BACKUP_KEY_SEE_FULL_KEY_BUTTON_TITLE" = "Показати весь ключ";
 
 /* Body for a warning sheet shown to discourage the user from sharing their 'Recovery Key', warning them not to share it with anyone. */
-"BACKUP_NEVER_SHARE_RECOVERY_KEY_SHEET_BODY" = "Нікому не повідомляйте свій ключ відновлення. Маючи ключ відновлення, інша людина може вкрасти ваш акаунт. <bold>Представники Signal ніколи</bold> не питатимуть у вас ключ відновлення. Ніколи не відповідайте на повідомлення нібито від Signal.";
+"BACKUP_NEVER_SHARE_RECOVERY_KEY_SHEET_BODY" = "Нікому не повідомляйте свій ключ відновлення. Маючи ключ відновлення, інша людина може вкрасти ваш акаунт. <bold>Представники Radar ніколи</bold> не питатимуть у вас ключ відновлення. Ніколи не відповідайте на повідомлення нібито від Radar.";
 
 /* Title for a warning sheet shown to discourage the user from sharing their 'Recovery Key'. */
 "BACKUP_NEVER_SHARE_RECOVERY_KEY_SHEET_TITLE" = "Нікому не повідомляйте ключ відновлення";
@@ -752,7 +752,7 @@
 "BACKUP_RESTORE_MODAL_TITLE" = "Відновлення повідомлень…";
 
 /* Message for a confirmation sheet shown before saving the user's Recovery Key to their password manager. */
-"BACKUP_SAVE_KEY_PW_MGR_CONFIRM_SHEET_MESSAGE" = "Зберігайте ключ відновлення тільки в надійному менеджері паролів. Signal не дає порад щодо вибору найкращого менеджера паролів.";
+"BACKUP_SAVE_KEY_PW_MGR_CONFIRM_SHEET_MESSAGE" = "Зберігайте ключ відновлення тільки в надійному менеджері паролів. Radar не дає порад щодо вибору найкращого менеджера паролів.";
 
 /* Title for a confirmation sheet shown before saving the user's Recovery Key to their password manager. */
 "BACKUP_SAVE_KEY_PW_MGR_CONFIRM_SHEET_TITLE" = "Зберегти в менеджер паролів?";
@@ -1064,31 +1064,31 @@
 "BACKUP_SETTINGS_LANDING_OTHER_WAYS_HEADER" = "Інші способи резервного копіювання";
 
 /* Subtitle on the Backups settings landing page. */
-"BACKUP_SETTINGS_LANDING_PAGE_SUBTITLE" = "Зберігайте історію повідомлень і не втрачайте дані в разі зміни телефона або перевстановлення Signal.";
+"BACKUP_SETTINGS_LANDING_PAGE_SUBTITLE" = "Зберігайте історію повідомлень і не втрачайте дані в разі зміни телефона або перевстановлення Radar.";
 
 /* Button to begin setting up Signal Secure Backups on the Backups settings landing page. */
 "BACKUP_SETTINGS_LANDING_SET_UP_BUTTON" = "Налаштувати";
 
 /* Description of Signal Secure Backups on the Backups settings landing page. */
-"BACKUP_SETTINGS_LANDING_SIGNAL_BACKUPS_BODY" = "Автоматичне створення резервних копій у надійному сховищі даних Signal, захищеному наскрізним шифруванням.";
+"BACKUP_SETTINGS_LANDING_SIGNAL_BACKUPS_BODY" = "Автоматичне створення резервних копій у надійному сховищі даних Radar, захищеному наскрізним шифруванням.";
 
 /* Title for the Signal Secure Backups cell on the Backups settings landing page. */
-"BACKUP_SETTINGS_LANDING_SIGNAL_BACKUPS_TITLE" = "Резервне копіювання від Signal";
+"BACKUP_SETTINGS_LANDING_SIGNAL_BACKUPS_TITLE" = "Резервне копіювання від Radar";
 
 /* Button to view settings for remote backups on the Backups settings landing page. */
 "BACKUP_SETTINGS_LANDING_VIEW_SETTINGS_BUTTON" = "Відкрити налаштування";
 
 /* Note on the linked-device Backups screen explaining that the Backups subscription can only be managed on the user's primary device. */
-"BACKUP_SETTINGS_LINKED_DEVICE_MANAGE_ON_PRIMARY_FOOTER" = "Щоб змінити передплату на надійне резервне копіювання від Signal, зайдіть в акаунт на основному пристрої.";
+"BACKUP_SETTINGS_LINKED_DEVICE_MANAGE_ON_PRIMARY_FOOTER" = "Щоб змінити передплату на надійне резервне копіювання від Radar, зайдіть в акаунт на основному пристрої.";
 
 /* Note on the linked-device Backups screen, shown on the paid tier, explaining that the Backups subscription can only be managed on the user's primary device. */
-"BACKUP_SETTINGS_LINKED_DEVICE_MANAGE_ON_PRIMARY_FOOTER_PAID" = "Щоб змінити або скасувати передплату на надійне резервне копіювання від Signal, зайдіть в акаунт на основному пристрої.";
+"BACKUP_SETTINGS_LINKED_DEVICE_MANAGE_ON_PRIMARY_FOOTER_PAID" = "Щоб змінити або скасувати передплату на надійне резервне копіювання від Radar, зайдіть в акаунт на основному пристрої.";
 
 /* Body text on the linked-device Backups screen, shown when Backups aren't set up, explaining the feature and that it can be enabled on the user's primary device. */
-"BACKUP_SETTINGS_LINKED_DEVICE_NO_BACKUP_FOOTER" = "Автоматичне створення резервних копій у надійному сховищі даних Signal, захищеному наскрізним шифруванням. Налаштуйте з основного пристрою.";
+"BACKUP_SETTINGS_LINKED_DEVICE_NO_BACKUP_FOOTER" = "Автоматичне створення резервних копій у надійному сховищі даних Radar, захищеному наскрізним шифруванням. Налаштуйте з основного пристрою.";
 
 /* Message on the linked-device Backups screen, shown when the user's paid subscription can't be found, prompting them to renew. */
-"BACKUP_SETTINGS_LINKED_DEVICE_SUBSCRIPTION_NOT_FOUND" = "Передплату не знайдено. Поновіть її, щоб знову користуватися надійним резервним копіюванням від Signal.";
+"BACKUP_SETTINGS_LINKED_DEVICE_SUBSCRIPTION_NOT_FOUND" = "Передплату не знайдено. Поновіть її, щоб знову користуватися надійним резервним копіюванням від Radar.";
 
 /* Title for a button allowing users to trigger a manual backup. */
 "BACKUP_SETTINGS_MANUAL_BACKUP_BUTTON_TITLE" = "Створити копію зараз";
@@ -1130,10 +1130,10 @@
 "BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_TOGGLE_FOOTER_UNAVAILABLE" = "Оптимізація пам'яті доступна тим, хто користується платним резервним копіюванням від Radar. Оформте передплату, щоб використовувати цю функцію.";
 
 /* Title for a toggle allowing users to change the Optimize Local Storage setting. */
-"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_TOGGLE_TITLE" = "Оптимізувати сховище Signal";
+"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_TOGGLE_TITLE" = "Оптимізувати сховище Radar";
 
 /* Body for a Backup plan upsell view encouraging users to subscribe to a paid Backup plan to use storage optimization. */
-"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_UPSELL_BODY" = "Оптимізація сховища доступна тим, хто платить за надійне резервне копіювання від Signal. Оформте передплату, щоб використовувати цю функцію.";
+"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_UPSELL_BODY" = "Оптимізація сховища доступна тим, хто платить за надійне резервне копіювання від Radar. Оформте передплату, щоб використовувати цю функцію.";
 
 /* Title for a Backup plan upsell view encouraging users to subscribe to a paid Backup plan to use storage optimization. */
 "BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_UPSELL_TITLE" = "Оптимізуйте сховище з платним резервним копіюванням";
@@ -1217,7 +1217,7 @@
 "BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_OPTIMIZE_MEDIA_TOGGLE_FOOTER" = "Старі медіафайли буде вивантажено з пам'яті пристрою під час створення чергової резервної копії; їх можна в будь-який час завантажити на пристрій з резервної копії.";
 
 /* Title for a toggle shown after the user enables backups, letting them enable the Optimize Storage feature. */
-"BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_OPTIMIZE_MEDIA_TOGGLE_TITLE" = "Оптимізувати сховище Signal";
+"BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_OPTIMIZE_MEDIA_TOGGLE_TITLE" = "Оптимізувати сховище Radar";
 
 /* Title for a sheet shown after the user enables backups. */
 "BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_TITLE" = "Усе готово. Тепер можна створити надійну резервну копію.";
@@ -1247,7 +1247,7 @@
 "BACKUP_SUBSCRIPTION_FAILED_TO_RENEW_SHEET_TITLE" = "Не вдалося продовжити передплату на резервне копіювання";
 
 /* Body for a megaphone shown on the chat list encouraging users to subscribe to a paid Backup plan to back up all their media. Embeds {{ the amount of storage included in the paid plan, preformatted as a localized byte count, e.g. '100 GB' }}. */
-"BACKUPS_BACK_UP_YOUR_MEDIA_MEGAPHONE_BODY" = "З платним резервним копіюванням від Signal ви можете зберігати всі медіафайли, до %1$@.";
+"BACKUPS_BACK_UP_YOUR_MEDIA_MEGAPHONE_BODY" = "З платним резервним копіюванням від Radar ви можете зберігати всі медіафайли, до %1$@.";
 
 /* Title for a button on a megaphone encouraging users to subscribe to a paid Backup plan to back up all their media. */
 "BACKUPS_BACK_UP_YOUR_MEDIA_MEGAPHONE_PRIMARY_ACTION" = "Змінити план";
@@ -1256,7 +1256,7 @@
 "BACKUPS_BACK_UP_YOUR_MEDIA_MEGAPHONE_TITLE" = "Резервна копія всіх медіафайлів";
 
 /* Body for a Backup plan upsell view encouraging users to subscribe to a paid Backup plan to back up all their media. Embeds {{ the amount of storage included in the paid plan, preformatted as a localized byte count, e.g. '100 GB' }}. */
-"BACKUPS_BACK_UP_YOUR_MEDIA_UPSELL_BODY" = "Оплачуючи надійне резервне копіювання від Signal, ви зможете зберігати всі медіафайли, до %1$@. Ви не втратите зображення і відео, навіть якщо зміните телефон або перевстановите Signal.";
+"BACKUPS_BACK_UP_YOUR_MEDIA_UPSELL_BODY" = "Оплачуючи надійне резервне копіювання від Radar, ви зможете зберігати всі медіафайли, до %1$@. Ви не втратите зображення і відео, навіть якщо зміните телефон або перевстановите Radar.";
 
 /* Title for a Backup plan upsell view encouraging users to subscribe to a paid Backup plan to back up all their media. */
 "BACKUPS_BACK_UP_YOUR_MEDIA_UPSELL_TITLE" = "Зберігайте всі медіафайли з платним резервним копіюванням";
@@ -1268,7 +1268,7 @@
 "BACKUPS_MEDIA_ERROR_NOTIFICATION_TITLE" = "Помилка резервного копіюванням медіафайлів";
 
 /* Body for a megaphone shown on the chat list encouraging users to enable Signal Secure Backups. */
-"BACKUPS_NEVER_LOSE_A_MESSAGE_MEGAPHONE_BODY" = "Увімкніть надійне резервне копіювання від Signal, щоб зберігати всі повідомлення і медіафайли";
+"BACKUPS_NEVER_LOSE_A_MESSAGE_MEGAPHONE_BODY" = "Увімкніть надійне резервне копіювання від Radar, щоб зберігати всі повідомлення і медіафайли";
 
 /* Title for a button on a megaphone encouraging users to enable Signal Secure Backups. */
 "BACKUPS_NEVER_LOSE_A_MESSAGE_MEGAPHONE_PRIMARY_ACTION" = "Увімкнути";
@@ -1277,7 +1277,7 @@
 "BACKUPS_NEVER_LOSE_A_MESSAGE_MEGAPHONE_TITLE" = "Не втрачайте доступу до повідомлень";
 
 /* Body for a megaphone shown on the chat list encouraging users to subscribe to a paid Backup plan to save on-device storage space. */
-"BACKUPS_SAVE_SPACE_MEGAPHONE_BODY" = "Завдяки резервному копіюванню від Signal у сховищі буде більше вільного місця, оскільки медіафайли буде вивантажено з пристрою.";
+"BACKUPS_SAVE_SPACE_MEGAPHONE_BODY" = "Завдяки резервному копіюванню від Radar у сховищі буде більше вільного місця, оскільки медіафайли буде вивантажено з пристрою.";
 
 /* Title for a button on a megaphone encouraging users to subscribe to a paid Backup plan to save on-device storage space, when the user does not yet have Signal Secure Backups enabled. */
 "BACKUPS_SAVE_SPACE_MEGAPHONE_PRIMARY_ACTION_TURN_ON" = "Увімкнути";
@@ -1289,7 +1289,7 @@
 "BACKUPS_SAVE_SPACE_MEGAPHONE_TITLE" = "Економте місце з платним резервним копіюванням";
 
 /* Body for a Backup plan upsell view encouraging users to subscribe to a paid Backup plan to save on-device storage space. Embeds {{ the amount of storage space being consumed on-device by media, preformatted as a localized byte count, e.g. '1.2 GB' }}. */
-"BACKUPS_SAVE_SPACE_UPSELL_BODY" = "Signal використовує %1$@ пам'яті для медіафайлів. З платним резервним копіюванням від Signal ви можете звільнити місце в сховищі, вивантажуючи медіафайли з пристрою і водночас зберігаючи всю історію чатів у резервній копії.";
+"BACKUPS_SAVE_SPACE_UPSELL_BODY" = "Radar використовує %1$@ пам'яті для медіафайлів. З платним резервним копіюванням від Radar ви можете звільнити місце в сховищі, вивантажуючи медіафайли з пристрою і водночас зберігаючи всю історію чатів у резервній копії.";
 
 /* Title for a Backup plan upsell view encouraging users to subscribe to a paid Backup plan to save on-device storage space. */
 "BACKUPS_SAVE_SPACE_UPSELL_TITLE" = "Економте місце з платним резервним копіюванням";
@@ -1298,7 +1298,7 @@
 "BACKUPS_SETTINGS_TITLE" = "Надійне резервне копіювання";
 
 /* Message for an action sheet shown on iPad saying you need to set up backups on your phone */
-"BACKUPS_SETUP_ON_PRIMARY_MESSAGE" = "Щоб налаштувати резервне копіювання, відкрийте Signal на основному пристрої iPhone / Android і перейдіть у налаштування > Резервні копії.";
+"BACKUPS_SETUP_ON_PRIMARY_MESSAGE" = "Щоб налаштувати резервне копіювання, відкрийте Radar на основному пристрої iPhone / Android і перейдіть у налаштування > Резервні копії.";
 
 /* Body for system notification or megaphone when backups is enabled. Embeds {{ time backups was enabled }} */
 "BACKUPS_TURNED_ON_NOTIFICATION_BODY_FORMAT" = "Для цього акаунту було ввімкнено резервне копіювання від Radar. Час увімкнення: %1$@. Торкніться, щоб переглянути.";
@@ -1655,7 +1655,7 @@
 "CALL_QUALITY_SURVEY_COMPLETION_TOAST" = "Дякуємо за відгук!";
 
 /* Footer text explaining custom issue descriptions in the call quality survey */
-"CALL_QUALITY_SURVEY_CUSTOM_ISSUE_FOOTER" = "Зазначте всі подробиці, що стосуються проблеми. Уся інформація залишиться конфіденційною. Ми використаємо її лише для покращення викликів у Signal.";
+"CALL_QUALITY_SURVEY_CUSTOM_ISSUE_FOOTER" = "Зазначте всі подробиці, що стосуються проблеми. Уся інформація залишиться конфіденційною. Ми використаємо її лише для покращення викликів у Radar.";
 
 /* Placeholder text for the custom issue entry in the call quality survey */
 "CALL_QUALITY_SURVEY_CUSTOM_ISSUE_PLACEHOLDER" = "Опишіть проблему";
@@ -1670,7 +1670,7 @@
 "CALL_QUALITY_SURVEY_DEBUG_LOG_PREVIEW_LINK" = "Переглянути журнал налагодження";
 
 /* Title for the debug log sharing screen in the call quality survey */
-"CALL_QUALITY_SURVEY_DEBUG_LOG_TITLE" = "Допоможіть нам покращити Signal";
+"CALL_QUALITY_SURVEY_DEBUG_LOG_TITLE" = "Допоможіть нам покращити Radar";
 
 /* Label for the toggle to share debug log in the call quality survey */
 "CALL_QUALITY_SURVEY_DEBUG_LOG_TOGGLE" = "Надіслати журнал налагодження";
@@ -1724,7 +1724,7 @@
 "CALL_QUALITY_SURVEY_ISSUES_SHEET_TITLE" = "Яка проблема у вас виникла?";
 
 /* Header text explaining the purpose of the call quality survey */
-"CALL_QUALITY_SURVEY_RATING_HEADER" = "Ваш відгук допоможе нам покращити виклики в Signal. Ми не зберігатимемо ніякої особистої інформації.";
+"CALL_QUALITY_SURVEY_RATING_HEADER" = "Ваш відгук допоможе нам покращити виклики в Radar. Ми не зберігатимемо ніякої особистої інформації.";
 
 /* Title for the initial rating screen in the call quality survey */
 "CALL_QUALITY_SURVEY_RATING_TITLE" = "Як пройшов ваш дзвінок?";
@@ -2111,7 +2111,7 @@
 "CHAT_LIST_BACKUP_PROGRESS_VIEW_RESUME_CELLULAR_DATA_BUTTON" = "Відновити";
 
 /* Message shown in an action sheet when the user tries to resume backup using cellular data. */
-"CHAT_LIST_BACKUP_PROGRESS_VIEW_RESUME_CELLULAR_DATA_MESSAGE" = "За резервне копіювання медіафайлів через мобільний інтернет може стягуватися плата. Завантаження може тривати довго, тому залиште Signal відкритим, щоб ніщо його не перервало.";
+"CHAT_LIST_BACKUP_PROGRESS_VIEW_RESUME_CELLULAR_DATA_MESSAGE" = "За резервне копіювання медіафайлів через мобільний інтернет може стягуватися плата. Завантаження може тривати довго, тому залиште Radar відкритим, щоб ніщо його не перервало.";
 
 /* Title for the action sheet shown when the user tries to resume backup using cellular data. */
 "CHAT_LIST_BACKUP_PROGRESS_VIEW_RESUME_CELLULAR_DATA_TITLE" = "Відновити, використовуючи мобільний інтернет?";
@@ -2243,7 +2243,7 @@
 "CLOCK_SKEW_APP_BLOCKING_DEVICE_TIME_FORMAT" = "Час на вашому пристрої: %1$@ UTC.";
 
 /* Subtitle for a screen shown when the app can't be used until the user corrects their device's date and time. */
-"CLOCK_SKEW_APP_BLOCKING_SUBTITLE" = "Signal не можна використовувати, якщо на пристрої неправильно налаштовано дату й час. Змініть дату і час у параметрах.";
+"CLOCK_SKEW_APP_BLOCKING_SUBTITLE" = "Radar не можна використовувати, якщо на пристрої неправильно налаштовано дату й час. Змініть дату і час у параметрах.";
 
 /* Title for a screen shown when the app can't be used until the user corrects their device's date and time. */
 "CLOCK_SKEW_APP_BLOCKING_TITLE" = "Неправильна дата";
@@ -2462,7 +2462,7 @@
 "CONTACT_SHARE_AVATAR_ROW_LABEL" = "Фото";
 
 /* Name of the option to share a contact's Signal profile photo. Read by VoiceOver on the option, and as the current value of the photo row when it's selected. */
-"CONTACT_SHARE_AVATAR_SIGNAL_PHOTO" = "Фото профілю Signal";
+"CONTACT_SHARE_AVATAR_SIGNAL_PHOTO" = "Фото профілю Radar";
 
 /* Name of the option to share a contact's photo from the phone's contacts. Read by VoiceOver on the option, and as the current value of the photo row when it's selected. */
 "CONTACT_SHARE_AVATAR_SYSTEM_CONTACT_PHOTO" = "Фото контакту";
@@ -2477,7 +2477,7 @@
 "CONTACT_SHARE_MESSAGE_BUTTON" = "Повідомлення";
 
 /* Notice at the top of the 'Share Contact' view when the shared contact includes their Signal account. Embeds {{ contact name }}. */
-"CONTACT_SHARE_SIGNAL_ACCOUNT_NOTICE_FORMAT" = "Усі, з ким ви поділитеся цим профілем, зможуть написати користувачеві %1$@ в Signal.";
+"CONTACT_SHARE_SIGNAL_ACCOUNT_NOTICE_FORMAT" = "Усі, з ким ви поділитеся цим профілем, зможуть написати користувачеві %1$@ в Radar.";
 
 /* Alert body when contacts disabled while trying to share a contact. */
 "CONTACT_SHARING_NO_ACCESS_BODY" = "Radar потребує доступу до ваших контактів. Відкрийте параметри iOS і надайте відповідний дозвіл. Ваші контакти зашифровано й приховано від служби Radar.";
@@ -4698,10 +4698,10 @@
 "GROUP_NAME_EDUCATION_SHEET_BULLET_1" = "Зважайте на те, що є групи, які лише вдають, ніби представляють реальні компанії та організації";
 
 /* Second bullet point for the explainer sheet for group names */
-"GROUP_NAME_EDUCATION_SHEET_BULLET_2" = "Signal не може перевірити справжність імен і фотографій";
+"GROUP_NAME_EDUCATION_SHEET_BULLET_2" = "Radar не може перевірити справжність імен і фотографій";
 
 /* Third bullet point for the explainer sheet for group names */
-"GROUP_NAME_EDUCATION_SHEET_BULLET_3" = "Представники Signal ніколи не питатимуть у вас код для реєстрації, PIN-код і ключ відновлення";
+"GROUP_NAME_EDUCATION_SHEET_BULLET_3" = "Представники Radar ніколи не питатимуть у вас код для реєстрації, PIN-код і ключ відновлення";
 
 /* Fourth bullet point for the explainer sheet for group names */
 "GROUP_NAME_EDUCATION_SHEET_BULLET_4" = "Не діліться особистою інформацією з незнайомцями";
@@ -5266,6 +5266,9 @@
 
 /* Placeholder text displayed in empty input box in chat screen. */
 "INPUT_TOOLBAR_MESSAGE_PLACEHOLDER" = "Повідомлення";
+/* accessibility label for the button which show up send payemnt screen */
+"INPUT_TOOLBAR_PAYMENTS_BUTTON_ACCESSIBILITY_LABEL" = "Надіслати платіж";
+
 
 /* accessibility label for the button which shows the sticker picker */
 "INPUT_TOOLBAR_STICKER_BUTTON_ACCESSIBILITY_LABEL" = "Стікери";
@@ -5490,7 +5493,7 @@
 "LINKED_DEVICE_INFO_SHEET_BULLET_3" = "Деякі налаштування доступні лише на основному пристрої, зокрема налаштування акаунту й резервні копії.";
 
 /* Lead paragraph for a sheet explaining linked devices. The text within the <bold></bold> tags is styled bold. */
-"LINKED_DEVICE_INFO_SHEET_HEADER" = "<bold>Зв’язані пристрої</bold> дають безпечний доступ до акаунту й повідомлень Signal на будь-якому з додаткових пристроїв.";
+"LINKED_DEVICE_INFO_SHEET_HEADER" = "<bold>Зв’язані пристрої</bold> дають безпечний доступ до акаунту й повідомлень Radar на будь-якому з додаткових пристроїв.";
 
 /* Shown in a banner when you tap the 'New Chat' icon at the top of the list of chats. */
 "LINKED_DEVICE_MANAGE_CONTACTS_BANNER" = "Керування контактами пристрою більше не підтримується на зв'язаних пристроях. Цей пристрій синхронізуватиме всі зміни вашого списку контактів із Radar на вашому основному пристрої.";
@@ -5556,7 +5559,7 @@
 "LINKING_DEVICE_FAILED_TITLE" = "Не вдалося зв'язати пристрій";
 
 /* Shown when trying to link a device to an account but that device is out of date and must first update its version of Signal. */
-"LINKING_DEVICE_OUT_OF_DATE" = "На вашому другому пристрої встановлено стару версію Signal. Оновіть Signal на тому пристрої, щоб зв'язати його.";
+"LINKING_DEVICE_OUT_OF_DATE" = "На вашому другому пристрої встановлено стару версію Radar. Оновіть Radar на тому пристрої, щоб зв'язати його.";
 
 /* Progress label when the message loading has nearly completed during the device linking process */
 "LINKING_SYNCING_FINALIZING" = "Перенесення повідомлень майже завершено…";
@@ -5580,7 +5583,7 @@
 "LOCAL_BACKUP_SETTINGS_CREATE_NEW_KEY_WARNING_SHEET_BODY" = "Створювати новий ключ варто, лише якщо хтось дізнався ваш поточний ключ. Щоб створити новий ключ, спершу потрібно вимкнути резервне копіювання на пристрої.\n\nПісля того як ви вимкнете резервне копіювання на пристрої та створите новий ключ, вам потрібно заново ввімкнути резервне копіювання на пристрої.";
 
 /* Body for an error sheet shown when the user's folder choice does not contain a backup file. */
-"LOCAL_BACKUPS_MISSING_BACKUP_ACTION_SHEET_BODY" = "У цій папці не було знайдено резервної копії Signal. Виберіть іншу папку.";
+"LOCAL_BACKUPS_MISSING_BACKUP_ACTION_SHEET_BODY" = "У цій папці не було знайдено резервної копії Radar. Виберіть іншу папку.";
 
 /* Title for an error sheet shown when the user's folder choice does not contain a backup file. */
 "LOCAL_BACKUPS_MISSING_BACKUP_ACTION_SHEET_TITLE" = "Резервної копії не знайдено";
@@ -5628,7 +5631,7 @@
 "LOCAL_FILE_BACKUP_ONBOARDING_INTRO_BULLET_3" = "Можна вимкнути в будь-який час";
 
 /* Subtitle for a view introducing local file backups during the onboarding flow. */
-"LOCAL_FILE_BACKUP_ONBOARDING_INTRO_SUBTITLE" = "Зберігайте повідомлення в папці на цьому пристрої. Резервна копія захищена наскрізним шифруванням, і дані з неї можна відновити, якщо заново встановити Signal і вибрати «Відновлення або перенесення акаунту».";
+"LOCAL_FILE_BACKUP_ONBOARDING_INTRO_SUBTITLE" = "Зберігайте повідомлення в папці на цьому пристрої. Резервна копія захищена наскрізним шифруванням, і дані з неї можна відновити, якщо заново встановити Radar і вибрати «Відновлення або перенесення акаунту».";
 
 /* Title for a view introducing local file backups during the onboarding flow. */
 "LOCAL_FILE_BACKUP_ONBOARDING_INTRO_TITLE" = "Резервна копія на пристрої";
@@ -5643,10 +5646,10 @@
 "LOCAL_FILE_BACKUPS_CHOOSE_FOLDER_TITLE" = "Оберіть папку";
 
 /* Warning shown when a user tries to enable local file backups with optimize media enabled */
-"LOCAL_FILE_BACKUPS_OPTIMIZE_MEDIA_WARNING_ACTION_SHEET" = "У вас увімкнено функцію «Оптимізувати сховище Signal». Якщо ви хочете зберігати всі медіафайли в резервній копії на пристрої, вимкніть це налаштування.";
+"LOCAL_FILE_BACKUPS_OPTIMIZE_MEDIA_WARNING_ACTION_SHEET" = "У вас увімкнено функцію «Оптимізувати сховище Radar». Якщо ви хочете зберігати всі медіафайли в резервній копії на пристрої, вимкніть це налаштування.";
 
 /* Message for a sheet warning the user about enabling Optimize Storage with local backups enabled. */
-"LOCAL_FILE_BACKUPS_OPTIMIZE_MEDIA_WARNING_ACTION_SHEET_2_BODY" = "Якщо ввімкнути функцію «Оптимізувати сховище Signal», старі медіафайли буде вивантажено з пристрою. Ви можете завантажити їх у будь-який час. Також старі медіафайли буде вилучено з резервної копії на пристрої.";
+"LOCAL_FILE_BACKUPS_OPTIMIZE_MEDIA_WARNING_ACTION_SHEET_2_BODY" = "Якщо ввімкнути функцію «Оптимізувати сховище Radar», старі медіафайли буде вивантажено з пристрою. Ви можете завантажити їх у будь-який час. Також старі медіафайли буде вилучено з резервної копії на пристрої.";
 
 /* Title for a sheet warning the user about enabling Optimize Storage with local backups enabled. */
 "LOCAL_FILE_BACKUPS_OPTIMIZE_MEDIA_WARNING_ACTION_SHEET_2_TITLE" = "З резервної копії на пристрої буде вилучено медіафайли";
@@ -5676,10 +5679,10 @@
 "LONG_TEXT_VIEW_TITLE" = "Повідомлення";
 
 /* Message for a sheet warning the user that their device is low on storage space. Embeds 1:{{ the localized name of the user's device model, e.g. iPhone }}; 2:{{ an amount of storage space as a file size, e.g. 1 GB }}. */
-"LOW_DISK_SPACE_WARNING_SHEET_MESSAGE_FORMAT" = "На вашому %1$@ недостатньо пам'яті. Якщо пам'ять закінчиться, Signal перестане працювати, а деякі дані може бути втрачено. Звільніть принаймні %2$@ місця.";
+"LOW_DISK_SPACE_WARNING_SHEET_MESSAGE_FORMAT" = "На вашому %1$@ недостатньо пам'яті. Якщо пам'ять закінчиться, Radar перестане працювати, а деякі дані може бути втрачено. Звільніть принаймні %2$@ місця.";
 
 /* A suggestion for freeing up storage space, on a sheet warning the user that their device is low on storage space. */
-"LOW_DISK_SPACE_WARNING_SHEET_SUGGESTION_DELETE_CAMERA_ROLL_MEDIA" = "Видаліть великі відео із застосунку «Фотографії», Signal або з інших месенджерів";
+"LOW_DISK_SPACE_WARNING_SHEET_SUGGESTION_DELETE_CAMERA_ROLL_MEDIA" = "Видаліть великі відео із застосунку «Фотографії», Radar або з інших месенджерів";
 
 /* A suggestion for freeing up storage space, on a sheet warning the user that their device is low on storage space. */
 "LOW_DISK_SPACE_WARNING_SHEET_SUGGESTION_DELETE_DOWNLOADED_MEDIA" = "Видаліть завантажену музику або інші медіафайли";
@@ -5844,7 +5847,7 @@
 "MEMBER_LABEL_VIEW_TITLE" = "Роль учасника";
 
 /* A one-time confirmation that you, as an admin, want to delete for everyone */
-"MESSAGE_ACTION_ADMIN_DELETE_FOR_EVERYONE_CONFIRMATION" = "Учасники групи, які користуються новими версіями Signal, побачать, що ви видалили це повідомлення.";
+"MESSAGE_ACTION_ADMIN_DELETE_FOR_EVERYONE_CONFIRMATION" = "Учасники групи, які користуються новими версіями Radar, побачать, що ви видалили це повідомлення.";
 
 /* Action sheet button title */
 "MESSAGE_ACTION_COPY_TEXT" = "Копіювати текст повідомлення";
@@ -6045,7 +6048,7 @@
 "MESSAGE_REQUEST_CONFIRM_ACCEPT_MESSAGE" = "Приймайте запити лише від тих, кому довіряєте. %1$@ не питатимуть ваш код для реєстрації, PIN-код і ключ відновлення.";
 
 /* Embedded text in the message for an action sheet asking the user to confirm if they want to accept a message request. */
-"MESSAGE_REQUEST_CONFIRM_ACCEPT_MESSAGE_EMBEDDED_BOLD_TEXT" = "Представники Signal ніколи";
+"MESSAGE_REQUEST_CONFIRM_ACCEPT_MESSAGE_EMBEDDED_BOLD_TEXT" = "Представники Radar ніколи";
 
 /* Title for an action sheet asking the user to confirm if they want to accept a message request */
 "MESSAGE_REQUEST_CONFIRM_ACCEPT_TITLE" = "Прийняти запит?";
@@ -6492,13 +6495,13 @@
 "NO_OTHER_GROUPS_IN_COMMON" = "Інших спільних груп немає.";
 
 /* Shown in place of the text input box in a conversation when the user is no longer registered can't send messages. The embedded value is 'Re-link' (translated via NOT_LINKED_BOTTOM_RELINK), and it will be formatted as a tappable link. */
-"NOT_LINKED_BOTTOM" = "Цей пристрій більше не зв'язаний. %1$@, щоб і надалі використовувати на ньому Signal.";
+"NOT_LINKED_BOTTOM" = "Цей пристрій більше не зв'язаний. %1$@, щоб і надалі використовувати на ньому Radar.";
 
 /* Shown in place of the text input box in a conversation when the user is no longer registered can't send messages. This value is a tappable link embedded in a larger sentence. */
 "NOT_LINKED_BOTTOM_RELINK" = "Зв'яжіть пристрій повторно";
 
 /* Shown in place of the text input box in a conversation when the user is no longer registered can't send messages. The embedded value is 'Re-register' (translated via NOT_REGISTERED_BOTTOM_REREGISTER), and it will be formatted as a tappable link. */
-"NOT_REGISTERED_BOTTOM" = "Реєстрація на цьому пристрої вже не дійсна. %1$@ пристрій, щоб і надалі використовувати на ньому Signal.";
+"NOT_REGISTERED_BOTTOM" = "Реєстрація на цьому пристрої вже не дійсна. %1$@ пристрій, щоб і надалі використовувати на ньому Radar.";
 
 /* Shown in place of the text input box in a conversation when the user is no longer registered can't send messages. This value is a tappable link embedded in a larger sentence. */
 "NOT_REGISTERED_BOTTOM_REREGISTER" = "Перереєструйте";
@@ -6510,13 +6513,13 @@
 "NOTE_TO_SELF" = "Нотатник";
 
 /* Body for a notification shown when Signal can't fetch messages because the device's date and time are incorrect. */
-"NOTIFICATION_BODY_CLOCK_SKEW" = "Signal не може відновити повідомлення, якщо на пристрої неправильно налаштовано дату й час. Змініть дату і час у параметрах.";
+"NOTIFICATION_BODY_CLOCK_SKEW" = "Radar не може відновити повідомлення, якщо на пристрої неправильно налаштовано дату й час. Змініть дату і час у параметрах.";
 
 /* Body for a notification representing a message request. */
 "NOTIFICATION_BODY_INCOMING_MESSAGE_REQUEST" = "Запит на повідомлення";
 
 /* Body for a notification shown when Signal can't fetch messages because the device is low on storage space. */
-"NOTIFICATION_BODY_LOW_STORAGE_SPACE" = "У вас можуть бути нові повідомлення, але на пристрої не вистачає пам'яті для роботи Signal. Торкніться, щоб дізнатися більше.";
+"NOTIFICATION_BODY_LOW_STORAGE_SPACE" = "У вас можуть бути нові повідомлення, але на пристрої не вистачає пам'яті для роботи Radar. Торкніться, щоб дізнатися більше.";
 
 /* Lock screen notification text presented after user powers on their device without unlocking. Embeds {{device model}} (either 'iPad' or 'iPhone') */
 "NOTIFICATION_BODY_PHONE_LOCKED_FORMAT" = "Поки ваш %1$@ перезапускався, вам могли надійти повідомлення.";
@@ -6615,10 +6618,10 @@
 "ONBOARDING_CHOOSE_BACKUP_SHEET_TITLE" = "Виберіть резервну копію";
 
 /* The body for the device transfer 'choice' view 'restore backup' option */
-"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_BODY" = "Відновити акаунт і повідомлення з резервної копії від Radar/Radar";
+"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_BODY" = "Відновити акаунт і повідомлення з резервної копії від Signal/Radar";
 
 /* The title for the device transfer 'choice' view 'restore backup' option */
-"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_TITLE" = "Відновити з надійної резервної копії Radar/Radar";
+"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_TITLE" = "Відновити з надійної резервної копії Signal/Radar";
 
 /* Body for a sheet warning users about skipping restore. */
 "ONBOARDING_CHOOSE_RESTORE_METHOD_CONFIRM_SKIP_RESTORE_BODY" = "Якщо ви не відновите дані зараз, то не зможете зробити цього пізніше. Якщо ви знову ввімкнете резервне копіювання на цьому пристрої, поточну резервну копію буде замінено на нову історію повідомлень.";
@@ -6696,7 +6699,7 @@
 "ONBOARDING_MODE_SWITCH_EXPLANATION_PROVISIONING" = "Якщо ви натиснете «Зареєструвати iPad», то зможете створити абсолютно новий акаунт Radar або перенести на цей iPad уже наявний акаунт. Після цього Radar буде деактивовано на інших пристроях, де він зареєстрований на цей номер телефону.";
 
 /* explanation to the user they're switching from registering to linking flow */
-"ONBOARDING_MODE_SWITCH_EXPLANATION_REGISTERING" = "Натисніть «Зв’язати цей пристрій», щоб підключити його до наявного акаунта Signal.";
+"ONBOARDING_MODE_SWITCH_EXPLANATION_REGISTERING" = "Натисніть «Зв’язати цей пристрій», щоб підключити його до наявного акаунта Radar.";
 
 /* header text indicating to the user they're switching from linking to registering flow */
 "ONBOARDING_MODE_SWITCH_TITLE_PROVISIONING" = "Зареєструвати цей iPad";
@@ -6783,13 +6786,13 @@
 "ONBOARDING_SIGN_UP_USE_SIGNAL_ACCOUNT_BUTTON_TITLE" = "Use my Signal account";
 
 /* Explanation of 'do not have old device' flow for the 'Restore or Transfer' prompt */
-"ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_BODY" = "Або ви перевстановлюєте Radar/Radar на цьому ж пристрої";
+"ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_BODY" = "Або ви перевстановлюєте Signal/Radar на цьому ж пристрої";
 
 /* Title for the 'do not have my old device' choice of the 'Restore or Transfer' prompt */
 "ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_TITLE" = "У мене не лишилося старого телефона";
 
 /* Explanation of 'have old device' flow for the 'Restore or Transfer' prompt */
-"ONBOARDING_SPLASH_HAVE_OLD_DEVICE_BODY" = "Для швидшого початку зіскануйте QR-код пристроєм, на якому зараз використовуєте Radar/Radar";
+"ONBOARDING_SPLASH_HAVE_OLD_DEVICE_BODY" = "Для швидшого початку зіскануйте QR-код пристроєм, на якому зараз використовуєте Signal/Radar";
 
 /* Title for the 'have my old device' choice of the 'Restore or Transfer' prompt */
 "ONBOARDING_SPLASH_HAVE_OLD_DEVICE_TITLE" = "У мене лишився старий телефон";
@@ -7033,7 +7036,7 @@ Send money securely.";
 "OVERSIZE_TEXT_UNAVAILABLE_SHEET_TITLE" = "Повне повідомлення недоступне";
 
 /* The name of the Signal app, used as the title for an entry in a user's password manager for their Signal Recovery Key. Should be localized with the same value as the app's name in the iOS App Store. */
-"PASSWORD_MANAGER_SIGNAL_APP_NAME" = "Приватний месенджер Signal";
+"PASSWORD_MANAGER_SIGNAL_APP_NAME" = "Приватний месенджер Radar";
 
 /* Header title for bank payment details screen */
 "PAYMENT_DETAILS_BANK_TITLE" = "Банківський переказ";
@@ -7924,10 +7927,10 @@ Send money securely.";
 "PROFILE_NAME_CHANGE_SYSTEM_NONCONTACT_FORMAT" = "Користувач %1$@ змінив ім'я профілю на %2$@.";
 
 /* First bullet point for the explainer sheet for profile names */
-"PROFILE_NAME_EDUCATION_SHEET_BULLET_1" = "Signal не може перевірити справжність імен і фотографій";
+"PROFILE_NAME_EDUCATION_SHEET_BULLET_1" = "Radar не може перевірити справжність імен і фотографій";
 
 /* Second bullet point for the explainer sheet for profile names */
-"PROFILE_NAME_EDUCATION_SHEET_BULLET_2" = "Представники Signal ніколи не питатимуть ваш код для реєстрації, PIN-код і ключ відновлення";
+"PROFILE_NAME_EDUCATION_SHEET_BULLET_2" = "Представники Radar ніколи не питатимуть ваш код для реєстрації, PIN-код і ключ відновлення";
 
 /* Third bullet point for the explainer sheet for profile names */
 "PROFILE_NAME_EDUCATION_SHEET_BULLET_3" = "Зважайте на те, що акаунти можуть бути фейкові";
@@ -8035,7 +8038,7 @@ Send money securely.";
 "QUICK_RESTORE_URL_OPENED_ACTION_SHEET_EXTERNAL_URL_ACTION_TITLE" = "Сканування QR-коду";
 
 /* Message for an action sheet telling users how to use quick restore, when trying to open an external quick restore URL. */
-"QUICK_RESTORE_URL_OPENED_ACTION_SHEET_EXTERNAL_URL_MESSAGE" = "Щоб перенести акаунт на новий пристрій, виберіть «Продовжити» й зіскануйте QR-код камерою в Signal. Переконайтеся, що скануєте QR-коди, згенеровані безпосередньо Signal.";
+"QUICK_RESTORE_URL_OPENED_ACTION_SHEET_EXTERNAL_URL_MESSAGE" = "Щоб перенести акаунт на новий пристрій, виберіть «Продовжити» й зіскануйте QR-код камерою в Radar. Переконайтеся, що скануєте QR-коди, згенеровані безпосередньо Radar.";
 
 /* Accessibility label stating the author of the message to which you are replying. Embeds: {{ the author of the message to which you are replying }} {{ original message }}. */
 "QUOTED_REPLY_ACCESSIBILITY_LABEL_FORMAT" = "Відповідь користувачу %1$@. %2$@";
@@ -8203,7 +8206,7 @@ Send money securely.";
 "REGISTER_WITHOUT_NUMBER" = "Реєстрація без номера";
 
 /* Short description for a sheet warning users about an incorrect recovery key used for registration. */
-"REGISTRATION_BACKUP_REGISTRATION_ERROR_INCORRECT_KEY_BODY" = "Потрібно зайти з того ж самого номера телефону й використати той самий 64-значний ключ відновлення, який ви зберегли, активувавши резервне копіювання від Signal. Без цього ключа відновити дані з резервної копії неможливо.";
+"REGISTRATION_BACKUP_REGISTRATION_ERROR_INCORRECT_KEY_BODY" = "Потрібно зайти з того ж самого номера телефону й використати той самий 64-значний ключ відновлення, який ви зберегли, активувавши резервне копіювання від Radar. Без цього ключа відновити дані з резервної копії неможливо.";
 
 /* Title for a sheet warning users about an incorrect recovery key used for registration. */
 "REGISTRATION_BACKUP_REGISTRATION_ERROR_INCORRECT_KEY_TITLE" = "Неправильний ключ відновлення";
@@ -8212,7 +8215,7 @@ Send money securely.";
 "REGISTRATION_BACKUP_REGISTRATION_ERROR_INCORRECT_KEY_TRY_PIN_ACTION" = "Інший спосіб реєстрації";
 
 /* Message body for a sheet asking users if they would rather use PIN/SMS for registration. */
-"REGISTRATION_BACKUP_REGISTRATION_ERROR_INCORRECT_KEY_TRY_PIN_MESSAGE" = "Ви можете зареєструвати акаунт, ввівши свій PIN-код або код, який Signal надішле вам в SMS. Після реєстрації ви можете знову спробувати відновити дані з резервної копії за допомогою ключа відновлення.";
+"REGISTRATION_BACKUP_REGISTRATION_ERROR_INCORRECT_KEY_TRY_PIN_MESSAGE" = "Ви можете зареєструвати акаунт, ввівши свій PIN-код або код, який Radar надішле вам в SMS. Після реєстрації ви можете знову спробувати відновити дані з резервної копії за допомогою ключа відновлення.";
 
 /* Title for a sheet asking users if they would rather use PIN/SMS for registration. */
 "REGISTRATION_BACKUP_REGISTRATION_ERROR_INCORRECT_KEY_TRY_PIN_TITLE" = "Підтвердити через SMS або PIN-код?";
@@ -8269,7 +8272,7 @@ Send money securely.";
 "REGISTRATION_BACKUP_RESTORE_ERROR_LOCAL_BACKUP_LOCATION_TITLE" = "Відновлення не вдалося";
 
 /* Message for a sheet telling the user that their phone number is mismatched with their recovery key used for making a local backup */
-"REGISTRATION_BACKUP_RESTORE_ERROR_MISMATCHED_LOCAL_BACKUP_MESSAGE" = "Резервну копію, яку ви намагаєтеся відновити, було створено для іншого акаунту Signal. Щоб відновити цю резервну копію, потрібно використати той самий номер телефону і ключ відновлення, що ви зберегли, активувавши резервне копіювання на пристрої.";
+"REGISTRATION_BACKUP_RESTORE_ERROR_MISMATCHED_LOCAL_BACKUP_MESSAGE" = "Резервну копію, яку ви намагаєтеся відновити, було створено для іншого акаунту Radar. Щоб відновити цю резервну копію, потрібно використати той самий номер телефону і ключ відновлення, що ви зберегли, активувавши резервне копіювання на пристрої.";
 
 /* Body for a sheet warning users about a network error during backup restore. */
 "REGISTRATION_BACKUP_RESTORE_ERROR_NETWORK_BODY" = "Не вдається відновити дані з резервної копії. Перевірте з'єднання з інтернетом і спробуйте ще раз.";
@@ -8761,7 +8764,7 @@ Send money securely.";
 "RING_ON_CONFIRMATION_TOAST_LABEL" = "Дзвінок увімкнено";
 
 /* Message shown in an action sheet when attempting to disable PIN, but Backups is enabled. */
-"ROTATE_AEP_ACTION_BACKUPS_DISABLE_REQUIRED" = "Спершу потрібно вимкнути надійне резервне копіювання від Signal.";
+"ROTATE_AEP_ACTION_BACKUPS_DISABLE_REQUIRED" = "Спершу потрібно вимкнути надійне резервне копіювання від Radar.";
 
 /* button title to confirm adding a recipient when their safety number has recently changed */
 "SAFETY_NUMBER_CHANGED_CONFIRM_ADD_MEMBER_ACTION" = "Усе одно додати";
@@ -8803,13 +8806,13 @@ Send money securely.";
 "SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_BUTTON_VERIFYING" = "Підтвердження шифрування…";
 
 /* Body for a sheet introducing Key Transparency. */
-"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_EDUCATION_SHEET_BODY" = "Signal може автоматично підтверджувати надійність з'єднання з людьми, з якими ви пов'язані через номер телефону, за допомогою процесу, що називається прозорістю ключа. Для надійності ви все ще можете підтверджувати особу співрозмовника вручну за допомогою QR-коду або порівнявши коди безпеки.";
+"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_EDUCATION_SHEET_BODY" = "Radar може автоматично підтверджувати надійність з'єднання з людьми, з якими ви пов'язані через номер телефону, за допомогою процесу, що називається прозорістю ключа. Для надійності ви все ще можете підтверджувати особу співрозмовника вручну за допомогою QR-коду або порівнявши коди безпеки.";
 
 /* Title for a sheet introducing Key Transparency. */
-"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_EDUCATION_SHEET_TITLE" = "Тепер Signal може автоматично підтверджувати шифрування";
+"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_EDUCATION_SHEET_TITLE" = "Тепер Radar може автоматично підтверджувати шифрування";
 
 /* Body for a sheet explaining that encryption auto-verification did not succeed. Embeds {{ 1: the contact's name }}. */
-"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_FAILURE_SHEET_BODY_FORMAT" = "Signal не може автоматично підтвердити шифрування для цього чату. Можливо, користувач %1$@ змінив номер телефону або налаштування конфіденційності номера телефону. Перевірте наявність наскрізного шифрування, порівнявши цифри з попереднього екрана з цифрами на пристрої співрозмовника або зісканувавши код з його пристрою.";
+"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_FAILURE_SHEET_BODY_FORMAT" = "Radar не може автоматично підтвердити шифрування для цього чату. Можливо, користувач %1$@ змінив номер телефону або налаштування конфіденційності номера телефону. Перевірте наявність наскрізного шифрування, порівнявши цифри з попереднього екрана з цифрами на пристрої співрозмовника або зісканувавши код з його пристрою.";
 
 /* Title for a sheet explaining that encryption auto-verification did not succeed. */
 "SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_FAILURE_SHEET_TITLE" = "Автоматичне підтвердження більше не доступне для цього чату";
@@ -8821,13 +8824,13 @@ Send money securely.";
 "SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_HEADER" = "Автоматичне підтвердження ключа";
 
 /* Body for a sheet explaining that encryption auto-verification is not available. */
-"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_NOT_AVAILABLE_SHEET_BODY" = "Signal може підтверджувати шифрування автоматично лише в чатах, які було почато через номер телефону. Якщо ви почали чат через ім'я користувача або спільну групу, перевірте наявність наскрізного шифрування, порівнявши цифри з попереднього екрана з цифрами на пристрої співрозмовника або зісканувавши код з його пристрою.";
+"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_NOT_AVAILABLE_SHEET_BODY" = "Radar може підтверджувати шифрування автоматично лише в чатах, які було почато через номер телефону. Якщо ви почали чат через ім'я користувача або спільну групу, перевірте наявність наскрізного шифрування, порівнявши цифри з попереднього екрана з цифрами на пристрої співрозмовника або зісканувавши код з його пристрою.";
 
 /* Title for a sheet explaining that encryption auto-verification is not available. */
 "SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_NOT_AVAILABLE_SHEET_TITLE" = "Автоматичне підтвердження недоступне для цього чату";
 
 /* Body for a sheet explaining that encryption auto-verification succeeded. */
-"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_SUCCESS_SHEET_BODY" = "Signal може автоматично підтверджувати надійність з'єднання з контактами, з якими ви пов'язані через номер телефону, за допомогою процесу, що називається прозорістю ключа. Для надійності ми радимо перевірити наявність наскрізного шифрування, порівнявши цифри з попереднього екрана з цифрами на пристрої співрозмовника або зісканувавши код з його пристрою.";
+"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_SUCCESS_SHEET_BODY" = "Radar може автоматично підтверджувати надійність з'єднання з контактами, з якими ви пов'язані через номер телефону, за допомогою процесу, що називається прозорістю ключа. Для надійності ми радимо перевірити наявність наскрізного шифрування, порівнявши цифри з попереднього екрана з цифрами на пристрої співрозмовника або зісканувавши код з його пристрою.";
 
 /* Title for a sheet explaining that encryption auto-verification succeeded. */
 "SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_SUCCESS_SHEET_TITLE" = "Шифрування для цього чату підтверджено автоматично";
@@ -8842,7 +8845,7 @@ Send money securely.";
 "SAFETY_TIPS_CRYPTO_TITLE" = "Шахрайство з криптовалютою або грошима";
 
 /* Message body describing the enable reglock safety tip. */
-"SAFETY_TIPS_ENABLE_REGLOCK_BODY" = "Захистіть свій акаунт: зробіть введення PIN-коду Signal разом з кодом підтвердження обов'язковим для здійснення реєстрації.";
+"SAFETY_TIPS_ENABLE_REGLOCK_BODY" = "Захистіть свій акаунт: зробіть введення PIN-коду Radar разом з кодом підтвердження обов'язковим для здійснення реєстрації.";
 
 /* Message title describing the enable reglock safety tip. */
 "SAFETY_TIPS_ENABLE_REGLOCK_TITLE" = "Увімкніть блокування реєстрації в налаштуваннях акаунту";
@@ -8875,22 +8878,22 @@ Send money securely.";
 "SAFETY_TIPS_MESSAGE_LINKS_TITLE" = "Повідомлення з посиланнями";
 
 /* Message body describing the review names safety tip. */
-"SAFETY_TIPS_REVIEW_NAMES_BODY" = "Звертайте увагу на примітку про те, що імена не проходять перевірку. Кожен користувач самостійно встановлює назву свого профілю в Signal.";
+"SAFETY_TIPS_REVIEW_NAMES_BODY" = "Звертайте увагу на примітку про те, що імена не проходять перевірку. Кожен користувач самостійно встановлює назву свого профілю в Radar.";
 
 /* Message body describing the review names safety tip in the 'view more' flow. */
-"SAFETY_TIPS_REVIEW_NAMES_BODY_VIEW_MORE" = "Звертайте увагу на примітку про те, що імена не проходять перевірку. Кожен користувач самостійно встановлює назву свого профілю і фото в Signal. Якщо ви не впевнені, хто надіслав запит, безпечніше його проігнорувати.";
+"SAFETY_TIPS_REVIEW_NAMES_BODY_VIEW_MORE" = "Звертайте увагу на примітку про те, що імена не проходять перевірку. Кожен користувач самостійно встановлює назву свого профілю і фото в Radar. Якщо ви не впевнені, хто надіслав запит, безпечніше його проігнорувати.";
 
 /* Message title describing the review names safety tip. */
 "SAFETY_TIPS_REVIEW_NAMES_TITLE" = "Перевіряйте імена і фото";
 
 /* Message body describing the signal chats tip. */
-"SAFETY_TIPS_SIGNAL_CHATS_BODY" = "Представники Signal ніколи не питатимуть ваш код для реєстрації, PIN-код і ключ відновлення. Ніколи не відповідайте на повідомлення нібито від Signal.";
+"SAFETY_TIPS_SIGNAL_CHATS_BODY" = "Представники Radar ніколи не питатимуть ваш код для реєстрації, PIN-код і ключ відновлення. Ніколи не відповідайте на повідомлення нібито від Radar.";
 
 /* Message body describing the signal chats tip in the 'view more' flow. */
-"SAFETY_TIPS_SIGNAL_CHATS_BODY_VIEW_MORE" = "Представники Signal ніколи не питатимуть ваш код для реєстрації, PIN-код і ключ відновлення. Ніколи не відповідайте на чати нібито від Signal і служби підтримки Signal. Зловмисники створюють чати з фейковими назвами у спробах вкрасти чужі акаунти.";
+"SAFETY_TIPS_SIGNAL_CHATS_BODY_VIEW_MORE" = "Представники Radar ніколи не питатимуть ваш код для реєстрації, PIN-код і ключ відновлення. Ніколи не відповідайте на чати нібито від Radar і служби підтримки Radar. Зловмисники створюють чати з фейковими назвами у спробах вкрасти чужі акаунти.";
 
 /* Message title describing the signal chats tip. */
-"SAFETY_TIPS_SIGNAL_CHATS_TITLE" = "Не відповідайте на повідомлення нібито від Signal";
+"SAFETY_TIPS_SIGNAL_CHATS_TITLE" = "Не відповідайте на повідомлення нібито від Radar";
 
 /* Message contents for the vague message safety tip. */
 "SAFETY_TIPS_VAGUE_MESSAGE_BODY" = "Щоб привернути увагу, спамери часто починають з простих повідомлень на кшталт «Привіт». Відповідь лише заохотить їх продовжити.";
@@ -9025,10 +9028,10 @@ Send money securely.";
 "SECONDARY_ONBOARDING_SCAN_CODE_STEP_LINK_DEVICE" = "Виберіть «Зв'язані пристрої» та «Зв'язати новий пристрій»";
 
 /* First bullet point on the QR code screen for linking a device */
-"SECONDARY_ONBOARDING_SCAN_CODE_STEP_OPEN_PRIMARY" = "Відкрийте Signal на основному пристрої";
+"SECONDARY_ONBOARDING_SCAN_CODE_STEP_OPEN_PRIMARY" = "Відкрийте Radar на основному пристрої";
 
 /* Second bullet point on the QR code screen for linking a device */
-"SECONDARY_ONBOARDING_SCAN_CODE_STEP_OPEN_SETTINGS" = "Торкніться фото свого профілю, щоб відкрити налаштування Signal";
+"SECONDARY_ONBOARDING_SCAN_CODE_STEP_OPEN_SETTINGS" = "Торкніться фото свого профілю, щоб відкрити налаштування Radar";
 
 /* header text while displaying a QR code which, when scanned, will link this device. */
 "SECONDARY_ONBOARDING_SCAN_CODE_TITLE" = "Зіскануйте цей QR-код, щоб зв'язати свій акаунт";
@@ -9067,13 +9070,13 @@ Send money securely.";
 "SELECT_CONTACT_FOR_SHARING_PERMISSION_PROMPT_ALLOW_BUTTON" = "Надати доступ";
 
 /* Body of the prompt on the 'Select Contact' view that asks the user to allow access to their contacts. */
-"SELECT_CONTACT_FOR_SHARING_PERMISSION_PROMPT_BODY" = "Надайте доступ до контактів. Ваші контакти зашифровано й приховано від служби Signal.";
+"SELECT_CONTACT_FOR_SHARING_PERMISSION_PROMPT_BODY" = "Надайте доступ до контактів. Ваші контакти зашифровано й приховано від служби Radar.";
 
 /* Button on the 'Select Contact' view's contacts permission prompt that hides the prompt. */
 "SELECT_CONTACT_FOR_SHARING_PERMISSION_PROMPT_DISMISS_BUTTON" = "Не хочу";
 
 /* Title of the prompt on the 'Select Contact' view that asks the user to allow access to their contacts. */
-"SELECT_CONTACT_FOR_SHARING_PERMISSION_PROMPT_TITLE" = "Знаходьте знайомих у Signal";
+"SELECT_CONTACT_FOR_SHARING_PERMISSION_PROMPT_TITLE" = "Знаходьте знайомих у Radar";
 
 /* Placeholder text for the search bar on the 'Select Contact' view */
 "SELECT_CONTACT_FOR_SHARING_SEARCH_BAR_PLACEHOLDER" = "Пошук";
@@ -9460,7 +9463,7 @@ Send money securely.";
 "SETTINGS_KEEP_MUTED_ARCHIVED_LABEL" = "Залишати чати з вимкненими сповіщеннями в архіві";
 
 /* Footer for settings section describing Key Transparency. */
-"SETTINGS_KEY_TRANSPARENCY_OPT_OUT_FOOTER" = "Якщо ввімкнути, Signal намагатиметься автоматично підтверджувати шифрування в особистих чатах.";
+"SETTINGS_KEY_TRANSPARENCY_OPT_OUT_FOOTER" = "Якщо ввімкнути, Radar намагатиметься автоматично підтверджувати шифрування в особистих чатах.";
 
 /* Title for for a settings option describing that Key Transparency is enabled. */
 "SETTINGS_KEY_TRANSPARENCY_OPT_OUT_SWITCH_TITLE" = "Автоматичне підтвердження ключа";
@@ -9475,7 +9478,7 @@ Send money securely.";
 "SETTINGS_LINK_PREVIEWS_FOOTER" = "Показувати попередній вигляд вебсторінок за посиланнями, які ви надсилаєте в повідомленнях.";
 
 /* Subtitle of a card on a linked device's account settings, explaining that account settings are managed on the primary device. */
-"SETTINGS_LINKED_DEVICE_ACCOUNT_CARD_SUBTITLE" = "Щоб керувати налаштуваннями акаунту, відкрийте Signal на основному пристрої.";
+"SETTINGS_LINKED_DEVICE_ACCOUNT_CARD_SUBTITLE" = "Щоб керувати налаштуваннями акаунту, відкрийте Radar на основному пристрої.";
 
 /* Title of a card on a linked device's account settings, indicating that this is a linked device. */
 "SETTINGS_LINKED_DEVICE_ACCOUNT_CARD_TITLE" = "Це зв'язаний пристрій";
@@ -9484,7 +9487,7 @@ Send money securely.";
 "SETTINGS_LINKED_DEVICE_DELETE_DATA_BUTTON" = "Видалити дані застосунку";
 
 /* Footer below the 'delete app data' button, shown on a linked device's account settings. */
-"SETTINGS_LINKED_DEVICE_DELETE_DATA_FOOTER" = "Із застосунку Signal на цьому пристрої буде видалено всі дані.";
+"SETTINGS_LINKED_DEVICE_DELETE_DATA_FOOTER" = "Із застосунку Radar на цьому пристрої буде видалено всі дані.";
 
 /* Text for a toast confirming the user changed their local file backup location. */
 "SETTINGS_LOCAL_FILE_BACKUP_FOLDER_UPDATED" = "Папку для резервних копій змінено";
@@ -9508,7 +9511,7 @@ Send money securely.";
 "SETTINGS_LOCAL_FILE_BACKUPS_LAST_BACKUP_DATE" = "Найновіша резервна копія";
 
 /* Message for an action sheet when a user cannot perform a remote backup because a local backup is in progress */
-"SETTINGS_LOCAL_FILE_BACKUPS_LOCAL_BACKUP_IN_PROGRESS_MESSAGE" = "Не вдалося створити резервну копію від Signal, тому що триває резервне копіювання на пристрої. Спробуйте пізніше.";
+"SETTINGS_LOCAL_FILE_BACKUPS_LOCAL_BACKUP_IN_PROGRESS_MESSAGE" = "Не вдалося створити резервну копію від Radar, тому що триває резервне копіювання на пристрої. Спробуйте пізніше.";
 
 /* Label for a progress bar while attachments are being copied for an on-device backup. Embeds 1:{{%1$@ completed bytes copied, %2$@ total bytes to copy, %3$@ percentage complete }}. */
 "SETTINGS_LOCAL_FILE_BACKUPS_PROGRESS_COPYING_ATTACHMENTS" = "Створення резервної копії на пристрої: %1$@ з %2$@ (%3$@)";
@@ -9523,10 +9526,10 @@ Send money securely.";
 "SETTINGS_LOCAL_FILE_BACKUPS_PROGRESS_RESTORING_ATTACHMENTS" = "Відновлення з резервної копії на пристрої (%1$@ з %2$@)";
 
 /* Message for an action sheet when a user cannot perform a local backup because a remote backup is in progress */
-"SETTINGS_LOCAL_FILE_BACKUPS_REMOTE_BACKUP_IN_PROGRESS_MESSAGE" = "Не вдалося створити резервну копію на пристрої, тому що триває резервне копіювання від Signal. Спробуйте пізніше.";
+"SETTINGS_LOCAL_FILE_BACKUPS_REMOTE_BACKUP_IN_PROGRESS_MESSAGE" = "Не вдалося створити резервну копію на пристрої, тому що триває резервне копіювання від Radar. Спробуйте пізніше.";
 
 /* Footer text on the on-device backups settings page explaining how to restore a backup. */
-"SETTINGS_LOCAL_FILE_BACKUPS_RESTORE_FOOTER" = "Щоб відновити дані з резервної копії, встановіть застосунок Signal ще раз. Відкрийте застосунок, натисніть «Відновлення або перенесення акаунту» > «Резервна копія на пристрої».";
+"SETTINGS_LOCAL_FILE_BACKUPS_RESTORE_FOOTER" = "Щоб відновити дані з резервної копії, встановіть застосунок Radar ще раз. Відкрийте застосунок, натисніть «Відновлення або перенесення акаунту» > «Резервна копія на пристрої».";
 
 /* Label for the button that turns off on-device backups. */
 "SETTINGS_LOCAL_FILE_BACKUPS_TURN_OFF" = "Вимкнути й видалити резервну копію";
@@ -9616,7 +9619,7 @@ Send money securely.";
 "SETTINGS_NOTIFICATIONS_APP_BADGE_SECTION" = "Значок застосунку";
 
 /* Explanation for the switch controlling whether a notification is shown when a phone contact joins Signal. */
-"SETTINGS_NOTIFICATIONS_CONTACT_JOINED_SIGNAL_FOOTER" = "Показувати сповіщення, коли контакт із телефона приєднується до Signal.";
+"SETTINGS_NOTIFICATIONS_CONTACT_JOINED_SIGNAL_FOOTER" = "Показувати сповіщення, коли контакт із телефона приєднується до Radar.";
 
 /* Label for a switch controlling whether reactions to your messages generate notifications. */
 "SETTINGS_NOTIFICATIONS_REACTIONS" = "Сповіщення про реакції";
@@ -10394,7 +10397,7 @@ Send money securely.";
 "SHARE_ACTION_MESSAGE" = "Повідомлення";
 
 /* Message for an action sheet shown when sharing fails because the device's date and time are incorrect. */
-"SHARE_EXTENSION_FAILED_SENDING_BECAUSE_CLOCK_SKEW_MESSAGE" = "На вашому пристрої неправильно налаштовано дату й час, тому Signal, можливо, не надіслав ваше повідомлення. Змініть дату і час у параметрах.";
+"SHARE_EXTENSION_FAILED_SENDING_BECAUSE_CLOCK_SKEW_MESSAGE" = "На вашому пристрої неправильно налаштовано дату й час, тому Radar, можливо, не надіслав ваше повідомлення. Змініть дату і час у параметрах.";
 
 /* alert body when sharing file failed because of untrusted/changed identity keys */
 "SHARE_EXTENSION_FAILED_SENDING_BECAUSE_UNTRUSTED_IDENTITY_FORMAT" = "Ваш код безпеки для чатів з користувачем %1$@ недавно змінився. Можливо, варто його перевірити в основному застосунку, перш ніж надсилати повідомлення знову.";
@@ -10403,7 +10406,7 @@ Send money securely.";
 "SHARE_EXTENSION_LOADING" = "Завантаження…";
 
 /* Message for an error shown when the user tries to share to Signal but the device is too low on storage space. */
-"SHARE_EXTENSION_LOW_STORAGE_SPACE_MESSAGE" = "Не вдалось поділитися через Signal, оскільки на пристрої не вистачає пам'яті. Звільніть місце, налаштувавши використання сховища, і спробуйте знову.";
+"SHARE_EXTENSION_LOW_STORAGE_SPACE_MESSAGE" = "Не вдалось поділитися через Radar, оскільки на пристрої не вистачає пам'яті. Звільніть місце, налаштувавши використання сховища, і спробуйте знову.";
 
 /* Title for an error shown when the user tries to share to Signal but the device is too low on storage space. */
 "SHARE_EXTENSION_LOW_STORAGE_SPACE_TITLE" = "Пам'яті майже не лишилося";
@@ -10445,7 +10448,7 @@ Send money securely.";
 "SIGNAL_LOGIN_RECOVERY_KEY_PLACEHOLDER_TITLE" = "Ключ відновлення";
 
 /* Title for the sheet presented when user taps on Signal Proxy link in chat. */
-"SIGNAL_PROXY" = "Проксі-сервер Signal";
+"SIGNAL_PROXY" = "Проксі-сервер Radar";
 
 /* body sent to contacts when inviting to Install Signal */
 "SMS_INVITE_BODY" = "Пропоную встановити Radar! Завантажуй за цим посиланням:";
@@ -10488,6 +10491,10 @@ Send money securely.";
 
 /* Text for a toast confirming that the speakerphone has been turned on for a call. */
 "SPEAKERPHONE_ON_CONFIRMATION_TOAST_LABEL" = "Динамік увімкнено";
+
+"STAR" = "Star";
+
+"STARRED_MESSAGES" = "Starred messages";
 
 /* Title for a button to view a sticker pack */
 "STICKER_BUTTON_VIEW_PACK" = "Переглянути набір";
@@ -10532,7 +10539,7 @@ Send money securely.";
 "STICKER_PACK_SHARE_SHEET_HEADER" = "Маючи це посилання, будь-який користувач зможе додати й поширити цей набір стікерів.";
 
 /* Label for a button on a sticker-pack share sheet that sends the pack in Signal. */
-"STICKER_PACK_SHARE_SHEET_SEND_IN_SIGNAL" = "Надіслати в Signal";
+"STICKER_PACK_SHARE_SHEET_SEND_IN_SIGNAL" = "Надіслати в Radar";
 
 /* Message when trying to show a sticker that has expired and is unavailable for download */
 "STICKER_UNAVAILABLE_MESSAGE_LABEL" = "Стікер недоступний";
@@ -11242,6 +11249,8 @@ Send money securely.";
 /* Notification body for unread reminders. First placeholder is unread messages, second is a summary of either unread mentions or replies */
 "UnreadReminderJob__unread_one_summary" = "У вас %1$@, зокрема %2$@.";
 
+"UNSTAR" = "Unstar";
+
 /* No comment provided by engineer. */
 "UNSUPPORTED_ATTACHMENT" = "Отримано непідтримуваний тип вкладення.";
 
@@ -11435,7 +11444,7 @@ Send money securely.";
 "VERIFICATION_CODE_REQUESTED_HERO_BODY_FIRST" = "Ви попросили надіслати код підтвердження";
 
 /* Second part of body for a hero sheet informing the user a verification code was requested. */
-"VERIFICATION_CODE_REQUESTED_HERO_BODY_SECOND" = "Нікому не повідомляйте отриманого коду. Signal ніколи не писатиме вам, запитуючи код. Якщо ви отримали повідомлення нібито від Signal, це шахраї.\nЯкщо ви справді надсилали запит на отримання коду, можете не зважати на це повідомлення.";
+"VERIFICATION_CODE_REQUESTED_HERO_BODY_SECOND" = "Нікому не повідомляйте отриманого коду. Radar ніколи не писатиме вам, запитуючи код. Якщо ви отримали повідомлення нібито від Radar, це шахраї.\nЯкщо ви справді надсилали запит на отримання коду, можете не зважати на це повідомлення.";
 
 /* Format for info message indicating that the verification state was unverified on this device. Embeds {{user's name or phone number}}. */
 "VERIFICATION_STATE_CHANGE_FORMAT_NOT_VERIFIED_LOCAL" = "Ви позначили користувача %1$@ як неперевірений контакт.";

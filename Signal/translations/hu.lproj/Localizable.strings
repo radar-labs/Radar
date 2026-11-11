@@ -2,7 +2,7 @@
 "AB_PERMISSION_MISSING_ACTION_NOT_NOW" = "Később";
 
 /* Footer for the 'about' help section. For non-English languages, exclude the word '501c3'. */
-"ABOUT_SECTION_FOOTER" = "Copyright Signal Messenger\n AGPLv3 licenc alatt\n A Signal egy nonprofit szervezet.";
+"ABOUT_SECTION_FOOTER" = "Copyright Signal Messenger\nCopyright 2026 Radar Chat, Inc.\n AGPLv3 licenc alatt";
 
 /* Title for the 'about' help section */
 "ABOUT_SECTION_TITLE" = "Az alkalmazásról";
@@ -71,7 +71,7 @@
 "ACCOUNT_DATA_REPORT_TITLE" = "Fiókadataid";
 
 /* Label for 'invite' button in contact view. */
-"ACTION_INVITE" = "Meghívás Signalba";
+"ACTION_INVITE" = "Meghívás Radarba";
 
 /* Label for button that lets you send a message to a contact. */
 "ACTION_SEND_MESSAGE" = "Üzenet küldése";
@@ -215,7 +215,7 @@
 "APN_Message" = "Új üzenet érkezett";
 
 /* Shown in place of the text input box in a conversation when the app has expired and the user is no longer allowed to send messages. The embedded value is 'Update now' (translated via APP_EXPIRED_BOTTOM_UPDATE), and it will be formatted as a tappable link. */
-"APP_EXPIRED_BOTTOM" = "A Signal jelenlegi verziója lejárt. %1$@ üzenetek küldéséhez és fogadásához.";
+"APP_EXPIRED_BOTTOM" = "A Radar jelenlegi verziója lejárt. %1$@ üzenetek küldéséhez és fogadásához.";
 
 /* Shown in place of the text input box in a conversation when the app has expired and the user is no longer allowed to send messages. This value is a tappable link embedded in a larger sentence. */
 "APP_EXPIRED_BOTTOM_UPDATE" = "Frissítés most";
@@ -230,13 +230,13 @@
 "APP_LAUNCH_FAILURE_CORRUPT_REGISTRATION_MESSAGE" = "Kérjük, küldj egy hibanapló fájlt a support@radar.chat e-mail-címre, hogy kivizsgálhassuk, mi történt.";
 
 /* Title for an error indicating that the app couldn't launch because some unexpected error happened with the user's registration status. */
-"APP_LAUNCH_FAILURE_CORRUPT_REGISTRATION_TITLE" = "Nem sikerült megnyitni a Signalt";
+"APP_LAUNCH_FAILURE_CORRUPT_REGISTRATION_TITLE" = "Nem sikerült megnyitni a Radart";
 
 /* Error indicating that the app could not launch because the database could not be loaded. */
 "APP_LAUNCH_FAILURE_COULD_NOT_LOAD_DATABASE" = "Adatbázis-betöltési hiba";
 
 /* Message for an action sheet explaining that Signal can't launch because the database is corrupted. */
-"APP_LAUNCH_FAILURE_DATABASE_CORRUPTED_MESSAGE" = "A Signal nem indítható el, mert az adatbázis sérült. Ez semmilyen hatással nincs a fiókod vagy az üzeneteid biztonságára.";
+"APP_LAUNCH_FAILURE_DATABASE_CORRUPTED_MESSAGE" = "A Radar nem indítható el, mert az adatbázis sérült. Ez semmilyen hatással nincs a fiókod vagy az üzeneteid biztonságára.";
 
 /* Title for an action sheet explaining that Signal can't launch because the database is corrupted. */
 "APP_LAUNCH_FAILURE_DATABASE_CORRUPTED_TITLE" = "Adatbázis sérült";
@@ -245,7 +245,7 @@
 "APP_LAUNCH_FAILURE_DATABASE_RECOVERY_ACTION_TITLE" = "Javítás";
 
 /* Action in an action sheet offering to exit the app. */
-"APP_LAUNCH_FAILURE_EXIT_APP_ACTION_TITLE" = "Kilépés a Signalból";
+"APP_LAUNCH_FAILURE_EXIT_APP_ACTION_TITLE" = "Kilépés a Radarból";
 
 /* Error indicating that the app could not launch without reverting unknown database migrations. */
 "APP_LAUNCH_FAILURE_INVALID_DATABASE_VERSION_MESSAGE" = "Kérlek frissíts a legújabb Radar verzióra.";
@@ -260,13 +260,13 @@
 "APP_LAUNCH_FAILURE_LAST_LAUNCH_CRASHED_TITLE" = "Hibás Radar indítás legutóbb";
 
 /* Message for an error sheet shown when the app cannot launch because the device is out of storage space. Embeds 1:{{ the localized name of the user's device model, e.g. iPhone }}; 2:{{ an amount of storage space as a file size, e.g. 1 GB }}. */
-"APP_LAUNCH_FAILURE_NOT_ENOUGH_STORAGE_SPACE_MESSAGE_FORMAT" = "A Signal nem nyitható meg, mert a(z) %1$@ eszközön elfogyott a tárhely. Szabadíts fel legalább %2$@ tárhelyet, majd nyisd meg újra a Signalt.\n\nLépj az iOS-beállítások > Általános > Tárhely menüpontra, és távolítsd el a nem használt alkalmazásokat, töröld a nagy videókat a Fotók alkalmazásból vagy más alkalmazásokból, és töröld a letöltött zenéket és médiafájlokat.";
+"APP_LAUNCH_FAILURE_NOT_ENOUGH_STORAGE_SPACE_MESSAGE_FORMAT" = "A Radar nem nyitható meg, mert a(z) %1$@ eszközön elfogyott a tárhely. Szabadíts fel legalább %2$@ tárhelyet, majd nyisd meg újra a Radart.\n\nLépj az iOS-beállítások > Általános > Tárhely menüpontra, és távolítsd el a nem használt alkalmazásokat, töröld a nagy videókat a Fotók alkalmazásból vagy más alkalmazásokból, és töröld a letöltött zenéket és médiafájlokat.";
 
 /* Title for an error sheet shown when the app cannot launch because the device is out of storage space. */
 "APP_LAUNCH_FAILURE_NOT_ENOUGH_STORAGE_SPACE_TITLE" = "Nincs elég tárhely";
 
 /* Error indicating that the app could not restore transferred data. */
-"APP_LAUNCH_FAILURE_RESTORE_FAILED_MESSAGE" = "A régi eszközödről hozott adat nem helyreállítható. Kérjük, küldj egy hibanapló fájlt a support@radar.chat e-mail-címre, hogy megvizsgálhassuk, mi történt. Ha újratelepíted a Signalt, az üzenet-előzményeid elveszhetnek.";
+"APP_LAUNCH_FAILURE_RESTORE_FAILED_MESSAGE" = "A régi eszközödről hozott adat nem helyreállítható. Kérjük, küldj egy hibanapló fájlt a support@radar.chat e-mail-címre, hogy megvizsgálhassuk, mi történt. Ha újratelepíted a Radart, az üzenet-előzményeid elveszhetnek.";
 
 /* Error indicating that the app could not restore transferred data. */
 "APP_LAUNCH_FAILURE_RESTORE_FAILED_TITLE" = "Az adatok visszaállítása sikertelen.";
@@ -377,13 +377,13 @@
 "ATTACHMENT_APPROVAL_MEDIA_QUALITY_TITLE" = "Média minősége";
 
 /* Notification body shown when media sync to a linked device is complete. */
-"ATTACHMENT_BACKFILL_FINISHED_NOTIFICATION" = "Befejeződött a szinkronizálás a Signallal a kapcsolt eszközödön.";
+"ATTACHMENT_BACKFILL_FINISHED_NOTIFICATION" = "Befejeződött a szinkronizálás a Radarlal a kapcsolt eszközödön.";
 
 /* Notification body shown when media sync to a linked device was interrupted. */
-"ATTACHMENT_BACKFILL_INTERRUPTED_NOTIFICATION" = "Nyisd meg a Signalt a kapcsolt eszközöddel való szinkronizálás folytatásához";
+"ATTACHMENT_BACKFILL_INTERRUPTED_NOTIFICATION" = "Nyisd meg a Radart a kapcsolt eszközöddel való szinkronizálás folytatásához";
 
 /* Notification body shown while syncing media to a linked device. */
-"ATTACHMENT_BACKFILL_SYNCING_NOTIFICATION" = "Szinkronizálás a Signallal a kapcsolt eszközödön";
+"ATTACHMENT_BACKFILL_SYNCING_NOTIFICATION" = "Szinkronizálás a Radarlal a kapcsolt eszközödön";
 
 /* Generic filename for an attachment with no known name */
 "ATTACHMENT_DEFAULT_FILENAME" = "Csatolmány";
@@ -632,7 +632,7 @@
 "BACKUP_KEY_SEE_FULL_KEY_BUTTON_TITLE" = "Teljes kulcs megtekintése";
 
 /* Body for a warning sheet shown to discourage the user from sharing their 'Recovery Key', warning them not to share it with anyone. */
-"BACKUP_NEVER_SHARE_RECOVERY_KEY_SHEET_BODY" = "Ne oszd meg senkivel a helyreállítási kulcsodat. Ezzel lehetővé teszed, hogy átvegyék az irányítást a fiókod felett. <bold>A Signal soha nem fog üzenetet küldeni</bold> a helyreállítási kulcsod miatt. Soha ne válaszolj olyan csevegésre, amelyben úgy tesznek, mintha a Signal nevében írnának.";
+"BACKUP_NEVER_SHARE_RECOVERY_KEY_SHEET_BODY" = "Ne oszd meg senkivel a helyreállítási kulcsodat. Ezzel lehetővé teszed, hogy átvegyék az irányítást a fiókod felett. <bold>A Radar soha nem fog üzenetet küldeni</bold> a helyreállítási kulcsod miatt. Soha ne válaszolj olyan csevegésre, amelyben úgy tesznek, mintha a Radar nevében írnának.";
 
 /* Title for a warning sheet shown to discourage the user from sharing their 'Recovery Key'. */
 "BACKUP_NEVER_SHARE_RECOVERY_KEY_SHEET_TITLE" = "Ne oszd meg a helyreállítási kulcsot";
@@ -752,7 +752,7 @@
 "BACKUP_RESTORE_MODAL_TITLE" = "Üzenetek visszaállítása…";
 
 /* Message for a confirmation sheet shown before saving the user's Recovery Key to their password manager. */
-"BACKUP_SAVE_KEY_PW_MGR_CONFIRM_SHEET_MESSAGE" = "A helyreállítási kulcsodat kizárólag olyan jelszókezelőben tárold, amelynek biztonságosságában megbízol. A Signal nem tesz javaslatot arra, hogy melyik jelszókezelő a megfelelő számodra.";
+"BACKUP_SAVE_KEY_PW_MGR_CONFIRM_SHEET_MESSAGE" = "A helyreállítási kulcsodat kizárólag olyan jelszókezelőben tárold, amelynek biztonságosságában megbízol. A Radar nem tesz javaslatot arra, hogy melyik jelszókezelő a megfelelő számodra.";
 
 /* Title for a confirmation sheet shown before saving the user's Recovery Key to their password manager. */
 "BACKUP_SAVE_KEY_PW_MGR_CONFIRM_SHEET_TITLE" = "Mentés a jelszókezelőbe?";
@@ -1064,31 +1064,31 @@
 "BACKUP_SETTINGS_LANDING_OTHER_WAYS_HEADER" = "A biztonsági mentés egyéb módjai";
 
 /* Subtitle on the Backups settings landing page. */
-"BACKUP_SETTINGS_LANDING_PAGE_SUBTITLE" = "Készíts biztonsági másolatot az üzenetelőzményeidről, hogy soha ne veszíts el adatot új telefon vásárlásakor vagy a Signal újratelepítésekor.";
+"BACKUP_SETTINGS_LANDING_PAGE_SUBTITLE" = "Készíts biztonsági másolatot az üzenetelőzményeidről, hogy soha ne veszíts el adatot új telefon vásárlásakor vagy a Radar újratelepítésekor.";
 
 /* Button to begin setting up Signal Secure Backups on the Backups settings landing page. */
 "BACKUP_SETTINGS_LANDING_SET_UP_BUTTON" = "Beállítás";
 
 /* Description of Signal Secure Backups on the Backups settings landing page. */
-"BACKUP_SETTINGS_LANDING_SIGNAL_BACKUPS_BODY" = "Automatikus biztonsági mentések a Signal biztonságos, végpontok közötti titkosított tárolási szolgáltatásával.";
+"BACKUP_SETTINGS_LANDING_SIGNAL_BACKUPS_BODY" = "Automatikus biztonsági mentések a Radar biztonságos, végpontok közötti titkosított tárolási szolgáltatásával.";
 
 /* Title for the Signal Secure Backups cell on the Backups settings landing page. */
-"BACKUP_SETTINGS_LANDING_SIGNAL_BACKUPS_TITLE" = "Signal biztonsági mentések";
+"BACKUP_SETTINGS_LANDING_SIGNAL_BACKUPS_TITLE" = "Radar biztonsági mentések";
 
 /* Button to view settings for remote backups on the Backups settings landing page. */
 "BACKUP_SETTINGS_LANDING_VIEW_SETTINGS_BUTTON" = "Beállítások megtekintése";
 
 /* Note on the linked-device Backups screen explaining that the Backups subscription can only be managed on the user's primary device. */
-"BACKUP_SETTINGS_LINKED_DEVICE_MANAGE_ON_PRIMARY_FOOTER" = "A Signal Biztonságos biztonsági mentéseire vonatkozó előfizetésedet kezelheted és módosíthatod az elsődleges eszközödön.";
+"BACKUP_SETTINGS_LINKED_DEVICE_MANAGE_ON_PRIMARY_FOOTER" = "A Radar Biztonságos biztonsági mentéseire vonatkozó előfizetésedet kezelheted és módosíthatod az elsődleges eszközödön.";
 
 /* Note on the linked-device Backups screen, shown on the paid tier, explaining that the Backups subscription can only be managed on the user's primary device. */
-"BACKUP_SETTINGS_LINKED_DEVICE_MANAGE_ON_PRIMARY_FOOTER_PAID" = "A Signal Biztonsági mentéseire vonatkozó előfizetésedet kezelheted és lemondhatod az elsődleges eszközödön.";
+"BACKUP_SETTINGS_LINKED_DEVICE_MANAGE_ON_PRIMARY_FOOTER_PAID" = "A Radar Biztonsági mentéseire vonatkozó előfizetésedet kezelheted és lemondhatod az elsődleges eszközödön.";
 
 /* Body text on the linked-device Backups screen, shown when Backups aren't set up, explaining the feature and that it can be enabled on the user's primary device. */
-"BACKUP_SETTINGS_LINKED_DEVICE_NO_BACKUP_FOOTER" = "Automatikus biztonsági mentések a Signal biztonságos, végpontok közötti titkosított tárolási szolgáltatásával. Kezdj hozzá az elsődleges eszközödön!";
+"BACKUP_SETTINGS_LINKED_DEVICE_NO_BACKUP_FOOTER" = "Automatikus biztonsági mentések a Radar biztonságos, végpontok közötti titkosított tárolási szolgáltatásával. Kezdj hozzá az elsődleges eszközödön!";
 
 /* Message on the linked-device Backups screen, shown when the user's paid subscription can't be found, prompting them to renew. */
-"BACKUP_SETTINGS_LINKED_DEVICE_SUBSCRIPTION_NOT_FOUND" = "Az előfizetésed nem található. A Signal Biztonságos Biztonsági mentéseinek további használatához újítsd meg az előfizetésedet.";
+"BACKUP_SETTINGS_LINKED_DEVICE_SUBSCRIPTION_NOT_FOUND" = "Az előfizetésed nem található. A Radar Biztonságos Biztonsági mentéseinek további használatához újítsd meg az előfizetésedet.";
 
 /* Title for a button allowing users to trigger a manual backup. */
 "BACKUP_SETTINGS_MANUAL_BACKUP_BUTTON_TITLE" = "Biztonsági mentés készítése";
@@ -1100,7 +1100,7 @@
 "BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_DOWNLOAD_SHEET_LATER_ACTION" = "Letöltés később";
 
 /* Message for an action sheet allowing users to download their offloaded media. */
-"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_DOWNLOAD_SHEET_MESSAGE" = "A biztonsági mentésben olyan médiatartalmak vannak, amelyek nincsenek ezen az eszközön. A letöltés eltarthat egy ideig, a letöltés megszakításának elkerülése érdekében hagyd nyitva a Signalt.";
+"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_DOWNLOAD_SHEET_MESSAGE" = "A biztonsági mentésben olyan médiatartalmak vannak, amelyek nincsenek ezen az eszközön. A letöltés eltarthat egy ideig, a letöltés megszakításának elkerülése érdekében hagyd nyitva a Radart.";
 
 /* Action in an action sheet allowing users to download their offloaded media now. */
 "BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_DOWNLOAD_SHEET_NOW_ACTION" = "Letöltés most";
@@ -1130,16 +1130,16 @@
 "BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_TOGGLE_FOOTER_UNAVAILABLE" = "A tárhely-optimalizálás csak a díj ellenében igénybe vehető Radar biztonsági mentésekkel használható. A funkció használatának megkezdéséhez frissítsd a biztonsági csomagodat.";
 
 /* Title for a toggle allowing users to change the Optimize Local Storage setting. */
-"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_TOGGLE_TITLE" = "Optimalizáld a Signal-tárhelyedet";
+"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_TOGGLE_TITLE" = "Optimalizáld a Radar-tárhelyedet";
 
 /* Body for a Backup plan upsell view encouraging users to subscribe to a paid Backup plan to use storage optimization. */
-"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_UPSELL_BODY" = "A tárhely-optimalizálás csak a díj ellenében igénybe vehető Signal biztonsági mentésekkel használható. A funkció használatának megkezdéséhez frissítsd a biztonsági csomagodat.";
+"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_UPSELL_BODY" = "A tárhely-optimalizálás csak a díj ellenében igénybe vehető Radar biztonsági mentésekkel használható. A funkció használatának megkezdéséhez frissítsd a biztonsági csomagodat.";
 
 /* Title for a Backup plan upsell view encouraging users to subscribe to a paid Backup plan to use storage optimization. */
 "BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_UPSELL_TITLE" = "Váltás a Tárhely-optimalizálás bekapcsolására";
 
 /* Subtitle for a notification telling the user they are out of remote storage space. */
-"BACKUP_SETTINGS_OUT_OF_STORAGE_SPACE_NOTIFICATION_SUBTITLE" = "Elérted a biztonsági mentések tárhelykorlátját. A csevegések és médiafájlok biztonsági mentésének folytatásához szabadíts fel tárhelyet a Signalban.";
+"BACKUP_SETTINGS_OUT_OF_STORAGE_SPACE_NOTIFICATION_SUBTITLE" = "Elérted a biztonsági mentések tárhelykorlátját. A csevegések és médiafájlok biztonsági mentésének folytatásához szabadíts fel tárhelyet a Radarban.";
 
 /* Title for a notification telling the user they are out of remote storage space. */
 "BACKUP_SETTINGS_OUT_OF_STORAGE_SPACE_NOTIFICATION_TITLE" = "A biztonsági mentések tárhelye megtelt";
@@ -1199,7 +1199,7 @@
 "BACKUP_SETTINGS_UPLOAD_PROGRESS_SUBTITLE_PAUSED_NEEDS_WIFI" = "Médiafeltöltés szünetel: wifire vár";
 
 /* Subtitle for a progress bar tracking uploads that are paused because the user is out of remote storage space. Embeds 1:{{ total storage space provided, e.g. 100 GB }}; 2:{{ space the user needs to free up by deleting media, e.g. 1 GB }}. */
-"BACKUP_SETTINGS_UPLOAD_PROGRESS_SUBTITLE_PAUSED_OUT_OF_STORAGE_SPACE_FORMAT" = "Elérted a biztonsági mentési csomagodban foglalt %1$@ tárhelykorlátot. Az új csevegések és médiatartalmak biztonsági mentéséhez szabadíts fel %2$@ tárhelyet a Signalban, majd koppints a „Biztonsági mentés most” lehetőségre!";
+"BACKUP_SETTINGS_UPLOAD_PROGRESS_SUBTITLE_PAUSED_OUT_OF_STORAGE_SPACE_FORMAT" = "Elérted a biztonsági mentési csomagodban foglalt %1$@ tárhelykorlátot. Az új csevegések és médiatartalmak biztonsági mentéséhez szabadíts fel %2$@ tárhelyet a Radarban, majd koppints a „Biztonsági mentés most” lehetőségre!";
 
 /* Subtitle for a progress bar tracking active uploading. Embeds 1:{{ the amount uploaded as a file size, e.g. 100 MB }}; 2:{{ the total amount to upload as a file size, e.g. 1 GB }}; 3:{{ the percentage uploaded as a percent, e.g. 40% }}. */
 "BACKUP_SETTINGS_UPLOAD_PROGRESS_SUBTITLE_RUNNING" = "Feltöltés: %1$@/%2$@ (%3$@)";
@@ -1211,13 +1211,13 @@
 "BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_BUTTON_TITLE" = "Biztonsági mentés készítése";
 
 /* Message for a sheet shown after the user enables backups. */
-"BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_MESSAGE" = "Ez eltarthat egy ideig. A Signalt a szokásos módon használhatod biztonsági mentés közben.";
+"BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_MESSAGE" = "Ez eltarthat egy ideig. A Radart a szokásos módon használhatod biztonsági mentés közben.";
 
 /* Footer for a toggle shown after the user enables backups, letting them enable the Optimize Storage feature. */
 "BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_OPTIMIZE_MEDIA_TOGGLE_FOOTER" = "A régebbi médiafájlok a következő biztonsági mentéskor le lesznek törölve, de bármikor letölthetők a biztonsági mentésből.";
 
 /* Title for a toggle shown after the user enables backups, letting them enable the Optimize Storage feature. */
-"BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_OPTIMIZE_MEDIA_TOGGLE_TITLE" = "Optimalizáld a Signal-tárhelyedet";
+"BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_OPTIMIZE_MEDIA_TOGGLE_TITLE" = "Optimalizáld a Radar-tárhelyedet";
 
 /* Title for a sheet shown after the user enables backups. */
 "BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_TITLE" = "Kész is vagy! Kezdd el a biztonsági mentést most.";
@@ -1247,7 +1247,7 @@
 "BACKUP_SUBSCRIPTION_FAILED_TO_RENEW_SHEET_TITLE" = "Nem sikerült megújítani a biztonsági mentésre vonatkozó előfizetésedet";
 
 /* Body for a megaphone shown on the chat list encouraging users to subscribe to a paid Backup plan to back up all their media. Embeds {{ the amount of storage included in the paid plan, preformatted as a localized byte count, e.g. '100 GB' }}. */
-"BACKUPS_BACK_UP_YOUR_MEDIA_MEGAPHONE_BODY" = "A fizetős Signal biztonsági mentési csomagok az összes médiafájlt megőrzik, akár %1$@ méretig.";
+"BACKUPS_BACK_UP_YOUR_MEDIA_MEGAPHONE_BODY" = "A fizetős Radar biztonsági mentési csomagok az összes médiafájlt megőrzik, akár %1$@ méretig.";
 
 /* Title for a button on a megaphone encouraging users to subscribe to a paid Backup plan to back up all their media. */
 "BACKUPS_BACK_UP_YOUR_MEDIA_MEGAPHONE_PRIMARY_ACTION" = "Frissítés";
@@ -1256,7 +1256,7 @@
 "BACKUPS_BACK_UP_YOUR_MEDIA_MEGAPHONE_TITLE" = "Készíts biztonsági mentést az összes médiafájlodról";
 
 /* Body for a Backup plan upsell view encouraging users to subscribe to a paid Backup plan to back up all their media. Embeds {{ the amount of storage included in the paid plan, preformatted as a localized byte count, e.g. '100 GB' }}. */
-"BACKUPS_BACK_UP_YOUR_MEDIA_UPSELL_BODY" = "A fizetős Signal biztonsági mentés funkció az összes médiafájlodat tárolja, maximum %1$@ méretig. Soha többé nem veszítesz el egyetlen fotót vagy videót sem, amikor új telefont kapsz, vagy újratelepíted a Signalt.";
+"BACKUPS_BACK_UP_YOUR_MEDIA_UPSELL_BODY" = "A fizetős Radar biztonsági mentés funkció az összes médiafájlodat tárolja, maximum %1$@ méretig. Soha többé nem veszítesz el egyetlen fotót vagy videót sem, amikor új telefont kapsz, vagy újratelepíted a Radart.";
 
 /* Title for a Backup plan upsell view encouraging users to subscribe to a paid Backup plan to back up all their media. */
 "BACKUPS_BACK_UP_YOUR_MEDIA_UPSELL_TITLE" = "Váltás az Összes médiafájl mentésére";
@@ -1268,7 +1268,7 @@
 "BACKUPS_MEDIA_ERROR_NOTIFICATION_TITLE" = "Biztonsági mentési adathordozó hiba";
 
 /* Body for a megaphone shown on the chat list encouraging users to enable Signal Secure Backups. */
-"BACKUPS_NEVER_LOSE_A_MESSAGE_MEGAPHONE_BODY" = "Az üzeneteid és a médiafájljaid megőrzéséhez kapcsold be a Signal biztonsági mentés szolgáltatást.";
+"BACKUPS_NEVER_LOSE_A_MESSAGE_MEGAPHONE_BODY" = "Az üzeneteid és a médiafájljaid megőrzéséhez kapcsold be a Radar biztonsági mentés szolgáltatást.";
 
 /* Title for a button on a megaphone encouraging users to enable Signal Secure Backups. */
 "BACKUPS_NEVER_LOSE_A_MESSAGE_MEGAPHONE_PRIMARY_ACTION" = "Bekapcsolás";
@@ -1277,7 +1277,7 @@
 "BACKUPS_NEVER_LOSE_A_MESSAGE_MEGAPHONE_TITLE" = "Soha ne veszíts el egyetlen üzenetet sem";
 
 /* Body for a megaphone shown on the chat list encouraging users to subscribe to a paid Backup plan to save on-device storage space. */
-"BACKUPS_SAVE_SPACE_MEGAPHONE_BODY" = "A Signal biztonsági mentés funkcióval tárhelyet takaríthatsz meg a médiafájlok áthelyezésével.";
+"BACKUPS_SAVE_SPACE_MEGAPHONE_BODY" = "A Radar biztonsági mentés funkcióval tárhelyet takaríthatsz meg a médiafájlok áthelyezésével.";
 
 /* Title for a button on a megaphone encouraging users to subscribe to a paid Backup plan to save on-device storage space, when the user does not yet have Signal Secure Backups enabled. */
 "BACKUPS_SAVE_SPACE_MEGAPHONE_PRIMARY_ACTION_TURN_ON" = "Bekapcsolás";
@@ -1289,7 +1289,7 @@
 "BACKUPS_SAVE_SPACE_MEGAPHONE_TITLE" = "Takaríts meg helyet a fizetős biztonsági mentésekkel";
 
 /* Body for a Backup plan upsell view encouraging users to subscribe to a paid Backup plan to save on-device storage space. Embeds {{ the amount of storage space being consumed on-device by media, preformatted as a localized byte count, e.g. '1.2 GB' }}. */
-"BACKUPS_SAVE_SPACE_UPSELL_BODY" = "A Signal %1$@ tárhelyet használ a médiafájlokhoz. A fizetős Signal biztonsági mentési csomagok tárhelyet takaríthatnak meg a médiafájlok áthelyezésével, miközben a teljes csevegési előzményeket megőrzik a biztonsági mentésben.";
+"BACKUPS_SAVE_SPACE_UPSELL_BODY" = "A Radar %1$@ tárhelyet használ a médiafájlokhoz. A fizetős Radar biztonsági mentési csomagok tárhelyet takaríthatnak meg a médiafájlok áthelyezésével, miközben a teljes csevegési előzményeket megőrzik a biztonsági mentésben.";
 
 /* Title for a Backup plan upsell view encouraging users to subscribe to a paid Backup plan to save on-device storage space. */
 "BACKUPS_SAVE_SPACE_UPSELL_TITLE" = "Takaríts meg helyet a fizetős biztonsági mentésekkel";
@@ -1298,7 +1298,7 @@
 "BACKUPS_SETTINGS_TITLE" = "Biztonságos biztonsági mentések";
 
 /* Message for an action sheet shown on iPad saying you need to set up backups on your phone */
-"BACKUPS_SETUP_ON_PRIMARY_MESSAGE" = "A biztonsági mentések konfigurálásához nyisd meg a Signal alkalmazást az elsődleges iPhone-odon vagy Android operációs rendszerű készülékeden, és lépj a Beállítások > Biztonsági mentések menüpontba.";
+"BACKUPS_SETUP_ON_PRIMARY_MESSAGE" = "A biztonsági mentések konfigurálásához nyisd meg a Radar alkalmazást az elsődleges iPhone-odon vagy Android operációs rendszerű készülékeden, és lépj a Beállítások > Biztonsági mentések menüpontba.";
 
 /* Body for system notification or megaphone when backups is enabled. Embeds {{ time backups was enabled }} */
 "BACKUPS_TURNED_ON_NOTIFICATION_BODY_FORMAT" = "A Radar biztonsági mentései %1$@ időpontban bekapcsolásra kerültek ehhez a fiókhoz. Koppints a megtekintéshez.";
@@ -1319,10 +1319,10 @@
 "BADGE_DETAILS_DONATE_TO_SIGNAL" = "Adományozás most";
 
 /* When viewing someone else's donor badge, you'll see a sheet. This is the title on that sheet. Embeds {badge owner's short name} */
-"BADGE_DETAILS_TITLE_FOR_SUPPORTER" = "%1$@ támogatja a Signalt";
+"BADGE_DETAILS_TITLE_FOR_SUPPORTER" = "%1$@ támogatja a Radart";
 
 /* String explaining to the user that their boost badge has expired on the badge expiry sheet. */
-"BADGE_EXPIRED_BOOST_BODY" = "A Boost-jelvényed érvényessége lejárt, így már nem jelenik meg a profilodon.\n\nTovábbra is használhatod a Signalt, de a számodra kifejlesztett technológia támogatása érdekében fontold meg, hogy havi adományozóvá válj!";
+"BADGE_EXPIRED_BOOST_BODY" = "A Boost-jelvényed érvényessége lejárt, így már nem jelenik meg a profilodon.\n\nTovábbra is használhatod a Radart, de a számodra kifejlesztett technológia támogatása érdekében fontold meg, hogy havi adományozóvá válj!";
 
 /* String explaining to the user that their boost badge has expired while they are a current subscription sustainer on the badge expiry sheet. */
 "BADGE_EXPIRED_BOOST_CURRENT_SUSTAINER_BODY" = "A Boost-jelvényed érvényessége lejárt, így már nem jelenik meg a profilodon.\n\nEgy egyszeri hozzájárulással újraaktiválhatod a Boost-jelvényed újabb 30 napra.";
@@ -1376,7 +1376,7 @@
 "BANK_MANDATE_READ_MORE" = "Koppints a teljeshez";
 
 /* Users can donate to Signal with a bank account. We are required to show them a mandate with information about bank transfers. This is a subtitle about the payment processor Stripe above that mandate. */
-"BANK_MANDATE_SUBTITLE" = "A Stripe feldolgozza a Signalnak adott adományokat. A Radar nem gyűjti és nem tárolja a személyes adataidat.";
+"BANK_MANDATE_SUBTITLE" = "A Stripe feldolgozza a Radarnak adott adományokat. A Radar nem gyűjti és nem tárolja a személyes adataidat.";
 
 /* Users can donate to Signal with a bank account. We are required to show them a mandate with information about bank transfers. This is the title above that mandate. */
 "BANK_MANDATE_TITLE" = "Banki átutalás";
@@ -1634,7 +1634,7 @@
 "CALL_LINK_REQUIRE_APPROVAL" = "Adminisztrátori jóváhagyás szükséges";
 
 /* Button to open UI to share a Call Link with someone on Signal. */
-"CALL_LINK_SHARE_VIA_SIGNAL" = "Hivatkozás megosztása a Signalon keresztül";
+"CALL_LINK_SHARE_VIA_SIGNAL" = "Hivatkozás megosztása a Radaron keresztül";
 
 /* Button to open the system share sheet to share a Call Link. */
 "CALL_LINK_SHARE_VIA_SYSTEM" = "Link megosztása";
@@ -1655,7 +1655,7 @@
 "CALL_QUALITY_SURVEY_COMPLETION_TOAST" = "Köszönjük a visszajelzésedet!";
 
 /* Footer text explaining custom issue descriptions in the call quality survey */
-"CALL_QUALITY_SURVEY_CUSTOM_ISSUE_FOOTER" = "Kérjük, add meg a problémához kapcsolódó összes részletet. Amit itt megosztottál, az bizalmas marad, és csak a Signal-hívások fejlesztésére használjuk fel.";
+"CALL_QUALITY_SURVEY_CUSTOM_ISSUE_FOOTER" = "Kérjük, add meg a problémához kapcsolódó összes részletet. Amit itt megosztottál, az bizalmas marad, és csak a Radar-hívások fejlesztésére használjuk fel.";
 
 /* Placeholder text for the custom issue entry in the call quality survey */
 "CALL_QUALITY_SURVEY_CUSTOM_ISSUE_PLACEHOLDER" = "Írd le a problémádat";
@@ -1724,7 +1724,7 @@
 "CALL_QUALITY_SURVEY_ISSUES_SHEET_TITLE" = "Milyen problémáid voltak?";
 
 /* Header text explaining the purpose of the call quality survey */
-"CALL_QUALITY_SURVEY_RATING_HEADER" = "Ez segít nekünk a Signal-hívások jobbá tételében. Személyazonosításra alkalmas adatokat nem tárolunk.";
+"CALL_QUALITY_SURVEY_RATING_HEADER" = "Ez segít nekünk a Radar-hívások jobbá tételében. Személyazonosításra alkalmas adatokat nem tárolunk.";
 
 /* Title for the initial rating screen in the call quality survey */
 "CALL_QUALITY_SURVEY_RATING_TITLE" = "Milyen volt a hívás minősége?";
@@ -2111,7 +2111,7 @@
 "CHAT_LIST_BACKUP_PROGRESS_VIEW_RESUME_CELLULAR_DATA_BUTTON" = "Folytatás";
 
 /* Message shown in an action sheet when the user tries to resume backup using cellular data. */
-"CHAT_LIST_BACKUP_PROGRESS_VIEW_RESUME_CELLULAR_DATA_MESSAGE" = "A médiatartalmak mobilinternettel történő biztonsági mentése adatforgalmi díjakkal járhat. A biztonsági mentésed feltöltése hosszú időt vehet igénybe, a megszakítások elkerülése érdekében tartsd megnyitva a Signalt.";
+"CHAT_LIST_BACKUP_PROGRESS_VIEW_RESUME_CELLULAR_DATA_MESSAGE" = "A médiatartalmak mobilinternettel történő biztonsági mentése adatforgalmi díjakkal járhat. A biztonsági mentésed feltöltése hosszú időt vehet igénybe, a megszakítások elkerülése érdekében tartsd megnyitva a Radart.";
 
 /* Title for the action sheet shown when the user tries to resume backup using cellular data. */
 "CHAT_LIST_BACKUP_PROGRESS_VIEW_RESUME_CELLULAR_DATA_TITLE" = "Folytatod a mobilinternet használatát?";
@@ -2243,7 +2243,7 @@
 "CLOCK_SKEW_APP_BLOCKING_DEVICE_TIME_FORMAT" = "Az eszközöd által jelzett dátum és idő: %1$@ (UTC).";
 
 /* Subtitle for a screen shown when the app can't be used until the user corrects their device's date and time. */
-"CLOCK_SKEW_APP_BLOCKING_SUBTITLE" = "A Signal nem használható, ha az eszközöd dátuma és ideje helytelen. A javításhoz nyisd meg a Beállításokat.";
+"CLOCK_SKEW_APP_BLOCKING_SUBTITLE" = "A Radar nem használható, ha az eszközöd dátuma és ideje helytelen. A javításhoz nyisd meg a Beállításokat.";
 
 /* Title for a screen shown when the app can't be used until the user corrects their device's date and time. */
 "CLOCK_SKEW_APP_BLOCKING_TITLE" = "A dátum pontatlan";
@@ -2339,7 +2339,7 @@
 "CONTACT_ABOUT_SHEET_PROFILE_NAMES_EDUCATION" = "A profilnevek nincsenek ellenőrizve";
 
 /* Message for a tooltip that appears above a parenthesized name for another user, indicating that that name is the name the other user set for themself. Embeds {{name}} */
-"CONTACT_ABOUT_SHEET_SECONDARY_NAME_TOOLTIP_MESSAGE" = "A(z) „ %1$@” az a profilnév, amelyet ez a személy beállított magának a Signalban.";
+"CONTACT_ABOUT_SHEET_SECONDARY_NAME_TOOLTIP_MESSAGE" = "A(z) „ %1$@” az a profilnév, amelyet ez a személy beállított magának a Radarban.";
 
 /* A label indicating a user is a signal connection. */
 "CONTACT_ABOUT_SHEET_SIGNAL_CONNECTION_LABEL" = "Radar Névjegyek";
@@ -2390,7 +2390,7 @@
 "CONTACT_NOTE_TITLE" = "Megjegyzés";
 
 /* Body for contact permission action sheet */
-"CONTACT_PERMISSION_ACTION_SHEET_2_BODY" = "Ismerősök keresése a Signalban:";
+"CONTACT_PERMISSION_ACTION_SHEET_2_BODY" = "Ismerősök keresése a Radarban:";
 
 /* First step for contact permission action sheet */
 "CONTACT_PERMISSION_ACTION_SHEET_2_STEP_ONE" = "Koppints a \"Beállításokhoz\" címkére lent";
@@ -2423,10 +2423,10 @@
 "CONTACT_PERMISSION_REMINDER_MEGAPHONE_ACTION" = "Hozzáférés engedélyezése";
 
 /* Body for contact permission reminder megaphone */
-"CONTACT_PERMISSION_REMINDER_MEGAPHONE_BODY" = "Engedélyezd a hozzáférést a névjegyeidhez, hogy gyorsan megtaláld őket a Signalban.";
+"CONTACT_PERMISSION_REMINDER_MEGAPHONE_BODY" = "Engedélyezd a hozzáférést a névjegyeidhez, hogy gyorsan megtaláld őket a Radarban.";
 
 /* Title for contact permission reminder megaphone */
-"CONTACT_PERMISSION_REMINDER_MEGAPHONE_TITLE" = "Névjegyek keresése a Signalban";
+"CONTACT_PERMISSION_REMINDER_MEGAPHONE_TITLE" = "Névjegyek keresése a Radarban";
 
 /* Label for a contact's phone number. */
 "CONTACT_PHONE" = "Telefonszám";
@@ -2462,7 +2462,7 @@
 "CONTACT_SHARE_AVATAR_ROW_LABEL" = "Kép";
 
 /* Name of the option to share a contact's Signal profile photo. Read by VoiceOver on the option, and as the current value of the photo row when it's selected. */
-"CONTACT_SHARE_AVATAR_SIGNAL_PHOTO" = "Signal profilfotó";
+"CONTACT_SHARE_AVATAR_SIGNAL_PHOTO" = "Radar profilfotó";
 
 /* Name of the option to share a contact's photo from the phone's contacts. Read by VoiceOver on the option, and as the current value of the photo row when it's selected. */
 "CONTACT_SHARE_AVATAR_SYSTEM_CONTACT_PHOTO" = "Névjegy fotó";
@@ -2477,10 +2477,10 @@
 "CONTACT_SHARE_MESSAGE_BUTTON" = "Üzenet";
 
 /* Notice at the top of the 'Share Contact' view when the shared contact includes their Signal account. Embeds {{ contact name }}. */
-"CONTACT_SHARE_SIGNAL_ACCOUNT_NOTICE_FORMAT" = "Bárki, akivel megosztod ezt a profilt, üzenetet küldhet %1$@ felhasználónak a Signalon.";
+"CONTACT_SHARE_SIGNAL_ACCOUNT_NOTICE_FORMAT" = "Bárki, akivel megosztod ezt a profilt, üzenetet küldhet %1$@ felhasználónak a Radaron.";
 
 /* Alert body when contacts disabled while trying to share a contact. */
-"CONTACT_SHARING_NO_ACCESS_BODY" = "A Signalnak hozzá kell férnie a névjegyeidhez. Menj az iOS beállításokba és kapcsold be a névjegyeket. A névjegyeid titkosítva vannak, és nem láthatók a Radar számára.";
+"CONTACT_SHARING_NO_ACCESS_BODY" = "A Radarnak hozzá kell férnie a névjegyeidhez. Menj az iOS beállításokba és kapcsold be a névjegyeket. A névjegyeid titkosítva vannak, és nem láthatók a Radar számára.";
 
 /* Alert title when contacts disabled while trying to share a contact. */
 "CONTACT_SHARING_NO_ACCESS_TITLE" = "Kontaktokhoz hozzáférés engedélyezése";
@@ -3083,7 +3083,7 @@
 "DELETE_ACCOUNT_CONFIRMATION_PHONE_NUMBER_TITLE" = "Telefonszám";
 
 /* Section header */
-"DELETE_ACCOUNT_CONFIRMATION_SECTION_TITLE" = "Erősítsd meg Signalos telefonszámodat";
+"DELETE_ACCOUNT_CONFIRMATION_SECTION_TITLE" = "Erősítsd meg Radaros telefonszámodat";
 
 /* Title for the 'delete account' confirmation view. */
 "DELETE_ACCOUNT_CONFIRMATION_TITLE" = "Fiók törlése";
@@ -3135,7 +3135,7 @@
 "DEPOSIT_RECEIVED_TITLE" = "Deposit Received";
 
 /* Notification warning the user that they have been de-registered. */
-"DEREGISTRATION_NOTIFICATION" = "Kijelentkeztél a Signalból ezen a készüléken.";
+"DEREGISTRATION_NOTIFICATION" = "Kijelentkeztél a Radarból ezen a készüléken.";
 
 /* Button that lets users re-register using the same phone number. */
 "DEREGISTRATION_REREGISTER_BUTTON" = "Újraregisztrálás";
@@ -3144,7 +3144,7 @@
 "DEREGISTRATION_REREGISTER_PROMPT_TITLE" = "Telefonszám újraregisztrálása?";
 
 /* Label warning the user that they have been de-registered. */
-"DEREGISTRATION_WARNING" = "Ez az eszköz már nincs regisztrálva. Ennek valószínűleg az az oka, hogy egy másik eszközön regisztráltad a telefonszámod a Signalon.";
+"DEREGISTRATION_WARNING" = "Ez az eszköz már nincs regisztrálva. Ennek valószínűleg az az oka, hogy egy másik eszközön regisztráltad a telefonszámod a Radaron.";
 
 /* If the user has been deregistered, they'll see a warning. This is This is the call to action on that warning. */
 "DEREGISTRATION_WARNING_ACTION_TITLE" = "Regisztráld újra az eszközt";
@@ -3231,7 +3231,7 @@
 "DEVICE_TRANSFER_PAIR_OLD_DEVICE_TITLE" = "Párosítsd a régi eszközöddel";
 
 /* The explanation on the view that shows receiving progress */
-"DEVICE_TRANSFER_RECEIVING_EXPLANATION" = "Tartsd a két eszközt egymás közelében. Ne kapcsold ki egyik eszközt sem és tartsd a Signalt nyitva. Az adatvitel végpontok között titkosított.";
+"DEVICE_TRANSFER_RECEIVING_EXPLANATION" = "Tartsd a két eszközt egymás közelében. Ne kapcsold ki egyik eszközt sem és tartsd a Radart nyitva. Az adatvitel végpontok között titkosított.";
 
 /* The title on the view that shows receiving progress */
 "DEVICE_TRANSFER_RECEIVING_TITLE" = "Adat fogadása";
@@ -3267,7 +3267,7 @@
 "DEVICE_TRANSFER_STATUS_NEW_DEVICE_TRANSFERRING" = "Áthelyezés";
 
 /* Description in the progress view displayed during device transfer. */
-"DEVICE_TRANSFER_STATUS_NEW_DEVICE_TRANSFERRING_DESCRIPTION" = "Tartsd a két eszközt egymás közelében. Ne kapcsold ki egyik eszközt sem és tartsd a Signalt nyitva. Az adatvitel végpontok között titkosított.";
+"DEVICE_TRANSFER_STATUS_NEW_DEVICE_TRANSFERRING_DESCRIPTION" = "Tartsd a két eszközt egymás közelében. Ne kapcsold ki egyik eszközt sem és tartsd a Radart nyitva. Az adatvitel végpontok között titkosított.";
 
 /* Status message on old device when cancelling transfer. */
 "DEVICE_TRANSFER_STATUS_OLD_DEVICE_CANCELLING" = "Az új iPhone-nal való kapcsolat megszakítása…";
@@ -3396,13 +3396,13 @@
 "DONATE_CHOOSE_PAYMENT_METHOD_SHEET_SUBTITLE_FOR_ONE_TIME_DONATION" = "Szerezd meg a(z) %1$@ jelvényt 30 napra";
 
 /* When users make donations on a friend's behalf, they see a sheet that lets them pick a payment method. This is the title on that sheet. Embeds {{amount of money}}, such as \"$5\". */
-"DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_DONATION_ON_BEHALF_OF_A_FRIEND" = "%1$@ adomány a Signalnak";
+"DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_DONATION_ON_BEHALF_OF_A_FRIEND" = "%1$@ adomány a Radarnak";
 
 /* When users make monthly donations, they see a sheet that lets them pick a payment method. This is the title on that sheet. Embeds {{amount of money per month}}, such as \"$5/month\". */
-"DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_MONTHLY_DONATION" = "Adományozz %1$@ összeget a Signalnak";
+"DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_MONTHLY_DONATION" = "Adományozz %1$@ összeget a Radarnak";
 
 /* When users make one-time donations, they see a sheet that lets them pick a payment method. This is the title on that sheet. Embeds {{amount of money}}, such as \"$5\". */
-"DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_ONE_TIME_DONATION" = "Adományozz %1$@ összeget a Signalnak";
+"DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_ONE_TIME_DONATION" = "Adományozz %1$@ összeget a Radarnak";
 
 /* Users can donate on a friend's behalf and can optionally add a message. This is tells users about that optional message. */
 "DONATE_ON_BEHALF_OF_A_FRIEND_ADDITIONAL_MESSAGE_INFO" = "Az adományozásról közvetlenül üzenetben értesítjük a címzettet. Add hozzá a saját üzeneted alább.";
@@ -3516,7 +3516,7 @@
 "DONATION_ON_BEHALF_OF_A_FRIEND_BADGE_REDEEMED" = "Beváltva";
 
 /* Users can donate on behalf of a friend, and the friend will receive a badge. This is a short paragraph on the screen where users choose the badge their friend will receive. */
-"DONATION_ON_BEHALF_OF_A_FRIEND_CHOOSE_BADGE_DESCRIPTION" = "Támogasd a Signalt azáltal, hogy adományozol egy olyan ismerősödnek vagy családtagodnak, aki használja a Signalt. Az adott személy pedig lehetőséget kap arra, hogy a profilján megjelenítse a támogatást.";
+"DONATION_ON_BEHALF_OF_A_FRIEND_CHOOSE_BADGE_DESCRIPTION" = "Támogasd a Radart azáltal, hogy adományozol egy olyan ismerősödnek vagy családtagodnak, aki használja a Radart. Az adott személy pedig lehetőséget kap arra, hogy a profilján megjelenítse a támogatást.";
 
 /* Users can donate on behalf of a friend, and the friend will receive a badge. This is the title on the screen where users choose the badge their friend will receive. */
 "DONATION_ON_BEHALF_OF_A_FRIEND_CHOOSE_BADGE_TITLE" = "Adomány egy ismerősnek";
@@ -3552,7 +3552,7 @@
 "DONATION_ON_BEHALF_OF_A_FRIEND_PREVIEW_OUTGOING" = "Adományoztál %1$@ számára";
 
 /* You received a donation from a friend. This is the title of that message in the chat. Embeds {{short contact name}}. */
-"DONATION_ON_BEHALF_OF_A_FRIEND_RECEIVED_TITLE_FORMAT" = "%1$@ adományozott a Signalnak a nevedben";
+"DONATION_ON_BEHALF_OF_A_FRIEND_RECEIVED_TITLE_FORMAT" = "%1$@ adományozott a Radarnak a nevedben";
 
 /* Users can donate on a friend's behalf. This is the error message that appears if the try to do this, but the recipient is blocked. */
 "DONATION_ON_BEHALF_OF_A_FRIEND_RECIPIENT_IS_BLOCKED_ERROR_BODY" = "Nem adományozhatsz ennek a felhasználónak, mert letiltottad.";
@@ -3585,7 +3585,7 @@
 "DONATION_ON_BEHALF_OF_A_FRIEND_VIEW" = "Megtekintés";
 
 /* A friend has donated on your behalf and you received a badge. This text says that you received a badge, and from whom. Embeds {{contact's short name, such as a first name}}. */
-"DONATION_ON_BEHALF_OF_A_FRIEND_YOU_RECEIVED_A_BADGE_FORMAT" = "%1$@ adományozott a Signalnak a nevedben! Mutasd meg a profilodon, hogy támogatod a Signalt!";
+"DONATION_ON_BEHALF_OF_A_FRIEND_YOU_RECEIVED_A_BADGE_FORMAT" = "%1$@ adományozott a Radarnak a nevedben! Mutasd meg a profilodon, hogy támogatod a Radart!";
 
 /* Body text for a sheet discussing donating to Signal. */
 "DONATION_READ_MORE_SHEET_BODY" = "Független nonprofit szervezetként a Signal elkötelezett a privát üzenetek és hívások iránt. Nincsenek hirdetések, nincsenek nyomkövetők és nincs megfigyelés. Adományozz még ma, és támogasd a Signalt!";
@@ -3633,7 +3633,7 @@
 "DONATION_RECEIPTS" = "Adomány nyugták";
 
 /* Text at the bottom of the donation receipts list, telling users that receipts might not be available */
-"DONATION_RECEIPTS_MIGHT_BE_MISSING_IF_YOU_REINSTALLED" = "Ha újratelepítetted a Signalt, korábbi adományaid nyugtái nem lesznek elérhetőek.";
+"DONATION_RECEIPTS_MIGHT_BE_MISSING_IF_YOU_REINSTALLED" = "Ha újratelepítetted a Radart, korábbi adományaid nyugtái nem lesznek elérhetőek.";
 
 /* Error message displayed if something goes wrong with 3DSecure/iDEAL payment authorization.  This will be encountered if the user cancels the webview before authrizing the payment. */
 "DONATION_REDIRECT_ERROR_CANCELLED_MESSAGE" = "Fizetés törölve. Próbáld újra!";
@@ -3648,7 +3648,7 @@
 "DONATION_SCREEN_DONATE_BUTTON" = "Támogatás";
 
 /* On donation screens, a small amount of information text is shown. This is the subtitle for that text. */
-"DONATION_SCREENS_HEADER_DESCRIPTION" = "Adományozz és támogasd a privát üzeneteket. Tartsd meg a Signal függetlenségét és hirdetésmentességét.";
+"DONATION_SCREENS_HEADER_DESCRIPTION" = "Adományozz és támogasd a privát üzeneteket. Tartsd meg a Radar függetlenségét és hirdetésmentességét.";
 
 /* On donation screens, a small amount of information text is shown. Users can click this link to learn more information. */
 "DONATION_SCREENS_HEADER_READ_MORE" = "Koppints a teljeshez";
@@ -3759,13 +3759,13 @@
 "EDIT_CONTACT_WITHOUT_CONTACTS_PERMISSION_ALERT_BODY" = "Hozzáférés az iOS Beállításokban adható.";
 
 /* Alert title for when the user has just tried to edit a contacts after declining to give Signal contacts permissions */
-"EDIT_CONTACT_WITHOUT_CONTACTS_PERMISSION_ALERT_TITLE" = "A Signalnak hozzáférésre van szüksége Kontakt listádhoz hogy szerkeszthesd az elemeit";
+"EDIT_CONTACT_WITHOUT_CONTACTS_PERMISSION_ALERT_TITLE" = "A Radarnak hozzáférésre van szüksége Kontakt listádhoz hogy szerkeszthesd az elemeit";
 
 /* The navbar title for the 'update group' view. */
 "EDIT_GROUP_DEFAULT_TITLE" = "Csoport szerkesztése";
 
 /* Error message indicating the a user can't be added to a group. */
-"EDIT_GROUP_ERROR_CANNOT_ADD_MEMBER" = "A felhasználó nem adható a csoporthoz, amíg nem frissíti a Signalt.";
+"EDIT_GROUP_ERROR_CANNOT_ADD_MEMBER" = "A felhasználó nem adható a csoporthoz, amíg nem frissíti a Radart.";
 
 /* Error message indicating that an avatar image is invalid and cannot be used. */
 "EDIT_GROUP_ERROR_INVALID_AVATAR" = "Érvénytelen fotófájl.";
@@ -3792,10 +3792,10 @@
 "EDIT_MESSAGE_SEND_MESSAGE_UNKNOWN_ERROR" = "EDIT_MESSAGE_SEND_MESSAGE_UNKNOWN_ERROR";
 
 /* body of email sent to contacts when inviting to install Signal. Embeds {{link to install Signal}} and {{link to the Signal home page}} */
-"EMAIL_INVITE_BODY" = "Szia!\n\nÚjabban privát csevegéseimet a Radar üzenetküldő alkalmazással bonyolítom iPhone-on. Örülnék, ha te is telepítenéd, így biztosak lehetünk benne, hogy amit írunk, vagy mondunk a telefonba, az köztünk marad.\n\nA Radar elérhető iPhone és Android telefonokra, valamint asztali számítógépre. Itt szerezheted meg: %1$@\n\nA Radar az ismert csevegőprogramokhoz hasonlóan működik: küldhetünk képeket, videókat, hívhatjuk egymást, csoportos csevegést indíthatunk. A legjobb, hogy a fentiekbe senkinek, még a Radar fejlesztőinek sincs semmilyen betekintési, belehallgatási lehetősége.\n\nA Signalról itt olvashatsz bővebben: %2$@.";
+"EMAIL_INVITE_BODY" = "Szia!\n\nÚjabban privát csevegéseimet a Radar üzenetküldő alkalmazással bonyolítom iPhone-on. Örülnék, ha te is telepítenéd, így biztosak lehetünk benne, hogy amit írunk, vagy mondunk a telefonba, az köztünk marad.\n\nA Radar elérhető iPhone és Android telefonokra, valamint asztali számítógépre. Itt szerezheted meg: %1$@\n\nA Radar az ismert csevegőprogramokhoz hasonlóan működik: küldhetünk képeket, videókat, hívhatjuk egymást, csoportos csevegést indíthatunk. A legjobb, hogy a fentiekbe senkinek, még a Radar fejlesztőinek sincs semmilyen betekintési, belehallgatási lehetősége.\n\nA Radarról itt olvashatsz bővebben: %2$@.";
 
 /* subject of email sent to contacts when inviting to install Signal */
-"EMAIL_INVITE_SUBJECT" = "Váltsunk Signalra!";
+"EMAIL_INVITE_SUBJECT" = "Váltsunk Radarra!";
 
 /* Description for the fallback support sheet if user cannot send email */
 "EMAIL_SIGNAL_MESSAGE" = "Készülékeden nincs beállítva levelező kliens. Vagy állítsd be, vagy támogatási kérelmedet emailben küldd el erre a címre: support@radar.chat";
@@ -3930,7 +3930,7 @@
 "ERROR_DESCRIPTION_UNKNOWN_ERROR" = "Ismeretlen hiba történt.";
 
 /* Error message when attempting to send message */
-"ERROR_DESCRIPTION_UNREGISTERED_RECIPIENT" = "Nem sikerült elküldeni az üzenetet, mert ez a személy már nem használja a Signalt.";
+"ERROR_DESCRIPTION_UNREGISTERED_RECIPIENT" = "Nem sikerült elküldeni az üzenetet, mert ez a személy már nem használja a Radart.";
 
 /* Error message indicating that attachment upload(s) failed. */
 "ERROR_MESSAGE_ATTACHMENT_UPLOAD_FAILED" = "A csatolmány feltöltése sikertelen.";
@@ -4575,7 +4575,7 @@
 "GROUP_LINK_VIEW_SHARE_LINK_VIA_QR_CODE" = "QR kód";
 
 /* Label for the 'share group link via Signal' button in the 'group link' view. */
-"GROUP_LINK_VIEW_SHARE_LINK_VIA_SIGNAL" = "Megosztás Signallal";
+"GROUP_LINK_VIEW_SHARE_LINK_VIA_SIGNAL" = "Megosztás Radarlal";
 
 /* Message for the 'share group link' action sheet in the 'group link' view. */
 "GROUP_LINK_VIEW_SHARE_SHEET_MESSAGE" = "Ennek a linknek a birtokában bárki láthatja a csoportnevet és a tagok listáját, továbbá belépési kéréssel fordulhat a csoport felé. Azokkal oszd csak meg, akikben megbízol.";
@@ -4698,10 +4698,10 @@
 "GROUP_NAME_EDUCATION_SHEET_BULLET_1" = "Legyél óvatos azokkal a csoportokkal, amelyek szervezeteknek és vállalkozásoknak adják ki magukat";
 
 /* Second bullet point for the explainer sheet for group names */
-"GROUP_NAME_EDUCATION_SHEET_BULLET_2" = "A Signal nem tudja ellenőrizni a neveket és a fotókat";
+"GROUP_NAME_EDUCATION_SHEET_BULLET_2" = "A Radar nem tudja ellenőrizni a neveket és a fotókat";
 
 /* Third bullet point for the explainer sheet for group names */
-"GROUP_NAME_EDUCATION_SHEET_BULLET_3" = "A Signal soha nem veszi fel veled a kapcsolatot a regisztrációs kódoddal, a PIN-kódoddal vagy a helyreállítási kulcsoddal kapcsolatban";
+"GROUP_NAME_EDUCATION_SHEET_BULLET_3" = "A Radar soha nem veszi fel veled a kapcsolatot a regisztrációs kódoddal, a PIN-kódoddal vagy a helyreállítási kulcsoddal kapcsolatban";
 
 /* Fourth bullet point for the explainer sheet for group names */
 "GROUP_NAME_EDUCATION_SHEET_BULLET_4" = "Ne oszd meg a személyes adataidat olyanokkal, akiket nem ismersz";
@@ -5154,7 +5154,7 @@
 "INACTIVE_PRIMARY_DEVICE_REMINDER_MEGAPHONE_LEARN_MORE_BUTTON" = "Tudj meg többet";
 
 /* Title for an in-app megaphone about a user's inactive primary device. */
-"INACTIVE_PRIMARY_DEVICE_REMINDER_MEGAPHONE_TITLE" = "Nyisd meg a Signalt a telefonodon!";
+"INACTIVE_PRIMARY_DEVICE_REMINDER_MEGAPHONE_TITLE" = "Nyisd meg a Radart a telefonodon!";
 
 /* Label reminding the user that they are in archive mode, and that muted chats remain archived when they receive a new message. */
 "INBOX_VIEW_ARCHIVE_MODE_MUTED_CHATS_REMINDER" = "A némítva archivált csevegések új üzenet érkezésekor továbbra is archiválva maradnak.";
@@ -5256,7 +5256,7 @@
 "INFO_MESSAGE_USER_CHANGED_PHONE_NUMBER_FORMAT" = "%1$@ megváltoztatta a telefonszámát.";
 
 /* Shown in inbox and conversation when a user joins Signal, embeds the new user's {{contact name}} */
-"INFO_MESSAGE_USER_JOINED_SIGNAL_BODY_FORMAT" = "%1$@ már elérhető Signalon!";
+"INFO_MESSAGE_USER_JOINED_SIGNAL_BODY_FORMAT" = "%1$@ már elérhető Radaron!";
 
 /* Label at the top of the input text when editing a message */
 "INPUT_TOOLBAR_EDIT_MESSAGE_LABEL" = "Üzenet szerkesztése";
@@ -5266,6 +5266,9 @@
 
 /* Placeholder text displayed in empty input box in chat screen. */
 "INPUT_TOOLBAR_MESSAGE_PLACEHOLDER" = "Üzenet";
+/* accessibility label for the button which show up send payemnt screen */
+"INPUT_TOOLBAR_PAYMENTS_BUTTON_ACCESSIBILITY_LABEL" = "Fizetés küldése";
+
 
 /* accessibility label for the button which shows the sticker picker */
 "INPUT_TOOLBAR_STICKER_BUTTON_ACCESSIBILITY_LABEL" = "Matricák";
@@ -5490,7 +5493,7 @@
 "LINKED_DEVICE_INFO_SHEET_BULLET_3" = "Egyes beállítások csak az elsődleges eszközön kezelhetők, beleértve a fiókbeállításokat és a biztonsági mentéseket.";
 
 /* Lead paragraph for a sheet explaining linked devices. The text within the <bold></bold> tags is styled bold. */
-"LINKED_DEVICE_INFO_SHEET_HEADER" = "A <bold>Kapcsolt eszközök</bold> funkcióval biztonságosan hozzáférhetsz a Signal-fiókodhoz és az üzeneteidhez bármelyik további eszközödön.";
+"LINKED_DEVICE_INFO_SHEET_HEADER" = "A <bold>Kapcsolt eszközök</bold> funkcióval biztonságosan hozzáférhetsz a Radar-fiókodhoz és az üzeneteidhez bármelyik további eszközödön.";
 
 /* Shown in a banner when you tap the 'New Chat' icon at the top of the list of chats. */
 "LINKED_DEVICE_MANAGE_CONTACTS_BANNER" = "A telefonos névjegyek kezelése már nem támogatott a kapcsolt eszközökön. Ez az eszköz továbbra is szinkronizálja a névjegyzéked módosításait a Radar alkalmazásból az elsődleges eszközödön.";
@@ -5508,7 +5511,7 @@
 "LINKED_DEVICE_NOTIFICATION_TITLE" = "Összekapcsoltál egy új eszközt";
 
 /* Message for an action sheet telling users how to link a device, when trying to open an external device-linking URL. */
-"LINKED_DEVICE_URL_OPENED_ACTION_SHEET_EXTERNAL_URL_MESSAGE" = "Ha asztali számítógépet vagy iPadet szeretnél kapcsolni ehhez a Radar-fiókhoz, lépj a Kapcsolt eszközök oldalra, koppints az „Új eszköz összekapcsolása” lehetőségre, és olvasd be újra a QR-kódot. Ügyelj rá, hogy csak közvetlenül a Signaltól származó QR-kódokat olvass be.";
+"LINKED_DEVICE_URL_OPENED_ACTION_SHEET_EXTERNAL_URL_MESSAGE" = "Ha asztali számítógépet vagy iPadet szeretnél kapcsolni ehhez a Radar-fiókhoz, lépj a Kapcsolt eszközök oldalra, koppints az „Új eszköz összekapcsolása” lehetőségre, és olvasd be újra a QR-kódot. Ügyelj rá, hogy csak közvetlenül a Radartól származó QR-kódokat olvass be.";
 
 /* Message for an action sheet telling users how to link a device, when trying to open a device-linking URL from the in-app camera. */
 "LINKED_DEVICE_URL_OPENED_ACTION_SHEET_IN_APP_CAMERA_MESSAGE" = "Úgy tűnik, hogy egy Radar-eszközt próbálsz társítani. Koppints a Folytatás, majd az „Új eszköz összekapcsolása” elemre, és olvasd be újra a QR-kódot.";
@@ -5517,7 +5520,7 @@
 "LINKED_DEVICES_EDUCATION_POINT_DOWNLOADS" = "A Radar telepítéséhez az összekapcsolni kívánt eszközön keresd fel a %1$@ webhelyet";
 
 /* Bullet point about message sync on the linked devices education sheet */
-"LINKED_DEVICES_EDUCATION_POINT_MESSAGES" = "A Radar-üzenetek szinkronizálva vannak a mobiltelefonodon megtalálható Signallal, miután összekapcsolásra kerültek.";
+"LINKED_DEVICES_EDUCATION_POINT_MESSAGES" = "A Radar-üzenetek szinkronizálva vannak a mobiltelefonodon megtalálható Radarlal, miután összekapcsolásra kerültek.";
 
 /* Bullet point about privacy on the linked devices education sheet */
 "LINKED_DEVICES_EDUCATION_POINT_PRIVACY" = "A kapcsolt eszközökön minden üzenet privát";
@@ -5556,7 +5559,7 @@
 "LINKING_DEVICE_FAILED_TITLE" = "Eszköz nem kapcsolható össze";
 
 /* Shown when trying to link a device to an account but that device is out of date and must first update its version of Signal. */
-"LINKING_DEVICE_OUT_OF_DATE" = "A másik eszközödön a Signal egy régebbi verziója fut. Összekapcsolás előtt frissítened kell a Signal-alkalmazást az adott eszközön.";
+"LINKING_DEVICE_OUT_OF_DATE" = "A másik eszközödön a Radar egy régebbi verziója fut. Összekapcsolás előtt frissítened kell a Radar-alkalmazást az adott eszközön.";
 
 /* Progress label when the message loading has nearly completed during the device linking process */
 "LINKING_SYNCING_FINALIZING" = "Üzenetátvitel befejezése…";
@@ -5580,7 +5583,7 @@
 "LOCAL_BACKUP_SETTINGS_CREATE_NEW_KEY_WARNING_SHEET_BODY" = "Új kulcs létrehozására csak akkor van szükség, ha valaki más is ismeri a kulcsodat. Új kulcs létrehozásához először le kell tiltani az eszközön tárolt biztonsági mentéseket.\n\nAz eszközön tárolt biztonsági mentések letiltása és új kulcs létrehozása után újra engedélyezned kell az eszközön tárolt biztonsági mentéseket.";
 
 /* Body for an error sheet shown when the user's folder choice does not contain a backup file. */
-"LOCAL_BACKUPS_MISSING_BACKUP_ACTION_SHEET_BODY" = "A kiválasztott mappában nem található Signal biztonsági mentés. Kérjük, próbálkozz egy másik mappával.";
+"LOCAL_BACKUPS_MISSING_BACKUP_ACTION_SHEET_BODY" = "A kiválasztott mappában nem található Radar biztonsági mentés. Kérjük, próbálkozz egy másik mappával.";
 
 /* Title for an error sheet shown when the user's folder choice does not contain a backup file. */
 "LOCAL_BACKUPS_MISSING_BACKUP_ACTION_SHEET_TITLE" = "Nem található biztonsági mentés";
@@ -5628,7 +5631,7 @@
 "LOCAL_FILE_BACKUP_ONBOARDING_INTRO_BULLET_3" = "Bármikor kikapcsolhatod a biztonsági mentéseket";
 
 /* Subtitle for a view introducing local file backups during the onboarding flow. */
-"LOCAL_FILE_BACKUP_ONBOARDING_INTRO_SUBTITLE" = "Készíts biztonsági másolatot az üzeneteidről egy mappába az eszközödön. A biztonsági mentésed végponttól végpontig titkosított, és visszaállítható a Signal új példányának telepítésével és a „Visszaállítás vagy átvitel” opció kiválasztásával.";
+"LOCAL_FILE_BACKUP_ONBOARDING_INTRO_SUBTITLE" = "Készíts biztonsági másolatot az üzeneteidről egy mappába az eszközödön. A biztonsági mentésed végponttól végpontig titkosított, és visszaállítható a Radar új példányának telepítésével és a „Visszaállítás vagy átvitel” opció kiválasztásával.";
 
 /* Title for a view introducing local file backups during the onboarding flow. */
 "LOCAL_FILE_BACKUP_ONBOARDING_INTRO_TITLE" = "Biztonsági mentések az eszközön";
@@ -5643,10 +5646,10 @@
 "LOCAL_FILE_BACKUPS_CHOOSE_FOLDER_TITLE" = "Válassz egy mappát";
 
 /* Warning shown when a user tries to enable local file backups with optimize media enabled */
-"LOCAL_FILE_BACKUPS_OPTIMIZE_MEDIA_WARNING_ACTION_SHEET" = "Be van kapcsolva a „Signal tárhely-optimalizálás” beállítás. Ha az összes médiafájlt bele szeretnéd foglalni az eszközön lévő biztonsági mentésbe, kapcsold ki a beállítást.";
+"LOCAL_FILE_BACKUPS_OPTIMIZE_MEDIA_WARNING_ACTION_SHEET" = "Be van kapcsolva a „Radar tárhely-optimalizálás” beállítás. Ha az összes médiafájlt bele szeretnéd foglalni az eszközön lévő biztonsági mentésbe, kapcsold ki a beállítást.";
 
 /* Message for a sheet warning the user about enabling Optimize Storage with local backups enabled. */
-"LOCAL_FILE_BACKUPS_OPTIMIZE_MEDIA_WARNING_ACTION_SHEET_2_BODY" = "A „Signal tárhely-optimalizálás” funkció bekapcsolásával a régi médiafájlok áthelyezésre kerülnek az eszközödről. Bármikor újra letöltheted. A régi médiafájlokat is eltávolítod az eszközön lévő biztonsági mentésből.";
+"LOCAL_FILE_BACKUPS_OPTIMIZE_MEDIA_WARNING_ACTION_SHEET_2_BODY" = "A „Radar tárhely-optimalizálás” funkció bekapcsolásával a régi médiafájlok áthelyezésre kerülnek az eszközödről. Bármikor újra letöltheted. A régi médiafájlokat is eltávolítod az eszközön lévő biztonsági mentésből.";
 
 /* Title for a sheet warning the user about enabling Optimize Storage with local backups enabled. */
 "LOCAL_FILE_BACKUPS_OPTIMIZE_MEDIA_WARNING_ACTION_SHEET_2_TITLE" = "A médiafájlok eltávolításra kerülnek az eszközön lévő biztonsági mentésből.";
@@ -5676,10 +5679,10 @@
 "LONG_TEXT_VIEW_TITLE" = "Üzenet";
 
 /* Message for a sheet warning the user that their device is low on storage space. Embeds 1:{{ the localized name of the user's device model, e.g. iPhone }}; 2:{{ an amount of storage space as a file size, e.g. 1 GB }}. */
-"LOW_DISK_SPACE_WARNING_SHEET_MESSAGE_FORMAT" = "Kevés a tárhely a(z) %1$@ eszközödön. Ha megtelik, a Signal nem fog működni, és adatvesztés történhet. Szabadíts fel legalább %2$@ tárhelyet.";
+"LOW_DISK_SPACE_WARNING_SHEET_MESSAGE_FORMAT" = "Kevés a tárhely a(z) %1$@ eszközödön. Ha megtelik, a Radar nem fog működni, és adatvesztés történhet. Szabadíts fel legalább %2$@ tárhelyet.";
 
 /* A suggestion for freeing up storage space, on a sheet warning the user that their device is low on storage space. */
-"LOW_DISK_SPACE_WARNING_SHEET_SUGGESTION_DELETE_CAMERA_ROLL_MEDIA" = "Töröld a nagy méretű videókat a Fotók alkalmazásból, a Signalból vagy más üzenetküldő alkalmazásokból";
+"LOW_DISK_SPACE_WARNING_SHEET_SUGGESTION_DELETE_CAMERA_ROLL_MEDIA" = "Töröld a nagy méretű videókat a Fotók alkalmazásból, a Radarból vagy más üzenetküldő alkalmazásokból";
 
 /* A suggestion for freeing up storage space, on a sheet warning the user that their device is low on storage space. */
 "LOW_DISK_SPACE_WARNING_SHEET_SUGGESTION_DELETE_DOWNLOADED_MEDIA" = "Töröld a letöltött zenéket vagy más médiafájlokat";
@@ -5844,7 +5847,7 @@
 "MEMBER_LABEL_VIEW_TITLE" = "Tagsági címke";
 
 /* A one-time confirmation that you, as an admin, want to delete for everyone */
-"MESSAGE_ACTION_ADMIN_DELETE_FOR_EVERYONE_CONFIRMATION" = "A Signal legújabb verzióit használó csoporttagok látni fogják, hogy törölted ezeket az üzeneteket.";
+"MESSAGE_ACTION_ADMIN_DELETE_FOR_EVERYONE_CONFIRMATION" = "A Radar legújabb verzióit használó csoporttagok látni fogják, hogy törölted ezeket az üzeneteket.";
 
 /* Action sheet button title */
 "MESSAGE_ACTION_COPY_TEXT" = "Szöveg másolása";
@@ -6045,7 +6048,7 @@
 "MESSAGE_REQUEST_CONFIRM_ACCEPT_MESSAGE" = "Csak olyan emberektől fogadj el kéréseket, akikben megbízol. %1$@ küld üzenetet a regisztrációs kódoddal, a PIN-kódoddal vagy a helyreállítási kulcsoddal kapcsolatban.";
 
 /* Embedded text in the message for an action sheet asking the user to confirm if they want to accept a message request. */
-"MESSAGE_REQUEST_CONFIRM_ACCEPT_MESSAGE_EMBEDDED_BOLD_TEXT" = "A Signal soha nem";
+"MESSAGE_REQUEST_CONFIRM_ACCEPT_MESSAGE_EMBEDDED_BOLD_TEXT" = "A Radar soha nem";
 
 /* Title for an action sheet asking the user to confirm if they want to accept a message request */
 "MESSAGE_REQUEST_CONFIRM_ACCEPT_TITLE" = "Elfogadod a felkérést?";
@@ -6225,7 +6228,7 @@
 "MISSED_CALL_BLOCKED_SYSTEM_CONTACT" = "Nem fogadott hívás a telefon beállításaiban letiltott névjegytől";
 
 /* Action to block contact in Signal for sheet shown when the user taps a missed call from a contact blocked in iOS settings. */
-"MISSED_CALL_BLOCKED_SYSTEM_SETTINGS_SHEET_BLOCK_ACTION" = "A Signalban is tiltsd le a névjegyet";
+"MISSED_CALL_BLOCKED_SYSTEM_SETTINGS_SHEET_BLOCK_ACTION" = "A Radarban is tiltsd le a névjegyet";
 
 /* Message for sheet shown when the user taps a missed call from a contact blocked in iOS settings. */
 "MISSED_CALL_BLOCKED_SYSTEM_SETTINGS_SHEET_MESSAGE" = "Nem fogadtad a hívását, mert a telefon beállításaiban le van tiltva. Lépj a Beállítások > Telefon menüpontra, és koppints a Letiltott névjegyek elemre a névjegy kezeléséhez.";
@@ -6252,7 +6255,7 @@
 "MISSING_LOCATION_PERMISSION_MESSAGE" = "Engedélyezheted az iOS Beállításokban.";
 
 /* Alert title indicating the user has denied location permissions */
-"MISSING_LOCATION_PERMISSION_TITLE" = "Ehhez a művelethez a Signalnak helymeghatározási hozzáférés kell.";
+"MISSING_LOCATION_PERMISSION_TITLE" = "Ehhez a művelethez a Radarnak helymeghatározási hozzáférés kell.";
 
 /* Alert body when user has previously denied media library access */
 "MISSING_MEDIA_LIBRARY_PERMISSION_MESSAGE" = "Engedélyezheted az iOS Beállításokban.";
@@ -6492,13 +6495,13 @@
 "NO_OTHER_GROUPS_IN_COMMON" = "Nincs egyéb közös csoportotok.";
 
 /* Shown in place of the text input box in a conversation when the user is no longer registered can't send messages. The embedded value is 'Re-link' (translated via NOT_LINKED_BOTTOM_RELINK), and it will be formatted as a tappable link. */
-"NOT_LINKED_BOTTOM" = "Az eszköz társítása megszűnt. %1$@ a Signal használatának folytatásához ezen az eszközön.";
+"NOT_LINKED_BOTTOM" = "Az eszköz társítása megszűnt. %1$@ a Radar használatának folytatásához ezen az eszközön.";
 
 /* Shown in place of the text input box in a conversation when the user is no longer registered can't send messages. This value is a tappable link embedded in a larger sentence. */
 "NOT_LINKED_BOTTOM_RELINK" = "Újratársítás";
 
 /* Shown in place of the text input box in a conversation when the user is no longer registered can't send messages. The embedded value is 'Re-register' (translated via NOT_REGISTERED_BOTTOM_REREGISTER), and it will be formatted as a tappable link. */
-"NOT_REGISTERED_BOTTOM" = "Ez az eszköz már nincs regisztrálva. %1$@ a Signal használatának folytatásához.";
+"NOT_REGISTERED_BOTTOM" = "Ez az eszköz már nincs regisztrálva. %1$@ a Radar használatának folytatásához.";
 
 /* Shown in place of the text input box in a conversation when the user is no longer registered can't send messages. This value is a tappable link embedded in a larger sentence. */
 "NOT_REGISTERED_BOTTOM_REREGISTER" = "Újraregisztrálás";
@@ -6510,13 +6513,13 @@
 "NOTE_TO_SELF" = "Privát feljegyzés";
 
 /* Body for a notification shown when Signal can't fetch messages because the device's date and time are incorrect. */
-"NOTIFICATION_BODY_CLOCK_SKEW" = "A Signal nem tud üzeneteket fogadni, ha az eszközödön megadott dátum és idő helytelen. A javításhoz nyisd meg a Beállításokat.";
+"NOTIFICATION_BODY_CLOCK_SKEW" = "A Radar nem tud üzeneteket fogadni, ha az eszközödön megadott dátum és idő helytelen. A javításhoz nyisd meg a Beállításokat.";
 
 /* Body for a notification representing a message request. */
 "NOTIFICATION_BODY_INCOMING_MESSAGE_REQUEST" = "Üzenet felkérés";
 
 /* Body for a notification shown when Signal can't fetch messages because the device is low on storage space. */
-"NOTIFICATION_BODY_LOW_STORAGE_SPACE" = "Lehet, hogy új üzeneteid érkeztek, de az eszközödön nincs elég tárhely a Signal futtatásához. További információért koppints!";
+"NOTIFICATION_BODY_LOW_STORAGE_SPACE" = "Lehet, hogy új üzeneteid érkeztek, de az eszközödön nincs elég tárhely a Radar futtatásához. További információért koppints!";
 
 /* Lock screen notification text presented after user powers on their device without unlocking. Embeds {{device model}} (either 'iPad' or 'iPhone') */
 "NOTIFICATION_BODY_PHONE_LOCKED_FORMAT" = "Lehetséges, hogy volt bejövő üzeneted, amíg az %1$@ újraindult.";
@@ -6615,10 +6618,10 @@
 "ONBOARDING_CHOOSE_BACKUP_SHEET_TITLE" = "A visszaállításhoz válassz egy biztonsági mentést";
 
 /* The body for the device transfer 'choice' view 'restore backup' option */
-"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_BODY" = "Fiók és üzenetek visszaállítása a Radar/Radar Biztonsági mentésből";
+"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_BODY" = "Fiók és üzenetek visszaállítása a Signal/Radar Biztonsági mentésből";
 
 /* The title for the device transfer 'choice' view 'restore backup' option */
-"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_TITLE" = "A Radar/Radar biztonsági mentésének visszaállítása";
+"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_TITLE" = "A Signal/Radar biztonsági mentésének visszaállítása";
 
 /* Body for a sheet warning users about skipping restore. */
 "ONBOARDING_CHOOSE_RESTORE_METHOD_CONFIRM_SKIP_RESTORE_BODY" = "Ha most kihagyod a visszaállítást, később nem fogod tudni visszaállítani. Ha újra engedélyezed a biztonsági mentéseket ezen az eszközön, a jelenlegi biztonsági mentést az új üzenetküldési előzmények felülírják.";
@@ -6696,7 +6699,7 @@
 "ONBOARDING_MODE_SWITCH_EXPLANATION_PROVISIONING" = "Az „iPad regisztrálása” menüponttal egy új Radar-fiókot hozhatsz létre, vagy mozgathatsz át egy meglevőt erre az eszközre. Ez a művelet a többi meglevő eszközödön letiltja ezzel a telefonszámmal korábban regisztrált Radar fiókjaidat.";
 
 /* explanation to the user they're switching from registering to linking flow */
-"ONBOARDING_MODE_SWITCH_EXPLANATION_REGISTERING" = "Az „Eszköz összekapcsolása” lehetőségre koppintva csatlakoztathatod ezt az eszközt egy meglévő Signal-fiókhoz.";
+"ONBOARDING_MODE_SWITCH_EXPLANATION_REGISTERING" = "Az „Eszköz összekapcsolása” lehetőségre koppintva csatlakoztathatod ezt az eszközt egy meglévő Radar-fiókhoz.";
 
 /* header text indicating to the user they're switching from linking to registering flow */
 "ONBOARDING_MODE_SWITCH_TITLE_PROVISIONING" = "iPad regisztrálása";
@@ -6705,7 +6708,7 @@
 "ONBOARDING_MODE_SWITCH_TITLE_REGISTERING" = "Eszköz összekapcsolása";
 
 /* warning to the user that registering an ipad is not recommended */
-"ONBOARDING_MODE_SWITCH_WARNING_PROVISIONING" = "Ezen iPad regisztrálása letiltja a Signalt az ezzel a telefonszámmal regisztrált egyéb eszközökön.";
+"ONBOARDING_MODE_SWITCH_WARNING_PROVISIONING" = "Ezen iPad regisztrálása letiltja a Radart az ezzel a telefonszámmal regisztrált egyéb eszközökön.";
 
 /* Description of the 'Contacts' permission in the 'onboarding permissions' view. */
 "ONBOARDING_PERMISSIONS_CONTACTS_DESCRIPTION" = "Találj olyan személyeket, akiket ismersz. A névjegyeid titkosítva vannak, és nem láthatók a Radar számára.";
@@ -6732,7 +6735,7 @@
 "ONBOARDING_PERMISSIONS_TITLE" = "Jogosultságok engedélyezése";
 
 /* Explanation of the 'onboarding phone number discoverability' view. Embeds {user phone number} */
-"ONBOARDING_PHONE_NUMBER_DISCOVERABILITY_EXPLANATION_FORMAT" = "Válassz, hogy a(z) %1$@ telefonszámod alapján ki találhat meg Signalon";
+"ONBOARDING_PHONE_NUMBER_DISCOVERABILITY_EXPLANATION_FORMAT" = "Válassz, hogy a(z) %1$@ telefonszámod alapján ki találhat meg Radaron";
 
 /* Title of the 'onboarding phone number discoverability' view. */
 "ONBOARDING_PHONE_NUMBER_DISCOVERABILITY_TITLE" = "Ki találhat meg telefonszámod alapján?";
@@ -6783,13 +6786,13 @@
 "ONBOARDING_SIGN_UP_USE_SIGNAL_ACCOUNT_BUTTON_TITLE" = "Use my Signal account";
 
 /* Explanation of 'do not have old device' flow for the 'Restore or Transfer' prompt */
-"ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_BODY" = "Vagy telepítsd újra a Radar/Signalt ugyanarra az eszközre";
+"ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_BODY" = "Vagy telepítsd újra a Signal/Radart ugyanarra az eszközre";
 
 /* Title for the 'do not have my old device' choice of the 'Restore or Transfer' prompt */
 "ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_TITLE" = "Nincs nálam a régi telefonom";
 
 /* Explanation of 'have old device' flow for the 'Restore or Transfer' prompt */
-"ONBOARDING_SPLASH_HAVE_OLD_DEVICE_BODY" = "A gyors kezdéshez olvasd be a QR-kódot jelenlegi Radar/Radar-fiókodból";
+"ONBOARDING_SPLASH_HAVE_OLD_DEVICE_BODY" = "A gyors kezdéshez olvasd be a QR-kódot jelenlegi Signal/Radar-fiókodból";
 
 /* Title for the 'have my old device' choice of the 'Restore or Transfer' prompt */
 "ONBOARDING_SPLASH_HAVE_OLD_DEVICE_TITLE" = "Nálam van a régi telefonom";
@@ -6919,7 +6922,7 @@ Send money securely.";
 "OUTDATED_PAYMENT_CLIENT_ACTION_TITLE" = "Frissítés most";
 
 /* Label warning the user that they should update Signal to continue using payments. */
-"OUTDATED_PAYMENT_CLIENT_REMINDER_TEXT" = "A fizetések további használatához frissítsd a Signalt. Előfordulhat, hogy az egyenleged nem naprakész.";
+"OUTDATED_PAYMENT_CLIENT_REMINDER_TEXT" = "A fizetések további használatához frissítsd a Radart. Előfordulhat, hogy az egyenleged nem naprakész.";
 
 /* Body of prompt notifying restore was cancelled. */
 "OUTGOING_DEVICE_REGISTRATION_CANCELLED_RESTORE_BODY" = "Visszaállítás megszakítva. Próbáld újra!";
@@ -7012,7 +7015,7 @@ Send money securely.";
 "OUTGOING_MISSED_VOICE_CALL" = "Nem fogadott hanghívás";
 
 /* Button for action sheet shown when device transfer completes; quits the Signal app immediately (does not automatically relaunch, but the user may choose to relaunch). */
-"OUTGOING_TRANSFER_COMPLETE_EXIT_ACTION" = "Kilépés a Signalból";
+"OUTGOING_TRANSFER_COMPLETE_EXIT_ACTION" = "Kilépés a Radarból";
 
 /* Message for action sheet shown when device transfer completes */
 "OUTGOING_TRANSFER_COMPLETE_MESSAGE" = "A Radar most kilép ezen az eszközön";
@@ -7033,7 +7036,7 @@ Send money securely.";
 "OVERSIZE_TEXT_UNAVAILABLE_SHEET_TITLE" = "A teljes üzenet nem érhető el";
 
 /* The name of the Signal app, used as the title for an entry in a user's password manager for their Signal Recovery Key. Should be localized with the same value as the app's name in the iOS App Store. */
-"PASSWORD_MANAGER_SIGNAL_APP_NAME" = "Signal Privát üzenetküldő";
+"PASSWORD_MANAGER_SIGNAL_APP_NAME" = "Radar Privát üzenetküldő";
 
 /* Header title for bank payment details screen */
 "PAYMENT_DETAILS_BANK_TITLE" = "Banki átutalás";
@@ -7200,7 +7203,7 @@ Send money securely.";
 "PAYMENTS_NEW_PAYMENT_ERROR_INVALID_TRANSACTION" = "Érvénytelen tranzakció";
 
 /* Indicates that a payment failed due to an outdated client. */
-"PAYMENTS_NEW_PAYMENT_ERROR_OUTDATED_CLIENT" = "Frissítsd a Signalt a fizetések használatához!";
+"PAYMENTS_NEW_PAYMENT_ERROR_OUTDATED_CLIENT" = "Frissítsd a Radart a fizetések használatához!";
 
 /* Indicates that an outgoing payment could not be verified in a timely way. */
 "PAYMENTS_NEW_PAYMENT_ERROR_OUTGOING_VERIFICATION_TAKING_TOO_LONG" = "A fizetés még nem került ellenőrzésre";
@@ -7462,13 +7465,13 @@ Send money securely.";
 "PHONE_NUMBER_DISCOVERABILITY_EVERYBODY" = "Mindenki";
 
 /* A user friendly description of the 'everybody' phone number discoverability mode. */
-"PHONE_NUMBER_DISCOVERABILITY_EVERYBODY_DESCRIPTION" = "Bárki, aki tudja a telefonszámodat, látni fogja, hogy használod a Signalt, és csevegést kezdeményezhet veled.";
+"PHONE_NUMBER_DISCOVERABILITY_EVERYBODY_DESCRIPTION" = "Bárki, aki tudja a telefonszámodat, látni fogja, hogy használod a Radart, és csevegést kezdeményezhet veled.";
 
 /* A user friendly name for the 'nobody' phone number discoverability mode. */
 "PHONE_NUMBER_DISCOVERABILITY_NOBODY" = "Senki";
 
 /* A user friendly description of the 'nobody' phone number discoverability mode. */
-"PHONE_NUMBER_DISCOVERABILITY_NOBODY_DESCRIPTION" = "Senki sem láthatja, hogy használod a Signalt, hacsak nem küldesz valakinek üzenetet, vagy nem folytatsz csevegést valakivel.";
+"PHONE_NUMBER_DISCOVERABILITY_NOBODY_DESCRIPTION" = "Senki sem láthatja, hogy használod a Radart, hacsak nem küldesz valakinek üzenetet, vagy nem folytatsz csevegést valakivel.";
 
 /* A format for a label showing an example phone number. Embeds {{the example phone number}}. */
 "PHONE_NUMBER_EXAMPLE_FORMAT" = "Például: %1$@";
@@ -7606,7 +7609,7 @@ Send money securely.";
 "PIN_CREATION_WEAK_ERROR" = "Válassz egy erősebb PIN kódot";
 
 /* If your attempted PIN is too weak, you'll see an error message. This is the text on the error dialog. */
-"PIN_CREATION_WEAK_ERROR_MESSAGE" = "A PIN-kód titkosítja a Signalban tárolt adataidat, így csak te férhetsz hozzá. Válassz erősebb PIN-kódot a fiókod védelme érdekében.";
+"PIN_CREATION_WEAK_ERROR_MESSAGE" = "A PIN-kód titkosítja a Radarban tárolt adataidat, így csak te férhetsz hozzá. Válassz erősebb PIN-kódot a fiókod védelme érdekében.";
 
 /* If the user is re-registering, they need to enter their PIN to restore all their data. In some cases, they can skip this entry and lose some data. This text is shown on a button that lets them begin to do this. */
 "PIN_ENTER_EXISTING_SKIP" = "PIN-kód kihagyása";
@@ -7924,10 +7927,10 @@ Send money securely.";
 "PROFILE_NAME_CHANGE_SYSTEM_NONCONTACT_FORMAT" = "%1$@ megváltoztatta a profilnevét %2$@ névre.";
 
 /* First bullet point for the explainer sheet for profile names */
-"PROFILE_NAME_EDUCATION_SHEET_BULLET_1" = "A Signal nem tudja ellenőrizni a neveket és a fotókat";
+"PROFILE_NAME_EDUCATION_SHEET_BULLET_1" = "A Radar nem tudja ellenőrizni a neveket és a fotókat";
 
 /* Second bullet point for the explainer sheet for profile names */
-"PROFILE_NAME_EDUCATION_SHEET_BULLET_2" = "A Signal soha nem veszi fel veled a kapcsolatot a regisztrációs kódoddal, a PIN-kódoddal vagy a helyreállítási kulcsoddal kapcsolatban";
+"PROFILE_NAME_EDUCATION_SHEET_BULLET_2" = "A Radar soha nem veszi fel veled a kapcsolatot a regisztrációs kódoddal, a PIN-kódoddal vagy a helyreállítási kulcsoddal kapcsolatban";
 
 /* Third bullet point for the explainer sheet for profile names */
 "PROFILE_NAME_EDUCATION_SHEET_BULLET_3" = "Legyél óvatos azokkal a fiókokkal, amelyek másoknak adják ki magukat";
@@ -7936,7 +7939,7 @@ Send money securely.";
 "PROFILE_NAME_EDUCATION_SHEET_BULLET_4" = "Ne oszd meg a személyes adataidat olyanokkal, akiket nem ismersz";
 
 /* Header for the explainer sheet for profile names */
-"PROFILE_NAME_EDUCATION_SHEET_HEADER_FORMAT" = "A <bold>profilneveket</bold> a Signalon a fióktulajdonos választja ki.";
+"PROFILE_NAME_EDUCATION_SHEET_HEADER_FORMAT" = "A <bold>profilneveket</bold> a Radaron a fióktulajdonos választja ki.";
 
 /* Title for the profile name view. */
 "PROFILE_NAME_VIEW_TITLE" = "Neved";
@@ -8035,7 +8038,7 @@ Send money securely.";
 "QUICK_RESTORE_URL_OPENED_ACTION_SHEET_EXTERNAL_URL_ACTION_TITLE" = "QR-kód beolvasása";
 
 /* Message for an action sheet telling users how to use quick restore, when trying to open an external quick restore URL. */
-"QUICK_RESTORE_URL_OPENED_ACTION_SHEET_EXTERNAL_URL_MESSAGE" = "A fiók új eszközre való átviteléhez koppints a „Folytatás” gombra, és olvasd be a QR-kódot a Signal kamerával. Ügyelj rá, hogy csak közvetlenül a Signaltól származó QR-kódokat olvass be.";
+"QUICK_RESTORE_URL_OPENED_ACTION_SHEET_EXTERNAL_URL_MESSAGE" = "A fiók új eszközre való átviteléhez koppints a „Folytatás” gombra, és olvasd be a QR-kódot a Radar kamerával. Ügyelj rá, hogy csak közvetlenül a Radartól származó QR-kódokat olvass be.";
 
 /* Accessibility label stating the author of the message to which you are replying. Embeds: {{ the author of the message to which you are replying }} {{ original message }}. */
 "QUOTED_REPLY_ACCESSIBILITY_LABEL_FORMAT" = "Válasz %1$@ számára. %2$@";
@@ -8170,7 +8173,7 @@ Send money securely.";
 "RECIPIENT_PICKER_INVITE_MESSAGE" = "%1$@ nem Radar-felhasználó. Szeretnéd meghívni ezt a számot?";
 
 /* Alert title. Shown after selecting a phone number that isn't a Signal user. */
-"RECIPIENT_PICKER_INVITE_TITLE" = "Meghívás a Signalba";
+"RECIPIENT_PICKER_INVITE_TITLE" = "Meghívás a Radarba";
 
 /* Description of how and why Signal iOS uses Touch ID/Face ID/Phone Passcode during a periodic reminder to record your recovery key. */
 "RECOVERY_KEY_REMINDER_AUTHENTICATION_REASON" = "A helyreállítási kulcs megtekintéséhez hitelesítés szükséges";
@@ -8212,7 +8215,7 @@ Send money securely.";
 "REGISTRATION_BACKUP_REGISTRATION_ERROR_INCORRECT_KEY_TRY_PIN_ACTION" = "Regisztráció más módszerrel";
 
 /* Message body for a sheet asking users if they would rather use PIN/SMS for registration. */
-"REGISTRATION_BACKUP_REGISTRATION_ERROR_INCORRECT_KEY_TRY_PIN_MESSAGE" = "A fiókodat regisztrálhatod a Signal által küldött SMS-kóddal, vagy a PIN-kódod megadásával. A regisztráció után megpróbálhatod újra visszaállítani a biztonsági mentést a helyreállítási kulccsal.";
+"REGISTRATION_BACKUP_REGISTRATION_ERROR_INCORRECT_KEY_TRY_PIN_MESSAGE" = "A fiókodat regisztrálhatod a Radar által küldött SMS-kóddal, vagy a PIN-kódod megadásával. A regisztráció után megpróbálhatod újra visszaállítani a biztonsági mentést a helyreállítási kulccsal.";
 
 /* Title for a sheet asking users if they would rather use PIN/SMS for registration. */
 "REGISTRATION_BACKUP_REGISTRATION_ERROR_INCORRECT_KEY_TRY_PIN_TITLE" = "Hitelesítés SMS- vagy PIN-kóddal?";
@@ -8269,7 +8272,7 @@ Send money securely.";
 "REGISTRATION_BACKUP_RESTORE_ERROR_LOCAL_BACKUP_LOCATION_TITLE" = "Nem lehet visszaállítani a biztonsági másolatot";
 
 /* Message for a sheet telling the user that their phone number is mismatched with their recovery key used for making a local backup */
-"REGISTRATION_BACKUP_RESTORE_ERROR_MISMATCHED_LOCAL_BACKUP_MESSAGE" = "A visszaállítani kívánt biztonsági mentés egy másik Signal-fiókkal készült. A biztonsági mentés visszaállításához ugyanazt a telefonszámot és helyreállítási kulcsot kell használnod, amelyet az eszközön tárolt biztonsági mentések engedélyezésekor mentettél el.";
+"REGISTRATION_BACKUP_RESTORE_ERROR_MISMATCHED_LOCAL_BACKUP_MESSAGE" = "A visszaállítani kívánt biztonsági mentés egy másik Radar-fiókkal készült. A biztonsági mentés visszaállításához ugyanazt a telefonszámot és helyreállítási kulcsot kell használnod, amelyet az eszközön tárolt biztonsági mentések engedélyezésekor mentettél el.";
 
 /* Body for a sheet warning users about a network error during backup restore. */
 "REGISTRATION_BACKUP_RESTORE_ERROR_NETWORK_BODY" = "A biztonsági másolatot jelenleg nem lehet visszaállítani. Ellenőrizd az internetkapcsolatodat, és próbáld újra.";
@@ -8425,7 +8428,7 @@ Send money securely.";
 "REGISTRATION_RESTORE_METHOD_MAKE_BACKUP_TUTORIAL_ENABLE_BACKUPS" = "Engedélyezd a biztonsági mentéseket, és várd meg, amíg a biztonsági mentés befejeződik";
 
 /* First step in directions for how to make a backup */
-"REGISTRATION_RESTORE_METHOD_MAKE_BACKUP_TUTORIAL_OPEN_SIGNAL" = "Nyisd meg a Signalt a régi eszközödön";
+"REGISTRATION_RESTORE_METHOD_MAKE_BACKUP_TUTORIAL_OPEN_SIGNAL" = "Nyisd meg a Radart a régi eszközödön";
 
 /* Second step in directions for how to make a backup */
 "REGISTRATION_RESTORE_METHOD_MAKE_BACKUP_TUTORIAL_TAP_SETTINGS" = "Koppints a Beállítások > Biztonsági mentések lehetőségre";
@@ -8443,7 +8446,7 @@ Send money securely.";
 "REGISTRATION_SCAN_QR_CODE_TITLE" = "Olvasd be ezt a kódot a régi eszközöddel";
 
 /* Tutorial text describing the first step to scanning the restore/transfer QR code with your old phone: opening Signal */
-"REGISTRATION_SCAN_QR_CODE_TUTORIAL_OPEN_SIGNAL" = "Nyisd meg a Signalt a régi eszközödön";
+"REGISTRATION_SCAN_QR_CODE_TUTORIAL_OPEN_SIGNAL" = "Nyisd meg a Radart a régi eszközödön";
 
 /* Tutorial text describing the third step to scanning the restore/transfer QR code with your old phone: scan the code */
 "REGISTRATION_SCAN_QR_CODE_TUTORIAL_SCAN" = "Olvasd be ezt a kódot a kamerával";
@@ -8761,7 +8764,7 @@ Send money securely.";
 "RING_ON_CONFIRMATION_TOAST_LABEL" = "Csengés be";
 
 /* Message shown in an action sheet when attempting to disable PIN, but Backups is enabled. */
-"ROTATE_AEP_ACTION_BACKUPS_DISABLE_REQUIRED" = "A folytatás előtt le kell tiltanod a Signal biztonsági mentés funkciót.";
+"ROTATE_AEP_ACTION_BACKUPS_DISABLE_REQUIRED" = "A folytatás előtt le kell tiltanod a Radar biztonsági mentés funkciót.";
 
 /* button title to confirm adding a recipient when their safety number has recently changed */
 "SAFETY_NUMBER_CHANGED_CONFIRM_ADD_MEMBER_ACTION" = "Így is hozzáadom";
@@ -8773,7 +8776,7 @@ Send money securely.";
 "SAFETY_NUMBER_CHANGED_CONFIRM_SEND_ACTION" = "Küldés ennek ellenére";
 
 /* Message for the 'safety number confirmation' view */
-"SAFETY_NUMBER_CONFIRMATION_MESSAGE" = "A következő személyek lehet, hogy újratelepítették a Signalt vagy készüléket cseréltek. Ellenőrizd biztonsági számotokat a privacy biztosítása érdekében!";
+"SAFETY_NUMBER_CONFIRMATION_MESSAGE" = "A következő személyek lehet, hogy újratelepítették a Radart vagy készüléket cseréltek. Ellenőrizd biztonsági számotokat a privacy biztosítása érdekében!";
 
 /* Text explaining that the given contact previously had their safety number verified. */
 "SAFETY_NUMBER_CONFIRMATION_PREVIOUSLY_VERIFIED" = "Már Ellenőrzött";
@@ -8803,13 +8806,13 @@ Send money securely.";
 "SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_BUTTON_VERIFYING" = "Titkosítás ellenőrzése…";
 
 /* Body for a sheet introducing Key Transparency. */
-"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_EDUCATION_SHEET_BODY" = "Azoknál a személyeknél, akikhez telefonszámon keresztül kapcsolódsz, a Signal egy kulcsátláthatóságnak nevezett folyamat segítségével automatikusan megerősítheti, hogy a kapcsolat biztonságos-e. A fokozott biztonság érdekében továbbra is ellenőrizheted manuálisan a névjegyeket egy QR-kóddal vagy a biztonsági számok összehasonlításával.";
+"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_EDUCATION_SHEET_BODY" = "Azoknál a személyeknél, akikhez telefonszámon keresztül kapcsolódsz, a Radar egy kulcsátláthatóságnak nevezett folyamat segítségével automatikusan megerősítheti, hogy a kapcsolat biztonságos-e. A fokozott biztonság érdekében továbbra is ellenőrizheted manuálisan a névjegyeket egy QR-kóddal vagy a biztonsági számok összehasonlításával.";
 
 /* Title for a sheet introducing Key Transparency. */
-"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_EDUCATION_SHEET_TITLE" = "A Signal mostantól automatikusan ellenőrizheti a titkosítást.";
+"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_EDUCATION_SHEET_TITLE" = "A Radar mostantól automatikusan ellenőrizheti a titkosítást.";
 
 /* Body for a sheet explaining that encryption auto-verification did not succeed. Embeds {{ 1: the contact's name }}. */
-"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_FAILURE_SHEET_BODY_FORMAT" = "A Signal nem tudja automatikusan ellenőrizni a titkosítást ennél a csevegésnél. Ennek az lehet az oka, hogy %1$@ megváltoztatta a telefonszámát vagy a telefonszám adatvédelmi beállításait. Ellenőrizd manuálisan a végpontok közötti titkosítást az előző képernyőn látható számok összehasonlításával vagy az eszközön található kód beolvasásával.";
+"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_FAILURE_SHEET_BODY_FORMAT" = "A Radar nem tudja automatikusan ellenőrizni a titkosítást ennél a csevegésnél. Ennek az lehet az oka, hogy %1$@ megváltoztatta a telefonszámát vagy a telefonszám adatvédelmi beállításait. Ellenőrizd manuálisan a végpontok közötti titkosítást az előző képernyőn látható számok összehasonlításával vagy az eszközön található kód beolvasásával.";
 
 /* Title for a sheet explaining that encryption auto-verification did not succeed. */
 "SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_FAILURE_SHEET_TITLE" = "Az automatikus ellenőrzés már nem érhető el ehhez a csevegéshez";
@@ -8821,13 +8824,13 @@ Send money securely.";
 "SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_HEADER" = "Automatikus kulcsellenőrzés";
 
 /* Body for a sheet explaining that encryption auto-verification is not available. */
-"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_NOT_AVAILABLE_SHEET_BODY" = "A Signal csak azokban a csevegésekben tudja automatikusan ellenőrizni a titkosítást, ahol telefonszámon keresztül vagy kapcsolatban valakivel. Ha a csevegést közös felhasználónévvel vagy csoporttal indították, ellenőrizd a végpontok közötti titkosítást az előző képernyőn látható számok összehasonlításával vagy az eszközön található kód beolvasásával.";
+"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_NOT_AVAILABLE_SHEET_BODY" = "A Radar csak azokban a csevegésekben tudja automatikusan ellenőrizni a titkosítást, ahol telefonszámon keresztül vagy kapcsolatban valakivel. Ha a csevegést közös felhasználónévvel vagy csoporttal indították, ellenőrizd a végpontok közötti titkosítást az előző képernyőn látható számok összehasonlításával vagy az eszközön található kód beolvasásával.";
 
 /* Title for a sheet explaining that encryption auto-verification is not available. */
 "SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_NOT_AVAILABLE_SHEET_TITLE" = "Az automatikus ellenőrzés nem érhető el ehhez a csevegéshez";
 
 /* Body for a sheet explaining that encryption auto-verification succeeded. */
-"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_SUCCESS_SHEET_BODY" = "Azoknál a névjegyeknél, amelyekhez telefonszámon keresztül kapcsolódsz, a Signal egy kulcsátláthatóságnak nevezett folyamat segítségével automatikusan megerősítheti, hogy a kapcsolat biztonságos-e. A fokozott biztonság érdekében ellenőrizd manuálisan a végpontok közötti titkosítást az előző képernyőn látható számok összehasonlításával vagy az eszközön található kód beolvasásával.";
+"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_SUCCESS_SHEET_BODY" = "Azoknál a névjegyeknél, amelyekhez telefonszámon keresztül kapcsolódsz, a Radar egy kulcsátláthatóságnak nevezett folyamat segítségével automatikusan megerősítheti, hogy a kapcsolat biztonságos-e. A fokozott biztonság érdekében ellenőrizd manuálisan a végpontok közötti titkosítást az előző képernyőn látható számok összehasonlításával vagy az eszközön található kód beolvasásával.";
 
 /* Title for a sheet explaining that encryption auto-verification succeeded. */
 "SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_SUCCESS_SHEET_TITLE" = "A titkosítás ellenőrzése automatikus ennél a csevegésnél.";
@@ -8842,7 +8845,7 @@ Send money securely.";
 "SAFETY_TIPS_CRYPTO_TITLE" = "Kripto- vagy pénzzel kapcsolatos átverések";
 
 /* Message body describing the enable reglock safety tip. */
-"SAFETY_TIPS_ENABLE_REGLOCK_BODY" = "Védd a fiókod azzal, hogy a Signal-regisztráció során a megerősítő kódod mellett a Signal PIN-kódodat is meg kelljen adnod.";
+"SAFETY_TIPS_ENABLE_REGLOCK_BODY" = "Védd a fiókod azzal, hogy a Radar-regisztráció során a megerősítő kódod mellett a Radar PIN-kódodat is meg kelljen adnod.";
 
 /* Message title describing the enable reglock safety tip. */
 "SAFETY_TIPS_ENABLE_REGLOCK_TITLE" = "Kapcsold be a regisztrációs zárat a fiókbeállításokban";
@@ -8875,22 +8878,22 @@ Send money securely.";
 "SAFETY_TIPS_MESSAGE_LINKS_TITLE" = "Üzenetek webhivatkozásokkal";
 
 /* Message body describing the review names safety tip. */
-"SAFETY_TIPS_REVIEW_NAMES_BODY" = "Vigyázz a „Név nincs ellenőrizve” értesítések esetén. A Signalban mindenki saját maga állítja be a profilnevét.";
+"SAFETY_TIPS_REVIEW_NAMES_BODY" = "Vigyázz a „Név nincs ellenőrizve” értesítések esetén. A Radarban mindenki saját maga állítja be a profilnevét.";
 
 /* Message body describing the review names safety tip in the 'view more' flow. */
-"SAFETY_TIPS_REVIEW_NAMES_BODY_VIEW_MORE" = "Vigyázz a „Név nincs ellenőrizve” értesítések esetén. A Signalban mindenki saját maga állítja be a profilnevét és fotóját. Ha nem vagy biztos benne, hogy kitől érkezett egy új kérés, biztonságosabb, ha figyelmen kívül hagyod.";
+"SAFETY_TIPS_REVIEW_NAMES_BODY_VIEW_MORE" = "Vigyázz a „Név nincs ellenőrizve” értesítések esetén. A Radarban mindenki saját maga állítja be a profilnevét és fotóját. Ha nem vagy biztos benne, hogy kitől érkezett egy új kérés, biztonságosabb, ha figyelmen kívül hagyod.";
 
 /* Message title describing the review names safety tip. */
 "SAFETY_TIPS_REVIEW_NAMES_TITLE" = "Nevek és fotók felülvizsgálata";
 
 /* Message body describing the signal chats tip. */
-"SAFETY_TIPS_SIGNAL_CHATS_BODY" = "A Signal soha nem küld üzenetet a regisztrációs kódoddal, a PIN-kódoddal vagy a helyreállítási kulcsoddal kapcsolatban. Soha ne válaszolj olyan csevegésre, amelyben úgy tesznek, mintha a Signal nevében írnának.";
+"SAFETY_TIPS_SIGNAL_CHATS_BODY" = "A Radar soha nem küld üzenetet a regisztrációs kódoddal, a PIN-kódoddal vagy a helyreállítási kulcsoddal kapcsolatban. Soha ne válaszolj olyan csevegésre, amelyben úgy tesznek, mintha a Radar nevében írnának.";
 
 /* Message body describing the signal chats tip in the 'view more' flow. */
-"SAFETY_TIPS_SIGNAL_CHATS_BODY_VIEW_MORE" = "A Signal soha nem küld üzenetet a regisztrációs kódoddal, a PIN-kódoddal vagy a helyreállítási kulcsoddal kapcsolatban. Ne válaszolj olyan csevegésekre, amelyek a Signalnak vagy a Signal ügyfélszolgálatának adják ki magukat. A rosszindulatú szereplők hamis neveket adnak meg, hogy megpróbálják átvenni az irányítást a fiókod felett.";
+"SAFETY_TIPS_SIGNAL_CHATS_BODY_VIEW_MORE" = "A Radar soha nem küld üzenetet a regisztrációs kódoddal, a PIN-kódoddal vagy a helyreállítási kulcsoddal kapcsolatban. Ne válaszolj olyan csevegésekre, amelyek a Radarnak vagy a Radar ügyfélszolgálatának adják ki magukat. A rosszindulatú szereplők hamis neveket adnak meg, hogy megpróbálják átvenni az irányítást a fiókod felett.";
 
 /* Message title describing the signal chats tip. */
-"SAFETY_TIPS_SIGNAL_CHATS_TITLE" = "Ne válaszolj a Signal csevegéseire";
+"SAFETY_TIPS_SIGNAL_CHATS_TITLE" = "Ne válaszolj a Radar csevegéseire";
 
 /* Message contents for the vague message safety tip. */
 "SAFETY_TIPS_VAGUE_MESSAGE_BODY" = "A kéretlen üzenetek küldői gyakran egy olyan egyszerű üzenettel indítanak, mint például „Szia”, hogy magukhoz vonzzanak téged. Ha válaszolsz, lehet, hogy továbbmennek.";
@@ -8968,7 +8971,7 @@ Send money securely.";
 "SECONDARY_LINKING_ERROR_DIFFERENT_ACCOUNT_TITLE" = "Nem egyező fiók";
 
 /* Message for error alert indicating that a linked device must be upgraded before it can be linked. */
-"SECONDARY_LINKING_ERROR_OBSOLETE_LINKED_DEVICE_MESSAGE" = "A telefonod párosításához frissítsd a Signalt ezen az eszközön!";
+"SECONDARY_LINKING_ERROR_OBSOLETE_LINKED_DEVICE_MESSAGE" = "A telefonod párosításához frissítsd a Radart ezen az eszközön!";
 
 /* Title for error alert indicating that a linked device must be upgraded before it can be linked. */
 "SECONDARY_LINKING_ERROR_OBSOLETE_LINKED_DEVICE_TITLE" = "Nem támogatott verzió";
@@ -8977,7 +8980,7 @@ Send money securely.";
 "SECONDARY_LINKING_ERROR_OLD_VERSION_MESSAGE" = "Ez az eszköz a Radar egy régebbi verzióját futtatja, ami még nem képes iOS QR kód beolvasására. Kérlek frissíts a legújabb verzióra és próbáld újra.";
 
 /* alert title for outdated linking device */
-"SECONDARY_LINKING_ERROR_OLD_VERSION_TITLE" = "Frissítsd a Signalt a társítandó eszközön";
+"SECONDARY_LINKING_ERROR_OLD_VERSION_TITLE" = "Frissítsd a Radart a társítandó eszközön";
 
 /* alert title */
 "SECONDARY_LINKING_ERROR_WAITING_FOR_SCAN" = "Nem sikerült a készülék társítása";
@@ -9004,7 +9007,7 @@ Send money securely.";
 "SECONDARY_ONBOARDING_CHOOSE_DEVICE_NAME_PLACEHOLDER" = "Válassz egy nevet";
 
 /* header text before the user can link this device */
-"SECONDARY_ONBOARDING_GET_STARTED_BY_OPENING_PRIMARY" = "Nyisd meg a telefonodon a Signalt ezen iPad társításához";
+"SECONDARY_ONBOARDING_GET_STARTED_BY_OPENING_PRIMARY" = "Nyisd meg a telefonodon a Radart ezen iPad társításához";
 
 /* Link explaining what to do when trying to link a device before having a primary device. */
 "SECONDARY_ONBOARDING_GET_STARTED_DO_NOT_HAVE_PRIMARY" = "Nincs Radar a telefonomon…";
@@ -9013,7 +9016,7 @@ Send money securely.";
 "SECONDARY_ONBOARDING_INSTALL_PRIMARY_FIRST_BODY" = "Telepítsd a Radar alkalmazást az App Store alól, végezd el a regisztrációs folyamatot, ez után már képes leszel ugyan ahhoz a fiókhoz társítani az iPad készüléked.";
 
 /* alert title */
-"SECONDARY_ONBOARDING_INSTALL_PRIMARY_FIRST_TITLE" = "Telepítsd a Signalt a telefonodra";
+"SECONDARY_ONBOARDING_INSTALL_PRIMARY_FIRST_TITLE" = "Telepítsd a Radart a telefonodra";
 
 /* Link text for page with troubleshooting info shown on the QR scanning screen */
 "SECONDARY_ONBOARDING_SCAN_CODE_HELP_TEXT" = "Kérj segítséget ezekkel a lépésekkel kapcsolatban";
@@ -9025,16 +9028,16 @@ Send money securely.";
 "SECONDARY_ONBOARDING_SCAN_CODE_STEP_LINK_DEVICE" = "Koppints a „Kapcsolt eszközök” és az „Új eszköz összekapcsolása” lehetőségre";
 
 /* First bullet point on the QR code screen for linking a device */
-"SECONDARY_ONBOARDING_SCAN_CODE_STEP_OPEN_PRIMARY" = "Nyisd meg a Signalt az elsődleges eszközödön";
+"SECONDARY_ONBOARDING_SCAN_CODE_STEP_OPEN_PRIMARY" = "Nyisd meg a Radart az elsődleges eszközödön";
 
 /* Second bullet point on the QR code screen for linking a device */
-"SECONDARY_ONBOARDING_SCAN_CODE_STEP_OPEN_SETTINGS" = "A Signal beállításainak megnyitásához koppints a profilképedre";
+"SECONDARY_ONBOARDING_SCAN_CODE_STEP_OPEN_SETTINGS" = "A Radar beállításainak megnyitásához koppints a profilképedre";
 
 /* header text while displaying a QR code which, when scanned, will link this device. */
 "SECONDARY_ONBOARDING_SCAN_CODE_TITLE" = "A fiókod összekapcsolásához olvasd be ezt a kódot";
 
 /* header text before the user can transfer to this device */
-"SECONDARY_TRANSFER_GET_STARTED_BY_OPENING_IPAD" = "Indítsd el a Signalt régi Ipad-eden a fiók átmozgatásához";
+"SECONDARY_TRANSFER_GET_STARTED_BY_OPENING_IPAD" = "Indítsd el a Radart régi Ipad-eden a fiók átmozgatásához";
 
 /* No comment provided by engineer. */
 "SECURE_SESSION_RESET" = "Biztonságos munkamenet alaphelyzetbe állítva.";
@@ -9067,13 +9070,13 @@ Send money securely.";
 "SELECT_CONTACT_FOR_SHARING_PERMISSION_PROMPT_ALLOW_BUTTON" = "Hozzáférés engedélyezése";
 
 /* Body of the prompt on the 'Select Contact' view that asks the user to allow access to their contacts. */
-"SELECT_CONTACT_FOR_SHARING_PERMISSION_PROMPT_BODY" = "Engedélyezd a névjegyeidhez való hozzáférést. A névjegyeid titkosítva vannak, és nem láthatók a Signal számára.";
+"SELECT_CONTACT_FOR_SHARING_PERMISSION_PROMPT_BODY" = "Engedélyezd a névjegyeidhez való hozzáférést. A névjegyeid titkosítva vannak, és nem láthatók a Radar számára.";
 
 /* Button on the 'Select Contact' view's contacts permission prompt that hides the prompt. */
 "SELECT_CONTACT_FOR_SHARING_PERMISSION_PROMPT_DISMISS_BUTTON" = "Nem, köszönöm";
 
 /* Title of the prompt on the 'Select Contact' view that asks the user to allow access to their contacts. */
-"SELECT_CONTACT_FOR_SHARING_PERMISSION_PROMPT_TITLE" = "Keress ismerősöket a Signalban";
+"SELECT_CONTACT_FOR_SHARING_PERMISSION_PROMPT_TITLE" = "Keress ismerősöket a Radarban";
 
 /* Placeholder text for the search bar on the 'Select Contact' view */
 "SELECT_CONTACT_FOR_SHARING_SEARCH_BAR_PLACEHOLDER" = "Keresés";
@@ -9460,7 +9463,7 @@ Send money securely.";
 "SETTINGS_KEEP_MUTED_ARCHIVED_LABEL" = "A némított csevegések maradjanak archiválva";
 
 /* Footer for settings section describing Key Transparency. */
-"SETTINGS_KEY_TRANSPARENCY_OPT_OUT_FOOTER" = "Ha engedélyezve van, a Signal megpróbálja automatikusan ellenőrizni az egyéni csevegések titkosítását.";
+"SETTINGS_KEY_TRANSPARENCY_OPT_OUT_FOOTER" = "Ha engedélyezve van, a Radar megpróbálja automatikusan ellenőrizni az egyéni csevegések titkosítását.";
 
 /* Title for for a settings option describing that Key Transparency is enabled. */
 "SETTINGS_KEY_TRANSPARENCY_OPT_OUT_SWITCH_TITLE" = "Automatikus kulcsellenőrzés";
@@ -9475,7 +9478,7 @@ Send money securely.";
 "SETTINGS_LINK_PREVIEWS_FOOTER" = "Előnézeti képek lekérése közvetlenül a weboldalról az elküldendő üzenetekhez.";
 
 /* Subtitle of a card on a linked device's account settings, explaining that account settings are managed on the primary device. */
-"SETTINGS_LINKED_DEVICE_ACCOUNT_CARD_SUBTITLE" = "Fiókbeállításaid kezeléséhez nyisd meg a Signal alkalmazást az elsődleges eszközödön.";
+"SETTINGS_LINKED_DEVICE_ACCOUNT_CARD_SUBTITLE" = "Fiókbeállításaid kezeléséhez nyisd meg a Radar alkalmazást az elsődleges eszközödön.";
 
 /* Title of a card on a linked device's account settings, indicating that this is a linked device. */
 "SETTINGS_LINKED_DEVICE_ACCOUNT_CARD_TITLE" = "Ez egy kapcsolt eszköz";
@@ -9484,7 +9487,7 @@ Send money securely.";
 "SETTINGS_LINKED_DEVICE_DELETE_DATA_BUTTON" = "Alkalmazásadatok törlése";
 
 /* Footer below the 'delete app data' button, shown on a linked device's account settings. */
-"SETTINGS_LINKED_DEVICE_DELETE_DATA_FOOTER" = "Ez az összes adatot eltávolítja a Signal alkalmazásból ezen az eszközön.";
+"SETTINGS_LINKED_DEVICE_DELETE_DATA_FOOTER" = "Ez az összes adatot eltávolítja a Radar alkalmazásból ezen az eszközön.";
 
 /* Text for a toast confirming the user changed their local file backup location. */
 "SETTINGS_LOCAL_FILE_BACKUP_FOLDER_UPDATED" = "Biztonsági mentés mappája frissítve";
@@ -9508,7 +9511,7 @@ Send money securely.";
 "SETTINGS_LOCAL_FILE_BACKUPS_LAST_BACKUP_DATE" = "Utolsó biztonsági mentés";
 
 /* Message for an action sheet when a user cannot perform a remote backup because a local backup is in progress */
-"SETTINGS_LOCAL_FILE_BACKUPS_LOCAL_BACKUP_IN_PROGRESS_MESSAGE" = "Nem sikerült Signal biztonsági mentést végezni, mert folyamatban van egy biztonsági mentés az eszközön. Próbáld újra később!";
+"SETTINGS_LOCAL_FILE_BACKUPS_LOCAL_BACKUP_IN_PROGRESS_MESSAGE" = "Nem sikerült Radar biztonsági mentést végezni, mert folyamatban van egy biztonsági mentés az eszközön. Próbáld újra később!";
 
 /* Label for a progress bar while attachments are being copied for an on-device backup. Embeds 1:{{%1$@ completed bytes copied, %2$@ total bytes to copy, %3$@ percentage complete }}. */
 "SETTINGS_LOCAL_FILE_BACKUPS_PROGRESS_COPYING_ATTACHMENTS" = "Biztonsági mentés létrehozása az eszközön %1$@/%2$@ (%3$@)";
@@ -9523,10 +9526,10 @@ Send money securely.";
 "SETTINGS_LOCAL_FILE_BACKUPS_PROGRESS_RESTORING_ATTACHMENTS" = "Az eszközön tárolt biztonsági mentés helyreállítása (%1$@/%2$@)";
 
 /* Message for an action sheet when a user cannot perform a local backup because a remote backup is in progress */
-"SETTINGS_LOCAL_FILE_BACKUPS_REMOTE_BACKUP_IN_PROGRESS_MESSAGE" = "Nem sikerült biztonsági mentést végezni az eszközön, mert folyamatban van egy Signal biztonsági mentés. Próbáld újra később!";
+"SETTINGS_LOCAL_FILE_BACKUPS_REMOTE_BACKUP_IN_PROGRESS_MESSAGE" = "Nem sikerült biztonsági mentést végezni az eszközön, mert folyamatban van egy Radar biztonsági mentés. Próbáld újra később!";
 
 /* Footer text on the on-device backups settings page explaining how to restore a backup. */
-"SETTINGS_LOCAL_FILE_BACKUPS_RESTORE_FOOTER" = "Egy biztonsági mentés visszaállításához először is telepítsd a Signalt! Nyisd meg az alkalmazást, koppints a „Visszaállítás vagy átvitel” lehetőségre, majd válaszd a „Biztonsági mentés az eszközön” lehetőséget.";
+"SETTINGS_LOCAL_FILE_BACKUPS_RESTORE_FOOTER" = "Egy biztonsági mentés visszaállításához először is telepítsd a Radart! Nyisd meg az alkalmazást, koppints a „Visszaállítás vagy átvitel” lehetőségre, majd válaszd a „Biztonsági mentés az eszközön” lehetőséget.";
 
 /* Label for the button that turns off on-device backups. */
 "SETTINGS_LOCAL_FILE_BACKUPS_TURN_OFF" = "Biztonsági mentés kikapcsolása és törlése";
@@ -9616,7 +9619,7 @@ Send money securely.";
 "SETTINGS_NOTIFICATIONS_APP_BADGE_SECTION" = "Alkalmazásjelvény";
 
 /* Explanation for the switch controlling whether a notification is shown when a phone contact joins Signal. */
-"SETTINGS_NOTIFICATIONS_CONTACT_JOINED_SIGNAL_FOOTER" = "Értesítés megjelenítése, amikor egy telefonos névjegy csatlakozik a Signalhoz.";
+"SETTINGS_NOTIFICATIONS_CONTACT_JOINED_SIGNAL_FOOTER" = "Értesítés megjelenítése, amikor egy telefonos névjegy csatlakozik a Radarhoz.";
 
 /* Label for a switch controlling whether reactions to your messages generate notifications. */
 "SETTINGS_NOTIFICATIONS_REACTIONS" = "Reakció értesítések";
@@ -9714,10 +9717,10 @@ Send money securely.";
 "SETTINGS_PAYMENTS_DEACTIVATE_TITLE" = "Fizetések deaktiválása";
 
 /* Explanation of the 'deactivate payments with balance' process in the 'deactivate payments' settings. */
-"SETTINGS_PAYMENTS_DEACTIVATE_WITH_BALANCE_EXPLANATION" = "Azt javasoljuk, hogy a fizetések deaktiválása előtt utald át a pénzösszegeidet egy másik tárca címére. Ha úgy döntesz, hogy most nem utalod át a pénzösszegeket, azok a Signalhoz kapcsolt tárcádban maradnak, ha újraaktiválod a fizetéseket.";
+"SETTINGS_PAYMENTS_DEACTIVATE_WITH_BALANCE_EXPLANATION" = "Azt javasoljuk, hogy a fizetések deaktiválása előtt utald át a pénzösszegeidet egy másik tárca címére. Ha úgy döntesz, hogy most nem utalod át a pénzösszegeket, azok a Radarhoz kapcsolt tárcádban maradnak, ha újraaktiválod a fizetéseket.";
 
 /* Description for the 'deactivate payments confirmation' UI in the payment settings. */
-"SETTINGS_PAYMENTS_DEACTIVATE_WITHOUT_TRANSFER_CONFIRM_DESCRIPTION" = "Az egyenleged a Signalhoz kapcsolt tárcádban marad, ha úgy döntesz, hogy újraaktiválod a fizetéseket.";
+"SETTINGS_PAYMENTS_DEACTIVATE_WITHOUT_TRANSFER_CONFIRM_DESCRIPTION" = "Az egyenleged a Radarhoz kapcsolt tárcádban marad, ha úgy döntesz, hogy újraaktiválod a fizetéseket.";
 
 /* Title for the 'deactivate payments confirmation' UI in the payment settings. */
 "SETTINGS_PAYMENTS_DEACTIVATE_WITHOUT_TRANSFER_CONFIRM_TITLE" = "Deaktiválás átutalás nélkül?";
@@ -10193,7 +10196,7 @@ Send money securely.";
 "SETTINGS_PHONE_NUMBER_DISCOVERABILITY_DISABLED_TOAST" = "A beállítás módosításához állítsd a „Ki láthatja a telefonszámomat” „Senki” lehetőségre.";
 
 /* The description for a sheet asking for confirmation that the user wants to set their phone number discoverability to 'nobody'. */
-"SETTINGS_PHONE_NUMBER_DISCOVERABILITY_NOBODY_CONFIRMATION_DESCRIPTION" = "A „Ki találhat meg a számom alapján” beállítása „Senki” opcióra nehezebbé teszi az emberek számára, hogy megtaláljanak téged a Signalon.";
+"SETTINGS_PHONE_NUMBER_DISCOVERABILITY_NOBODY_CONFIRMATION_DESCRIPTION" = "A „Ki találhat meg a számom alapján” beállítása „Senki” opcióra nehezebbé teszi az emberek számára, hogy megtaláljanak téged a Radaron.";
 
 /* The title for a sheet asking for confirmation that the user wants to set their phone number discoverability to 'nobody'. */
 "SETTINGS_PHONE_NUMBER_DISCOVERABILITY_NOBODY_CONFIRMATION_TITLE" = "Biztos vagy benne?";
@@ -10202,7 +10205,7 @@ Send money securely.";
 "SETTINGS_PHONE_NUMBER_DISCOVERABILITY_TITLE" = "Ki találhat meg a telefonszámom szerint";
 
 /* Description label for Phone Number Privacy */
-"SETTINGS_PHONE_NUMBER_PRIVACY_DESCRIPTION_LABEL" = "Válaszd ki, hogy ki láthatja a telefonszámod, és ki léphet kapcsolatba veled a Signalon keresztül.";
+"SETTINGS_PHONE_NUMBER_PRIVACY_DESCRIPTION_LABEL" = "Válaszd ki, hogy ki láthatja a telefonszámod, és ki léphet kapcsolatba veled a Radaron keresztül.";
 
 /* The title for phone number privacy settings. */
 "SETTINGS_PHONE_NUMBER_PRIVACY_TITLE" = "Telefonszám";
@@ -10394,7 +10397,7 @@ Send money securely.";
 "SHARE_ACTION_MESSAGE" = "Üzenet";
 
 /* Message for an action sheet shown when sharing fails because the device's date and time are incorrect. */
-"SHARE_EXTENSION_FAILED_SENDING_BECAUSE_CLOCK_SKEW_MESSAGE" = "Az eszközödön megadott dátum és idő helytelen, és előfordulhat, hogy a Signal nem küldte el az üzenetet. Az eszköz dátumának és idejének javításához nyisd meg a Beállításokat.";
+"SHARE_EXTENSION_FAILED_SENDING_BECAUSE_CLOCK_SKEW_MESSAGE" = "Az eszközödön megadott dátum és idő helytelen, és előfordulhat, hogy a Radar nem küldte el az üzenetet. Az eszköz dátumának és idejének javításához nyisd meg a Beállításokat.";
 
 /* alert body when sharing file failed because of untrusted/changed identity keys */
 "SHARE_EXTENSION_FAILED_SENDING_BECAUSE_UNTRUSTED_IDENTITY_FORMAT" = "Biztonsági azonosítód megváltozott a következő ismerősöddel: %1$@. Érdemes lenne leellenőrizni, mielőtt újraküldenéd ezt az üzenetet.";
@@ -10403,13 +10406,13 @@ Send money securely.";
 "SHARE_EXTENSION_LOADING" = "Betöltés…";
 
 /* Message for an error shown when the user tries to share to Signal but the device is too low on storage space. */
-"SHARE_EXTENSION_LOW_STORAGE_SPACE_MESSAGE" = "Nem oszthatsz meg a Signalban, mert kevés a tárhely az eszközödön. Szabadíts fel helyet a Beállításokban a tárhely kezelésével, majd próbáld újra!";
+"SHARE_EXTENSION_LOW_STORAGE_SPACE_MESSAGE" = "Nem oszthatsz meg a Radarban, mert kevés a tárhely az eszközödön. Szabadíts fel helyet a Beállításokban a tárhely kezelésével, majd próbáld újra!";
 
 /* Title for an error shown when the user tries to share to Signal but the device is too low on storage space. */
 "SHARE_EXTENSION_LOW_STORAGE_SPACE_TITLE" = "Kevés a tárhely";
 
 /* Message indicating that the share extension cannot be used until the user has registered in the main app. */
-"SHARE_EXTENSION_NOT_REGISTERED_MESSAGE" = "Indítsd el a Signalt a regisztrálás elvégzéséhez.";
+"SHARE_EXTENSION_NOT_REGISTERED_MESSAGE" = "Indítsd el a Radart a regisztrálás elvégzéséhez.";
 
 /* Title indicating that the share extension cannot be used until the user has registered in the main app. */
 "SHARE_EXTENSION_NOT_REGISTERED_TITLE" = "Nincs regisztrálva";
@@ -10445,10 +10448,10 @@ Send money securely.";
 "SIGNAL_LOGIN_RECOVERY_KEY_PLACEHOLDER_TITLE" = "Helyreállítási kulcs";
 
 /* Title for the sheet presented when user taps on Signal Proxy link in chat. */
-"SIGNAL_PROXY" = "Signal Proxy szerver";
+"SIGNAL_PROXY" = "Radar Proxy szerver";
 
 /* body sent to contacts when inviting to Install Signal */
-"SMS_INVITE_BODY" = "Szia, használd te is a Signalt! Innen telepítheted:";
+"SMS_INVITE_BODY" = "Szia, használd te is a Radart! Innen telepítheted:";
 
 /* An error message generically indicating that something went wrong. */
 "SOMETHING_WENT_WRONG_ERROR" = "Probléma merült fel!";
@@ -10488,6 +10491,10 @@ Send money securely.";
 
 /* Text for a toast confirming that the speakerphone has been turned on for a call. */
 "SPEAKERPHONE_ON_CONFIRMATION_TOAST_LABEL" = "Hangszóró bekapcsolva";
+
+"STAR" = "Star";
+
+"STARRED_MESSAGES" = "Starred messages";
 
 /* Title for a button to view a sticker pack */
 "STICKER_BUTTON_VIEW_PACK" = "Csomag megtekintése";
@@ -10532,7 +10539,7 @@ Send money securely.";
 "STICKER_PACK_SHARE_SHEET_HEADER" = "Bárki, aki rendelkezik ezzel a linkkel, telepítheti és megoszthatja ezt a matricacsomagot.";
 
 /* Label for a button on a sticker-pack share sheet that sends the pack in Signal. */
-"STICKER_PACK_SHARE_SHEET_SEND_IN_SIGNAL" = "Küldés a Signalban";
+"STICKER_PACK_SHARE_SHEET_SEND_IN_SIGNAL" = "Küldés a Radarban";
 
 /* Message when trying to show a sticker that has expired and is unavailable for download */
 "STICKER_UNAVAILABLE_MESSAGE_LABEL" = "Matrica nem elérhető";
@@ -11123,7 +11130,7 @@ Send money securely.";
 "TRANSFER_COMPLETE_SHEET_TITLE" = "Átvitel kész";
 
 /* Notification prompting the user to relaunch Signal after a device transfer completed. */
-"TRANSFER_RELAUNCH_NOTIFICATION" = "Üzenet küldéséhez nyisd meg a Signalt";
+"TRANSFER_RELAUNCH_NOTIFICATION" = "Üzenet küldéséhez nyisd meg a Radart";
 
 /* Label for a button that says 'Try Again'. */
 "TRY_AGAIN_BUTTON_TITLE" = "Újrapróbálkozás";
@@ -11195,7 +11202,7 @@ Send money securely.";
 "UNLINK_CONFIRMATION_ALERT_TITLE" = "Társítás megszüntetése ezzel: \"%1$@\"?";
 
 /* Label warning the user that they have been unlinked from their primary device. */
-"UNLINKED_WARNING" = "Az eszköz társítása megszűnt. Az üzenetküldés és -fogadás folytatásához társítsd újra a Signalt a telefonoddal.";
+"UNLINKED_WARNING" = "Az eszköz társítása megszűnt. Az üzenetküldés és -fogadás folytatásához társítsd újra a Radart a telefonoddal.";
 
 /* If this device has become unlinked from their primary device, they'll see a warning. This is the call to action on that warning. */
 "UNLINKED_WARNING_ACTION_TITLE" = "Eszköz újbóli társítása";
@@ -11242,6 +11249,8 @@ Send money securely.";
 /* Notification body for unread reminders. First placeholder is unread messages, second is a summary of either unread mentions or replies */
 "UnreadReminderJob__unread_one_summary" = "%1$@, beleértve %2$@.";
 
+"UNSTAR" = "Unstar";
+
 /* No comment provided by engineer. */
 "UNSUPPORTED_ATTACHMENT" = "Nem támogatott melléklet típust kaptál.";
 
@@ -11249,7 +11258,7 @@ Send money securely.";
 "UNSUPPORTED_FEATURE_ERROR" = "Készüléked nem támogatja ezt a funkciót.";
 
 /* Description for the unverified safety number change. Embeds {name of contact with identity change} */
-"UNVERIFIED_SAFETY_NUMBER_CHANGE_DESCRIPTION_FORMAT" = "Biztonsági azonosítód %1$@ kontaktoddal megváltozott, valószínűleg újratelepítette a Signalt, vagy új eszközre váltott. Opcionálisan koppinthatsz az új azonosító ellenőrzöttnek jelöléséhez.";
+"UNVERIFIED_SAFETY_NUMBER_CHANGE_DESCRIPTION_FORMAT" = "Biztonsági azonosítód %1$@ kontaktoddal megváltozott, valószínűleg újratelepítette a Radart, vagy új eszközre váltott. Opcionálisan koppinthatsz az új azonosító ellenőrzöttnek jelöléséhez.";
 
 /* Action to verify a safety number after it has changed */
 "UNVERIFIED_SAFETY_NUMBER_VERIFY_ACTION" = "Hitelesítés";
@@ -11267,7 +11276,7 @@ Send money securely.";
 "USE_PROXY_BUTTON" = "Proxy használata";
 
 /* Explanation of when you should use a signal proxy */
-"USE_PROXY_EXPLANATION" = "Csak abban az esetben használj proxy-t, ha nem lehet a Signalhoz csatlakozni se mobilnet, se Wi-Fi használatával.";
+"USE_PROXY_EXPLANATION" = "Csak abban az esetben használj proxy-t, ha nem lehet a Radarhoz csatlakozni se mobilnet, se Wi-Fi használatával.";
 
 /* Description of username links and QR codes on the username education sheet */
 "USERNAME_EDUCATION_LINK_DESCRIPTION" = "A felhasználónevek egyedi QR-kóddal és hivatkozással rendelkeznek, amelyet megoszthatsz a barátaiddal, hogy gyorsan cseveghess velük.";
@@ -11384,7 +11393,7 @@ Send money securely.";
 "USERNAME_ONBOARDING_TITLE" = "Your Username";
 
 /* Instructions that appear below the username QR code on a sharable exported image. */
-"USERNAME_QR_CODE_EXPORT_INSTRUCTIONS" = "Olvasd be ezt a QR-kódot a telefonoddal és csevegj velem a Signalban.";
+"USERNAME_QR_CODE_EXPORT_INSTRUCTIONS" = "Olvasd be ezt a QR-kódot a telefonoddal és csevegj velem a Radarban.";
 
 /* A message in a toast informing the user their username, link, and QR code have successfully been reset. Embeds {{ the user's new username }}. */
 "USERNAME_RESET_SUCCESSFUL_TOAST" = "A QR-kódod és hivatkozásod visszaállításra került, a felhasználóneved pedig %1$@";
@@ -11435,7 +11444,7 @@ Send money securely.";
 "VERIFICATION_CODE_REQUESTED_HERO_BODY_FIRST" = "Egy megerősítő kód lekérésre került";
 
 /* Second part of body for a hero sheet informing the user a verification code was requested. */
-"VERIFICATION_CODE_REQUESTED_HERO_BODY_SECOND" = "Ne add meg senkinek a megerősítő kódodat. A Signal soha nem fog üzenni neked emiatt. Ha üzenetet kaptál valakitől, aki a Signalnak adta ki magát, az átverés.\nHa te magad kérted a kódot, nyugodtan figyelmen kívül hagyhatod ezt az üzenetet.";
+"VERIFICATION_CODE_REQUESTED_HERO_BODY_SECOND" = "Ne add meg senkinek a megerősítő kódodat. A Radar soha nem fog üzenni neked emiatt. Ha üzenetet kaptál valakitől, aki a Radarnak adta ki magát, az átverés.\nHa te magad kérted a kódot, nyugodtan figyelmen kívül hagyhatod ezt az üzenetet.";
 
 /* Format for info message indicating that the verification state was unverified on this device. Embeds {{user's name or phone number}}. */
 "VERIFICATION_STATE_CHANGE_FORMAT_NOT_VERIFIED_LOCAL" = "%1$@ ismerősödet Nem Ellenőrzöttnek jelölted.";

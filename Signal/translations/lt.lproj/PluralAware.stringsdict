@@ -823,13 +823,13 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>„Signal“ grupės geriausiai veikia, kai jose yra %1$d ar mažiau narių. Pridėjus daugiau narių, žinučių išsiuntimas ir gavimas bus uždelsiamas.</string>
+			<string>„Radar“ grupės geriausiai veikia, kai jose yra %1$d ar mažiau narių. Pridėjus daugiau narių, žinučių išsiuntimas ir gavimas bus uždelsiamas.</string>
 			<key>few</key>
-			<string>„Signal“ grupės geriausiai veikia, kai jose yra %1$d ar mažiau narių. Pridėjus daugiau narių, žinučių išsiuntimas ir gavimas bus uždelsiamas.</string>
+			<string>„Radar“ grupės geriausiai veikia, kai jose yra %1$d ar mažiau narių. Pridėjus daugiau narių, žinučių išsiuntimas ir gavimas bus uždelsiamas.</string>
 			<key>many</key>
-			<string>„Signal“ grupės geriausiai veikia, kai jose yra %1$d ar mažiau narių. Pridėjus daugiau narių, žinučių išsiuntimas ir gavimas bus uždelsiamas.</string>
+			<string>„Radar“ grupės geriausiai veikia, kai jose yra %1$d ar mažiau narių. Pridėjus daugiau narių, žinučių išsiuntimas ir gavimas bus uždelsiamas.</string>
 			<key>other</key>
-			<string>„Signal“ grupės geriausiai veikia, kai jose yra %1$d ar mažiau narių. Pridėjus daugiau narių, žinučių išsiuntimas ir gavimas bus uždelsiamas.</string>
+			<string>„Radar“ grupės geriausiai veikia, kai jose yra %1$d ar mažiau narių. Pridėjus daugiau narių, žinučių išsiuntimas ir gavimas bus uždelsiamas.</string>
 		</dict>
 	</dict>
 	<key>GROUP_CALL_HAS_MAX_DEVICES_%d</key>
@@ -1023,13 +1023,13 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Signal skambins naudotojams %2$@, %3$@ ir dar %1$d žmogui</string>
+			<string>Radar skambins naudotojams %2$@, %3$@ ir dar %1$d žmogui</string>
 			<key>few</key>
-			<string>Signal skambins naudotojams %2$@, %3$@ ir dar %1$d žmonėms</string>
+			<string>Radar skambins naudotojams %2$@, %3$@ ir dar %1$d žmonėms</string>
 			<key>many</key>
-			<string>Signal skambins naudotojams %2$@, %3$@ ir dar %1$d žmonių</string>
+			<string>Radar skambins naudotojams %2$@, %3$@ ir dar %1$d žmonių</string>
 			<key>other</key>
-			<string>Signal skambins naudotojams %2$@, %3$@ ir dar %1$d žmogui</string>
+			<string>Radar skambins naudotojams %2$@, %3$@ ir dar %1$d žmogui</string>
 		</dict>
 	</dict>
 	<key>GROUP_INVITES_SENT_ALERT_TITLE_%d</key>
@@ -1383,13 +1383,13 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Kad „%2$@“ liktų susietas, atidarykite „Signal“ tame įrenginyje per %1$d d.</string>
+			<string>Kad „%2$@“ liktų susietas, atidarykite „Radar“ tame įrenginyje per %1$d d.</string>
 			<key>few</key>
-			<string>Kad „%2$@“ liktų susietas, atidarykite „Signal“ tame įrenginyje per %1$d d.</string>
+			<string>Kad „%2$@“ liktų susietas, atidarykite „Radar“ tame įrenginyje per %1$d d.</string>
 			<key>many</key>
-			<string>Kad „%2$@“ liktų susietas, atidarykite „Signal“ tame įrenginyje per %1$d d.</string>
+			<string>Kad „%2$@“ liktų susietas, atidarykite „Radar“ tame įrenginyje per %1$d d.</string>
 			<key>other</key>
-			<string>Kad „%2$@“ liktų susietas, atidarykite „Signal“ tame įrenginyje per %1$d d.</string>
+			<string>Kad „%2$@“ liktų susietas, atidarykite „Radar“ tame įrenginyje per %1$d d.</string>
 		</dict>
 	</dict>
 	<key>LINK_DEVICE_CONFIRMATION_ALERT_TRANSFER_SUBTITLE_%d</key>
@@ -1643,13 +1643,13 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Visi „Signal“ kontaktai · 1 žiūrovas</string>
+			<string>Visi „Radar“ kontaktai · 1 žiūrovas</string>
 			<key>few</key>
-			<string>Visi „Signal“ kontaktai · %1$d žiūrovai</string>
+			<string>Visi „Radar“ kontaktai · %1$d žiūrovai</string>
 			<key>many</key>
-			<string>Visi „Signal“ kontaktai · %1$d žiūrovo</string>
+			<string>Visi „Radar“ kontaktai · %1$d žiūrovo</string>
 			<key>other</key>
-			<string>Visi „Signal“ kontaktai · %1$d žiūrovų</string>
+			<string>Visi „Radar“ kontaktai · %1$d žiūrovų</string>
 		</dict>
 	</dict>
 	<key>MY_STORY_VIEWERS_ALL_CONNECTIONS_EXCLUDING_%d</key>
@@ -1663,13 +1663,13 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Visi „Signal“ kontaktai · 1 neįtrauktas</string>
+			<string>Visi „Radar“ kontaktai · 1 neįtrauktas</string>
 			<key>few</key>
-			<string>Visi „Signal“ kontaktai · %1$d neįtraukti</string>
+			<string>Visi „Radar“ kontaktai · %1$d neįtraukti</string>
 			<key>many</key>
-			<string>Visi „Signal“ kontaktai · %1$d neįtraukto</string>
+			<string>Visi „Radar“ kontaktai · %1$d neįtraukto</string>
 			<key>other</key>
-			<string>Visi „Signal“ kontaktai · %1$d neįtrauktų</string>
+			<string>Visi „Radar“ kontaktai · %1$d neįtrauktų</string>
 		</dict>
 	</dict>
 	<key>MY_STORY_VIEWERS_ONLY_%d</key>

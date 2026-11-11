@@ -823,13 +823,13 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>קבוצות Signal מתפקדות בצורה הטובה ביותר עם חבר/ה %1$d. הוספת חברים נוספים תגרום לעיכובים בשליחה ובקבלה של הודעות.</string>
+			<string>קבוצות Radar מתפקדות בצורה הטובה ביותר עם חבר/ה %1$d. הוספת חברים נוספים תגרום לעיכובים בשליחה ובקבלה של הודעות.</string>
 			<key>two</key>
-			<string>קבוצות Signal מתפקדות בצורה הטובה ביותר עם %1$d חברים או פחות. הוספת חברים נוספים תגרום לעיכובים בשליחה ובקבלה של הודעות.</string>
+			<string>קבוצות Radar מתפקדות בצורה הטובה ביותר עם %1$d חברים או פחות. הוספת חברים נוספים תגרום לעיכובים בשליחה ובקבלה של הודעות.</string>
 			<key>many</key>
-			<string>קבוצות Signal מתפקדות בצורה הטובה ביותר עם %1$d חברים או פחות. הוספת חברים נוספים תגרום לעיכובים בשליחה ובקבלה של הודעות.</string>
+			<string>קבוצות Radar מתפקדות בצורה הטובה ביותר עם %1$d חברים או פחות. הוספת חברים נוספים תגרום לעיכובים בשליחה ובקבלה של הודעות.</string>
 			<key>other</key>
-			<string>קבוצות Signal מתפקדות בצורה הטובה ביותר עם %1$d חברים או פחות. הוספת חברים נוספים תגרום לעיכובים בשליחה ובקבלה של הודעות.</string>
+			<string>קבוצות Radar מתפקדות בצורה הטובה ביותר עם %1$d חברים או פחות. הוספת חברים נוספים תגרום לעיכובים בשליחה ובקבלה של הודעות.</string>
 		</dict>
 	</dict>
 	<key>GROUP_CALL_HAS_MAX_DEVICES_%d</key>
@@ -1023,13 +1023,13 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Signal תתקשר ל%2$@, %3$@, ועוד %1$d</string>
+			<string>Radar תתקשר ל%2$@, %3$@, ועוד %1$d</string>
 			<key>two</key>
-			<string>Signal תתקשר ל%2$@, %3$@, ועוד %1$d</string>
+			<string>Radar תתקשר ל%2$@, %3$@, ועוד %1$d</string>
 			<key>many</key>
-			<string>Signal תתקשר ל%2$@, %3$@, ועוד %1$d</string>
+			<string>Radar תתקשר ל%2$@, %3$@, ועוד %1$d</string>
 			<key>other</key>
-			<string>Signal תתקשר ל%2$@, %3$@, ועוד %1$d</string>
+			<string>Radar תתקשר ל%2$@, %3$@, ועוד %1$d</string>
 		</dict>
 	</dict>
 	<key>GROUP_INVITES_SENT_ALERT_TITLE_%d</key>
@@ -1383,13 +1383,13 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>כדי להשאיר את ״%2$@״ מחובר, צריך לפתוח את Signal במכשיר הזה תוך יום אחד.</string>
+			<string>כדי להשאיר את ״%2$@״ מחובר, צריך לפתוח את Radar במכשיר הזה תוך יום אחד.</string>
 			<key>two</key>
-			<string>כדי להשאיר את ״%2$@״ מחובר, צריך לפתוח את Signal במכשיר הזה תוך יומיים.</string>
+			<string>כדי להשאיר את ״%2$@״ מחובר, צריך לפתוח את Radar במכשיר הזה תוך יומיים.</string>
 			<key>many</key>
-			<string>כדי להשאיר את ״%2$@״ מחובר, צריך לפתוח את Signal במכשיר הזה תוך %1$d ימים.</string>
+			<string>כדי להשאיר את ״%2$@״ מחובר, צריך לפתוח את Radar במכשיר הזה תוך %1$d ימים.</string>
 			<key>other</key>
-			<string>כדי להשאיר את ״%2$@״ מחובר, צריך לפתוח את Signal במכשיר הזה תוך %1$d ימים.</string>
+			<string>כדי להשאיר את ״%2$@״ מחובר, צריך לפתוח את Radar במכשיר הזה תוך %1$d ימים.</string>
 		</dict>
 	</dict>
 	<key>LINK_DEVICE_CONFIRMATION_ALERT_TRANSFER_SUBTITLE_%d</key>
@@ -1643,13 +1643,13 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>כל חברי ה–Signal · צופה %1$d</string>
+			<string>כל חברי ה–Radar · צופה %1$d</string>
 			<key>two</key>
-			<string>כל חברי ה–Signal · %1$d צופים</string>
+			<string>כל חברי ה–Radar · %1$d צופים</string>
 			<key>many</key>
-			<string>כל חברי ה–Signal · %1$d צופים</string>
+			<string>כל חברי ה–Radar · %1$d צופים</string>
 			<key>other</key>
-			<string>כל חברי ה–Signal · %1$d צופים</string>
+			<string>כל חברי ה–Radar · %1$d צופים</string>
 		</dict>
 	</dict>
 	<key>MY_STORY_VIEWERS_ALL_CONNECTIONS_EXCLUDING_%d</key>
@@ -1663,13 +1663,13 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>כל חברי ה–Signal · מוסתר מאדם %1$d</string>
+			<string>כל חברי ה–Radar · מוסתר מאדם %1$d</string>
 			<key>two</key>
-			<string>כל חברי ה–Signal · מוסתר מ–%1$d אנשים</string>
+			<string>כל חברי ה–Radar · מוסתר מ–%1$d אנשים</string>
 			<key>many</key>
-			<string>כל חברי ה–Signal · מוסתר מ–%1$d אנשים</string>
+			<string>כל חברי ה–Radar · מוסתר מ–%1$d אנשים</string>
 			<key>other</key>
-			<string>כל חברי ה–Signal · מוסתר מ–%1$d אנשים</string>
+			<string>כל חברי ה–Radar · מוסתר מ–%1$d אנשים</string>
 		</dict>
 	</dict>
 	<key>MY_STORY_VIEWERS_ONLY_%d</key>

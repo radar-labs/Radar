@@ -659,9 +659,9 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Групите в Signal работят най-добре с максимум %1$d член или по-малко. Добавянето на повече членове ще доведе до забавяне на изпращането и получаването на съобщения.</string>
+			<string>Групите в Radar работят най-добре с максимум %1$d член или по-малко. Добавянето на повече членове ще доведе до забавяне на изпращането и получаването на съобщения.</string>
 			<key>other</key>
-			<string>Групите в Signal работят най-добре с максимум %1$d членове или по-малко. Добавянето на повече членове ще доведе до забавяне на изпращането и получаването на съобщения.</string>
+			<string>Групите в Radar работят най-добре с максимум %1$d членове или по-малко. Добавянето на повече членове ще доведе до забавяне на изпращането и получаването на съобщения.</string>
 		</dict>
 	</dict>
 	<key>GROUP_CALL_HAS_MAX_DEVICES_%d</key>
@@ -819,9 +819,9 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Signal ще звънне на %2$@, %3$@ и още %1$d</string>
+			<string>Radar ще звънне на %2$@, %3$@ и още %1$d</string>
 			<key>other</key>
-			<string>Signal ще звънне на %2$@, %3$@ и още %1$d</string>
+			<string>Radar ще звънне на %2$@, %3$@ и още %1$d</string>
 		</dict>
 	</dict>
 	<key>GROUP_INVITES_SENT_ALERT_TITLE_%d</key>
@@ -1107,9 +1107,9 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>За да запазите връзката с „%2$@“, отворете Signal на въпросното устройство в рамките на един ден.</string>
+			<string>За да запазите връзката с „%2$@“, отворете Radar на въпросното устройство в рамките на един ден.</string>
 			<key>other</key>
-			<string>За да запазите връзката с „%2$@“, отворете Signal на въпросното устройство в рамките на %1$d дни.</string>
+			<string>За да запазите връзката с „%2$@“, отворете Radar на въпросното устройство в рамките на %1$d дни.</string>
 		</dict>
 	</dict>
 	<key>LINK_DEVICE_CONFIRMATION_ALERT_TRANSFER_SUBTITLE_%d</key>
@@ -1315,9 +1315,9 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Всички контакти в Signal · %1$d зрител</string>
+			<string>Всички контакти в Radar · %1$d зрител</string>
 			<key>other</key>
-			<string>Всички контакти в Signal · %1$d зрители</string>
+			<string>Всички контакти в Radar · %1$d зрители</string>
 		</dict>
 	</dict>
 	<key>MY_STORY_VIEWERS_ALL_CONNECTIONS_EXCLUDING_%d</key>
@@ -1331,9 +1331,9 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Всички контакти в Signal · %1$d изключен</string>
+			<string>Всички контакти в Radar · %1$d изключен</string>
 			<key>other</key>
-			<string>Всички контакти в Signal · %1$d изключени</string>
+			<string>Всички контакти в Radar · %1$d изключени</string>
 		</dict>
 	</dict>
 	<key>MY_STORY_VIEWERS_ONLY_%d</key>

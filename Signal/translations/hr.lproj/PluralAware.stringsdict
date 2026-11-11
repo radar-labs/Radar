@@ -823,13 +823,13 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Signal grupe najbolje funkcioniraju s %1$d članom ili manje. Dodavanje više članova uzrokovat će kašnjenja u slanju i primanju poruka.</string>
+			<string>Radar grupe najbolje funkcioniraju s %1$d članom ili manje. Dodavanje više članova uzrokovat će kašnjenja u slanju i primanju poruka.</string>
 			<key>few</key>
-			<string>Signal grupe najbolje funkcioniraju s %1$d člana ili manje. Dodavanje više članova uzrokovat će kašnjenja u slanju i primanju poruka.</string>
+			<string>Radar grupe najbolje funkcioniraju s %1$d člana ili manje. Dodavanje više članova uzrokovat će kašnjenja u slanju i primanju poruka.</string>
 			<key>many</key>
-			<string>Signal grupe najbolje funkcioniraju s %1$d članova ili manje. Dodavanje više članova uzrokovat će kašnjenja u slanju i primanju poruka.</string>
+			<string>Radar grupe najbolje funkcioniraju s %1$d članova ili manje. Dodavanje više članova uzrokovat će kašnjenja u slanju i primanju poruka.</string>
 			<key>other</key>
-			<string>Signal grupe najbolje funkcioniraju s %1$d članova ili manje. Dodavanje više članova uzrokovat će kašnjenja u slanju i primanju poruka.</string>
+			<string>Radar grupe najbolje funkcioniraju s %1$d članova ili manje. Dodavanje više članova uzrokovat će kašnjenja u slanju i primanju poruka.</string>
 		</dict>
 	</dict>
 	<key>GROUP_CALL_HAS_MAX_DEVICES_%d</key>
@@ -1383,13 +1383,13 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Da bi uređaj &quot;%2$@&quot; ostao povezan, otvorite Signal na tom uređaju unutar %1$d dana.</string>
+			<string>Da bi uređaj &quot;%2$@&quot; ostao povezan, otvorite Radar na tom uređaju unutar %1$d dana.</string>
 			<key>few</key>
-			<string>Da bi uređaj &quot;%2$@&quot; ostao povezan, otvorite Signal na tom uređaju unutar %1$d dana.</string>
+			<string>Da bi uređaj &quot;%2$@&quot; ostao povezan, otvorite Radar na tom uređaju unutar %1$d dana.</string>
 			<key>many</key>
-			<string>Da bi uređaj &quot;%2$@&quot; ostao povezan, otvorite Signal na tom uređaju unutar %1$d dana.</string>
+			<string>Da bi uređaj &quot;%2$@&quot; ostao povezan, otvorite Radar na tom uređaju unutar %1$d dana.</string>
 			<key>other</key>
-			<string>Da bi uređaj &quot;%2$@&quot; ostao povezan, otvorite Signal na tom uređaju unutar %1$d dana.</string>
+			<string>Da bi uređaj &quot;%2$@&quot; ostao povezan, otvorite Radar na tom uređaju unutar %1$d dana.</string>
 		</dict>
 	</dict>
 	<key>LINK_DEVICE_CONFIRMATION_ALERT_TRANSFER_SUBTITLE_%d</key>
@@ -1643,13 +1643,13 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Svi Signal kontakti · %1$d gledatelj</string>
+			<string>Svi Radar kontakti · %1$d gledatelj</string>
 			<key>few</key>
-			<string>Svi Signal kontakti · %1$d gledatelja</string>
+			<string>Svi Radar kontakti · %1$d gledatelja</string>
 			<key>many</key>
-			<string>Svi Signal kontakti · %1$d gledatelja</string>
+			<string>Svi Radar kontakti · %1$d gledatelja</string>
 			<key>other</key>
-			<string>Svi Signal kontakti · %1$d gledatelja</string>
+			<string>Svi Radar kontakti · %1$d gledatelja</string>
 		</dict>
 	</dict>
 	<key>MY_STORY_VIEWERS_ALL_CONNECTIONS_EXCLUDING_%d</key>
@@ -1663,13 +1663,13 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Svi Signal kontakti · %1$d isključen</string>
+			<string>Svi Radar kontakti · %1$d isključen</string>
 			<key>few</key>
-			<string>Svi Signal kontakti · %1$d isključena</string>
+			<string>Svi Radar kontakti · %1$d isključena</string>
 			<key>many</key>
-			<string>Svi Signal kontakti · %1$d isključenih</string>
+			<string>Svi Radar kontakti · %1$d isključenih</string>
 			<key>other</key>
-			<string>Svi Signal kontakti · %1$d isključenih</string>
+			<string>Svi Radar kontakti · %1$d isključenih</string>
 		</dict>
 	</dict>
 	<key>MY_STORY_VIEWERS_ONLY_%d</key>

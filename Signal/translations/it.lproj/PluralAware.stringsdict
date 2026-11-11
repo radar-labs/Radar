@@ -659,9 +659,9 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>I gruppi di Signal funzionano meglio con massimo %1$d persona o meno. Aggiungere più persone causerà ritardi nell&apos;invio e nella ricezione dei messaggi.</string>
+			<string>I gruppi di Radar funzionano meglio con massimo %1$d persona o meno. Aggiungere più persone causerà ritardi nell&apos;invio e nella ricezione dei messaggi.</string>
 			<key>other</key>
-			<string>I gruppi di Signal funzionano meglio con massimo %1$d persone o meno. Aggiungere più persone causerà ritardi nell&apos;invio e nella ricezione dei messaggi.</string>
+			<string>I gruppi di Radar funzionano meglio con massimo %1$d persone o meno. Aggiungere più persone causerà ritardi nell&apos;invio e nella ricezione dei messaggi.</string>
 		</dict>
 	</dict>
 	<key>GROUP_CALL_HAS_MAX_DEVICES_%d</key>
@@ -819,9 +819,9 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Signal chiamerà %2$@, %3$@ e %1$d altra persona</string>
+			<string>Radar chiamerà %2$@, %3$@ e %1$d altra persona</string>
 			<key>other</key>
-			<string>Signal chiamerà %2$@, %3$@ e altre %1$d persone</string>
+			<string>Radar chiamerà %2$@, %3$@ e altre %1$d persone</string>
 		</dict>
 	</dict>
 	<key>GROUP_INVITES_SENT_ALERT_TITLE_%d</key>
@@ -1107,9 +1107,9 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Per continuare a tenere &quot;%2$@&quot; collegato, devi aprire Signal su quel dispositivo entro %1$d giorno.</string>
+			<string>Per continuare a tenere &quot;%2$@&quot; collegato, devi aprire Radar su quel dispositivo entro %1$d giorno.</string>
 			<key>other</key>
-			<string>Per continuare a tenere &quot;%2$@&quot; collegato, devi aprire Signal su quel dispositivo entro %1$d giorni.</string>
+			<string>Per continuare a tenere &quot;%2$@&quot; collegato, devi aprire Radar su quel dispositivo entro %1$d giorni.</string>
 		</dict>
 	</dict>
 	<key>LINK_DEVICE_CONFIRMATION_ALERT_TRANSFER_SUBTITLE_%d</key>
@@ -1315,9 +1315,9 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Tutte le amicizie di Signal · %1$d Persona</string>
+			<string>Tutte le amicizie di Radar · %1$d Persona</string>
 			<key>other</key>
-			<string>Tutte le amicizie di Signal · %1$d Persone</string>
+			<string>Tutte le amicizie di Radar · %1$d Persone</string>
 		</dict>
 	</dict>
 	<key>MY_STORY_VIEWERS_ALL_CONNECTIONS_EXCLUDING_%d</key>
@@ -1331,9 +1331,9 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Tutte le amicizie di Signal · %1$d Persona esclusa</string>
+			<string>Tutte le amicizie di Radar · %1$d Persona esclusa</string>
 			<key>other</key>
-			<string>Tutte le amicizie di Signal · %1$d Persone escluse</string>
+			<string>Tutte le amicizie di Radar · %1$d Persone escluse</string>
 		</dict>
 	</dict>
 	<key>MY_STORY_VIEWERS_ONLY_%d</key>

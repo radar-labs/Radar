@@ -659,9 +659,9 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Signal-ryhmät toimivat parhaiten, kun niissä on enintään %1$d jäsen. Korkeampi jäsenmäärä viivästyttää viestien kulkua.</string>
+			<string>Radar-ryhmät toimivat parhaiten, kun niissä on enintään %1$d jäsen. Korkeampi jäsenmäärä viivästyttää viestien kulkua.</string>
 			<key>other</key>
-			<string>Signal-ryhmät toimivat parhaiten, kun niissä on enintään %1$d jäsentä. Korkeampi jäsenmäärä viivästyttää viestien kulkua.</string>
+			<string>Radar-ryhmät toimivat parhaiten, kun niissä on enintään %1$d jäsentä. Korkeampi jäsenmäärä viivästyttää viestien kulkua.</string>
 		</dict>
 	</dict>
 	<key>GROUP_CALL_HAS_MAX_DEVICES_%d</key>
@@ -819,9 +819,9 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Signal soittaa käyttäjille %2$@, %3$@ ja %1$d muulle</string>
+			<string>Radar soittaa käyttäjille %2$@, %3$@ ja %1$d muulle</string>
 			<key>other</key>
-			<string>Signal soittaa käyttäjille %2$@, %3$@ ja %1$d muulle</string>
+			<string>Radar soittaa käyttäjille %2$@, %3$@ ja %1$d muulle</string>
 		</dict>
 	</dict>
 	<key>GROUP_INVITES_SENT_ALERT_TITLE_%d</key>
@@ -1107,9 +1107,9 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Jos haluat pitää laitteen %2$@ yhdistettynä, avaa Signal kyseisellä laitteella %1$d päivän kuluessa.</string>
+			<string>Jos haluat pitää laitteen %2$@ yhdistettynä, avaa Radar kyseisellä laitteella %1$d päivän kuluessa.</string>
 			<key>other</key>
-			<string>Jos haluat pitää laitteen %2$@ yhdistettynä, avaa Signal kyseisellä laitteella %1$d päivän kuluessa.</string>
+			<string>Jos haluat pitää laitteen %2$@ yhdistettynä, avaa Radar kyseisellä laitteella %1$d päivän kuluessa.</string>
 		</dict>
 	</dict>
 	<key>LINK_DEVICE_CONFIRMATION_ALERT_TRANSFER_SUBTITLE_%d</key>
@@ -1315,9 +1315,9 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Kaikki Signal-kontaktit · %1$d katsoja</string>
+			<string>Kaikki Radar-kontaktit · %1$d katsoja</string>
 			<key>other</key>
-			<string>Kaikki Signal-kontaktit · %1$d katsojaa</string>
+			<string>Kaikki Radar-kontaktit · %1$d katsojaa</string>
 		</dict>
 	</dict>
 	<key>MY_STORY_VIEWERS_ALL_CONNECTIONS_EXCLUDING_%d</key>
@@ -1331,9 +1331,9 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Kaikki Signal-kontaktit · %1$d suljettu pois</string>
+			<string>Kaikki Radar-kontaktit · %1$d suljettu pois</string>
 			<key>other</key>
-			<string>Kaikki Signal-kontaktit · %1$d suljettu pois</string>
+			<string>Kaikki Radar-kontaktit · %1$d suljettu pois</string>
 		</dict>
 	</dict>
 	<key>MY_STORY_VIEWERS_ONLY_%d</key>

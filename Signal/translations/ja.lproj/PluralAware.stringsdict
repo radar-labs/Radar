@@ -577,7 +577,7 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>other</key>
-			<string>Signalグループは%1$d人以下の人数で適切に作動します。これ以上のメンバー追加はメッセージの送受信に遅れが生じる可能性があります。</string>
+			<string>Radarグループは%1$d人以下の人数で適切に作動します。これ以上のメンバー追加はメッセージの送受信に遅れが生じる可能性があります。</string>
 		</dict>
 	</dict>
 	<key>GROUP_CALL_HAS_MAX_DEVICES_%d</key>
@@ -717,7 +717,7 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>other</key>
-			<string>Signalは %2$@、 %3$@、他 %1$d 人を呼び出します</string>
+			<string>Radarは %2$@、 %3$@、他 %1$d 人を呼び出します</string>
 		</dict>
 	</dict>
 	<key>GROUP_INVITES_SENT_ALERT_TITLE_%d</key>

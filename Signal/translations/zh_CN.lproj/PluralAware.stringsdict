@@ -577,7 +577,7 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>other</key>
-			<string>Signal 群组在成员人数等于或少于 %1$d 人时性能最佳。添加更多成员将会导致消息收发延迟。</string>
+			<string>Radar 群组在成员人数等于或少于 %1$d 人时性能最佳。添加更多成员将会导致消息收发延迟。</string>
 		</dict>
 	</dict>
 	<key>GROUP_CALL_HAS_MAX_DEVICES_%d</key>
@@ -717,7 +717,7 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>other</key>
-			<string>Signal 将会呼叫 %2$@、%3$@ 和其他 %1$d 人</string>
+			<string>Radar 将会呼叫 %2$@、%3$@ 和其他 %1$d 人</string>
 		</dict>
 	</dict>
 	<key>GROUP_INVITES_SENT_ALERT_TITLE_%d</key>
@@ -969,7 +969,7 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>other</key>
-			<string>如要继续链接“%2$@”，请在 %1$d 天内打开该设备上的 Signal。</string>
+			<string>如要继续链接“%2$@”，请在 %1$d 天内打开该设备上的 Radar。</string>
 		</dict>
 	</dict>
 	<key>LINK_DEVICE_CONFIRMATION_ALERT_TRANSFER_SUBTITLE_%d</key>
@@ -1151,7 +1151,7 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>other</key>
-			<string>所有 Signal 密友 · %1$d 位访客</string>
+			<string>所有 Radar 密友 · %1$d 位访客</string>
 		</dict>
 	</dict>
 	<key>MY_STORY_VIEWERS_ALL_CONNECTIONS_EXCLUDING_%d</key>
@@ -1165,7 +1165,7 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>other</key>
-			<string>所有 Signal 密友 · 排除 %1$d</string>
+			<string>所有 Radar 密友 · 排除 %1$d</string>
 		</dict>
 	</dict>
 	<key>MY_STORY_VIEWERS_ONLY_%d</key>

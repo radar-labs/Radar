@@ -659,9 +659,9 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Signal-groepen werken het best met %1$d lid. Het toevoegen van extra leden zal vertragingen veroorzaken in het verzenden en ontvangen van berichten.</string>
+			<string>Radar-groepen werken het best met %1$d lid. Het toevoegen van extra leden zal vertragingen veroorzaken in het verzenden en ontvangen van berichten.</string>
 			<key>other</key>
-			<string>Signal-groepen werken het best met %1$d of minder leden. Het toevoegen van extra leden zal vertragingen veroorzaken in het verzenden en ontvangen van berichten.</string>
+			<string>Radar-groepen werken het best met %1$d of minder leden. Het toevoegen van extra leden zal vertragingen veroorzaken in het verzenden en ontvangen van berichten.</string>
 		</dict>
 	</dict>
 	<key>GROUP_CALL_HAS_MAX_DEVICES_%d</key>
@@ -819,9 +819,9 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Signal zal %2$@, %3$@ en %1$d ander bellen</string>
+			<string>Radar zal %2$@, %3$@ en %1$d ander bellen</string>
 			<key>other</key>
-			<string>Signal zal %2$@, %3$@ en %1$d anderen bellen</string>
+			<string>Radar zal %2$@, %3$@ en %1$d anderen bellen</string>
 		</dict>
 	</dict>
 	<key>GROUP_INVITES_SENT_ALERT_TITLE_%d</key>
@@ -1107,9 +1107,9 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Om ‘%2$@’ gekoppeld te houden, open Signal binnen één dag op het betreffende apparaat.</string>
+			<string>Om ‘%2$@’ gekoppeld te houden, open Radar binnen één dag op het betreffende apparaat.</string>
 			<key>other</key>
-			<string>Om ‘%2$@’ gekoppeld te houden, open Signal binnen %1$d dagen op het betreffende apparaat.</string>
+			<string>Om ‘%2$@’ gekoppeld te houden, open Radar binnen %1$d dagen op het betreffende apparaat.</string>
 		</dict>
 	</dict>
 	<key>LINK_DEVICE_CONFIRMATION_ALERT_TRANSFER_SUBTITLE_%d</key>
@@ -1315,9 +1315,9 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Alle Signal-contacten · %1$d kijker</string>
+			<string>Alle Radar-contacten · %1$d kijker</string>
 			<key>other</key>
-			<string>Alle Signal-contacten · %1$d kijkers</string>
+			<string>Alle Radar-contacten · %1$d kijkers</string>
 		</dict>
 	</dict>
 	<key>MY_STORY_VIEWERS_ALL_CONNECTIONS_EXCLUDING_%d</key>
@@ -1331,9 +1331,9 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Alle Signal-contacten · Voor %1$d verborgen</string>
+			<string>Alle Radar-contacten · Voor %1$d verborgen</string>
 			<key>other</key>
-			<string>Alle Signal-contacten · Voor %1$d verborgen</string>
+			<string>Alle Radar-contacten · Voor %1$d verborgen</string>
 		</dict>
 	</dict>
 	<key>MY_STORY_VIEWERS_ONLY_%d</key>

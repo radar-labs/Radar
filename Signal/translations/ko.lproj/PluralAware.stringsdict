@@ -577,7 +577,7 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>other</key>
-			<string>Signal 그룹은 멤버가 %1$d명 이하일 때 가장 원활하게 작동합니다. 멤버를 더 추가하면 메시지 송수신이 지연될 수 있습니다.</string>
+			<string>Radar 그룹은 멤버가 %1$d명 이하일 때 가장 원활하게 작동합니다. 멤버를 더 추가하면 메시지 송수신이 지연될 수 있습니다.</string>
 		</dict>
 	</dict>
 	<key>GROUP_CALL_HAS_MAX_DEVICES_%d</key>
@@ -717,7 +717,7 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>other</key>
-			<string>Signal에서 %2$@ 님, %3$@ 님 외 %1$d명에게 전화를 겁니다.</string>
+			<string>Radar에서 %2$@ 님, %3$@ 님 외 %1$d명에게 전화를 겁니다.</string>
 		</dict>
 	</dict>
 	<key>GROUP_INVITES_SENT_ALERT_TITLE_%d</key>
@@ -969,7 +969,7 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>other</key>
-			<string>&apos;%2$@&apos;의 연동 상태를 유지하려면 해당 기기에서 %1$d일 이내에 Signal을 열어주세요.</string>
+			<string>&apos;%2$@&apos;의 연동 상태를 유지하려면 해당 기기에서 %1$d일 이내에 Radar를 열어주세요.</string>
 		</dict>
 	</dict>
 	<key>LINK_DEVICE_CONFIRMATION_ALERT_TRANSFER_SUBTITLE_%d</key>
@@ -1151,7 +1151,7 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>other</key>
-			<string>모든 Signal 친구 · 볼 수 있는 사람 %1$d명</string>
+			<string>모든 Radar 친구 · 볼 수 있는 사람 %1$d명</string>
 		</dict>
 	</dict>
 	<key>MY_STORY_VIEWERS_ALL_CONNECTIONS_EXCLUDING_%d</key>
@@ -1165,7 +1165,7 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>other</key>
-			<string>모든 Signal 친구 · %1$d명 제외</string>
+			<string>모든 Radar 친구 · %1$d명 제외</string>
 		</dict>
 	</dict>
 	<key>MY_STORY_VIEWERS_ONLY_%d</key>

@@ -2,7 +2,7 @@
 "AB_PERMISSION_MISSING_ACTION_NOT_NOW" = "Để sau";
 
 /* Footer for the 'about' help section. For non-English languages, exclude the word '501c3'. */
-"ABOUT_SECTION_FOOTER" = "Bản quyền Signal Messenger\nĐược cấp phép theo AGPLv3\nSignal là một tổ chức phi lợi nhuận";
+"ABOUT_SECTION_FOOTER" = "Bản quyền Signal Messenger\nCopyright 2026 Radar Chat, Inc.\nĐược cấp phép theo AGPLv3";
 
 /* Title for the 'about' help section */
 "ABOUT_SECTION_TITLE" = "Về Radar";
@@ -215,7 +215,7 @@
 "APN_Message" = "Bạn có thể có tin nhắn mới";
 
 /* Shown in place of the text input box in a conversation when the app has expired and the user is no longer allowed to send messages. The embedded value is 'Update now' (translated via APP_EXPIRED_BOTTOM_UPDATE), and it will be formatted as a tappable link. */
-"APP_EXPIRED_BOTTOM" = "Phiên bản này của Signal đã hết hạn. %1$@ để gửi và nhận tin nhắn.";
+"APP_EXPIRED_BOTTOM" = "Phiên bản này của Radar đã hết hạn. %1$@ để gửi và nhận tin nhắn.";
 
 /* Shown in place of the text input box in a conversation when the app has expired and the user is no longer allowed to send messages. This value is a tappable link embedded in a larger sentence. */
 "APP_EXPIRED_BOTTOM_UPDATE" = "Cập nhật ngay";
@@ -236,7 +236,7 @@
 "APP_LAUNCH_FAILURE_COULD_NOT_LOAD_DATABASE" = "Không thể tải cơ sở dữ liệu";
 
 /* Message for an action sheet explaining that Signal can't launch because the database is corrupted. */
-"APP_LAUNCH_FAILURE_DATABASE_CORRUPTED_MESSAGE" = "Signal không thể chạy vì cơ sở dữ liệu bị hỏng. Tính bảo mật hay tin nhắn của bạn không bị ảnh hưởng.";
+"APP_LAUNCH_FAILURE_DATABASE_CORRUPTED_MESSAGE" = "Radar không thể chạy vì cơ sở dữ liệu bị hỏng. Tính bảo mật hay tin nhắn của bạn không bị ảnh hưởng.";
 
 /* Title for an action sheet explaining that Signal can't launch because the database is corrupted. */
 "APP_LAUNCH_FAILURE_DATABASE_CORRUPTED_TITLE" = "Cơ sở dữ liệu bị hỏng";
@@ -245,7 +245,7 @@
 "APP_LAUNCH_FAILURE_DATABASE_RECOVERY_ACTION_TITLE" = "Sửa";
 
 /* Action in an action sheet offering to exit the app. */
-"APP_LAUNCH_FAILURE_EXIT_APP_ACTION_TITLE" = "Thoát Signal";
+"APP_LAUNCH_FAILURE_EXIT_APP_ACTION_TITLE" = "Thoát Radar";
 
 /* Error indicating that the app could not launch without reverting unknown database migrations. */
 "APP_LAUNCH_FAILURE_INVALID_DATABASE_VERSION_MESSAGE" = "Vui lòng cập nhật phiên bản mới nhất của Radar.";
@@ -260,7 +260,7 @@
 "APP_LAUNCH_FAILURE_LAST_LAUNCH_CRASHED_TITLE" = "Không thể mở Radar";
 
 /* Message for an error sheet shown when the app cannot launch because the device is out of storage space. Embeds 1:{{ the localized name of the user's device model, e.g. iPhone }}; 2:{{ an amount of storage space as a file size, e.g. 1 GB }}. */
-"APP_LAUNCH_FAILURE_NOT_ENOUGH_STORAGE_SPACE_MESSAGE_FORMAT" = "Signal không thể mở vì %1$@ của bạn đã hết dung lượng lưu trữ. Hãy giải phóng ít nhất %2$@ dung lượng, sau đó mở lại Signal.\nVào Cài đặt iOS > Chung > Dung lượng và gỡ bỏ ứng dụng bạn không dùng, xóa video dung lượng lớn khỏi ứng dụng Ảnh hoặc các ứng dụng khác, và xóa nhạc và tập tin đa phương tiện đã tải xuống.";
+"APP_LAUNCH_FAILURE_NOT_ENOUGH_STORAGE_SPACE_MESSAGE_FORMAT" = "Radar không thể mở vì %1$@ của bạn đã hết dung lượng lưu trữ. Hãy giải phóng ít nhất %2$@ dung lượng, sau đó mở lại Radar.\nVào Cài đặt iOS > Chung > Dung lượng và gỡ bỏ ứng dụng bạn không dùng, xóa video dung lượng lớn khỏi ứng dụng Ảnh hoặc các ứng dụng khác, và xóa nhạc và tập tin đa phương tiện đã tải xuống.";
 
 /* Title for an error sheet shown when the app cannot launch because the device is out of storage space. */
 "APP_LAUNCH_FAILURE_NOT_ENOUGH_STORAGE_SPACE_TITLE" = "Không đủ dung lượng";
@@ -377,13 +377,13 @@
 "ATTACHMENT_APPROVAL_MEDIA_QUALITY_TITLE" = "Chất lượng Đa phương tiện";
 
 /* Notification body shown when media sync to a linked device is complete. */
-"ATTACHMENT_BACKFILL_FINISHED_NOTIFICATION" = "Đã hoàn tất đồng bộ hóa với Signal trên thiết bị đã liên kết của bạn.";
+"ATTACHMENT_BACKFILL_FINISHED_NOTIFICATION" = "Đã hoàn tất đồng bộ hóa với Radar trên thiết bị đã liên kết của bạn.";
 
 /* Notification body shown when media sync to a linked device was interrupted. */
-"ATTACHMENT_BACKFILL_INTERRUPTED_NOTIFICATION" = "Mở Signal để tiếp tục đồng bộ hóa với thiết bị đã liên kết của bạn";
+"ATTACHMENT_BACKFILL_INTERRUPTED_NOTIFICATION" = "Mở Radar để tiếp tục đồng bộ hóa với thiết bị đã liên kết của bạn";
 
 /* Notification body shown while syncing media to a linked device. */
-"ATTACHMENT_BACKFILL_SYNCING_NOTIFICATION" = "Đang đồng bộ hóa với Signal trên thiết bị đã liên kết của bạn";
+"ATTACHMENT_BACKFILL_SYNCING_NOTIFICATION" = "Đang đồng bộ hóa với Radar trên thiết bị đã liên kết của bạn";
 
 /* Generic filename for an attachment with no known name */
 "ATTACHMENT_DEFAULT_FILENAME" = "Tập tin đính kèm";
@@ -632,7 +632,7 @@
 "BACKUP_KEY_SEE_FULL_KEY_BUTTON_TITLE" = "Xem mã khóa đầy đủ";
 
 /* Body for a warning sheet shown to discourage the user from sharing their 'Recovery Key', warning them not to share it with anyone. */
-"BACKUP_NEVER_SHARE_RECOVERY_KEY_SHEET_BODY" = "Không chia sẻ mã khóa khôi phục của bạn với bất kỳ ai. Thông tin này sẽ giúp người khác chiếm được tài khoản của bạn. <bold>Signal sẽ không bao giờ nhắn tin yêu cầu bạn</bold> cung cấp mã khóa khôi phục. Đừng bao giờ trả lời tin nhắn giả mạo Signal.";
+"BACKUP_NEVER_SHARE_RECOVERY_KEY_SHEET_BODY" = "Không chia sẻ mã khóa khôi phục của bạn với bất kỳ ai. Thông tin này sẽ giúp người khác chiếm được tài khoản của bạn. <bold>Radar sẽ không bao giờ nhắn tin yêu cầu bạn</bold> cung cấp mã khóa khôi phục. Đừng bao giờ trả lời tin nhắn giả mạo Radar.";
 
 /* Title for a warning sheet shown to discourage the user from sharing their 'Recovery Key'. */
 "BACKUP_NEVER_SHARE_RECOVERY_KEY_SHEET_TITLE" = "Không chia sẻ mã khóa khôi phục";
@@ -752,7 +752,7 @@
 "BACKUP_RESTORE_MODAL_TITLE" = "Đang khôi phục tin nhắn…";
 
 /* Message for a confirmation sheet shown before saving the user's Recovery Key to their password manager. */
-"BACKUP_SAVE_KEY_PW_MGR_CONFIRM_SHEET_MESSAGE" = "Chỉ lưu trữ mã khóa khôi phục trong công cụ quản lý mật khẩu bạn tin tưởng là an toàn. Signal không đưa ra khuyến nghị về công cụ quản lý mật khẩu phù hợp với bạn.";
+"BACKUP_SAVE_KEY_PW_MGR_CONFIRM_SHEET_MESSAGE" = "Chỉ lưu trữ mã khóa khôi phục trong công cụ quản lý mật khẩu bạn tin tưởng là an toàn. Radar không đưa ra khuyến nghị về công cụ quản lý mật khẩu phù hợp với bạn.";
 
 /* Title for a confirmation sheet shown before saving the user's Recovery Key to their password manager. */
 "BACKUP_SAVE_KEY_PW_MGR_CONFIRM_SHEET_TITLE" = "Lưu vào công cụ quản lý mật khẩu?";
@@ -1064,31 +1064,31 @@
 "BACKUP_SETTINGS_LANDING_OTHER_WAYS_HEADER" = "Cách sao lưu khác";
 
 /* Subtitle on the Backups settings landing page. */
-"BACKUP_SETTINGS_LANDING_PAGE_SUBTITLE" = "Sao lưu lịch sử tin nhắn để không bao giờ mất dữ liệu khi bạn có điện thoại mới hoặc cài lại Signal.";
+"BACKUP_SETTINGS_LANDING_PAGE_SUBTITLE" = "Sao lưu lịch sử tin nhắn để không bao giờ mất dữ liệu khi bạn có điện thoại mới hoặc cài lại Radar.";
 
 /* Button to begin setting up Signal Secure Backups on the Backups settings landing page. */
 "BACKUP_SETTINGS_LANDING_SET_UP_BUTTON" = "Thiết Lập";
 
 /* Description of Signal Secure Backups on the Backups settings landing page. */
-"BACKUP_SETTINGS_LANDING_SIGNAL_BACKUPS_BODY" = "Sao lưu tự động với dịch vụ lưu trữ bảo mật, được mã hóa đầu cuối của Signal.";
+"BACKUP_SETTINGS_LANDING_SIGNAL_BACKUPS_BODY" = "Sao lưu tự động với dịch vụ lưu trữ bảo mật, được mã hóa đầu cuối của Radar.";
 
 /* Title for the Signal Secure Backups cell on the Backups settings landing page. */
-"BACKUP_SETTINGS_LANDING_SIGNAL_BACKUPS_TITLE" = "Sao lưu bảo mật Signal";
+"BACKUP_SETTINGS_LANDING_SIGNAL_BACKUPS_TITLE" = "Sao lưu bảo mật Radar";
 
 /* Button to view settings for remote backups on the Backups settings landing page. */
 "BACKUP_SETTINGS_LANDING_VIEW_SETTINGS_BUTTON" = "Hiển thị các cài đặt";
 
 /* Note on the linked-device Backups screen explaining that the Backups subscription can only be managed on the user's primary device. */
-"BACKUP_SETTINGS_LINKED_DEVICE_MANAGE_ON_PRIMARY_FOOTER" = "Bạn có thể quản lý hoặc nâng cấp gói đăng ký Sao lưu bảo mật Signal trên thiết bị chính của mình.";
+"BACKUP_SETTINGS_LINKED_DEVICE_MANAGE_ON_PRIMARY_FOOTER" = "Bạn có thể quản lý hoặc nâng cấp gói đăng ký Sao lưu bảo mật Radar trên thiết bị chính của mình.";
 
 /* Note on the linked-device Backups screen, shown on the paid tier, explaining that the Backups subscription can only be managed on the user's primary device. */
-"BACKUP_SETTINGS_LINKED_DEVICE_MANAGE_ON_PRIMARY_FOOTER_PAID" = "Bạn có thể quản lý hoặc hủy gói đăng ký Sao lưu Signal trên thiết bị chính của mình.";
+"BACKUP_SETTINGS_LINKED_DEVICE_MANAGE_ON_PRIMARY_FOOTER_PAID" = "Bạn có thể quản lý hoặc hủy gói đăng ký Sao lưu Radar trên thiết bị chính của mình.";
 
 /* Body text on the linked-device Backups screen, shown when Backups aren't set up, explaining the feature and that it can be enabled on the user's primary device. */
-"BACKUP_SETTINGS_LINKED_DEVICE_NO_BACKUP_FOOTER" = "Sao lưu tự động với dịch vụ lưu trữ bảo mật, được mã hóa đầu cuối của Signal. Bắt đầu trên thiết bị chính của bạn.";
+"BACKUP_SETTINGS_LINKED_DEVICE_NO_BACKUP_FOOTER" = "Sao lưu tự động với dịch vụ lưu trữ bảo mật, được mã hóa đầu cuối của Radar. Bắt đầu trên thiết bị chính của bạn.";
 
 /* Message on the linked-device Backups screen, shown when the user's paid subscription can't be found, prompting them to renew. */
-"BACKUP_SETTINGS_LINKED_DEVICE_SUBSCRIPTION_NOT_FOUND" = "Không tìm thấy gói đăng ký của bạn. Gia hạn gói đăng ký Sao lưu bảo mật Signal để tiếp tục sử dụng.";
+"BACKUP_SETTINGS_LINKED_DEVICE_SUBSCRIPTION_NOT_FOUND" = "Không tìm thấy gói đăng ký của bạn. Gia hạn gói đăng ký Sao lưu bảo mật Radar để tiếp tục sử dụng.";
 
 /* Title for a button allowing users to trigger a manual backup. */
 "BACKUP_SETTINGS_MANUAL_BACKUP_BUTTON_TITLE" = "Sao lưu Ngay";
@@ -1130,10 +1130,10 @@
 "BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_TOGGLE_FOOTER_UNAVAILABLE" = "Tối ưu hóa lưu trữ là tính năng của gói trả phí Sao lưu Radar. Nâng cấp gói sao lưu để bắt đầu sử dụng tính năng này.";
 
 /* Title for a toggle allowing users to change the Optimize Local Storage setting. */
-"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_TOGGLE_TITLE" = "Tối ưu hóa dung lượng của Signal";
+"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_TOGGLE_TITLE" = "Tối ưu hóa dung lượng của Radar";
 
 /* Body for a Backup plan upsell view encouraging users to subscribe to a paid Backup plan to use storage optimization. */
-"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_UPSELL_BODY" = "Tối ưu hóa lưu trữ là tính năng của gói trả phí Sao lưu bảo mật Signal. Nâng cấp gói sao lưu để bắt đầu sử dụng tính năng này.";
+"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_UPSELL_BODY" = "Tối ưu hóa lưu trữ là tính năng của gói trả phí Sao lưu bảo mật Radar. Nâng cấp gói sao lưu để bắt đầu sử dụng tính năng này.";
 
 /* Title for a Backup plan upsell view encouraging users to subscribe to a paid Backup plan to use storage optimization. */
 "BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_UPSELL_TITLE" = "Nâng cấp để bật Tối ưu hóa dung lượng";
@@ -1217,7 +1217,7 @@
 "BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_OPTIMIZE_MEDIA_TOGGLE_FOOTER" = "Các tập tin đa phương tiện cũ hơn sẽ được gỡ khi bạn tạo bản sao lưu tiếp theo, nhưng có thể được tải xuống từ bản sao lưu bất cứ lúc nào.";
 
 /* Title for a toggle shown after the user enables backups, letting them enable the Optimize Storage feature. */
-"BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_OPTIMIZE_MEDIA_TOGGLE_TITLE" = "Tối ưu hóa dung lượng của Signal";
+"BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_OPTIMIZE_MEDIA_TOGGLE_TITLE" = "Tối ưu hóa dung lượng của Radar";
 
 /* Title for a sheet shown after the user enables backups. */
 "BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_TITLE" = "Mọi thứ đã sẵn sàng. Bắt đầu sao lưu ngay.";
@@ -1247,7 +1247,7 @@
 "BACKUP_SUBSCRIPTION_FAILED_TO_RENEW_SHEET_TITLE" = "Gia hạn không thành công gói đăng ký sao lưu của bạn";
 
 /* Body for a megaphone shown on the chat list encouraging users to subscribe to a paid Backup plan to back up all their media. Embeds {{ the amount of storage included in the paid plan, preformatted as a localized byte count, e.g. '100 GB' }}. */
-"BACKUPS_BACK_UP_YOUR_MEDIA_MEGAPHONE_BODY" = "Gói Sao lưu bảo mật Signal trả phí giữ tất cả tập tin đa phương tiện của bạn, lên đến %1$@.";
+"BACKUPS_BACK_UP_YOUR_MEDIA_MEGAPHONE_BODY" = "Gói Sao lưu bảo mật Radar trả phí giữ tất cả tập tin đa phương tiện của bạn, lên đến %1$@.";
 
 /* Title for a button on a megaphone encouraging users to subscribe to a paid Backup plan to back up all their media. */
 "BACKUPS_BACK_UP_YOUR_MEDIA_MEGAPHONE_PRIMARY_ACTION" = "Nâng cấp";
@@ -1256,7 +1256,7 @@
 "BACKUPS_BACK_UP_YOUR_MEDIA_MEGAPHONE_TITLE" = "Sao lưu tất cả đa phương tiện";
 
 /* Body for a Backup plan upsell view encouraging users to subscribe to a paid Backup plan to back up all their media. Embeds {{ the amount of storage included in the paid plan, preformatted as a localized byte count, e.g. '100 GB' }}. */
-"BACKUPS_BACK_UP_YOUR_MEDIA_UPSELL_BODY" = "Gói Sao lưu bảo mật Signal trả phí giữ tất cả tập tin đa phương tiện của bạn, tối đa đến %1$@. Không để mất hình ảnh hoặc video trên điện thoại mới hoặc khi cài đặt lại Signal.";
+"BACKUPS_BACK_UP_YOUR_MEDIA_UPSELL_BODY" = "Gói Sao lưu bảo mật Radar trả phí giữ tất cả tập tin đa phương tiện của bạn, tối đa đến %1$@. Không để mất hình ảnh hoặc video trên điện thoại mới hoặc khi cài đặt lại Radar.";
 
 /* Title for a Backup plan upsell view encouraging users to subscribe to a paid Backup plan to back up all their media. */
 "BACKUPS_BACK_UP_YOUR_MEDIA_UPSELL_TITLE" = "Nâng cấp để lưu tất cả tập tin đa phương tiện";
@@ -1268,7 +1268,7 @@
 "BACKUPS_MEDIA_ERROR_NOTIFICATION_TITLE" = "Lỗi bản sao lưu đa phương tiện";
 
 /* Body for a megaphone shown on the chat list encouraging users to enable Signal Secure Backups. */
-"BACKUPS_NEVER_LOSE_A_MESSAGE_MEGAPHONE_BODY" = "Bật Sao lưu bảo mật Signal để bảo vệ tin nhắn và tập tin đa phương tiện của bạn";
+"BACKUPS_NEVER_LOSE_A_MESSAGE_MEGAPHONE_BODY" = "Bật Sao lưu bảo mật Radar để bảo vệ tin nhắn và tập tin đa phương tiện của bạn";
 
 /* Title for a button on a megaphone encouraging users to enable Signal Secure Backups. */
 "BACKUPS_NEVER_LOSE_A_MESSAGE_MEGAPHONE_PRIMARY_ACTION" = "Bật";
@@ -1277,7 +1277,7 @@
 "BACKUPS_NEVER_LOSE_A_MESSAGE_MEGAPHONE_TITLE" = "Không để mất tin nhắn";
 
 /* Body for a megaphone shown on the chat list encouraging users to subscribe to a paid Backup plan to save on-device storage space. */
-"BACKUPS_SAVE_SPACE_MEGAPHONE_BODY" = "Sao lưu bảo mật Signal có thể tiết kiệm dung lượng lưu trữ bằng cách giảm tải tập tin đa phương tiện.";
+"BACKUPS_SAVE_SPACE_MEGAPHONE_BODY" = "Sao lưu bảo mật Radar có thể tiết kiệm dung lượng lưu trữ bằng cách giảm tải tập tin đa phương tiện.";
 
 /* Title for a button on a megaphone encouraging users to subscribe to a paid Backup plan to save on-device storage space, when the user does not yet have Signal Secure Backups enabled. */
 "BACKUPS_SAVE_SPACE_MEGAPHONE_PRIMARY_ACTION_TURN_ON" = "Bật";
@@ -1289,7 +1289,7 @@
 "BACKUPS_SAVE_SPACE_MEGAPHONE_TITLE" = "Tiết kiệm dung lượng với các bản sao lưu trả phí";
 
 /* Body for a Backup plan upsell view encouraging users to subscribe to a paid Backup plan to save on-device storage space. Embeds {{ the amount of storage space being consumed on-device by media, preformatted as a localized byte count, e.g. '1.2 GB' }}. */
-"BACKUPS_SAVE_SPACE_UPSELL_BODY" = "Signal đang sử dụng %1$@ dung lượng cho tập tin đa phương tiện. Gói Sao lưu bảo mật Signal trả phí có thể tiết kiệm dung lượng lưu trữ bằng cách giảm tải tập tin đa phương tiện, và vẫn giữ nguyên toàn bộ lịch sử trò chuyện trong bản sao lưu của bạn.";
+"BACKUPS_SAVE_SPACE_UPSELL_BODY" = "Radar đang sử dụng %1$@ dung lượng cho tập tin đa phương tiện. Gói Sao lưu bảo mật Radar trả phí có thể tiết kiệm dung lượng lưu trữ bằng cách giảm tải tập tin đa phương tiện, và vẫn giữ nguyên toàn bộ lịch sử trò chuyện trong bản sao lưu của bạn.";
 
 /* Title for a Backup plan upsell view encouraging users to subscribe to a paid Backup plan to save on-device storage space. */
 "BACKUPS_SAVE_SPACE_UPSELL_TITLE" = "Tiết kiệm dung lượng với các bản sao lưu trả phí";
@@ -1298,7 +1298,7 @@
 "BACKUPS_SETTINGS_TITLE" = "Sao lưu bảo mật";
 
 /* Message for an action sheet shown on iPad saying you need to set up backups on your phone */
-"BACKUPS_SETUP_ON_PRIMARY_MESSAGE" = "Để cấu hình Sao lưu, hãy mở Signal trên iPhone hoặc Android chính của bạn và vào Cài đặt > Sao lưu.";
+"BACKUPS_SETUP_ON_PRIMARY_MESSAGE" = "Để cấu hình Sao lưu, hãy mở Radar trên iPhone hoặc Android chính của bạn và vào Cài đặt > Sao lưu.";
 
 /* Body for system notification or megaphone when backups is enabled. Embeds {{ time backups was enabled }} */
 "BACKUPS_TURNED_ON_NOTIFICATION_BODY_FORMAT" = "Đã bật tính năng Sao lưu cho tài khoản này vào %1$@. Nhấn để xem.";
@@ -1655,7 +1655,7 @@
 "CALL_QUALITY_SURVEY_COMPLETION_TOAST" = "Cảm ơn góp ý của bạn!";
 
 /* Footer text explaining custom issue descriptions in the call quality survey */
-"CALL_QUALITY_SURVEY_CUSTOM_ISSUE_FOOTER" = "Vui lòng cung cấp mọi thông tin liên quan đến vấn đề. Mọi thông tin bạn chia sẻ ở đây sẽ được bảo mật và chỉ được sử dụng để tăng chất lượng cuộc gọi Signal.";
+"CALL_QUALITY_SURVEY_CUSTOM_ISSUE_FOOTER" = "Vui lòng cung cấp mọi thông tin liên quan đến vấn đề. Mọi thông tin bạn chia sẻ ở đây sẽ được bảo mật và chỉ được sử dụng để tăng chất lượng cuộc gọi Radar.";
 
 /* Placeholder text for the custom issue entry in the call quality survey */
 "CALL_QUALITY_SURVEY_CUSTOM_ISSUE_PLACEHOLDER" = "Mô tả vấn đề của bạn";
@@ -1724,7 +1724,7 @@
 "CALL_QUALITY_SURVEY_ISSUES_SHEET_TITLE" = "Bạn đã gặp vấn đề gì?";
 
 /* Header text explaining the purpose of the call quality survey */
-"CALL_QUALITY_SURVEY_RATING_HEADER" = "Điều này giúp chúng tôi cải thiện chất lượng cuộc gọi Signal. Chúng tôi sẽ không lưu thông tin thông tin nhận dạng cá nhân.";
+"CALL_QUALITY_SURVEY_RATING_HEADER" = "Điều này giúp chúng tôi cải thiện chất lượng cuộc gọi Radar. Chúng tôi sẽ không lưu thông tin thông tin nhận dạng cá nhân.";
 
 /* Title for the initial rating screen in the call quality survey */
 "CALL_QUALITY_SURVEY_RATING_TITLE" = "Cuộc gọi của bạn thế nào?";
@@ -2111,7 +2111,7 @@
 "CHAT_LIST_BACKUP_PROGRESS_VIEW_RESUME_CELLULAR_DATA_BUTTON" = "Tiếp tục";
 
 /* Message shown in an action sheet when the user tries to resume backup using cellular data. */
-"CHAT_LIST_BACKUP_PROGRESS_VIEW_RESUME_CELLULAR_DATA_MESSAGE" = "Việc sao lưu tập tin đa phương tiện của bạn bằng dữ liệu di động có thể phát sinh phí dữ liệu. Bản sao lưu của bạn có thể cần một khoảng thời gian dài để tải lên, tiếp tục mở Signal để tránh làm gián đoạn.";
+"CHAT_LIST_BACKUP_PROGRESS_VIEW_RESUME_CELLULAR_DATA_MESSAGE" = "Việc sao lưu tập tin đa phương tiện của bạn bằng dữ liệu di động có thể phát sinh phí dữ liệu. Bản sao lưu của bạn có thể cần một khoảng thời gian dài để tải lên, tiếp tục mở Radar để tránh làm gián đoạn.";
 
 /* Title for the action sheet shown when the user tries to resume backup using cellular data. */
 "CHAT_LIST_BACKUP_PROGRESS_VIEW_RESUME_CELLULAR_DATA_TITLE" = "Tiếp tục tải bằng dữ liệu di động?";
@@ -2243,7 +2243,7 @@
 "CLOCK_SKEW_APP_BLOCKING_DEVICE_TIME_FORMAT" = "Giờ của thiết bị của bạn là %1$@ UTC.";
 
 /* Subtitle for a screen shown when the app can't be used until the user corrects their device's date and time. */
-"CLOCK_SKEW_APP_BLOCKING_SUBTITLE" = "Không thể sử dụng Signal khi ngày và giờ của thiết bị của bạn không chính xác. Mở Cài đặt để điều chỉnh.";
+"CLOCK_SKEW_APP_BLOCKING_SUBTITLE" = "Không thể sử dụng Radar khi ngày và giờ của thiết bị của bạn không chính xác. Mở Cài đặt để điều chỉnh.";
 
 /* Title for a screen shown when the app can't be used until the user corrects their device's date and time. */
 "CLOCK_SKEW_APP_BLOCKING_TITLE" = "Ngày không chính xác";
@@ -2462,7 +2462,7 @@
 "CONTACT_SHARE_AVATAR_ROW_LABEL" = "Ảnh";
 
 /* Name of the option to share a contact's Signal profile photo. Read by VoiceOver on the option, and as the current value of the photo row when it's selected. */
-"CONTACT_SHARE_AVATAR_SIGNAL_PHOTO" = "Ảnh đại diện Signal";
+"CONTACT_SHARE_AVATAR_SIGNAL_PHOTO" = "Ảnh đại diện Radar";
 
 /* Name of the option to share a contact's photo from the phone's contacts. Read by VoiceOver on the option, and as the current value of the photo row when it's selected. */
 "CONTACT_SHARE_AVATAR_SYSTEM_CONTACT_PHOTO" = "Ảnh liên hệ";
@@ -2477,7 +2477,7 @@
 "CONTACT_SHARE_MESSAGE_BUTTON" = "Tin nhắn";
 
 /* Notice at the top of the 'Share Contact' view when the shared contact includes their Signal account. Embeds {{ contact name }}. */
-"CONTACT_SHARE_SIGNAL_ACCOUNT_NOTICE_FORMAT" = "Bất kỳ ai được bạn chia sẻ hồ sơ này đều có thể nhắn tin cho %1$@ trên Signal.";
+"CONTACT_SHARE_SIGNAL_ACCOUNT_NOTICE_FORMAT" = "Bất kỳ ai được bạn chia sẻ hồ sơ này đều có thể nhắn tin cho %1$@ trên Radar.";
 
 /* Alert body when contacts disabled while trying to share a contact. */
 "CONTACT_SHARING_NO_ACCESS_BODY" = "Radar cần quyền truy cập vào danh bạ của bạn. Vào Cài đặt iOS và bật mục danh bạ. Danh bạ của bạn được mã hóa và Radar không thể truy cập được.";
@@ -4698,10 +4698,10 @@
 "GROUP_NAME_EDUCATION_SHEET_BULLET_1" = "Hãy cẩn trọng với các nhóm mạo danh tổ chức và doanh nghiệp";
 
 /* Second bullet point for the explainer sheet for group names */
-"GROUP_NAME_EDUCATION_SHEET_BULLET_2" = "Signal không thể xác minh tên và ảnh";
+"GROUP_NAME_EDUCATION_SHEET_BULLET_2" = "Radar không thể xác minh tên và ảnh";
 
 /* Third bullet point for the explainer sheet for group names */
-"GROUP_NAME_EDUCATION_SHEET_BULLET_3" = "Signal sẽ không bao giờ nhắn tin yêu cầu bạn cung cấp mã đăng ký, mã PIN hoặc mã khóa khôi phục";
+"GROUP_NAME_EDUCATION_SHEET_BULLET_3" = "Radar sẽ không bao giờ nhắn tin yêu cầu bạn cung cấp mã đăng ký, mã PIN hoặc mã khóa khôi phục";
 
 /* Fourth bullet point for the explainer sheet for group names */
 "GROUP_NAME_EDUCATION_SHEET_BULLET_4" = "Không chia sẻ thông tin cá nhân với người bạn không quen biết";
@@ -5266,6 +5266,9 @@
 
 /* Placeholder text displayed in empty input box in chat screen. */
 "INPUT_TOOLBAR_MESSAGE_PLACEHOLDER" = "Tin nhắn";
+/* accessibility label for the button which show up send payemnt screen */
+"INPUT_TOOLBAR_PAYMENTS_BUTTON_ACCESSIBILITY_LABEL" = "Gửi Thanh toán";
+
 
 /* accessibility label for the button which shows the sticker picker */
 "INPUT_TOOLBAR_STICKER_BUTTON_ACCESSIBILITY_LABEL" = "Nhãn dán";
@@ -5490,7 +5493,7 @@
 "LINKED_DEVICE_INFO_SHEET_BULLET_3" = "Một số cài đặt tài khoản chỉ được quản lý trên thiết bị chính của bạn, bao gồm cài đặt tài khoản và bản sao lưu.";
 
 /* Lead paragraph for a sheet explaining linked devices. The text within the <bold></bold> tags is styled bold. */
-"LINKED_DEVICE_INFO_SHEET_HEADER" = "Tính năng <bold>Liên kết thiết bị</bold> cho phép bạn truy cập tài khoản Signal và tin nhắn một cách an toàn trên thiết bị bổ sung bất kỳ của bạn.";
+"LINKED_DEVICE_INFO_SHEET_HEADER" = "Tính năng <bold>Liên kết thiết bị</bold> cho phép bạn truy cập tài khoản Radar và tin nhắn một cách an toàn trên thiết bị bổ sung bất kỳ của bạn.";
 
 /* Shown in a banner when you tap the 'New Chat' icon at the top of the list of chats. */
 "LINKED_DEVICE_MANAGE_CONTACTS_BANNER" = "Chức năng quản lý danh bạ của điện thoại không còn được hỗ trợ trên các thiết bị được liên kết. Thiết bị này sẽ tiếp tục đồng bộ mọi thay đổi đối với danh bạ của bạn từ Radar trên thiết bị chính.";
@@ -5556,7 +5559,7 @@
 "LINKING_DEVICE_FAILED_TITLE" = "Không thể liên kết thiết bị";
 
 /* Shown when trying to link a device to an account but that device is out of date and must first update its version of Signal. */
-"LINKING_DEVICE_OUT_OF_DATE" = "Thiết bị còn lại của bạn đang chạy phiên bản Signal cũ. Bạn cần cập nhật Signal trên thiết bị đó trước khi có thể liên kết.";
+"LINKING_DEVICE_OUT_OF_DATE" = "Thiết bị còn lại của bạn đang chạy phiên bản Radar cũ. Bạn cần cập nhật Radar trên thiết bị đó trước khi có thể liên kết.";
 
 /* Progress label when the message loading has nearly completed during the device linking process */
 "LINKING_SYNCING_FINALIZING" = "Đang hoàn tất việc chuyển tin nhắn…";
@@ -5580,7 +5583,7 @@
 "LOCAL_BACKUP_SETTINGS_CREATE_NEW_KEY_WARNING_SHEET_BODY" = "Việc tạo mã khóa mới chỉ cần thiết nếu có người khác biết mã khóa của bạn. Trước tiên, cần tắt tính năng Sao lưu trên thiết bị để tạo mã khóa mới.\n\nSau khi tắt Sao lưu trên thiết bị và tạo một mã khóa mới, bạn sẽ cần bật lại Sao lưu trên thiết bị.";
 
 /* Body for an error sheet shown when the user's folder choice does not contain a backup file. */
-"LOCAL_BACKUPS_MISSING_BACKUP_ACTION_SHEET_BODY" = "Không tìm thấy bản sao lưu Signal trong thư mục đã chọn. Vui lòng thử một thư mục khác.";
+"LOCAL_BACKUPS_MISSING_BACKUP_ACTION_SHEET_BODY" = "Không tìm thấy bản sao lưu Radar trong thư mục đã chọn. Vui lòng thử một thư mục khác.";
 
 /* Title for an error sheet shown when the user's folder choice does not contain a backup file. */
 "LOCAL_BACKUPS_MISSING_BACKUP_ACTION_SHEET_TITLE" = "Không tìm thấy bản sao lưu";
@@ -5628,7 +5631,7 @@
 "LOCAL_FILE_BACKUP_ONBOARDING_INTRO_BULLET_3" = "Tắt sao lưu bất cứ lúc nào";
 
 /* Subtitle for a view introducing local file backups during the onboarding flow. */
-"LOCAL_FILE_BACKUP_ONBOARDING_INTRO_SUBTITLE" = "Sao lưu tin nhắn của bạn vào một thư mục trên thiết bị. Bản sao lưu của bạn được mã hóa đầu cuối và có thể được khôi phục bằng cách cài đặt mới Signal và chọn \"Khôi phục hoặc Chuyển\".";
+"LOCAL_FILE_BACKUP_ONBOARDING_INTRO_SUBTITLE" = "Sao lưu tin nhắn của bạn vào một thư mục trên thiết bị. Bản sao lưu của bạn được mã hóa đầu cuối và có thể được khôi phục bằng cách cài đặt mới Radar và chọn \"Khôi phục hoặc Chuyển\".";
 
 /* Title for a view introducing local file backups during the onboarding flow. */
 "LOCAL_FILE_BACKUP_ONBOARDING_INTRO_TITLE" = "Bản sao lưu trên thiết bị";
@@ -5643,10 +5646,10 @@
 "LOCAL_FILE_BACKUPS_CHOOSE_FOLDER_TITLE" = "Chọn thư mục";
 
 /* Warning shown when a user tries to enable local file backups with optimize media enabled */
-"LOCAL_FILE_BACKUPS_OPTIMIZE_MEDIA_WARNING_ACTION_SHEET" = "Bạn đang bật Tối ưu hóa dung lượng của Signal. Nếu bạn muốn bao gồm tất cả tập tin đa phương tiện vào bản sao lưu trên thiết bị, hãy tắt tùy chọn này.";
+"LOCAL_FILE_BACKUPS_OPTIMIZE_MEDIA_WARNING_ACTION_SHEET" = "Bạn đang bật Tối ưu hóa dung lượng của Radar. Nếu bạn muốn bao gồm tất cả tập tin đa phương tiện vào bản sao lưu trên thiết bị, hãy tắt tùy chọn này.";
 
 /* Message for a sheet warning the user about enabling Optimize Storage with local backups enabled. */
-"LOCAL_FILE_BACKUPS_OPTIMIZE_MEDIA_WARNING_ACTION_SHEET_2_BODY" = "Việc bật tùy chọn \"Tối ưu hóa dung lượng của Signal\" sẽ giúp gỡ các tập tin đa phương tiện cũ khỏi thiết bị của bạn. Bạn có thể tải xuống lại bất cứ lúc nào. Tùy chọn này cũng sẽ xóa các tập tin đa phương tiện cũ khỏi bản sao lưu trên thiết bị của bạn.";
+"LOCAL_FILE_BACKUPS_OPTIMIZE_MEDIA_WARNING_ACTION_SHEET_2_BODY" = "Việc bật tùy chọn \"Tối ưu hóa dung lượng của Radar\" sẽ giúp gỡ các tập tin đa phương tiện cũ khỏi thiết bị của bạn. Bạn có thể tải xuống lại bất cứ lúc nào. Tùy chọn này cũng sẽ xóa các tập tin đa phương tiện cũ khỏi bản sao lưu trên thiết bị của bạn.";
 
 /* Title for a sheet warning the user about enabling Optimize Storage with local backups enabled. */
 "LOCAL_FILE_BACKUPS_OPTIMIZE_MEDIA_WARNING_ACTION_SHEET_2_TITLE" = "Tập tin đa phương tiện sẽ bị xóa khỏi bản sao lưu trên thiết bị của bạn";
@@ -5676,10 +5679,10 @@
 "LONG_TEXT_VIEW_TITLE" = "Tin nhắn";
 
 /* Message for a sheet warning the user that their device is low on storage space. Embeds 1:{{ the localized name of the user's device model, e.g. iPhone }}; 2:{{ an amount of storage space as a file size, e.g. 1 GB }}. */
-"LOW_DISK_SPACE_WARNING_SHEET_MESSAGE_FORMAT" = "%1$@ của bạn sắp hết dung lượng lưu trữ. Nếu bộ nhớ đầy, Signal sẽ ngừng hoạt động và bạn có thể mất dữ liệu. Hãy giải phóng ít nhất %2$@ dung lượng.";
+"LOW_DISK_SPACE_WARNING_SHEET_MESSAGE_FORMAT" = "%1$@ của bạn sắp hết dung lượng lưu trữ. Nếu bộ nhớ đầy, Radar sẽ ngừng hoạt động và bạn có thể mất dữ liệu. Hãy giải phóng ít nhất %2$@ dung lượng.";
 
 /* A suggestion for freeing up storage space, on a sheet warning the user that their device is low on storage space. */
-"LOW_DISK_SPACE_WARNING_SHEET_SUGGESTION_DELETE_CAMERA_ROLL_MEDIA" = "Xóa video có dung lượng lớn khỏi ứng dụng Ảnh, Signal hoặc các ứng dụng nhắn tin khác";
+"LOW_DISK_SPACE_WARNING_SHEET_SUGGESTION_DELETE_CAMERA_ROLL_MEDIA" = "Xóa video có dung lượng lớn khỏi ứng dụng Ảnh, Radar hoặc các ứng dụng nhắn tin khác";
 
 /* A suggestion for freeing up storage space, on a sheet warning the user that their device is low on storage space. */
 "LOW_DISK_SPACE_WARNING_SHEET_SUGGESTION_DELETE_DOWNLOADED_MEDIA" = "Xóa nhạc hoặc tập tin đa phương tiện khác đã tải xuống";
@@ -5844,7 +5847,7 @@
 "MEMBER_LABEL_VIEW_TITLE" = "Nhãn thành viên";
 
 /* A one-time confirmation that you, as an admin, want to delete for everyone */
-"MESSAGE_ACTION_ADMIN_DELETE_FOR_EVERYONE_CONFIRMATION" = "Thành viên nhóm sử dụng phiên bản Signal mới nhất sẽ thấy bạn đã xóa các tin nhắn này.";
+"MESSAGE_ACTION_ADMIN_DELETE_FOR_EVERYONE_CONFIRMATION" = "Thành viên nhóm sử dụng phiên bản Radar mới nhất sẽ thấy bạn đã xóa các tin nhắn này.";
 
 /* Action sheet button title */
 "MESSAGE_ACTION_COPY_TEXT" = "Sao chép Nội dung Tin nhắn";
@@ -6045,7 +6048,7 @@
 "MESSAGE_REQUEST_CONFIRM_ACCEPT_MESSAGE" = "Chỉ chấp nhận yêu cầu kết bạn từ những người bạn tin tưởng. %1$@ nhắn tin yêu cầu bạn cung cấp mã đăng ký, mã PIN hoặc mã khóa khôi phục.";
 
 /* Embedded text in the message for an action sheet asking the user to confirm if they want to accept a message request. */
-"MESSAGE_REQUEST_CONFIRM_ACCEPT_MESSAGE_EMBEDDED_BOLD_TEXT" = "Signal không bao giờ";
+"MESSAGE_REQUEST_CONFIRM_ACCEPT_MESSAGE_EMBEDDED_BOLD_TEXT" = "Radar không bao giờ";
 
 /* Title for an action sheet asking the user to confirm if they want to accept a message request */
 "MESSAGE_REQUEST_CONFIRM_ACCEPT_TITLE" = "Chấp nhận yêu cầu?";
@@ -6492,13 +6495,13 @@
 "NO_OTHER_GROUPS_IN_COMMON" = "Không có nhóm chung nào khác.";
 
 /* Shown in place of the text input box in a conversation when the user is no longer registered can't send messages. The embedded value is 'Re-link' (translated via NOT_LINKED_BOTTOM_RELINK), and it will be formatted as a tappable link. */
-"NOT_LINKED_BOTTOM" = "Thiết bị này không còn được liên kết. %1$@ để tiếp tục sử dụng Signal trên thiết bị này.";
+"NOT_LINKED_BOTTOM" = "Thiết bị này không còn được liên kết. %1$@ để tiếp tục sử dụng Radar trên thiết bị này.";
 
 /* Shown in place of the text input box in a conversation when the user is no longer registered can't send messages. This value is a tappable link embedded in a larger sentence. */
 "NOT_LINKED_BOTTOM_RELINK" = "Liên kết lại";
 
 /* Shown in place of the text input box in a conversation when the user is no longer registered can't send messages. The embedded value is 'Re-register' (translated via NOT_REGISTERED_BOTTOM_REREGISTER), and it will be formatted as a tappable link. */
-"NOT_REGISTERED_BOTTOM" = "Thiết bị này không còn được đăng ký. %1$@ để tiếp tục sử dụng Signal.";
+"NOT_REGISTERED_BOTTOM" = "Thiết bị này không còn được đăng ký. %1$@ để tiếp tục sử dụng Radar.";
 
 /* Shown in place of the text input box in a conversation when the user is no longer registered can't send messages. This value is a tappable link embedded in a larger sentence. */
 "NOT_REGISTERED_BOTTOM_REREGISTER" = "Đăng ký lại";
@@ -6510,13 +6513,13 @@
 "NOTE_TO_SELF" = "Ghi chú";
 
 /* Body for a notification shown when Signal can't fetch messages because the device's date and time are incorrect. */
-"NOTIFICATION_BODY_CLOCK_SKEW" = "Signal không thể nhận tin nhắn khi ngày và giờ trên thiết bị của bạn không chính xác. Mở Cài đặt để điều chỉnh.";
+"NOTIFICATION_BODY_CLOCK_SKEW" = "Radar không thể nhận tin nhắn khi ngày và giờ trên thiết bị của bạn không chính xác. Mở Cài đặt để điều chỉnh.";
 
 /* Body for a notification representing a message request. */
 "NOTIFICATION_BODY_INCOMING_MESSAGE_REQUEST" = "Yêu cầu gửi Tin nhắn";
 
 /* Body for a notification shown when Signal can't fetch messages because the device is low on storage space. */
-"NOTIFICATION_BODY_LOW_STORAGE_SPACE" = "Bạn có thể nhận được tin nhắn mới nhưng thiết bị của bạn không đủ dung lượng lưu trữ để Signal hoạt động. Nhấn để xem thêm thông tin.";
+"NOTIFICATION_BODY_LOW_STORAGE_SPACE" = "Bạn có thể nhận được tin nhắn mới nhưng thiết bị của bạn không đủ dung lượng lưu trữ để Radar hoạt động. Nhấn để xem thêm thông tin.";
 
 /* Lock screen notification text presented after user powers on their device without unlocking. Embeds {{device model}} (either 'iPad' or 'iPhone') */
 "NOTIFICATION_BODY_PHONE_LOCKED_FORMAT" = "Bạn có thể đã nhận tin nhắn này khi %1$@ đang khởi động nguồn trở lại.";
@@ -6615,10 +6618,10 @@
 "ONBOARDING_CHOOSE_BACKUP_SHEET_TITLE" = "Chọn bản sao lưu để khôi phục";
 
 /* The body for the device transfer 'choice' view 'restore backup' option */
-"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_BODY" = "Khôi phục tài khoản và tin nhắn của bạn từ Sao lưu Radar/Radar";
+"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_BODY" = "Khôi phục tài khoản và tin nhắn của bạn từ Sao lưu Signal/Radar";
 
 /* The title for the device transfer 'choice' view 'restore backup' option */
-"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_TITLE" = "Khôi phục bản Sao lưu bảo mật Radar/Radar";
+"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_TITLE" = "Khôi phục bản Sao lưu bảo mật Signal/Radar";
 
 /* Body for a sheet warning users about skipping restore. */
 "ONBOARDING_CHOOSE_RESTORE_METHOD_CONFIRM_SKIP_RESTORE_BODY" = "Nếu bạn bỏ qua việc khôi phục bây giờ, bạn sẽ không thể khôi phục sau này. Nếu bạn bật lại tính năng sao lưu trên thiết bị này, bản sao lưu hiện tại sẽ được thay thế bởi lịch sử tin nhắn mới.";
@@ -6696,7 +6699,7 @@
 "ONBOARDING_MODE_SWITCH_EXPLANATION_PROVISIONING" = "Nhấn \"Đăng kí iPad\" sẽ cho phép bạn tạo một tài khoản Radar mới hoặc chuyển một tài khoản có sẵn sang iPad này. Thao tác này sẽ vô hiệu hóa Radar trên thiết bị được đăng kí với cùng số điện thoại.";
 
 /* explanation to the user they're switching from registering to linking flow */
-"ONBOARDING_MODE_SWITCH_EXPLANATION_REGISTERING" = "Nhấn vào \"Liên kết thiết bị này\" sẽ cho phép bạn kết nối thiết bị này với tài khoản Signal hiện có.";
+"ONBOARDING_MODE_SWITCH_EXPLANATION_REGISTERING" = "Nhấn vào \"Liên kết thiết bị này\" sẽ cho phép bạn kết nối thiết bị này với tài khoản Radar hiện có.";
 
 /* header text indicating to the user they're switching from linking to registering flow */
 "ONBOARDING_MODE_SWITCH_TITLE_PROVISIONING" = "Đăng ký iPad này";
@@ -6783,13 +6786,13 @@
 "ONBOARDING_SIGN_UP_USE_SIGNAL_ACCOUNT_BUTTON_TITLE" = "Use my Signal account";
 
 /* Explanation of 'do not have old device' flow for the 'Restore or Transfer' prompt */
-"ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_BODY" = "Hoặc bạn đang cài lại Radar/Radar trên cùng thiết bị";
+"ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_BODY" = "Hoặc bạn đang cài lại Signal/Radar trên cùng thiết bị";
 
 /* Title for the 'do not have my old device' choice of the 'Restore or Transfer' prompt */
 "ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_TITLE" = "Tôi không có điện thoại cũ";
 
 /* Explanation of 'have old device' flow for the 'Restore or Transfer' prompt */
-"ONBOARDING_SPLASH_HAVE_OLD_DEVICE_BODY" = "Quét mã QR từ tài khoản Radar/Radar điện thoại của bạn để nhanh chóng bắt đầu";
+"ONBOARDING_SPLASH_HAVE_OLD_DEVICE_BODY" = "Quét mã QR từ tài khoản Signal/Radar điện thoại của bạn để nhanh chóng bắt đầu";
 
 /* Title for the 'have my old device' choice of the 'Restore or Transfer' prompt */
 "ONBOARDING_SPLASH_HAVE_OLD_DEVICE_TITLE" = "Tôi có điện thoại cũ";
@@ -7033,7 +7036,7 @@ Send money securely.";
 "OVERSIZE_TEXT_UNAVAILABLE_SHEET_TITLE" = "Tin nhắn hoàn chỉnh không có sẵn";
 
 /* The name of the Signal app, used as the title for an entry in a user's password manager for their Signal Recovery Key. Should be localized with the same value as the app's name in the iOS App Store. */
-"PASSWORD_MANAGER_SIGNAL_APP_NAME" = "Signal Private Messenger";
+"PASSWORD_MANAGER_SIGNAL_APP_NAME" = "Radar Private Messenger";
 
 /* Header title for bank payment details screen */
 "PAYMENT_DETAILS_BANK_TITLE" = "Chuyển khoản Ngân hàng";
@@ -7924,10 +7927,10 @@ Send money securely.";
 "PROFILE_NAME_CHANGE_SYSTEM_NONCONTACT_FORMAT" = "%1$@ đã đổi tên hồ sơ thành %2$@.";
 
 /* First bullet point for the explainer sheet for profile names */
-"PROFILE_NAME_EDUCATION_SHEET_BULLET_1" = "Signal không thể xác minh tên và ảnh";
+"PROFILE_NAME_EDUCATION_SHEET_BULLET_1" = "Radar không thể xác minh tên và ảnh";
 
 /* Second bullet point for the explainer sheet for profile names */
-"PROFILE_NAME_EDUCATION_SHEET_BULLET_2" = "Signal sẽ không bao giờ liên hệ yêu cầu bạn cung cấp mã đăng ký, mã PIN hoặc mã khóa khôi phục";
+"PROFILE_NAME_EDUCATION_SHEET_BULLET_2" = "Radar sẽ không bao giờ liên hệ yêu cầu bạn cung cấp mã đăng ký, mã PIN hoặc mã khóa khôi phục";
 
 /* Third bullet point for the explainer sheet for profile names */
 "PROFILE_NAME_EDUCATION_SHEET_BULLET_3" = "Hãy cẩn trọng với các tài khoản mạo danh";
@@ -8035,7 +8038,7 @@ Send money securely.";
 "QUICK_RESTORE_URL_OPENED_ACTION_SHEET_EXTERNAL_URL_ACTION_TITLE" = "Quét Mã QR";
 
 /* Message for an action sheet telling users how to use quick restore, when trying to open an external quick restore URL. */
-"QUICK_RESTORE_URL_OPENED_ACTION_SHEET_EXTERNAL_URL_MESSAGE" = "Để chuyển tài khoản này đến thiết bị mới, hãy nhấn \"Tiếp tục\" và quét mã QR bằng camera của Signal. Đảm bảo bạn chỉ quét mã QR có nguồn gốc trực tiếp từ Signal.";
+"QUICK_RESTORE_URL_OPENED_ACTION_SHEET_EXTERNAL_URL_MESSAGE" = "Để chuyển tài khoản này đến thiết bị mới, hãy nhấn \"Tiếp tục\" và quét mã QR bằng camera của Radar. Đảm bảo bạn chỉ quét mã QR có nguồn gốc trực tiếp từ Radar.";
 
 /* Accessibility label stating the author of the message to which you are replying. Embeds: {{ the author of the message to which you are replying }} {{ original message }}. */
 "QUOTED_REPLY_ACCESSIBILITY_LABEL_FORMAT" = "Đang trả lời %1$@. %2$@";
@@ -8203,7 +8206,7 @@ Send money securely.";
 "REGISTER_WITHOUT_NUMBER" = "Đăng ký không dùng số điện thoại";
 
 /* Short description for a sheet warning users about an incorrect recovery key used for registration. */
-"REGISTRATION_BACKUP_REGISTRATION_ERROR_INCORRECT_KEY_BODY" = "Hãy đảm bảo bạn đang đăng ký bằng cùng số điện thoại và mã khóa khôi phục 64 ký tự mà bạn đã lưu khi bật tính năng sao lưu Signal. Không thể khôi phục bản sao lưu nếu không có mã khóa này.";
+"REGISTRATION_BACKUP_REGISTRATION_ERROR_INCORRECT_KEY_BODY" = "Hãy đảm bảo bạn đang đăng ký bằng cùng số điện thoại và mã khóa khôi phục 64 ký tự mà bạn đã lưu khi bật tính năng sao lưu Radar. Không thể khôi phục bản sao lưu nếu không có mã khóa này.";
 
 /* Title for a sheet warning users about an incorrect recovery key used for registration. */
 "REGISTRATION_BACKUP_REGISTRATION_ERROR_INCORRECT_KEY_TITLE" = "Mã khóa khôi phục không đúng";
@@ -8212,7 +8215,7 @@ Send money securely.";
 "REGISTRATION_BACKUP_REGISTRATION_ERROR_INCORRECT_KEY_TRY_PIN_ACTION" = "Đăng ký cách khác";
 
 /* Message body for a sheet asking users if they would rather use PIN/SMS for registration. */
-"REGISTRATION_BACKUP_REGISTRATION_ERROR_INCORRECT_KEY_TRY_PIN_MESSAGE" = "Bạn có thể đăng ký tài khoản bằng cách xác minh qua mã SMS mà Signal sẽ gửi cho bạn, hoặc bằng cách nhập mã PIN của mình. Sau khi đăng ký, bạn có thể thử khôi phục lại bản sao lưu bằng mã khóa khôi phục.";
+"REGISTRATION_BACKUP_REGISTRATION_ERROR_INCORRECT_KEY_TRY_PIN_MESSAGE" = "Bạn có thể đăng ký tài khoản bằng cách xác minh qua mã SMS mà Radar sẽ gửi cho bạn, hoặc bằng cách nhập mã PIN của mình. Sau khi đăng ký, bạn có thể thử khôi phục lại bản sao lưu bằng mã khóa khôi phục.";
 
 /* Title for a sheet asking users if they would rather use PIN/SMS for registration. */
 "REGISTRATION_BACKUP_REGISTRATION_ERROR_INCORRECT_KEY_TRY_PIN_TITLE" = "Xác minh bằng SMS hoặc mã PIN?";
@@ -8269,7 +8272,7 @@ Send money securely.";
 "REGISTRATION_BACKUP_RESTORE_ERROR_LOCAL_BACKUP_LOCATION_TITLE" = "Không thể khôi phục bản sao lưu";
 
 /* Message for a sheet telling the user that their phone number is mismatched with their recovery key used for making a local backup */
-"REGISTRATION_BACKUP_RESTORE_ERROR_MISMATCHED_LOCAL_BACKUP_MESSAGE" = "Bản sao lưu bạn đang cố khôi phục được tạo bằng một tài khoản Signal khác. Để khôi phục bản sao lưu này, bạn phải dùng cùng số điện thoại và mã khóa khôi phục mà bạn đã lưu khi bật tính năng sao lưu trên thiết bị.";
+"REGISTRATION_BACKUP_RESTORE_ERROR_MISMATCHED_LOCAL_BACKUP_MESSAGE" = "Bản sao lưu bạn đang cố khôi phục được tạo bằng một tài khoản Radar khác. Để khôi phục bản sao lưu này, bạn phải dùng cùng số điện thoại và mã khóa khôi phục mà bạn đã lưu khi bật tính năng sao lưu trên thiết bị.";
 
 /* Body for a sheet warning users about a network error during backup restore. */
 "REGISTRATION_BACKUP_RESTORE_ERROR_NETWORK_BODY" = "Hiện không thể khôi phục bản sao lưu của bạn. Kiểm tra kết nối internet của bạn và thử lại.";
@@ -8761,7 +8764,7 @@ Send money securely.";
 "RING_ON_CONFIRMATION_TOAST_LABEL" = "Đổ chuông đang bật";
 
 /* Message shown in an action sheet when attempting to disable PIN, but Backups is enabled. */
-"ROTATE_AEP_ACTION_BACKUPS_DISABLE_REQUIRED" = "Bạn phải tắt tính năng Sao lưu bảo mật Signal trước khi tiếp tục.";
+"ROTATE_AEP_ACTION_BACKUPS_DISABLE_REQUIRED" = "Bạn phải tắt tính năng Sao lưu bảo mật Radar trước khi tiếp tục.";
 
 /* button title to confirm adding a recipient when their safety number has recently changed */
 "SAFETY_NUMBER_CHANGED_CONFIRM_ADD_MEMBER_ACTION" = "Xác nhận Thêm";
@@ -8803,13 +8806,13 @@ Send money securely.";
 "SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_BUTTON_VERIFYING" = "Đang xác minh mã hóa…";
 
 /* Body for a sheet introducing Key Transparency. */
-"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_EDUCATION_SHEET_BODY" = "Đối với những người bạn đã kết nối thông qua số điện thoại, Signal có thể tự động xác nhận xem kết nối có an toàn hay không bằng cách sử dụng quy trình được gọi là độ minh bạch của mã khóa. Để tăng độ bảo mật, bạn vẫn có thể xác minh thủ công các kết nối bằng mã QR hoặc bằng cách so sánh mã số an toàn.";
+"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_EDUCATION_SHEET_BODY" = "Đối với những người bạn đã kết nối thông qua số điện thoại, Radar có thể tự động xác nhận xem kết nối có an toàn hay không bằng cách sử dụng quy trình được gọi là độ minh bạch của mã khóa. Để tăng độ bảo mật, bạn vẫn có thể xác minh thủ công các kết nối bằng mã QR hoặc bằng cách so sánh mã số an toàn.";
 
 /* Title for a sheet introducing Key Transparency. */
-"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_EDUCATION_SHEET_TITLE" = "Signal giờ đây có thể tự động xác minh mã hóa";
+"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_EDUCATION_SHEET_TITLE" = "Radar giờ đây có thể tự động xác minh mã hóa";
 
 /* Body for a sheet explaining that encryption auto-verification did not succeed. Embeds {{ 1: the contact's name }}. */
-"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_FAILURE_SHEET_BODY_FORMAT" = "Signal không thể tự động xác minh mã hóa cho cuộc trò chuyện này. Điều này có thể là vì %1$@ đã đổi số điện thoại của họ hoặc đã thay đổi phần cài đặt sự riêng tư cho số điện thoại. Xác minh thủ công mã hóa đầu cuối bằng cách so sánh các số trên màn hình trước đó hoặc quét mã trên thiết bị của họ.";
+"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_FAILURE_SHEET_BODY_FORMAT" = "Radar không thể tự động xác minh mã hóa cho cuộc trò chuyện này. Điều này có thể là vì %1$@ đã đổi số điện thoại của họ hoặc đã thay đổi phần cài đặt sự riêng tư cho số điện thoại. Xác minh thủ công mã hóa đầu cuối bằng cách so sánh các số trên màn hình trước đó hoặc quét mã trên thiết bị của họ.";
 
 /* Title for a sheet explaining that encryption auto-verification did not succeed. */
 "SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_FAILURE_SHEET_TITLE" = "Tính năng tự động xác minh không còn khả dụng cho cuộc trò chuyện này";
@@ -8821,13 +8824,13 @@ Send money securely.";
 "SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_HEADER" = "Xác minh mã khóa tự động";
 
 /* Body for a sheet explaining that encryption auto-verification is not available. */
-"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_NOT_AVAILABLE_SHEET_BODY" = "Signal chỉ có thể tự động xác minh mã hóa trong các cuộc trò chuyện mà bạn được kết nối với ai đó thông qua số điện thoại. Nếu cuộc trò chuyện được bắt đầu với tên người dùng hoặc một nhóm chung, hãy xác minh mã hóa đầu cuối bằng cách so sánh các số trên màn hình trước đó hoặc quét mã trên thiết bị của họ.";
+"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_NOT_AVAILABLE_SHEET_BODY" = "Radar chỉ có thể tự động xác minh mã hóa trong các cuộc trò chuyện mà bạn được kết nối với ai đó thông qua số điện thoại. Nếu cuộc trò chuyện được bắt đầu với tên người dùng hoặc một nhóm chung, hãy xác minh mã hóa đầu cuối bằng cách so sánh các số trên màn hình trước đó hoặc quét mã trên thiết bị của họ.";
 
 /* Title for a sheet explaining that encryption auto-verification is not available. */
 "SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_NOT_AVAILABLE_SHEET_TITLE" = "Hiện không thể sử dụng tính năng tự động xác minh cho cuộc trò chuyện này";
 
 /* Body for a sheet explaining that encryption auto-verification succeeded. */
-"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_SUCCESS_SHEET_BODY" = "Đối với các liên hệ bạn đã kết nối thông qua số điện thoại, Signal có thể tự động xác nhận xem kết nối có an toàn hay không bằng cách sử dụng quy trình gọi là độ minh bạch của mã khóa. Để tăng cường bảo mật, hãy xác minh thủ công mã hóa đầu cuối bằng cách so sánh các số trên màn hình trước đó hoặc quét mã trên thiết bị của họ.";
+"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_SUCCESS_SHEET_BODY" = "Đối với các liên hệ bạn đã kết nối thông qua số điện thoại, Radar có thể tự động xác nhận xem kết nối có an toàn hay không bằng cách sử dụng quy trình gọi là độ minh bạch của mã khóa. Để tăng cường bảo mật, hãy xác minh thủ công mã hóa đầu cuối bằng cách so sánh các số trên màn hình trước đó hoặc quét mã trên thiết bị của họ.";
 
 /* Title for a sheet explaining that encryption auto-verification succeeded. */
 "SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_SUCCESS_SHEET_TITLE" = "Mã hóa đã được tự động xác minh cho cuộc trò chuyện này";
@@ -8842,7 +8845,7 @@ Send money securely.";
 "SAFETY_TIPS_CRYPTO_TITLE" = "Lừa đảo tiền điện tử hoặc tiền";
 
 /* Message body describing the enable reglock safety tip. */
-"SAFETY_TIPS_ENABLE_REGLOCK_BODY" = "Hãy bảo vệ tài khoản của bạn bằng cách yêu cầu nhập mã PIN của Signal, ngoài mã xác minh, khi đăng ký tài khoản Signal.";
+"SAFETY_TIPS_ENABLE_REGLOCK_BODY" = "Hãy bảo vệ tài khoản của bạn bằng cách yêu cầu nhập mã PIN của Radar, ngoài mã xác minh, khi đăng ký tài khoản Radar.";
 
 /* Message title describing the enable reglock safety tip. */
 "SAFETY_TIPS_ENABLE_REGLOCK_TITLE" = "Bật khóa đăng ký trong mục cài đặt tài khoản";
@@ -8875,22 +8878,22 @@ Send money securely.";
 "SAFETY_TIPS_MESSAGE_LINKS_TITLE" = "Tin nhắn có chứa đường dẫn web";
 
 /* Message body describing the review names safety tip. */
-"SAFETY_TIPS_REVIEW_NAMES_BODY" = "Hãy chú ý đến thông báo \"Tên chưa được xác minh\". Người dùng có thể tự đặt tên hồ sơ của mình trên Signal.";
+"SAFETY_TIPS_REVIEW_NAMES_BODY" = "Hãy chú ý đến thông báo \"Tên chưa được xác minh\". Người dùng có thể tự đặt tên hồ sơ của mình trên Radar.";
 
 /* Message body describing the review names safety tip in the 'view more' flow. */
-"SAFETY_TIPS_REVIEW_NAMES_BODY_VIEW_MORE" = "Hãy chú ý đến thông báo \"Tên chưa được xác minh\". Người dùng có thể tự đặt tên hồ sơ và ảnh đại diện của mình trên Signal. Nếu bạn không chắc yêu cầu mới đến từ ai, tốt hơn hết là nên bỏ qua.";
+"SAFETY_TIPS_REVIEW_NAMES_BODY_VIEW_MORE" = "Hãy chú ý đến thông báo \"Tên chưa được xác minh\". Người dùng có thể tự đặt tên hồ sơ và ảnh đại diện của mình trên Radar. Nếu bạn không chắc yêu cầu mới đến từ ai, tốt hơn hết là nên bỏ qua.";
 
 /* Message title describing the review names safety tip. */
 "SAFETY_TIPS_REVIEW_NAMES_TITLE" = "Kiểm tra tên và ảnh";
 
 /* Message body describing the signal chats tip. */
-"SAFETY_TIPS_SIGNAL_CHATS_BODY" = "Signal sẽ không bao giờ nhắn tin yêu cầu bạn cung cấp mã đăng ký, mã PIN hoặc mã khóa khôi phục. Đừng bao giờ trả lời tin nhắn giả mạo Signal.";
+"SAFETY_TIPS_SIGNAL_CHATS_BODY" = "Radar sẽ không bao giờ nhắn tin yêu cầu bạn cung cấp mã đăng ký, mã PIN hoặc mã khóa khôi phục. Đừng bao giờ trả lời tin nhắn giả mạo Radar.";
 
 /* Message body describing the signal chats tip in the 'view more' flow. */
-"SAFETY_TIPS_SIGNAL_CHATS_BODY_VIEW_MORE" = "Signal sẽ không bao giờ nhắn tin yêu cầu bạn cung cấp mã đăng ký, mã PIN hoặc mã khóa khôi phục. Đừng trả lời tin nhắn giả danh Signal hoặc bộ phận hỗ trợ của Signal. Kẻ xấu sử dụng tên giả để cố gắng chiếm đoạt tài khoản của bạn.";
+"SAFETY_TIPS_SIGNAL_CHATS_BODY_VIEW_MORE" = "Radar sẽ không bao giờ nhắn tin yêu cầu bạn cung cấp mã đăng ký, mã PIN hoặc mã khóa khôi phục. Đừng trả lời tin nhắn giả danh Radar hoặc bộ phận hỗ trợ của Radar. Kẻ xấu sử dụng tên giả để cố gắng chiếm đoạt tài khoản của bạn.";
 
 /* Message title describing the signal chats tip. */
-"SAFETY_TIPS_SIGNAL_CHATS_TITLE" = "Đừng trả lời tin nhắn từ Signal";
+"SAFETY_TIPS_SIGNAL_CHATS_TITLE" = "Đừng trả lời tin nhắn từ Radar";
 
 /* Message contents for the vague message safety tip. */
 "SAFETY_TIPS_VAGUE_MESSAGE_BODY" = "Người gửi spam thường gửi cho bạn một tin nhắn đơn giản như “Xin chào” để khiến bạn tò mò. Nếu bạn trả lời, họ có thể sẽ tiếp tục tương tác với bạn.";
@@ -9025,10 +9028,10 @@ Send money securely.";
 "SECONDARY_ONBOARDING_SCAN_CODE_STEP_LINK_DEVICE" = "Nhấn vào \"Thiết bị đã liên kết\" và \"Liên kết thiết bị mới\"";
 
 /* First bullet point on the QR code screen for linking a device */
-"SECONDARY_ONBOARDING_SCAN_CODE_STEP_OPEN_PRIMARY" = "Mở Signal trên thiết bị chính của bạn";
+"SECONDARY_ONBOARDING_SCAN_CODE_STEP_OPEN_PRIMARY" = "Mở Radar trên thiết bị chính của bạn";
 
 /* Second bullet point on the QR code screen for linking a device */
-"SECONDARY_ONBOARDING_SCAN_CODE_STEP_OPEN_SETTINGS" = "Nhấn vào ảnh đại diện của bạn để mở Cài đặt Signal";
+"SECONDARY_ONBOARDING_SCAN_CODE_STEP_OPEN_SETTINGS" = "Nhấn vào ảnh đại diện của bạn để mở Cài đặt Radar";
 
 /* header text while displaying a QR code which, when scanned, will link this device. */
 "SECONDARY_ONBOARDING_SCAN_CODE_TITLE" = "Quét mã này để liên kết tài khoản của bạn";
@@ -9067,13 +9070,13 @@ Send money securely.";
 "SELECT_CONTACT_FOR_SHARING_PERMISSION_PROMPT_ALLOW_BUTTON" = "Cho phép Truy cập";
 
 /* Body of the prompt on the 'Select Contact' view that asks the user to allow access to their contacts. */
-"SELECT_CONTACT_FOR_SHARING_PERMISSION_PROMPT_BODY" = "Cho phép truy cập danh bạ của bạn. Danh bạ của bạn được mã hóa và Signal không thể truy cập được.";
+"SELECT_CONTACT_FOR_SHARING_PERMISSION_PROMPT_BODY" = "Cho phép truy cập danh bạ của bạn. Danh bạ của bạn được mã hóa và Radar không thể truy cập được.";
 
 /* Button on the 'Select Contact' view's contacts permission prompt that hides the prompt. */
 "SELECT_CONTACT_FOR_SHARING_PERMISSION_PROMPT_DISMISS_BUTTON" = "Không, cảm ơn";
 
 /* Title of the prompt on the 'Select Contact' view that asks the user to allow access to their contacts. */
-"SELECT_CONTACT_FOR_SHARING_PERMISSION_PROMPT_TITLE" = "Tìm người bạn biết trên Signal";
+"SELECT_CONTACT_FOR_SHARING_PERMISSION_PROMPT_TITLE" = "Tìm người bạn biết trên Radar";
 
 /* Placeholder text for the search bar on the 'Select Contact' view */
 "SELECT_CONTACT_FOR_SHARING_SEARCH_BAR_PLACEHOLDER" = "Tìm kiếm";
@@ -9460,7 +9463,7 @@ Send money securely.";
 "SETTINGS_KEEP_MUTED_ARCHIVED_LABEL" = "Giữ cuộc trò chuyện đã tắt tiếng trong mục lưu trữ";
 
 /* Footer for settings section describing Key Transparency. */
-"SETTINGS_KEY_TRANSPARENCY_OPT_OUT_FOOTER" = "Khi được bật, Signal sẽ cố gắng tự động xác minh mã hóa của các cuộc trò chuyện 1:1.";
+"SETTINGS_KEY_TRANSPARENCY_OPT_OUT_FOOTER" = "Khi được bật, Radar sẽ cố gắng tự động xác minh mã hóa của các cuộc trò chuyện 1:1.";
 
 /* Title for for a settings option describing that Key Transparency is enabled. */
 "SETTINGS_KEY_TRANSPARENCY_OPT_OUT_SWITCH_TITLE" = "Xác minh mã khóa tự động";
@@ -9475,7 +9478,7 @@ Send money securely.";
 "SETTINGS_LINK_PREVIEWS_FOOTER" = "Thêm xem trước liên kết trang web vào trong tin nhắn bạn gửi.";
 
 /* Subtitle of a card on a linked device's account settings, explaining that account settings are managed on the primary device. */
-"SETTINGS_LINKED_DEVICE_ACCOUNT_CARD_SUBTITLE" = "Để quản lý phần cài đặt tài khoản, mở Signal trên thiết bị chính của bạn.";
+"SETTINGS_LINKED_DEVICE_ACCOUNT_CARD_SUBTITLE" = "Để quản lý phần cài đặt tài khoản, mở Radar trên thiết bị chính của bạn.";
 
 /* Title of a card on a linked device's account settings, indicating that this is a linked device. */
 "SETTINGS_LINKED_DEVICE_ACCOUNT_CARD_TITLE" = "Đây là một thiết bị đã liên kết";
@@ -9484,7 +9487,7 @@ Send money securely.";
 "SETTINGS_LINKED_DEVICE_DELETE_DATA_BUTTON" = "Xóa dữ liệu của ứng dụng";
 
 /* Footer below the 'delete app data' button, shown on a linked device's account settings. */
-"SETTINGS_LINKED_DEVICE_DELETE_DATA_FOOTER" = "Thao tác này sẽ xóa toàn bộ dữ liệu khỏi ứng dụng Signal trên thiết bị này.";
+"SETTINGS_LINKED_DEVICE_DELETE_DATA_FOOTER" = "Thao tác này sẽ xóa toàn bộ dữ liệu khỏi ứng dụng Radar trên thiết bị này.";
 
 /* Text for a toast confirming the user changed their local file backup location. */
 "SETTINGS_LOCAL_FILE_BACKUP_FOLDER_UPDATED" = "Thư mục sao lưu đã cập nhật";
@@ -9508,7 +9511,7 @@ Send money securely.";
 "SETTINGS_LOCAL_FILE_BACKUPS_LAST_BACKUP_DATE" = "Bản sao lưu gần nhất";
 
 /* Message for an action sheet when a user cannot perform a remote backup because a local backup is in progress */
-"SETTINGS_LOCAL_FILE_BACKUPS_LOCAL_BACKUP_IN_PROGRESS_MESSAGE" = "Không thể thực hiện Sao lưu bảo mật Signal vì một quá trình sao lưu trên thiết bị đang diễn ra. Thử lại sau.";
+"SETTINGS_LOCAL_FILE_BACKUPS_LOCAL_BACKUP_IN_PROGRESS_MESSAGE" = "Không thể thực hiện Sao lưu bảo mật Radar vì một quá trình sao lưu trên thiết bị đang diễn ra. Thử lại sau.";
 
 /* Label for a progress bar while attachments are being copied for an on-device backup. Embeds 1:{{%1$@ completed bytes copied, %2$@ total bytes to copy, %3$@ percentage complete }}. */
 "SETTINGS_LOCAL_FILE_BACKUPS_PROGRESS_COPYING_ATTACHMENTS" = "Đang tạo bản sao lưu trên thiết bị %1$@/%2$@ (%3$@)";
@@ -9523,10 +9526,10 @@ Send money securely.";
 "SETTINGS_LOCAL_FILE_BACKUPS_PROGRESS_RESTORING_ATTACHMENTS" = "Đang khôi phục bản sao lưu trên thiết bị (%1$@/%2$@)";
 
 /* Message for an action sheet when a user cannot perform a local backup because a remote backup is in progress */
-"SETTINGS_LOCAL_FILE_BACKUPS_REMOTE_BACKUP_IN_PROGRESS_MESSAGE" = "Không thể thực hiện sao lưu trên thiết bị vì quá trình Sao lưu bảo mật Signal đang diễn ra. Thử lại sau.";
+"SETTINGS_LOCAL_FILE_BACKUPS_REMOTE_BACKUP_IN_PROGRESS_MESSAGE" = "Không thể thực hiện sao lưu trên thiết bị vì quá trình Sao lưu bảo mật Radar đang diễn ra. Thử lại sau.";
 
 /* Footer text on the on-device backups settings page explaining how to restore a backup. */
-"SETTINGS_LOCAL_FILE_BACKUPS_RESTORE_FOOTER" = "Để khôi phục bản sao lưu, hãy cài đặt mới Signal. Mở ứng dụng, nhấn vào \"Khôi phục hoặc Chuyển\" và chọn \"Bản sao lưu trên thiết bị\".";
+"SETTINGS_LOCAL_FILE_BACKUPS_RESTORE_FOOTER" = "Để khôi phục bản sao lưu, hãy cài đặt mới Radar. Mở ứng dụng, nhấn vào \"Khôi phục hoặc Chuyển\" và chọn \"Bản sao lưu trên thiết bị\".";
 
 /* Label for the button that turns off on-device backups. */
 "SETTINGS_LOCAL_FILE_BACKUPS_TURN_OFF" = "Tắt & Xóa bản sao lưu";
@@ -9616,7 +9619,7 @@ Send money securely.";
 "SETTINGS_NOTIFICATIONS_APP_BADGE_SECTION" = "Huy hiệu ứng dụng";
 
 /* Explanation for the switch controlling whether a notification is shown when a phone contact joins Signal. */
-"SETTINGS_NOTIFICATIONS_CONTACT_JOINED_SIGNAL_FOOTER" = "Hiển thị thông báo khi một liên hệ trong danh bạ điện thoại tham gia Signal.";
+"SETTINGS_NOTIFICATIONS_CONTACT_JOINED_SIGNAL_FOOTER" = "Hiển thị thông báo khi một liên hệ trong danh bạ điện thoại tham gia Radar.";
 
 /* Label for a switch controlling whether reactions to your messages generate notifications. */
 "SETTINGS_NOTIFICATIONS_REACTIONS" = "Thông báo về bày tỏ cảm xúc";
@@ -10394,7 +10397,7 @@ Send money securely.";
 "SHARE_ACTION_MESSAGE" = "Tin nhắn";
 
 /* Message for an action sheet shown when sharing fails because the device's date and time are incorrect. */
-"SHARE_EXTENSION_FAILED_SENDING_BECAUSE_CLOCK_SKEW_MESSAGE" = "Ngày và giờ trên thiết bị của bạn không chính xác, và Signal có thể đã không gửi tin nhắn của bạn. Mở phần Cài đặt để chỉnh lại ngày và giờ của thiết bị.";
+"SHARE_EXTENSION_FAILED_SENDING_BECAUSE_CLOCK_SKEW_MESSAGE" = "Ngày và giờ trên thiết bị của bạn không chính xác, và Radar có thể đã không gửi tin nhắn của bạn. Mở phần Cài đặt để chỉnh lại ngày và giờ của thiết bị.";
 
 /* alert body when sharing file failed because of untrusted/changed identity keys */
 "SHARE_EXTENSION_FAILED_SENDING_BECAUSE_UNTRUSTED_IDENTITY_FORMAT" = "Số an toàn của bạn với %1$@ vừa được thay đổi. Bạn nên xác minh lại trong ứng dụng chính trước khi gửi lại.";
@@ -10403,7 +10406,7 @@ Send money securely.";
 "SHARE_EXTENSION_LOADING" = "Đang tải…";
 
 /* Message for an error shown when the user tries to share to Signal but the device is too low on storage space. */
-"SHARE_EXTENSION_LOW_STORAGE_SPACE_MESSAGE" = "Bạn không thể chia sẻ lên Signal vì thiết bị của bạn sắp hết dung lượng lưu trữ. Giải phóng dung lượng bằng cách quản lý dung lượng lưu trữ trong Cài đặt, sau đó thử lại.";
+"SHARE_EXTENSION_LOW_STORAGE_SPACE_MESSAGE" = "Bạn không thể chia sẻ lên Radar vì thiết bị của bạn sắp hết dung lượng lưu trữ. Giải phóng dung lượng bằng cách quản lý dung lượng lưu trữ trong Cài đặt, sau đó thử lại.";
 
 /* Title for an error shown when the user tries to share to Signal but the device is too low on storage space. */
 "SHARE_EXTENSION_LOW_STORAGE_SPACE_TITLE" = "Dung lượng lưu trữ thấp";
@@ -10445,7 +10448,7 @@ Send money securely.";
 "SIGNAL_LOGIN_RECOVERY_KEY_PLACEHOLDER_TITLE" = "Mã khóa khôi phục";
 
 /* Title for the sheet presented when user taps on Signal Proxy link in chat. */
-"SIGNAL_PROXY" = "Máy chủ proxy Signal";
+"SIGNAL_PROXY" = "Máy chủ proxy Radar";
 
 /* body sent to contacts when inviting to Install Signal */
 "SMS_INVITE_BODY" = "Tôi đang mời bạn cài đặt Radar! Đây là đường dẫn:";
@@ -10488,6 +10491,10 @@ Send money securely.";
 
 /* Text for a toast confirming that the speakerphone has been turned on for a call. */
 "SPEAKERPHONE_ON_CONFIRMATION_TOAST_LABEL" = "Bật loa";
+
+"STAR" = "Star";
+
+"STARRED_MESSAGES" = "Starred messages";
 
 /* Title for a button to view a sticker pack */
 "STICKER_BUTTON_VIEW_PACK" = "Xem gói";
@@ -10532,7 +10539,7 @@ Send money securely.";
 "STICKER_PACK_SHARE_SHEET_HEADER" = "Bất kỳ ai có đường dẫn này đều có thể thêm và chia sẻ gói nhãn dán này.";
 
 /* Label for a button on a sticker-pack share sheet that sends the pack in Signal. */
-"STICKER_PACK_SHARE_SHEET_SEND_IN_SIGNAL" = "Gửi trong Signal";
+"STICKER_PACK_SHARE_SHEET_SEND_IN_SIGNAL" = "Gửi trong Radar";
 
 /* Message when trying to show a sticker that has expired and is unavailable for download */
 "STICKER_UNAVAILABLE_MESSAGE_LABEL" = "Nhãn dán không có sẵn";
@@ -11242,6 +11249,8 @@ Send money securely.";
 /* Notification body for unread reminders. First placeholder is unread messages, second is a summary of either unread mentions or replies */
 "UnreadReminderJob__unread_one_summary" = "Bạn có %1$@, trong đó có %2$@.";
 
+"UNSTAR" = "Unstar";
+
 /* No comment provided by engineer. */
 "UNSUPPORTED_ATTACHMENT" = "Nhận loại tập tin đính kèm không được hỗ trợ.";
 
@@ -11435,7 +11444,7 @@ Send money securely.";
 "VERIFICATION_CODE_REQUESTED_HERO_BODY_FIRST" = "Có yêu cầu mã xác minh";
 
 /* Second part of body for a hero sheet informing the user a verification code was requested. */
-"VERIFICATION_CODE_REQUESTED_HERO_BODY_SECOND" = "Không bao giờ tiết lộ mã xác minh của bạn cho bất kỳ ai. Signal sẽ không bao giờ nhắn tin cho bạn để yêu cầu cung cấp mã. Nếu bạn nhận được tin nhắn từ ai đó giả danh Signal, đó là hành vi lừa đảo.\nBạn hoàn toàn có thể bỏ qua thông báo này nếu bạn tự yêu cầu mã.";
+"VERIFICATION_CODE_REQUESTED_HERO_BODY_SECOND" = "Không bao giờ tiết lộ mã xác minh của bạn cho bất kỳ ai. Radar sẽ không bao giờ nhắn tin cho bạn để yêu cầu cung cấp mã. Nếu bạn nhận được tin nhắn từ ai đó giả danh Radar, đó là hành vi lừa đảo.\nBạn hoàn toàn có thể bỏ qua thông báo này nếu bạn tự yêu cầu mã.";
 
 /* Format for info message indicating that the verification state was unverified on this device. Embeds {{user's name or phone number}}. */
 "VERIFICATION_STATE_CHANGE_FORMAT_NOT_VERIFIED_LOCAL" = "Bạn đã đánh dấu %1$@ là chưa xác minh.";

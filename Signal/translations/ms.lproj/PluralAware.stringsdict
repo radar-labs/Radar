@@ -577,7 +577,7 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>other</key>
-			<string>Kumpulan Signal berjalan dengan baik dengan %1$d ahli atau kurang. Menambah lebih banyak ahli akan menyebabkan kelewatan menghantar dan menerima mesej.</string>
+			<string>Kumpulan Radar berjalan dengan baik dengan %1$d ahli atau kurang. Menambah lebih banyak ahli akan menyebabkan kelewatan menghantar dan menerima mesej.</string>
 		</dict>
 	</dict>
 	<key>GROUP_CALL_HAS_MAX_DEVICES_%d</key>
@@ -717,7 +717,7 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>other</key>
-			<string>Signal akan memanggil %2$@, %3$@ dan %1$d yang lain</string>
+			<string>Radar akan memanggil %2$@, %3$@ dan %1$d yang lain</string>
 		</dict>
 	</dict>
 	<key>GROUP_INVITES_SENT_ALERT_TITLE_%d</key>
@@ -969,7 +969,7 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>other</key>
-			<string>Untuk memastikan &quot;%2$@&quot; dipautkan, buka Signal pada peranti dalam masa %1$d hari.</string>
+			<string>Untuk memastikan &quot;%2$@&quot; dipautkan, buka Radar pada peranti dalam masa %1$d hari.</string>
 		</dict>
 	</dict>
 	<key>LINK_DEVICE_CONFIRMATION_ALERT_TRANSFER_SUBTITLE_%d</key>
@@ -1151,7 +1151,7 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>other</key>
-			<string>Semua Hubungan Signal · %1$d Penonton</string>
+			<string>Semua Hubungan Radar · %1$d Penonton</string>
 		</dict>
 	</dict>
 	<key>MY_STORY_VIEWERS_ALL_CONNECTIONS_EXCLUDING_%d</key>
@@ -1165,7 +1165,7 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>other</key>
-			<string>Semua Hubungan Signal · %1$d Dikecualikan</string>
+			<string>Semua Hubungan Radar · %1$d Dikecualikan</string>
 		</dict>
 	</dict>
 	<key>MY_STORY_VIEWERS_ONLY_%d</key>
