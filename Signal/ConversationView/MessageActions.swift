@@ -19,6 +19,7 @@ protocol MessageActionsDelegate: AnyObject {
     func messageActionsEndPoll(_ itemViewModel: CVItemViewModelImpl)
     func messageActionsChangePinStatus(_ itemViewModel: CVItemViewModelImpl, pin: Bool)
     func messageActionsViewStickerPack(_ itemViewModel: CVItemViewModelImpl)
+    func messageActionsStarItem(_ itemViewModel: CVItemViewModelImpl)
 }
 
 // MARK: -
@@ -246,6 +247,27 @@ enum MessageActionBuilder {
         )
     }
 
+    static func star(itemViewModel: CVItemViewModelImpl, delegate: MessageActionsDelegate) -> MessageAction {
+        let isStarred: Bool = {
+            guard let message = itemViewModel.interaction as? TSMessage else {
+                return false
+            }
+            return SSKEnvironment.shared.databaseStorageRef.read { tx in message.isStarred(tx: tx) }
+        }()
+        let title = isStarred ? "UNSTAR" : "STAR"
+
+        return MessageAction(
+            isStarred ? .unstar : .star,
+            accessibilityLabel: OWSLocalizedString(title, comment: "Action sheet button title"),
+            accessibilityIdentifier: UIView.accessibilityIdentifier(containerName: "message_action", name: "star"),
+            contextMenuTitle: OWSLocalizedString(title, comment: "Context menu button title"),
+            contextMenuAttributes: [],
+            block: { [weak delegate] _ in
+                delegate?.messageActionsStarItem(itemViewModel)
+            },
+        )
+    }
+
 }
 
 class MessageActions {
@@ -280,6 +302,9 @@ class MessageActions {
             let replyAction = MessageActionBuilder.reply(itemViewModel: itemViewModel, delegate: delegate)
             actions.append(replyAction)
         }
+
+        let starAction = MessageActionBuilder.star(itemViewModel: itemViewModel, delegate: delegate)
+        actions.append(starAction)
 
         if itemViewModel.canForwardMessage {
             actions.append(MessageActionBuilder.forwardMessage(itemViewModel: itemViewModel, delegate: delegate))

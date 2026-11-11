@@ -20,11 +20,20 @@ extension ConversationViewController: MessageActionsDelegate {
 
         if hasUnsavedDraft {
             let sheet = ActionSheetController(
-                title: OWSLocalizedString("DISCARD_DRAFT_CONFIRMATION_TITLE", comment: "Title for confirmation prompt when discarding a draft before editing a message"),
-                message: OWSLocalizedString("DISCARD_DRAFT_CONFIRMATION_MESSAGE", comment: "Message/subtitle for confirmation prompt when discarding a draft before editing a message"),
+                title: OWSLocalizedString(
+                    "DISCARD_DRAFT_CONFIRMATION_TITLE",
+                    comment:
+                    "Title for confirmation prompt when discarding a draft before editing a message",
+                ),
+                message: OWSLocalizedString(
+                    "DISCARD_DRAFT_CONFIRMATION_MESSAGE",
+                    comment:
+                    "Message/subtitle for confirmation prompt when discarding a draft before editing a message",
+                ),
             )
             sheet.addAction(
-                ActionSheetAction(title: CommonStrings.discardButton, style: .destructive) { [self] _ in
+                ActionSheetAction(title: CommonStrings.discardButton, style: .destructive) {
+                    [self] _ in
                     populateMessageEdit(itemViewModel)
                 },
             )
@@ -190,7 +199,10 @@ extension ConversationViewController: MessageActionsDelegate {
             }
             return SSKEnvironment.shared.databaseStorageRef.read { transaction in
                 if message is OWSPaymentMessage {
-                    return DraftQuotedReplyModel.fromOriginalPaymentMessage(message, tx: transaction)
+                    return DraftQuotedReplyModel.fromOriginalPaymentMessage(
+                        message,
+                        tx: transaction,
+                    )
                 }
                 return DependenciesBridge.shared.quotedReplyManager.buildDraftQuotedReply(
                     originalMessage: message,
@@ -212,7 +224,11 @@ extension ConversationViewController: MessageActionsDelegate {
     func messageActionsForwardItem(_ itemViewModel: CVItemViewModelImpl) {
         AssertIsOnMainThread()
 
-        ForwardMessageViewController.present(forItemViewModel: itemViewModel, from: self, delegate: self)
+        ForwardMessageViewController.present(
+            forItemViewModel: itemViewModel,
+            from: self,
+            delegate: self,
+        )
     }
 
     func messageActionsStartedSelect(initialItem itemViewModel: CVItemViewModelImpl) {
@@ -254,7 +270,8 @@ extension ConversationViewController: MessageActionsDelegate {
             return
         }
         let contactName = SSKEnvironment.shared.databaseStorageRef.read { tx in
-            return SSKEnvironment.shared.contactManagerRef.displayName(for: contactAddress, tx: tx).resolvedValue()
+            return SSKEnvironment.shared.contactManagerRef.displayName(for: contactAddress, tx: tx)
+                .resolvedValue()
         }
 
         let paymentHistoryItem: PaymentsHistoryItem
@@ -269,13 +286,18 @@ extension ConversationViewController: MessageActionsDelegate {
         {
             paymentHistoryItem = item
         } else if let paymentModel = itemViewModel.paymentAttachment?.model {
-            paymentHistoryItem = PaymentsHistoryModelItem(paymentModel: paymentModel, displayName: contactName)
+            paymentHistoryItem = PaymentsHistoryModelItem(
+                paymentModel: paymentModel,
+                displayName: contactName,
+            )
         } else {
             owsFailDebug("We should have a matching TSPaymentModel at this point")
             return
         }
 
-        let paymentsDetailViewController = PaymentsDetailViewController(paymentItem: paymentHistoryItem)
+        let paymentsDetailViewController = PaymentsDetailViewController(
+            paymentItem: paymentHistoryItem,
+        )
         navigationController?.pushViewController(paymentsDetailViewController, animated: true)
     }
 
@@ -574,5 +596,15 @@ extension ConversationViewController: MessageActionsDelegate {
 
         let stickerPackViewController = StickerPackViewController(stickerPackInfo: stickerMetadata.packInfo)
         stickerPackViewController.present(from: self, animated: true)
+    }
+
+    func messageActionsStarItem(_ itemViewModel: CVItemViewModelImpl) {
+        guard let message = itemViewModel.interaction as? TSMessage else {
+            return owsFailDebug("Invalid interaction.")
+        }
+
+        SSKEnvironment.shared.databaseStorageRef.write { transaction in
+            message.setIsStarred(!message.isStarred(tx: transaction), tx: transaction)
+        }
     }
 }

@@ -10,6 +10,14 @@ import SignalUI
 extension ConversationViewController {
 
     func updateNavigationTitle() {
+        guard !self.onlyStarred else {
+            navigationItem.title = OWSLocalizedString(
+                "STARRED_MESSAGES",
+                comment: "table cell label in conversation settings",
+            )
+            return
+        }
+
         let title = threadViewModel.name
 
         // Important as it will be displayed in <Back button popup in view controllers
@@ -34,6 +42,10 @@ extension ConversationViewController {
     }
 
     func createHeaderViews() {
+        guard !self.onlyStarred else {
+            return
+        }
+
         headerView.configure(threadViewModel: threadViewModel)
         headerView.accessibilityLabel = OWSLocalizedString(
             "CONVERSATION_SETTINGS",
@@ -145,6 +157,10 @@ extension ConversationViewController {
     }
 
     func updateBarButtonItems() {
+        guard !self.onlyStarred else {
+            return
+        }
+
         guard !thread.isReleaseNotesThread else {
             return
         }

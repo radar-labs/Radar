@@ -374,6 +374,8 @@ public class GRDBSchemaMigrator {
         case addLastSnapshotAt
         case removeLocalFileBackupLastEnumeratedAttachmentId
         case addLocalKeyAndSizeToInstalledSticker
+        // Radar: keep this identifier as-is; existing installs have already run it.
+        case addStarredMessageColumn
 
         // NOTE: Every time we add a migration id, consider
         // incrementing grdbSchemaVersionLatest.
@@ -5743,6 +5745,15 @@ public class GRDBSchemaMigrator {
             try tx.database.alter(table: "model_InstalledSticker") {
                 $0.add(column: "localKey", .blob)
                 $0.add(column: "plaintextLength", .integer)
+            }
+            return .success(())
+        }
+
+        // Radar: starred messages. Existing installs ran this when the column was
+        // introduced; fresh installs run it after every upstream schema migration.
+        migrator.registerMigration(.addStarredMessageColumn) { tx in
+            try tx.database.alter(table: "model_TSInteraction") { table in
+                table.add(column: "isStarred", .boolean).defaults(to: false)
             }
             return .success(())
         }

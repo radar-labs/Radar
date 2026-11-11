@@ -53,6 +53,7 @@ extension ConversationSettingsViewController {
         addNicknameItemIfNecessary(to: mainSection)
         addColorAndWallpaperSettingsItemIfNecessary(to: mainSection)
         if !isNoteToSelf { addSoundAndNotificationSettingsItem(to: mainSection) }
+        addStarredMessagesItem(to: mainSection)
         addSafetyNumberItemIfNecessary(to: mainSection)
 
         contents.add(mainSection)
@@ -664,6 +665,36 @@ extension ConversationSettingsViewController {
             ),
         ])
         return helpSection
+    }
+
+    private func addStarredMessagesItem(to section: OWSTableSection) {
+        section.add(
+            OWSTableItem(
+                customCellBlock: { [weak self] in
+                    guard let self else {
+                        owsFailDebug("Missing self")
+                        return OWSTableItem.newCell()
+                    }
+
+                    let cell = OWSTableItem.buildCell(
+                        icon: .contextMenuStarFill,
+                        itemName: OWSLocalizedString(
+                            "STARRED_MESSAGES",
+                            comment: "table cell label in conversation settings",
+                        ),
+                        accessoryType: .disclosureIndicator,
+                        accessibilityIdentifier: UIView.accessibilityIdentifier(
+                            in: self,
+                            name: "starred_messages",
+                        ),
+                    )
+                    return cell
+                },
+                actionBlock: { [weak self] in
+                    self?.showStarredMessagesView()
+                },
+            ),
+        )
     }
 
     private func addDisappearingMessagesItemIfNecessary(to section: OWSTableSection) {

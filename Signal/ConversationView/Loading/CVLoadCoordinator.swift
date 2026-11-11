@@ -86,6 +86,7 @@ class CVLoadCoordinator: NSObject {
         threadViewModel: ThreadViewModel,
         conversationViewModel: ConversationViewModel,
         oldestUnreadMessageSortId: UInt64?,
+        onlyStarred: Bool,
     ) {
         self.viewState = viewState
         self.threadUniqueId = threadViewModel.threadRecord.uniqueId
@@ -105,8 +106,9 @@ class CVLoadCoordinator: NSObject {
             viewStateSnapshot: viewStateSnapshot,
         )
         self.messageLoader = MessageLoader(
-            cursorFactory: ConversationViewCursorFactory(interactionFinder: InteractionFinder(threadUniqueId: thread.uniqueId)),
+            cursorFactory: ConversationViewCursorFactory(interactionFinder: InteractionFinder(threadUniqueId: thread.uniqueId), onlyStarred: onlyStarred),
             interactionFetchers: [SSKEnvironment.shared.modelReadCachesRef.interactionReadCache, SDSInteractionFetcherImpl()],
+            onlyStarred: onlyStarred,
         )
         super.init()
     }

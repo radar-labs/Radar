@@ -71,6 +71,8 @@ class MessageLoader {
     /// we believe we've loaded all the way to the end of the chat.
     private(set) var canLoadNewer = true
 
+    let onlyStarred: Bool
+
     /// Initializes a MessageLoader.
     ///
     /// - Parameter cursorFactory: An object responsible for building cursors
@@ -85,9 +87,11 @@ class MessageLoader {
     init(
         cursorFactory: MessageLoaderCursorFactory,
         interactionFetchers: [MessageLoaderInteractionFetcher],
+        onlyStarred: Bool = false,
     ) {
         self.cursorFactory = cursorFactory
         self.interactionFetchers = interactionFetchers
+        self.onlyStarred = onlyStarred
     }
 
     // The smaller this number is, the faster the conversation can display.
@@ -935,9 +939,11 @@ class SDSInteractionFetcherImpl: MessageLoaderInteractionFetcher {
 
 class ConversationViewCursorFactory: MessageLoaderCursorFactory {
     private let interactionFinder: InteractionFinder
+    private let onlyStarred: Bool
 
-    init(interactionFinder: InteractionFinder) {
+    init(interactionFinder: InteractionFinder, onlyStarred: Bool = false) {
         self.interactionFinder = interactionFinder
+        self.onlyStarred = onlyStarred
     }
 
     func buildUniqueIdCursor(
@@ -947,6 +953,7 @@ class ConversationViewCursorFactory: MessageLoaderCursorFactory {
         interactionFinder.buildUniqueIdCursorForConversationView(
             rowIdFilter: filter,
             tx: tx,
+            onlyStarred: onlyStarred,
         )
     }
 }

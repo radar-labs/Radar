@@ -1159,10 +1159,11 @@ public class InteractionFinder: NSObject {
     public func buildUniqueIdCursorForConversationView(
         rowIdFilter: RowIdFilter,
         tx: DBReadTransaction,
+        onlyStarred: Bool = false,
     ) -> FailIfThrowsValueCursor<String> {
         let (rowIdClause, arguments, _) = sqlClauseForInteractionsByRowId(
             rowIdFilter: rowIdFilter,
-            additionalFiltering: .filterForConversationView,
+            additionalFiltering: onlyStarred ? .filterForConversationViewWithOnlyStarred : .filterForConversationView,
             limit: nil,
         )
 
@@ -1301,6 +1302,8 @@ public class InteractionFinder: NSObject {
         ///
         /// Relies on `index_interactions_on_threadUniqueId_and_id`.
         case noFiltering
+
+        case filterForConversationViewWithOnlyStarred
     }
 
     private func buildInteractionCursor(
@@ -1317,7 +1320,7 @@ public class InteractionFinder: NSObject {
 
         let indexedBy: String
         switch additionalFiltering {
-        case .filterForConversationView:
+        case .filterForConversationView, .filterForConversationViewWithOnlyStarred:
             indexedBy = "INDEXED BY index_interactions_on_threadUniqueId_and_id"
         case .filterForIncomingMessages:
             indexedBy = DEBUG_INDEXED_BY("index_interactions_on_recordType_and_threadUniqueId_and_errorType")
@@ -1375,6 +1378,13 @@ public class InteractionFinder: NSObject {
             \(Self.filterGroupStoryRepliesClause())
             \(Self.filterEditHistoryClause())
             \(Self.filterPlaceholdersClause)
+            """
+        case .filterForConversationViewWithOnlyStarred:
+            """
+            \(Self.filterGroupStoryRepliesClause())
+            \(Self.filterEditHistoryClause())
+            \(Self.filterPlaceholdersClause)
+            AND IsStarred = 1 AND errorType is NULL
             """
         case .filterForIncomingMessages:
             "AND recordType = \(SDSRecordType.incomingMessage.rawValue) AND errorType is NULL"

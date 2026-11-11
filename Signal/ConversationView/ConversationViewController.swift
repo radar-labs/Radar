@@ -54,6 +54,8 @@ final class ConversationViewController: OWSViewController, OWSNavigationChildCon
     let layout: ConversationViewLayout
     let collectionView: ConversationCollectionView
     let searchController: ConversationSearchController
+    /// Radar: when true this view only lists the thread's starred messages.
+    let onlyStarred: Bool
     var pinnedMessageIndex: Int
     var memberLabelCoordinator: MemberLabelCoordinator?
     var sendStickerFlow: SendStickerFlow?
@@ -80,6 +82,7 @@ final class ConversationViewController: OWSViewController, OWSNavigationChildCon
         threadViewModel: ThreadViewModel,
         action: ConversationViewAction,
         focusMessageId: String?,
+        onlyStarred: Bool = false,
         tx: DBReadTransaction,
     ) -> ConversationViewController {
         let thread = threadViewModel.threadRecord
@@ -127,6 +130,7 @@ final class ConversationViewController: OWSViewController, OWSNavigationChildCon
             oldestUnreadMessage: oldestUnreadMessage,
             chatColor: chatColor,
             wallpaperViewBuilder: wallpaperViewBuilder,
+            onlyStarred: onlyStarred,
         )
 
         return cvc
@@ -153,6 +157,7 @@ final class ConversationViewController: OWSViewController, OWSNavigationChildCon
         oldestUnreadMessage: TSInteraction?,
         chatColor: ColorOrGradientSetting,
         wallpaperViewBuilder: WallpaperViewBuilder?,
+        onlyStarred: Bool,
     ) {
         AssertIsOnMainThread()
 
@@ -169,10 +174,12 @@ final class ConversationViewController: OWSViewController, OWSNavigationChildCon
             threadViewModel: threadViewModel,
             conversationViewModel: conversationViewModel,
             oldestUnreadMessageSortId: oldestUnreadMessage?.sortId,
+            onlyStarred: onlyStarred,
         )
         self.layout = ConversationViewLayout(conversationStyle: conversationStyle)
         self.collectionView = ConversationCollectionView(frame: .zero, collectionViewLayout: self.layout)
         self.searchController = ConversationSearchController(thread: threadViewModel.threadRecord)
+        self.onlyStarred = onlyStarred
 
         self.pinnedMessageIndex = 0
 
