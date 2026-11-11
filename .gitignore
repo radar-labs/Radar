@@ -44,3 +44,6 @@ debuglogs/
 /.vscode
 
 fastlane/Preview.html
+
+# Generated config for BreezSDK
+SignalUI/Payments/BreezSdkConfig.swift

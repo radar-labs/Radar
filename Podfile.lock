@@ -1,24 +1,58 @@
 PODS:
+  - breez_sdk_sparkFFI (0.27.2)
+  - BreezSdkSpark (0.27.2):
+    - breez_sdk_sparkFFI (= 0.27.2)
+    - PasskeyPRFHelperObjC (= 0.27.2)
+    - Swift-BigInt (~> 2.0)
+  - MnemonicSwift (2.2.4)
+  - PasskeyPRFHelperObjC (0.27.2)
   - SignalRingRTC (2.73.0):
     - SignalRingRTC/WebRTC (= 2.73.0)
   - SignalRingRTC/WebRTC (2.73.0)
+  - Swift-BigInt (2.4.0)
 
 DEPENDENCIES:
+  - breez_sdk_sparkFFI (from `./ThirdParty/breez_sdk_sparkFFI.podspec.json`)
+  - BreezSdkSpark (from `./ThirdParty/BreezSdkSpark.podspec.json`)
+  - MnemonicSwift (from `https://github.com/zcash/swift-bip39`, tag `2.2.5`)
+  - PasskeyPRFHelperObjC (from `./ThirdParty/PasskeyPRFHelperObjC.podspec.json`)
   - SignalRingRTC (from `https://github.com/signalapp/ringrtc`, tag `v2.73.0`)
+  - Swift-BigInt (= 2.4.0)
+
+SPEC REPOS:
+  trunk:
+    - Swift-BigInt
 
 EXTERNAL SOURCES:
+  breez_sdk_sparkFFI:
+    :podspec: "./ThirdParty/breez_sdk_sparkFFI.podspec.json"
+  BreezSdkSpark:
+    :podspec: "./ThirdParty/BreezSdkSpark.podspec.json"
+  MnemonicSwift:
+    :git: https://github.com/zcash/swift-bip39
+    :tag: 2.2.5
+  PasskeyPRFHelperObjC:
+    :podspec: "./ThirdParty/PasskeyPRFHelperObjC.podspec.json"
   SignalRingRTC:
     :git: https://github.com/signalapp/ringrtc
     :tag: v2.73.0
 
 CHECKOUT OPTIONS:
+  MnemonicSwift:
+    :git: https://github.com/zcash/swift-bip39
+    :tag: 2.2.5
   SignalRingRTC:
     :git: https://github.com/signalapp/ringrtc
     :tag: v2.73.0
 
 SPEC CHECKSUMS:
+  breez_sdk_sparkFFI: 5f4d1b8a9796c5bb994819b50afad305cf3d8f09
+  BreezSdkSpark: d1372625b4774ea6336f855cfcfeb46c12037029
+  MnemonicSwift: 40ba76b951b75b32e2719df989b4d6da5798fe26
+  PasskeyPRFHelperObjC: 3471bb92826b13612f48184f20df12715afaa755
   SignalRingRTC: d91fcb22696b892df857b2b98fe60411b9ea3ebd
+  Swift-BigInt: 39035927416daca0ff0ee7949f5fef18b3a1a7db
 
-PODFILE CHECKSUM: 3d5bb71ebeb73d5b44dd75ffa39dfd55b48b8a66
+PODFILE CHECKSUM: 687c2a3cc4cfc66c3cda96e62ed582f30d0602b3
 
-COCOAPODS: 1.15.2
+COCOAPODS: 1.16.2

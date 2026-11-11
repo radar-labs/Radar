@@ -14,11 +14,30 @@ pod 'SignalRingRTC', git: 'https://github.com/signalapp/ringrtc', tag: 'v2.73.0'
 # pod 'SignalRingRTC', path: '../ringrtc', testspecs: ["Tests"]
 
 ###
+# Radar pods (Lightning wallet). Kept in CocoaPods; everything else upstream moved
+# to Swift Package Manager.
+###
+
+def radar_breez_pods
+  pod 'PasskeyPRFHelperObjC', :podspec => './ThirdParty/PasskeyPRFHelperObjC.podspec.json'
+  pod 'breez_sdk_sparkFFI', :podspec => './ThirdParty/breez_sdk_sparkFFI.podspec.json'
+  pod 'BreezSdkSpark', :podspec => './ThirdParty/BreezSdkSpark.podspec.json'
+end
+
+def radar_ui_pods
+  radar_breez_pods
+  pod 'Swift-BigInt', '2.4.0'
+  pod "MnemonicSwift", git: 'https://github.com/zcash/swift-bip39', tag: '2.2.5'
+end
+
+###
 # third party pods
 ####
 
 target 'Signal' do
   project 'Signal.xcodeproj', 'Debug' => :debug, 'Release' => :release
+
+  radar_ui_pods
 
   target 'SignalTests' do
     inherit! :search_paths
@@ -27,13 +46,22 @@ end
 
 # These extensions inherit all of the common pods
 
+target 'SignalShareExtension' do
+  radar_ui_pods
+end
+
 target 'SignalUI' do
+  radar_ui_pods
+
   target 'SignalUITests' do
     inherit! :search_paths
   end
 end
 
 target 'SignalServiceKit' do
+  pod 'Swift-BigInt', '2.4.0'
+  radar_breez_pods
+
   target 'SignalServiceKitTests' do
     inherit! :search_paths
   end
@@ -54,6 +82,7 @@ post_install do |installer|
   update_frameworks_script(installer)
   disable_non_development_pod_warnings(installer)
   fix_ringrtc_project_symlink(installer)
+  disable_extension_api_only_for_breez(installer)
   fetch_ringrtc
   copy_acknowledgements
 end
@@ -73,6 +102,18 @@ def enable_extension_support_for_purelayout(installer)
       target.build_configurations.each do |build_configuration|
          build_configuration.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= '$(inherited)'
          build_configuration.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] << ' PURELAYOUT_APP_EXTENSIONS=1'
+      end
+    end
+  end
+end
+
+# BreezSdkSpark uses APIs that are unavailable to app extensions; it is only
+# linked into extension targets transitively, so allow it to build.
+def disable_extension_api_only_for_breez(installer)
+  installer.pods_project.targets.each do |target|
+    if target.name == "BreezSdkSpark"
+      target.build_configurations.each do |build_configuration|
+        build_configuration.build_settings['APPLICATION_EXTENSION_API_ONLY'] = 'NO'
       end
     end
   end
