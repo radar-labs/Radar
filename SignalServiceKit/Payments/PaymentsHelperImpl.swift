@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
+import BreezSdkSpark
 public import LibSignalClient
 
 public class PaymentsHelperImpl: PaymentsHelperSwift, PaymentsHelper {
@@ -86,6 +87,13 @@ public class PaymentsHelperImpl: PaymentsHelperSwift, PaymentsHelper {
     }
 
     public func enablePayments(withPaymentsEntropy newPaymentsEntropy: Data, transaction: DBWriteTransaction) -> Bool {
+        // Reject invalid entropy here (not just in PaymentsState.build, which
+        // silently degrades to .disabled) so callers like the restore flow
+        // report failure to the user instead of dismissing as if it succeeded.
+        guard PaymentsConstants.supportedPaymentsEntropyLengths.contains(newPaymentsEntropy.count) else {
+            owsFailDebug("Invalid paymentsEntropy length: \(newPaymentsEntropy.count).")
+            return false
+        }
         let oldPaymentsEntropy = Self.loadPaymentsState(transaction: transaction).paymentsEntropy
         guard oldPaymentsEntropy == nil || oldPaymentsEntropy == newPaymentsEntropy else {
             owsFailDebug("paymentsEntropy is already set.")
@@ -117,6 +125,29 @@ public class PaymentsHelperImpl: PaymentsHelperSwift, PaymentsHelper {
             owsFailDebug("Payments already disabled.")
         }
         owsAssertDebug(!arePaymentsEnabled)
+    }
+
+    public func resetPaymentsState(transaction: DBWriteTransaction) {
+        // Wipe local payment history rows; they belong to the wallet we're deleting.
+        var paymentModelsToRemove: [TSPaymentModel] = []
+        TSPaymentModel.anyEnumerate(transaction: transaction) { paymentModel, _ in
+            paymentModelsToRemove.append(paymentModel)
+        }
+        for paymentModel in paymentModelsToRemove {
+            paymentModel.anyRemove(transaction: transaction)
+        }
+
+        // Clear all KV state (paymentsEntropy, arePaymentsEnabled, lastKnownLocalPaymentAddress, ...).
+        Self.keyValueStore.removeAll(transaction: transaction)
+
+        paymentStateCache.set(.disabled)
+
+        // Push the cleared state to StorageService so linked devices and reinstalls
+        // don't restore the old wallet seed.
+        transaction.addSyncCompletion {
+            SSKEnvironment.shared.storageServiceManagerRef.recordPendingLocalAccountUpdates()
+            NotificationCenter.default.postOnMainThread(name: PaymentsConstants.arePaymentsEnabledDidChange, object: nil)
+        }
     }
 
     public func setPaymentsState(
@@ -168,7 +199,18 @@ public class PaymentsHelperImpl: PaymentsHelperSwift, PaymentsHelper {
 
         self.paymentStateCache.set(newPaymentsState)
 
-        SSKEnvironment.shared.paymentsEventsRef.updateLastKnownLocalPaymentAddressProtoData(transaction: transaction)
+        // Explicitly clear the cached payment address proto data when transitioning
+        // out of an enabled state, so the subsequent profile re-upload removes the
+        // address from the server. Other code paths (opportunistic cache refresh in
+        // updateLastKnownLocalPaymentAddressProtoData) intentionally never clear the
+        // cache, which makes this the single point where a disable propagates.
+        if !newPaymentsState.isEnabled, oldPaymentsState.isEnabled {
+            Self.keyValueStore.setData(
+                nil,
+                key: Self.lastKnownLocalPaymentAddressProtoDataKey,
+                transaction: transaction,
+            )
+        }
 
         let localAci = DependenciesBridge.shared.tsAccountManager.localIdentifiers(tx: transaction)?.aci
         TSPaymentsActivationRequestModel
@@ -208,18 +250,21 @@ public class PaymentsHelperImpl: PaymentsHelperSwift, PaymentsHelper {
                 SSKEnvironment.shared.paymentsEventsRef.paymentsStateDidChange()
 
                 if originatedLocally {
-                    // We only need to re-upload the profile if the change originated
-                    // locally.
-                    Logger.info("Re-uploading local profile due to payments state change.")
-                    await DependenciesBridge.shared.db.awaitableWrite { tx in
-                        _ = SSKEnvironment.shared.profileManagerRef.reuploadLocalProfile(
-                            unsavedRotatedProfileKey: nil,
-                            mustReuploadAvatar: false,
-                            authedAccount: .implicit,
-                            tx: tx,
-                        )
+                    if !newPaymentsState.isEnabled {
+                        Logger.info("Re-uploading local profile due to payments disable.")
+                        await DependenciesBridge.shared.db.awaitableWrite { tx in
+                            _ = SSKEnvironment.shared.profileManagerRef.reuploadLocalProfileWithProfileKeyVersion(
+                                PaymentsConstants.bitcoinLightningProfileKeyVersion,
+                                unsavedRotatedProfileKey: nil,
+                                mustReuploadAvatar: false,
+                                authedAccount: .implicit,
+                                tx: tx,
+                            )
+                        }
                     }
 
+                    // Sync paymentsEntropy to StorageService; without this the
+                    // wallet seed lives only on this device and is unrecoverable.
                     SSKEnvironment.shared.storageServiceManagerRef.recordPendingLocalAccountUpdates()
                 }
             }
@@ -253,6 +298,10 @@ public class PaymentsHelperImpl: PaymentsHelperSwift, PaymentsHelper {
     }
 
     public func setLastKnownLocalPaymentAddressProtoData(_ data: Data?, transaction: DBWriteTransaction) {
+        if let data, data.isEmpty {
+            owsFailDebug("Refusing to cache empty payment address proto data.")
+            return
+        }
         Self.keyValueStore.setData(data, key: Self.lastKnownLocalPaymentAddressProtoDataKey, transaction: transaction)
     }
 
@@ -293,6 +342,10 @@ public class PaymentsHelperImpl: PaymentsHelperSwift, PaymentsHelper {
             thread: thread,
             senderAci: senderAci,
             transaction: transaction,
+        )
+        NotificationCenter.default.post(
+            name: Notification.Name("processIncomingPaymentNotification"),
+            object: nil,
         )
     }
 
@@ -355,6 +408,38 @@ public class PaymentsHelperImpl: PaymentsHelperSwift, PaymentsHelper {
             userProfileWriter: .paymentActivation,
             tx: tx,
         )
+
+        transaction.addSyncCompletion {
+            Task {
+                await Self.fetchBitcoinLightningProfileWithRetry(for: senderAci)
+            }
+        }
+    }
+
+    private static func fetchBitcoinLightningProfileWithRetry(for senderAci: Aci) async {
+        let attemptDelaysNs: [UInt64] = [0, 3_000_000_000, 8_000_000_000]
+        for (index, delayNs) in attemptDelaysNs.enumerated() {
+            if delayNs > 0 {
+                try? await Task.sleep(nanoseconds: delayNs)
+            }
+            do {
+                let fetched = try await SSKEnvironment.shared.profileFetcherRef
+                    .fetchProfileWithLightningBitcoinAddress(for: senderAci)
+                let paymentAddress = fetched.decryptedProfile?
+                    .paymentAddress(identityKey: fetched.identityKey)
+                if paymentAddress != nil {
+                    NotificationCenter.default.postOnMainThread(
+                        name: PaymentsConstants.paymentsActivatedForRecipient,
+                        object: senderAci,
+                    )
+                    return
+                }
+                Logger.info("Activated-message profile fetch attempt \(index + 1)/\(attemptDelaysNs.count) had no paymentAddress yet for \(senderAci).")
+            } catch {
+                Logger.warn("Activated-message profile fetch attempt \(index + 1)/\(attemptDelaysNs.count) failed for \(senderAci): \(error)")
+            }
+        }
+        Logger.warn("Gave up refreshing bitcoin lightning profile after activation from \(senderAci).")
     }
 
     public func processReceivedTranscriptPaymentNotification(
@@ -383,11 +468,11 @@ public class PaymentsHelperImpl: PaymentsHelperSwift, PaymentsHelper {
                 }
                 recipientAci = aci
             }
-            let paymentAmount = TSPaymentAmount(currency: .mobileCoin, picoMob: mobileCoinProto.amountPicoMob)
+            let paymentAmount = TSPaymentAmount(currency: .bitcoin, picoMob: mobileCoinProto.amountPicoMob)
             guard paymentAmount.isValidAmount(canBeEmpty: true) else {
                 throw OWSAssertionError("Invalid payment sync message: invalid paymentAmount.")
             }
-            let feeAmount = TSPaymentAmount(currency: .mobileCoin, picoMob: mobileCoinProto.feePicoMob)
+            let feeAmount = TSPaymentAmount(currency: .bitcoin, picoMob: mobileCoinProto.feePicoMob)
             guard feeAmount.isValidAmount(canBeEmpty: false) else {
                 throw OWSAssertionError("Invalid payment sync message: invalid feeAmount.")
             }
@@ -633,35 +718,14 @@ public class PaymentsHelperImpl: PaymentsHelperSwift, PaymentsHelper {
         senderAci: Aci,
         transaction: DBWriteTransaction,
     ) {
+        // BreezReceiptParser understands the current SDK layout and the frozen 0.14.0 layout, so
+        // a receipt from a sender on an old-breez build still yields a payment model instead of
+        // leaving the bubble amount-less ("UNAVAILABLE sats").
+        guard let paymentModel = paymentNotification.buildIncomingPaymentModel(senderAci: senderAci, isUnread: true) else {
+            owsFailDebug("Undecodable payment receipt (\(paymentNotification.mcReceiptData.count) bytes).")
+            return
+        }
         do {
-            let mcReceiptData = paymentNotification.mcReceiptData
-            let receiptInfo = try SSKEnvironment.shared.mobileCoinHelperRef.info(forReceiptData: mcReceiptData)
-
-            let mobileCoin = MobileCoinPayment(
-                recipientPublicAddressData: nil,
-                transactionData: nil,
-                receiptData: paymentNotification.mcReceiptData,
-                incomingTransactionPublicKeys: [receiptInfo.txOutPublicKey],
-                spentKeyImages: nil,
-                outputPublicKeys: nil,
-                ledgerBlockTimestamp: 0,
-                ledgerBlockIndex: 0,
-                feeAmount: nil,
-            )
-            let paymentModel = TSPaymentModel(
-                paymentType: .incomingPayment,
-                paymentState: .incomingUnverified,
-                paymentAmount: nil,
-                createdDate: Date(),
-                senderOrRecipientAci: senderAci,
-                memoMessage: paymentNotification.memoMessage?.nilIfEmpty,
-                isUnread: true,
-                interactionUniqueId: nil,
-                mobileCoin: mobileCoin,
-            )
-            guard paymentModel.isValid else {
-                throw OWSAssertionError("Invalid paymentModel.")
-            }
             try tryToInsertPaymentModel(paymentModel, transaction: transaction)
 
             // TODO: Remove any corresponding payment request.
@@ -678,8 +742,8 @@ public struct PaymentsPassphrase: Equatable {
     public let words: [String]
 
     public init(words: [String]) throws {
-        guard words.count == PaymentsConstants.passphraseWordCount else {
-            owsFailDebug("words.count \(words.count) != \(PaymentsConstants.passphraseWordCount)")
+        guard PaymentsConstants.supportedPassphraseWordCounts.contains(words.count) else {
+            owsFailDebug("words.count \(words.count) not in supported counts \(PaymentsConstants.supportedPassphraseWordCounts)")
             throw PaymentsError.invalidPassphrase
         }
 
@@ -691,4 +755,17 @@ public struct PaymentsPassphrase: Equatable {
     public var asPassphrase: String { words.joined(separator: " ") }
 
     public var debugDescription: String { asPassphrase }
+}
+
+extension Payment {
+    var hash: String? {
+        switch details {
+        case .lightning(_, _, _, let htlcDetails, _, _, _, _):
+            return htlcDetails.paymentHash
+        case .spark(_, let htlcDetails, _):
+            return htlcDetails?.paymentHash
+        default:
+            return nil
+        }
+    }
 }

@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
+import BreezSdkSpark
 import MobileCoin
 public import SignalServiceKit
 
@@ -649,18 +650,27 @@ private class PaymentProcessingOperation {
             throw PaymentsError.tooOldToSubmit
         }
 
-        guard
-            let mcTransactionData = paymentModel.mcTransactionData,
-            mcTransactionData.count > 0,
-            let transaction = MobileCoin.Transaction(serializedData: mcTransactionData)
-        else {
+        guard let preparedTransaction = paymentModel.asPreparedTransaction() else {
             await Self.handleIndeterminatePayment(paymentModel: paymentModel)
             throw PaymentsError.indeterminateState
         }
 
         do {
-            let mobileCoinAPI = try await SUIEnvironment.shared.paymentsImplRef.getMobileCoinAPI()
-            _ = try await mobileCoinAPI.submitTransaction(transaction: transaction)
+            let sdk = try SUIEnvironment.shared.paymentsImplRef.getBreezSdk()
+            let receipt: PaymentReceipt
+            switch preparedTransaction {
+            case .lnurlPay(let prepareLnurlPayResponse):
+                let paymentResponse = try await sdk.lnurlPay(request: LnurlPayRequest(prepareResponse: prepareLnurlPayResponse))
+                receipt = .lnurlPay(paymentResponse)
+            case .bolt11(let prepareSendPaymentResponse):
+                let paymentResponse = try await sdk.sendPayment(request: SendPaymentRequest(
+                    prepareResponse: prepareSendPaymentResponse,
+                    options: .bolt11Invoice(preferSpark: true, completionTimeoutSecs: nil),
+                    idempotencyKey: nil,
+                ))
+                receipt = .bolt11(paymentResponse)
+            }
+            try await Self.updatePaymentReceiptData(paymentModel: paymentModel, receiptData: receipt.serializeData())
             try await Self.updatePaymentStatePromise(paymentModel: paymentModel, fromState: .outgoingUnsubmitted, toState: .outgoingUnverified)
         } catch PaymentsError.inputsAlreadySpent {
             // e.g. if we double-submit a transaction, it should become unverified,
@@ -672,39 +682,36 @@ private class PaymentProcessingOperation {
     private func verifyOutgoingPayment(paymentModel: TSPaymentModel) async throws {
         owsAssertDebug(paymentModel.paymentState == .outgoingUnverified)
 
-        let mobileCoinAPI = try await SUIEnvironment.shared.paymentsImplRef.getMobileCoinAPI()
+        let sdk = try SUIEnvironment.shared.paymentsImplRef.getBreezSdk()
 
+        // asPaymentReceipt() only reads the current SDK layout; BreezReceiptParser also reads the
+        // frozen 0.14.0 layout, so an outgoing payment that was still unverified across an app
+        // upgrade is not deleted as indeterminate.
         guard
-            let mcTransactionData = paymentModel.mcTransactionData,
-            mcTransactionData.count > 0,
-            let transaction = MobileCoin.Transaction(serializedData: mcTransactionData)
+            let paymentId = paymentModel.asPaymentReceipt()?.paymentId
+            ?? BreezReceiptParser.parse(paymentModel.mcReceiptData)?.paymentId
         else {
             await Self.handleIndeterminatePayment(paymentModel: paymentModel)
             throw PaymentsError.indeterminateState
         }
 
-        let transactionStatus = try await mobileCoinAPI.getOutgoingTransactionStatus(transaction: transaction)
+        _ = try await sdk.syncWallet(request: SyncWalletRequest())
+        guard let payment = try? await sdk.getPayment(request: GetPaymentRequest(paymentId: paymentId)).payment else {
+            owsFailDebug("Payment with ID: \(paymentId) not found.")
+            return
+        }
 
         try await SSKEnvironment.shared.databaseStorageRef.awaitableWrite { transaction in
-            switch transactionStatus.transactionStatus {
-            case .unknown:
-                throw PaymentsError.verificationStatusUnknown
-            case .accepted(let block):
-                if !paymentModel.hasMCLedgerBlockIndex {
-                    paymentModel.update(mcLedgerBlockIndex: block.index, transaction: transaction)
-                }
-                if
-                    let ledgerBlockDate = block.timestamp,
-                    !paymentModel.hasMCLedgerBlockTimestamp
-                {
-                    paymentModel.update(mcLedgerBlockTimestamp: ledgerBlockDate.ows_millisecondsSince1970, transaction: transaction)
-                }
+            switch payment.status {
+            case .completed:
                 try paymentModel.updatePaymentModelState(fromState: .outgoingUnverified, toState: .outgoingVerified, transaction: transaction)
 
                 // If we've verified a payment, our balance may have changed.
                 SUIEnvironment.shared.paymentsImplRef.updateCurrentPaymentBalance()
             case .failed:
                 Self.markAsFailed(paymentModel: paymentModel, paymentFailure: .validationFailed, paymentState: .outgoingFailed, transaction: transaction)
+            case .pending:
+                throw PaymentsError.verificationStatusUnknown
             }
         }
     }
@@ -785,28 +792,33 @@ private class PaymentProcessingOperation {
 
     private func verifyIncomingPayment(paymentModel: TSPaymentModel) async throws {
         owsAssertDebug(paymentModel.paymentState == .incomingUnverified)
+        let sdk = try SUIEnvironment.shared.paymentsImplRef.getBreezSdk()
 
-        let mobileCoinAPI = try await SUIEnvironment.shared.paymentsImplRef.getMobileCoinAPI()
-
-        guard let mcReceiptData = paymentModel.mcReceiptData, let receipt = MobileCoin.Receipt(serializedData: mcReceiptData) else {
+        // BreezReceiptParser, not the raw SDK reader: a receipt serialized by an older breez
+        // build (frozen 0.14.0 layout) is still a real, verifiable payment. Failing here would
+        // route it to handleIndeterminatePayment, which DELETES the payment model.
+        guard let mcReceiptData = paymentModel.mcReceiptData, let receipt = BreezReceiptParser.parse(mcReceiptData) else {
             await Self.handleIndeterminatePayment(paymentModel: paymentModel)
             throw PaymentsError.indeterminateState
         }
 
-        let receiptStatus = try await mobileCoinAPI.getIncomingReceiptStatus(receipt: receipt).awaitable()
+        _ = try await sdk.syncWallet(request: SyncWalletRequest())
+        guard let paymentHash = receipt.paymentHash else {
+            owsFailDebug("Payment hash for: \(receipt.paymentId ?? "unknown") not found.")
+            return
+        }
+
+        guard let payment = try? await sdk.payment(by: paymentHash) else {
+            owsFailDebug("Payment with ID: \(receipt.paymentId ?? "unknown") not found.")
+            return
+        }
 
         try await SSKEnvironment.shared.databaseStorageRef.awaitableWrite { transaction in
-            switch receiptStatus.receiptStatus {
-            case .unknown:
+            switch payment.status {
+            case .pending:
                 throw PaymentsError.verificationStatusUnknown
-            case .received(let block):
-                paymentModel.update(mcLedgerBlockIndex: block.index, transaction: transaction)
-                if let ledgerBlockDate = block.timestamp {
-                    paymentModel.update(mcLedgerBlockTimestamp: ledgerBlockDate.ows_millisecondsSince1970, transaction: transaction)
-                } else {
-                    Logger.warn("Missing ledgerBlockDate.")
-                }
-                paymentModel.update(withPaymentAmount: receiptStatus.paymentAmount, transaction: transaction)
+            case .completed:
+                paymentModel.update(withPaymentAmount: payment.paymentAmount, transaction: transaction)
                 try paymentModel.updatePaymentModelState(fromState: .incomingUnverified, toState: .incomingVerified, transaction: transaction)
 
                 // If we've verified a payment, our balance may have changed.
@@ -847,5 +859,50 @@ private class PaymentProcessingOperation {
             }
             paymentModel.update(paymentState: toState, transaction: transaction)
         }
+    }
+
+    private static func updatePaymentTransactionData(paymentModel: TSPaymentModel, transactionData: Data) async throws {
+        try await SSKEnvironment.shared.databaseStorageRef.awaitableWrite { transaction in
+            guard let paymentModel = TSPaymentModel.anyFetch(uniqueId: paymentModel.uniqueId, transaction: transaction) else {
+                throw OWSAssertionError("Missing TSPaymentModel.")
+            }
+
+            paymentModel.update(withTransactionData: transactionData, transaction: transaction)
+        }
+    }
+
+    private static func updatePaymentReceiptData(paymentModel: TSPaymentModel, receiptData: Data) async throws {
+        try await SSKEnvironment.shared.databaseStorageRef.awaitableWrite { transaction in
+            guard let paymentModel = TSPaymentModel.anyFetch(uniqueId: paymentModel.uniqueId, transaction: transaction) else {
+                throw OWSAssertionError("Missing TSPaymentModel.")
+            }
+
+            paymentModel.update(withReceiptData: receiptData, transaction: transaction)
+        }
+    }
+}
+
+// TODO: Separate into a file
+extension TSPaymentModel {
+    func asPreparedTransaction() -> PreparedTransaction? {
+        guard
+            let transactionData = mcTransactionData,
+            transactionData.count > 0
+        else {
+            return nil
+        }
+
+        return PreparedTransaction.deserialize(from: transactionData)
+    }
+
+    func asPaymentReceipt() -> PaymentReceipt? {
+        guard
+            let receiptData = mcReceiptData,
+            receiptData.count > 0
+        else {
+            return nil
+        }
+
+        return PaymentReceipt.deserialize(from: receiptData)
     }
 }

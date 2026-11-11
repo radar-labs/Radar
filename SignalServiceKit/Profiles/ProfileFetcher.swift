@@ -20,16 +20,27 @@ public struct ProfileFetchContext {
     /// such as if storage service is updated after the write.
     public var userProfileWriter: UserProfileWriter
 
+    /// Radar: if set, fetch this specific profile key version (Radar publishes the
+    /// Lightning address under `PaymentsConstants.bitcoinLightningProfileKeyVersion`).
+    public var profileKeyVersion: String?
+
+    /// Radar: if false, the fetched profile is not written to the local profile cache.
+    public var cache: Bool
+
     public init(
         groupId: GroupIdentifier? = nil,
         isOpportunistic: Bool = false,
         mustFetchNewCredential: Bool = false,
         userProfileWriter: UserProfileWriter = .profileFetch,
+        profileKeyVersion: String? = nil,
+        cache: Bool = true,
     ) {
         self.groupId = groupId
         self.isOpportunistic = isOpportunistic
         self.mustFetchNewCredential = mustFetchNewCredential
         self.userProfileWriter = userProfileWriter
+        self.profileKeyVersion = profileKeyVersion
+        self.cache = cache
     }
 }
 
@@ -44,6 +55,17 @@ extension ProfileFetcher {
         for serviceId: ServiceId,
         context: ProfileFetchContext = ProfileFetchContext(),
         authedAccount: AuthedAccount = .implicit,
+    ) async throws -> FetchedProfile {
+        return try await fetchProfileImpl(for: serviceId, context: context, authedAccount: authedAccount)
+    }
+
+    public func fetchProfileWithLightningBitcoinAddress(
+        for serviceId: ServiceId,
+        context: ProfileFetchContext = ProfileFetchContext(
+            profileKeyVersion: PaymentsConstants.bitcoinLightningProfileKeyVersion,
+            cache: false,
+        ),
+        authedAccount: AuthedAccount = .implicit(),
     ) async throws -> FetchedProfile {
         return try await fetchProfileImpl(for: serviceId, context: context, authedAccount: authedAccount)
     }
@@ -69,6 +91,8 @@ public actor ProfileFetcherImpl: ProfileFetcher {
         _ mustFetchNewCredential: Bool,
         AuthedAccount,
         UserProfileWriter,
+        _ profileKeyVersion: String?,
+        _ profileAutoUpdate: Bool,
     ) -> ProfileFetcherJob
     private let reachabilityManager: any SSKReachabilityManager
     private let tsAccountManager: any TSAccountManager
@@ -121,7 +145,7 @@ public actor ProfileFetcherImpl: ProfileFetcher {
     ) {
         self.reachabilityManager = reachabilityManager
         self.tsAccountManager = tsAccountManager
-        self.jobCreator = { serviceId, groupIdContext, mustFetchNewCredential, authedAccount, userProfileWriter in
+        self.jobCreator = { serviceId, groupIdContext, mustFetchNewCredential, authedAccount, userProfileWriter, profileKeyVersion, profileAutoUpdate in
             return ProfileFetcherJob(
                 serviceId: serviceId,
                 groupIdContext: groupIdContext,
@@ -143,6 +167,8 @@ public actor ProfileFetcherImpl: ProfileFetcher {
                 udManager: udManager,
                 versionedProfiles: versionedProfiles,
                 userProfileWriter: userProfileWriter,
+                profileKeyVersion: profileKeyVersion,
+                profileAutoUpdate: profileAutoUpdate,
             )
         }
     }
@@ -266,6 +292,8 @@ public actor ProfileFetcherImpl: ProfileFetcher {
             context.mustFetchNewCredential,
             authedAccount,
             context.userProfileWriter,
+            context.profileKeyVersion,
+            context.cache,
         ).run() }
         let outcome: FetchResult.Outcome
         do {
@@ -282,7 +310,11 @@ public actor ProfileFetcherImpl: ProfileFetcher {
         if case .failure(ProfileRequestError.rateLimit) = result {
             self.rateLimitExpirationDate = now.adding(5 * .minute)
         }
-        self.recentFetchResults[serviceId] = FetchResult(outcome: outcome, completionDate: now)
+
+        if context.cache {
+            self.recentFetchResults[serviceId] = FetchResult(outcome: outcome, completionDate: now)
+        }
+
         return try result.get()
     }
 

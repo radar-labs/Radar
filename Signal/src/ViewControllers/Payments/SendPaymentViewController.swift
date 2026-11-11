@@ -3,18 +3,18 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
+public import LibSignalClient
 import Lottie
-import SignalServiceKit
-import SignalUI
+public import SignalServiceKit
+public import SignalUI
 
-@MainActor
-protocol SendPaymentViewDelegate: AnyObject {
+public protocol SendPaymentViewDelegate: AnyObject {
     func didSendPayment(success: Bool)
 }
 
 // MARK: -
 
-enum SendPaymentMode: UInt {
+public enum SendPaymentMode: UInt {
     case fromConversationView
     case fromPaymentSettings
     case fromTransferOutFlow
@@ -32,58 +32,27 @@ enum SendPaymentMode: UInt {
 
 // MARK: -
 
-class SendPaymentViewController: OWSViewController, SendPaymentMemoViewDelegate, SendPaymentHelperDelegate,
-    SendPaymentCompletionDelegate, AmountsDelegate
-{
+public class SendPaymentViewController: OWSViewController {
+
     private let mode: SendPaymentMode
 
     fileprivate typealias PaymentInfo = SendPaymentInfo
 
-    weak var delegate: SendPaymentViewDelegate?
+    public weak var delegate: SendPaymentViewDelegate?
 
     private let recipient: SendPaymentRecipient
     private let isOutgoingTransfer: Bool
 
-    private let bigAmountLabel: UILabel = {
-        let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 54)
-        label.textAlignment = .center
-        label.adjustsFontSizeToFitWidth = true
-        label.minimumScaleFactor = 0.25
-        label.setContentHuggingVerticalHigh()
-        label.setCompressionResistanceVerticalHigh()
-        return label
-    }()
+    private let rootStack = UIStackView()
 
-    private let smallAmountLabel: UILabel = {
-        let label = UILabel()
-        label.font = .dynamicTypeSubheadlineClamped
-        label.adjustsFontSizeToFitWidth = true
-        label.adjustsFontForContentSizeCategory = true
-        label.textColor = .Signal.secondaryLabel
-        label.textAlignment = .center
-        label.setContentHuggingVerticalHigh()
-        label.setCompressionResistanceVerticalHigh()
-        return label
-    }()
-
-    private lazy var currencyConversionInfoButton: UIButton = {
-        let button = UIButton(
-            configuration: .plain(),
-            primaryAction: UIAction { [weak self] _ in
-                self?.didTapCurrencyConversionInfo()
-            },
-        )
-        button.configuration?.image = UIImage(named: "info-20")
-        button.configuration?.contentInsets = .init(hMargin: 12, vMargin: 4)
-        button.tintColor = .Signal.secondaryLabel
-        button.setCompressionResistanceHorizontalHigh()
-        return button
-    }()
-
-    private var memoView = UIView()
+    private let bigAmountLabel = UILabel()
+    private let smallAmountLabel = UILabel()
+    private let currencyConversionInfoView = UIImageView()
 
     private let balanceLabel = SendPaymentHelper.buildBottomLabel()
+    private let noteTextField = UITextField()
+    private let noteContainer = UIView()
+    private let balancePillView = UIView()
 
     // MARK: - Amount
 
@@ -93,11 +62,7 @@ class SendPaymentViewController: OWSViewController, SendPaymentMemoViewDelegate,
 
     // MARK: -
 
-    private var memoMessage: String? {
-        didSet {
-            updateMemoView()
-        }
-    }
+    private var memoMessage: String?
 
     private var hasMemoMessage: Bool {
         memoMessage?.strippedOrNil != nil
@@ -115,7 +80,11 @@ class SendPaymentViewController: OWSViewController, SendPaymentMemoViewDelegate,
         return presentingViewController != nil
     }
 
-    init(
+    private var isSatoshiEnabled: Bool {
+        PaymentsDisplayPreferences.shared.isSatoshiEnabled
+    }
+
+    public init(
         recipient: SendPaymentRecipient,
         initialPaymentAmount: TSPaymentAmount?,
         isOutgoingTransfer: Bool,
@@ -125,22 +94,21 @@ class SendPaymentViewController: OWSViewController, SendPaymentMemoViewDelegate,
         self.mode = mode
         self.isOutgoingTransfer = isOutgoingTransfer
 
-        if
-            Self.wasLastPaymentInFiat,
-            let defaultFiatAmount = Amounts.defaultFiatAmount
-        {
+        if PaymentsDisplayPreferences.shared.isSatoshiEnabled {
+            amounts.set(currentAmount: Amounts.defaultSatoshiAmount, otherCurrencyAmount: nil)
+        } else if Self.wasLastPaymentInFiat, let defaultFiatAmount = Amounts.defaultFiatAmount {
             amounts.set(currentAmount: defaultFiatAmount, otherCurrencyAmount: nil)
         } else {
             amounts.set(currentAmount: Amounts.defaultMCAmount, otherCurrencyAmount: nil)
         }
 
         if let initialPaymentAmount {
-            owsAssertDebug(initialPaymentAmount.currency == .mobileCoin)
+            owsAssertDebug(initialPaymentAmount.currency == .bitcoin)
 
             if let amountString = PaymentsFormat.formatAsDoubleString(picoMob: initialPaymentAmount.picoMob) {
                 let inputString = InputString.parseString(amountString, isFiat: false)
                 amounts.set(
-                    currentAmount: .mobileCoin(
+                    currentAmount: .cryptoCurrency(
                         inputString: inputString,
                         exactAmount: initialPaymentAmount,
                     ),
@@ -156,14 +124,6 @@ class SendPaymentViewController: OWSViewController, SendPaymentMemoViewDelegate,
         helper = SendPaymentHelper(delegate: self)
         amounts.delegate = self
     }
-
-    deinit {
-        for observation in observations {
-            NotificationCenter.default.removeObserver(observation)
-        }
-    }
-
-    // MARK: - Presenting
 
     private enum PresentationMode {
         case fromConversationView(fromViewController: UIViewController)
@@ -256,15 +216,11 @@ class SendPaymentViewController: OWSViewController, SendPaymentMemoViewDelegate,
             return
         }
 
-        let databaseStorage = SSKEnvironment.shared.databaseStorageRef
-        let profileManager = SSKEnvironment.shared.profileManagerRef
-
-        let recipientProfile = databaseStorage.read { tx in
-            return profileManager.userProfile(for: recipientAddress, tx: tx)
-        }
-
-        if recipientProfile?.hasPaymentAddress == true {
-            presentAfterRecipientCheck(
+        // Captures the original presentation arguments so we can re-enter this
+        // flow after the recipient responds to a payments-activation request.
+        let retryPresent: () -> Void = {
+            present(
+                fromViewController: fromViewController,
                 presentationMode: presentationMode,
                 delegate: delegate,
                 recipientAddress: recipientAddress,
@@ -272,32 +228,39 @@ class SendPaymentViewController: OWSViewController, SendPaymentMemoViewDelegate,
                 isOutgoingTransfer: isOutgoingTransfer,
                 mode: mode,
             )
-        } else {
-            // Check whether recipient can receive payments.
-            ModalActivityIndicatorViewController.presentAsInvisible(fromViewController: fromViewController) { modalActivityIndicator in
-                Task { @MainActor in
-                    do {
-                        guard let serviceId = recipientAddress.serviceId else {
-                            throw ProfileRequestError.notFound
-                        }
-                        let profileFetcher = SSKEnvironment.shared.profileFetcherRef
-                        _ = try await profileFetcher.fetchProfile(for: serviceId)
+        }
 
-                        modalActivityIndicator.dismiss {
-                            Self.presentAfterRecipientCheck(
-                                presentationMode: presentationMode,
-                                delegate: delegate,
-                                recipientAddress: recipientAddress,
-                                initialPaymentAmount: initialPaymentAmount,
-                                isOutgoingTransfer: isOutgoingTransfer,
-                                mode: mode,
-                            )
-                        }
-                    } catch {
-                        owsFailDebug("Error: \(error)")
-                        modalActivityIndicator.dismiss {
-                            Self.showRecipientNotEnabledAlert(recipientAddress: recipientAddress)
-                        }
+        // Check whether recipient can receive payments.
+        ModalActivityIndicatorViewController.presentAsInvisible(fromViewController: fromViewController) { modalActivityIndicator in
+            Task { @MainActor in
+                do {
+                    guard let serviceId = recipientAddress.serviceId else {
+                        throw ProfileRequestError.notFound
+                    }
+                    let profileFetcher = SSKEnvironment.shared.profileFetcherRef
+                    let fetchedProfile = try await profileFetcher.fetchProfileWithLightningBitcoinAddress(for: serviceId)
+
+                    modalActivityIndicator.dismiss {
+                        Self.presentAfterRecipientCheck(
+                            fromViewController: fromViewController,
+                            presentationMode: presentationMode,
+                            delegate: delegate,
+                            recipientAddress: recipientAddress,
+                            profile: fetchedProfile,
+                            initialPaymentAmount: initialPaymentAmount,
+                            isOutgoingTransfer: isOutgoingTransfer,
+                            mode: mode,
+                            retryPresent: retryPresent,
+                        )
+                    }
+                } catch {
+                    owsFailDebug("Error: \(error)")
+                    modalActivityIndicator.dismiss {
+                        Self.showRecipientNotEnabledAlert(
+                            fromViewController: fromViewController,
+                            recipientAddress: recipientAddress,
+                            retryPresent: retryPresent,
+                        )
                     }
                 }
             }
@@ -305,21 +268,28 @@ class SendPaymentViewController: OWSViewController, SendPaymentMemoViewDelegate,
     }
 
     private static func presentAfterRecipientCheck(
+        fromViewController: UIViewController,
         presentationMode: PresentationMode,
         delegate: SendPaymentViewDelegate,
         recipientAddress: SignalServiceAddress,
+        profile: FetchedProfile,
         initialPaymentAmount: TSPaymentAmount? = nil,
         isOutgoingTransfer: Bool,
         mode: SendPaymentMode,
+        retryPresent: @escaping () -> Void,
     ) {
-        let databaseStorage = SSKEnvironment.shared.databaseStorageRef
-        let profileManager = SSKEnvironment.shared.profileManagerRef
-
-        let recipientProfile = databaseStorage.read { tx in
-            return profileManager.userProfile(for: recipientAddress, tx: tx)
-        }
-        guard recipientProfile?.hasPaymentAddress == true else {
-            showRecipientNotEnabledAlert(recipientAddress: recipientAddress)
+        guard
+            let decryptedProfile = profile.decryptedProfile,
+            let paymentAddress = decryptedProfile.paymentAddress(identityKey: profile.identityKey),
+            paymentAddress.isValid,
+            paymentAddress.currency == .bitcoin,
+            (try? paymentAddress.asAddress())?.isEmpty == false
+        else {
+            showRecipientNotEnabledAlert(
+                fromViewController: fromViewController,
+                recipientAddress: recipientAddress,
+                retryPresent: retryPresent,
+            )
             return
         }
 
@@ -340,7 +310,11 @@ class SendPaymentViewController: OWSViewController, SendPaymentMemoViewDelegate,
         }
     }
 
-    private static func showRecipientNotEnabledAlert(recipientAddress: SignalServiceAddress) {
+    private static func showRecipientNotEnabledAlert(
+        fromViewController: UIViewController,
+        recipientAddress: SignalServiceAddress,
+        retryPresent: @escaping () -> Void,
+    ) {
         let titleFormat = OWSLocalizedString(
             "PAYMENTS_RECIPIENT_PAYMENTS_NOT_ENABLED_TITLE",
             comment: "Title for error alert indicating that a given user cannot receive payments because they have not enabled payments. Embeds {{ the contact's name }}",
@@ -348,7 +322,7 @@ class SendPaymentViewController: OWSViewController, SendPaymentMemoViewDelegate,
         let recipientName: String = SSKEnvironment.shared.databaseStorageRef.read { tx in
             SSKEnvironment.shared.contactManagerRef.displayName(for: recipientAddress, tx: tx).resolvedValue()
         }
-        let title = String.nonPluralLocalizedStringWithFormat(titleFormat, recipientName)
+        let title = String(format: titleFormat, recipientName)
         let actionSheet = ActionSheetController(
             title: title,
             message: OWSLocalizedString(
@@ -365,11 +339,77 @@ class SendPaymentViewController: OWSViewController, SendPaymentMemoViewDelegate,
             style: .default,
         ) { _ in
             sendActivationRequest(recipientAddress: recipientAddress)
+            waitForActivationAndRetry(
+                fromViewController: fromViewController,
+                recipientAddress: recipientAddress,
+                retryPresent: retryPresent,
+            )
         }
         actionSheet.addAction(sendAction)
         actionSheet.addAction(OWSActionSheets.cancelAction)
 
         OWSActionSheets.showActionSheet(actionSheet)
+    }
+
+    private static func waitForActivationAndRetry(
+        fromViewController: UIViewController,
+        recipientAddress: SignalServiceAddress,
+        retryPresent: @escaping () -> Void,
+    ) {
+        guard let recipientServiceId = recipientAddress.serviceId else {
+            return
+        }
+        ModalActivityIndicatorViewController.present(
+            fromViewController: fromViewController,
+            canCancel: true,
+        ) { modal in
+            Task { @MainActor in
+                let activated = await waitForActivationNotification(
+                    serviceId: recipientServiceId,
+                    timeout: 30,
+                )
+                modal.dismiss {
+                    // If user cancelled the modal, don't auto-retry.
+                    guard !modal.wasCancelled, activated else { return }
+                    retryPresent()
+                }
+            }
+        }
+    }
+
+    private static func waitForActivationNotification(
+        serviceId: ServiceId,
+        timeout: TimeInterval,
+    ) async -> Bool {
+        let expectedServiceIdString = serviceId.serviceIdUppercaseString
+        return await withCheckedContinuation { (continuation: CheckedContinuation<Bool, Never>) in
+            let didResume = AtomicBool(false, lock: .sharedGlobal)
+            var observerToken: NSObjectProtocol?
+
+            func resumeOnce(_ value: Bool) {
+                guard didResume.swap(true) == false else { return }
+                if let observerToken {
+                    NotificationCenter.default.removeObserver(observerToken)
+                }
+                continuation.resume(returning: value)
+            }
+
+            observerToken = NotificationCenter.default.addObserver(
+                forName: PaymentsConstants.paymentsActivatedForRecipient,
+                object: nil,
+                queue: .main,
+            ) { notification in
+                guard
+                    let aci = notification.object as? Aci,
+                    aci.serviceIdUppercaseString == expectedServiceIdString
+                else { return }
+                resumeOnce(true)
+            }
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + timeout) {
+                resumeOnce(false)
+            }
+        }
     }
 
     private static func sendActivationRequest(recipientAddress: SignalServiceAddress) {
@@ -382,7 +422,7 @@ class SendPaymentViewController: OWSViewController, SendPaymentMemoViewDelegate,
             else {
                 return
             }
-            let message = OutgoingPaymentActivationRequestMessage(thread: thread, tx: transaction)
+            let message = OWSPaymentActivationRequestMessage(thread: thread, transaction: transaction)
             // The request message isn't inserted or rendered in chat; thats done with an info message.
             let preparedMessage = PreparedOutgoingMessage.preprepared(
                 transientMessageWithoutAttachments: message,
@@ -404,7 +444,7 @@ class SendPaymentViewController: OWSViewController, SendPaymentMemoViewDelegate,
         }
     }
 
-    static func presentFromConversationView(
+    public static func presentFromConversationView(
         _ fromViewController: UIViewController,
         delegate: SendPaymentViewDelegate,
         recipientAddress: SignalServiceAddress,
@@ -422,7 +462,7 @@ class SendPaymentViewController: OWSViewController, SendPaymentMemoViewDelegate,
         )
     }
 
-    static func present(
+    public static func present(
         inNavigationController navigationController: UINavigationController,
         delegate: SendPaymentViewDelegate,
         recipientAddress: SignalServiceAddress,
@@ -441,127 +481,24 @@ class SendPaymentViewController: OWSViewController, SendPaymentMemoViewDelegate,
         )
     }
 
-    // MARK: - UIViewController
-
     override open func viewDidLoad() {
         super.viewDidLoad()
 
-        if mode.isModalRootView {
-            navigationItem.rightBarButtonItem = .doneButton(dismissingFrom: self)
-        }
+        view.backgroundColor = OWSTableViewController2.tableBackgroundColor(isUsingPresentedStyle: isUsingPresentedStyle)
 
-        view.backgroundColor = .Signal.groupedBackground
+        addListeners()
 
-        //
-        // 1. Amounts
-        //
-        let amountsView = UIView()
-        // Big label.
-        amountsView.addSubview(bigAmountLabel)
-        // Small label with (i) info button next to it.
-        amountsView.addSubview(smallAmountLabel)
-        amountsView.addSubview(currencyConversionInfoButton)
+        createSubviews()
 
-        bigAmountLabel.translatesAutoresizingMaskIntoConstraints = false
-        smallAmountLabel.translatesAutoresizingMaskIntoConstraints = false
-        currencyConversionInfoButton.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            bigAmountLabel.topAnchor.constraint(equalTo: amountsView.topAnchor),
-            bigAmountLabel.leadingAnchor.constraint(greaterThanOrEqualTo: amountsView.leadingAnchor),
-            bigAmountLabel.centerXAnchor.constraint(equalTo: amountsView.centerXAnchor),
-
-            smallAmountLabel.topAnchor.constraint(equalTo: bigAmountLabel.bottomAnchor, constant: 8),
-            smallAmountLabel.leadingAnchor.constraint(greaterThanOrEqualTo: amountsView.leadingAnchor),
-            smallAmountLabel.centerXAnchor.constraint(equalTo: amountsView.centerXAnchor),
-            smallAmountLabel.bottomAnchor.constraint(equalTo: amountsView.bottomAnchor),
-
-            currencyConversionInfoButton.centerYAnchor.constraint(equalTo: smallAmountLabel.centerYAnchor),
-            currencyConversionInfoButton.leadingAnchor.constraint(equalTo: smallAmountLabel.trailingAnchor),
-            currencyConversionInfoButton.trailingAnchor.constraint(lessThanOrEqualTo: amountsView.trailingAnchor),
-        ])
-        // Transfer button next to big label.
-        if currentCurrencyConversion != nil {
-            let transferButton = UIButton(
-                configuration: .plain(),
-                primaryAction: UIAction { [weak self] _ in
-                    self?.didTapSwapCurrency()
-                },
-            )
-            transferButton.tintColor = .secondaryLabel
-            transferButton.configuration?.image = UIImage(named: "transfer")
-            transferButton.configuration?.contentInsets = .init(margin: 4)
-            transferButton.setCompressionResistanceHorizontalHigh()
-            amountsView.addSubview(transferButton)
-            transferButton.translatesAutoresizingMaskIntoConstraints = false
-            NSLayoutConstraint.activate([
-                transferButton.centerYAnchor.constraint(equalTo: bigAmountLabel.centerYAnchor),
-                transferButton.trailingAnchor.constraint(equalTo: amountsView.trailingAnchor),
-                transferButton.leadingAnchor.constraint(greaterThanOrEqualTo: bigAmountLabel.trailingAnchor),
-            ])
-        }
-
-        let stackView = addStaticContentStackView(
-            arrangedSubviews: [
-                amountsView,
-            ],
-            isScrollable: true,
-        )
-
-        //
-        // 2. Memo (optional)
-        //
-        if isIdentifiedPayment {
-            updateMemoView()
-            stackView.addArrangedSubview(memoView)
-        }
-
-        //
-        //
-        // 3. Stretching space.
-        stackView.addArrangedSubview(.vStretchingSpacer())
-
-        //
-        // 4. Keyboard
-        //
-        let keyboardView = buildKeyboardView()
-        stackView.addArrangedSubview(keyboardView)
-        stackView.setCustomSpacing(24, after: keyboardView)
-
-        //
-        // 5. Big blue Pay button.
-        //
-        let payButton = UIButton(
-            configuration: .largePrimary(title: OWSLocalizedString(
-                "PAYMENTS_NEW_PAYMENT_PAY_BUTTON",
-                comment: "Label for the 'new payment' button.",
-            )),
-            primaryAction: UIAction { [weak self] _ in
-                self?.didTapPayButton()
-            },
-        )
-        // This sets required side margins and is necessary even though there's just one button.
-        let payButtonContainer = [payButton].enclosedInVerticalStackView(isFullWidthButtons: true)
-        stackView.addArrangedSubview(payButtonContainer)
-        stackView.setCustomSpacing(0, after: payButtonContainer)
-
-        //
-        // 6. Balance Label.
-        //
-        stackView.addArrangedSubview(balanceLabel)
-        stackView.addArrangedSubview(.spacer(withHeight: 16))
-
-        updateAmountLabels()
-        updateBalanceLabel()
-
-        addObservations()
+        updateContents()
     }
 
-    override func viewWillAppear(_ animated: Bool) {
+    override public func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         helper?.refreshObservedValues()
     }
 
-    override func viewDidAppear(_ animated: Bool) {
+    override public func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
 
         // For now, the design only allows for portrait layout on non-iPads
@@ -570,24 +507,22 @@ class SendPaymentViewController: OWSViewController, SendPaymentMemoViewDelegate,
         }
     }
 
-    override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
-        return UIDevice.current.isIPad ? .all : .portrait
+    override public func themeDidChange() {
+        super.themeDidChange()
+
+        updateContents()
     }
 
-    // MARK: - Observations
-
-    private var observations = [NotificationCenter.Observer]()
-
-    private func addObservations() {
-        observations.append(NotificationCenter.default.addObserver(
+    private func addListeners() {
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(isPaymentsVersionOutdatedDidChange),
             name: PaymentsConstants.isPaymentsVersionOutdatedDidChange,
-        ) { [weak self] _ in
-            MainActor.assumeIsolated {
-                self?.isPaymentsVersionOutdatedDidChange()
-            }
-        })
+            object: nil,
+        )
     }
 
+    @objc
     private func isPaymentsVersionOutdatedDidChange() {
         guard UIApplication.shared.frontmostViewController == self else { return }
         if SSKEnvironment.shared.paymentsHelperRef.isPaymentsVersionOutdated {
@@ -595,13 +530,373 @@ class SendPaymentViewController: OWSViewController, SendPaymentMemoViewDelegate,
         }
     }
 
-    // MARK: - Updating UI
+    override public var supportedInterfaceOrientations: UIInterfaceOrientationMask {
+        return UIDevice.current.isIPad ? .all : .portrait
+    }
+
+    private func resetContents() {
+        amounts.reset()
+
+        memoMessage = nil
+    }
+
+    private func updateContents() {
+        AssertIsOnMainThread()
+
+        view.backgroundColor = OWSTableViewController2.tableBackgroundColor(isUsingPresentedStyle: isUsingPresentedStyle)
+        navigationItem.title = nil
+        if mode.isModalRootView {
+            navigationItem.rightBarButtonItem = .doneButton(dismissingFrom: self)
+        } else {
+            navigationItem.rightBarButtonItem = nil
+        }
+
+        updateAmountLabels()
+        updateBalanceLabel()
+
+        let swapCurrencyIconSize: CGFloat = 24
+        let bigAmountRight: UIView
+        if nil != currentCurrencyConversion {
+            bigAmountRight = UIImageView.withTemplateImageName("transfer", tintColor: .ows_gray45)
+            bigAmountRight.autoPinToSquareAspectRatio()
+            bigAmountRight.isUserInteractionEnabled = true
+            bigAmountRight.addGestureRecognizer(UITapGestureRecognizer(
+                target: self,
+                action: #selector(didTapSwapCurrency),
+            ))
+        } else {
+            bigAmountRight = UIView.container()
+        }
+        bigAmountRight.autoSetDimension(.width, toSize: swapCurrencyIconSize)
+
+        let amountWithIcon = UIStackView(arrangedSubviews: [bigAmountLabel, bigAmountRight])
+        amountWithIcon.axis = .horizontal
+        amountWithIcon.alignment = .center
+        amountWithIcon.spacing = 6
+
+        let amountLeftSpacer = UIView.container()
+        let amountRightSpacer = UIView.container()
+        amountLeftSpacer.setContentHuggingHorizontalLow()
+        amountRightSpacer.setContentHuggingHorizontalLow()
+        let bigAmountRow = UIStackView(arrangedSubviews: [amountLeftSpacer, amountWithIcon, amountRightSpacer])
+        UIView.matchWidthsOfViews([amountLeftSpacer, amountRightSpacer])
+        bigAmountRow.axis = .horizontal
+        bigAmountRow.alignment = .center
+
+        noteContainer.backgroundColor = OWSTableViewController2.cellBackgroundColor(isUsingPresentedStyle: isUsingPresentedStyle)
+        noteTextField.text = memoMessage
+
+        balancePillView.backgroundColor = Theme.isDarkThemeEnabled
+            ? UIColor.white.withAlphaComponent(0.1)
+            : UIColor.black.withAlphaComponent(0.05)
+
+        let spacerFactory = SpacerFactory()
+
+        let keyboardViews = buildKeyboard(spacerFactory: spacerFactory)
+
+        let amountButtons = buildAmountButtons()
+
+        let smallAmountSpacerFactory = SpacerFactory()
+        let smallAmountRow = UIStackView(arrangedSubviews: [
+            smallAmountSpacerFactory.buildHSpacer(),
+            smallAmountLabel,
+            currencyConversionInfoView,
+            smallAmountSpacerFactory.buildHSpacer(),
+        ])
+        smallAmountSpacerFactory.finalizeSpacers()
+        smallAmountRow.axis = .horizontal
+        smallAmountRow.alignment = .center
+        smallAmountRow.spacing = 8
+        smallAmountRow.isUserInteractionEnabled = true
+        smallAmountRow.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(didTapCurrencyConversionInfo)))
+
+        var requiredViews = [UIView]()
+        requiredViews += [
+            bigAmountRow,
+            smallAmountRow,
+        ]
+        if isIdentifiedPayment {
+            requiredViews.append(noteContainer)
+        }
+        requiredViews += [
+            amountButtons,
+        ]
+        requiredViews += keyboardViews.keyboardRows
+
+        for requiredView in requiredViews {
+            requiredView.setCompressionResistanceVerticalHigh()
+            requiredView.setContentHuggingHigh()
+        }
+
+        let balanceLeftSpacer = UIView.container()
+        let balanceRightSpacer = UIView.container()
+        balanceLeftSpacer.setContentHuggingHorizontalLow()
+        balanceRightSpacer.setContentHuggingHorizontalLow()
+        let balancePillRow = UIStackView(arrangedSubviews: [balanceLeftSpacer, balancePillView, balanceRightSpacer])
+        UIView.matchWidthsOfViews([balanceLeftSpacer, balanceRightSpacer])
+        balancePillRow.axis = .horizontal
+        balancePillRow.alignment = .center
+
+        rootStack.removeAllSubviews()
+        rootStack.addArrangedSubviews(
+            [
+                balancePillRow,
+                spacerFactory.buildVSpacer(),
+                spacerFactory.buildVSpacer(),
+                bigAmountRow,
+                smallAmountRow,
+                spacerFactory.buildVSpacer(),
+                spacerFactory.buildVSpacer(),
+                noteContainer,
+                spacerFactory.buildVSpacer(),
+                spacerFactory.buildVSpacer(),
+                spacerFactory.buildVSpacer(),
+            ] +
+                keyboardViews.allRows
+                + [
+                    spacerFactory.buildVSpacer(),
+                    spacerFactory.buildVSpacer(),
+                    spacerFactory.buildVSpacer(),
+                    amountButtons,
+                ],
+        )
+
+        spacerFactory.finalizeSpacers()
+
+        UIView.matchHeightsOfViews(keyboardViews.keyboardRows)
+    }
+
+    struct KeyboardViews {
+        let allRows: [UIView]
+        let keyboardRows: [UIView]
+    }
+
+    private func buildKeyboard(spacerFactory: SpacerFactory) -> KeyboardViews {
+
+        let keyboardHSpacing: CGFloat = 32
+        let buttonFont = UIFont.dynamicTypeTitle1Clamped
+        func buildAmountKeyboardButton(title: String, block: @escaping () -> Void) -> OWSButton {
+            let button = OWSButton(block: block)
+
+            let label = UILabel()
+            label.text = title
+            label.font = buttonFont
+            label.textColor = Theme.primaryTextColor
+            button.addSubview(label)
+            button.backgroundColor = OWSTableViewController2.cellBackgroundColor(isUsingPresentedStyle: isUsingPresentedStyle)
+            label.autoCenterInSuperview()
+
+            return button
+        }
+        func buildAmountKeyboardButton(imageName: String, block: @escaping () -> Void) -> OWSButton {
+            let button = OWSButton(
+                imageName: imageName,
+                tintColor: Theme.primaryTextColor,
+                block: block,
+            )
+            button.backgroundColor = OWSTableViewController2.cellBackgroundColor(isUsingPresentedStyle: isUsingPresentedStyle)
+            return button
+        }
+        var keyboardRows = [UIView]()
+        let buildAmountKeyboardRow = { (buttons: [OWSButton]) -> UIView in
+
+            let buttons = buttons.map { (button) -> UIView in
+                let buttonSize = buttonFont.lineHeight * 1.7
+                button.autoSetDimension(.height, toSize: buttonSize)
+
+                let downStateColor = (
+                    Theme.isDarkThemeEnabled
+                        ? UIColor.ows_gray90
+                        : UIColor.ows_gray02,
+                )
+                let downStateImage = UIImage.image(
+                    color: downStateColor,
+                    size: CGSize(width: 1, height: 1),
+                )
+                button.setBackgroundImage(downStateImage, for: .highlighted)
+
+                // We clip the button to a circle so that the
+                // down state is circular.
+                let buttonClipView = OWSLayerView.circleView()
+                buttonClipView.addSubview(button)
+                button.autoPinEdgesToSuperviewEdges()
+                buttonClipView.clipsToBounds = true
+
+                let buttonWrapper = UIView.container()
+                buttonWrapper.addSubview(buttonClipView)
+                buttonClipView.autoPinEdge(toSuperviewEdge: .top)
+                buttonClipView.autoPinEdge(toSuperviewEdge: .bottom)
+                buttonClipView.autoHCenterInSuperview()
+                buttonClipView.autoPinEdge(toSuperviewEdge: .leading)
+                buttonClipView.autoPinEdge(toSuperviewEdge: .trailing)
+
+                return buttonWrapper
+            }
+
+            let rowStack = UIStackView(arrangedSubviews: buttons)
+            rowStack.axis = .horizontal
+            rowStack.spacing = keyboardHSpacing
+            rowStack.distribution = .fillEqually
+            rowStack.alignment = .fill
+
+            keyboardRows.append(rowStack)
+
+            return rowStack
+        }
+
+        func buildDecimalButton() -> OWSButton {
+            if let decimalSeparator = PaymentsConstants.decimalSeparator.nilIfEmpty {
+                return buildAmountKeyboardButton(title: decimalSeparator) { [weak self] in
+                    self?.keyboardPressedDecimal()
+                }
+            } else {
+                return buildAmountKeyboardButton(imageName: "decimal-32") { [weak self] in
+                    self?.keyboardPressedDecimal()
+                }
+            }
+        }
+
+        // Don't localize; use Arabic numeral literals.
+        //
+        // TODO: Localize or remove custom keyboard to support payments
+        //       in locales that don't use arabic numerals.
+        let allRows = [
+            buildAmountKeyboardRow([
+                buildAmountKeyboardButton(title: "1") { [weak self] in
+                    self?.keyboardPressedNumeral("1")
+                },
+                buildAmountKeyboardButton(title: "2") { [weak self] in
+                    self?.keyboardPressedNumeral("2")
+                },
+                buildAmountKeyboardButton(title: "3") { [weak self] in
+                    self?.keyboardPressedNumeral("3")
+                },
+            ]),
+            spacerFactory.buildVSpacer(),
+            buildAmountKeyboardRow([
+                buildAmountKeyboardButton(title: "4") { [weak self] in
+                    self?.keyboardPressedNumeral("4")
+                },
+                buildAmountKeyboardButton(title: "5") { [weak self] in
+                    self?.keyboardPressedNumeral("5")
+                },
+                buildAmountKeyboardButton(title: "6") { [weak self] in
+                    self?.keyboardPressedNumeral("6")
+                },
+            ]),
+            spacerFactory.buildVSpacer(),
+            buildAmountKeyboardRow([
+                buildAmountKeyboardButton(title: "7") { [weak self] in
+                    self?.keyboardPressedNumeral("7")
+                },
+                buildAmountKeyboardButton(title: "8") { [weak self] in
+                    self?.keyboardPressedNumeral("8")
+                },
+                buildAmountKeyboardButton(title: "9") { [weak self] in
+                    self?.keyboardPressedNumeral("9")
+                },
+            ]),
+            spacerFactory.buildVSpacer(),
+            buildAmountKeyboardRow([
+                buildDecimalButton(),
+                buildAmountKeyboardButton(title: "0") { [weak self] in
+                    self?.keyboardPressedNumeral("0")
+                },
+                buildAmountKeyboardButton(imageName: "backspace-32") { [weak self] in
+                    self?.keyboardPressedBackspace()
+                },
+            ]),
+        ]
+
+        return KeyboardViews(allRows: allRows, keyboardRows: keyboardRows)
+    }
+
+    private func buildAmountButtons() -> UIView {
+        return buildBottomButtonStack([buildBottomButton(
+            title: OWSLocalizedString("PAYMENTS_NEW_PAYMENT_SEND_BUTTON", comment: "Label for the 'send payment' button."),
+            target: self,
+            selector: #selector(didTapPayButton),
+        )])
+    }
+
+    // MARK: -
+
+    private func createSubviews() {
+        rootStack.axis = .vertical
+        rootStack.alignment = .fill
+        rootStack.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(rootStack)
+        NSLayoutConstraint.activate([
+            rootStack.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            rootStack.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor, constant: 20),
+            rootStack.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor, constant: -20),
+            rootStack.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -24),
+        ])
+
+        bigAmountLabel.font = UIFont.regularFont(ofSize: 60)
+        bigAmountLabel.textAlignment = .center
+        bigAmountLabel.adjustsFontSizeToFitWidth = true
+        bigAmountLabel.minimumScaleFactor = 0.25
+        bigAmountLabel.setContentHuggingVerticalHigh()
+        bigAmountLabel.setCompressionResistanceVerticalHigh()
+
+        smallAmountLabel.font = UIFont.dynamicTypeSubheadline
+        smallAmountLabel.textColor = Theme.secondaryTextAndIconColor
+        smallAmountLabel.textAlignment = .center
+        smallAmountLabel.setContentHuggingVerticalHigh()
+        smallAmountLabel.setCompressionResistanceVerticalHigh()
+
+        currencyConversionInfoView.setTemplateImageName("info-compact", tintColor: Theme.secondaryTextAndIconColor)
+        currencyConversionInfoView.autoSetDimensions(to: .square(16))
+        currencyConversionInfoView.setCompressionResistanceHigh()
+
+        noteTextField.placeholder = OWSLocalizedString(
+            "PAYMENTS_NEW_PAYMENT_ADD_MEMO",
+            comment: "Placeholder for the note text field in the 'send payment' UI.",
+        )
+        noteTextField.font = .dynamicTypeBodyClamped
+        noteTextField.borderStyle = .none
+        noteTextField.returnKeyType = .done
+        noteTextField.delegate = self
+        noteTextField.addTarget(self, action: #selector(noteTextFieldDidChange), for: .editingChanged)
+
+        noteContainer.layer.cornerRadius = 26
+        noteContainer.layer.masksToBounds = true
+        noteContainer.addSubview(noteTextField)
+
+        let notePasteIconView = UIImageView(image: UIImage(systemName: "doc.on.clipboard"))
+        notePasteIconView.tintColor = Theme.primaryIconColor
+        notePasteIconView.contentMode = .scaleAspectFit
+        notePasteIconView.autoSetDimensions(to: .square(24))
+        notePasteIconView.setCompressionResistanceHigh()
+        notePasteIconView.setContentHuggingHigh()
+        notePasteIconView.isUserInteractionEnabled = true
+        notePasteIconView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(didTapNotePaste)))
+        noteContainer.addSubview(notePasteIconView)
+        notePasteIconView.autoPinEdge(toSuperviewEdge: .trailing, withInset: 16)
+        notePasteIconView.autoAlignAxis(toSuperviewAxis: .horizontal)
+
+        noteTextField.autoPinEdge(toSuperviewEdge: .leading, withInset: 16)
+        noteTextField.autoPinEdge(.trailing, to: .leading, of: notePasteIconView, withOffset: -8)
+        noteTextField.autoPinEdge(toSuperviewEdge: .top)
+        noteTextField.autoPinEdge(toSuperviewEdge: .bottom)
+        noteContainer.autoSetDimension(.height, toSize: 52)
+
+        balancePillView.layer.cornerRadius = 16
+        balancePillView.layer.masksToBounds = true
+        balancePillView.addSubview(balanceLabel)
+        balanceLabel.autoPinEdge(toSuperviewEdge: .leading, withInset: 12)
+        balanceLabel.autoPinEdge(toSuperviewEdge: .trailing, withInset: 12)
+        balanceLabel.autoPinEdge(toSuperviewEdge: .top, withInset: 6)
+        balanceLabel.autoPinEdge(toSuperviewEdge: .bottom, withInset: 6)
+    }
 
     private func updateAmountLabels() {
+
         let isZero = amount.inputString.isZero
 
         func hideConversionLabelOrShowWarning() {
-            let shouldHaveValidValue = isZero == false && currentCurrencyConversion != nil
+            let shouldHaveValidValue = (!isZero && currentCurrencyConversion != nil)
             smallAmountLabel.text = (
                 shouldHaveValidValue
                     ? OWSLocalizedString(
@@ -610,30 +905,25 @@ class SendPaymentViewController: OWSViewController, SendPaymentMemoViewDelegate,
                     )
                     : " ",
             )
-            smallAmountLabel.textColor = .Signal.warningLabel
-            currencyConversionInfoButton.alpha = 0
+            smallAmountLabel.textColor = UIColor.ows_accentRed
+            currencyConversionInfoView.tintColor = .clear
         }
 
         func enableSmallLabel(_ text: String) {
             smallAmountLabel.text = text
-            smallAmountLabel.textColor = .Signal.secondaryLabel
-            currencyConversionInfoButton.alpha = 1
+            smallAmountLabel.textColor = Theme.secondaryTextAndIconColor
+            currencyConversionInfoView.tintColor = Theme.secondaryTextAndIconColor
         }
 
-        bigAmountLabel.attributedText = amount.formatAsKeyboardInputAttributed(withSpace: false)
+        bigAmountLabel.attributedText = amount.formatAsKeyboardInputAttributed(withSpace: true)
 
         switch amount {
-        case .mobileCoin:
+        case .cryptoCurrency:
             if
-                let otherCurrencyAmount,
-                let currencyConversion = otherCurrencyAmount.currencyConversion
+                let otherCurrencyAmount = self.otherCurrencyAmount,
+                otherCurrencyAmount.currencyConversion != nil
             {
-                let formattedAmount = otherCurrencyAmount.formatForDisplay(withSpace: true).string
-                enableSmallLabel(Self.formatWithConversionFreshness(
-                    formattedAmount: formattedAmount,
-                    currencyConversion: currencyConversion,
-                    isZero: isZero,
-                ))
+                enableSmallLabel(otherCurrencyAmount.formatForDisplay(withSpace: true).string)
             } else if
                 let currencyConversion = currentCurrencyConversion,
                 let fiatCurrencyAmount = currencyConversion.convertToFiatCurrency(paymentAmount: parsedPaymentAmount),
@@ -643,132 +933,87 @@ class SendPaymentViewController: OWSViewController, SendPaymentMemoViewDelegate,
                     withSpace: true,
                 )
             {
-                enableSmallLabel(Self.formatWithConversionFreshness(
-                    formattedAmount: fiatString.string,
-                    currencyConversion: currencyConversion,
-                    isZero: isZero,
-                ))
+                enableSmallLabel(fiatString.string)
             } else {
                 hideConversionLabelOrShowWarning()
             }
         case .fiatCurrency(_, let currencyConversion):
             if let otherCurrencyAmount = self.otherCurrencyAmount {
-                let formattedAmount = otherCurrencyAmount.formatForDisplay(withSpace: true).string
-                enableSmallLabel(Self.formatWithConversionFreshness(
-                    formattedAmount: formattedAmount,
-                    currencyConversion: currencyConversion,
-                    isZero: isZero,
-                ))
+                enableSmallLabel(otherCurrencyAmount.formatForDisplay(withSpace: true).string)
             } else {
                 let paymentAmount = currencyConversion.convertFromFiatCurrencyToMOB(amount.asDouble)
-                let formattedAmount = PaymentsFormat.attributedFormat(
+                enableSmallLabel(PaymentsFormat.attributedFormat(
                     paymentAmount: paymentAmount,
                     isShortForm: false,
                     withSpace: true,
-                ).string
-                enableSmallLabel(Self.formatWithConversionFreshness(
-                    formattedAmount: formattedAmount,
-                    currencyConversion: currencyConversion,
-                    isZero: isZero,
-                ))
+                ).string)
             }
-        }
-    }
-
-    private func updateMemoView() {
-        memoView.removeAllSubviews()
-
-        var buttonConfiguration: UIButton.Configuration
-        if let memoString = memoMessage?.stripped.nilIfEmpty {
-            buttonConfiguration = .bordered()
-            buttonConfiguration.baseBackgroundColor = .Signal.secondaryGroupedBackground
-            buttonConfiguration.title = memoString
-            buttonConfiguration.titleTextAttributesTransformer = .defaultFont(.dynamicTypeSubheadlineClamped)
-            buttonConfiguration.baseForegroundColor = .Signal.label
-            if #available(iOS 26, *) {
-                buttonConfiguration.cornerStyle = .capsule
+        case .satoshi:
+            if
+                let otherCurrencyAmount = self.otherCurrencyAmount,
+                otherCurrencyAmount.currencyConversion != nil
+            {
+                enableSmallLabel(otherCurrencyAmount.formatForDisplay(withSpace: true).string)
+            } else if
+                let currencyConversion = currentCurrencyConversion,
+                let fiatAmount = currencyConversion.convertToFiatCurrency(paymentAmount: parsedPaymentAmount),
+                let fiatString = PaymentsFormat.attributedFormat(
+                    fiatCurrencyAmount: fiatAmount,
+                    currencyCode: currencyConversion.currencyCode,
+                    withSpace: true,
+                )
+            {
+                enableSmallLabel(fiatString.string)
             } else {
-                buttonConfiguration.cornerStyle = .fixed
-                buttonConfiguration.background.cornerRadius = 10
+                hideConversionLabelOrShowWarning()
             }
-        } else {
-            buttonConfiguration = .plain()
-            buttonConfiguration.title = OWSLocalizedString(
-                "PAYMENTS_NEW_PAYMENT_ADD_MEMO",
-                comment: "Label for the 'add memo' ui in the 'send payment' UI.",
-            )
-            buttonConfiguration.titleTextAttributesTransformer = .defaultFont(.dynamicTypeBodyClamped)
-            buttonConfiguration.baseForegroundColor = .Signal.accent
         }
-        buttonConfiguration.contentInsets = .init(
-            hMargin: OWSTableViewController2.cellHInnerMargin,
-            vMargin: OWSTableViewController2.cellVInnerMargin,
-        )
-
-        let button = UIButton(
-            configuration: buttonConfiguration,
-            primaryAction: UIAction { [weak self] _ in
-                self?.didTapAddMemo()
-            },
-        )
-        memoView.addSubview(button)
-        button.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            button.topAnchor.constraint(equalTo: memoView.topAnchor),
-            button.leadingAnchor.constraint(greaterThanOrEqualTo: memoView.leadingAnchor),
-            button.centerXAnchor.constraint(equalTo: memoView.centerXAnchor),
-            button.bottomAnchor.constraint(equalTo: memoView.bottomAnchor),
-        ])
     }
 
     private func updateBalanceLabel() {
-        helper?.updateBalanceLabel(balanceLabel)
+        guard let helper else {
+            return
+        }
+        helper.updateBalanceLabel(balanceLabel)
     }
 
-    // MARK: - Formatting helpers
-
-    static func formatWithConversionFreshness(
-        formattedAmount: String,
-        currencyConversion: CurrencyConversionInfo,
-        isZero: Bool,
-    ) -> String {
-        guard !isZero else {
-            return formattedAmount
-        }
-        let formattedFreshness = DateUtil.formatDateAsTime(currencyConversion.conversionDate)
-        let conversionFormat = OWSLocalizedString(
-            "PAYMENTS_CURRENCY_CONVERSION_FRESHNESS_FORMAT",
-            comment: "Format for indicator of a payment amount converted to fiat currency with the freshness of the conversion rate. Embeds: {{ %1$@ the payment amount, %2$@ the freshness of the currency conversion rate }}.",
+    private func showInvalidAmountAlert() {
+        let errorMessage = OWSLocalizedString(
+            "PAYMENTS_NEW_PAYMENT_INVALID_AMOUNT",
+            comment: "Label for the 'invalid amount' button.",
         )
-        return String.nonPluralLocalizedStringWithFormat(conversionFormat, formattedAmount, formattedFreshness)
+        OWSActionSheets.showErrorAlert(message: errorMessage)
+    }
+
+    // MARK: - Events
+
+    @objc
+    private func noteTextFieldDidChange() {
+        memoMessage = noteTextField.text?.nilIfEmpty
+    }
+
+    @objc
+    private func didTapNotePaste() {
+        guard let text = UIPasteboard.general.string, !text.isEmpty else { return }
+        noteTextField.text = text
+        noteTextFieldDidChange()
     }
 
     private func updateAmount(_ amount: Amount) -> Amount {
-        guard let currentCurrencyConversion else {
+        guard let currencyConversion = self.currentCurrencyConversion else {
             return amount
         }
         switch amount {
-        case .mobileCoin:
+        case .cryptoCurrency:
             return amount
         case .fiatCurrency(let inputString, _):
-            return .fiatCurrency(inputString: inputString, currencyConversion: currentCurrencyConversion)
+            return .fiatCurrency(inputString: inputString, currencyConversion: currencyConversion)
+        case .satoshi:
+            return amount
         }
     }
 
-    private func resetContents() {
-        amounts.reset()
-
-        memoMessage = nil
-    }
-
-    // MARK: - Button action handlers
-
-    private func didTapAddMemo() {
-        let view = SendPaymentMemoViewController(memoMessage: self.memoMessage)
-        view.delegate = self
-        navigationController?.pushViewController(view, animated: true)
-    }
-
+    @objc
     private func didTapSwapCurrency() {
         // If users repeatedly swap input currency, we don't want the
         // values to drift due to rounding errors.  So we keep around
@@ -783,7 +1028,7 @@ class SendPaymentViewController: OWSViewController, SendPaymentMemoViewDelegate,
         }
 
         switch amount {
-        case .mobileCoin:
+        case .cryptoCurrency:
             if
                 let currencyConversion = currentCurrencyConversion,
                 let fiatCurrencyAmount = currencyConversion.convertToFiatCurrency(paymentAmount: parsedPaymentAmount),
@@ -803,31 +1048,70 @@ class SendPaymentViewController: OWSViewController, SendPaymentMemoViewDelegate,
             }
         case .fiatCurrency(_, let currencyConversion):
             let paymentAmount = currencyConversion.convertFromFiatCurrencyToMOB(amount.asDouble)
-            if let mobString = PaymentsFormat.formatAsDoubleString(picoMob: paymentAmount.picoMob) {
-                // Store the otherCurrencyAmount.
+            if isSatoshiEnabled {
+                let satoshi = PaymentsConstants.convertPicoMobToSatoshi(paymentAmount.picoMob)
+                let satoshiString = "\(satoshi)"
                 amounts.set(
-                    currentAmount: .mobileCoin(
-                        inputString: InputString.parseString(
-                            mobString,
-                            isFiat: false,
-                        ),
-                        exactAmount: nil,
+                    currentAmount: .satoshi(
+                        inputString: InputString.parseString(satoshiString, isFiat: false, isSatoshi: true),
                     ),
                     otherCurrencyAmount: self.amount,
                 )
             } else {
-                owsFailDebug("Could not switch from fiat currency.")
-                resetContents()
+                if let mobString = PaymentsFormat.formatAsDoubleString(picoMob: paymentAmount.picoMob) {
+                    amounts.set(
+                        currentAmount: .cryptoCurrency(
+                            inputString: InputString.parseString(mobString, isFiat: false),
+                            exactAmount: nil,
+                        ),
+                        otherCurrencyAmount: self.amount,
+                    )
+                } else {
+                    owsFailDebug("Could not switch from fiat currency.")
+                    resetContents()
+                }
+            }
+        case .satoshi:
+            guard let currencyConversion = currentCurrencyConversion else {
+                owsFailDebug("No currency conversion available for satoshi swap.")
+                return
+            }
+            let paymentAmount = parsedPaymentAmount
+            if
+                let fiatCurrencyAmount = currencyConversion.convertToFiatCurrency(paymentAmount: paymentAmount),
+                let fiatString = PaymentsFormat.formatAsDoubleString(fiatCurrencyAmount)
+            {
+                amounts.set(
+                    currentAmount: .fiatCurrency(
+                        inputString: InputString.parseString(fiatString, isFiat: true),
+                        currencyConversion: currencyConversion,
+                    ),
+                    otherCurrencyAmount: self.amount,
+                )
+            } else {
+                owsFailDebug("Could not convert satoshi to fiat currency.")
             }
         }
     }
 
-    private func didTapCurrencyConversionInfo() {
-        PaymentsSettingsViewController.showCurrencyConversionInfoAlert(fromViewController: self)
+    @objc
+    private func didTapRequestButton(_ sender: UIButton) {
+        // TODO: Add support for requests.
+        //        guard let parsedAmount = parsedAmount,
+        //              parsedAmount > 0 else {
+        //            showInvalidAmountAlert()
+        //            return
+        //        }
+        //        let paymentAmount = TSPaymentAmount(currency: .mobileCoin, picoMob: parsedAmount)
+        //        // Snapshot the conversion rate.
+        //        let currencyConversion = self.currentCurrencyConversion
+        //        currentStep = .confirmRequest(paymentAmount: paymentAmount, currencyConversion: currencyConversion)
     }
 
     // MARK: -
 
+    // Upstream migrated this store to NewKeyValueStore (migrateSomeKeyValueStores
+    // converts "SendPaymentView.wasLastPaymentInFiat"), so read and write it the same way.
     private static let keyValueStore = NewKeyValueStore(collection: "SendPaymentView")
     private static let wasLastPaymentInFiatKey = "wasLastPaymentInFiat"
 
@@ -851,19 +1135,10 @@ class SendPaymentViewController: OWSViewController, SendPaymentMemoViewDelegate,
         }
     }
 
-    // MARK: - Payment handling
+    // MARK: -
 
-    private var actionSheet: SendPaymentCompletionActionSheet?
-
-    private func showInvalidAmountAlert() {
-        let errorMessage = OWSLocalizedString(
-            "PAYMENTS_NEW_PAYMENT_INVALID_AMOUNT",
-            comment: "Label for the 'invalid amount' button.",
-        )
-        OWSActionSheets.showErrorAlert(message: errorMessage)
-    }
-
-    private func didTapPayButton() {
+    @objc
+    private func didTapPayButton(_ sender: UIButton) {
         let paymentAmount = parsedPaymentAmount
         guard paymentAmount.picoMob > 0 else {
             showInvalidAmountAlert()
@@ -871,6 +1146,7 @@ class SendPaymentViewController: OWSViewController, SendPaymentMemoViewDelegate,
         }
 
         setWasLastPaymentInFiat(amounts.currentAmount.isFiat)
+
         getEstimatedFeeAndSubmit(paymentAmount: paymentAmount)
     }
 
@@ -891,8 +1167,6 @@ class SendPaymentViewController: OWSViewController, SendPaymentMemoViewDelegate,
                 AssertIsOnMainThread()
                 if case PaymentsError.insufficientFunds = error {
                     Logger.warn("Error: \(error)")
-                } else {
-                    owsFailDebugUnlessMCNetworkFailure(error)
                 }
 
                 modalActivityIndicator.dismiss {
@@ -940,16 +1214,24 @@ class SendPaymentViewController: OWSViewController, SendPaymentMemoViewDelegate,
     }
 
     private func showInsufficientBalanceUI(paymentBalance: PaymentBalance) {
-        let messageFormat = OWSLocalizedString(
-            "SETTINGS_PAYMENTS_PAYMENT_INSUFFICIENT_BALANCE_ALERT_MESSAGE_FORMAT",
-            comment: "Message for the 'insufficient balance for payment' alert. Embeds: {{ The current payments balance }}.",
-        )
-        let message = String.nonPluralLocalizedStringWithFormat(messageFormat, PaymentsFormat.format(
-            paymentAmount: paymentBalance.amount,
-            isShortForm: false,
-            withCurrencyCode: true,
-            withSpace: true,
-        ))
+        let message: String
+        if PaymentsDisplayPreferences.shared.isBalanceHidden {
+            message = OWSLocalizedString(
+                "SETTINGS_PAYMENTS_PAYMENT_INSUFFICIENT_BALANCE_ALERT_MESSAGE_HIDDEN",
+                comment: "Message for the 'insufficient balance for payment' alert when the balance is hidden.",
+            )
+        } else {
+            let messageFormat = OWSLocalizedString(
+                "SETTINGS_PAYMENTS_PAYMENT_INSUFFICIENT_BALANCE_ALERT_MESSAGE_FORMAT",
+                comment: "Message for the 'insufficient balance for payment' alert. Embeds: {{ The current payments balance }}.",
+            )
+            message = String(format: messageFormat, PaymentsFormat.format(
+                paymentAmount: paymentBalance.amount,
+                isShortForm: false,
+                withCurrencyCode: true,
+                withSpace: true,
+            ))
+        }
 
         let actionSheet = ActionSheetController(
             title: OWSLocalizedString(
@@ -1025,12 +1307,8 @@ class SendPaymentViewController: OWSViewController, SendPaymentMemoViewDelegate,
             memoMessage: memoMessage,
             isOutgoingTransfer: isOutgoingTransfer,
         )
-        let actionSheet = SendPaymentCompletionActionSheet(
-            mode: .payment(paymentInfo: paymentInfo),
-            delegate: self,
-        )
-        self.actionSheet = actionSheet
-        actionSheet.present(fromViewController: self)
+        let confirmVC = SendPaymentConfirmViewController(paymentInfo: paymentInfo, completionDelegate: self)
+        navigationController?.pushViewController(confirmVC, animated: true)
     }
 
     private static func showEnablePaymentsActionSheet() {
@@ -1095,172 +1373,15 @@ class SendPaymentViewController: OWSViewController, SendPaymentMemoViewDelegate,
         SignalApp.shared.showAppSettings(mode: .payments)
     }
 
-    // MARK: - SendPaymentMemoViewDelegate
-
-    func didChangeMemo(memoMessage: String?) {
-        // Will update UI in setter.
-        self.memoMessage = memoMessage?.nilIfEmpty
+    @objc
+    private func didTapCurrencyConversionInfo() {
+        PaymentsSettingsViewController.showCurrencyConversionInfoAlert(fromViewController: self)
     }
+}
 
-    // MARK: - Payment Keyboard
+// MARK: - Payment Keyboard
 
-    private func buildKeyboardView() -> UIView {
-        let keyboardButtonSpacing: CGFloat = 24
-        let buttonFont = UIFont.dynamicTypeTitle1Clamped
-        let buttonSize = buttonFont.lineHeight * 2.2
-
-        var buttonConfiguration: UIButton.Configuration
-        if #available(iOS 26, *) {
-            buttonConfiguration = .prominentGlass()
-        } else {
-            buttonConfiguration = .borderedProminent()
-        }
-        buttonConfiguration.cornerStyle = .capsule
-        buttonConfiguration.titleTextAttributesTransformer = .defaultFont(buttonFont)
-        buttonConfiguration.baseForegroundColor = .Signal.label
-        buttonConfiguration.baseBackgroundColor = .Signal.secondaryGroupedBackground
-
-        func buildAmountKeyboardButton(title: String, action: UIAction) -> UIButton {
-            let button = UIButton(configuration: buttonConfiguration, primaryAction: action)
-            button.configuration?.title = title
-            return button
-        }
-        func buildAmountKeyboardButton(imageName: String, action: UIAction) -> UIButton {
-            let button = UIButton(configuration: buttonConfiguration, primaryAction: action)
-            button.configuration?.image = UIImage(named: imageName)
-            return button
-        }
-
-        var keyboardRows = [UIView]()
-        let buildKeyboardRow = { (buttons: [UIButton]) -> UIView in
-            buttons.forEach { button in
-                button.translatesAutoresizingMaskIntoConstraints = false
-                NSLayoutConstraint.activate([
-                    button.widthAnchor.constraint(equalToConstant: buttonSize),
-                    button.widthAnchor.constraint(equalTo: button.heightAnchor),
-                ])
-            }
-
-            let rowStack = UIStackView(arrangedSubviews: buttons)
-            rowStack.axis = .horizontal
-            rowStack.spacing = keyboardButtonSpacing
-            rowStack.distribution = .fillEqually
-            rowStack.alignment = .fill
-            rowStack.translatesAutoresizingMaskIntoConstraints = false
-
-            let buttonWidth: CGFloat = buttonSize * CGFloat(buttons.count)
-            let spacingWidth: CGFloat = keyboardButtonSpacing * CGFloat(buttons.count - 1)
-            rowStack.widthAnchor.constraint(equalToConstant: buttonWidth + spacingWidth).isActive = true
-
-            keyboardRows.append(rowStack)
-
-            return rowStack
-        }
-
-        func buildDecimalButton() -> UIButton {
-            if let decimalSeparator = PaymentsConstants.decimalSeparator.nilIfEmpty {
-                return buildAmountKeyboardButton(
-                    title: decimalSeparator,
-                    action: UIAction { [weak self] _ in
-                        self?.keyboardPressedDecimal()
-                    },
-                )
-            }
-            return buildAmountKeyboardButton(
-                imageName: "decimal-32",
-                action: UIAction { [weak self] _ in
-                    self?.keyboardPressedDecimal()
-                },
-            )
-        }
-
-        // Don't localize; use Arabic numeral literals.
-        //
-        // TODO: Localize or remove custom keyboard to support payments
-        //       in locales that don't use arabic numerals.
-        let keyboardStackView = UIStackView(arrangedSubviews: [
-            buildKeyboardRow([
-                buildAmountKeyboardButton(
-                    title: "1",
-                    action: UIAction { [weak self] _ in
-                        self?.keyboardPressedNumeral("1")
-                    },
-                ),
-                buildAmountKeyboardButton(
-                    title: "2",
-                    action: UIAction { [weak self] _ in
-                        self?.keyboardPressedNumeral("2")
-                    },
-                ),
-                buildAmountKeyboardButton(
-                    title: "3",
-                    action: UIAction { [weak self] _ in
-                        self?.keyboardPressedNumeral("3")
-                    },
-                ),
-            ]),
-            buildKeyboardRow([
-                buildAmountKeyboardButton(
-                    title: "4",
-                    action: UIAction { [weak self] _ in
-                        self?.keyboardPressedNumeral("4")
-                    },
-                ),
-                buildAmountKeyboardButton(
-                    title: "5",
-                    action: UIAction { [weak self] _ in
-                        self?.keyboardPressedNumeral("5")
-                    },
-                ),
-                buildAmountKeyboardButton(
-                    title: "6",
-                    action: UIAction { [weak self] _ in
-                        self?.keyboardPressedNumeral("6")
-                    },
-                ),
-            ]),
-            buildKeyboardRow([
-                buildAmountKeyboardButton(
-                    title: "7",
-                    action: UIAction { [weak self] _ in
-                        self?.keyboardPressedNumeral("7")
-                    },
-                ),
-                buildAmountKeyboardButton(
-                    title: "8",
-                    action: UIAction { [weak self] _ in
-                        self?.keyboardPressedNumeral("8")
-                    },
-                ),
-                buildAmountKeyboardButton(
-                    title: "9",
-                    action: UIAction { [weak self] _ in
-                        self?.keyboardPressedNumeral("9")
-                    },
-                ),
-            ]),
-            buildKeyboardRow([
-                buildDecimalButton(),
-                buildAmountKeyboardButton(
-                    title: "0",
-                    action: UIAction { [weak self] _ in
-                        self?.keyboardPressedNumeral("0")
-                    },
-                ),
-                buildAmountKeyboardButton(
-                    imageName: "backspace-32",
-                    action: UIAction { [weak self] _ in
-                        self?.keyboardPressedBackspace()
-                    },
-                ),
-            ]),
-        ])
-        keyboardStackView.axis = .vertical
-        keyboardStackView.spacing = keyboardButtonSpacing
-        keyboardStackView.alignment = .center
-
-        return keyboardStackView
-    }
+private extension SendPaymentViewController {
 
     private func keyboardPressedNumeral(_ numeralString: String) {
         let inputString = amount.inputString.append(.digit(digit: numeralString))
@@ -1268,6 +1389,10 @@ class SendPaymentViewController: OWSViewController, SendPaymentMemoViewDelegate,
     }
 
     private func keyboardPressedDecimal() {
+        if case .satoshi = amount {
+            return
+        }
+
         let inputString = amount.inputString.append(.decimal)
         updateAmountString(inputString)
     }
@@ -1279,9 +1404,9 @@ class SendPaymentViewController: OWSViewController, SendPaymentMemoViewDelegate,
 
     private func updateAmountString(_ inputString: InputString) {
         switch amount {
-        case .mobileCoin:
+        case .cryptoCurrency:
             amounts.set(
-                currentAmount: .mobileCoin(
+                currentAmount: .cryptoCurrency(
                     inputString: inputString,
                     exactAmount: nil,
                 ),
@@ -1296,29 +1421,41 @@ class SendPaymentViewController: OWSViewController, SendPaymentMemoViewDelegate,
                 ),
                 otherCurrencyAmount: nil,
             )
+        case .satoshi:
+            amounts.set(
+                currentAmount: .satoshi(inputString: inputString),
+                otherCurrencyAmount: nil,
+            )
         }
     }
 
     private var parsedPaymentAmount: TSPaymentAmount {
         switch amount {
-        case .mobileCoin(_, let exactAmount):
+        case .cryptoCurrency(_, let exactAmount):
             if let exactAmount {
                 return exactAmount
             }
             let picoMob = PaymentsConstants.convertMobToPicoMob(amount.asDouble)
-            return TSPaymentAmount(currency: .mobileCoin, picoMob: picoMob)
+            return TSPaymentAmount(currency: .bitcoin, picoMob: picoMob)
         case .fiatCurrency(_, let currencyConversion):
             return currencyConversion.convertFromFiatCurrencyToMOB(amount.asDouble)
+        case .satoshi:
+            let satoshi = UInt64(amount.asDouble)
+            let picoMob = PaymentsConstants.convertSatoshiToPicoMob(satoshi)
+            return TSPaymentAmount(currency: .bitcoin, picoMob: picoMob)
         }
     }
+}
 
-    // MARK: - SendPaymentHelperDelegate
+// MARK: -
 
-    func balanceDidChange() {
+extension SendPaymentViewController: SendPaymentHelperDelegate {
+
+    public func balanceDidChange() {
         updateBalanceLabel()
     }
 
-    func currencyConversionDidChange() {
+    public func currencyConversionDidChange() {
         guard isViewLoaded else {
             return
         }
@@ -1343,21 +1480,16 @@ class SendPaymentViewController: OWSViewController, SendPaymentMemoViewDelegate,
         updateAmountLabels()
         updateBalanceLabel()
     }
+}
 
-    // MARK: - SendPaymentCompletionDelegate
+// MARK: -
 
-    func didSendPayment(success: Bool) {
+extension SendPaymentViewController: SendPaymentCompletionDelegate {
+    public func didSendPayment(success: Bool) {
         let delegate = self.delegate
-        dismiss(animated: true) {
+        self.dismiss(animated: true) {
             delegate?.didSendPayment(success: success)
         }
-    }
-
-    // MARK: - AmountsDelegate
-
-    fileprivate func amountDidChange(oldValue: Amount, newValue: Amount) {
-        guard isViewLoaded else { return }
-        updateAmountLabels()
     }
 }
 
@@ -1366,12 +1498,13 @@ class SendPaymentViewController: OWSViewController, SendPaymentMemoViewDelegate,
 private enum Amount {
     // inputString should be a raw double strings: e.g. 123456.789.
     // It should not be formatted: e.g. 123,456.789
-    case mobileCoin(inputString: InputString, exactAmount: TSPaymentAmount?)
+    case cryptoCurrency(inputString: InputString, exactAmount: TSPaymentAmount?)
     case fiatCurrency(inputString: InputString, currencyConversion: CurrencyConversionInfo)
+    case satoshi(inputString: InputString)
 
     var isFiat: Bool {
         switch self {
-        case .mobileCoin:
+        case .cryptoCurrency, .satoshi:
             return false
         case .fiatCurrency:
             return true
@@ -1380,25 +1513,37 @@ private enum Amount {
 
     var isZero: Bool {
         switch self {
-        case .mobileCoin(let inputString, _):
+        case .cryptoCurrency(let inputString, _):
             return inputString.isZero
         case .fiatCurrency(let inputString, _):
+            return inputString.isZero
+        case .satoshi(let inputString):
             return inputString.isZero
         }
     }
 
     var inputString: InputString {
         switch self {
-        case .mobileCoin(let inputString, _):
+        case .cryptoCurrency(let inputString, _):
             return inputString
         case .fiatCurrency(let inputString, _):
+            return inputString
+        case .satoshi(let inputString):
             return inputString
         }
     }
 
+    var isSatoshi: Bool {
+        guard case .satoshi = self else {
+            return false
+        }
+
+        return true
+    }
+
     var currencyConversion: CurrencyConversionInfo? {
         switch self {
-        case .mobileCoin:
+        case .cryptoCurrency, .satoshi:
             return nil
         case .fiatCurrency(_, let currencyConversion):
             return currencyConversion
@@ -1411,17 +1556,17 @@ private enum Amount {
 
     var formatForDisplay: String {
         switch self {
-        case .mobileCoin:
+        case .cryptoCurrency:
             guard
-                let mobString = PaymentsFormat.format(
+                let cryptoCurrencyAmountString = PaymentsFormat.format(
                     mob: asDouble,
                     isShortForm: false,
                 )
             else {
-                owsFailDebug("Couldn't format MOB string: \(inputString.asString(formatMode: .parsing))")
+                owsFailDebug("Couldn't format crypto currency amount string: \(inputString.asString(formatMode: .parsing))")
                 return inputString.asString(formatMode: .display)
             }
-            return mobString
+            return cryptoCurrencyAmountString
         case .fiatCurrency:
             guard
                 let fiatString = PaymentsFormat.format(
@@ -1433,6 +1578,9 @@ private enum Amount {
                 return inputString.asString(formatMode: .display)
             }
             return fiatString
+        case .satoshi:
+            let satoshi = UInt64(exactly: asDouble) ?? UInt64(asDouble)
+            return "\(satoshi)"
         }
     }
 
@@ -1442,9 +1590,9 @@ private enum Amount {
 
     func formatForDisplay(withSpace: Bool) -> NSAttributedString {
         switch self {
-        case .mobileCoin:
+        case .cryptoCurrency:
             return PaymentsFormat.attributedFormat(
-                mobileCoinString: formatForDisplay,
+                bitcoinString: formatForDisplay,
                 withSpace: withSpace,
             )
         case .fiatCurrency(_, let currencyConversion):
@@ -1453,14 +1601,16 @@ private enum Amount {
                 currencyCode: currencyConversion.currencyCode,
                 withSpace: withSpace,
             )
+        case .satoshi:
+            return PaymentsFormat.attributedFormat(satoshiString: formatForDisplay, withSpace: withSpace)
         }
     }
 
     func formatAsKeyboardInputAttributed(withSpace: Bool) -> NSAttributedString {
         switch self {
-        case .mobileCoin:
+        case .cryptoCurrency:
             return PaymentsFormat.attributedFormat(
-                mobileCoinString: formatAsKeyboardInput,
+                bitcoinString: formatAsKeyboardInput,
                 withSpace: withSpace,
             )
         case .fiatCurrency(_, let currencyConversion):
@@ -1469,29 +1619,33 @@ private enum Amount {
                 currencyCode: currencyConversion.currencyCode,
                 withSpace: withSpace,
             )
+        case .satoshi:
+            return PaymentsFormat.attributedFormat(satoshiString: formatAsKeyboardInput, withSpace: withSpace)
         }
     }
 }
 
 // MARK: -
 
-@MainActor
 private protocol AmountsDelegate: AnyObject {
     func amountDidChange(oldValue: Amount, newValue: Amount)
 }
 
 // MARK: -
 
-@MainActor
 private class Amounts {
 
     weak var delegate: AmountsDelegate?
 
     static var defaultMCAmount: Amount {
-        .mobileCoin(
+        .cryptoCurrency(
             inputString: InputString.defaultString(isFiat: false),
             exactAmount: nil,
         )
+    }
+
+    static var defaultSatoshiAmount: Amount {
+        .satoshi(inputString: InputString.defaultString(isFiat: false, isSatoshi: true))
     }
 
     static var defaultFiatAmount: Amount? {
@@ -1518,7 +1672,37 @@ private class Amounts {
     }
 
     func reset() {
-        set(currentAmount: Self.defaultMCAmount, otherCurrencyAmount: nil)
+        if PaymentsDisplayPreferences.shared.isSatoshiEnabled {
+            set(currentAmount: Self.defaultSatoshiAmount, otherCurrencyAmount: nil)
+        } else {
+            set(currentAmount: Self.defaultMCAmount, otherCurrencyAmount: nil)
+        }
+    }
+}
+
+// MARK: -
+
+extension SendPaymentViewController: AmountsDelegate {
+    fileprivate func amountDidChange(oldValue: Amount, newValue: Amount) {
+        guard isViewLoaded else {
+            return
+        }
+        let didChangeAmountType = (oldValue.isFiat != newValue.isFiat)
+            || (oldValue.isSatoshi != newValue.isSatoshi)
+        if didChangeAmountType {
+            updateContents()
+        } else {
+            updateAmountLabels()
+        }
+    }
+}
+
+// MARK: -
+
+extension SendPaymentViewController: UITextFieldDelegate {
+    public func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        return true
     }
 }
 
@@ -1559,10 +1743,12 @@ private enum InputChar: Equatable {
 private struct InputString: Equatable {
     let chars: [InputChar]
     let isFiat: Bool
+    let isSatoshi: Bool
 
-    init(_ chars: [InputChar], isFiat: Bool) {
+    init(_ chars: [InputChar], isFiat: Bool, isSatoshi: Bool = false) {
         self.chars = chars
         self.isFiat = isFiat
+        self.isSatoshi = isSatoshi
     }
 
     static func forDouble(_ value: Double, isFiat: Bool) -> InputString {
@@ -1573,8 +1759,8 @@ private struct InputString: Equatable {
         return parseString(stringValue, isFiat: isFiat)
     }
 
-    static func parseString(_ stringValue: String, isFiat: Bool) -> InputString {
-        var result = InputString.defaultString(isFiat: isFiat)
+    static func parseString(_ stringValue: String, isFiat: Bool, isSatoshi: Bool = false) -> InputString {
+        var result = InputString.defaultString(isFiat: isFiat, isSatoshi: isSatoshi)
         for char in stringValue {
             let charString = String(char)
             if charString == InputChar.decimal.asString(formatMode: .parsing) {
@@ -1589,8 +1775,8 @@ private struct InputString: Equatable {
     }
 
     static var defaultChar: InputChar { .digit(digit: "0") }
-    static func defaultString(isFiat: Bool) -> InputString {
-        InputString([defaultChar], isFiat: isFiat)
+    static func defaultString(isFiat: Bool, isSatoshi: Bool = false) -> InputString {
+        InputString([defaultChar], isFiat: isFiat, isSatoshi: isSatoshi)
     }
 
     func append(_ char: InputChar) -> InputString {
@@ -1601,17 +1787,17 @@ private struct InputString: Equatable {
                 //
                 // "00" should be "0"
                 // "01" should be "1"
-                if self == Self.defaultString(isFiat: isFiat) {
-                    return InputString([char], isFiat: isFiat)
+                if self == Self.defaultString(isFiat: isFiat, isSatoshi: isSatoshi) {
+                    return InputString([char], isFiat: isFiat, isSatoshi: isSatoshi)
                 } else {
-                    return InputString(chars + [char], isFiat: isFiat)
+                    return InputString(chars + [char], isFiat: isFiat, isSatoshi: isSatoshi)
                 }
             case .decimal:
                 if hasDecimal {
                     // Don't allow two decimals.
                     return self
                 } else {
-                    return InputString(chars + [char], isFiat: isFiat)
+                    return InputString(chars + [char], isFiat: isFiat, isSatoshi: isSatoshi)
                 }
             }
         }()
@@ -1627,15 +1813,18 @@ private struct InputString: Equatable {
             return InputString(
                 Array(chars.prefix(chars.count - 1)),
                 isFiat: isFiat,
+                isSatoshi: isSatoshi,
             )
         } else {
-            return Self.defaultString(isFiat: isFiat)
+            return Self.defaultString(isFiat: isFiat, isSatoshi: isSatoshi)
         }
     }
 
     var isValid: Bool {
-        digitCountBeforeDecimal <= maxDigitsBeforeDecimal &&
-            digitCountAfterDecimal <= maxDigitsAfterDecimal
+        (
+            digitCountBeforeDecimal <= maxDigitsBeforeDecimal &&
+                digitCountAfterDecimal <= maxDigitsAfterDecimal,
+        )
     }
 
     var isZero: Bool {
@@ -1656,22 +1845,28 @@ private struct InputString: Equatable {
         return false
     }
 
-    static func maxDigitsBeforeDecimal(isFiat: Bool) -> UInt {
+    static func maxDigitsBeforeDecimal(isFiat: Bool, isSatoshi: Bool) -> UInt {
+        if isSatoshi {
+            return PaymentsConstants.maxSatoshiDigits
+        }
         // Max transaction size: 1 billion MOB.
         return isFiat ? 9 : PaymentsConstants.maxMobNonDecimalDigits
     }
 
-    static func maxDigitsAfterDecimal(isFiat: Bool) -> UInt {
-        // picoMob
-        isFiat ? 2 : 12
+    static func maxDigitsAfterDecimal(isFiat: Bool, isSatoshi: Bool = false) -> UInt {
+        if isSatoshi {
+            return 0
+        }
+
+        return isFiat ? 2 : 8
     }
 
     var maxDigitsBeforeDecimal: UInt {
-        Self.maxDigitsBeforeDecimal(isFiat: isFiat)
+        Self.maxDigitsBeforeDecimal(isFiat: isFiat, isSatoshi: isSatoshi)
     }
 
     var maxDigitsAfterDecimal: UInt {
-        Self.maxDigitsAfterDecimal(isFiat: isFiat)
+        Self.maxDigitsAfterDecimal(isFiat: isFiat, isSatoshi: isSatoshi)
     }
 
     var digitsBeforeDecimal: [String] {
@@ -1786,5 +1981,74 @@ private struct InputString: Equatable {
 
         let formatted = formattedChars.joined()
         return formatted
+    }
+}
+
+// MARK: -
+
+// This view's contents must adapt to a wide variety of form factors.
+// We use vertical spacers of equal height to ensure the layout is
+// both responsive and balanced.
+class SpacerFactory {
+    private var hSpacers = [UIView]()
+    private var vSpacers = [UIView]()
+
+    func buildHSpacer() -> UIView {
+        let spacer = UIView.container()
+        spacer.setContentHuggingHorizontalLow()
+        hSpacers.append(spacer)
+        return spacer
+    }
+
+    func buildVSpacer() -> UIView {
+        let spacer = UIView.container()
+        spacer.setContentHuggingVerticalLow()
+        vSpacers.append(spacer)
+        return spacer
+    }
+
+    func finalizeSpacers() {
+        UIView.matchWidthsOfViews(hSpacers)
+        UIView.matchHeightsOfViews(vSpacers)
+    }
+}
+
+extension PaymentsFormat {
+
+    public static func formatSatoshi(_ satoshi: UInt64) -> String? {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        formatter.groupingSeparator = PaymentsConstants.groupingSeparator
+        formatter.groupingSize = PaymentsConstants.groupingSize
+        formatter.usesGroupingSeparator = true
+        formatter.minimumFractionDigits = 0
+        formatter.maximumFractionDigits = 0
+        return formatter.string(from: NSNumber(value: satoshi))
+    }
+
+    public static func attributedFormat(
+        satoshiString: String,
+        withSpace: Bool,
+    ) -> NSAttributedString {
+        let text = NSMutableAttributedString()
+        let currencyCode = PaymentsConstants.satoshiCurrencyIdentifier
+
+        text.append(NSAttributedString(string: satoshiString, attributes: [
+            .foregroundColor: Theme.primaryTextColor,
+        ]))
+
+        text.append(NSAttributedString(string: withSpace ? " \(currencyCode)" : currencyCode, attributes: [
+            .foregroundColor: Theme.secondaryTextAndIconColor,
+        ]))
+
+        return text
+    }
+
+    public static func attributedFormatSatoshi(
+        _ satoshi: UInt64,
+        withSpace: Bool,
+    ) -> NSAttributedString? {
+        guard let formatted = formatSatoshi(satoshi) else { return nil }
+        return attributedFormat(satoshiString: formatted, withSpace: withSpace)
     }
 }

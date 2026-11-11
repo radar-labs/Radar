@@ -191,7 +191,6 @@ extension ArchivedPayment {
 
 extension TSPaymentModel {
     func asArchivedPayment() -> ArchivedPayment {
-
         var identifier: ArchivedPayment.TransactionIdentifier?
         if let incomingTransactionPublicKeys = mobileCoin?.incomingTransactionPublicKeys {
             identifier = ArchivedPayment.TransactionIdentifier(

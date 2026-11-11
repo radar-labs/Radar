@@ -114,7 +114,7 @@ public class ShareViewController: OWSNavigationController, ShareViewDelegate {
             )
 
         // Configure the rest of the globals before preparing the database.
-        SUIEnvironment.shared.setUp(
+        await SUIEnvironment.shared.setUp(
             appReadiness: appReadiness,
             authCredentialManager: databaseContinuation.authCredentialManager,
         )

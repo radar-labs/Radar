@@ -14,6 +14,13 @@ class PaymentsRestoreWalletWordViewController: OWSViewController, UITextFieldDel
 
     private let wordIndex: Int
 
+    // Radar: the first word page lets the user pick a 12-word (Breez) or 24-word phrase.
+    private static let switcherAccentBlue = UIColor(red: 0, green: 105 / 255, blue: 254 / 255, alpha: 1)
+    private static let switcherContainerFill = UIColor(red: 233 / 255, green: 233 / 255, blue: 234 / 255, alpha: 1)
+
+    private var twelveWordTabButton: UIButton?
+    private var twentyFourWordTabButton: UIButton?
+
     private lazy var textField: UITextField = {
         let textField = UITextField()
         textField.textColor = .Signal.label
@@ -132,16 +139,21 @@ class PaymentsRestoreWalletWordViewController: OWSViewController, UITextFieldDel
             },
         )
 
+        var arrangedSubviews: [UIView] = [.spacer(withHeight: 16)]
+        if wordIndex == 0 {
+            arrangedSubviews.append(buildWordCountSwitcher())
+            arrangedSubviews.append(.spacer(withHeight: 20))
+        }
+        arrangedSubviews.append(contentsOf: [
+            instructionsLabel,
+            textFieldContainer,
+            warningLabel,
+            .vStretchingSpacer(),
+            nextButton,
+            .spacer(withHeight: 16),
+        ])
         let stackView = addStaticContentStackView(
-            arrangedSubviews: [
-                .spacer(withHeight: 16),
-                instructionsLabel,
-                textFieldContainer,
-                warningLabel,
-                .vStretchingSpacer(),
-                nextButton,
-                .spacer(withHeight: 16),
-            ],
+            arrangedSubviews: arrangedSubviews,
             shouldAvoidKeyboard: true,
         )
         stackView.setCustomSpacing(24, after: instructionsLabel)
@@ -157,6 +169,93 @@ class PaymentsRestoreWalletWordViewController: OWSViewController, UITextFieldDel
         super.viewDidAppear(animated)
 
         textField.becomeFirstResponder()
+    }
+
+    // MARK: - Word count switcher (Radar)
+
+    private func buildWordCountSwitcher() -> UIView {
+        let twelveTitle = OWSLocalizedString(
+            "SETTINGS_PAYMENTS_RESTORE_WALLET_WORD_COUNT_12",
+            comment: "Switcher option for restoring a 12-word recovery phrase.",
+        )
+        let twentyFourTitle = OWSLocalizedString(
+            "SETTINGS_PAYMENTS_RESTORE_WALLET_WORD_COUNT_24",
+            comment: "Switcher option for restoring a 24-word recovery phrase.",
+        )
+
+        let twelveBtn = makeWordCountTabButton(title: twelveTitle)
+        twelveBtn.addTarget(self, action: #selector(didTapTwelveWordTab), for: .touchUpInside)
+        let twentyFourBtn = makeWordCountTabButton(title: twentyFourTitle)
+        twentyFourBtn.addTarget(self, action: #selector(didTapTwentyFourWordTab), for: .touchUpInside)
+
+        twelveWordTabButton = twelveBtn
+        twentyFourWordTabButton = twentyFourBtn
+        applyWordCountTabStyling()
+
+        let tabStack = UIStackView(arrangedSubviews: [twelveBtn, twentyFourBtn])
+        tabStack.axis = .horizontal
+        tabStack.spacing = 0
+        tabStack.alignment = .center
+        tabStack.distribution = .fillEqually
+
+        let container = UIView()
+        container.backgroundColor = Self.switcherContainerFill
+        container.layer.cornerRadius = 24
+        container.layer.masksToBounds = true
+        container.addSubview(tabStack)
+        tabStack.autoPinEdgesToSuperviewEdges(with: UIEdgeInsets(top: 4, left: 4, bottom: 4, right: 4))
+        container.autoSetDimension(.height, toSize: 48)
+
+        let wrapper = UIView()
+        wrapper.addSubview(container)
+        container.autoHCenterInSuperview()
+        container.autoPinEdge(toSuperviewEdge: .top)
+        container.autoPinEdge(toSuperviewEdge: .bottom)
+        return wrapper
+    }
+
+    private func makeWordCountTabButton(title: String) -> UIButton {
+        var cfg = UIButton.Configuration.plain()
+        cfg.attributedTitle = AttributedString(
+            title,
+            attributes: AttributeContainer([.font: UIFont.systemFont(ofSize: 13, weight: .medium)]),
+        )
+        cfg.contentInsets = NSDirectionalEdgeInsets(top: 6, leading: 18, bottom: 6, trailing: 18)
+        cfg.background.cornerRadius = 20
+        cfg.background.backgroundColor = .clear
+        return UIButton(configuration: cfg)
+    }
+
+    private func applyWordCountTabStyling() {
+        let isTwelve = (partialPassphrase.wordCount == 12)
+        if let tBtn = twelveWordTabButton, var tCfg = tBtn.configuration {
+            tCfg.background.backgroundColor = isTwelve ? .white : .clear
+            tCfg.baseForegroundColor = isTwelve ? Self.switcherAccentBlue : UIColor.black.withAlphaComponent(0.5)
+            tBtn.configuration = tCfg
+        }
+        if let fBtn = twentyFourWordTabButton, var fCfg = fBtn.configuration {
+            fCfg.background.backgroundColor = isTwelve ? .clear : .white
+            fCfg.baseForegroundColor = isTwelve ? UIColor.black.withAlphaComponent(0.5) : Self.switcherAccentBlue
+            fBtn.configuration = fCfg
+        }
+    }
+
+    @objc
+    private func didTapTwelveWordTab() {
+        guard partialPassphrase.wordCount != 12 else { return }
+        partialPassphrase.reset(wordCount: 12)
+        textField.text = nil
+        warningLabel.alpha = 0
+        applyWordCountTabStyling()
+    }
+
+    @objc
+    private func didTapTwentyFourWordTab() {
+        guard partialPassphrase.wordCount != 24 else { return }
+        partialPassphrase.reset(wordCount: 24)
+        textField.text = nil
+        warningLabel.alpha = 0
+        applyWordCountTabStyling()
     }
 
     // MARK: - Events
@@ -214,11 +313,16 @@ class PartialPaymentsPassphrase {
 
     private var wordMap = [Int: String]()
 
+    /// Radar: 12 (Breez seed) or 24 words.
+    private(set) var wordCount: Int
+
     var isComplete: Bool {
-        wordMap.count == PaymentsConstants.passphraseWordCount
+        wordMap.count == wordCount
     }
 
-    init() {}
+    init(wordCount: Int = PaymentsConstants.passphraseWordCount) {
+        self.wordCount = wordCount
+    }
 
     static var empty: PartialPaymentsPassphrase { PartialPaymentsPassphrase() }
 
@@ -238,7 +342,7 @@ class PartialPaymentsPassphrase {
     func asPaymentsPassphrase() -> PaymentsPassphrase? {
         var words = [String]()
 
-        for index in 0..<PaymentsConstants.passphraseWordCount {
+        for index in 0..<wordCount {
             guard let word = wordMap[index] else {
                 owsFailDebug("Missing word: \(index)")
                 return nil
@@ -255,6 +359,11 @@ class PartialPaymentsPassphrase {
     }
 
     func reset() {
+        wordMap.removeAll()
+    }
+
+    func reset(wordCount: Int) {
+        self.wordCount = wordCount
         wordMap.removeAll()
     }
 }

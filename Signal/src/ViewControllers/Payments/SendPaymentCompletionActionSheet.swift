@@ -3,25 +3,25 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
+import Foundation
 import Lottie
 import SignalServiceKit
-import SignalUI
+public import SignalUI
 
-@MainActor
-protocol SendPaymentCompletionDelegate: AnyObject {
+public protocol SendPaymentCompletionDelegate: AnyObject {
     func didSendPayment(success: Bool)
 }
 
 // MARK: -
 
-class SendPaymentCompletionActionSheet: ActionSheetController, SendPaymentHelperDelegate {
+public class SendPaymentCompletionActionSheet: ActionSheetController {
 
-    typealias PaymentInfo = SendPaymentInfo
-    typealias RequestInfo = SendRequestInfo
+    public typealias PaymentInfo = SendPaymentInfo
+    public typealias RequestInfo = SendRequestInfo
 
-    weak var delegate: SendPaymentCompletionDelegate?
+    public weak var delegate: SendPaymentCompletionDelegate?
 
-    enum Mode {
+    public enum Mode {
         case payment(paymentInfo: PaymentInfo)
         // TODO: Add support for requests.
         // case request(requestInfo: RequestInfo)
@@ -51,167 +51,116 @@ class SendPaymentCompletionActionSheet: ActionSheetController, SendPaymentHelper
         }
     }
 
-    private let contentStack: UIStackView = {
-        let stackView = UIStackView()
-        stackView.axis = .vertical
-        return stackView
-    }()
+    private let outerStack = UIStackView()
 
-    private lazy var cancelButton: UIButton = {
-        let button = UIButton(
-            configuration: .plain(),
-            primaryAction: UIAction { [weak self] _ in
-                self?.didTapCancel()
-            },
-        )
-        button.configuration?.title = CommonStrings.cancelButton
-        button.configuration?.titleTextAttributesTransformer = .defaultFont(.dynamicTypeBodyClamped)
-        button.configuration?.contentInsets.leading = 0
-        button.setContentHuggingHorizontalHigh()
-        button.setCompressionResistanceHorizontalHigh()
-        return button
-    }()
+    private let innerStack = UIStackView()
 
-    private let paymentInfoContainerView = UIView.container()
+    private let headerStack = UIStackView()
 
-    private lazy var payButton = UIButton(
-        configuration: .largePrimary(title: OWSLocalizedString(
-            "PAYMENTS_NEW_PAYMENT_CONFIRM_PAYMENT_BUTTON",
-            comment: "Label for the 'confirm payment' button.",
-        )),
-        primaryAction: UIAction { [weak self] _ in
-            self?.didTapConfirmButton()
-        },
-    )
-
-    private lazy var payButtonContainerView: UIView = {
-        let view = UIView()
-        view.directionalLayoutMargins = .buttonContainerLayoutMargins
-        view.addSubview(payButton)
-        payButton.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            payButton.topAnchor.constraint(equalTo: view.layoutMarginsGuide.topAnchor),
-            payButton.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
-            payButton.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
-            payButton.bottomAnchor.constraint(equalTo: view.layoutMarginsGuide.bottomAnchor),
-        ])
-        return view
-    }()
-
-    private lazy var balanceLabel = SendPaymentHelper.buildBottomLabel()
-
-    private lazy var balanceLabelContainerView: UIView = {
-        let view = UIView()
-        view.directionalLayoutMargins = .init(margin: 8)
-        view.addSubview(balanceLabel)
-        balanceLabel.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            balanceLabel.topAnchor.constraint(equalTo: view.layoutMarginsGuide.topAnchor),
-            balanceLabel.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
-            balanceLabel.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
-            balanceLabel.bottomAnchor.constraint(equalTo: view.layoutMarginsGuide.bottomAnchor),
-        ])
-        return view
-    }()
+    private let balanceLabel = SendPaymentHelper.buildBottomLabel()
 
     private var helper: SendPaymentHelper?
 
     private var currentCurrencyConversion: CurrencyConversionInfo? { helper?.currentCurrencyConversion }
 
-    // MARK: - UIViewController
+    private let initialPreparedTask: Task<PreparedPayment, any Error>?
+    private let startAtProgressStep: Bool
 
-    init(mode: Mode, delegate: SendPaymentCompletionDelegate) {
+    public init(
+        mode: Mode,
+        delegate: SendPaymentCompletionDelegate,
+        preparedTask: Task<PreparedPayment, any Error>? = nil,
+        startAtProgressStep: Bool = false,
+    ) {
         self.mode = mode
         self.delegate = delegate
+        self.initialPreparedTask = preparedTask
+        self.startAtProgressStep = startAtProgressStep
 
         // TODO: Add support for requests.
         switch mode {
         case .payment(let paymentInfo):
-            currentStep = .confirmPay(paymentInfo: paymentInfo)
+            currentStep = startAtProgressStep
+                ? .progressPay(paymentInfo: paymentInfo)
+                : .confirmPay(paymentInfo: paymentInfo)
         }
 
         super.init()
 
         helper = SendPaymentHelper(delegate: self)
-        isCancelable = true
     }
 
-    func present(fromViewController: UIViewController) {
+    public func present(fromViewController: UIViewController) {
+        self.customHeader = outerStack
+        self.isCancelable = true
         fromViewController.presentFormSheet(self, animated: true)
     }
 
     override open func viewDidLoad() {
         super.viewDidLoad()
 
-        // Header
-        let titleLabel = UILabel()
-        titleLabel.text = OWSLocalizedString(
-            "PAYMENTS_NEW_PAYMENT_CONFIRM_PAYMENT_TITLE",
-            comment: "Title for the 'confirm payment' ui in the 'send payment' UI.",
-        )
-        titleLabel.font = .dynamicTypeHeadlineClamped
-        titleLabel.textColor = .Signal.label
-        titleLabel.textAlignment = .center
-        titleLabel.lineBreakMode = .byTruncatingTail
+        createSubviews()
 
-        let headerView = UIView()
-        headerView.addSubview(cancelButton)
-        headerView.addSubview(titleLabel)
-        cancelButton.translatesAutoresizingMaskIntoConstraints = false
-        titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            cancelButton.topAnchor.constraint(equalTo: headerView.layoutMarginsGuide.topAnchor),
-            cancelButton.centerYAnchor.constraint(equalTo: headerView.layoutMarginsGuide.centerYAnchor),
-            cancelButton.leadingAnchor.constraint(equalTo: headerView.layoutMarginsGuide.leadingAnchor),
-
-            titleLabel.leadingAnchor.constraint(greaterThanOrEqualTo: cancelButton.trailingAnchor, constant: 8),
-            titleLabel.centerYAnchor.constraint(equalTo: headerView.layoutMarginsGuide.centerYAnchor),
-            titleLabel.centerXAnchor.constraint(equalTo: headerView.layoutMarginsGuide.centerXAnchor),
-            titleLabel.trailingAnchor.constraint(lessThanOrEqualTo: headerView.layoutMarginsGuide.trailingAnchor),
-        ])
-        contentStack.addArrangedSubview(headerView)
-        contentStack.setCustomSpacing(16, after: headerView)
-
-        contentStack.addArrangedSubview(paymentInfoContainerView)
-        contentStack.setCustomSpacing(32, after: paymentInfoContainerView)
-
-        contentStack.addArrangedSubview(payButtonContainerView)
-
-        updateBalanceLabel()
-        contentStack.addArrangedSubview(balanceLabelContainerView)
-
-        customHeader = contentStack
-
-        // Try to optimistically prepare a payment before
-        // user approves it to reduce perceived latency
-        // when sending outgoing payments.
-        if let paymentInfo = mode.paymentInfo {
-            tryToPreparePayment(paymentInfo: paymentInfo)
-        } else {
+        guard let paymentInfo = mode.paymentInfo else {
             owsFailDebug("Missing paymentInfo.")
+            return
+        }
+
+        if let existingTask = initialPreparedTask {
+            preparedPaymentTask.set(existingTask)
+        } else {
+            tryToPreparePayment(paymentInfo: paymentInfo)
         }
     }
 
-    override func viewWillAppear(_ animated: Bool) {
+    override public func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
         updateContentsForMode()
     }
 
-    override func viewDidAppear(_ animated: Bool) {
+    override public func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
 
         // For now, the design only allows for portrait layout on non-iPads
         if !UIDevice.current.isIPad, view.window?.windowScene?.interfaceOrientation != .portrait {
             UIDevice.current.ows_setOrientation(.portrait)
         }
+
+        if startAtProgressStep, case .progressPay(let paymentInfo) = currentStep {
+            tryToSendPayment(paymentInfo: paymentInfo)
+        }
     }
 
-    override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
+    override public func themeDidChange() {
+        super.themeDidChange()
+
+        updateContentsForMode()
+    }
+
+    override public var supportedInterfaceOrientations: UIInterfaceOrientationMask {
         UIDevice.current.isIPad ? .all : .portrait
     }
 
-    // MARK: - UI configuration
+    private func createSubviews() {
+
+        outerStack.axis = .vertical
+        outerStack.alignment = .fill
+
+        innerStack.axis = .vertical
+        innerStack.alignment = .fill
+        innerStack.layoutMargins = UIEdgeInsets(top: 32, leading: 20, bottom: 22, trailing: 20)
+        innerStack.isLayoutMarginsRelativeArrangement = true
+
+        headerStack.axis = .horizontal
+        headerStack.alignment = .center
+        headerStack.distribution = .equalSpacing
+        headerStack.layoutMargins = UIEdgeInsets(top: 16, leading: 16, bottom: 16, trailing: 16)
+        headerStack.isLayoutMarginsRelativeArrangement = true
+
+        outerStack.addArrangedSubview(headerStack)
+        outerStack.addArrangedSubview(innerStack)
+    }
 
     private func updateContentsForMode() {
         switch currentStep {
@@ -226,144 +175,181 @@ class SendPaymentCompletionActionSheet: ActionSheetController, SendPaymentHelper
         }
     }
 
-    // Rebuilds and replaces whole payment info view.
-    private func updatePaymentInfoView(paymentInfo: PaymentInfo) {
-        paymentInfoContainerView.removeAllSubviews()
+    private func setContents(_ subviews: [UIView]) {
+        AssertIsOnMainThread()
 
-        let paymentInfoView = buildConfirmPaymentRows(paymentInfo: paymentInfo)
-        paymentInfoContainerView.addSubview(paymentInfoView)
-        paymentInfoView.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            paymentInfoView.topAnchor.constraint(equalTo: paymentInfoContainerView.topAnchor),
-            paymentInfoView.leadingAnchor.constraint(equalTo: paymentInfoContainerView.leadingAnchor),
-            paymentInfoView.trailingAnchor.constraint(equalTo: paymentInfoContainerView.trailingAnchor),
-            paymentInfoView.bottomAnchor.constraint(equalTo: paymentInfoContainerView.bottomAnchor),
-        ])
-    }
-
-    // Removes all animation view displayed instead of Pay button and make Pay button visible.
-    private func showPayButton() {
-        payButton.isHidden = false
-
-        for subview in payButtonContainerView.subviews {
-            guard subview !== payButton else { continue }
-            subview.removeFromSuperview()
-        }
-
-    }
-
-    // Hide Pay button and show an animation view instead.
-    private func showAnimationView(_ animationView: LottieAnimationView, size: CGSize) {
-        payButton.isHidden = true
-
-        for subview in payButtonContainerView.subviews {
-            guard subview !== payButton else { continue }
-            subview.removeFromSuperview()
-        }
-
-        payButtonContainerView.addSubview(animationView)
-        animationView.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            animationView.widthAnchor.constraint(equalToConstant: size.width),
-            animationView.heightAnchor.constraint(equalToConstant: size.height),
-            animationView.centerXAnchor.constraint(equalTo: payButtonContainerView.centerXAnchor),
-            animationView.centerYAnchor.constraint(equalTo: payButtonContainerView.centerYAnchor),
-        ])
-    }
-
-    // Removes error message (if any) and makes balance label visible.
-    private func showBalanceLabel() {
-        balanceLabel.isHidden = false
-
-        for subview in balanceLabelContainerView.subviews {
-            guard subview !== balanceLabel else { continue }
-            subview.removeFromSuperview()
+        innerStack.removeAllSubviews()
+        for subview in subviews {
+            innerStack.addArrangedSubview(subview)
         }
     }
 
-    // Hide balance label and show an error text in its place.
-    private func replaceBalanceWithErrorMessage(_ message: String) {
-        balanceLabel.isHidden = true
+    private func updateHeader(canCancel: Bool) {
+        AssertIsOnMainThread()
 
-        for subview in balanceLabelContainerView.subviews {
-            guard subview !== balanceLabel else { continue }
-            subview.removeFromSuperview()
+        headerStack.removeAllSubviews()
+
+        let cancelLabel = UILabel()
+        cancelLabel.text = CommonStrings.cancelButton
+        cancelLabel.font = UIFont.dynamicTypeBodyClamped
+        if canCancel {
+            cancelLabel.textColor = Theme.primaryTextColor
+            cancelLabel.isUserInteractionEnabled = true
+            cancelLabel.addGestureRecognizer(UITapGestureRecognizer(
+                target: self,
+                action: #selector(didTapCancel),
+            ))
+        } else {
+            cancelLabel.textColor = Theme.secondaryTextAndIconColor
         }
+        cancelLabel.setCompressionResistanceHigh()
+        cancelLabel.setContentHuggingHigh()
 
-        let errorLabel = SendPaymentHelper.buildBottomLabel()
-        errorLabel.text = message
-        errorLabel.numberOfLines = 0
-        errorLabel.lineBreakMode = .byWordWrapping
-        balanceLabelContainerView.addSubview(errorLabel)
-        errorLabel.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            errorLabel.topAnchor.constraint(equalTo: balanceLabelContainerView.layoutMarginsGuide.topAnchor),
-            errorLabel.leadingAnchor.constraint(equalTo: balanceLabelContainerView.layoutMarginsGuide.leadingAnchor),
-            errorLabel.trailingAnchor.constraint(equalTo: balanceLabelContainerView.layoutMarginsGuide.trailingAnchor),
-            errorLabel.bottomAnchor.constraint(equalTo: balanceLabelContainerView.layoutMarginsGuide.bottomAnchor),
-        ])
+        let titleLabel = UILabel()
+        titleLabel.text = OWSLocalizedString(
+            "PAYMENTS_NEW_PAYMENT_CONFIRM_PAYMENT_TITLE",
+            comment: "Title for the 'confirm payment' ui in the 'send payment' UI.",
+        )
+        titleLabel.font = UIFont.dynamicTypeHeadlineClamped
+        titleLabel.textColor = Theme.primaryTextColor
+        titleLabel.textAlignment = .center
+        titleLabel.lineBreakMode = .byTruncatingTail
+
+        let spacer = UIView.container()
+        spacer.setCompressionResistanceHigh()
+        spacer.setContentHuggingHigh()
+
+        headerStack.addArrangedSubview(cancelLabel)
+        headerStack.addArrangedSubview(titleLabel)
+        headerStack.addArrangedSubview(spacer)
+
+        // We use the spacer to balance the layout.
+        spacer.autoMatch(.width, to: .width, of: cancelLabel)
     }
 
     private func updateContentsForConfirmPay(paymentInfo: PaymentInfo) {
-        cancelButton.isEnabled = true
+        AssertIsOnMainThread()
 
-        updatePaymentInfoView(paymentInfo: paymentInfo)
+        updateHeader(canCancel: true)
 
-        showPayButton()
+        updateBalanceLabel()
 
-        showBalanceLabel()
+        setContents([
+            buildConfirmPaymentRows(paymentInfo: paymentInfo),
+            UIView.spacer(withHeight: 32),
+            buildConfirmPaymentButtons(),
+            UIView.spacer(withHeight: vSpacingAboveBalance),
+            balanceLabel,
+        ])
     }
 
     private func updateContentsForProgressPay(paymentInfo: PaymentInfo) {
-        cancelButton.isEnabled = false
+        AssertIsOnMainThread()
 
-        updatePaymentInfoView(paymentInfo: paymentInfo)
+        updateHeader(canCancel: false)
 
-        let animationName = Theme.isDarkThemeEnabled ? "payments_spinner_dark" : "payments_spinner"
+        let animationName = (
+            Theme.isDarkThemeEnabled
+                ? "payments_spinner_dark"
+                : "payments_spinner",
+        )
         let animationView = LottieAnimationView(name: animationName)
         animationView.backgroundBehavior = .pauseAndRestore
         animationView.loopMode = .loop
         animationView.contentMode = .scaleAspectFit
         animationView.play()
-        showAnimationView(animationView, size: .square(48))
+        animationView.autoSetDimensions(to: .square(48))
 
-        replaceBalanceWithErrorMessage(OWSLocalizedString(
+        // To void layout jitter, we use a label
+        // that occupies exactly the same height.
+        let bottomLabel = buildBottomLabel()
+        bottomLabel.text = OWSLocalizedString(
             "PAYMENTS_NEW_PAYMENT_PROCESSING",
             comment: "Indicator that a new payment is being processed in the 'send payment' UI.",
-        ))
+        )
+
+        setContents([
+            buildConfirmPaymentRows(paymentInfo: paymentInfo),
+            UIView.spacer(withHeight: 32),
+            // To void layout jitter, this view replaces the "bottom button"
+            // in the layout, exactly matching its height.
+            wrapBottomControl(animationView),
+            UIView.spacer(withHeight: vSpacingAboveBalance),
+            bottomLabel,
+        ])
     }
 
     private func updateContentsForSuccessPay(paymentInfo: PaymentInfo) {
-        cancelButton.isEnabled = false
+        AssertIsOnMainThread()
 
-        updatePaymentInfoView(paymentInfo: paymentInfo)
+        updateHeader(canCancel: false)
 
         let animationView = LottieAnimationView(name: "payments_spinner_success")
         animationView.backgroundBehavior = .pauseAndRestore
         animationView.loopMode = .playOnce
         animationView.contentMode = .scaleAspectFit
         animationView.play()
-        showAnimationView(animationView, size: .square(48))
+        animationView.autoSetDimensions(to: .square(48))
 
-        replaceBalanceWithErrorMessage(CommonStrings.doneButton)
+        // To void layout jitter, we use a label
+        // that occupies exactly the same height.
+        let bottomLabel = buildBottomLabel()
+        bottomLabel.text = CommonStrings.doneButton
+
+        setContents([
+            buildConfirmPaymentRows(paymentInfo: paymentInfo),
+            UIView.spacer(withHeight: 32),
+            // To void layout jitter, this view replaces the "bottom button"
+            // in the layout, exactly matching its height.
+            wrapBottomControl(animationView),
+            UIView.spacer(withHeight: vSpacingAboveBalance),
+            bottomLabel,
+        ])
+    }
+
+    private func wrapBottomControl(_ bottomControl: UIView) -> UIView {
+        let bottomStack = UIStackView(arrangedSubviews: [bottomControl])
+        bottomStack.axis = .vertical
+        bottomStack.alignment = .center
+        bottomStack.distribution = .equalCentering
+        // To void layout jitter, this view replaces the "bottom button"
+        // in the layout, exactly matching its height.
+        bottomStack.autoSetDimension(.height, toSize: bottomControlHeight)
+        return bottomStack
     }
 
     private func updateContentsForFailurePay(paymentInfo: PaymentInfo, error: Error) {
-        cancelButton.isEnabled = false
+        AssertIsOnMainThread()
 
-        updatePaymentInfoView(paymentInfo: paymentInfo)
+        updateHeader(canCancel: false)
 
         let animationView = LottieAnimationView(name: "payments_spinner_fail")
         animationView.backgroundBehavior = .pauseAndRestore
         animationView.loopMode = .playOnce
         animationView.contentMode = .scaleAspectFit
         animationView.play()
-        showAnimationView(animationView, size: .square(48))
+        animationView.autoSetDimensions(to: .square(48))
 
-        replaceBalanceWithErrorMessage(Self.formatPaymentFailure(error, withErrorPrefix: true))
+        // To void layout jitter, we use an empty placeholder label
+        // that occupies the exact same height
+        let bottomLabel = buildBottomLabel()
+        bottomLabel.text = Self.formatPaymentFailure(error, withErrorPrefix: true)
+
+        setContents([
+            buildConfirmPaymentRows(paymentInfo: paymentInfo),
+            UIView.spacer(withHeight: 32),
+            // To void layout jitter, this view replaces the "bottom button"
+            // in the layout, exactly matching its height.
+            wrapBottomControl(animationView),
+            UIView.spacer(withHeight: vSpacingAboveBalance),
+            bottomLabel,
+        ])
     }
 
     private func buildConfirmPaymentRows(paymentInfo: PaymentInfo) -> UIView {
+
+        var topGroup = [UIView]()
+        var bottomGroup = [UIView]()
 
         @discardableResult
         func addRow(
@@ -371,7 +357,9 @@ class SendPaymentCompletionActionSheet: ActionSheetController, SendPaymentHelper
             titleView: UILabel,
             valueView: UILabel,
             titleIconView: UIView? = nil,
+            addSeparator: Bool = false,
         ) -> UIView {
+
             valueView.setCompressionResistanceHorizontalHigh()
             valueView.setContentHuggingHorizontalHigh()
 
@@ -386,13 +374,19 @@ class SendPaymentCompletionActionSheet: ActionSheetController, SendPaymentHelper
             row.axis = .horizontal
             row.alignment = .center
             row.spacing = 8
-            row.backgroundColor = .Signal.secondaryGroupedBackground
+            row.backgroundColor = Theme.tableCell2BackgroundColor
+
+            let margin: CGFloat = 18
             row.translatesAutoresizingMaskIntoConstraints = false
             row.isLayoutMarginsRelativeArrangement = true
-            row.directionalLayoutMargins = .init(margin: 18)
+            row.directionalLayoutMargins = NSDirectionalEdgeInsets(
+                top: margin,
+                leading: margin,
+                bottom: margin,
+                trailing: margin,
+            )
 
             group.append(row)
-
             return row
         }
 
@@ -403,22 +397,23 @@ class SendPaymentCompletionActionSheet: ActionSheetController, SendPaymentHelper
             value: String,
             titleIconView: UIView? = nil,
             isTotal: Bool = false,
+            addSeparator: Bool = false,
         ) -> UIView {
+
             let titleLabel = UILabel()
             titleLabel.text = title
             titleLabel.font = .dynamicTypeBodyClamped
-            titleLabel.textColor = .Signal.label
+            titleLabel.textColor = Theme.primaryTextColor
             titleLabel.lineBreakMode = .byTruncatingTail
 
             let valueLabel = UILabel()
             valueLabel.text = value
-            valueLabel.adjustsFontSizeToFitWidth = true
             if isTotal {
-                valueLabel.font = .dynamicTypeHeadlineClamped
-                valueLabel.textColor = .Signal.label
+                valueLabel.font = .dynamicTypeTitle2Clamped
+                valueLabel.textColor = Theme.primaryTextColor
             } else {
                 valueLabel.font = .dynamicTypeBodyClamped
-                valueLabel.textColor = .Signal.secondaryLabel
+                valueLabel.textColor = Theme.secondaryTextAndIconColor
             }
 
             return addRow(
@@ -426,16 +421,16 @@ class SendPaymentCompletionActionSheet: ActionSheetController, SendPaymentHelper
                 titleView: titleLabel,
                 valueView: valueLabel,
                 titleIconView: titleIconView,
+                addSeparator: addSeparator,
             )
         }
 
-        // Top group: Receiver, Amount, Fee.
-        var topGroup = [UIView]()
         let recipientDescription = recipientDescriptionWithSneakyTransaction(paymentInfo: paymentInfo)
         addRow(
             to: &topGroup,
             title: recipientDescription,
-            value: SendPaymentHelper.formatMobileCoinAmount(paymentInfo.paymentAmount),
+            value: formatMobileCoinAmount(paymentInfo.paymentAmount),
+            addSeparator: true,
         )
 
         if let currencyConversion = paymentInfo.currencyConversion {
@@ -450,15 +445,16 @@ class SendPaymentCompletionActionSheet: ActionSheetController, SendPaymentHelper
                     comment: "Format for the 'fiat currency conversion estimate' indicator. Embeds {{ the fiat currency code }}.",
                 )
 
-                let currencyConversionInfoView = UIImageView.withTemplateImageName("info-compact", tintColor: .Signal.secondaryLabel)
+                let currencyConversionInfoView = UIImageView.withTemplateImageName("info-compact", tintColor: Theme.secondaryTextAndIconColor)
                 currencyConversionInfoView.autoSetDimensions(to: .square(16))
                 currencyConversionInfoView.setCompressionResistanceHigh()
 
                 let row = addRow(
                     to: &topGroup,
-                    title: String.nonPluralLocalizedStringWithFormat(fiatFormat, currencyConversion.currencyCode),
+                    title: String(format: fiatFormat, currencyConversion.currencyCode),
                     value: fiatAmountString,
                     titleIconView: currencyConversionInfoView,
+                    addSeparator: true,
                 )
 
                 row.isUserInteractionEnabled = true
@@ -474,11 +470,10 @@ class SendPaymentCompletionActionSheet: ActionSheetController, SendPaymentHelper
                 "PAYMENTS_NEW_PAYMENT_ESTIMATED_FEE",
                 comment: "Label for the 'payment estimated fee' indicator.",
             ),
-            value: SendPaymentHelper.formatMobileCoinAmount(paymentInfo.estimatedFeeAmount),
+            value: formatMobileCoinAmount(paymentInfo.estimatedFeeAmount),
+            addSeparator: false,
         )
 
-        // Bottom group (of 1): Total
-        var bottomGroup = [UIView]()
         let totalAmount = paymentInfo.paymentAmount.plus(paymentInfo.estimatedFeeAmount)
         addRow(
             to: &bottomGroup,
@@ -486,7 +481,7 @@ class SendPaymentCompletionActionSheet: ActionSheetController, SendPaymentHelper
                 "PAYMENTS_NEW_PAYMENT_PAYMENT_TOTAL",
                 comment: "Label for the 'total payment amount' indicator.",
             ),
-            value: SendPaymentHelper.formatMobileCoinAmount(totalAmount),
+            value: formatMobileCoinAmount(totalAmount),
             isTotal: true,
         )
 
@@ -496,6 +491,7 @@ class SendPaymentCompletionActionSheet: ActionSheetController, SendPaymentHelper
 
         let stack = UIStackView(arrangedSubviews: groups)
         stack.axis = .vertical
+        stack.alignment = .fill
         stack.spacing = 24
 
         return stack
@@ -512,17 +508,17 @@ class SendPaymentCompletionActionSheet: ActionSheetController, SendPaymentHelper
             otherUserName = SSKEnvironment.shared.databaseStorageRef.read { transaction in
                 SSKEnvironment.shared.contactManagerRef.displayName(for: recipientAddress, tx: transaction).resolvedValue()
             }
-        case .publicAddress(let recipientPublicAddress):
-            otherUserName = PaymentsImpl.formatAsBase58(publicAddress: recipientPublicAddress)
+        case .publicAddress(let inputType):
+            otherUserName = PaymentsImpl.formatForDisplay(inputType: inputType)
         }
         let userFormat = OWSLocalizedString(
             "PAYMENTS_NEW_PAYMENT_RECIPIENT_AMOUNT_FORMAT",
             comment: "Format for the 'payment recipient amount' indicator. Embeds {{ the name of the recipient of the payment }}.",
         )
-        return String.nonPluralLocalizedStringWithFormat(userFormat, otherUserName)
+        return String(format: userFormat, otherUserName)
     }
 
-    static func formatPaymentFailure(_ error: Error, withErrorPrefix: Bool) -> String {
+    public static func formatPaymentFailure(_ error: Error, withErrorPrefix: Bool) -> String {
         let errorDescription: String = {
             switch error {
             case let paymentsError as PaymentsError:
@@ -537,7 +533,7 @@ class SendPaymentCompletionActionSheet: ActionSheetController, SendPaymentHelper
                             "PAYMENTS_NEW_PAYMENT_ERROR_INSUFFICIENT_FUNDS_FORMAT",
                             comment: "Indicates that a payment failed due to insufficient funds. Embeds {{ current balance }}.",
                         )
-                        return String.nonPluralLocalizedStringWithFormat(format, formattedBalance)
+                        return String(format: format, formattedBalance)
                     } else {
                         return OWSLocalizedString(
                             "PAYMENTS_NEW_PAYMENT_ERROR_INSUFFICIENT_FUNDS",
@@ -608,11 +604,25 @@ class SendPaymentCompletionActionSheet: ActionSheetController, SendPaymentHelper
         return errorDescription
     }
 
-    private func updateBalanceLabel() {
-        helper?.updateBalanceLabel(balanceLabel)
+    private func buildConfirmPaymentButtons() -> UIView {
+        buildBottomButtonStack([
+            buildBottomButton(
+                title: OWSLocalizedString(
+                    "PAYMENTS_NEW_PAYMENT_CONFIRM_PAYMENT_BUTTON",
+                    comment: "Label for the 'confirm payment' button.",
+                ),
+                target: self,
+                selector: #selector(didTapConfirmButton),
+            ),
+        ])
     }
 
-    // MARK: - Payment Processing.
+    public func updateBalanceLabel() {
+        guard let helper else {
+            return
+        }
+        helper.updateBalanceLabel(balanceLabel)
+    }
 
     private let preparedPaymentTask = AtomicOptional<Task<PreparedPayment, any Error>>(nil, lock: .init())
 
@@ -637,30 +647,30 @@ class SendPaymentCompletionActionSheet: ActionSheetController, SendPaymentHelper
                 if case PaymentsError.defragmentationRequired = error {
                     Logger.warn("Error: \(error)")
                 } else {
-                    owsFailDebugUnlessMCNetworkFailure(error)
+                    Logger.warn("Could not prepare payment: \(error).")
                 }
             }
         }
     }
 
     private func tryToSendPayment(paymentInfo: PaymentInfo) {
-        currentStep = .progressPay(paymentInfo: paymentInfo)
+        self.currentStep = .progressPay(paymentInfo: paymentInfo)
 
         ModalActivityIndicatorViewController.present(fromViewController: self, isInvisible: true, asyncBlock: { modalActivityIndicator in
             do {
-                let authOutcome = await SSKEnvironment.shared.owsPaymentsLockRef.tryToUnlock()
-                switch authOutcome {
-                case .failure(let error):
-                    throw PaymentsUIError.paymentsLockFailed(reason: "local authentication failed with error: \(error)")
-                case .unexpectedFailure(let error):
-                    throw PaymentsUIError.paymentsLockFailed(reason: "local authentication failed with unexpected error: \(error)")
-                case .success:
-                    break
-                case .cancel:
-                    throw PaymentsUIError.paymentsLockCancelled(reason: "local authentication cancelled")
-                case .disabled:
-                    break
-                }
+//                let authOutcome = await SSKEnvironment.shared.owsPaymentsLockRef.tryToUnlock()
+//                switch authOutcome {
+//                case .failure(let error):
+//                    throw PaymentsUIError.paymentsLockFailed(reason: "local authentication failed with error: \(error)")
+//                case .unexpectedFailure(let error):
+//                    throw PaymentsUIError.paymentsLockFailed(reason: "local authentication failed with unexpected error: \(error)")
+//                case .success:
+//                    break
+//                case .cancel:
+//                    throw PaymentsUIError.paymentsLockCancelled(reason: "local authentication cancelled")
+//                case .disabled:
+//                    break
+//                }
 
                 guard let task = self.preparedPaymentTask.get() else {
                     throw OWSAssertionError("Missing preparedPaymentTask.")
@@ -699,7 +709,6 @@ class SendPaymentCompletionActionSheet: ActionSheetController, SendPaymentHelper
                 self.didSucceedPayment(paymentInfo: paymentInfo)
                 modalActivityIndicator.dismiss()
             } catch {
-                owsFailDebugUnlessMCNetworkFailure(error)
                 modalActivityIndicator.dismiss()
                 self.didFailPayment(paymentInfo: paymentInfo, error: error)
             }
@@ -709,7 +718,7 @@ class SendPaymentCompletionActionSheet: ActionSheetController, SendPaymentHelper
     private static let autoDismissDelay: TimeInterval = 2.5
 
     private func didSucceedPayment(paymentInfo: PaymentInfo) {
-        currentStep = .successPay(paymentInfo: paymentInfo)
+        self.currentStep = .successPay(paymentInfo: paymentInfo)
 
         let delegate = self.delegate
         DispatchQueue.main.asyncAfter(deadline: .now() + Self.autoDismissDelay) { [weak self] in
@@ -721,13 +730,17 @@ class SendPaymentCompletionActionSheet: ActionSheetController, SendPaymentHelper
     }
 
     private func didFailPayment(paymentInfo: PaymentInfo, error: Error) {
-        currentStep = .failurePay(paymentInfo: paymentInfo, error: error)
+        self.currentStep = .failurePay(paymentInfo: paymentInfo, error: error)
 
         let delegate = self.delegate
         DispatchQueue.main.asyncAfter(deadline: .now() + Self.autoDismissDelay) { [weak self] in
             guard let self else { return }
             self.dismiss(animated: true) {
-                PaymentActionSheets.showBiometryAuthFailedActionSheet { _ in
+                OWSActionSheets.showActionSheet(
+                    title: "Failed to send payment",
+                    message: error.localizedDescription,
+                    buttonTitle: CommonStrings.okButton,
+                ) { _ in
                     delegate?.didSendPayment(success: false)
                 }
             }
@@ -736,11 +749,13 @@ class SendPaymentCompletionActionSheet: ActionSheetController, SendPaymentHelper
 
     // MARK: - Events
 
+    @objc
     private func didTapCancel() {
         dismiss(animated: true, completion: nil)
     }
 
-    private func didTapConfirmButton() {
+    @objc
+    private func didTapConfirmButton(_ sender: UIButton) {
         switch currentStep {
         case .confirmPay(let paymentInfo):
             tryToSendPayment(paymentInfo: paymentInfo)
@@ -753,14 +768,16 @@ class SendPaymentCompletionActionSheet: ActionSheetController, SendPaymentHelper
     private func didTapCurrencyConversionInfo() {
         PaymentsSettingsViewController.showCurrencyConversionInfoAlert(fromViewController: self)
     }
+}
 
-    // MARK: - SendPaymentHelperDelegate
+// MARK: -
 
-    func balanceDidChange() {
+extension SendPaymentCompletionActionSheet: SendPaymentHelperDelegate {
+    public func balanceDidChange() {
         updateBalanceLabel()
     }
 
-    func currencyConversionDidChange() {}
+    public func currencyConversionDidChange() {}
 }
 
 private extension UIStackView {
@@ -769,7 +786,7 @@ private extension UIStackView {
         views.enumerated().forEach { offset, value in
             guard offset != views.count - 1 else { return }
             let separator = UIView()
-            separator.backgroundColor = UIColor.Signal.opaqueSeparator
+            separator.backgroundColor = Theme.hairlineColor
             separator.autoSetDimension(.height, toSize: 0.5)
             value.addSubview(separator)
 

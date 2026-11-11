@@ -12,6 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
 typedef NS_ENUM(NSUInteger, TSPaymentCurrency) {
     TSPaymentCurrencyUnknown = 0,
     TSPaymentCurrencyMobileCoin = 1,
+    TSPaymentCurrencyBitcoin = 2,
 };
 
 NSString *NSStringFromTSPaymentCurrency(TSPaymentCurrency value);

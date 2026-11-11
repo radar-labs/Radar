@@ -144,7 +144,7 @@ public final class TSPaymentModel: NSObject, SDSCodableModel, Decodable {
         memoMessage: String?,
         isUnread: Bool,
         interactionUniqueId: String?,
-        mobileCoin: MobileCoinPayment,
+        mobileCoin: MobileCoinPayment?,
     ) {
         self.uniqueId = UUID().uuidString
         self.paymentType = paymentType
@@ -159,9 +159,12 @@ public final class TSPaymentModel: NSObject, SDSCodableModel, Decodable {
         self.interactionUniqueId = interactionUniqueId
         self.mobileCoin = mobileCoin
 
-        self.mcLedgerBlockIndex = mobileCoin.ledgerBlockIndex
-        self.mcTransactionData = mobileCoin.transactionData
-        self.mcReceiptData = mobileCoin.receiptData
+        // Radar: Lightning payments have no MobileCoin payload; their transaction and
+        // receipt blobs are attached later via update(withTransactionData:) and
+        // update(withReceiptData:).
+        self.mcLedgerBlockIndex = mobileCoin?.ledgerBlockIndex ?? 0
+        self.mcTransactionData = mobileCoin?.transactionData
+        self.mcReceiptData = mobileCoin?.receiptData
 
         super.init()
 
@@ -224,6 +227,20 @@ public final class TSPaymentModel: NSObject, SDSCodableModel, Decodable {
         anyUpdate(transaction: transaction) {
             owsAssertDebug($0.paymentState.isIncoming == paymentState.isIncoming)
             $0.paymentState = paymentState
+        }
+    }
+
+    /// Radar: stores the serialized Lightning (Breez) transaction for an outgoing payment.
+    public func update(withTransactionData transactionData: Data, transaction: DBWriteTransaction) {
+        anyUpdate(transaction: transaction) {
+            $0.mcTransactionData = transactionData
+        }
+    }
+
+    /// Radar: stores the serialized Lightning (Breez) payment receipt.
+    public func update(withReceiptData receiptData: Data, transaction: DBWriteTransaction) {
+        anyUpdate(transaction: transaction) {
+            $0.mcReceiptData = receiptData
         }
     }
 

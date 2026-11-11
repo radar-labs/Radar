@@ -3,13 +3,16 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
+import BreezSdkSpark
 public import MobileCoin
 public import SignalServiceKit
 
 @objc
 public protocol Payments: AnyObject {
 
-    func walletAddressBase58() -> String?
+    var walletAddressLNURL: String? { get }
+
+    var walletLightningAddress: String? { get }
 
     var shouldShowPaymentsUI: Bool { get }
 
@@ -35,6 +38,14 @@ public protocol Payments: AnyObject {
     func canUsePayments() -> Bool
 
     func clearState(transaction: DBWriteTransaction)
+}
+
+// Radar: names used by Radar's payments UI. Upstream folded the remote kill
+// switch and the phone-number region check into `canUsePayments()`.
+extension Payments {
+    public var isKillSwitchActive: Bool { !canUsePayments() }
+
+    public var canEnablePayments: Bool { canUsePayments() }
 }
 
 // MARK: -
@@ -68,6 +79,8 @@ public protocol PaymentsSwift: Payments {
     func isValidPassphraseWord(_ word: String?) -> Bool
 
     func blockOnOutgoingVerification(paymentModel: TSPaymentModel) async throws -> Bool
+
+    func deletePaymentWallet() async throws
 }
 
 // MARK: -
@@ -79,8 +92,8 @@ extension PaymentsPassphrase {
         validateWords: Bool,
     ) throws -> PaymentsPassphrase {
         let words = Array(passphrase.lowercased().stripped.components(separatedBy: " ").compactMap { $0.nilIfEmpty })
-        guard words.count == PaymentsConstants.passphraseWordCount else {
-            Logger.warn("words.count \(words.count) != \(PaymentsConstants.passphraseWordCount)")
+        guard PaymentsConstants.supportedPassphraseWordCounts.contains(words.count) else {
+            Logger.warn("words.count \(words.count) not in supported counts \(PaymentsConstants.supportedPassphraseWordCounts)")
             throw PaymentsError.invalidPassphrase
         }
         if validateWords {
@@ -105,8 +118,7 @@ public protocol SendPaymentRecipient {
 // MARK: -
 
 public protocol PreparedPayment {
-    var transaction: MobileCoin.Transaction { get }
-    var receipt: MobileCoin.Receipt { get }
+    var preparedTransaction: PreparedTransaction { get }
     var feeAmount: TSPaymentAmount { get }
 }
 
@@ -139,9 +151,9 @@ extension MockPayments: PaymentsSwift {
 
     public var paymentsEntropy: Data? { nil }
 
-    public func walletAddressBase58() -> String? {
-        owsFail("Not implemented.")
-    }
+    public var walletAddressLNURL: String? { nil }
+
+    public var walletLightningAddress: String? { nil }
 
     public func canUsePayments() -> Bool { false }
 
@@ -229,6 +241,10 @@ extension MockPayments: PaymentsSwift {
     }
 
     public func blockOnOutgoingVerification(paymentModel: TSPaymentModel) async throws -> Bool {
+        owsFail("Not implemented.")
+    }
+
+    public func deletePaymentWallet() async throws {
         owsFail("Not implemented.")
     }
 }
