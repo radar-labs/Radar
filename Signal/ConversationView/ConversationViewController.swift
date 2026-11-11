@@ -530,7 +530,11 @@ final class ConversationViewController: OWSViewController, OWSNavigationChildCon
         // Title view sometimes disappears when orientation changes.
         // Reset it here as a workaround.
         navigationItem.titleView = nil
-        navigationItem.titleView = headerView
+        // Radar: the starred-messages view shows a plain title instead of the
+        // conversation header.
+        if !onlyStarred {
+            navigationItem.titleView = headerView
+        }
 
         guard hasViewWillAppearEverBegun else {
             return

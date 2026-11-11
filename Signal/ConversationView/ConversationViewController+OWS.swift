@@ -282,7 +282,8 @@ extension ConversationViewController {
 
         switch uiMode {
         case .normal:
-            if navigationItem.titleView != headerView {
+            // Radar: no conversation header in the starred-messages view.
+            if !onlyStarred, navigationItem.titleView != headerView {
                 navigationItem.titleView = headerView
             }
         case .search:
