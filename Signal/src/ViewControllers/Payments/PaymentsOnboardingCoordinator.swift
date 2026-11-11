@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
+import LibSignalClient
 import SignalServiceKit
 import SignalUI
 
@@ -17,12 +18,12 @@ class PaymentsOnboardingCoordinator {
     func prepareForPresentation(inNavController navController: UINavigationController) -> UIViewController {
         self.navController = navController
 
-        let existingUsername: Usernames.ParsedUsername? = SSKEnvironment.shared.databaseStorageRef.read { tx in
+        let existingUsername: UsernameComponents? = SSKEnvironment.shared.databaseStorageRef.read { tx in
             switch DependenciesBridge.shared.localUsernameManager.usernameState(tx: tx) {
             case .available(let username, _):
-                return Usernames.ParsedUsername(rawUsername: username)
+                return (try? LibSignalClient.Username(username))?.components()
             case .linkCorrupted(let username):
-                return Usernames.ParsedUsername(rawUsername: username)
+                return (try? LibSignalClient.Username(username))?.components()
             case .unset, .usernameAndLinkCorrupted:
                 return nil
             }

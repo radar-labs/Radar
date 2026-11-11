@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
+import LibSignalClient
 import SignalServiceKit
 import SignalUI
 import SwiftUI
@@ -30,7 +31,17 @@ class UsernameOnboardingViewController: HostingController<UsernameOnboardingView
 class UsernameOnboardingViewModel: ObservableObject {
     struct Context {
         let localUsernameManager: LocalUsernameManager
-        let existingUsername: Usernames.ParsedUsername?
+        let existingUsername: UsernameComponents?
+    }
+
+    /// A username the server reserved for us. `LibSignalClient.Username`
+    /// isn't `Equatable`, so compare by value.
+    struct ReservedUsername: Equatable {
+        let username: LibSignalClient.Username
+
+        static func == (lhs: Self, rhs: Self) -> Bool {
+            lhs.username.value == rhs.username.value
+        }
     }
 
     enum State: Equatable {
@@ -39,7 +50,7 @@ class UsernameOnboardingViewModel: ObservableObject {
         case cannotStartWithDigit
         case invalidCharacters
         case checking
-        case available(username: Usernames.ParsedUsername, hashedUsername: Usernames.HashedUsername)
+        case available(ReservedUsername)
         case unavailable
         case rateLimited
         case networkError
@@ -64,10 +75,10 @@ class UsernameOnboardingViewModel: ObservableObject {
         self.isDisplayingExistingUsername = context.existingUsername != nil
     }
 
-    var existingUsername: Usernames.ParsedUsername? { context.existingUsername }
+    var existingUsername: UsernameComponents? { context.existingUsername }
 
-    var confirmedUsername: Usernames.HashedUsername? {
-        if case .available(_, let hashed) = state { return hashed }
+    var confirmedUsername: LibSignalClient.Username? {
+        if case .available(let reserved) = state { return reserved.username }
         return nil
     }
 
@@ -85,22 +96,20 @@ class UsernameOnboardingViewModel: ObservableObject {
     }
 
     func confirmUsername() async {
-        guard case .available(_, let hashedUsername) = state else { return }
+        guard case .available(let reserved) = state else { return }
         reservationTask?.cancel()
         state = .confirming
 
-        let result = await context.localUsernameManager.confirmUsername(reservedUsername: hashedUsername)
-
-        switch result {
-        case .success(.success):
+        do {
+            try await context.localUsernameManager.confirmUsername(reservedUsername: reserved.username)
             onConfirm()
-        case .success(.rejected):
+        } catch SignalError.usernameNotAvailable, SignalError.usernameReservationNotFound {
             state = .unavailable
-        case .success(.rateLimited):
+        } catch SignalError.rateLimitedError(retryAfter: _, message: _) {
             state = .rateLimited
-        case .failure(.networkError):
+        } catch let error where error.isNetworkFailureOrTimeout {
             state = .networkError
-        case .failure(.otherError):
+        } catch {
             state = .unknownError
         }
     }
@@ -145,11 +154,11 @@ class UsernameOnboardingViewModel: ObservableObject {
     }
 
     private func attemptReservation(forNickname nickname: String, desiredDiscriminator: String) async {
-        typealias CandidateError = Usernames.HashedUsername.CandidateGenerationError
+        typealias CandidateError = Usernames.CandidateGenerationError
 
-        let candidates: Usernames.HashedUsername.GeneratedCandidates
+        let candidates: [LibSignalClient.Username]
         do {
-            candidates = try Usernames.HashedUsername.generateCandidates(
+            candidates = try Usernames.generateCandidates(
                 forNickname: nickname,
                 minNicknameLength: minNicknameLength,
                 maxNicknameLength: maxNicknameLength,
@@ -169,20 +178,22 @@ class UsernameOnboardingViewModel: ObservableObject {
             return
         }
 
-        let result = await context.localUsernameManager.reserveUsername(usernameCandidates: candidates)
+        let result = await Result(catching: {
+            try await self.context.localUsernameManager.reserveUsername(usernameCandidates: candidates)
+        })
         guard !Task.isCancelled else { return }
 
         switch result {
-        case .success(.successful(let parsedUsername, let hashedUsername)):
-            discriminatorInput = parsedUsername.discriminator
-            state = .available(username: parsedUsername, hashedUsername: hashedUsername)
-        case .success(.rejected):
+        case .success(let username):
+            discriminatorInput = username.components().discriminator
+            state = .available(ReservedUsername(username: username))
+        case .failure(SignalError.usernameNotAvailable(_)):
             state = .unavailable
-        case .success(.rateLimited):
+        case .failure(SignalError.rateLimitedError(retryAfter: _, message: _)):
             state = .rateLimited
-        case .failure(.networkError):
+        case .failure(let error) where error.isNetworkFailureOrTimeout:
             state = .networkError
-        case .failure(.otherError):
+        case .failure:
             state = .unknownError
         }
     }
@@ -307,7 +318,7 @@ struct UsernameOnboardingView: View {
 
     // MARK: Existing Username Display
 
-    private func existingUsernameRow(username: Usernames.ParsedUsername) -> some View {
+    private func existingUsernameRow(username: UsernameComponents) -> some View {
         HStack(spacing: 0) {
             Text(username.nickname)
                 .font(.system(size: 17, weight: .medium))
@@ -451,9 +462,12 @@ struct UsernameOnboardingView: View {
                 .font(.subheadline)
 
             case .networkError:
-                Text(Usernames.RemoteMutationError.networkError.localizedDescription)
-                    .foregroundStyle(Color.Signal.red)
-                    .font(.subheadline)
+                Text(OWSLocalizedString(
+                    "USERNAMES_REMOTE_MUTATION_ERROR_DESCRIPTION",
+                    comment: "An error message indicating that a usernames-related requeset failed because of a network error.",
+                ))
+                .foregroundStyle(Color.Signal.red)
+                .font(.subheadline)
 
             case .unknownError:
                 Text(CommonStrings.somethingWentWrongTryAgainLaterError)
@@ -492,7 +506,7 @@ struct UsernameOnboardingView: View {
     UsernameOnboardingView(
         viewModel: UsernameOnboardingViewModel(context: .init(
             localUsernameManager: DependenciesBridge.shared.localUsernameManager,
-            existingUsername: Usernames.ParsedUsername(rawUsername: "myname.67"),
+            existingUsername: (try? LibSignalClient.Username("myname.67"))?.components(),
         ), onConfirm: {}),
         onSkip: {},
     )
