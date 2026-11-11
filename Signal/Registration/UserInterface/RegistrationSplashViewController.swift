@@ -14,6 +14,8 @@ public protocol RegistrationSplashPresenter: AnyObject {
     func setHasOldDevice(_ hasOldDevice: Bool)
 
     func switchToDeviceLinkingMode()
+    func transferDevice()
+    func showRelinking()
 }
 
 // MARK: - RegistrationSplashViewController
@@ -36,15 +38,19 @@ public class RegistrationSplashViewController: OWSViewController, OWSNavigationC
 
         view.backgroundColor = .Signal.background
 
-        if !RegistrationUtils.isPrimaryByDefault {
+        // Buttons in the top right corner.
+        let canSwitchModes = UIDevice.current.isIPad
+        var transferButtonTrailingAnchor: NSLayoutAnchor<NSLayoutXAxisAnchor> = contentLayoutGuide.trailingAnchor
+        if canSwitchModes {
             let modeSwitchButton = UIButton(
                 configuration: .plain(),
                 primaryAction: UIAction { [weak self] _ in
                     self?.didTapModeSwitch()
                 },
             )
-            modeSwitchButton.configuration?.image = .link
+            modeSwitchButton.configuration?.image = .init(named: UIDevice.current.isIPad ? "link" : "link-slash")
             modeSwitchButton.tintColor = .ows_gray25
+            modeSwitchButton.accessibilityIdentifier = "registration.splash.modeSwitch"
 
             view.addSubview(modeSwitchButton)
             modeSwitchButton.translatesAutoresizingMaskIntoConstraints = false
@@ -54,25 +60,68 @@ public class RegistrationSplashViewController: OWSViewController, OWSNavigationC
                 modeSwitchButton.trailingAnchor.constraint(equalTo: contentLayoutGuide.trailingAnchor),
                 modeSwitchButton.topAnchor.constraint(equalTo: contentLayoutGuide.topAnchor),
             ])
+
+            transferButtonTrailingAnchor = modeSwitchButton.leadingAnchor
         }
 
-        // Image at the top.
-        let imageView = UIImageView(image: UIImage(named: "onboarding_splash_hero"))
-        imageView.contentMode = .scaleAspectFit
-        imageView.layer.minificationFilter = .trilinear
-        imageView.layer.magnificationFilter = .trilinear
-        imageView.setCompressionResistanceLow()
-        imageView.setContentHuggingVerticalLow()
-        let heroImageContainer = UIView.container()
-        heroImageContainer.addSubview(imageView)
-        imageView.translatesAutoresizingMaskIntoConstraints = false
-        // Center image vertically in the available space above title text.
+        if BuildFlags.preRegDeviceTransfer {
+            let transferButton = UIButton(
+                configuration: .plain(),
+                primaryAction: UIAction { [weak self] _ in
+                    self?.didTapTransfer()
+                },
+            )
+            transferButton.configuration?.image = Theme.iconImage(.transfer).resizedImage(to: .square(24))
+            transferButton.accessibilityIdentifier = "registration.splash.transfer"
+
+            view.addSubview(transferButton)
+            transferButton.translatesAutoresizingMaskIntoConstraints = false
+            NSLayoutConstraint.activate([
+                transferButton.widthAnchor.constraint(equalToConstant: 40),
+                transferButton.heightAnchor.constraint(equalToConstant: 40),
+                transferButton.trailingAnchor.constraint(equalTo: transferButtonTrailingAnchor),
+                transferButton.topAnchor.constraint(equalTo: contentLayoutGuide.topAnchor),
+            ])
+        }
+
+        // App icon at the top.
+        let iconSize: CGFloat = 160
+        let appIconView = UIImageView(image: UIImage(named: "AppIconPreview/default"))
+        appIconView.contentMode = .scaleAspectFit
+        appIconView.layer.cornerRadius = iconSize * 53.125 / 200
+        appIconView.layer.masksToBounds = true
+        appIconView.accessibilityIdentifier = "registration.splash.heroImageView"
+        appIconView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            imageView.centerXAnchor.constraint(equalTo: heroImageContainer.centerXAnchor),
-            imageView.widthAnchor.constraint(equalTo: heroImageContainer.widthAnchor),
-            imageView.centerYAnchor.constraint(equalTo: heroImageContainer.centerYAnchor),
-            imageView.heightAnchor.constraint(equalTo: heroImageContainer.heightAnchor, constant: 0.8),
+            appIconView.widthAnchor.constraint(equalToConstant: iconSize),
+            appIconView.heightAnchor.constraint(equalToConstant: iconSize),
         ])
+
+        // "Radar." wordmark below icon.
+        let wordmarkView = UILabel()
+        wordmarkView.text = "Radar."
+        // Match the orange of the app icon (#F46300).
+        wordmarkView.textColor = UIColor(red: 244 / 255, green: 99 / 255, blue: 0 / 255, alpha: 1)
+        wordmarkView.font = UIFont.systemFont(ofSize: 48, weight: .bold)
+        wordmarkView.textAlignment = .center
+        wordmarkView.accessibilityIdentifier = "registration.splash.wordmark"
+
+        let iconStack = UIStackView(arrangedSubviews: [appIconView, wordmarkView])
+        iconStack.axis = .vertical
+        iconStack.alignment = .center
+        iconStack.spacing = 18
+
+        // Fixed top spacer gives the icon breathing room below the status bar.
+        let topSpacer = UIView()
+        topSpacer.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            topSpacer.heightAnchor.constraint(equalToConstant: 40),
+        ])
+
+        // Flexible spacer absorbs all remaining vertical space between the ToS link
+        // and the bottom buttons, keeping the buttons anchored at the bottom.
+        let bottomSpacer = UIView()
+        bottomSpacer.setContentHuggingPriority(UILayoutPriority(1), for: .vertical)
 
         // Welcome text.
         let titleText = {
@@ -86,14 +135,7 @@ public class RegistrationSplashViewController: OWSViewController, OWSNavigationC
             }
         }()
         let titleLabel = UILabel.titleLabelForRegistration(text: titleText)
-
-        // Nonprofit label
-        let nonprofitAwarenessLabel = UILabel.explanationLabelForRegistration(
-            text: OWSLocalizedString(
-                "ONBOARDING_SPLASH_NONPROFIT",
-                comment: "Text indicating Signal is a nonprofit on the 'onboarding splash' view. For non-English languages, exclude the word '501c3'.",
-            ),
-        )
+        titleLabel.accessibilityIdentifier = "registration.splash.titleLabel"
 
         // Terms of service and privacy policy.
         let tosPPButton = UIButton(
@@ -106,42 +148,54 @@ public class RegistrationSplashViewController: OWSViewController, OWSNavigationC
             },
         )
         tosPPButton.configuration?.baseForegroundColor = .Signal.secondaryLabel
-        tosPPButton.accessibilityTraits.insert(.link)
         tosPPButton.enableMultilineLabel()
+        tosPPButton.accessibilityIdentifier = "registration.splash.explanationLabel"
 
         // Large buttons enclosed in a container with some extra horizontal padding.
         let continueButton = UIButton(
-            configuration: .largePrimary(title: CommonStrings.continueButton),
+            configuration: .largePrimary(title: OWSLocalizedString(
+                "ONBOARDING_SPLASH_NEW_TO_SIGNAL_BUTTON_TITLE",
+                comment: "Primary button on the 'onboarding splash' view for users who are new to the app.",
+            )),
             primaryAction: UIAction { [weak self] _ in
                 self?.continuePressed()
             },
         )
+        continueButton.enableMultilineLabel()
+        continueButton.accessibilityIdentifier = "registration.splash.continueButton"
 
-        let restoreOrTransferButton = UIButton(
-            configuration: .largeSecondary(title: OWSLocalizedString(
-                "ONBOARDING_SPLASH_RESTORE_OR_TRANSFER_BUTTON_TITLE",
-                comment: "Button for restoring or transferring account in the 'onboarding splash' view.",
-            )),
-            primaryAction: UIAction { [weak self] _ in
-                self?.didTapRestoreOrTransfer()
-            },
-        )
-        restoreOrTransferButton.enableMultilineLabel()
+        let largeButtonsContainer: UIView
+        if BuildFlags.Backups.registrationFlow {
+            let restoreOrTransferButton = UIButton(
+                configuration: .largeSecondary(title: OWSLocalizedString(
+                    "ONBOARDING_SPLASH_RESTORE_OR_TRANSFER_BUTTON_TITLE",
+                    comment: "Button for restoring or transferring account in the 'onboarding splash' view.",
+                )),
+                primaryAction: UIAction { [weak self] _ in
+                    self?.didTapRestoreOrTransfer()
+                },
+            )
+            restoreOrTransferButton.enableMultilineLabel()
+            restoreOrTransferButton.accessibilityIdentifier = "registration.splash.continueButton"
 
-        let largeButtonsContainer = UIStackView.verticalButtonStack(buttons: [continueButton, restoreOrTransferButton])
+            largeButtonsContainer = UIStackView.verticalButtonStack(buttons: [continueButton, restoreOrTransferButton])
+        } else {
+            largeButtonsContainer = UIStackView.verticalButtonStack(buttons: [continueButton])
+        }
 
         // Main content view.
         let stackView = addStaticContentStackView(arrangedSubviews: [
-            heroImageContainer,
+            topSpacer,
+            iconStack,
             titleLabel,
-            nonprofitAwarenessLabel,
             tosPPButton,
+            bottomSpacer,
             largeButtonsContainer,
         ])
-        stackView.setCustomSpacing(44, after: imageView)
-        stackView.setCustomSpacing(24, after: titleLabel)
-        stackView.setCustomSpacing(0, after: nonprofitAwarenessLabel)
-        stackView.setCustomSpacing(80, after: tosPPButton)
+        stackView.setCustomSpacing(32, after: topSpacer)
+        stackView.setCustomSpacing(32, after: iconStack)
+        stackView.setCustomSpacing(12, after: titleLabel)
+        stackView.setCustomSpacing(0, after: tosPPButton)
 
         view.sendSubviewToBack(stackView)
     }
@@ -153,6 +207,11 @@ public class RegistrationSplashViewController: OWSViewController, OWSNavigationC
         presenter?.switchToDeviceLinkingMode()
     }
 
+    private func didTapTransfer() {
+        Logger.info("")
+        presenter?.transferDevice()
+    }
+
     private func showTOSPP() {
         let safariVC = SFSafariViewController(url: TSConstants.legalTermsUrl)
         present(safariVC, animated: true)
@@ -160,7 +219,9 @@ public class RegistrationSplashViewController: OWSViewController, OWSNavigationC
 
     private func continuePressed() {
         Logger.info("")
-        presenter?.continueFromSplash()
+        guard let presenter else { return }
+        let signUpVC = RegistrationSignUpViewController(presenter: presenter)
+        navigationController?.pushViewController(signUpVC, animated: true)
     }
 
     private func didTapRestoreOrTransfer() {
@@ -168,21 +229,43 @@ public class RegistrationSplashViewController: OWSViewController, OWSNavigationC
         let sheet = RestoreOrTransferPickerController(
             setHasOldDeviceBlock: { [weak self] hasOldDevice in
                 self?.dismiss(animated: true) {
-                    self?.presenter?.setHasOldDevice(hasOldDevice)
+                    if hasOldDevice {
+                        self?.presenter?.setHasOldDevice(true)
+                    } else {
+                        self?.showMigrateFromSignalBackupDisclaimer()
+                    }
+                }
+            },
+            showRelinkingBlock: { [weak self] in
+                self?.dismiss(animated: true) {
+                    self?.presenter?.showRelinking()
                 }
             },
         )
         self.present(sheet, animated: true)
     }
+
+    private func showMigrateFromSignalBackupDisclaimer() {
+        let disclaimer = MigrateFromSignalBackupDisclaimerViewController(
+            completedBackupBlock: { [weak self] in
+                self?.dismiss(animated: true) {
+                    self?.presenter?.setHasOldDevice(false)
+                }
+            },
+        )
+        present(disclaimer, animated: true)
+    }
 }
 
-private class RestoreOrTransferPickerController: StackSheetViewController {
+class RestoreOrTransferPickerController: StackSheetViewController {
 
     override var placeOnGlassIfAvailable: Bool { false }
 
-    private let setHasOldDeviceBlock: (Bool) -> Void
-    init(setHasOldDeviceBlock: @escaping (Bool) -> Void) {
+    private let setHasOldDeviceBlock: ((Bool) -> Void)
+    private let showRelinkingBlock: (() -> Void)
+    init(setHasOldDeviceBlock: @escaping (Bool) -> Void, showRelinkingBlock: @escaping () -> Void) {
         self.setHasOldDeviceBlock = setHasOldDeviceBlock
+        self.showRelinkingBlock = showRelinkingBlock
         super.init()
     }
 
@@ -192,37 +275,189 @@ private class RestoreOrTransferPickerController: StackSheetViewController {
         super.viewDidLoad()
         stackView.spacing = 16
 
-        let hasDeviceButton = UIButton.registrationChoiceButton(
+        let migrateFromSignalButton = UIButton.registrationChoiceButton(
             title: OWSLocalizedString(
-                "ONBOARDING_SPLASH_HAVE_OLD_DEVICE_TITLE",
-                comment: "Title for the 'have my old device' choice of the 'Restore or Transfer' prompt",
+                "ONBOARDING_SPLASH_MIGRATE_FROM_SIGNAL_TITLE",
+                comment: "Title for the 'migrate from Signal' choice of the 'Restore or Transfer' prompt",
             ),
             subtitle: OWSLocalizedString(
-                "ONBOARDING_SPLASH_HAVE_OLD_DEVICE_BODY",
-                comment: "Explanation of 'have old device' flow for the 'Restore or Transfer' prompt",
+                "ONBOARDING_SPLASH_MIGRATE_FROM_SIGNAL_BODY",
+                comment: "Explanation of the 'migrate from Signal' flow for the 'Restore or Transfer' prompt",
             ),
-            iconName: "qr-code-48",
+            iconName: "signal-app-48",
+            iconRenderingMode: .alwaysOriginal,
+            primaryAction: UIAction { [weak self] _ in
+                self?.setHasOldDeviceBlock(false)
+            },
+        )
+        stackView.addArrangedSubview(migrateFromSignalButton)
+
+        let hasDeviceButton = UIButton.registrationChoiceButton(
+            title: OWSLocalizedString(
+                "ONBOARDING_SPLASH_SET_UP_NEW_PHONE_TITLE",
+                comment: "Title for the 'set up my new phone' choice of the 'Restore or Transfer' prompt",
+            ),
+            subtitle: OWSLocalizedString(
+                "ONBOARDING_SPLASH_SET_UP_NEW_PHONE_BODY",
+                comment: "Explanation of the 'set up my new phone' flow for the 'Restore or Transfer' prompt",
+            ),
+            iconName: "transfer-phone-48",
             primaryAction: UIAction { [weak self] _ in
                 self?.setHasOldDeviceBlock(true)
             },
         )
         stackView.addArrangedSubview(hasDeviceButton)
 
-        let noDeviceButton = UIButton.registrationChoiceButton(
-            title: OWSLocalizedString(
-                "ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_TITLE",
-                comment: "Title for the 'do not have my old device' choice of the 'Restore or Transfer' prompt",
-            ),
-            subtitle: OWSLocalizedString(
-                "ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_BODY",
-                comment: "Explanation of 'do not have old device' flow for the 'Restore or Transfer' prompt",
-            ),
-            iconName: "no-phone-48",
+        if BuildFlags.linkedPhones {
+            let linkDeviceButton = UIButton.registrationChoiceButton(
+                title: OWSLocalizedString(
+                    "ONBOARDING_SPLASH_LINK_DEVICE_TITLE",
+                    comment: "Title for the 'link device' choice of the 'Restore or Transfer' prompt",
+                ),
+                subtitle: OWSLocalizedString(
+                    "ONBOARDING_SPLASH_LINK_DEVICE_BODY",
+                    comment: "Explanation of the 'link device' flow for the 'Restore or Transfer' prompt",
+                ),
+                iconName: "link-48",
+                primaryAction: UIAction { [weak self] _ in
+                    self?.showRelinkingBlock()
+                },
+            )
+            stackView.addArrangedSubview(linkDeviceButton)
+        }
+    }
+}
+
+// MARK: - MigrateFromSignalBackupDisclaimerViewController
+
+class MigrateFromSignalBackupDisclaimerViewController: OWSViewController {
+
+    private let completedBackupBlock: () -> Void
+
+    init(completedBackupBlock: @escaping () -> Void) {
+        self.completedBackupBlock = completedBackupBlock
+        super.init()
+    }
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        view.backgroundColor = .Signal.background
+
+        let iconsView = UIImageView(image: UIImage(named: "migrate-from-signal-icons"))
+        iconsView.contentMode = .scaleAspectFit
+        iconsView.accessibilityIdentifier = "registration.migrateFromSignalBackup.iconsView"
+
+        let titleLabel = UILabel.titleLabelForRegistration(text: OWSLocalizedString(
+            "MIGRATE_FROM_SIGNAL_BACKUP_TITLE",
+            comment: "Title of the view asking the user to back up their Signal conversations before migrating from Signal.",
+        ))
+        titleLabel.accessibilityIdentifier = "registration.migrateFromSignalBackup.titleLabel"
+
+        let subtitleLabel = UILabel()
+        subtitleLabel.text = OWSLocalizedString(
+            "MIGRATE_FROM_SIGNAL_BACKUP_SUBTITLE",
+            comment: "Subtitle of the view asking the user to back up their Signal conversations before migrating from Signal.",
+        )
+        subtitleLabel.textColor = .Signal.accent
+        subtitleLabel.font = UIFont.dynamicTypeTitle3Clamped.medium()
+        subtitleLabel.textAlignment = .center
+        subtitleLabel.numberOfLines = 0
+        subtitleLabel.lineBreakMode = .byWordWrapping
+
+        let stepsStack = UIStackView(arrangedSubviews: [
+            Self.stepLabel(number: 1, text: OWSLocalizedString(
+                "MIGRATE_FROM_SIGNAL_BACKUP_STEP_1",
+                comment: "First step of the view asking the user to back up their Signal conversations before migrating from Signal.",
+            )),
+            Self.stepLabel(number: 2, text: OWSLocalizedString(
+                "MIGRATE_FROM_SIGNAL_BACKUP_STEP_2",
+                comment: "Second step of the view asking the user to back up their Signal conversations before migrating from Signal.",
+            )),
+        ])
+        stepsStack.axis = .vertical
+
+        let completedBackupButton = UIButton(
+            configuration: .largePrimary(title: OWSLocalizedString(
+                "MIGRATE_FROM_SIGNAL_BACKUP_COMPLETED_BUTTON",
+                comment: "Button confirming that the user has completed a Signal backup, on the view asking them to back up their Signal conversations before migrating from Signal.",
+            )),
             primaryAction: UIAction { [weak self] _ in
-                self?.setHasOldDeviceBlock(false)
+                self?.didTapCompletedBackup()
             },
         )
-        stackView.addArrangedSubview(noDeviceButton)
+        completedBackupButton.enableMultilineLabel()
+        completedBackupButton.accessibilityIdentifier = "registration.migrateFromSignalBackup.completedBackupButton"
+
+        // Flexible spacers of equal height center the content vertically
+        // between the top of the view and the bottom button.
+        let topSpacer = UIView()
+        topSpacer.setContentHuggingPriority(UILayoutPriority(1), for: .vertical)
+        let bottomSpacer = UIView()
+        bottomSpacer.setContentHuggingPriority(UILayoutPriority(1), for: .vertical)
+
+        let stackView = addStaticContentStackView(arrangedSubviews: [
+            topSpacer,
+            iconsView,
+            titleLabel,
+            subtitleLabel,
+            stepsStack,
+            bottomSpacer,
+            UIStackView.verticalButtonStack(buttons: [completedBackupButton], isFullWidthButtons: false),
+        ])
+        stackView.alignment = .center
+        stackView.setCustomSpacing(48, after: iconsView)
+        stackView.setCustomSpacing(32, after: titleLabel)
+        stackView.setCustomSpacing(32, after: subtitleLabel)
+
+        let subtitleWidthConstraint = subtitleLabel.widthAnchor.constraint(equalToConstant: 308)
+        subtitleWidthConstraint.priority = .defaultHigh
+        let stepsWidthConstraint = stepsStack.widthAnchor.constraint(equalToConstant: 308)
+        stepsWidthConstraint.priority = .defaultHigh
+        let buttonWidthConstraint = completedBackupButton.widthAnchor.constraint(equalToConstant: 288)
+        buttonWidthConstraint.priority = .defaultHigh
+
+        NSLayoutConstraint.activate([
+            iconsView.heightAnchor.constraint(equalToConstant: 75),
+            topSpacer.heightAnchor.constraint(equalTo: bottomSpacer.heightAnchor),
+            titleLabel.widthAnchor.constraint(lessThanOrEqualTo: stackView.widthAnchor),
+            subtitleWidthConstraint,
+            subtitleLabel.widthAnchor.constraint(lessThanOrEqualTo: stackView.widthAnchor),
+            stepsWidthConstraint,
+            stepsStack.widthAnchor.constraint(lessThanOrEqualTo: stackView.widthAnchor),
+            buttonWidthConstraint,
+            completedBackupButton.widthAnchor.constraint(lessThanOrEqualTo: stackView.widthAnchor),
+        ])
+    }
+
+    private static func stepLabel(number: Int, text: String) -> UILabel {
+        let markerColumnWidth: CGFloat = 26
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.tabStops = [NSTextTab(textAlignment: .natural, location: markerColumnWidth)]
+        paragraphStyle.defaultTabInterval = markerColumnWidth
+        paragraphStyle.headIndent = markerColumnWidth
+
+        let label = UILabel()
+        label.attributedText = NSAttributedString(
+            string: "\(number).\t\(text)",
+            attributes: [
+                .font: UIFont.dynamicTypeBodyClamped.medium(),
+                .foregroundColor: UIColor { traitCollection in
+                    UIColor(white: traitCollection.userInterfaceStyle == .dark ? 1 : 0, alpha: 0.5)
+                },
+                .paragraphStyle: paragraphStyle,
+            ],
+        )
+        label.numberOfLines = 0
+        label.lineBreakMode = .byWordWrapping
+        return label
+    }
+
+    // MARK: - Events
+
+    private func didTapCompletedBackup() {
+        Logger.info("")
+        completedBackupBlock()
     }
 }
 
@@ -244,6 +479,10 @@ private class PreviewRegistrationSplashPresenter: RegistrationSplashPresenter {
 
     func transferDevice() {
         print("transferDevice")
+    }
+
+    func showRelinking() {
+        print("showRelinking")
     }
 }
 

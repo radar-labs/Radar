@@ -493,6 +493,14 @@ class GetStartedBannerViewController: OWSViewController {
         SSKEnvironment.shared.databaseStorageRef.read { readTx -> [GetStartedCard] in
             var activeCards = Self.getActiveCards(readTx: readTx)
 
+            // Hide the post-onboarding "Get Started" cards entirely.
+            activeCards.removeAll { entry in
+                switch entry {
+                case .newGroup, .inviteFriends, .appearance, .avatarBuilder:
+                    return true
+                }
+            }
+
             if activeCards.isEmpty {
                 return []
             }
