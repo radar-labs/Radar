@@ -1,26 +1,46 @@
-# Signal iOS
+# Radar iOS
 
-Signal is a free and open source messaging app for simple private communication with friends.
+Your messages. Your Bitcoin. Together, at last.
 
-[![Available on the App Store](https://signal.org/external/images/app-store-download-badge.svg)](https://apps.apple.com/app/id874139669)
+Radar is the first app to bring private messaging and self-custodial Bitcoin into one seamless experience. The two most personal things you do every day — who you talk to and what you do with your money — finally live in one place.
 
-Also available on [Android](https://github.com/signalapp/signal-android) and [Desktop](https://github.com/signalapp/signal-desktop).
+For too long it's taken two apps. One to send a private message. Another to send Bitcoin. Copy, paste, switch, repeat. Radar ends the shuffle.
+
+### Send sats like you send a text
+
+No switching apps. No copy-paste. Just open a chat and send — settled instantly over Bitcoin Lightning. Split dinner, cover a friend, send rent, or surprise someone you love, right inside the conversation.
+
+### Your people are already here
+
+Radar is built on Signal's trusted messaging network, so the people you already talk to come with you. No rebuilding your network. No new account necessary.
+
+### Private by default, yours by design
+
+• End-to-end encrypted — built on Signal's battle-tested protocol for encryption you can actually trust.  
+• Self-custodial — your keys, your coins. Radar never holds your money; no one can freeze, seize, or lose it but you.  
+• Instant Bitcoin payments over the Lightning Network, settled in seconds.  
+• No ads or trackers. We don't sell ads and we don't track you. Your chats and payments are nobody's business but yours.  
+• Open source. Every line is open to inspect, audit, and build on — no black boxes.  
+• Always free. No subscriptions, no paid tiers, no hidden fees, for everyone, everywhere.  
+
+We even give back to the protocol we rely on — Signal's mission to keep private messaging alive is ours too.
+
+The people you connect with. The money you trust. Together, at last.
+
+Note: Radar is an independent project and is not affiliated with or endorsed by Signal Messenger, LLC.
+
 
 ## Questions?
 
-For troubleshooting and questions, please visit our [support center](https://support.signal.org/) or [unofficial community forum](https://community.signalusers.org/).
+For troubleshooting and questions, please send us an email at [support@radar.chat](mailto:support@radar.chat).
 
 ## Contributing Bug Reports
 
-The best way to submit a bug report or support request is [via the Support Center](https://support.signal.org/hc/requests/new). Signal iOS doesn't collect any analytics or telemetry, and we rely on your feedback to help us troubleshoot and fix problems when something isn't working correctly.
+The best way to submit a bug report or support request is via issues in this repo or via [email](mailto:support@radar.chat). Radar iOS doesn't collect any analytics or telemetry, and we rely on your feedback to help us troubleshoot and fix problems when something isn't working correctly.
 
 ## Contributing Code
 
-Instructions for how to configure your development environment and build Signal iOS can be found in [BUILDING.md](https://github.com/signalapp/Signal-iOS/blob/main/BUILDING.md). We also recommend reading the [contribution guidelines](https://github.com/signalapp/Signal-iOS/blob/main/CONTRIBUTING.md).
-
-## Contributing Ideas
-
-Have something you want to say about Signal Foundation projects or want to be part of the conversation? Get involved in the [community forum](https://community.signalusers.org).
+Instructions for how to configure your development environment and build Radar iOS can be found in [BUILDING.md](https://github.com/radar-labs/Radar/blob/main/BUILDING.md). We also recommend reading the [contribution guidelines](https://github.com/radar-labs/Radar/blob/main/CONTRIBUTING.md).
 
 ## Cryptography Notice
 
@@ -33,7 +53,8 @@ The form and manner of this distribution makes it eligible for export under the 
 
 ## License
 
-Copyright 2013-2026 Signal Messenger, LLC
+Copyright 2013-2025 Signal Messenger, LLC  
+Copyright 2026 Radar Chat, Inc.
 
 Licensed under the GNU AGPLv3: https://www.gnu.org/licenses/agpl-3.0.html
 
