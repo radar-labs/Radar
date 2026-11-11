@@ -37,6 +37,8 @@ public class RegistrationSplashViewController: OWSViewController, OWSNavigationC
 
         view.backgroundColor = .Signal.background
 
+        // Buttons in the top right corner.
+        var transferButtonTrailingAnchor: NSLayoutAnchor<NSLayoutXAxisAnchor> = contentLayoutGuide.trailingAnchor
         if !RegistrationUtils.isPrimaryByDefault {
             let modeSwitchButton = UIButton(
                 configuration: .plain(),
@@ -55,7 +57,35 @@ public class RegistrationSplashViewController: OWSViewController, OWSNavigationC
                 modeSwitchButton.trailingAnchor.constraint(equalTo: contentLayoutGuide.trailingAnchor),
                 modeSwitchButton.topAnchor.constraint(equalTo: contentLayoutGuide.topAnchor),
             ])
+
+            transferButtonTrailingAnchor = modeSwitchButton.leadingAnchor
         }
+
+        // Radar: keep the device transfer button. Upstream removed it together
+        // with its legacy QR screen (d6ac807f06); it now opens the current
+        // transfer flow, the same as "I already have an account" → "Set up my
+        // new phone": this phone shows a QR code that the old phone scans.
+        let transferButton = UIButton(
+            configuration: .plain(),
+            primaryAction: UIAction { [weak self] _ in
+                self?.didTapTransfer()
+            },
+        )
+        transferButton.configuration?.image = Theme.iconImage(.transfer).resized(maxDimensionPoints: 24)
+        transferButton.accessibilityIdentifier = "registration.splash.transfer"
+        transferButton.accessibilityLabel = OWSLocalizedString(
+            "ONBOARDING_SPLASH_SET_UP_NEW_PHONE_TITLE",
+            comment: "Title for the 'set up my new phone' choice of the 'Restore or Transfer' prompt",
+        )
+
+        view.addSubview(transferButton)
+        transferButton.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            transferButton.widthAnchor.constraint(equalToConstant: 40),
+            transferButton.heightAnchor.constraint(equalToConstant: 40),
+            transferButton.trailingAnchor.constraint(equalTo: transferButtonTrailingAnchor),
+            transferButton.topAnchor.constraint(equalTo: contentLayoutGuide.topAnchor),
+        ])
 
         // App icon at the top.
         let iconSize: CGFloat = 160
@@ -173,6 +203,11 @@ public class RegistrationSplashViewController: OWSViewController, OWSNavigationC
     private func didTapModeSwitch() {
         Logger.info("")
         presenter?.switchToDeviceLinkingMode()
+    }
+
+    private func didTapTransfer() {
+        Logger.info("")
+        presenter?.setHasOldDevice(true)
     }
 
     private func showTOSPP() {
