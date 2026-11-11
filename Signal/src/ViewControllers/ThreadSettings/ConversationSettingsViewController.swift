@@ -31,7 +31,6 @@ class ConversationSettingsViewController: OWSTableViewController2, BadgeCollecti
 
     private(set) var threadViewModel: ThreadViewModel
     private(set) var isSystemContact: Bool
-    private let appReadiness: AppReadinessSetter
     let spoilerState: SpoilerRenderState
     private(set) var callRecords: [CallRecord]
     typealias CallExpiration = CallsListViewController.CallViewModel.CallExpiration
@@ -67,7 +66,6 @@ class ConversationSettingsViewController: OWSTableViewController2, BadgeCollecti
     var shouldRefreshAttachmentsOnReappear = false
 
     init(
-        appReadiness: AppReadinessSetter,
         threadViewModel: ThreadViewModel,
         isSystemContact: Bool,
         spoilerState: SpoilerRenderState,
@@ -75,7 +73,6 @@ class ConversationSettingsViewController: OWSTableViewController2, BadgeCollecti
         callExpirations: [CallRecord.ID: CallExpiration] = [:],
         memberLabelCoordinator: MemberLabelCoordinator?,
     ) {
-        self.appReadiness = appReadiness
         self.threadViewModel = threadViewModel
         self.isSystemContact = isSystemContact
         self.spoilerState = spoilerState
@@ -466,7 +463,6 @@ class ConversationSettingsViewController: OWSTableViewController2, BadgeCollecti
     func showStarredMessagesView() {
         let conversationViewController = SSKEnvironment.shared.databaseStorageRef.read { tx in
             return ConversationViewController.load(
-                appReadiness: appReadiness,
                 threadViewModel: threadViewModel,
                 action: ConversationViewAction.none,
                 focusMessageId: nil,

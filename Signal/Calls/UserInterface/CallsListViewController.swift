@@ -2215,7 +2215,6 @@ extension CallsListViewController: CallCellDelegate, NewCallViewControllerDelega
         }
 
         let callDetailsView = ConversationSettingsViewController(
-            appReadiness: appReadiness,
             threadViewModel: threadViewModel,
             isSystemContact: isSystemContact,
             // Nothing would have been revealed, so this can be a fresh instance

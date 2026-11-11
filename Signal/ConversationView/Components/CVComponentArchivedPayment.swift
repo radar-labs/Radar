@@ -5,12 +5,12 @@
 
 import Foundation
 import SignalServiceKit
-public import SignalUI
+import SignalUI
 
 @objc
-public class CVComponentArchivedPayment: CVComponentBase, CVComponent {
+class CVComponentArchivedPayment: CVComponentBase, CVComponent {
 
-    public var componentKey: CVComponentKey { .archivedPaymentAttachment }
+    var componentKey: CVComponentKey { .archivedPaymentAttachment }
 
     private let archivedPaymentAttachment: CVComponentState.ArchivedPaymentAttachment
     private let messageStatus: MessageReceiptStatus
@@ -90,11 +90,11 @@ public class CVComponentArchivedPayment: CVComponentBase, CVComponent {
 
     // MARK: - Build component view
 
-    public func buildComponentView(componentDelegate: CVComponentDelegate) -> CVComponentView {
+    func buildComponentView(componentDelegate: CVComponentDelegate) -> CVComponentView {
         CVComponentViewArchivedPayment()
     }
 
-    public func configureForRendering(
+    func configureForRendering(
         componentView componentViewParam: CVComponentView,
         cellMeasurement: CVCellMeasurement,
         componentDelegate: CVComponentDelegate,
@@ -193,8 +193,8 @@ public class CVComponentArchivedPayment: CVComponentBase, CVComponent {
         if let si = footerState?.statusIndicator, let icon = UIImage(named: si.imageName) {
             statusView.image = icon.withRenderingMode(.alwaysTemplate)
             statusView.tintColor = tintColor
-            widthConstraint?.constant = si.imageSize.width
-            heightConstraint?.constant = si.imageSize.height
+            widthConstraint?.constant = CVComponentFooter.StatusIndicator.size.width
+            heightConstraint?.constant = CVComponentFooter.StatusIndicator.size.height
             statusView.isHidden = false
         } else {
             statusView.isHidden = true
@@ -203,7 +203,7 @@ public class CVComponentArchivedPayment: CVComponentBase, CVComponent {
 
     // MARK: - Measurement
 
-    public func measure(
+    func measure(
         maxWidth: CGFloat,
         measurementBuilder: CVCellMeasurement.Builder,
     ) -> CGSize {
@@ -304,7 +304,7 @@ public class CVComponentArchivedPayment: CVComponentBase, CVComponent {
 
     // MARK: - CVComponentView
 
-    public class CVComponentViewArchivedPayment: NSObject, CVComponentView {
+    class CVComponentViewArchivedPayment: NSObject, CVComponentView {
 
         private let containerView = UIView()
 
@@ -339,9 +339,9 @@ public class CVComponentArchivedPayment: CVComponentBase, CVComponent {
         var noteStatusWidthConstraint: NSLayoutConstraint?
         var noteStatusHeightConstraint: NSLayoutConstraint?
 
-        public var isDedicatedCellView = true
+        var isDedicatedCellView = true
 
-        public var rootView: UIView { containerView }
+        var rootView: UIView { containerView }
 
         override init() {
             super.init()
@@ -509,9 +509,9 @@ public class CVComponentArchivedPayment: CVComponentBase, CVComponent {
             ])
         }
 
-        public func setIsCellVisible(_ isCellVisible: Bool) {}
+        func setIsCellVisible(_ isCellVisible: Bool) {}
 
-        public func reset() {
+        func reset() {
             badgeLabel.text = nil
             badgeIconView.image = nil
             amountNumberLabel.text = nil
@@ -535,7 +535,7 @@ public class CVComponentArchivedPayment: CVComponentBase, CVComponent {
 
     // MARK: - Tap handler
 
-    override public func handleTap(
+    override func handleTap(
         sender: UIGestureRecognizer,
         componentDelegate: CVComponentDelegate,
         componentView: CVComponentView,
@@ -564,7 +564,7 @@ public class CVComponentArchivedPayment: CVComponentBase, CVComponent {
 // MARK: - Accessibility
 
 extension CVComponentArchivedPayment: CVAccessibilityComponent {
-    public var accessibilityDescription: String {
+    var accessibilityDescription: String {
         let amount = amountNumberText + amountUnitText
         if let note = noteText {
             return amount + ". " + note
