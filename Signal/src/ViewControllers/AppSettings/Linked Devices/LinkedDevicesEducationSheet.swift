@@ -51,8 +51,8 @@ class LinkedDevicesEducationSheet: StackSheetViewController {
         )
         stackView.addArrangedSubview(messagesBulletPoint)
 
-        let downloadLinkString = "signal.org/download"
-        let downloadURL = URL(string: "https://signal.org/download/")!
+        let downloadLinkString = "radar.chat/install"
+        let downloadURL = URL(string: "https://radar.chat/install/")!
 
         let downloadString = String.nonPluralLocalizedStringWithFormat(
             OWSLocalizedString(

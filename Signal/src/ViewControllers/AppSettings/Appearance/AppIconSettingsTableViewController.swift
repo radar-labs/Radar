@@ -16,17 +16,6 @@ final class AppIconSettingsTableViewController: OWSViewController, UITextViewDel
 
     private static let appIcons: [AppIcon] = [
         .default,
-        .white,
-        .color,
-        .night,
-        .nightVariant,
-        .chat,
-        .bubbles,
-        .yellow,
-        .news,
-        .notes,
-        .weather,
-        .waves,
     ]
 
     /// This URL itself is not used. The action is overridden in the text view delegate function.
