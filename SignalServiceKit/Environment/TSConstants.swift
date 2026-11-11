@@ -40,7 +40,7 @@ public class TSConstants {
 
     public static let legalTermsUrl = URL(string: "https://signal.org/legal/")!
     public static let donateUrl = URL(string: "https://signal.org/donate/")!
-    public static let appStoreUrl = URL(string: "https://itunes.apple.com/us/app/signal-private-messenger/id874139669?mt=8")!
+    public static let appStoreUrl = URL(string: "https://apps.apple.com/app/id6753939776")!
 
     public static var mainServiceURL: String { shared.mainServiceURL }
 
