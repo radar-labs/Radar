@@ -5,7 +5,7 @@
 "ABOUT_SECTION_FOOTER" = "Bản quyền Signal Messenger\nĐược cấp phép theo AGPLv3\nSignal là một tổ chức phi lợi nhuận";
 
 /* Title for the 'about' help section */
-"ABOUT_SECTION_TITLE" = "Về Signal";
+"ABOUT_SECTION_TITLE" = "Về Radar";
 
 /* Label for forward button in media control panel */
 "ACCESSIBILITY_FORWARD_BUTTON_LABEL" = "Chuyển tiếp";
@@ -38,7 +38,7 @@
 "ACCOUNT_DATA_REPORT_CONFIRM_EXPORT_CONFIRM_BUTTON" = "Xuất Báo cáo";
 
 /* Users can request a report of their account data. Before they get their account export, they are warned to only share account data with trustworthy sources. This is the message on that warning. */
-"ACCOUNT_DATA_REPORT_CONFIRM_EXPORT_MESSAGE" = "Chỉ chia sẻ dữ liệu tài khoản Signal của bạn với người hoặc ứng dụng bạn tin tưởng.";
+"ACCOUNT_DATA_REPORT_CONFIRM_EXPORT_MESSAGE" = "Chỉ chia sẻ dữ liệu tài khoản Radar của bạn với người hoặc ứng dụng bạn tin tưởng.";
 
 /* Users can request a report of their account data. If this request fails (probably because of a network connection problem), they will see an error sheet. This is the message on that error. */
 "ACCOUNT_DATA_REPORT_ERROR_MESSAGE" = "Kiểm tra kết nối của bạn và thử lại.";
@@ -62,16 +62,16 @@
 "ACCOUNT_DATA_REPORT_EXPORT_REPORT_BUTTON" = "Xuất Báo cáo";
 
 /* Users can request a report of their account data. This text appears at the bottom of this screen, offering more information. */
-"ACCOUNT_DATA_REPORT_FOOTER" = "Báo cáo của bạn chỉ được tạo ra tại thời điểm bạn chọn xuất báo cáo và không được lưu bởi Signal trên thiết bị của bạn.";
+"ACCOUNT_DATA_REPORT_FOOTER" = "Báo cáo của bạn chỉ được tạo ra tại thời điểm bạn chọn xuất báo cáo và không được lưu bởi Radar trên thiết bị của bạn.";
 
 /* Users can request a report of their account data. This is the subtitle on the screen where they do this, giving them more information. */
-"ACCOUNT_DATA_REPORT_SUBTITLE" = "Tải xuống và xuất báo cáo về dữ liệu tài khoản Signal của bạn. Báo cáo này không bao gồm nội dung tin nhắn hay tệp đa phương tiện nào.";
+"ACCOUNT_DATA_REPORT_SUBTITLE" = "Tải xuống và xuất báo cáo về dữ liệu tài khoản Radar của bạn. Báo cáo này không bao gồm nội dung tin nhắn hay tệp đa phương tiện nào.";
 
 /* Users can request a report of their account data. This is the title on the screen where they do this. */
 "ACCOUNT_DATA_REPORT_TITLE" = "Dữ liệu Tài khoản của bạn";
 
 /* Label for 'invite' button in contact view. */
-"ACTION_INVITE" = "Mời dùng Signal";
+"ACTION_INVITE" = "Mời dùng Radar";
 
 /* Label for button that lets you send a message to a contact. */
 "ACTION_SEND_MESSAGE" = "Gửi Tin nhắn";
@@ -89,7 +89,7 @@
 "ACTION_VIDEO_CALL" = "Gọi video";
 
 /* Label for 'voice call' button in contact view. */
-"ACTION_VOICE_CALL" = "Cuộc gọi Signal";
+"ACTION_VOICE_CALL" = "Cuộc gọi Radar";
 
 /* The title for the 'add group members' view. */
 "ADD_GROUP_MEMBERS_VIEW_TITLE" = "Thêm Thành viên";
@@ -221,16 +221,16 @@
 "APP_EXPIRED_BOTTOM_UPDATE" = "Cập nhật ngay";
 
 /* Default message for the 'app launch failed' alert. */
-"APP_LAUNCH_FAILURE_ALERT_MESSAGE" = "Không thể chạy Signal. Vui lòng gửi nhật kí lỗi đến support@signal.org để chúng tôi có thể xử lí vấn đề này.";
+"APP_LAUNCH_FAILURE_ALERT_MESSAGE" = "Không thể chạy Radar. Vui lòng gửi nhật kí lỗi đến support@radar.chat để chúng tôi có thể xử lí vấn đề này.";
 
 /* Button to try launching the app even though the last launch failed */
-"APP_LAUNCH_FAILURE_CONTINUE" = "Tiếp tục mở Signal";
+"APP_LAUNCH_FAILURE_CONTINUE" = "Tiếp tục mở Radar";
 
 /* Message for an error indicating that the app couldn't launch because some unexpected error happened with the user's registration status. */
-"APP_LAUNCH_FAILURE_CORRUPT_REGISTRATION_MESSAGE" = "Vui lòng gửi nhật ký gỡ lỗi đến support@signal.org để chúng tôi có thể xử lý vấn đề này.";
+"APP_LAUNCH_FAILURE_CORRUPT_REGISTRATION_MESSAGE" = "Vui lòng gửi nhật ký gỡ lỗi đến support@radar.chat để chúng tôi có thể xử lý vấn đề này.";
 
 /* Title for an error indicating that the app couldn't launch because some unexpected error happened with the user's registration status. */
-"APP_LAUNCH_FAILURE_CORRUPT_REGISTRATION_TITLE" = "Không thể mở Signal";
+"APP_LAUNCH_FAILURE_CORRUPT_REGISTRATION_TITLE" = "Không thể mở Radar";
 
 /* Error indicating that the app could not launch because the database could not be loaded. */
 "APP_LAUNCH_FAILURE_COULD_NOT_LOAD_DATABASE" = "Không thể tải cơ sở dữ liệu";
@@ -248,16 +248,16 @@
 "APP_LAUNCH_FAILURE_EXIT_APP_ACTION_TITLE" = "Thoát Signal";
 
 /* Error indicating that the app could not launch without reverting unknown database migrations. */
-"APP_LAUNCH_FAILURE_INVALID_DATABASE_VERSION_MESSAGE" = "Vui lòng cập nhật phiên bản mới nhất của Signal.";
+"APP_LAUNCH_FAILURE_INVALID_DATABASE_VERSION_MESSAGE" = "Vui lòng cập nhật phiên bản mới nhất của Radar.";
 
 /* Error indicating that the app could not launch without reverting unknown database migrations. */
 "APP_LAUNCH_FAILURE_INVALID_DATABASE_VERSION_TITLE" = "Phiên bản cơ sở dữ liệu không xác định.";
 
 /* Error indicating that the app crashed during the previous launch. */
-"APP_LAUNCH_FAILURE_LAST_LAUNCH_CRASHED_MESSAGE" = "Signal gặp vấn đề khi khởi động. Vui lòng gửi nhật ký gỡ lỗi đến support@signal.org để giúp chúng tôi xử lý vấn đề này.";
+"APP_LAUNCH_FAILURE_LAST_LAUNCH_CRASHED_MESSAGE" = "Radar gặp vấn đề khi khởi động. Vui lòng gửi nhật ký gỡ lỗi đến support@radar.chat để giúp chúng tôi xử lý vấn đề này.";
 
 /* Error indicating that the app crashed during the previous launch. */
-"APP_LAUNCH_FAILURE_LAST_LAUNCH_CRASHED_TITLE" = "Không thể mở Signal";
+"APP_LAUNCH_FAILURE_LAST_LAUNCH_CRASHED_TITLE" = "Không thể mở Radar";
 
 /* Message for an error sheet shown when the app cannot launch because the device is out of storage space. Embeds 1:{{ the localized name of the user's device model, e.g. iPhone }}; 2:{{ an amount of storage space as a file size, e.g. 1 GB }}. */
 "APP_LAUNCH_FAILURE_NOT_ENOUGH_STORAGE_SPACE_MESSAGE_FORMAT" = "Signal không thể mở vì %1$@ của bạn đã hết dung lượng lưu trữ. Hãy giải phóng ít nhất %2$@ dung lượng, sau đó mở lại Signal.\nVào Cài đặt iOS > Chung > Dung lượng và gỡ bỏ ứng dụng bạn không dùng, xóa video dung lượng lớn khỏi ứng dụng Ảnh hoặc các ứng dụng khác, và xóa nhạc và tập tin đa phương tiện đã tải xuống.";
@@ -266,7 +266,7 @@
 "APP_LAUNCH_FAILURE_NOT_ENOUGH_STORAGE_SPACE_TITLE" = "Không đủ dung lượng";
 
 /* Error indicating that the app could not restore transferred data. */
-"APP_LAUNCH_FAILURE_RESTORE_FAILED_MESSAGE" = "Dữ liệu từ thiết bị cũ của bạn không thể được khôi phục. Hãy gửi bản ghi chép lỗi đến support@signal.org để chúng tôi có thể khắc phục vấn đề. Nếu bạn cài đặt lại Signal, lịch sử trò chuyện của bạn sẽ không được lưu giữ.";
+"APP_LAUNCH_FAILURE_RESTORE_FAILED_MESSAGE" = "Dữ liệu từ thiết bị cũ của bạn không thể được khôi phục. Hãy gửi bản ghi chép lỗi đến support@radar.chat để chúng tôi có thể khắc phục vấn đề. Nếu bạn cài đặt lại Radar, lịch sử trò chuyện của bạn sẽ không được lưu giữ.";
 
 /* Error indicating that the app could not restore transferred data. */
 "APP_LAUNCH_FAILURE_RESTORE_FAILED_TITLE" = "Không thể Hoàn tất Quá trình chuyển";
@@ -440,7 +440,7 @@
 "ATTACHMENT_KEYBOARD_GIF" = "Ảnh GIF";
 
 /* Text in chat attachment panel when Signal only has access to some photos/videos. This string is in a compact horizontal space, so it should be short if possible. */
-"ATTACHMENT_KEYBOARD_LIMITED_ACCESS" = "Signal chỉ có thể truy cập một số ảnh";
+"ATTACHMENT_KEYBOARD_LIMITED_ACCESS" = "Radar chỉ có thể truy cập một số ảnh";
 
 /* A button to select a location from the Attachment Keyboard */
 "ATTACHMENT_KEYBOARD_LOCATION" = "Vị trí";
@@ -452,7 +452,7 @@
 "ATTACHMENT_KEYBOARD_NO_MEDIA_TITLE" = "Không có Ảnh hoặc Video";
 
 /* Text in chat attachment panel explaining that user needs to give Signal permission to access photos. */
-"ATTACHMENT_KEYBOARD_NO_PHOTO_ACCESS" = "Signal không có quyền truy cập ảnh hay video của bạn. Để cấp quyền truy cập, vào mục Cài đặt và nhấn vào Ảnh";
+"ATTACHMENT_KEYBOARD_NO_PHOTO_ACCESS" = "Radar không có quyền truy cập ảnh hay video của bạn. Để cấp quyền truy cập, vào mục Cài đặt và nhấn vào Ảnh";
 
 /* Button in chat attachment panel to let user open Settings app and give Signal persmission to access photos. */
 "ATTACHMENT_KEYBOARD_OPEN_SETTINGS" = "Mở cài đặt";
@@ -599,7 +599,7 @@
 "BACKUP_ENABLEMENT_REMINDER_MEGAPHONE_ACTION" = "Bật";
 
 /* Body for Backup enablement reminder megaphone */
-"BACKUP_ENABLEMENT_REMINDER_MEGAPHONE_BODY" = "Không bao giờ bị mất tin nhắn khi bạn có điện thoại mới hoặc cài đặt lại Signal.";
+"BACKUP_ENABLEMENT_REMINDER_MEGAPHONE_BODY" = "Không bao giờ bị mất tin nhắn khi bạn có điện thoại mới hoặc cài đặt lại Radar.";
 
 /* Title for Backup enablement reminder megaphone */
 "BACKUP_ENABLEMENT_REMINDER_MEGAPHONE_TITLE" = "Bật sao lưu được mã hóa";
@@ -647,7 +647,7 @@
 "BACKUP_ONBOARDING_CANCEL_SHEET_TITLE" = "Thoát thiết lập?";
 
 /* Body for a sheet warning users to their 'Recovery Key' safe. */
-"BACKUP_ONBOARDING_CONFIRM_KEY_KEEP_KEY_SAFE_SHEET_BODY" = "Signal sẽ không thể giúp bạn khôi phục bản sao lưu nếu bạn để mất mã khóa. Lưu mã khóa ở nơi an toàn và bảo mật, và không chia sẻ với ai khác.";
+"BACKUP_ONBOARDING_CONFIRM_KEY_KEEP_KEY_SAFE_SHEET_BODY" = "Radar sẽ không thể giúp bạn khôi phục bản sao lưu nếu bạn để mất mã khóa. Lưu mã khóa ở nơi an toàn và bảo mật, và không chia sẻ với ai khác.";
 
 /* Title for a sheet warning users to their 'Recovery Key' safe. */
 "BACKUP_ONBOARDING_CONFIRM_KEY_KEEP_KEY_SAFE_SHEET_TITLE" = "Cất giữ an toàn mã khóa";
@@ -674,10 +674,10 @@
 "BACKUP_ONBOARDING_INTRO_NOT_NOW_TOAST" = "Bạn có thể bật sao lưu trong Cài đặt.";
 
 /* Subtitle for a view introducing Backups during an onboarding flow. */
-"BACKUP_ONBOARDING_INTRO_SUBTITLE" = "Sao lưu tin nhắn và tập tin đa phương tiện với dịch vụ lưu trữ bảo mật, được mã hóa đầu cuối của Signal. Không bao giờ bị mất tin nhắn khi bạn có điện thoại mới hoặc cài đặt lại Signal.";
+"BACKUP_ONBOARDING_INTRO_SUBTITLE" = "Sao lưu tin nhắn và tập tin đa phương tiện với dịch vụ lưu trữ bảo mật, được mã hóa đầu cuối của Radar. Không bao giờ bị mất tin nhắn khi bạn có điện thoại mới hoặc cài đặt lại Radar.";
 
 /* Title for a view introducing Backups during an onboarding flow. */
-"BACKUP_ONBOARDING_INTRO_TITLE" = "Sao lưu bảo mật Signal";
+"BACKUP_ONBOARDING_INTRO_TITLE" = "Sao lưu bảo mật Radar";
 
 /* Text for a bullet point in a view introducing the 'Recovery Key' during an onboarding flow. */
 "BACKUP_ONBOARDING_KEY_INTRO_BULLET_1" = "Mã khóa khôi phục của bạn là mã có 64 ký tự bạn cần sử dụng để khôi phục bản sao lưu của mình.";
@@ -695,10 +695,10 @@
 "BACKUP_ONBOARDING_KEY_INTRO_TITLE" = "Mã khóa khôi phục";
 
 /* Body for a sheet shown when your Backup plan is downgraded. */
-"BACKUP_PLAN_DOWNGRADED_SHEET_BODY" = "Gói đăng ký sao lưu đã hết hạn vì chúng tôi không thể gia hạn với phương thức thanh toán của bạn.\n\nBạn có thể đăng ký lại gói để tiếp tục sao lưu tập tin đa phương tiện. Bạn sẽ tiếp tục có quyền truy cập gói Sao lưu Signal miễn phí.";
+"BACKUP_PLAN_DOWNGRADED_SHEET_BODY" = "Gói đăng ký sao lưu đã hết hạn vì chúng tôi không thể gia hạn với phương thức thanh toán của bạn.\n\nBạn có thể đăng ký lại gói để tiếp tục sao lưu tập tin đa phương tiện. Bạn sẽ tiếp tục có quyền truy cập gói Sao lưu Radar miễn phí.";
 
 /* Body for a sheet shown when your Backup plan is downgraded because you stopped using TestFlight. */
-"BACKUP_PLAN_DOWNGRADED_SHEET_BODY_TESTFLIGHT" = "Gói đăng ký sao lưu đã hết hạn vì bạn không còn sử dụng TestFlight.\n\nBạn có thể đăng ký lại gói để tiếp tục sao lưu tập tin đa phương tiện. Bạn sẽ tiếp tục có quyền truy cập gói Sao lưu Signal miễn phí.";
+"BACKUP_PLAN_DOWNGRADED_SHEET_BODY_TESTFLIGHT" = "Gói đăng ký sao lưu đã hết hạn vì bạn không còn sử dụng TestFlight.\n\nBạn có thể đăng ký lại gói để tiếp tục sao lưu tập tin đa phương tiện. Bạn sẽ tiếp tục có quyền truy cập gói Sao lưu Radar miễn phí.";
 
 /* Primary button for a sheet shown when your Backup plan is downgraded. */
 "BACKUP_PLAN_DOWNGRADED_SHEET_PRIMARY_BUTTON" = "Quản lý bản sao lưu";
@@ -770,7 +770,7 @@
 "BACKUP_SAVE_KEY_SAVE_TO_PW_MGR_BUTTON_TITLE" = "Lưu vào công cụ quản lý mật khẩu";
 
 /* Message describing that the Background App Refresh permission is disabled for Signal. \"Background App Refresh\" should be localized the same way it is in iOS Settings app permissions. */
-"BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_MESSAGE" = "Đã tắt tự động sao lưu. Bật tự động sao lưu bằng cách cập nhật quyền của Signal.";
+"BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_MESSAGE" = "Đã tắt tự động sao lưu. Bật tự động sao lưu bằng cách cập nhật quyền của Radar.";
 
 /* Add-on to a message describing that the Background App Refresh permission is disabled for Signal. \"Background App Refresh\" should be localized the same way it is in iOS Settings app permissions. */
 "BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_MESSAGE_UPDATE_NOW" = "Cập nhật ngay";
@@ -779,7 +779,7 @@
 "BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_SHEET_GO_TO_SETTINGS_BUTTON" = "Vào Cài đặt";
 
 /* Message for a sheet warning the user about the Background App Refresh permission. \"Background App Refresh\" should be localized the same way it is in iOS Settings app permissions. */
-"BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_SHEET_MESSAGE" = "Để cho phép Signal tự động sao lưu tin nhắn của bạn, hãy nhấn vào \"Chuyển đến Cài đặt\" dưới đây và bật \"Làm mới ứng dụng nền\"";
+"BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_SHEET_MESSAGE" = "Để cho phép Radar tự động sao lưu tin nhắn của bạn, hãy nhấn vào \"Chuyển đến Cài đặt\" dưới đây và bật \"Làm mới ứng dụng nền\"";
 
 /* Title for a sheet warning the user about the Background App Refresh permission. \"Background App Refresh\" should be localized the same way it is in iOS Settings app permissions. */
 "BACKUP_SETTINGS_BACKGROUND_APP_REFRESH_DISABLED_SHEET_TITLE" = "Đã tắt tự động sao lưu";
@@ -884,7 +884,7 @@
 "BACKUP_SETTINGS_BACKUP_PLAN_PAID_BUT_IAP_NOT_FOUND_LOCALLY_ACTION_BUTTON_TITLE" = "Gia hạn";
 
 /* Text describing that the user's paid backup plan did not correspond to a App Store subscription on this device. */
-"BACKUP_SETTINGS_BACKUP_PLAN_PAID_BUT_IAP_NOT_FOUND_LOCALLY_DESCRIPTION" = "Không tìm thấy gói đăng ký của bạn trên thiết bị này. Gia hạn gói đăng ký Sao lưu Signal để tiếp tục sử dụng.";
+"BACKUP_SETTINGS_BACKUP_PLAN_PAID_BUT_IAP_NOT_FOUND_LOCALLY_DESCRIPTION" = "Không tìm thấy gói đăng ký của bạn trên thiết bị này. Gia hạn gói đăng ký Sao lưu Radar để tiếp tục sử dụng.";
 
 /* Text on the landing page describing that the user's backup plan is paid, but free for them as a tester. */
 "BACKUP_SETTINGS_BACKUP_PLAN_PAID_COMPLIMENTARY_DESCRIPTION" = "Gói sao lưu của bạn là gói trả phí (miễn phí cho người dùng TestFlight)";
@@ -899,16 +899,16 @@
 "BACKUP_SETTINGS_BACKUP_PLAN_PAID_RENEWAL_FORMAT" = "Gia hạn vào ngày %1$@";
 
 /* Footer for a menu section related to settings for when Backups are disabled. */
-"BACKUP_SETTINGS_BACKUPS_DISABLED_SECTION_FOOTER" = "Đã tắt sao lưu và dữ liệu của bạn đã được xóa khỏi dịch vụ lưu trữ bảo mật của Signal.";
+"BACKUP_SETTINGS_BACKUPS_DISABLED_SECTION_FOOTER" = "Đã tắt sao lưu và dữ liệu của bạn đã được xóa khỏi dịch vụ lưu trữ bảo mật của Radar.";
 
 /* Description for a progress view tracking media being downloaded in service of disabling Backups. */
-"BACKUP_SETTINGS_BACKUPS_DISABLING_DOWNLOADING_MEDIA_PROGRESS_VIEW_DESCRIPTION" = "Đã tắt sao lưu, tập tin đa phương tiện không có trên thiết bị này sẽ bắt đầu tải xuống. Khi tải xong, dữ liệu của bạn sẽ được xóa khỏi dịch vụ lưu trữ bảo mật của Signal.";
+"BACKUP_SETTINGS_BACKUPS_DISABLING_DOWNLOADING_MEDIA_PROGRESS_VIEW_DESCRIPTION" = "Đã tắt sao lưu, tập tin đa phương tiện không có trên thiết bị này sẽ bắt đầu tải xuống. Khi tải xong, dữ liệu của bạn sẽ được xóa khỏi dịch vụ lưu trữ bảo mật của Radar.";
 
 /* Message for a view indicating we failed to delete the user's Backup due to an unexpected error. */
 "BACKUP_SETTINGS_BACKUPS_DISABLING_GENERIC_ERROR_MESSAGE" = "Có lỗi xảy ra. Vui lòng liên hệ bộ phận hỗ trợ.";
 
 /* Header for a menu section related to settings for when disabling Backups encountered an unexpected error. */
-"BACKUP_SETTINGS_BACKUPS_DISABLING_GENERIC_ERROR_SECTION_HEADER" = "Đã xảy ra lỗi khi xóa dữ liệu của bạn khỏi dịch vụ lưu trữ bảo mật của Signal.";
+"BACKUP_SETTINGS_BACKUPS_DISABLING_GENERIC_ERROR_SECTION_HEADER" = "Đã xảy ra lỗi khi xóa dữ liệu của bạn khỏi dịch vụ lưu trữ bảo mật của Radar.";
 
 /* Title for a view indicating we failed to delete the user's Backup due to an unexpected error. */
 "BACKUP_SETTINGS_BACKUPS_DISABLING_GENERIC_ERROR_TITLE" = "Không thể xóa bản sao lưu";
@@ -917,7 +917,7 @@
 "BACKUP_SETTINGS_BACKUPS_DISABLING_PROGRESS_VIEW_DESCRIPTION" = "Đang xóa bản sao lưu...";
 
 /* Header for a menu section related to disabling Backups. */
-"BACKUP_SETTINGS_BACKUPS_DISABLING_SECTION_HEADER" = "Đã tắt sao lưu và dữ liệu của bạn sẽ được xóa khỏi dịch vụ lưu trữ bảo mật của Signal.";
+"BACKUP_SETTINGS_BACKUPS_DISABLING_SECTION_HEADER" = "Đã tắt sao lưu và dữ liệu của bạn sẽ được xóa khỏi dịch vụ lưu trữ bảo mật của Radar.";
 
 /* Header for a menu section related to settings for when Backups are enabled. */
 "BACKUP_SETTINGS_BACKUPS_ENABLED_SECTION_HEADER" = "Thông tin bản sao lưu";
@@ -965,13 +965,13 @@
 "BACKUP_SETTINGS_DISABLING_CONFIRMATION_ACTION_SHEET_TITLE" = "Tắt và xóa bản sao lưu?";
 
 /* Message shown in an action sheet when the user disables Backups, explaining that their media is downloading first. */
-"BACKUP_SETTINGS_DISABLING_DOWNLOADS_STARTED_ACTION_SHEET_MESSAGE" = "Bạn có tập tin đa phương tiện trong bản sao lưu không có trên thiết bị này. Bản sao lưu của bạn có thể cần một khoảng thời gian dài để tải, tiếp tục mở Signal để tránh làm gián đoạn.";
+"BACKUP_SETTINGS_DISABLING_DOWNLOADS_STARTED_ACTION_SHEET_MESSAGE" = "Bạn có tập tin đa phương tiện trong bản sao lưu không có trên thiết bị này. Bản sao lưu của bạn có thể cần một khoảng thời gian dài để tải, tiếp tục mở Radar để tránh làm gián đoạn.";
 
 /* Title shown in an action sheet when the user disables Backups, explaining that their media is downloading first. */
 "BACKUP_SETTINGS_DISABLING_DOWNLOADS_STARTED_ACTION_SHEET_TITLE" = "Đang tải bản sao lưu của bạn";
 
 /* Message shown in an action sheet indicating we failed to delete the user's Backup due to an unexpected error. */
-"BACKUP_SETTINGS_DISABLING_ERROR_GENERIC_ERROR_ACTION_SHEET_MESSAGE" = "Đã xảy ra lỗi khi xóa dữ liệu của bạn khỏi dịch vụ lưu trữ bảo mật của Signal.";
+"BACKUP_SETTINGS_DISABLING_ERROR_GENERIC_ERROR_ACTION_SHEET_MESSAGE" = "Đã xảy ra lỗi khi xóa dữ liệu của bạn khỏi dịch vụ lưu trữ bảo mật của Radar.";
 
 /* Title shown in an action sheet indicating we failed to delete the user's Backup due to an unexpected error. */
 "BACKUP_SETTINGS_DISABLING_ERROR_GENERIC_ERROR_ACTION_SHEET_TITLE" = "Không thể xóa bản sao lưu";
@@ -983,7 +983,7 @@
 "BACKUP_SETTINGS_DISABLING_SUBSCRIPTION_CANCEL_ACTION_SHEET_MANAGE_SUBSCRIPTION_BUTTON" = "Quản lý Gói Ủng hộ";
 
 /* Message for an action sheet shown when the user disables Backups, but is still subscribed to the paid plan. */
-"BACKUP_SETTINGS_DISABLING_SUBSCRIPTION_CANCEL_ACTION_SHEET_MESSAGE" = "Nếu bạn muốn hủy gói đăng ký của mình, hãy nhấn Quản lý gói đăng ký > Signal > Hủy gói đăng ký";
+"BACKUP_SETTINGS_DISABLING_SUBSCRIPTION_CANCEL_ACTION_SHEET_MESSAGE" = "Nếu bạn muốn hủy gói đăng ký của mình, hãy nhấn Quản lý gói đăng ký > Radar > Hủy gói đăng ký";
 
 /* Title for an action sheet shown when the user disables Backups, but is still subscribed to the paid plan. */
 "BACKUP_SETTINGS_DISABLING_SUBSCRIPTION_CANCEL_ACTION_SHEET_TITLE" = "Bạn hiện vẫn đăng ký gói sao lưu có trả phí";
@@ -1100,7 +1100,7 @@
 "BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_DOWNLOAD_SHEET_LATER_ACTION" = "Tải xuống sau";
 
 /* Message for an action sheet allowing users to download their offloaded media. */
-"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_DOWNLOAD_SHEET_MESSAGE" = "Bạn có tập tin đa phương tiện trong bản sao lưu không có trên thiết bị này. Quá trình tải xuống có thể mất một thời gian, hãy tiếp tục mở Signal để tránh làm gián đoạn quá trình tải.";
+"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_DOWNLOAD_SHEET_MESSAGE" = "Bạn có tập tin đa phương tiện trong bản sao lưu không có trên thiết bị này. Quá trình tải xuống có thể mất một thời gian, hãy tiếp tục mở Radar để tránh làm gián đoạn quá trình tải.";
 
 /* Action in an action sheet allowing users to download their offloaded media now. */
 "BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_DOWNLOAD_SHEET_NOW_ACTION" = "Tải ngay";
@@ -1127,7 +1127,7 @@
 "BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_TOGGLE_FOOTER_AVAILABLE" = "Các tập tin đa phương tiện cũ hơn sẽ được gỡ khi bạn tạo bản sao lưu tiếp theo, nhưng có thể được tải xuống từ bản sao lưu bất cứ lúc nào.";
 
 /* Footer for a toggle allowing users to change the Optimize Local Storage setting, if the toggle is unavailable. */
-"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_TOGGLE_FOOTER_UNAVAILABLE" = "Tối ưu hóa lưu trữ là tính năng của gói trả phí Sao lưu Signal. Nâng cấp gói sao lưu để bắt đầu sử dụng tính năng này.";
+"BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_TOGGLE_FOOTER_UNAVAILABLE" = "Tối ưu hóa lưu trữ là tính năng của gói trả phí Sao lưu Radar. Nâng cấp gói sao lưu để bắt đầu sử dụng tính năng này.";
 
 /* Title for a toggle allowing users to change the Optimize Local Storage setting. */
 "BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_TOGGLE_TITLE" = "Tối ưu hóa dung lượng của Signal";
@@ -1139,7 +1139,7 @@
 "BACKUP_SETTINGS_OPTIMIZE_LOCAL_STORAGE_UPSELL_TITLE" = "Nâng cấp để bật Tối ưu hóa dung lượng";
 
 /* Subtitle for a notification telling the user they are out of remote storage space. */
-"BACKUP_SETTINGS_OUT_OF_STORAGE_SPACE_NOTIFICATION_SUBTITLE" = "Bạn đã đạt giới hạn dung lượng sao lưu. Giải phóng dung lượng trong Signal để tiếp tục sao lưu cuộc trò chuyện và tập tin đa phương tiện.";
+"BACKUP_SETTINGS_OUT_OF_STORAGE_SPACE_NOTIFICATION_SUBTITLE" = "Bạn đã đạt giới hạn dung lượng sao lưu. Giải phóng dung lượng trong Radar để tiếp tục sao lưu cuộc trò chuyện và tập tin đa phương tiện.";
 
 /* Title for a notification telling the user they are out of remote storage space. */
 "BACKUP_SETTINGS_OUT_OF_STORAGE_SPACE_NOTIFICATION_TITLE" = "Dung lượng sao lưu đầy";
@@ -1178,7 +1178,7 @@
 "BACKUP_SETTINGS_SUBSCRIPTION_ALREADY_REDEEMED_NOTICE_TITLE" = "Không thể nhận gói đăng ký sao lưu của bạn";
 
 /* Body for a sheet explaining that the user's Backups subscription was already redeemed. */
-"BACKUP_SETTINGS_SUBSCRIPTION_ALREADY_REDEEMED_SHEET_BODY" = "Có quá nhiều thiết bị cố gắng nhận gói đăng ký của bạn trong tháng này.\n\nCó thể bạn đã đăng ký lại tài khoản Signal quá nhiều lần, hoặc có quá nhiều thiết bị sử dụng cùng gói đăng ký.";
+"BACKUP_SETTINGS_SUBSCRIPTION_ALREADY_REDEEMED_SHEET_BODY" = "Có quá nhiều thiết bị cố gắng nhận gói đăng ký của bạn trong tháng này.\n\nCó thể bạn đã đăng ký lại tài khoản Radar quá nhiều lần, hoặc có quá nhiều thiết bị sử dụng cùng gói đăng ký.";
 
 /* Button for a sheet explaining that the user's Backups subscription was already redeemed. */
 "BACKUP_SETTINGS_SUBSCRIPTION_ALREADY_REDEEMED_SHEET_GOT_IT_BUTTON" = "Đã hiểu";
@@ -1199,7 +1199,7 @@
 "BACKUP_SETTINGS_UPLOAD_PROGRESS_SUBTITLE_PAUSED_NEEDS_WIFI" = "Đã tạm ngừng tải lên: chờ kết nối Wi-Fi";
 
 /* Subtitle for a progress bar tracking uploads that are paused because the user is out of remote storage space. Embeds 1:{{ total storage space provided, e.g. 100 GB }}; 2:{{ space the user needs to free up by deleting media, e.g. 1 GB }}. */
-"BACKUP_SETTINGS_UPLOAD_PROGRESS_SUBTITLE_PAUSED_OUT_OF_STORAGE_SPACE_FORMAT" = "Bạn đã đạt %1$@ giới hạn dung lượng có trong gói sao lưu. Để sao lưu cuộc trò chuyện và tập tin đa phương tiện mới, hãy giải phóng %2$@ dung lượng trong Signal rồi nhấn \"Sao lưu ngay\".";
+"BACKUP_SETTINGS_UPLOAD_PROGRESS_SUBTITLE_PAUSED_OUT_OF_STORAGE_SPACE_FORMAT" = "Bạn đã đạt %1$@ giới hạn dung lượng có trong gói sao lưu. Để sao lưu cuộc trò chuyện và tập tin đa phương tiện mới, hãy giải phóng %2$@ dung lượng trong Radar rồi nhấn \"Sao lưu ngay\".";
 
 /* Subtitle for a progress bar tracking active uploading. Embeds 1:{{ the amount uploaded as a file size, e.g. 100 MB }}; 2:{{ the total amount to upload as a file size, e.g. 1 GB }}; 3:{{ the percentage uploaded as a percent, e.g. 40% }}. */
 "BACKUP_SETTINGS_UPLOAD_PROGRESS_SUBTITLE_RUNNING" = "Đang tải lên %1$@ trên tổng số %2$@ (%3$@)";
@@ -1211,7 +1211,7 @@
 "BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_BUTTON_TITLE" = "Sao lưu Ngay";
 
 /* Message for a sheet shown after the user enables backups. */
-"BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_MESSAGE" = "Quá trình có thể mất một lúc. Bạn có thể sử dụng Signal bình thường trong thời gian sao lưu.";
+"BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_MESSAGE" = "Quá trình có thể mất một lúc. Bạn có thể sử dụng Radar bình thường trong thời gian sao lưu.";
 
 /* Footer for a toggle shown after the user enables backups, letting them enable the Optimize Storage feature. */
 "BACKUP_SETTINGS_WELCOME_TO_BACKUPS_SHEET_OPTIMIZE_MEDIA_TOGGLE_FOOTER" = "Các tập tin đa phương tiện cũ hơn sẽ được gỡ khi bạn tạo bản sao lưu tiếp theo, nhưng có thể được tải xuống từ bản sao lưu bất cứ lúc nào.";
@@ -1238,7 +1238,7 @@
 "BACKUP_SUBSCRIPTION_EXPIRING_SOON_PENDING_DOWNLOADS_HERO_SHEET_SECONDARY_BUTTON" = "Không tải bản sao lưu";
 
 /* Message for a sheet shown when your Backup subscription fails to renew. */
-"BACKUP_SUBSCRIPTION_FAILED_TO_RENEW_SHEET_MESSAGE" = "Kiểm tra để đảm bảo rằng phương thức thanh toán của bạn đã được cập nhật thông tin mới nhất. Nhấn vào Quản lý gói đăng ký > Signal > Cập nhật phương thức thanh toán.";
+"BACKUP_SUBSCRIPTION_FAILED_TO_RENEW_SHEET_MESSAGE" = "Kiểm tra để đảm bảo rằng phương thức thanh toán của bạn đã được cập nhật thông tin mới nhất. Nhấn vào Quản lý gói đăng ký > Radar > Cập nhật phương thức thanh toán.";
 
 /* Primary button for a sheet shown when your Backup subscription fails to renew. */
 "BACKUP_SUBSCRIPTION_FAILED_TO_RENEW_SHEET_PRIMARY_BUTTON" = "Quản lý Gói Ủng hộ";
@@ -1319,10 +1319,10 @@
 "BADGE_DETAILS_DONATE_TO_SIGNAL" = "Ủng Hộ Ngay";
 
 /* When viewing someone else's donor badge, you'll see a sheet. This is the title on that sheet. Embeds {badge owner's short name} */
-"BADGE_DETAILS_TITLE_FOR_SUPPORTER" = "%1$@ ủng hộ Signal";
+"BADGE_DETAILS_TITLE_FOR_SUPPORTER" = "%1$@ ủng hộ Radar";
 
 /* String explaining to the user that their boost badge has expired on the badge expiry sheet. */
-"BADGE_EXPIRED_BOOST_BODY" = "Huy hiệu Nhà Ủng hộ của bạn đã hết hạn và không còn hiển thị trên hồ sơ.\n\nBạn có thể tiếp tục sử dụng Signal nhưng để hỗ trợ cho nền tảng công nghệ được xây dựng cho bạn, hãy cân nhắc việc ủng hộ hàng tháng cho Signal.";
+"BADGE_EXPIRED_BOOST_BODY" = "Huy hiệu Nhà Ủng hộ của bạn đã hết hạn và không còn hiển thị trên hồ sơ.\n\nBạn có thể tiếp tục sử dụng Radar nhưng để hỗ trợ cho nền tảng công nghệ được xây dựng cho bạn, hãy cân nhắc việc ủng hộ hàng tháng cho Radar.";
 
 /* String explaining to the user that their boost badge has expired while they are a current subscription sustainer on the badge expiry sheet. */
 "BADGE_EXPIRED_BOOST_CURRENT_SUSTAINER_BODY" = "Huy hiệu Nhà Ủng hộ của bạn đã hết hạn và không còn hiển thị trên hồ sơ.\n\nBạn có thể tái kích hoạt huy hiệu Nhà Ủng hộ của mình trong 30 ngày chỉ với khoản ủng hộ một lần.";
@@ -1367,7 +1367,7 @@
 "BANK_DONATION_FOOTER_FIND_ACCOUNT_INFO" = "Tìm thông tin tài khoản";
 
 /* On the bank transfer donation screen, a small amount of information text is shown. This is that text. It should (1) instruct users to enter their bank information (2) tell them that Signal does not collect or store their personal information. */
-"BANK_DONATION_SUBHEADER_TEXT" = "Nhập thông tin ngân hàng của bạn. Signal không thu thập hay lưu trữ thông tin cá nhân của bạn.";
+"BANK_DONATION_SUBHEADER_TEXT" = "Nhập thông tin ngân hàng của bạn. Radar không thu thập hay lưu trữ thông tin cá nhân của bạn.";
 
 /* Users can donate to Signal with a bank account. We are required to show them a mandate with information about bank transfers. This is a label for a button to agree to the mandate. */
 "BANK_MANDATE_AGREE" = "Đồng ý";
@@ -1376,7 +1376,7 @@
 "BANK_MANDATE_READ_MORE" = "Đọc Thêm";
 
 /* Users can donate to Signal with a bank account. We are required to show them a mandate with information about bank transfers. This is a subtitle about the payment processor Stripe above that mandate. */
-"BANK_MANDATE_SUBTITLE" = "Stripe là đơn vị xử lý các khoản ủng hộ bạn gửi cho Signal. Signal không thu thập hay lưu trữ thông tin cá nhân của bạn.";
+"BANK_MANDATE_SUBTITLE" = "Stripe là đơn vị xử lý các khoản ủng hộ bạn gửi cho Radar. Radar không thu thập hay lưu trữ thông tin cá nhân của bạn.";
 
 /* Users can donate to Signal with a bank account. We are required to show them a mandate with information about bank transfers. This is the title above that mandate. */
 "BANK_MANDATE_TITLE" = "Chuyển khoản Ngân hàng";
@@ -1541,7 +1541,7 @@
 "CALL_AUDIO_MISSED_WEEK_NOTIFICATION_BODY_FORMAT" = "📞 Cuộc gọi thoại nhỡ vào %1$@";
 
 /* Alert message when calling and permissions for microphone are missing */
-"CALL_AUDIO_PERMISSION_MESSAGE" = "Hãy bật quyền truy cập micro trong Cài đặt iOS để gọi và ghi tin nhắn thoại với Signal.";
+"CALL_AUDIO_PERMISSION_MESSAGE" = "Hãy bật quyền truy cập micro trong Cài đặt iOS để gọi và ghi tin nhắn thoại với Radar.";
 
 /* Alert title when calling and permissions for microphone are missing */
 "CALL_AUDIO_PERMISSION_TITLE" = "Cần Quyền truy cập Micro";
@@ -1610,7 +1610,7 @@
 "CALL_LINK_JOIN_REQUEST_PROMPT" = "Muốn tham gia…";
 
 /* Shown in a message bubble when you send a call link in a Signal chat */
-"CALL_LINK_LINK_PREVIEW_DESCRIPTION" = "Sử dụng đường dẫn này để tham gia cuộc gọi Signal";
+"CALL_LINK_LINK_PREVIEW_DESCRIPTION" = "Sử dụng đường dẫn này để tham gia cuộc gọi Radar";
 
 /* Text that appears on a toast in a call lobby before joining a call link informing the user what information will be shared with other call members when they have phone number sharing turned off. */
 "CALL_LINK_LOBBY_SHARING_INFO_PHONE_NUMBER_SHARING_OFF" = "Bất kỳ ai tham gia cuộc gọi này qua đường dẫn sẽ thấy tên và ảnh của bạn.";
@@ -1634,7 +1634,7 @@
 "CALL_LINK_REQUIRE_APPROVAL" = "Cần quản trị viên chấp duyệt";
 
 /* Button to open UI to share a Call Link with someone on Signal. */
-"CALL_LINK_SHARE_VIA_SIGNAL" = "Chia sẻ đường dẫn qua Signal";
+"CALL_LINK_SHARE_VIA_SIGNAL" = "Chia sẻ đường dẫn qua Radar";
 
 /* Button to open the system share sheet to share a Call Link. */
 "CALL_LINK_SHARE_VIA_SYSTEM" = "Chia sẻ Đường dẫn";
@@ -1820,10 +1820,10 @@
 "CALLING_MEMBER_VIEW_YOUR_CAMERA_IS_OFF" = "Camera của bạn đang tắt";
 
 /* The generic name used for calls if CallKit privacy is enabled */
-"CALLKIT_ANONYMOUS_CONTACT_NAME" = "Người dùng Signal";
+"CALLKIT_ANONYMOUS_CONTACT_NAME" = "Người dùng Radar";
 
 /* The generic name used for group calls if CallKit privacy is enabled */
-"CALLKIT_ANONYMOUS_GROUP_NAME" = "Nhóm Signal";
+"CALLKIT_ANONYMOUS_GROUP_NAME" = "Nhóm Radar";
 
 /* Title for the calls list view. */
 "CALLS_LIST_TITLE" = "Cuộc gọi";
@@ -2000,7 +2000,7 @@
 "CARD_DONATION_EXPIRATION_DATE_PLACEHOLDER" = "MM/YY";
 
 /* Users can choose to learn more about their credit/debit card donations, which will open a sheet with additional information. This is the body text of that sheet. */
-"CARD_DONATION_READ_MORE_SHEET_BODY" = "Signal không thu thập hay lưu trữ thông tin cá nhân của bạn khi bạn gửi khoản ủng hộ.\n\nChúng tôi sử dụng Stripe làm hệ thống xử lý thanh toán để nhận các khoản ủng hộ. Chúng tôi không truy cập, lưu trữ, hoặc lưu bất kỳ thông tin nào bạn cung cấp cho phía hệ thống.\n\nSignal không và không thể liên kết thông tin thanh toán với tài khoản Signal của bạn.\n\nCảm ơn sự đóng góp của bạn!";
+"CARD_DONATION_READ_MORE_SHEET_BODY" = "Radar không thu thập hay lưu trữ thông tin cá nhân của bạn khi bạn gửi khoản ủng hộ.\n\nChúng tôi sử dụng Stripe làm hệ thống xử lý thanh toán để nhận các khoản ủng hộ. Chúng tôi không truy cập, lưu trữ, hoặc lưu bất kỳ thông tin nào bạn cung cấp cho phía hệ thống.\n\nSignal không và không thể liên kết thông tin thanh toán với tài khoản Radar của bạn.\n\nCảm ơn sự đóng góp của bạn!";
 
 /* Users can choose to learn more about their credit/debit card donations, which will open a sheet with additional information. This is the title of that sheet. */
 "CARD_DONATION_READ_MORE_SHEET_TITLE" = "Thông tin của bạn là riêng tư";
@@ -2009,7 +2009,7 @@
 "CARD_DONATION_SUBHEADER_LEARN_MORE" = "Tìm hiểu thêm.";
 
 /* On the credit/debit card donation screen, a small amount of information text is shown. This is that text. It should (1) instruct users to enter their credit/debit card information (2) tell them that Signal does not collect or store their personal information. */
-"CARD_DONATION_SUBHEADER_TEXT" = "Nhập thông tin thẻ của bạn. Signal không thu thập hay lưu trữ thông tin cá nhân của bạn.";
+"CARD_DONATION_SUBHEADER_TEXT" = "Nhập thông tin thẻ của bạn. Radar không thu thập hay lưu trữ thông tin cá nhân của bạn.";
 
 /* Title for the 'censorship circumvention country' view. */
 "CENSORSHIP_CIRCUMVENTION_COUNTRY_VIEW_TITLE" = "Chọn Quốc gia";
@@ -2234,7 +2234,7 @@
 "CHOOSE_BACKUP_PLAN_SUBSCRIBE_PAID_BUTTON_TEXT" = "Đăng ký gói với giá %1$@/tháng";
 
 /* Subtitle for a view allowing users to choose a Backup plan. */
-"CHOOSE_BACKUP_PLAN_SUBTITLE" = "Các bản sao lưu được mã hóa đầu cuối. Signal là một tổ chức phi lợi nhuận. Việc chi trả cho cơ chế sao lưu góp phần hỗ trợ chúng tôi.";
+"CHOOSE_BACKUP_PLAN_SUBTITLE" = "Các bản sao lưu được mã hóa đầu cuối. Signal là một tổ chức phi lợi nhuận. Việc chi trả cho cơ chế sao lưu góp phần hỗ trợ Signal.";
 
 /* Title for a view allowing users to choose a Backup plan. */
 "CHOOSE_BACKUP_PLAN_TITLE" = "Chọn gói sao lưu";
@@ -2264,7 +2264,7 @@
 "COMPARE_SAFETY_NUMBER_ACTION" = "So sánh với Bộ nhớ đệm";
 
 /* Accessibility hint describing what you can do with the compose button */
-"COMPOSE_BUTTON_HINT" = "Chọn hoặc tìm người dùng Signal để bắt đầu trò chuyện.";
+"COMPOSE_BUTTON_HINT" = "Chọn hoặc tìm người dùng Radar để bắt đầu trò chuyện.";
 
 /* Accessibility label from compose button. */
 "COMPOSE_BUTTON_LABEL" = "Soạn thảo";
@@ -2291,13 +2291,13 @@
 "COMPOSE_SCREEN_LIMITED_CONTACTS_CTA" = "Quản lý";
 
 /* Multi-line label explaining why compose-screen contact picker is empty. */
-"COMPOSE_SCREEN_LIMITED_CONTACTS_PERMISSION" = "Signal có quyền truy cập hạn chế vào danh bạ của thiết bị";
+"COMPOSE_SCREEN_LIMITED_CONTACTS_PERMISSION" = "Radar có quyền truy cập hạn chế vào danh bạ của thiết bị";
 
 /* Button to open settings from an empty compose-screen contact picker. */
 "COMPOSE_SCREEN_MISSING_CONTACTS_CTA" = "Mở cài đặt";
 
 /* Multi-line label explaining why compose-screen contact picker is empty. */
-"COMPOSE_SCREEN_MISSING_CONTACTS_PERMISSION" = "Bạn có thể cấp quyền truy cập danh bạ trong Cài đặt iOS để thấy những liên hệ nào đang dùng Signal.";
+"COMPOSE_SCREEN_MISSING_CONTACTS_PERMISSION" = "Bạn có thể cấp quyền truy cập danh bạ trong Cài đặt iOS để thấy những liên hệ nào đang dùng Radar.";
 
 /* Configure reactions title text */
 "CONFIGURE_REACTIONS" = "Điều chỉnh Bày tỏ cảm xúc";
@@ -2339,10 +2339,10 @@
 "CONTACT_ABOUT_SHEET_PROFILE_NAMES_EDUCATION" = "Tên hồ sơ chưa được xác minh";
 
 /* Message for a tooltip that appears above a parenthesized name for another user, indicating that that name is the name the other user set for themself. Embeds {{name}} */
-"CONTACT_ABOUT_SHEET_SECONDARY_NAME_TOOLTIP_MESSAGE" = "“%1$@” là tên hồ sơ người này đặt cho chính mình trong Signal.";
+"CONTACT_ABOUT_SHEET_SECONDARY_NAME_TOOLTIP_MESSAGE" = "“%1$@” là tên hồ sơ người này đặt cho chính mình trong Radar.";
 
 /* A label indicating a user is a signal connection. */
-"CONTACT_ABOUT_SHEET_SIGNAL_CONNECTION_LABEL" = "Liên hệ Signal";
+"CONTACT_ABOUT_SHEET_SIGNAL_CONNECTION_LABEL" = "Liên hệ Radar";
 
 /* The title for a contact 'about' sheet. */
 "CONTACT_ABOUT_SHEET_TITLE" = "Thông tin";
@@ -2390,7 +2390,7 @@
 "CONTACT_NOTE_TITLE" = "Ghi chú";
 
 /* Body for contact permission action sheet */
-"CONTACT_PERMISSION_ACTION_SHEET_2_BODY" = "Để tìm người bạn biết trên Signal:";
+"CONTACT_PERMISSION_ACTION_SHEET_2_BODY" = "Để tìm người bạn biết trên Radar:";
 
 /* First step for contact permission action sheet */
 "CONTACT_PERMISSION_ACTION_SHEET_2_STEP_ONE" = "Nhấn \"Mở Cài đặt\" ở dưới";
@@ -2423,10 +2423,10 @@
 "CONTACT_PERMISSION_REMINDER_MEGAPHONE_ACTION" = "Cho phép Truy cập";
 
 /* Body for contact permission reminder megaphone */
-"CONTACT_PERMISSION_REMINDER_MEGAPHONE_BODY" = "Cho phép truy cập danh bạ của bạn để nhanh chóng tìm được các liên hệ trên Signal.";
+"CONTACT_PERMISSION_REMINDER_MEGAPHONE_BODY" = "Cho phép truy cập danh bạ của bạn để nhanh chóng tìm được các liên hệ trên Radar.";
 
 /* Title for contact permission reminder megaphone */
-"CONTACT_PERMISSION_REMINDER_MEGAPHONE_TITLE" = "Tìm liên hệ trên Signal";
+"CONTACT_PERMISSION_REMINDER_MEGAPHONE_TITLE" = "Tìm liên hệ trên Radar";
 
 /* Label for a contact's phone number. */
 "CONTACT_PHONE" = "Số điện thoại";
@@ -2480,7 +2480,7 @@
 "CONTACT_SHARE_SIGNAL_ACCOUNT_NOTICE_FORMAT" = "Bất kỳ ai được bạn chia sẻ hồ sơ này đều có thể nhắn tin cho %1$@ trên Signal.";
 
 /* Alert body when contacts disabled while trying to share a contact. */
-"CONTACT_SHARING_NO_ACCESS_BODY" = "Signal cần quyền truy cập vào danh bạ của bạn. Vào Cài đặt iOS và bật mục danh bạ. Danh bạ của bạn được mã hóa và Signal không thể truy cập được.";
+"CONTACT_SHARING_NO_ACCESS_BODY" = "Radar cần quyền truy cập vào danh bạ của bạn. Vào Cài đặt iOS và bật mục danh bạ. Danh bạ của bạn được mã hóa và Radar không thể truy cập được.";
 
 /* Alert title when contacts disabled while trying to share a contact. */
 "CONTACT_SHARING_NO_ACCESS_TITLE" = "Cho phép Truy cập Danh bạ";
@@ -2534,7 +2534,7 @@
 "CONTACT_SUPPORT_FILTER_SOMETHING_NOT_WORKING_SHORT" = "Có điều gì đó đang không hoạt động";
 
 /* Alert body */
-"CONTACT_SUPPORT_PROMPT_ERROR_ALERT_BODY" = "Signal không thể hoàn thành yêu cầu hỗ trợ của bạn. ";
+"CONTACT_SUPPORT_PROMPT_ERROR_ALERT_BODY" = "Radar không thể hoàn thành yêu cầu hỗ trợ của bạn. ";
 
 /* Alert body */
 "CONTACT_SUPPORT_PROMPT_TO_INCLUDE_DEBUG_LOG_MESSAGE" = "Ghi chú lỗi của bạn sẽ giúp chúng tôi khắc phục sự cố nhanh hơn. Gửi các ghi chú này là không bắt buộc.";
@@ -2654,7 +2654,7 @@
 "CONVERSATION_SETTINGS_ATTRIBUTES_ACCESS_SECTION_FOOTER_V2" = "Chọn ai có thể chỉnh sửa tên nhóm, ảnh, miêu tả, và đồng hồ đếm tin nhắn tự xóa và tin nhắn ghim.";
 
 /* Footer string for a contact's badges in conversation settings */
-"CONVERSATION_SETTINGS_BADGES_FOOTER" = "Hãy thu thập nhiều huy hiệu đính trên hồ sơ của bạn bằng cách hổ trở cho Signal. Bấm vào \"huy hiệu\" để biết thêm chi tiết.";
+"CONVERSATION_SETTINGS_BADGES_FOOTER" = "Hãy thu thập nhiều huy hiệu đính trên hồ sơ của bạn bằng cách hổ trở cho Radar. Bấm vào \"huy hiệu\" để biết thêm chi tiết.";
 
 /* Header title for a contact's badges in conversation settings */
 "CONVERSATION_SETTINGS_BADGES_HEADER" = "Huy hiệu";
@@ -2963,7 +2963,7 @@
 "DATABASE_RECOVERY_MORE_STORAGE_SPACE_NEEDED_TITLE" = "Cần thêm Dung lượng Lưu trữ";
 
 /* The user has tried to recover their data after it was lost due to corruption. (They have not been hacked.) This is the description on the screen where we show an error message. */
-"DATABASE_RECOVERY_RECOVERY_FAILED_DESCRIPTION" = "Không thể khôi phục lịch sử tin nhắn. Bạn có thể tiếp tục sử dụng Signal sau khi cài đặt lại. Gửi nhật ký gỡ lỗi để chúng tôi có thể hiểu hơn vấn đề đã xảy ra.";
+"DATABASE_RECOVERY_RECOVERY_FAILED_DESCRIPTION" = "Không thể khôi phục lịch sử tin nhắn. Bạn có thể tiếp tục sử dụng Radar sau khi cài đặt lại. Gửi nhật ký gỡ lỗi để chúng tôi có thể hiểu hơn vấn đề đã xảy ra.";
 
 /* The user has tried to recover their data after it was lost due to corruption. (They have not been hacked.) This button lets them delete all of their data. */
 "DATABASE_RECOVERY_RECOVERY_FAILED_RESET_APP_BUTTON" = "Không Khôi phục được Dữ liệu";
@@ -2975,7 +2975,7 @@
 "DATABASE_RECOVERY_RECOVERY_FAILED_RESET_APP_CONFIRMATION_DESCRIPTION" = "Thông tin tài khoản của bạn, hồ sơ, và tất cả tin nhắn của bạn sẽ được xóa. Ứng dụng sẽ đóng sau khi quá trình này hoàn tất.";
 
 /* The user has tried to recover their data after it was lost due to corruption. (They have not been hacked.) If they want to delete the app and restart, they will be presented with a confirmation dialog. This is the title of that dialog. */
-"DATABASE_RECOVERY_RECOVERY_FAILED_RESET_APP_CONFIRMATION_TITLE" = "Đặt lại Signal";
+"DATABASE_RECOVERY_RECOVERY_FAILED_RESET_APP_CONFIRMATION_TITLE" = "Đặt lại Radar";
 
 /* The user has tried to recover their data after it was lost due to corruption. (They have not been hacked.) They were asked to submit a debug log. This is the button that submits this log. */
 "DATABASE_RECOVERY_RECOVERY_FAILED_SUBMIT_DEBUG_LOG_BUTTON" = "Gửi Nhật ký Gỡ lỗi";
@@ -3059,7 +3059,7 @@
 "DELETE_ACCOUNT_CONFIRMATION_ACTION_SHEEET_ACTION" = "Xóa Tài khoản";
 
 /* Title for the action sheet message of the 'delete account confirmation' view controller. */
-"DELETE_ACCOUNT_CONFIRMATION_ACTION_SHEEET_MESSAGE" = "Việc này sẽ xóa tài khoản Signal của bạn và đặt lại ứng dụng. Ứng dụng sẽ đóng sau khi quá trình này hoàn tất.";
+"DELETE_ACCOUNT_CONFIRMATION_ACTION_SHEEET_MESSAGE" = "Việc này sẽ xóa tài khoản Radar của bạn và đặt lại ứng dụng. Ứng dụng sẽ đóng sau khi quá trình này hoàn tất.";
 
 /* Title for the action sheet confirmation title of the 'delete account confirmation' view controller. */
 "DELETE_ACCOUNT_CONFIRMATION_ACTION_SHEEET_TITLE" = "Bạn có chắc muốn xóa tài khoản?";
@@ -3083,7 +3083,7 @@
 "DELETE_ACCOUNT_CONFIRMATION_PHONE_NUMBER_TITLE" = "Số điện thoại";
 
 /* Section header */
-"DELETE_ACCOUNT_CONFIRMATION_SECTION_TITLE" = "Xác minh Số Signal của bạn";
+"DELETE_ACCOUNT_CONFIRMATION_SECTION_TITLE" = "Xác minh Số Radar của bạn";
 
 /* Title for the 'delete account' confirmation view. */
 "DELETE_ACCOUNT_CONFIRMATION_TITLE" = "Xóa Tài khoản";
@@ -3129,9 +3129,13 @@
 
 /* Label indicating a user who deleted their account. */
 "DELETED_USER" = "Tài khoản đã xóa";
+"DEPOSIT_RECEIVED_DEPOSIT_MORE" = "Deposit more Funds";
+"DEPOSIT_RECEIVED_SATS_LABEL" = "sats";
+"DEPOSIT_RECEIVED_SUBTITLE" = "You can now start sending payments on Radar";
+"DEPOSIT_RECEIVED_TITLE" = "Deposit Received";
 
 /* Notification warning the user that they have been de-registered. */
-"DEREGISTRATION_NOTIFICATION" = "Bạn đã đăng xuất khỏi Signal trên thiết bị này.";
+"DEREGISTRATION_NOTIFICATION" = "Bạn đã đăng xuất khỏi Radar trên thiết bị này.";
 
 /* Button that lets users re-register using the same phone number. */
 "DEREGISTRATION_REREGISTER_BUTTON" = "Đăng ký lại";
@@ -3140,7 +3144,7 @@
 "DEREGISTRATION_REREGISTER_PROMPT_TITLE" = "Đăng ký lại số điện thoại này?";
 
 /* Label warning the user that they have been de-registered. */
-"DEREGISTRATION_WARNING" = "Thiết bị này không còn được đăng ký. Nguyên nhân có thể là do bạn đăng ký số điện thoại của bạn với Signal trên một thiết bị khác.";
+"DEREGISTRATION_WARNING" = "Thiết bị này không còn được đăng ký. Nguyên nhân có thể là do bạn đăng ký số điện thoại của bạn với Radar trên một thiết bị khác.";
 
 /* If the user has been deregistered, they'll see a warning. This is This is the call to action on that warning. */
 "DEREGISTRATION_WARNING_ACTION_TITLE" = "Đăng ký lại Thiết bị";
@@ -3203,7 +3207,7 @@
 "DEVICE_TRANSFER_CHOICE_TRANSFER_LINKED_TITLE" = "Chuyển từ iPad khác";
 
 /* An error indicating that the other device closed signal mid-transfer and it could not complete */
-"DEVICE_TRANSFER_ERROR_BACKGROUNDED" = "Quá trình chuyển không thể hoàn tất. Hãy đảm bảo cả hai thiết bị đều có Signal đang hoạt động và thử lại.";
+"DEVICE_TRANSFER_ERROR_BACKGROUNDED" = "Quá trình chuyển không thể hoàn tất. Hãy đảm bảo cả hai thiết bị đều có Radar đang hoạt động và thử lại.";
 
 /* An error indicating that something went wrong with the transfer and it could not complete */
 "DEVICE_TRANSFER_ERROR_GENERIC" = "Quá trình chuyển không thể hoàn tất. Hãy đảm bảo các thiết bị của bạn đang ở gần nhau và thử lại.";
@@ -3212,7 +3216,7 @@
 "DEVICE_TRANSFER_ERROR_NOT_ENOUGH_SPACE" = "Không đủ dung lượng để hoàn tất quá trình chuyển";
 
 /* An error indicating the user must update their device before trying to transfer. */
-"DEVICE_TRANSFER_ERROR_UNSUPPORTED_VERSION" = "Cập nhật phiên bản mới nhất của Signal và thử lại";
+"DEVICE_TRANSFER_ERROR_UNSUPPORTED_VERSION" = "Cập nhật phiên bản mới nhất của Radar và thử lại";
 
 /* Body of the device transfer screen for pairing a new device, from the new device */
 "DEVICE_TRANSFER_PAIR_NEW_DEVICE_MESSAGE" = "Để chuyển tài khoản, ghép nối thiết bị này với thiết bị cũ của bạn";
@@ -3227,7 +3231,7 @@
 "DEVICE_TRANSFER_PAIR_OLD_DEVICE_TITLE" = "Ghép nối với thiết bị cũ của bạn";
 
 /* The explanation on the view that shows receiving progress */
-"DEVICE_TRANSFER_RECEIVING_EXPLANATION" = "Để cả hai thiết bị gần nhau. Đừng tắt nguồn thiết bị nào và để mở ứng dụng Signal. Quá trình chuyển dữ liệu được bảo mật hai chiều.";
+"DEVICE_TRANSFER_RECEIVING_EXPLANATION" = "Để cả hai thiết bị gần nhau. Đừng tắt nguồn thiết bị nào và để mở ứng dụng Radar. Quá trình chuyển dữ liệu được bảo mật hai chiều.";
 
 /* The title on the view that shows receiving progress */
 "DEVICE_TRANSFER_RECEIVING_TITLE" = "Đang nhận dữ liệu";
@@ -3263,7 +3267,7 @@
 "DEVICE_TRANSFER_STATUS_NEW_DEVICE_TRANSFERRING" = "Đang chuyển";
 
 /* Description in the progress view displayed during device transfer. */
-"DEVICE_TRANSFER_STATUS_NEW_DEVICE_TRANSFERRING_DESCRIPTION" = "Giữ cả hai thiết bị ở gần nhau. Không tắt bất kỳ thiết bị nào và không đóng Signal. Quá trình chuyển được mã hóa đầu cuối.";
+"DEVICE_TRANSFER_STATUS_NEW_DEVICE_TRANSFERRING_DESCRIPTION" = "Giữ cả hai thiết bị ở gần nhau. Không tắt bất kỳ thiết bị nào và không đóng Radar. Quá trình chuyển được mã hóa đầu cuối.";
 
 /* Status message on old device when cancelling transfer. */
 "DEVICE_TRANSFER_STATUS_OLD_DEVICE_CANCELLING" = "Đang hủy kết nối đến iPhone mới…";
@@ -3392,13 +3396,13 @@
 "DONATE_CHOOSE_PAYMENT_METHOD_SHEET_SUBTITLE_FOR_ONE_TIME_DONATION" = "Sử dụng huy hiệu %1$@ trong 30 ngày";
 
 /* When users make donations on a friend's behalf, they see a sheet that lets them pick a payment method. This is the title on that sheet. Embeds {{amount of money}}, such as \"$5\". */
-"DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_DONATION_ON_BEHALF_OF_A_FRIEND" = "Khoản ủng hộ %1$@ cho Signal";
+"DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_DONATION_ON_BEHALF_OF_A_FRIEND" = "Khoản ủng hộ %1$@ cho Radar";
 
 /* When users make monthly donations, they see a sheet that lets them pick a payment method. This is the title on that sheet. Embeds {{amount of money per month}}, such as \"$5/month\". */
-"DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_MONTHLY_DONATION" = "Ủng hộ %1$@ cho Signal";
+"DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_MONTHLY_DONATION" = "Ủng hộ %1$@ cho Radar";
 
 /* When users make one-time donations, they see a sheet that lets them pick a payment method. This is the title on that sheet. Embeds {{amount of money}}, such as \"$5\". */
-"DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_ONE_TIME_DONATION" = "Ủng hộ %1$@ cho Signal";
+"DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_ONE_TIME_DONATION" = "Ủng hộ %1$@ cho Radar";
 
 /* Users can donate on a friend's behalf and can optionally add a message. This is tells users about that optional message. */
 "DONATE_ON_BEHALF_OF_A_FRIEND_ADDITIONAL_MESSAGE_INFO" = "Người nhận sẽ được thông báo về khoản ủng hộ trong một tin nhắn trực tiếp. Thêm tin nhắn của bạn vào dưới đây.";
@@ -3512,7 +3516,7 @@
 "DONATION_ON_BEHALF_OF_A_FRIEND_BADGE_REDEEMED" = "Đã nhận";
 
 /* Users can donate on behalf of a friend, and the friend will receive a badge. This is a short paragraph on the screen where users choose the badge their friend will receive. */
-"DONATION_ON_BEHALF_OF_A_FRIEND_CHOOSE_BADGE_DESCRIPTION" = "Hỗ trợ Signal bằng cách gửi ủng hộ thay cho một người bạn hoặc thành viên gia đình cũng sử dụng Signal. Họ sẽ có tuỳ chọn để thể hiện sự ủng hộ của mình trên hồ sơ.";
+"DONATION_ON_BEHALF_OF_A_FRIEND_CHOOSE_BADGE_DESCRIPTION" = "Hỗ trợ Radar bằng cách gửi ủng hộ thay cho một người bạn hoặc thành viên gia đình cũng sử dụng Radar. Họ sẽ có tuỳ chọn để thể hiện sự ủng hộ của mình trên hồ sơ.";
 
 /* Users can donate on behalf of a friend, and the friend will receive a badge. This is the title on the screen where users choose the badge their friend will receive. */
 "DONATION_ON_BEHALF_OF_A_FRIEND_CHOOSE_BADGE_TITLE" = "Ủng hộ thay cho một người bạn";
@@ -3536,7 +3540,7 @@
 "DONATION_ON_BEHALF_OF_A_FRIEND_PAYMENT_FAILED_ERROR_TITLE" = "Thanh toán không thành công";
 
 /* Users can donate on a friend's behalf. If the payment was processed but the donation failed to send, this error message will be shown. */
-"DONATION_ON_BEHALF_OF_A_FRIEND_PAYMENT_SUCCEEDED_BUT_MESSAGE_FAILED_ERROR_BODY" = "Khoản ủng hộ của bạn đã được xử lý nhưng Signal không thể gửi tin nhắn kèm khoản ủng hộ của bạn. Vui lòng liên hệ bộ phận hỗ trợ.";
+"DONATION_ON_BEHALF_OF_A_FRIEND_PAYMENT_SUCCEEDED_BUT_MESSAGE_FAILED_ERROR_BODY" = "Khoản ủng hộ của bạn đã được xử lý nhưng Radar không thể gửi tin nhắn kèm khoản ủng hộ của bạn. Vui lòng liên hệ bộ phận hỗ trợ.";
 
 /* Users can donate on a friend's behalf. If the payment was processed but the donation failed to send, an error dialog will be shown. This is the title of that dialog. */
 "DONATION_ON_BEHALF_OF_A_FRIEND_PAYMENT_SUCCEEDED_BUT_MESSAGE_FAILED_ERROR_TITLE" = "Ủng hộ không thành công";
@@ -3548,7 +3552,7 @@
 "DONATION_ON_BEHALF_OF_A_FRIEND_PREVIEW_OUTGOING" = "✨ Bạn đã ủng hộ thay cho %1$@";
 
 /* You received a donation from a friend. This is the title of that message in the chat. Embeds {{short contact name}}. */
-"DONATION_ON_BEHALF_OF_A_FRIEND_RECEIVED_TITLE_FORMAT" = "%1$@ đã thay mặt bạn ủng hộ Signal";
+"DONATION_ON_BEHALF_OF_A_FRIEND_RECEIVED_TITLE_FORMAT" = "%1$@ đã thay mặt bạn ủng hộ Radar";
 
 /* Users can donate on a friend's behalf. This is the error message that appears if the try to do this, but the recipient is blocked. */
 "DONATION_ON_BEHALF_OF_A_FRIEND_RECIPIENT_IS_BLOCKED_ERROR_BODY" = "Bạn không thể gửi khoản ủng hộ thay cho người dùng này vì bạn đã chặn người này.";
@@ -3572,7 +3576,7 @@
 "DONATION_ON_BEHALF_OF_A_FRIEND_SENT_TITLE_FORMAT" = "Khoản ủng hộ thay cho %1$@";
 
 /* When you donate on behalf of a friend, a thank-you sheet will appear. This is the text on that sheet. Embeds {{recipient name}}. */
-"DONATION_ON_BEHALF_OF_A_FRIEND_THANKS_BODY_FORMAT" = "Bạn đã gửi một khoản ủng hộ cho Signal thay cho %1$@. Họ sẽ có tuỳ chọn để thể hiện sự ủng hộ của mình trên hồ sơ.";
+"DONATION_ON_BEHALF_OF_A_FRIEND_THANKS_BODY_FORMAT" = "Bạn đã gửi một khoản ủng hộ cho Radar thay cho %1$@. Họ sẽ có tuỳ chọn để thể hiện sự ủng hộ của mình trên hồ sơ.";
 
 /* When you donate on behalf of a friend, a thank-you sheet will appear. This is the title on that sheet. */
 "DONATION_ON_BEHALF_OF_A_FRIEND_THANKS_TITLE" = "Cảm ơn bạn đã đóng góp!";
@@ -3581,7 +3585,7 @@
 "DONATION_ON_BEHALF_OF_A_FRIEND_VIEW" = "Xem";
 
 /* A friend has donated on your behalf and you received a badge. This text says that you received a badge, and from whom. Embeds {{contact's short name, such as a first name}}. */
-"DONATION_ON_BEHALF_OF_A_FRIEND_YOU_RECEIVED_A_BADGE_FORMAT" = "%1$@ đã gửi khoản ủng hộ cho Signal thay cho bạn! Thể hiện sự ủng hộ của bạn cho Signal trên hồ sơ của mình.";
+"DONATION_ON_BEHALF_OF_A_FRIEND_YOU_RECEIVED_A_BADGE_FORMAT" = "%1$@ đã gửi khoản ủng hộ cho Radar thay cho bạn! Thể hiện sự ủng hộ của bạn cho Radar trên hồ sơ của mình.";
 
 /* Body text for a sheet discussing donating to Signal. */
 "DONATION_READ_MORE_SHEET_BODY" = "Là một tổ chức phi lợi nhuận độc lập, Signal cam kết cung cấp dịch vụ nhắn tin và cuộc gọi riêng tư. Không quảng cáo, không trình theo dấu, không theo dõi. Ủng hộ ngay hôm nay để hỗ trợ Signal.";
@@ -3629,7 +3633,7 @@
 "DONATION_RECEIPTS" = "Biên lai các khoản ủng hộ";
 
 /* Text at the bottom of the donation receipts list, telling users that receipts might not be available */
-"DONATION_RECEIPTS_MIGHT_BE_MISSING_IF_YOU_REINSTALLED" = "Nếu bạn đã cài đặt lại Signal, các biên lai của các lần ủng hộ trước sẽ không còn nữa.";
+"DONATION_RECEIPTS_MIGHT_BE_MISSING_IF_YOU_REINSTALLED" = "Nếu bạn đã cài đặt lại Radar, các biên lai của các lần ủng hộ trước sẽ không còn nữa.";
 
 /* Error message displayed if something goes wrong with 3DSecure/iDEAL payment authorization.  This will be encountered if the user cancels the webview before authrizing the payment. */
 "DONATION_REDIRECT_ERROR_CANCELLED_MESSAGE" = "Khoản thanh toán đã bị hủy. Vui lòng thử lại.";
@@ -3644,7 +3648,7 @@
 "DONATION_SCREEN_DONATE_BUTTON" = "Ủng hộ";
 
 /* On donation screens, a small amount of information text is shown. This is the subtitle for that text. */
-"DONATION_SCREENS_HEADER_DESCRIPTION" = "Ủng hộ để hỗ trợ cho nền tảng nhắn tin riêng tư. Giúp Signal duy trì trạng thái độc lập, không quảng cáo.";
+"DONATION_SCREENS_HEADER_DESCRIPTION" = "Ủng hộ để hỗ trợ cho nền tảng nhắn tin riêng tư. Giúp Radar duy trì trạng thái độc lập, không quảng cáo.";
 
 /* On donation screens, a small amount of information text is shown. Users can click this link to learn more information. */
 "DONATION_SCREENS_HEADER_READ_MORE" = "Đọc thêm";
@@ -3719,7 +3723,7 @@
 "DONATION_VIEW_DONATE_ON_BEHALF_OF_A_FRIEND" = "Ủng hộ thay cho một người bạn";
 
 /* Text describing to the user that they're going to pay a donation to Signal */
-"DONATION_VIEW_DONATION_TO_SIGNAL" = "Đóng góp cho Signal";
+"DONATION_VIEW_DONATION_TO_SIGNAL" = "Đóng góp cho Radar";
 
 /* Title for the 'Donor FAQ' button on the donation screen */
 "DONATION_VIEW_DONOR_FAQ" = "Câu hỏi thường gặp về Nhà Ủng hộ";
@@ -3731,13 +3735,13 @@
 "DONATION_VIEW_MANAGE_BADGES" = "Huy hiệu";
 
 /* Text describing to the user that they're going to pay a monthly donation to Signal */
-"DONATION_VIEW_MONTHLY_DONATION_TO_SIGNAL" = "Khoản Ủng hộ hàng tháng cho Signal";
+"DONATION_VIEW_MONTHLY_DONATION_TO_SIGNAL" = "Khoản Ủng hộ hàng tháng cho Radar";
 
 /* Title for the 'my support' section in the donation view */
 "DONATION_VIEW_MY_SUPPORT_TITLE" = "Hổ trợ của tôi";
 
 /* Title on the 'Donate to Signal' screen */
-"DONATION_VIEW_TITLE" = "Ủng hộ Signal";
+"DONATION_VIEW_TITLE" = "Ủng hộ Radar";
 
 /* Label for the currency picker button in donation views */
 "DONATIONS_CURRENCY_PICKER_LABEL" = "Tiền tệ";
@@ -3755,13 +3759,13 @@
 "EDIT_CONTACT_WITHOUT_CONTACTS_PERMISSION_ALERT_BODY" = "Bạn có thể cho phép quyền truy cập trong Cài đặt iOS.";
 
 /* Alert title for when the user has just tried to edit a contacts after declining to give Signal contacts permissions */
-"EDIT_CONTACT_WITHOUT_CONTACTS_PERMISSION_ALERT_TITLE" = "Signal cần Quyền truy cập vào Danh bạ để Chỉnh sửa Thông tin Liên hệ";
+"EDIT_CONTACT_WITHOUT_CONTACTS_PERMISSION_ALERT_TITLE" = "Radar cần Quyền truy cập vào Danh bạ để Chỉnh sửa Thông tin Liên hệ";
 
 /* The navbar title for the 'update group' view. */
 "EDIT_GROUP_DEFAULT_TITLE" = "Sửa nhóm";
 
 /* Error message indicating the a user can't be added to a group. */
-"EDIT_GROUP_ERROR_CANNOT_ADD_MEMBER" = "Người dùng này không thể được thêm vào nhóm cho đến khi người này nâng cấp Signal.";
+"EDIT_GROUP_ERROR_CANNOT_ADD_MEMBER" = "Người dùng này không thể được thêm vào nhóm cho đến khi người này nâng cấp Radar.";
 
 /* Error message indicating that an avatar image is invalid and cannot be used. */
 "EDIT_GROUP_ERROR_INVALID_AVATAR" = "Ảnh không hợp lệ.";
@@ -3788,13 +3792,13 @@
 "EDIT_MESSAGE_SEND_MESSAGE_UNKNOWN_ERROR" = "EDIT_MESSAGE_SEND_MESSAGE_UNKNOWN_ERROR";
 
 /* body of email sent to contacts when inviting to install Signal. Embeds {{link to install Signal}} and {{link to the Signal home page}} */
-"EMAIL_INVITE_BODY" = "Chào bạn,\n\nGần đây mình dùng Signal để các cuộc trò chuyện trên iPhone được riêng tư. Bạn cũng cài dùng thử nhé, để yên tâm là chỉ có hai bên đọc được tin nhắn và nghe cuộc gọi.\n\nSignal có trên iPhone, Android và Máy tính. Tải ở đây nhé: %1$@\n\nSignal hoạt động như ứng dụng nhắn tin đang dùng. Mình có thể gửi ảnh và video, gọi, và tạo nhóm trò chuyện. Thú vị nhất là không ai có thể xem được bất kỳ nội dung nào, cả những người tạo ra Signal cũng không!\n\nBạn có thể đọc thêm về Signal tại đây: %2$@";
+"EMAIL_INVITE_BODY" = "Chào bạn,\n\nGần đây mình dùng Radar để các cuộc trò chuyện trên iPhone được riêng tư. Bạn cũng cài dùng thử nhé, để yên tâm là chỉ có hai bên đọc được tin nhắn và nghe cuộc gọi.\n\nSignal có trên iPhone, Android và Máy tính. Tải ở đây nhé: %1$@\n\nSignal hoạt động như ứng dụng nhắn tin đang dùng. Mình có thể gửi ảnh và video, gọi, và tạo nhóm trò chuyện. Thú vị nhất là không ai có thể xem được bất kỳ nội dung nào, cả những người tạo ra Radar cũng không!\n\nBạn có thể đọc thêm về Radar tại đây: %2$@";
 
 /* subject of email sent to contacts when inviting to install Signal */
-"EMAIL_INVITE_SUBJECT" = "Cùng chuyển sang sử dụng Signal";
+"EMAIL_INVITE_SUBJECT" = "Cùng chuyển sang sử dụng Radar";
 
 /* Description for the fallback support sheet if user cannot send email */
-"EMAIL_SIGNAL_MESSAGE" = "Thiết bị của bạn chưa có được thiết lập để gửi email. Để gửi yêu cầu hỗ trợ, thiết lập email trên thiết bị của bạn hoặc email cho support@signal.org";
+"EMAIL_SIGNAL_MESSAGE" = "Thiết bị của bạn chưa có được thiết lập để gửi email. Để gửi yêu cầu hỗ trợ, thiết lập email trên thiết bị của bạn hoặc email cho support@radar.chat";
 
 /* Title for the fallback support sheet if user cannot send email */
 "EMAIL_SIGNAL_TITLE" = "Không có email";
@@ -3830,7 +3834,7 @@
 "EMOJI_CATEGORY_TRAVEL_NAME" = "Du lịch & Nơi chốn";
 
 /* Full width label displayed when attempting to compose message */
-"EMPTY_CONTACTS_LABEL_LINE1" = "Không ai trong danh bạ sử dụng Signal.";
+"EMPTY_CONTACTS_LABEL_LINE1" = "Không ai trong danh bạ sử dụng Radar.";
 
 /* Full width label displayed when attempting to compose message */
 "EMPTY_CONTACTS_LABEL_LINE2" = "Tại sao bạn không thử mời ai đó nhỉ?";
@@ -3926,7 +3930,7 @@
 "ERROR_DESCRIPTION_UNKNOWN_ERROR" = "Đã xảy ra lỗi không xác định.";
 
 /* Error message when attempting to send message */
-"ERROR_DESCRIPTION_UNREGISTERED_RECIPIENT" = "Không thể gửi tin nhắn vì người này không còn sử dụng Signal.";
+"ERROR_DESCRIPTION_UNREGISTERED_RECIPIENT" = "Không thể gửi tin nhắn vì người này không còn sử dụng Radar.";
 
 /* Error message indicating that attachment upload(s) failed. */
 "ERROR_MESSAGE_ATTACHMENT_UPLOAD_FAILED" = "Không thể tải lên tệp đính kèm.";
@@ -3971,10 +3975,10 @@
 "ERROR_NETWORK_FAILURE" = "Lỗi Kết nối mạng";
 
 /* Format string for an error alert notification message. Embeds {{ error string }} */
-"ERROR_NOTIFICATION_MESSAGE_FORMAT" = "Vui lòng giúp chúng tôi nâng cập Signal bằng cách báo cáo lỗi này và lịch sử sửa lỗi từ thiết bị của bạn đến support@signal.org;%1$@";
+"ERROR_NOTIFICATION_MESSAGE_FORMAT" = "Vui lòng giúp chúng tôi nâng cập Radar bằng cách báo cáo lỗi này và lịch sử sửa lỗi từ thiết bị của bạn đến support@radar.chat;%1$@";
 
 /* Format string for an error alert notification title. */
-"ERROR_NOTIFICATION_TITLE" = "Signal Beta: Đã xảy ra lỗi";
+"ERROR_NOTIFICATION_TITLE" = "Radar Beta: Đã xảy ra lỗi";
 
 /* Error indicating a send failure due to a delinked application. */
 "ERROR_SENDING_DELINKED" = "Thiết bị này không còn được liên kết. Hãy liên kết lại để gửi tin nhắn.";
@@ -3983,7 +3987,7 @@
 "ERROR_SENDING_DEREGISTERED" = "Thiết bị này không còn được đăng kí. Hãy đăng kí lại để gửi tin nhắn.";
 
 /* Error indicating a send failure due to an expired application. */
-"ERROR_SENDING_EXPIRED" = "Phiên bản Signal của bạn đã hết hạn. Vui lòng cập nhật để tiếp tục gửi tin nhắn.";
+"ERROR_SENDING_EXPIRED" = "Phiên bản Radar của bạn đã hết hạn. Vui lòng cập nhật để tiếp tục gửi tin nhắn.";
 
 /* Format string for 'unregistered user' error. Embeds {{the unregistered user's name or signal id}}. */
 "ERROR_UNREGISTERED_USER_FORMAT" = "Người dùng Chưa đăng ký: %1$@";
@@ -3995,22 +3999,22 @@
 "EXIT_REREGISTRATION" = "Thoát Đăng ký";
 
 /* Label notifying the user that the app has expired. */
-"EXPIRATION_ERROR" = "Phiên bản này của Signal đã hết hạn. Hãy cập nhật để gửi và nhận tin nhắn.";
+"EXPIRATION_ERROR" = "Phiên bản này của Radar đã hết hạn. Hãy cập nhật để gửi và nhận tin nhắn.";
 
 /* If the user's app is too old, they'll be shown a warning asking them to upgrade. This is the text on the warning, and tapping it will open the App Store page for Signal. */
 "EXPIRATION_WARNING_ACTION_TITLE" = "Cập nhật ngay";
 
 /* Label warning the user that the app will expire soon. Embeds {{date}}. */
-"EXPIRATION_WARNING_SOON" = "Phiên bản này của Signal sẽ hết hạn vào ngày %1$@. Hãy cập nhật để tiếp tục nhắn tin.";
+"EXPIRATION_WARNING_SOON" = "Phiên bản này của Radar sẽ hết hạn vào ngày %1$@. Hãy cập nhật để tiếp tục nhắn tin.";
 
 /* Label warning the user that the app will expire today. */
-"EXPIRATION_WARNING_TODAY" = "Phiên bản này của Signal sẽ hết hạn hôm nay. Hãy cập nhật để tiếp tục nhắn tin.";
+"EXPIRATION_WARNING_TODAY" = "Phiên bản này của Radar sẽ hết hạn hôm nay. Hãy cập nhật để tiếp tục nhắn tin.";
 
 /* Description of how and why Signal iOS uses Touch ID/Face ID/Phone Passcode to export your chat history. */
 "EXPORT_CHATS_AUTHENTICATION_REASON" = "Xác thực để xuất lịch sử trò chuyện của bạn";
 
 /* action sheet header when re-sending message which failed because of an invalid key signature */
-"FAILED_SENDING_BECAUSE_INVALID_KEY_SIGNATURE" = "Không thể gửi tin nhắn vì %1$@ cần cập nhật và mở Signal.";
+"FAILED_SENDING_BECAUSE_INVALID_KEY_SIGNATURE" = "Không thể gửi tin nhắn vì %1$@ cần cập nhật và mở Radar.";
 
 /* action sheet header when re-sending message which failed because of untrusted identity keys */
 "FAILED_SENDING_BECAUSE_UNTRUSTED_IDENTITY_KEY" = "Số an toàn của bạn với %1$@ vừa được thay đổi. Bạn nên xác minh lại trước khi gửi lại tin nhắn này.";
@@ -4349,10 +4353,10 @@
 "GROUP_CALL_WILL_NOTIFY_TWO_PEOPLE_FORMAT" = "%1$@ và %2$@ sẽ được thông báo";
 
 /* Text shown before the user starts a group call if the user has enabled ringing and there is one other person in the group. Embeds {member name} */
-"GROUP_CALL_WILL_RING_ONE_PERSON_FORMAT" = "Signal sẽ rung chuông %1$@";
+"GROUP_CALL_WILL_RING_ONE_PERSON_FORMAT" = "Radar sẽ rung chuông %1$@";
 
 /* Text shown before the user starts a group call if the user has enabled ringing and there are two other people in the group. Embeds {{ %1$@ participant1, %2$@ participant2 }} */
-"GROUP_CALL_WILL_RING_TWO_PEOPLE_FORMAT" = "Signal sẽ đổ chuông %1$@và %2$@";
+"GROUP_CALL_WILL_RING_TWO_PEOPLE_FORMAT" = "Radar sẽ đổ chuông %1$@và %2$@";
 
 /* Text explaining that you are in the group call. */
 "GROUP_CALL_YOU_ARE_HERE" = "Bạn đang trong cuộc gọi nhóm";
@@ -4571,7 +4575,7 @@
 "GROUP_LINK_VIEW_SHARE_LINK_VIA_QR_CODE" = "Mã QR";
 
 /* Label for the 'share group link via Signal' button in the 'group link' view. */
-"GROUP_LINK_VIEW_SHARE_LINK_VIA_SIGNAL" = "Chia sẻ qua Signal";
+"GROUP_LINK_VIEW_SHARE_LINK_VIA_SIGNAL" = "Chia sẻ qua Radar";
 
 /* Message for the 'share group link' action sheet in the 'group link' view. */
 "GROUP_LINK_VIEW_SHARE_SHEET_MESSAGE" = "Bất kì ai có đường dẫn này có thể xem tên và thành viên của nhóm và yêu cầu tham gia. Chia sẻ nó với những người mà bạn tin tưởng.";
@@ -5036,13 +5040,13 @@
 "HOME_VIEW_DRAFT_PREFIX" = "Nháp: ";
 
 /* Format string for a label offering to start a new conversation with your contacts, if you have 1 Signal contact.  Embeds {{The name of 1 of your Signal contacts}}. */
-"HOME_VIEW_FIRST_CONVERSATION_OFFER_1_CONTACT_FORMAT" = "Một số liên hệ của bạn đã có trên Signal, bao gồm %1$@.";
+"HOME_VIEW_FIRST_CONVERSATION_OFFER_1_CONTACT_FORMAT" = "Một số liên hệ của bạn đã có trên Radar, bao gồm %1$@.";
 
 /* Format string for a label offering to start a new conversation with your contacts, if you have 2 Signal contacts.  Embeds {{The names of 2 of your Signal contacts}}. */
-"HOME_VIEW_FIRST_CONVERSATION_OFFER_2_CONTACTS_FORMAT" = "Một số liên hệ của bạn đã có trên Signal, bao gồm %1$@ và %2$@";
+"HOME_VIEW_FIRST_CONVERSATION_OFFER_2_CONTACTS_FORMAT" = "Một số liên hệ của bạn đã có trên Radar, bao gồm %1$@ và %2$@";
 
 /* Format string for a label offering to start a new conversation with your contacts, if you have at least 3 Signal contacts.  Embeds {{The names of 3 of your Signal contacts}}. */
-"HOME_VIEW_FIRST_CONVERSATION_OFFER_3_CONTACTS_FORMAT" = "Một số liên hệ của bạn đã có trên Signal, bao gồm %1$@, %2$@ và %3$@";
+"HOME_VIEW_FIRST_CONVERSATION_OFFER_3_CONTACTS_FORMAT" = "Một số liên hệ của bạn đã có trên Radar, bao gồm %1$@, %2$@ và %3$@";
 
 /* A label offering to start a new conversation with your contacts, if you have no Signal contacts. */
 "HOME_VIEW_FIRST_CONVERSATION_OFFER_NO_CONTACTS" = "Bắt đầu cuộc trò chuyện đầu tiên của bạn ở đây.";
@@ -5141,7 +5145,7 @@
 "INACTIVE_LINKED_DEVICE_REMINDER_MEGAPHONE_TITLE" = "Thiết bị đã liên kết không còn hoạt động";
 
 /* Body for an in-app megaphone about a user's inactive primary device. */
-"INACTIVE_PRIMARY_DEVICE_REMINDER_MEGAPHONE_BODY" = "Để giữ cho tài khoản hoạt động, mở Signal trên thiết bị chính của bạn.";
+"INACTIVE_PRIMARY_DEVICE_REMINDER_MEGAPHONE_BODY" = "Để giữ cho tài khoản hoạt động, mở Radar trên thiết bị chính của bạn.";
 
 /* Title for a button in an in-app megaphone about a user's inactive primary device, temporarily dismissing the megaphone. */
 "INACTIVE_PRIMARY_DEVICE_REMINDER_MEGAPHONE_GOT_IT_BUTTON" = "Đã hiểu";
@@ -5150,7 +5154,7 @@
 "INACTIVE_PRIMARY_DEVICE_REMINDER_MEGAPHONE_LEARN_MORE_BUTTON" = "Tìm hiểu thêm";
 
 /* Title for an in-app megaphone about a user's inactive primary device. */
-"INACTIVE_PRIMARY_DEVICE_REMINDER_MEGAPHONE_TITLE" = "Mở Signal trên điện thoại của bạn";
+"INACTIVE_PRIMARY_DEVICE_REMINDER_MEGAPHONE_TITLE" = "Mở Radar trên điện thoại của bạn";
 
 /* Label reminding the user that they are in archive mode, and that muted chats remain archived when they receive a new message. */
 "INBOX_VIEW_ARCHIVE_MODE_MUTED_CHATS_REMINDER" = "Các cuộc trò chuyện đã tắt tiếng vẫn sẽ ở trong mục lưu trữ khi có tin nhắn mới được gửi đến.";
@@ -5210,10 +5214,10 @@
 "INFO_MESSAGE_BLOCKED_OTHER_USER" = "Bạn đã chặn người này.";
 
 /* Indicates that a previously-removed recipient has been added back to the current user's contacts. */
-"INFO_MESSAGE_CONTACT_REINSTATED" = "Người này đã được thêm vào lại danh sách liên hệ Signal của bạn.";
+"INFO_MESSAGE_CONTACT_REINSTATED" = "Người này đã được thêm vào lại danh sách liên hệ Radar của bạn.";
 
 /* Indicates that the recipient has been removed from the current user's contacts and that messaging them will re-add them. */
-"INFO_MESSAGE_CONTACT_REMOVED" = "Bạn đã gỡ người này khỏi danh sách liên hệ Signal, việc gửi tin nhắn cho người này sẽ thêm họ vào lại.";
+"INFO_MESSAGE_CONTACT_REMOVED" = "Bạn đã gỡ người này khỏi danh sách liên hệ Radar, việc gửi tin nhắn cho người này sẽ thêm họ vào lại.";
 
 /* When you start a chat with someone and then later learn their profile name, we insert an in-chat message with this string to record the identifier you originally used to contact them. Embeds {{ the identifier, either a phone number, a username, or a name someone else shared }}. */
 "INFO_MESSAGE_LEARNED_PROFILE_KEY" = "Bạn đã bắt đầu cuộc trò chuyện này với %1$@.";
@@ -5234,7 +5238,7 @@
 "INFO_MESSAGE_REPORTED_SPAM" = "Đã báo cáo là spam";
 
 /* Body message of the alert shown when a user taps on 'learn more' via the spam info message. */
-"INFO_MESSAGE_REPORTED_SPAM_LEARN_MORE_MESSAGE" = "Signal đã được thông báo rằng người này có thể đang gửi spam. Signal không thể xem nội dung của bất kỳ cuộc trò chuyện nào.";
+"INFO_MESSAGE_REPORTED_SPAM_LEARN_MORE_MESSAGE" = "Radar đã được thông báo rằng người này có thể đang gửi spam. Radar không thể xem nội dung của bất kỳ cuộc trò chuyện nào.";
 
 /* Title of the alert shown when a user taps on 'learn more' via the spam info message. */
 "INFO_MESSAGE_REPORTED_SPAM_LEARN_MORE_TITLE" = "Đã báo cáo spam";
@@ -5252,7 +5256,7 @@
 "INFO_MESSAGE_USER_CHANGED_PHONE_NUMBER_FORMAT" = "%1$@ đã đổi số điện thoại của họ.";
 
 /* Shown in inbox and conversation when a user joins Signal, embeds the new user's {{contact name}} */
-"INFO_MESSAGE_USER_JOINED_SIGNAL_BODY_FORMAT" = "%1$@ đang sử dụng Signal!";
+"INFO_MESSAGE_USER_JOINED_SIGNAL_BODY_FORMAT" = "%1$@ đang sử dụng Radar!";
 
 /* Label at the top of the input text when editing a message */
 "INPUT_TOOLBAR_EDIT_MESSAGE_LABEL" = "Chỉnh sửa tin nhắn";
@@ -5279,13 +5283,13 @@
 "INVALID_PROXY_HOST_ERROR" = "Địa chỉ proxy bạn nhập không hợp lệ, vui lòng kiểm tra lại địa chỉ và thử lại.";
 
 /* Alert body when contacts disabled while trying to invite contacts to signal */
-"INVITE_FLOW_REQUIRES_CONTACT_ACCESS_BODY" = "Bạn có thể cấp quyền truy cập danh bạ trong Cài đặt iOS để mời bạn bè tham gia sử dụng Signal.";
+"INVITE_FLOW_REQUIRES_CONTACT_ACCESS_BODY" = "Bạn có thể cấp quyền truy cập danh bạ trong Cài đặt iOS để mời bạn bè tham gia sử dụng Radar.";
 
 /* Alert title when contacts disabled while trying to invite contacts to signal */
 "INVITE_FLOW_REQUIRES_CONTACT_ACCESS_TITLE" = "Cho phép Truy cập Danh bạ";
 
 /* Label for the cell that presents the 'invite contacts' workflow. */
-"INVITE_FRIENDS_CONTACT_TABLE_BUTTON" = "Mời Bạn bè sử dụng Signal";
+"INVITE_FRIENDS_CONTACT_TABLE_BUTTON" = "Mời Bạn bè sử dụng Radar";
 
 /* Header label above a section for more options for adding contacts */
 "INVITE_FRIENDS_CONTACT_TABLE_HEADER" = "Thêm";
@@ -5423,7 +5427,7 @@
 "LINK_DEVICE_SCANNING_INSTRUCTIONS_SHEET_TITLE" = "Quét Mã QR";
 
 /* Body text for a sheet when a user tries to link a device informing them that they will need to authenticate their device */
-"LINK_NEW_DEVICE_AUTHENTICATION_INFO_SHEET_BODY" = "Nhấn tiếp tục và nhập mã khóa điện thoại của bạn để xác nhận. Không nhập mã PIN Signal của bạn.";
+"LINK_NEW_DEVICE_AUTHENTICATION_INFO_SHEET_BODY" = "Nhấn tiếp tục và nhập mã khóa điện thoại của bạn để xác nhận. Không nhập mã PIN Radar của bạn.";
 
 /* Title for a sheet when a user tries to link a device informing them that they will need to authenticate their device */
 "LINK_NEW_DEVICE_AUTHENTICATION_INFO_SHEET_TITLE" = "Xác nhận trước khi liên kết";
@@ -5432,7 +5436,7 @@
 "LINK_NEW_DEVICE_AUTHENTICATION_REASON" = "Xác thực để liên kết thiết bị";
 
 /* Body text for a sheet when a user has started linking a device informing them to finish the process on that other device */
-"LINK_NEW_DEVICE_FINISH_ON_OTHER_DEVICE_SHEET_BODY" = "Hoàn tất liên kết với Signal trên thiết bị khác của bạn.";
+"LINK_NEW_DEVICE_FINISH_ON_OTHER_DEVICE_SHEET_BODY" = "Hoàn tất liên kết với Radar trên thiết bị khác của bạn.";
 
 /* Title for a sheet when a user has started linking a device informing them to finish the process on that other device */
 "LINK_NEW_DEVICE_FINISH_ON_OTHER_DEVICE_SHEET_TITLE" = "Hoàn tất liên kết trên thiết bị khác của bạn";
@@ -5453,7 +5457,7 @@
 "LINK_NEW_DEVICE_SYNC_FAILED_TITLE" = "Đồng bộ tin nhắn không thành công";
 
 /* On a progress modal */
-"LINK_NEW_DEVICE_SYNC_PROGRESS_DO_NOT_CLOSE_APP" = "Đừng đóng Signal";
+"LINK_NEW_DEVICE_SYNC_PROGRESS_DO_NOT_CLOSE_APP" = "Đừng đóng Radar";
 
 /* On a progress modal indicating the percent complete the sync process is. Embeds {{ formatted percentage }} */
 "LINK_NEW_DEVICE_SYNC_PROGRESS_PERCENT" = "%1$@ đã hoàn tất";
@@ -5474,7 +5478,7 @@
 "LINK_PREVIEW_UNKNOWN_DOMAIN" = "Xem trước Đường dẫn";
 
 /* Shown in an alert when trying to edit a contact. */
-"LINKED_DEVICE_CONTACTS_NOT_ALLOWED" = "Chức năng quản lý danh bạ của điện thoại không còn khả dụng trên các thiết bị được liên kết. Để thêm các kết nối Signal vào danh bạ điện thoại của bạn, hãy mở Signal trên thiết bị chính của bạn.";
+"LINKED_DEVICE_CONTACTS_NOT_ALLOWED" = "Chức năng quản lý danh bạ của điện thoại không còn khả dụng trên các thiết bị được liên kết. Để thêm các kết nối Radar vào danh bạ điện thoại của bạn, hãy mở Radar trên thiết bị chính của bạn.";
 
 /* Bullet point on the linked devices info sheet, describing what can be linked. */
 "LINKED_DEVICE_INFO_SHEET_BULLET_1" = "Bạn có thể liên kết máy tính để bàn, máy tính bảng hoặc điện thoại bổ sung.";
@@ -5489,7 +5493,7 @@
 "LINKED_DEVICE_INFO_SHEET_HEADER" = "Tính năng <bold>Liên kết thiết bị</bold> cho phép bạn truy cập tài khoản Signal và tin nhắn một cách an toàn trên thiết bị bổ sung bất kỳ của bạn.";
 
 /* Shown in a banner when you tap the 'New Chat' icon at the top of the list of chats. */
-"LINKED_DEVICE_MANAGE_CONTACTS_BANNER" = "Chức năng quản lý danh bạ của điện thoại không còn được hỗ trợ trên các thiết bị được liên kết. Thiết bị này sẽ tiếp tục đồng bộ mọi thay đổi đối với danh bạ của bạn từ Signal trên thiết bị chính.";
+"LINKED_DEVICE_MANAGE_CONTACTS_BANNER" = "Chức năng quản lý danh bạ của điện thoại không còn được hỗ trợ trên các thiết bị được liên kết. Thiết bị này sẽ tiếp tục đồng bộ mọi thay đổi đối với danh bạ của bạn từ Radar trên thiết bị chính.";
 
 /* A button shown in a banner when you tap the 'New Chat' icon at the top of the list of chats. Tapping it opens a website with more details. */
 "LINKED_DEVICE_MANAGE_CONTACTS_LEARN_MORE" = "Tìm hiểu thêm";
@@ -5504,28 +5508,28 @@
 "LINKED_DEVICE_NOTIFICATION_TITLE" = "Bạn đã liên kết một thiết bị mới";
 
 /* Message for an action sheet telling users how to link a device, when trying to open an external device-linking URL. */
-"LINKED_DEVICE_URL_OPENED_ACTION_SHEET_EXTERNAL_URL_MESSAGE" = "Để liên kết máy tính hoặc iPad với tài khoản Signal này, đến mục Thiết bị đã liên kết và nhấn \"Liên kết thiết bị mới\" và quét lại mã QR. Đảm bảo bạn chỉ quét mã QR có nguồn gốc trực tiếp từ Signal.";
+"LINKED_DEVICE_URL_OPENED_ACTION_SHEET_EXTERNAL_URL_MESSAGE" = "Để liên kết máy tính hoặc iPad với tài khoản Radar này, đến mục Thiết bị đã liên kết và nhấn \"Liên kết thiết bị mới\" và quét lại mã QR. Đảm bảo bạn chỉ quét mã QR có nguồn gốc trực tiếp từ Radar.";
 
 /* Message for an action sheet telling users how to link a device, when trying to open a device-linking URL from the in-app camera. */
-"LINKED_DEVICE_URL_OPENED_ACTION_SHEET_IN_APP_CAMERA_MESSAGE" = "Có vẻ như bạn đang cố liên kết một thiết bị Signal. Nhấn tiếp tục và sau đó nhấn \"Liên kết thiết bị mới\" và quét lại mã QR.";
+"LINKED_DEVICE_URL_OPENED_ACTION_SHEET_IN_APP_CAMERA_MESSAGE" = "Có vẻ như bạn đang cố liên kết một thiết bị Radar. Nhấn tiếp tục và sau đó nhấn \"Liên kết thiết bị mới\" và quét lại mã QR.";
 
 /* Bullet point about a download link on the linked devices education sheet. Embeds {{ %1$@ download link }} */
-"LINKED_DEVICES_EDUCATION_POINT_DOWNLOADS" = "Trên thiết bị bạn muốn liên kết, truy cập %1$@ để cài đặt Signal";
+"LINKED_DEVICES_EDUCATION_POINT_DOWNLOADS" = "Trên thiết bị bạn muốn liên kết, truy cập %1$@ để cài đặt Radar";
 
 /* Bullet point about message sync on the linked devices education sheet */
-"LINKED_DEVICES_EDUCATION_POINT_MESSAGES" = "Tin nhắn Signal được đồng bộ với Signal trên điện thoại của bạn sau khi được liên kết.";
+"LINKED_DEVICES_EDUCATION_POINT_MESSAGES" = "Tin nhắn Radar được đồng bộ với Radar trên điện thoại của bạn sau khi được liên kết.";
 
 /* Bullet point about privacy on the linked devices education sheet */
 "LINKED_DEVICES_EDUCATION_POINT_PRIVACY" = "Tất cả nội dung tin nhắn được bảo mật trên các thiết bị đã liên kết";
 
 /* Title for the linked device education sheet */
-"LINKED_DEVICES_EDUCATION_TITLE" = "Signal trên thiết bị đã liên kết";
+"LINKED_DEVICES_EDUCATION_TITLE" = "Radar trên thiết bị đã liên kết";
 
 /* Text that appears where the linked device list would be indicating that there are no linked devices. */
 "LINKED_DEVICES_EMPTY_STATE" = "Không có thiết bị liên kết";
 
 /* Description for header of the linked devices list */
-"LINKED_DEVICES_HEADER_DESCRIPTION" = "Sử dụng tài khoản Signal trên một thiết bị khác.";
+"LINKED_DEVICES_HEADER_DESCRIPTION" = "Sử dụng tài khoản Radar trên một thiết bị khác.";
 
 /* Footer text below the list of currently-linked devices */
 "LINKED_DEVICES_LIST_FOOTER" = "Thông tin tin nhắn và cuộc trò chuyện được bảo vệ bằng hình thức mã hóa đầu cuối trên tất cả thiết bị";
@@ -5570,7 +5574,7 @@
 "LINKING_SYNCING_TIMING_INFO" = "Quá trình này có thể mất ít phút";
 
 /* Shown to users while the app is loading, asking them not to close the app. */
-"LOADING_VIEW_CONTROLLER_DONT_CLOSE_APP" = "Không đóng Signal.";
+"LOADING_VIEW_CONTROLLER_DONT_CLOSE_APP" = "Không đóng Radar.";
 
 /* Body for a sheet warning users about creating a new Recovery Key. */
 "LOCAL_BACKUP_SETTINGS_CREATE_NEW_KEY_WARNING_SHEET_BODY" = "Việc tạo mã khóa mới chỉ cần thiết nếu có người khác biết mã khóa của bạn. Trước tiên, cần tắt tính năng Sao lưu trên thiết bị để tạo mã khóa mới.\n\nSau khi tắt Sao lưu trên thiết bị và tạo một mã khóa mới, bạn sẽ cần bật lại Sao lưu trên thiết bị.";
@@ -5666,7 +5670,7 @@
 "LOGGING_SECTION" = "Ghi chép";
 
 /* Footer for the 'logging' help section. */
-"LOGGING_SECTION_FOOTER" = "Ghi chú lỗi có thể giúp Signal sửa chữa vấn đề và sự cố.";
+"LOGGING_SECTION_FOOTER" = "Ghi chú lỗi có thể giúp Radar sửa chữa vấn đề và sự cố.";
 
 /* Title for the 'long text message' view. */
 "LONG_TEXT_VIEW_TITLE" = "Tin nhắn";
@@ -5849,7 +5853,7 @@
 "MESSAGE_ACTION_DELETE_FOR_EVERYONE" = "Xóa đối với Mọi người";
 
 /* A one-time confirmation that you want to delete for everyone */
-"MESSAGE_ACTION_DELETE_FOR_EVERYONE_CONFIRMATION" = "Tin nhắn này sẽ được xóa cho tất cả mọi người trong cuộc trò chuyện nếu như họ sử dụng phiên bản mới của Signal. Họ sẽ có thể thấy được rằng bạn đã xóa tin nhắn.";
+"MESSAGE_ACTION_DELETE_FOR_EVERYONE_CONFIRMATION" = "Tin nhắn này sẽ được xóa cho tất cả mọi người trong cuộc trò chuyện nếu như họ sử dụng phiên bản mới của Radar. Họ sẽ có thể thấy được rằng bạn đã xóa tin nhắn.";
 
 /* The title for the action sheet asking who the user wants to delete the message for. */
 "MESSAGE_ACTION_DELETE_FOR_TITLE" = "Bạn muốn xóa tin nhắn này cho ai?";
@@ -5894,7 +5898,7 @@
 "MESSAGE_ACTION_LINK_OPEN_LINK" = "Mở đường dẫn";
 
 /* Label for button to open a signal proxy. */
-"MESSAGE_ACTION_LINK_OPEN_PROXY" = "Mở Proxy của Signal";
+"MESSAGE_ACTION_LINK_OPEN_PROXY" = "Mở Proxy của Radar";
 
 /* Label for button to open a sticker pack. */
 "MESSAGE_ACTION_LINK_OPEN_STICKER_PACK" = "Xem Bộ Nhãn dán";
@@ -6077,7 +6081,7 @@
 "MESSAGE_REQUEST_NAME_COLLISON_UPDATE_CONTACT_ACTION" = "Cập nhật liên hệ";
 
 /* Action sheet message to confirm reporting a conversation as spam via a message request. */
-"MESSAGE_REQUEST_REPORT_CONVERSATION_MESSAGE" = "Signal sẽ nhận được thông báo rằng người này có thể đang gửi spam. Signal không thể xem nội dung của bất kỳ cuộc trò chuyện nào.";
+"MESSAGE_REQUEST_REPORT_CONVERSATION_MESSAGE" = "Radar sẽ nhận được thông báo rằng người này có thể đang gửi spam. Radar không thể xem nội dung của bất kỳ cuộc trò chuyện nào.";
 
 /* Action sheet title to confirm reporting a conversation as spam via a message request. */
 "MESSAGE_REQUEST_REPORT_CONVERSATION_TITLE" = "Báo cáo spam?";
@@ -6202,11 +6206,26 @@
 /* Indicator that separates read from unread messages. */
 "MESSAGES_VIEW_UNREAD_INDICATOR" = "Các tin nhắn Mới";
 
+/* Button confirming that the user has completed a Signal backup, on the view asking them to back up their Signal conversations before migrating from Signal. */
+"MIGRATE_FROM_SIGNAL_BACKUP_COMPLETED_BUTTON" = "Tôi đã hoàn tất sao lưu";
+
+/* First step of the view asking the user to back up their Signal conversations before migrating from Signal. */
+"MIGRATE_FROM_SIGNAL_BACKUP_STEP_1" = "Trong Signal, hãy vào Cài đặt → Sao lưu và tạo bản sao lưu nếu bạn chưa thực hiện";
+
+/* Second step of the view asking the user to back up their Signal conversations before migrating from Signal. */
+"MIGRATE_FROM_SIGNAL_BACKUP_STEP_2" = "Lưu Mã khóa khôi phục của bạn một cách an toàn để đảm bảo bạn có thể khôi phục đúng cách từ bản sao lưu";
+
+/* Subtitle of the view asking the user to back up their Signal conversations before migrating from Signal. */
+"MIGRATE_FROM_SIGNAL_BACKUP_SUBTITLE" = "Trước khi đăng nhập vào Radar, hãy nhớ sao lưu các cuộc trò chuyện của bạn trong Signal:";
+
+/* Title of the view asking the user to back up their Signal conversations before migrating from Signal. */
+"MIGRATE_FROM_SIGNAL_BACKUP_TITLE" = "Chuyển các cuộc trò chuyện của bạn";
+
 /* info message text in conversation view for when a call was dropped because the contact is blocked in iOS settings */
 "MISSED_CALL_BLOCKED_SYSTEM_CONTACT" = "Cuộc gọi nhỡ từ liên hệ đã bị chặn trong mục cài đặt của điện thoại";
 
 /* Action to block contact in Signal for sheet shown when the user taps a missed call from a contact blocked in iOS settings. */
-"MISSED_CALL_BLOCKED_SYSTEM_SETTINGS_SHEET_BLOCK_ACTION" = "Đồng thời Chặn Liên hệ trong Signal";
+"MISSED_CALL_BLOCKED_SYSTEM_SETTINGS_SHEET_BLOCK_ACTION" = "Đồng thời Chặn Liên hệ trong Radar";
 
 /* Message for sheet shown when the user taps a missed call from a contact blocked in iOS settings. */
 "MISSED_CALL_BLOCKED_SYSTEM_SETTINGS_SHEET_MESSAGE" = "Bạn để lỡ cuộc gọi của người đó vì họ đã bị chặn trong mục cài đặt của điện thoại. Đến mục Cài đặt > Điện thoại và nhấn Liên hệ Đã chặn để điều chỉnh.";
@@ -6227,19 +6246,19 @@
 "MISSING_CAMERA_PERMISSION_MESSAGE" = "Bạn có thể bật quyền truy cập camera trong ứng dụng Cài đặt trên iOS.";
 
 /* Alert title */
-"MISSING_CAMERA_PERMISSION_TITLE" = "Signal cần truy cập camera của bạn.";
+"MISSING_CAMERA_PERMISSION_TITLE" = "Radar cần truy cập camera của bạn.";
 
 /* Alert body indicating the user has denied location permissions */
 "MISSING_LOCATION_PERMISSION_MESSAGE" = "Bạn có thể cho phép quyền truy cập này trong Cài đặt iOS. ";
 
 /* Alert title indicating the user has denied location permissions */
-"MISSING_LOCATION_PERMISSION_TITLE" = "Signal cần quyền truy cập vị trí của bạn cho tính năng này.";
+"MISSING_LOCATION_PERMISSION_TITLE" = "Radar cần quyền truy cập vị trí của bạn cho tính năng này.";
 
 /* Alert body when user has previously denied media library access */
 "MISSING_MEDIA_LIBRARY_PERMISSION_MESSAGE" = "Bạn có thể cho phép quyền truy cập này trong Cài đặt iOS. ";
 
 /* Alert title when user has previously denied media library access */
-"MISSING_MEDIA_LIBRARY_PERMISSION_TITLE" = "Signal cần quyền truy cập vào hình ảnh của bạn cho tính năng này.";
+"MISSING_MEDIA_LIBRARY_PERMISSION_TITLE" = "Radar cần quyền truy cập vào hình ảnh của bạn cho tính năng này.";
 
 /* Title for a progress modal shown after the user taps Cancel, while the work is being cancelled. */
 "MODAL_CIRCULAR_PROGRESS_CANCELLING_TITLE" = "Đang hủy…";
@@ -6287,7 +6306,7 @@
 "MY_STORIES_SETTINGS_VISIBILITY_ALL_SIGNAL_CONNECTIONS_EXCEPT_TITLE" = "Tất Cả Trừ…";
 
 /* Title for the visibility option */
-"MY_STORIES_SETTINGS_VISIBILITY_ALL_SIGNAL_CONNECTIONS_TITLE" = "Tất cả Liên hệ Signal";
+"MY_STORIES_SETTINGS_VISIBILITY_ALL_SIGNAL_CONNECTIONS_TITLE" = "Tất cả Liên hệ Radar";
 
 /* Title for the visibility option */
 "MY_STORIES_SETTINGS_VISIBILITY_ONLY_SHARE_WITH_TITLE" = "Chỉ Chia Sẻ Với…";
@@ -6446,7 +6465,7 @@
 "NICKNAME_EDITOR_DELETE_CONFIRMATION_TITLE" = "Xóa biệt danh?";
 
 /* The description below the title on the profile nickname editor view. */
-"NICKNAME_EDITOR_DESCRIPTION" = "Biệt danh và ghi chú được lưu trữ với Signal và được mã hóa đầu cuối. Những nội dung này chỉ hiển thị với bạn.";
+"NICKNAME_EDITOR_DESCRIPTION" = "Biệt danh và ghi chú được lưu trữ với Radar và được mã hóa đầu cuối. Những nội dung này chỉ hiển thị với bạn.";
 
 /* Placeholder text it the text field for the family name in the profile nickname editor. */
 "NICKNAME_EDITOR_FAMILY_NAME_PLACEHOLDER" = "Họ";
@@ -6530,7 +6549,7 @@
 "NOTIFICATION_PERMISSION_REMINDER_MEGAPHONE_TITLE" = "Bật thông báo?";
 
 /* Shown as the body of an alert when notifications can't be shown due to an error. */
-"NOTIFICATIONS_ERROR_MESSAGE" = "Khởi động lại %1$@ nếu bạn không nhận được thông báo của Signal.";
+"NOTIFICATIONS_ERROR_MESSAGE" = "Khởi động lại %1$@ nếu bạn không nhận được thông báo của Radar.";
 
 /* Shown as the title of an alert when notifications can't be shown due to an error. */
 "NOTIFICATIONS_ERROR_TITLE" = "Không Thể Hiển Thị Thông Báo";
@@ -6596,10 +6615,10 @@
 "ONBOARDING_CHOOSE_BACKUP_SHEET_TITLE" = "Chọn bản sao lưu để khôi phục";
 
 /* The body for the device transfer 'choice' view 'restore backup' option */
-"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_BODY" = "Khôi phục tài khoản và tin nhắn của bạn từ Sao lưu Signal";
+"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_BODY" = "Khôi phục tài khoản và tin nhắn của bạn từ Sao lưu Radar/Radar";
 
 /* The title for the device transfer 'choice' view 'restore backup' option */
-"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_TITLE" = "Khôi phục bản Sao lưu bảo mật Signal";
+"ONBOARDING_CHOOSE_RESTORE_METHOD_BACKUPS_TITLE" = "Khôi phục bản Sao lưu bảo mật Radar/Radar";
 
 /* Body for a sheet warning users about skipping restore. */
 "ONBOARDING_CHOOSE_RESTORE_METHOD_CONFIRM_SKIP_RESTORE_BODY" = "Nếu bạn bỏ qua việc khôi phục bây giờ, bạn sẽ không thể khôi phục sau này. Nếu bạn bật lại tính năng sao lưu trên thiết bị này, bản sao lưu hiện tại sẽ được thay thế bởi lịch sử tin nhắn mới.";
@@ -6611,7 +6630,7 @@
 "ONBOARDING_CHOOSE_RESTORE_METHOD_DESCRIPTION" = "Chọn cách bạn muốn khôi phục lịch sử tin nhắn và dữ liệu tài khoản của mình.";
 
 /* Message body displayed to a user during registration if there are no restore options available. */
-"ONBOARDING_CHOOSE_RESTORE_METHOD_NONE_AVAILABLE_BODY" = "Vì bạn đang chuyển từ Android sang iOS, cách duy nhất để chuyển tin nhắn và tập tin đa phương tiện là bật Sao lưu Signal trên thiết bị cũ của bạn.";
+"ONBOARDING_CHOOSE_RESTORE_METHOD_NONE_AVAILABLE_BODY" = "Vì bạn đang chuyển từ Android sang iOS, cách duy nhất để chuyển tin nhắn và tập tin đa phương tiện là bật Sao lưu Radar trên thiết bị cũ của bạn.";
 
 /* Title displayed to a user during registration if there are no restore options available. */
 "ONBOARDING_CHOOSE_RESTORE_METHOD_NONE_AVAILABLE_TITLE" = "Không có bản sao lưu";
@@ -6674,7 +6693,7 @@
 "ONBOARDING_MODE_SWITCH_BUTTON_REGISTERING" = "Liên kết thiết bị này";
 
 /* explanation to the user they're switching from linking to registering flow */
-"ONBOARDING_MODE_SWITCH_EXPLANATION_PROVISIONING" = "Nhấn \"Đăng kí iPad\" sẽ cho phép bạn tạo một tài khoản Signal mới hoặc chuyển một tài khoản có sẵn sang iPad này. Thao tác này sẽ vô hiệu hóa Signal trên thiết bị được đăng kí với cùng số điện thoại.";
+"ONBOARDING_MODE_SWITCH_EXPLANATION_PROVISIONING" = "Nhấn \"Đăng kí iPad\" sẽ cho phép bạn tạo một tài khoản Radar mới hoặc chuyển một tài khoản có sẵn sang iPad này. Thao tác này sẽ vô hiệu hóa Radar trên thiết bị được đăng kí với cùng số điện thoại.";
 
 /* explanation to the user they're switching from registering to linking flow */
 "ONBOARDING_MODE_SWITCH_EXPLANATION_REGISTERING" = "Nhấn vào \"Liên kết thiết bị này\" sẽ cho phép bạn kết nối thiết bị này với tài khoản Signal hiện có.";
@@ -6686,10 +6705,10 @@
 "ONBOARDING_MODE_SWITCH_TITLE_REGISTERING" = "Liên kết thiết bị này";
 
 /* warning to the user that registering an ipad is not recommended */
-"ONBOARDING_MODE_SWITCH_WARNING_PROVISIONING" = "Đăng kí iPad này sẽ vô hiệu hóa Signal trên thiết bị được đăng kí với cùng số điện thoại.";
+"ONBOARDING_MODE_SWITCH_WARNING_PROVISIONING" = "Đăng kí iPad này sẽ vô hiệu hóa Radar trên thiết bị được đăng kí với cùng số điện thoại.";
 
 /* Description of the 'Contacts' permission in the 'onboarding permissions' view. */
-"ONBOARDING_PERMISSIONS_CONTACTS_DESCRIPTION" = "Tìm người bạn biết. Danh bạ của bạn được mã hóa và Signal không thể truy cập được.";
+"ONBOARDING_PERMISSIONS_CONTACTS_DESCRIPTION" = "Tìm người bạn biết. Danh bạ của bạn được mã hóa và Radar không thể truy cập được.";
 
 /* Title introducing the 'Contacts' permission in the 'onboarding permissions' view. */
 "ONBOARDING_PERMISSIONS_CONTACTS_TITLE" = "Danh bạ";
@@ -6701,13 +6720,19 @@
 "ONBOARDING_PERMISSIONS_NOTIFICATIONS_TITLE" = "Thông báo";
 
 /* Preamble of the 'onboarding permissions' view. */
-"ONBOARDING_PERMISSIONS_PREAMBLE" = "Signal muốn được cấp các quyền sau.";
+"ONBOARDING_PERMISSIONS_PREAMBLE" = "Radar muốn được cấp các quyền sau.";
+
+/* Description of the 'Notification Relay' permission in the 'onboarding permissions' view. */
+"ONBOARDING_PERMISSIONS_RELAY_DESCRIPTION" = "Enable Radar notification relay to ensure you get immediate background notifications in Radar. Relay is always privacy-preserving and keeps your messages end-to-end encrypted no matter what.";
+
+/* Title introducing the 'Notification Relay' permission in the 'onboarding permissions' view. */
+"ONBOARDING_PERMISSIONS_RELAY_TITLE" = "Notification Relay";
 
 /* Title of the 'onboarding permissions' view. */
 "ONBOARDING_PERMISSIONS_TITLE" = "Đồng ý Cho phép";
 
 /* Explanation of the 'onboarding phone number discoverability' view. Embeds {user phone number} */
-"ONBOARDING_PHONE_NUMBER_DISCOVERABILITY_EXPLANATION_FORMAT" = "Chọn người nào có thể tìm bạn trên Signal bằng số điện thoại của bạn %1$@";
+"ONBOARDING_PHONE_NUMBER_DISCOVERABILITY_EXPLANATION_FORMAT" = "Chọn người nào có thể tìm bạn trên Radar bằng số điện thoại của bạn %1$@";
 
 /* Title of the 'onboarding phone number discoverability' view. */
 "ONBOARDING_PHONE_NUMBER_DISCOVERABILITY_TITLE" = "Ai có thể tìm được bạn với số điện thoại của bạn?";
@@ -6722,7 +6747,7 @@
 "ONBOARDING_PHONE_NUMBER_VALIDATION_WARNING" = "Số điện thoại không hợp lệ. Xin hãy nhập một số điện thoại hợp lệ để đăng ký.";
 
 /* Explanation of the 'onboarding pin attempts exhausted' view when reglock is disabled. */
-"ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_EXPLANATION" = "Bạn đã hết lượt thử mã PIN, nhưng bạn vẫn có thể truy cập tài khoản Signal của bạn bằng cách tạo mã PIN mới. Vì sự riêng tư và bảo mật  bạn, tài khoản của bạn sẽ được khôi phục mà không có các thông tin hoặc cài đặt người dùng.";
+"ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_EXPLANATION" = "Bạn đã hết lượt thử mã PIN, nhưng bạn vẫn có thể truy cập tài khoản Radar của bạn bằng cách tạo mã PIN mới. Vì sự riêng tư và bảo mật  bạn, tài khoản của bạn sẽ được khôi phục mà không có các thông tin hoặc cài đặt người dùng.";
 
 /* Label for the 'learn more' link when reglock is disabled in the 'onboarding pin attempts exhausted' view. */
 "ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_LEARN_MORE" = "Tìm hiểu Thêm Về PIN";
@@ -6731,31 +6756,77 @@
 "ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_TITLE" = "Mã PIN không chính xác";
 
 /* Explanation of the 'onboarding pin attempts exhausted' view when it is unknown if reglock is enabled. */
-"ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_WITH_UNKNOWN_REGLOCK_EXPLANATION" = "Bạn đã hết số lần thử mã PIN, nhưng bạn vẫn có thể thử truy cập tài khoản Signal bằng cách xác minh số điện thoại của mình. Để đảm bảo bảo mật và tính riêng tư, tài khoản mới của bạn sẽ được khôi phục nhưng thông tin hồ sơ và cài đặt thì không.";
+"ONBOARDING_PIN_ATTEMPTS_EXHAUSTED_WITH_UNKNOWN_REGLOCK_EXPLANATION" = "Bạn đã hết số lần thử mã PIN, nhưng bạn vẫn có thể thử truy cập tài khoản Radar bằng cách xác minh số điện thoại của mình. Để đảm bảo bảo mật và tính riêng tư, tài khoản mới của bạn sẽ được khôi phục nhưng thông tin hồ sơ và cài đặt thì không.";
+
+/* Subtitle for the setup complete screen shown at the end of the onboarding flow. */
+"ONBOARDING_SETUP_COMPLETE_SUBTITLE" = "Bây giờ bạn có thể bắt đầu sử dụng Radar";
+
+/* Title for the setup complete screen shown at the end of the onboarding flow. */
+"ONBOARDING_SETUP_COMPLETE_TITLE" = "Cài đặt hoàn tất";
+
+/* Primary button on the 'sign up' screen that begins the new account flow. */
+"ONBOARDING_SIGN_UP_CREATE_ACCOUNT_BUTTON_TITLE" = "Create New Account";
+
+/* Continuation of the body text on the 'sign up' onboarding screen. Begins with a leading space and follows the highlighted phrase. */
+"ONBOARDING_SIGN_UP_SIGNAL_INFO_BODY" = " and compatible with it, letting you keep all your existing conversations";
+
+/* Highlighted leading phrase of the body text on the 'sign up' onboarding screen. Rendered in the app's accent color. */
+"ONBOARDING_SIGN_UP_SIGNAL_INFO_HIGHLIGHT" = "Radar is based on Signal";
+
+/* Subtitle on the 'sign up' screen shown after the user taps 'I'm new to Radar' on the onboarding splash. */
+"ONBOARDING_SIGN_UP_SUBTITLE" = "Create a new account or restore an existing Signal account";
+
+/* Title of the 'sign up' screen shown after the user taps 'I'm new to Radar' on the onboarding splash. */
+"ONBOARDING_SIGN_UP_TITLE" = "Sign up";
+
+/* Secondary text button on the 'sign up' screen that begins the restore / use existing Signal account flow. */
+"ONBOARDING_SIGN_UP_USE_SIGNAL_ACCOUNT_BUTTON_TITLE" = "Use my Signal account";
 
 /* Explanation of 'do not have old device' flow for the 'Restore or Transfer' prompt */
-"ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_BODY" = "Hoặc bạn đang cài lại Signal trên cùng thiết bị";
+"ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_BODY" = "Hoặc bạn đang cài lại Radar/Radar trên cùng thiết bị";
 
 /* Title for the 'do not have my old device' choice of the 'Restore or Transfer' prompt */
 "ONBOARDING_SPLASH_DO_NOT_HAVE_OLD_DEVICE_TITLE" = "Tôi không có điện thoại cũ";
 
 /* Explanation of 'have old device' flow for the 'Restore or Transfer' prompt */
-"ONBOARDING_SPLASH_HAVE_OLD_DEVICE_BODY" = "Quét mã QR từ tài khoản Signal điện thoại của bạn để nhanh chóng bắt đầu";
+"ONBOARDING_SPLASH_HAVE_OLD_DEVICE_BODY" = "Quét mã QR từ tài khoản Radar/Radar điện thoại của bạn để nhanh chóng bắt đầu";
 
 /* Title for the 'have my old device' choice of the 'Restore or Transfer' prompt */
 "ONBOARDING_SPLASH_HAVE_OLD_DEVICE_TITLE" = "Tôi có điện thoại cũ";
+
+/* Explanation of the 'link device' flow for the 'Restore or Transfer' prompt */
+"ONBOARDING_SPLASH_LINK_DEVICE_BODY" = "Dùng thiết bị này làm thiết bị phụ cho phiên hiện có của bạn";
+
+/* Title for the 'link device' choice of the 'Restore or Transfer' prompt */
+"ONBOARDING_SPLASH_LINK_DEVICE_TITLE" = "Liên kết thiết bị";
+
+/* Explanation of the 'migrate from Signal' flow for the 'Restore or Transfer' prompt */
+"ONBOARDING_SPLASH_MIGRATE_FROM_SIGNAL_BODY" = "Khôi phục tài khoản của bạn từ ứng dụng Signal được cài trên thiết bị này";
+
+/* Title for the 'migrate from Signal' choice of the 'Restore or Transfer' prompt */
+"ONBOARDING_SPLASH_MIGRATE_FROM_SIGNAL_TITLE" = "Chuyển từ Signal";
+
+/* Primary button on the 'onboarding splash' view for users who are new to the app. */
+"ONBOARDING_SPLASH_NEW_TO_SIGNAL_BUTTON_TITLE" = "I'm new to Radar";
 
 /* Text indicating Signal is a nonprofit on the 'onboarding splash' view. For non-English languages, exclude the word '501c3'. */
 "ONBOARDING_SPLASH_NONPROFIT" = "Signal là một tổ chức phi lợi nhuận";
 
 /* Button for restoring or transferring account in the 'onboarding splash' view. */
-"ONBOARDING_SPLASH_RESTORE_OR_TRANSFER_BUTTON_TITLE" = "Khôi phục hoặc chuyển tài khoản";
+"ONBOARDING_SPLASH_RESTORE_OR_TRANSFER_BUTTON_TITLE" = "I already have an account";
+
+/* Explanation of the 'set up my new phone' flow for the 'Restore or Transfer' prompt */
+"ONBOARDING_SPLASH_SET_UP_NEW_PHONE_BODY" = "Quét mã QR từ tài khoản Signal/Radar hiện tại của bạn để bắt đầu nhanh chóng";
+
+/* Title for the 'set up my new phone' choice of the 'Restore or Transfer' prompt */
+"ONBOARDING_SPLASH_SET_UP_NEW_PHONE_TITLE" = "Thiết lập điện thoại mới của tôi";
 
 /* Link to the 'terms and privacy policy' in the 'onboarding splash' view. */
 "ONBOARDING_SPLASH_TERM_AND_PRIVACY_POLICY" = "Điều khoản & Quyền riêng tư";
 
 /* Title of the 'onboarding splash' view. */
-"ONBOARDING_SPLASH_TITLE" = "Luôn có được sự riêng tư.\nHãy là chính mình trong từng tin nhắn.";
+"ONBOARDING_SPLASH_TITLE" = "Message privately,
+Send money securely.";
 
 /* Subtitle for action to verify with an authenticator as a 2fa method. */
 "ONBOARDING_TWO_FACTOR_AUTH_METHOD_AUTHENTICATOR_APP_BODY" = "Nhập mã dùng một lần được tạo bởi ứng dụng xác thực của bạn.";
@@ -6821,19 +6892,19 @@
 "OPEN_SETTINGS_BUTTON" = "Cài đặt";
 
 /* Signal doesn't support old versions of iOS and shows a warning if you're on unsupported version. Some users can upgrade their device to a newer version of iOS to continue using Signal. If that's the case, they'll be shown this text. */
-"OS_EXPIRED_AND_CAN_UPGRADE_OS" = "Signal không còn hoạt động được trên thiết bị này. Để tiếp tục sử dụng Signal, hãy cập nhật thiết bị của bạn lên một phiên bản iOS mới hơn.";
+"OS_EXPIRED_AND_CAN_UPGRADE_OS" = "Radar không còn hoạt động được trên thiết bị này. Để tiếp tục sử dụng Radar, hãy cập nhật thiết bị của bạn lên một phiên bản iOS mới hơn.";
 
 /* Signal doesn't support old devices. If that's the case, they'll be shown this action, and tapping it will open information about Signal's minimum supported operating systems. */
-"OS_EXPIRED_AND_DEVICE_IS_STUCK" = "Signal không còn hoạt động được trên thiết bị này. Để tiếp tục sử dụng Signal, hãy đổi qua một thiết bị mới hơn.";
+"OS_EXPIRED_AND_DEVICE_IS_STUCK" = "Radar không còn hoạt động được trên thiết bị này. Để tiếp tục sử dụng Radar, hãy đổi qua một thiết bị mới hơn.";
 
 /* Signal doesn't support old versions of iOS and shows a warning if you're on an old version. Some users can upgrade their device to a newer version of iOS to continue using Signal. If that's the case, they'll be shown this action, and tapping it will open device update instructions. */
 "OS_SOON_TO_EXPIRE_ACTION_TITLE" = "Cập nhật ngay";
 
 /* Signal doesn't support old versions of iOS and shows a warning if you're an old version that will soon lose support. Some users can upgrade their device to a newer version of iOS to continue using Signal. If that's the case, they'll be shown this text. Embeds {{expiration date}}. */
-"OS_SOON_TO_EXPIRE_AND_CAN_UPGRADE_OS_FORMAT" = "Signal sẽ sớm không còn hỗ trợ phiên bản iOS trên thiết bị của bạn. Để tiếp tục sử dụng Signal, hãy cập nhật thiết bị của bạn lên một phiên bản iOS mới hơn trước ngày %1$@.";
+"OS_SOON_TO_EXPIRE_AND_CAN_UPGRADE_OS_FORMAT" = "Radar sẽ sớm không còn hỗ trợ phiên bản iOS trên thiết bị của bạn. Để tiếp tục sử dụng Radar, hãy cập nhật thiết bị của bạn lên một phiên bản iOS mới hơn trước ngày %1$@.";
 
 /* Signal doesn't support old versions of iOS and shows a warning if you're on an old version that will soon lose support. This is the text on that warning when users can't upgrade iOS without getting a new device. Embeds {{expiration date}}. */
-"OS_SOON_TO_EXPIRE_AND_DEVICE_WILL_BE_STUCK_FORMAT" = "Signal sẽ sớm không còn hỗ trợ phiên bản iOS trên thiết bị của bạn. Để tiếp tục sử dụng Signal, hãy đổi qua một thiết bị mới hơn trước ngày %1$@.";
+"OS_SOON_TO_EXPIRE_AND_DEVICE_WILL_BE_STUCK_FORMAT" = "Radar sẽ sớm không còn hỗ trợ phiên bản iOS trên thiết bị của bạn. Để tiếp tục sử dụng Radar, hãy đổi qua một thiết bị mới hơn trước ngày %1$@.";
 
 /* Info Message when another user disabled disappearing messages. Embeds {{name of other user}}. */
 "OTHER_DISABLED_DISAPPEARING_MESSAGES_CONFIGURATION" = "%1$@ đã tắt tính năng tự hủy tin nhắn.";
@@ -6842,13 +6913,13 @@
 "OTHER_UPDATED_DISAPPEARING_MESSAGES_CONFIGURATION" = "%1$@ đã đặt thời gian để tin nhắn biến mất là %2$@.";
 
 /* Label warning the user that the Signal service may be down. */
-"OUTAGE_WARNING" = "Signal đang gặp trục trặc kĩ thuật. Chúng thôi đang cố gắng để khôi phục dịch vụ sớm nhất có thể.";
+"OUTAGE_WARNING" = "Radar đang gặp trục trặc kĩ thuật. Chúng thôi đang cố gắng để khôi phục dịch vụ sớm nhất có thể.";
 
 /* Label for action link when the user has an outdated payment client */
 "OUTDATED_PAYMENT_CLIENT_ACTION_TITLE" = "Cập nhật ngay";
 
 /* Label warning the user that they should update Signal to continue using payments. */
-"OUTDATED_PAYMENT_CLIENT_REMINDER_TEXT" = "Cập nhật Signal để tiếp tục sử dụng các hình thức thanh toán. Số dư tài khoản của bạn có thể không phải là mới nhất.";
+"OUTDATED_PAYMENT_CLIENT_REMINDER_TEXT" = "Cập nhật Radar để tiếp tục sử dụng các hình thức thanh toán. Số dư tài khoản của bạn có thể không phải là mới nhất.";
 
 /* Body of prompt notifying restore was cancelled. */
 "OUTGOING_DEVICE_REGISTRATION_CANCELLED_RESTORE_BODY" = "Đã hủy khôi phục. Vui lòng thử lại.";
@@ -6857,7 +6928,7 @@
 "OUTGOING_DEVICE_REGISTRATION_CANCELLED_RESTORE_TITLE" = "Đã hủy khôi phục";
 
 /* Body of prompt notifying registration without restore completed on the new device. */
-"OUTGOING_DEVICE_REGISTRATION_COMPLETE_BODY" = "Tài khoản Signal của bạn đã được kích hoạt trên thiết bị khác của bạn. Signal hiện không còn hoạt động trên thiết bị này.";
+"OUTGOING_DEVICE_REGISTRATION_COMPLETE_BODY" = "Tài khoản Radar của bạn đã được kích hoạt trên thiết bị khác của bạn. Radar hiện không còn hoạt động trên thiết bị này.";
 
 /* Title of prompt notifying registration without restore completed on the new device. */
 "OUTGOING_DEVICE_REGISTRATION_COMPLETE_TITLE" = "Hoàn tất đăng ký";
@@ -6896,7 +6967,7 @@
 "OUTGOING_DEVICE_RESTORE_BACKUP_RESTORE_DESCRIPTION" = "Bản sao lưu gần nhất của bạn là vào lúc %2$@ ngày %1$@.";
 
 /* Body of prompt notifying device restore started on the new device. */
-"OUTGOING_DEVICE_RESTORE_COMPLETE_BODY" = "Tài khoản và tin nhắn Signal của bạn đã bắt đầu được chuyển đến thiết bị khác của bạn. Signal hiện không còn hoạt động trên thiết bị này.";
+"OUTGOING_DEVICE_RESTORE_COMPLETE_BODY" = "Tài khoản và tin nhắn Radar của bạn đã bắt đầu được chuyển đến thiết bị khác của bạn. Radar hiện không còn hoạt động trên thiết bị này.";
 
 /* Title of prompt notifying device restore started on the new device. */
 "OUTGOING_DEVICE_RESTORE_COMPLETE_TITLE" = "Hoàn tất khôi phục";
@@ -6920,7 +6991,7 @@
 "OUTGOING_DEVICE_RESTORE_INITIAL_VIEW_TITLE" = "Chuyển Tài khoản";
 
 /* Body of prompt notifying device transfer completed. */
-"OUTGOING_DEVICE_TRANSFER_COMPLETE_BODY" = "Tài khoản và tin nhắn Signal của bạn đã được chuyển đến thiết bị khác của bạn. Signal hiện không còn hoạt động trên thiết bị này.";
+"OUTGOING_DEVICE_TRANSFER_COMPLETE_BODY" = "Tài khoản và tin nhắn Radar của bạn đã được chuyển đến thiết bị khác của bạn. Radar hiện không còn hoạt động trên thiết bị này.";
 
 /* Title of prompt notifying device transfer completed. */
 "OUTGOING_DEVICE_TRANSFER_COMPLETE_TITLE" = "Chuyển hoàn tất";
@@ -6941,10 +7012,10 @@
 "OUTGOING_MISSED_VOICE_CALL" = "Cuộc gọi thoại không được trả lời";
 
 /* Button for action sheet shown when device transfer completes; quits the Signal app immediately (does not automatically relaunch, but the user may choose to relaunch). */
-"OUTGOING_TRANSFER_COMPLETE_EXIT_ACTION" = "Thoát Signal";
+"OUTGOING_TRANSFER_COMPLETE_EXIT_ACTION" = "Thoát Radar";
 
 /* Message for action sheet shown when device transfer completes */
-"OUTGOING_TRANSFER_COMPLETE_MESSAGE" = "Signal sẽ thoát ra trên thiết bị này";
+"OUTGOING_TRANSFER_COMPLETE_MESSAGE" = "Radar sẽ thoát ra trên thiết bị này";
 
 /* Title for action sheet shown when device transfer completes */
 "OUTGOING_TRANSFER_COMPLETE_TITLE" = "Chuyển hoàn tất!";
@@ -6972,6 +7043,26 @@
 
 /* Header title for iDEAL|Wero bank payment details screen */
 "PAYMENT_DETAILS_IDEAL_BANK_TITLE" = "iDEAL | Wero";
+
+
+
+
+/* Format for indicator of a payment amount converted to fiat currency with the freshness of the conversion rate. Embeds: {{ %1$@ the payment amount, %2$@ the freshness of the currency conversion rate }}. */
+
+/* Instruction shown on the Add Funds screen telling the user which address and network to use. */
+"PAYMENTS_ADD_FUNDS_INSTRUCTION" = "Gửi Bitcoin đến Địa chỉ và Mạng lưới sau:";
+
+/* Button label to skip the Add Funds step during payments onboarding. */
+"PAYMENTS_ADD_FUNDS_INTRO_SKIP" = "Skip this step";
+
+/* Subtitle for the Add Funds onboarding screen explaining where to deposit from. */
+"PAYMENTS_ADD_FUNDS_INTRO_SUBTITLE" = "To start sending payments, deposit funds from your existing account or exchange";
+
+/* Title for the Add Funds onboarding screen. */
+"PAYMENTS_ADD_FUNDS_INTRO_TITLE" = "Add Funds";
+
+/* Toast shown when fetching the on-chain Bitcoin receive address fails on the Add Funds screen. */
+"PAYMENTS_ADD_FUNDS_ONCHAIN_FETCH_FAILED" = "Couldn't load Bitcoin address";
 
 /* Format for indicator of a payment amount converted to fiat currency with the freshness of the conversion rate. Embeds: {{ %1$@ the payment amount, %2$@ the freshness of the currency conversion rate }}. */
 "PAYMENTS_CURRENCY_CONVERSION_FRESHNESS_FORMAT" = "%1$@ tại %2$@";
@@ -7011,6 +7102,15 @@
 
 /* Status indicator for invalid payments which could not be processed. */
 "PAYMENTS_INFO_UNAVAILABLE_MESSAGE" = "KHÔNG KHẢ DỤNG";
+
+/* Body text for the Payments introduction screen explaining the Bitcoin Lightning Network. */
+"PAYMENTS_INTRO_BODY" = "Thanks to the Bitcoin Lightning Network, it's easy, fast and private.";
+
+/* Subtitle for the Payments introduction screen. */
+"PAYMENTS_INTRO_SUBTITLE" = "With Radar, you can send and receive money in your chats.";
+
+/* Title for the Payments introduction screen shown during onboarding. */
+"PAYMENTS_INTRO_TITLE" = "Introducing Payments";
 
 /* Indicates that an unknown error occurred while using Touch ID/Face ID/Phone Passcode. */
 "PAYMENTS_LOCK_AUTHENTICATION_ENABLE_UNKNOWN_ERROR" = "Không thể truy cập xác thực.";
@@ -7073,10 +7173,10 @@
 "PAYMENTS_LOCK_REASON_UNLOCK_PAYMENTS_LOCK" = "Xác thực để xác nhận thanh toán.";
 
 /* Label for the 'add memo' ui in the 'send payment' UI. */
-"PAYMENTS_NEW_PAYMENT_ADD_MEMO" = "Thêm Ghi chú";
+"PAYMENTS_NEW_PAYMENT_ADD_MEMO" = "Ghi chú (tùy chọn)";
 
 /* Format for the 'balance' indicator. Embeds {{ the current payments balance }}. */
-"PAYMENTS_NEW_PAYMENT_BALANCE_FORMAT" = "Số dư có sẵn: %1$@";
+"PAYMENTS_NEW_PAYMENT_BALANCE_FORMAT" = "Có sẵn: %@";
 
 /* Label for the 'confirm payment' button. */
 "PAYMENTS_NEW_PAYMENT_CONFIRM_PAYMENT_BUTTON" = "Xác nhận Thanh toán";
@@ -7091,16 +7191,16 @@
 "PAYMENTS_NEW_PAYMENT_ERROR_CONNECTIVITY_FAILURE" = "Không thể liên lạc dịch vụ";
 
 /* Indicates that a payment failed due to insufficient funds. */
-"PAYMENTS_NEW_PAYMENT_ERROR_INSUFFICIENT_FUNDS" = "Bạn không có đủ MOB để hoàn tất thanh toán này.";
+"PAYMENTS_NEW_PAYMENT_ERROR_INSUFFICIENT_FUNDS" = "Bạn không có đủ BTC để hoàn tất thanh toán này.";
 
 /* Indicates that a payment failed due to insufficient funds. Embeds {{ current balance }}. */
-"PAYMENTS_NEW_PAYMENT_ERROR_INSUFFICIENT_FUNDS_FORMAT" = "Bạn không có đủ MOB để hoàn tất thanh toán này. Số dư hiện tại của bạn là %1$@.";
+"PAYMENTS_NEW_PAYMENT_ERROR_INSUFFICIENT_FUNDS_FORMAT" = "Bạn không có đủ BTC để hoàn tất thanh toán này. Số dư hiện tại của bạn là %1$@.";
 
 /* Indicates that a payment failed due to being invalid. */
 "PAYMENTS_NEW_PAYMENT_ERROR_INVALID_TRANSACTION" = "Giao dịch không hợp lệ";
 
 /* Indicates that a payment failed due to an outdated client. */
-"PAYMENTS_NEW_PAYMENT_ERROR_OUTDATED_CLIENT" = "Cập nhật Signal để sử dụng thanh toán.";
+"PAYMENTS_NEW_PAYMENT_ERROR_OUTDATED_CLIENT" = "Cập nhật Radar để sử dụng thanh toán.";
 
 /* Indicates that an outgoing payment could not be verified in a timely way. */
 "PAYMENTS_NEW_PAYMENT_ERROR_OUTGOING_VERIFICATION_TAKING_TOO_LONG" = "Thanh toán chưa được xác minh";
@@ -7141,6 +7241,9 @@
 /* Format for the 'payment recipient amount' indicator. Embeds {{ the name of the recipient of the payment }}. */
 "PAYMENTS_NEW_PAYMENT_RECIPIENT_AMOUNT_FORMAT" = "Đến %1$@";
 
+/* Label for the 'send payment' button. */
+"PAYMENTS_NEW_PAYMENT_SEND_BUTTON" = "Gửi";
+
 /* Label for the payments notification banner for a single payment notification. */
 "PAYMENTS_NOTIFICATION_BANNER_1" = "1 thông báo thanh toán mới";
 
@@ -7149,6 +7252,9 @@
 
 /* Format for the payments notification banner for multiple payment notifications. Embeds: {{ the number of unread payment notifications }}. */
 "PAYMENTS_NOTIFICATION_BANNER_N_FORMAT" = "%1$@ thông báo thanh toán mới";
+
+/* Badge label shown on failed payment bubbles in chat */
+"PAYMENTS_PAYMENT_STATUS_FAILED" = "Failed";
 
 /* Payment status context with contact name, failed. Embeds {{ Name of receiving contact }} */
 "PAYMENTS_PAYMENT_STATUS_IN_CHAT_PAYMENT_TO" = "Thanh toán cho %1$@";
@@ -7191,6 +7297,12 @@
 
 /* Status indicator for payments which had an unknown failure. */
 "PAYMENTS_PAYMENT_STATUS_LONG_UNKNOWN" = "Lỗi không rõ";
+
+/* Badge label shown on received payment bubbles in chat */
+"PAYMENTS_PAYMENT_STATUS_RECEIVED" = "Received";
+
+/* Badge label shown on sent payment bubbles in chat */
+"PAYMENTS_PAYMENT_STATUS_SENT" = "Sent";
 
 /* Status indicator for incoming payments which are complete. */
 "PAYMENTS_PAYMENT_STATUS_SHORT_INCOMING_COMPLETE" = "Hoàn tất";
@@ -7246,6 +7358,9 @@
 /* Title for error alert indicating that a given user cannot receive payments because they have not enabled payments. Embeds {{ the contact's name }} */
 "PAYMENTS_RECIPIENT_PAYMENTS_NOT_ENABLED_TITLE" = "%1$@ chưa bật tính năng Thanh toán";
 
+/* Label for 'send' button on the payments screen. */
+"PAYMENTS_SCREEN_SEND_BUTTON" = "Send";
+
 /* Payments Preview Text shown in chat list for payments. */
 "PAYMENTS_THREAD_PREVIEW_TEXT" = "💳 Thanh toán";
 
@@ -7260,6 +7375,10 @@
 
 /* Label for unknown payments. */
 "PAYMENTS_UNKNOWN_PAYMENT" = "Thanh toán Không hợp lệ";
+/* Label for the Payments Username row in payment settings. */
+"PAYMENTS_USERNAME_SETTINGS_TITLE" = "Tên người dùng thanh toán";
+
+"PAYMENTS_WALLET_ADDRESS_LOADING" = "Đang tải...";
 
 /* The alert message if user tries to exit a task without saving changes. */
 "PENDING_CHANGES_ACTION_SHEET_MESSAGE" = "Bạn có muốn bỏ các thay đổi này?";
@@ -7343,13 +7462,13 @@
 "PHONE_NUMBER_DISCOVERABILITY_EVERYBODY" = "Tất cả mọi người";
 
 /* A user friendly description of the 'everybody' phone number discoverability mode. */
-"PHONE_NUMBER_DISCOVERABILITY_EVERYBODY_DESCRIPTION" = "Bất kỳ ai có số điện thoại của bạn sẽ thấy bạn trên Signal và có thể bắt đầu trò chuyện với bạn.";
+"PHONE_NUMBER_DISCOVERABILITY_EVERYBODY_DESCRIPTION" = "Bất kỳ ai có số điện thoại của bạn sẽ thấy bạn trên Radar và có thể bắt đầu trò chuyện với bạn.";
 
 /* A user friendly name for the 'nobody' phone number discoverability mode. */
 "PHONE_NUMBER_DISCOVERABILITY_NOBODY" = "Không ai";
 
 /* A user friendly description of the 'nobody' phone number discoverability mode. */
-"PHONE_NUMBER_DISCOVERABILITY_NOBODY_DESCRIPTION" = "Sẽ không có ai nhìn thấy số điện thoại của bạn trên Signal, trừ khi bạn nhắn tin với người đó hoặc đã có một cuộc trò chuyện với người đó.";
+"PHONE_NUMBER_DISCOVERABILITY_NOBODY_DESCRIPTION" = "Sẽ không có ai nhìn thấy số điện thoại của bạn trên Radar, trừ khi bạn nhắn tin với người đó hoặc đã có một cuộc trò chuyện với người đó.";
 
 /* A format for a label showing an example phone number. Embeds {{the example phone number}}. */
 "PHONE_NUMBER_EXAMPLE_FORMAT" = "Ví dụ: %1$@";
@@ -7439,13 +7558,13 @@
 "PIN_CREATION_DISABLE_CONFIRMATION_ACTION" = "Tắt PIN";
 
 /* Message of the 'pin disable' action sheet. */
-"PIN_CREATION_DISABLE_CONFIRMATION_MESSAGE" = "Nếu bạn vô hiệu hoá mã PIN, bạn sẽ mất tất cả dữ liệu khi bạn đăng ký lại Signal trừ khi bạn chuyển nó từ một thiết bị iOS khác. Bạn không thể bật Khoá Đăng ký khi mã PIN bị vô hiệu hoá.";
+"PIN_CREATION_DISABLE_CONFIRMATION_MESSAGE" = "Nếu bạn vô hiệu hoá mã PIN, bạn sẽ mất tất cả dữ liệu khi bạn đăng ký lại Radar trừ khi bạn chuyển nó từ một thiết bị iOS khác. Bạn không thể bật Khoá Đăng ký khi mã PIN bị vô hiệu hoá.";
 
 /* Title of the 'pin disable' action sheet. */
 "PIN_CREATION_DISABLE_CONFIRMATION_TITLE" = "Cảnh báo";
 
 /* The explanation in the 'pin creation' view. */
-"PIN_CREATION_EXPLANATION" = "Mã PIN mã hoá các thông tin được lưu trữ với Signal để chỉ mình bạn có thể truy cập được. Thông tin người dùng, cài đặt, và các liên hệ sẽ được khôi phục khi bạn cài lại Signal. Bạn không cần điền PIN mỗi lần mở ứng dụng.";
+"PIN_CREATION_EXPLANATION" = "Mã PIN mã hoá các thông tin được lưu trữ với Radar để chỉ mình bạn có thể truy cập được. Thông tin người dùng, cài đặt, và các liên hệ sẽ được khôi phục khi bạn cài lại Radar. Bạn không cần điền PIN mỗi lần mở ứng dụng.";
 
 /* Message when a generic error occurs while creating a PIN. */
 "PIN_CREATION_GENERIC_ERROR_MESSAGE" = "Đã xảy ra lỗi khi tạo mã PIN của bạn. Vui lòng liên hệ bộ phận hỗ trợ.";
@@ -7454,10 +7573,10 @@
 "PIN_CREATION_LEARN_MORE" = "Tìm Hiểu Thêm về Mã PIN";
 
 /* Users can create PINs to restore their account data later. They can learn more about this on a sheet. This is the text on that sheet. */
-"PIN_CREATION_LEARN_MORE_TEXT" = "Mã PIN giúp thông tin trên Signal của bạn được mã hóa để bạn là người duy nhất có thể truy cập. Hồ sơ, các cài đặt và danh bạ sẽ được khôi phục khi bạn cài đặt lại Signal.";
+"PIN_CREATION_LEARN_MORE_TEXT" = "Mã PIN giúp thông tin trên Radar của bạn được mã hóa để bạn là người duy nhất có thể truy cập. Hồ sơ, các cài đặt và danh bạ sẽ được khôi phục khi bạn cài đặt lại Radar.";
 
 /* Users can create PINs to restore their account data later. They can learn more about this on a sheet. This is the title on that sheet. */
-"PIN_CREATION_LEARN_MORE_TITLE" = "Về Mã PIN của Signal";
+"PIN_CREATION_LEARN_MORE_TITLE" = "Về Mã PIN của Radar";
 
 /* Label indicating that the attempted PIN does not match the first PIN */
 "PIN_CREATION_MISMATCH_ERROR" = "Mã PIN không khớp. Hãy thử lại.";
@@ -7487,7 +7606,7 @@
 "PIN_CREATION_WEAK_ERROR" = "Chọn mã PIN mạnh hơn";
 
 /* If your attempted PIN is too weak, you'll see an error message. This is the text on the error dialog. */
-"PIN_CREATION_WEAK_ERROR_MESSAGE" = "Mã PIN giúp thông tin trên Signal của bạn được mã hóa để bạn là người duy nhất có thể truy cập. Chọn một mã PIN mạnh hơn để bảo vệ tài khoản của bạn.";
+"PIN_CREATION_WEAK_ERROR_MESSAGE" = "Mã PIN giúp thông tin trên Radar của bạn được mã hóa để bạn là người duy nhất có thể truy cập. Chọn một mã PIN mạnh hơn để bảo vệ tài khoản của bạn.";
 
 /* If the user is re-registering, they need to enter their PIN to restore all their data. In some cases, they can skip this entry and lose some data. This text is shown on a button that lets them begin to do this. */
 "PIN_ENTER_EXISTING_SKIP" = "Bỏ qua mã PIN";
@@ -7511,7 +7630,7 @@
 "PIN_REMINDER_MEGAPHONE_FEW_DAYS_TOAST" = "Chúng tôi sẽ nhắc bạn trong vài ngày tới.";
 
 /* Title for PIN reminder megaphone */
-"PIN_REMINDER_MEGAPHONE_TITLE" = "Xác minh mã PIN Signal của bạn";
+"PIN_REMINDER_MEGAPHONE_TITLE" = "Xác minh mã PIN Radar của bạn";
 
 /* Toast indicating that we'll ask you for your PIN again in 2 weeks, after successfully entering it. */
 "PIN_REMINDER_MEGAPHONE_TWO_WEEK_SUCCESSFUL_TOAST" = "Mã PIN đúng. Chúng tôi sẽ nhắc bạn lại trong vài tuần nữa.";
@@ -7529,7 +7648,7 @@
 "PIN_REMINDER_MISMATCH_ERROR" = "Mã PIN không đúng, hãy thử lại.";
 
 /* The title for the 'pin reminder' dialog. */
-"PIN_REMINDER_TITLE" = "Nhập mã PIN Signal của bạn";
+"PIN_REMINDER_TITLE" = "Nhập mã PIN Radar của bạn";
 
 /* Label indicating that the attempted PIN is too short */
 "PIN_REMINDER_TOO_SHORT_ERROR" = "Mã PIN phải có ít nhất 4 kí tự.";
@@ -7613,7 +7732,7 @@
 "PINS_MEGAPHONE_ACTION" = "Tạo mã PIN";
 
 /* Body for PIN megaphone when user doesn't have a PIN */
-"PINS_MEGAPHONE_BODY" = "Hãy hoàn thành việc tạo mã PIN của Signal.";
+"PINS_MEGAPHONE_BODY" = "Hãy hoàn thành việc tạo mã PIN của Radar.";
 
 /* Title for PIN megaphone when user doesn't have a PIN */
 "PINS_MEGAPHONE_TITLE" = "Tạo mã PIN";
@@ -7727,19 +7846,19 @@
 "PRIVACY_VERIFICATION_FAILED_MISMATCHED_SAFETY_NUMBERS_IN_CLIPBOARD" = "Số trong bảng sao chép của bạn không giống với số an toàn đúng của bạn cho cuộc trò chuyện này.";
 
 /* Alert body for user error */
-"PRIVACY_VERIFICATION_FAILED_NO_SAFETY_NUMBERS_IN_CLIPBOARD" = "Signal không thể tìm thấy số an toàn nào trong bảng ghi tạm của bạn. Bạn có sao chép đúng số không?";
+"PRIVACY_VERIFICATION_FAILED_NO_SAFETY_NUMBERS_IN_CLIPBOARD" = "Radar không thể tìm thấy số an toàn nào trong bảng ghi tạm của bạn. Bạn có sao chép đúng số không?";
 
 /* Alert body when verifying with {{contact name}} */
-"PRIVACY_VERIFICATION_FAILED_THEY_HAVE_WRONG_KEY_FOR_ME" = "Mỗi cặp người dùng của Signal chia sẻ một số an toàn riêng biệt. Kiểm tra xem %1$@ có đang hiển thị số an toàn riêng \"của bạn\" không.";
+"PRIVACY_VERIFICATION_FAILED_THEY_HAVE_WRONG_KEY_FOR_ME" = "Mỗi cặp người dùng của Radar chia sẻ một số an toàn riêng biệt. Kiểm tra xem %1$@ có đang hiển thị số an toàn riêng \"của bạn\" không.";
 
 /* alert body */
-"PRIVACY_VERIFICATION_FAILED_WITH_OLD_LOCAL_VERSION" = "Bạn đang sử dụng Signal phiên bản cũ. Bạn cần cập nhật trước khi có thể xác minh.";
+"PRIVACY_VERIFICATION_FAILED_WITH_OLD_LOCAL_VERSION" = "Bạn đang sử dụng Radar phiên bản cũ. Bạn cần cập nhật trước khi có thể xác minh.";
 
 /* alert body */
-"PRIVACY_VERIFICATION_FAILED_WITH_OLD_REMOTE_VERSION" = "Người trò chuyện với bạn đang sử dụng Signal phiên bản cũ. Họ cần phải cập nhật trước khi bạn có thể xác minh.";
+"PRIVACY_VERIFICATION_FAILED_WITH_OLD_REMOTE_VERSION" = "Người trò chuyện với bạn đang sử dụng Radar phiên bản cũ. Họ cần phải cập nhật trước khi bạn có thể xác minh.";
 
 /* alert body */
-"PRIVACY_VERIFICATION_FAILURE_INVALID_QRCODE" = "Mã đã quét không giống số an toàn. Cả hai có đang sử dụng Signal phiên bản mới nhất không?";
+"PRIVACY_VERIFICATION_FAILURE_INVALID_QRCODE" = "Mã đã quét không giống số an toàn. Cả hai có đang sử dụng Radar phiên bản mới nhất không?";
 
 /* Navbar title */
 "PRIVACY_VERIFICATION_TITLE" = "Xác minh mã số an toàn";
@@ -7817,7 +7936,7 @@
 "PROFILE_NAME_EDUCATION_SHEET_BULLET_4" = "Không chia sẻ thông tin cá nhân với người bạn không quen biết";
 
 /* Header for the explainer sheet for profile names */
-"PROFILE_NAME_EDUCATION_SHEET_HEADER_FORMAT" = "<bold>Tên hồ sơ</bold> trên Signal được chọn bởi chủ tài khoản.";
+"PROFILE_NAME_EDUCATION_SHEET_HEADER_FORMAT" = "<bold>Tên hồ sơ</bold> trên Radar được chọn bởi chủ tài khoản.";
 
 /* Title for the profile name view. */
 "PROFILE_NAME_VIEW_TITLE" = "Tên của Bạn";
@@ -7963,6 +8082,15 @@
 /* Indicates this message is a quoted reply to a voice message. */
 "QUOTED_REPLY_TYPE_VOICE_MESSAGE" = "Tin nhắn Thoại";
 
+/* Footer explaining what the Radar push relay does and the implications of disabling it. */
+"RADAR_PUSH_RELAY_FOOTER" = "When enabled, Radar uses an external service to deliver push notifications even when the app has been force-quit. Disabling it removes the linked device used for relaying.";
+
+/* Header for the Radar push notification relay setting section. */
+"RADAR_PUSH_RELAY_SECTION_HEADER" = "Push relay";
+
+/* Label for the switch that enables/disables the Radar push notification relay. */
+"RADAR_PUSH_RELAY_TOGGLE_LABEL" = "Use Radar push relay";
+
 /* Label for a button to lower your raised hand in a call. */
 "RAISED_HANDS_LOWER_HAND_BUTTON" = "Hạ Tay";
 
@@ -8030,7 +8158,7 @@
 "RECIPIENT_PICKER_ERROR_USER_CANNOT_BE_SELECTED" = "Không thể chọn được người dùng.";
 
 /* Alert text. Shown after selecting a phone number that isn't valid. */
-"RECIPIENT_PICKER_INVALID_NUMBER_MESSAGE" = "%1$@ không phải là người dùng Signal. Thử lại với một số điện thoại hợp lệ.";
+"RECIPIENT_PICKER_INVALID_NUMBER_MESSAGE" = "%1$@ không phải là người dùng Radar. Thử lại với một số điện thoại hợp lệ.";
 
 /* Alert title. Shown after selecting a phone number that isn't valid. */
 "RECIPIENT_PICKER_INVALID_NUMBER_TITLE" = "Số điện thoại không hợp lệ";
@@ -8039,10 +8167,10 @@
 "RECIPIENT_PICKER_INVITE_ACTION" = "Mời";
 
 /* Alert text. Shown after selecting a phone number that isn't a Signal user. */
-"RECIPIENT_PICKER_INVITE_MESSAGE" = "%1$@ không phải là người dùng Signal. Bạn có muốn mời số điện thoại này?";
+"RECIPIENT_PICKER_INVITE_MESSAGE" = "%1$@ không phải là người dùng Radar. Bạn có muốn mời số điện thoại này?";
 
 /* Alert title. Shown after selecting a phone number that isn't a Signal user. */
-"RECIPIENT_PICKER_INVITE_TITLE" = "Mời dùng Signal";
+"RECIPIENT_PICKER_INVITE_TITLE" = "Mời dùng Radar";
 
 /* Description of how and why Signal iOS uses Touch ID/Face ID/Phone Passcode during a periodic reminder to record your recovery key. */
 "RECOVERY_KEY_REMINDER_AUTHENTICATION_REASON" = "Xác thực để xem mã khóa khôi phục của bạn";
@@ -8051,13 +8179,13 @@
 "REGISTER_2FA_FORGOT_PIN_ALERT_TITLE" = "Cần Hỗ trợ?";
 
 /* Alert body for a forgotten SVR (V2) PIN */
-"REGISTER_2FA_FORGOT_SVR_PIN_ALERT_MESSAGE" = "Mã pin của bạn là một mã có 4+ ký tự bạn đã tạo, có thể là dãy số hoặc có cả số và chữ cái. Nếu bạn không nhớ được mã PIN, bạn cần chờ 7 ngày để đăng ký lại tài khoản của mình. Nếu bạn đã kích hoạt Sao lưu bảo mật Signal, bạn có thể tiến hành với Mã khóa khôi phục của mình.";
+"REGISTER_2FA_FORGOT_SVR_PIN_ALERT_MESSAGE" = "Mã pin của bạn là một mã có 4+ ký tự bạn đã tạo, có thể là dãy số hoặc có cả số và chữ cái. Nếu bạn không nhớ được mã PIN, bạn cần chờ 7 ngày để đăng ký lại tài khoản của mình. Nếu bạn đã kích hoạt Sao lưu bảo mật Radar, bạn có thể tiến hành với Mã khóa khôi phục của mình.";
 
 /* Alert body for a forgotten SVR (V2) PIN when the user doesn't have reglock and they cannot necessarily create a new PIN */
-"REGISTER_2FA_FORGOT_SVR_PIN_WITHOUT_REGLOCK_ALERT_MESSAGE" = "Mã pin của bạn là một mã có 4+ ký tự bạn đã tạo, có thể là dãy số hoặc có cả số và chữ cái. Nếu bạn không nhớ được mã PIN, bạn có thể đăng ký và dùng tài khoản của bạn nhưng bạn sẽ mất một số cài đặt được lưu lại như thông tin người dùng. Nếu bạn đã kích hoạt Sao lưu bảo mật Signal, bạn có thể tiến hành với Mã khóa khôi phục của mình.";
+"REGISTER_2FA_FORGOT_SVR_PIN_WITHOUT_REGLOCK_ALERT_MESSAGE" = "Mã pin của bạn là một mã có 4+ ký tự bạn đã tạo, có thể là dãy số hoặc có cả số và chữ cái. Nếu bạn không nhớ được mã PIN, bạn có thể đăng ký và dùng tài khoản của bạn nhưng bạn sẽ mất một số cài đặt được lưu lại như thông tin người dùng. Nếu bạn đã kích hoạt Sao lưu bảo mật Radar, bạn có thể tiến hành với Mã khóa khôi phục của mình.";
 
 /* Alert body for a forgotten SVR (V2) PIN when the user doesn't have reglock and they can create a new PIN */
-"REGISTER_2FA_FORGOT_SVR_PIN_WITHOUT_REGLOCK_AND_CAN_CREATE_NEW_PIN_ALERT_MESSAGE" = "Mã pin của bạn là một mã có 4+ ký tự bạn đã tạo, có thể là dãy số hoặc có cả số và chữ cái. Nếu bạn không nhớ mã PIN của mình, bạn có thể tạo một mã mới. Bạn có thể đăng ký và sử dụng tài khoản của mình nhưng sẽ không còn các cài đặt đã lưu như thông tin hồ sơ. Nếu bạn đã kích hoạt Sao lưu bảo mật Signal, bạn có thể tiến hành với Mã khóa khôi phục của mình.";
+"REGISTER_2FA_FORGOT_SVR_PIN_WITHOUT_REGLOCK_AND_CAN_CREATE_NEW_PIN_ALERT_MESSAGE" = "Mã pin của bạn là một mã có 4+ ký tự bạn đã tạo, có thể là dãy số hoặc có cả số và chữ cái. Nếu bạn không nhớ mã PIN của mình, bạn có thể tạo một mã mới. Bạn có thể đăng ký và sử dụng tài khoản của mình nhưng sẽ không còn các cài đặt đã lưu như thông tin hồ sơ. Nếu bạn đã kích hoạt Sao lưu bảo mật Radar, bạn có thể tiến hành với Mã khóa khôi phục của mình.";
 
 /* Alert title explaining what happens if you forget your 'two-factor auth pin'. */
 "REGISTER_2FA_INVALID_PIN_ALERT_TITLE" = "Mã PIN không chính xác";
@@ -8126,7 +8254,7 @@
 "REGISTRATION_BACKUP_RESTORE_ERROR_GENERIC_TITLE" = "Không thể hoàn tất việc chuyển";
 
 /* Body for a sheet warning users about an incorrect recovery key. */
-"REGISTRATION_BACKUP_RESTORE_ERROR_INCORRECT_KEY_BODY" = "Có thể bạn đã nhập sai mã khóa khôi phục hoặc chưa hoàn tất ít nhất một lần sao lưu trên thiết bị cũ. \n\nHãy đảm bảo rằng bạn đang đăng ký bằng cùng số điện thoại và mã khóa khôi phục bạn đã lưu khi bật Sao lưu bảo mật Signal và xác nhận rằng thiết bị cũ của bạn đã hoàn tất quá trình sao lưu.";
+"REGISTRATION_BACKUP_RESTORE_ERROR_INCORRECT_KEY_BODY" = "Có thể bạn đã nhập sai mã khóa khôi phục hoặc chưa hoàn tất ít nhất một lần sao lưu trên thiết bị cũ. \n\nHãy đảm bảo rằng bạn đang đăng ký bằng cùng số điện thoại và mã khóa khôi phục bạn đã lưu khi bật Sao lưu bảo mật Radar và xác nhận rằng thiết bị cũ của bạn đã hoàn tất quá trình sao lưu.";
 
 /* Body for a sheet warning users about an incorrect recovery key and having hit a rate limit on retries. */
 "REGISTRATION_BACKUP_RESTORE_ERROR_INCORRECT_KEY_RATE_LIMIT_BODY" = "Bạn đã hết số lượt thử mã khóa khôi phục. Vì lý do bảo mật, bạn chỉ có thể nhập mã khóa với số lượt nhất định. Hãy chờ 1 tiếng và thử lại.";
@@ -8165,7 +8293,7 @@
 "REGISTRATION_BACKUP_RESTORE_ERROR_UNRETRYABLE_SERVER_ERROR_TITLE" = "Không thể khôi phục bản sao lưu";
 
 /* Body for a sheet warning users about an incompatible backup version. */
-"REGISTRATION_BACKUP_RESTORE_ERROR_UNSUPPORTED_BACKUP_VERSION_BODY" = "Để khôi phục bản sao lưu của bạn, đảm bảo bạn đang sử dụng phiên bản mới nhất của Signal và thử lại. Nếu vẫn gặp vấn đề này, hãy liên hệ với bộ phận hỗ trợ.";
+"REGISTRATION_BACKUP_RESTORE_ERROR_UNSUPPORTED_BACKUP_VERSION_BODY" = "Để khôi phục bản sao lưu của bạn, đảm bảo bạn đang sử dụng phiên bản mới nhất của Radar và thử lại. Nếu vẫn gặp vấn đề này, hãy liên hệ với bộ phận hỗ trợ.";
 
 /* Title for a sheet warning users about an incompatible backup version. */
 "REGISTRATION_BACKUP_RESTORE_ERROR_UNSUPPORTED_BACKUP_VERSION_TITLE" = "Yêu cầu Cập nhật";
@@ -8177,7 +8305,7 @@
 "REGISTRATION_CANNOT_CONTINUE_WITHOUT_UPDATING_APP_ACTION" = "Cập nhật";
 
 /* During (re)registration, users may need to update their app to continue. They'll be presented with an alert if this is the case, prompting them to update. This is the description text on that alert. */
-"REGISTRATION_CANNOT_CONTINUE_WITHOUT_UPDATING_APP_DESCRIPTION" = "Để tiếp tục đăng ký, vui lòng cập nhật phiên bản mới nhất của Signal.";
+"REGISTRATION_CANNOT_CONTINUE_WITHOUT_UPDATING_APP_DESCRIPTION" = "Để tiếp tục đăng ký, vui lòng cập nhật phiên bản mới nhất của Radar.";
 
 /* During (re)registration, users may need to update their app to continue. They'll be presented with an alert if this is the case, prompting them to update. This is the title on that alert. */
 "REGISTRATION_CANNOT_CONTINUE_WITHOUT_UPDATING_APP_TITLE" = "Yêu cầu Cập nhật";
@@ -8219,7 +8347,7 @@
 "REGISTRATION_NO_BACKUP_KEY_BUTTON_TITLE" = "Không có mã khôi phục?";
 
 /* Body text on a sheet with info for what to do if you don't have a recovery key */
-"REGISTRATION_NO_BACKUP_KEY_SHEET_BODY" = "Không thể khôi phục bản sao lưu nếu không có mã khóa sao lưu 64 ký tự. Nếu bạn đã để mất mã khóa khôi phục của mình, Signal không thể hỗ trợ bạn khôi phục bản sao lưu.\n\nNếu có thiết bị cũ của mình, bạn có thể xem mã khóa khôi phục trong Cài đặt > Sao lưu. Sau đó nhấn Xem mã khóa khôi phục.";
+"REGISTRATION_NO_BACKUP_KEY_SHEET_BODY" = "Không thể khôi phục bản sao lưu nếu không có mã khóa sao lưu 64 ký tự. Nếu bạn đã để mất mã khóa khôi phục của mình, Radar không thể hỗ trợ bạn khôi phục bản sao lưu.\n\nNếu có thiết bị cũ của mình, bạn có thể xem mã khóa khôi phục trong Cài đặt > Sao lưu. Sau đó nhấn Xem mã khóa khôi phục.";
 
 /* Title for sheet with info for what to do if you don't have a recovery key */
 "REGISTRATION_NO_BACKUP_KEY_SHEET_TITLE" = "Không có mã khôi phục?";
@@ -8249,13 +8377,13 @@
 "REGISTRATION_PIN_CONFIRM_TITLE" = "Xác nhận mã PIN của bạn";
 
 /* During registration, users are asked to create a PIN code. This is the subtitle on the screen where this happens. A \"learn more\" link will be added to the end of this string. */
-"REGISTRATION_PIN_CREATE_SUBTITLE" = "Mã PIN có thể giúp bạn khôi phục tài khoản và giúp mã hóa thông tin của bạn với Signal.";
+"REGISTRATION_PIN_CREATE_SUBTITLE" = "Mã PIN có thể giúp bạn khôi phục tài khoản và giúp mã hóa thông tin của bạn với Radar.";
 
 /* During registration, users are asked to create a PIN code. This is the title on the screen where this happens. */
 "REGISTRATION_PIN_CREATE_TITLE" = "Tạo mã PIN của bạn";
 
 /* During re-registration, users may be asked to re-enter their PIN code. This is the subtitle on the screen where this happens. A \"learn more\" link will be added to the end of this string. */
-"REGISTRATION_PIN_ENTER_EXISTING_SUBTITLE" = "Mã PIN có thể giúp bạn khôi phục tài khoản và giúp mã hóa thông tin của bạn với Signal.";
+"REGISTRATION_PIN_ENTER_EXISTING_SUBTITLE" = "Mã PIN có thể giúp bạn khôi phục tài khoản và giúp mã hóa thông tin của bạn với Radar.";
 
 /* During re-registration, users may be asked to re-enter their PIN code. This is the title on the screen where this happens. */
 "REGISTRATION_PIN_ENTER_EXISTING_TITLE" = "Nhập mã PIN của bạn";
@@ -8297,7 +8425,7 @@
 "REGISTRATION_RESTORE_METHOD_MAKE_BACKUP_TUTORIAL_ENABLE_BACKUPS" = "Bật sao lưu và chờ quá trình sao lưu hoàn tất";
 
 /* First step in directions for how to make a backup */
-"REGISTRATION_RESTORE_METHOD_MAKE_BACKUP_TUTORIAL_OPEN_SIGNAL" = "Mở Signal trên thiết bị cũ của bạn";
+"REGISTRATION_RESTORE_METHOD_MAKE_BACKUP_TUTORIAL_OPEN_SIGNAL" = "Mở Radar trên thiết bị cũ của bạn";
 
 /* Second step in directions for how to make a backup */
 "REGISTRATION_RESTORE_METHOD_MAKE_BACKUP_TUTORIAL_TAP_SETTINGS" = "Nhấn Cài đặt > Sao lưu";
@@ -8315,7 +8443,7 @@
 "REGISTRATION_SCAN_QR_CODE_TITLE" = "Quét mã với thiết bị của bạn";
 
 /* Tutorial text describing the first step to scanning the restore/transfer QR code with your old phone: opening Signal */
-"REGISTRATION_SCAN_QR_CODE_TUTORIAL_OPEN_SIGNAL" = "Mở Signal trên thiết bị cũ của bạn";
+"REGISTRATION_SCAN_QR_CODE_TUTORIAL_OPEN_SIGNAL" = "Mở Radar trên thiết bị cũ của bạn";
 
 /* Tutorial text describing the third step to scanning the restore/transfer QR code with your old phone: scan the code */
 "REGISTRATION_SCAN_QR_CODE_TUTORIAL_SCAN" = "Quét mã này với camera";
@@ -8454,6 +8582,18 @@
 
 /* Error message when sending a verification code via voice call failed, but resending via sms might succeed. */
 "REGISTRATION_VOICE_CODE_FAILED_TRY_SMS_ERROR" = "Chúng tôi không thể gửi mã xác nhận cho bạn qua cuộc gọi thoại. Hãy thử nhận mã qua tin nhắn SMS.";
+
+/* Button title to allow / enable the Radar notification relay. */
+"RELAY_PERMISSION_ALERT_ALLOW" = "Allow";
+
+/* Button title to disable the Radar notification relay. */
+"RELAY_PERMISSION_ALERT_DISABLE" = "Don't Allow";
+
+/* Body of the alert asking the user whether to enable the Radar notification relay. */
+"RELAY_PERMISSION_ALERT_MESSAGE" = "Enable Radar notification relay to ensure you get immediate background notifications in Radar. Relay is always privacy-preserving and keeps your messages end-to-end encrypted no matter what.";
+
+/* Title of the alert asking the user whether to enable the Radar notification relay. */
+"RELAY_PERMISSION_ALERT_TITLE" = "Enable Notification Relay";
 
 /* Bottom bar label for the release notes thread */
 "RELEASE_NOTES_BOTTOM_BAR_LABEL" = "Cuộc trò chuyện chính thức duy nhất từ Signal";
@@ -8648,7 +8788,7 @@
 "SAFETY_NUMBER_CONFIRMATION_VIEW_ACTION" = "Xem";
 
 /* Snippet to share {{safety number}} with a friend. sent e.g. via SMS */
-"SAFETY_NUMBER_SHARE_FORMAT" = "Số An toàn Signal của chúng tôi:\n%1$@";
+"SAFETY_NUMBER_SHARE_FORMAT" = "Số An toàn Radar của chúng tôi:\n%1$@";
 
 /* Title for a button offering automatic key verification. */
 "SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_BUTTON_VERIFY" = "Xác minh tự động";
@@ -8789,13 +8929,13 @@
 "SCREEN_LOCK_REASON_CHANGE_SCREEN_LOCK_SETTINGS" = "Xác thực để thay đổi cài đặt Khóa màn hình.";
 
 /* Description of how and why Signal iOS uses Touch ID/Face ID/Phone Passcode to unlock 'screen lock'. */
-"SCREEN_LOCK_REASON_UNLOCK_SCREEN_LOCK" = "Xác thực mở khóa để mở Signal.";
+"SCREEN_LOCK_REASON_UNLOCK_SCREEN_LOCK" = "Xác thực mở khóa để mở Radar.";
 
 /* Title for alert indicating that screen lock could not be unlocked. */
 "SCREEN_LOCK_UNLOCK_FAILED" = "Xác thực Không thành công";
 
 /* Label for button on lock screen that lets users unlock Signal. */
-"SCREEN_LOCK_UNLOCK_SIGNAL" = "Mở khóa Signal";
+"SCREEN_LOCK_UNLOCK_SIGNAL" = "Mở khóa Radar";
 
 /* Placeholder text indicating the user can search for contacts by name, username, or phone number. */
 "SEARCH_BY_NAME_OR_USERNAME_OR_NUMBER_PLACEHOLDER_TEXT" = "Tên, tên người dùng hoặc sđt";
@@ -8828,13 +8968,13 @@
 "SECONDARY_LINKING_ERROR_DIFFERENT_ACCOUNT_TITLE" = "Tài khoản Không Khớp";
 
 /* Message for error alert indicating that a linked device must be upgraded before it can be linked. */
-"SECONDARY_LINKING_ERROR_OBSOLETE_LINKED_DEVICE_MESSAGE" = "Cập nhật Signal trên thiết bị này để liên kết nó với điện thoại của bạn.";
+"SECONDARY_LINKING_ERROR_OBSOLETE_LINKED_DEVICE_MESSAGE" = "Cập nhật Radar trên thiết bị này để liên kết nó với điện thoại của bạn.";
 
 /* Title for error alert indicating that a linked device must be upgraded before it can be linked. */
 "SECONDARY_LINKING_ERROR_OBSOLETE_LINKED_DEVICE_TITLE" = "Phiên bản Không được hỗ trợ";
 
 /* alert message for outdated linking device */
-"SECONDARY_LINKING_ERROR_OLD_VERSION_MESSAGE" = "Thiết bị còn lại của bạn đang chạy một phiên bản cũ của Signal không hỗ trợ quét mã QR iPad. Vui lòng cập nhật phiên bản Signal mới nhất và thử lại.";
+"SECONDARY_LINKING_ERROR_OLD_VERSION_MESSAGE" = "Thiết bị còn lại của bạn đang chạy một phiên bản cũ của Radar không hỗ trợ quét mã QR iPad. Vui lòng cập nhật phiên bản Radar mới nhất và thử lại.";
 
 /* alert title for outdated linking device */
 "SECONDARY_LINKING_ERROR_OLD_VERSION_TITLE" = "Cập nhật thiết bị quét";
@@ -8855,7 +8995,7 @@
 "SECONDARY_LINKING_SYNCING_UPDATE_REQUIRED_CHECK_FOR_UPDATE_BUTTON" = "Kiểm tra cập nhật";
 
 /* Message for action sheet when the secondary device fails to sync messages due to an app update being required. */
-"SECONDARY_LINKING_SYNCING_UPDATE_REQUIRED_ERROR_MESSAGE" = "Để hoàn thành đồng bộ hóa tin nhắn, cập nhật Signal ngay.";
+"SECONDARY_LINKING_SYNCING_UPDATE_REQUIRED_ERROR_MESSAGE" = "Để hoàn thành đồng bộ hóa tin nhắn, cập nhật Radar ngay.";
 
 /* Title for action sheet when the secondary device fails to sync messages due to an app update being required. */
 "SECONDARY_LINKING_SYNCING_UPDATE_REQUIRED_ERROR_TITLE" = "Yêu cầu Cập nhật";
@@ -8864,16 +9004,16 @@
 "SECONDARY_ONBOARDING_CHOOSE_DEVICE_NAME_PLACEHOLDER" = "Chọn tên";
 
 /* header text before the user can link this device */
-"SECONDARY_ONBOARDING_GET_STARTED_BY_OPENING_PRIMARY" = "Mở Signal trên điện thoại để liên kết iPad này với tài khoản của bạn";
+"SECONDARY_ONBOARDING_GET_STARTED_BY_OPENING_PRIMARY" = "Mở Radar trên điện thoại để liên kết iPad này với tài khoản của bạn";
 
 /* Link explaining what to do when trying to link a device before having a primary device. */
-"SECONDARY_ONBOARDING_GET_STARTED_DO_NOT_HAVE_PRIMARY" = "Tôi không có Signal trên điện thoại…";
+"SECONDARY_ONBOARDING_GET_STARTED_DO_NOT_HAVE_PRIMARY" = "Tôi không có Radar trên điện thoại…";
 
 /* alert body */
-"SECONDARY_ONBOARDING_INSTALL_PRIMARY_FIRST_BODY" = "Hãy vào App Store trên điện thoại, cài Signal, hoàn thành quá trình đăng kí và rồi bạn có thể liên kết iPad với cùng một tài khoản.";
+"SECONDARY_ONBOARDING_INSTALL_PRIMARY_FIRST_BODY" = "Hãy vào App Store trên điện thoại, cài Radar, hoàn thành quá trình đăng kí và rồi bạn có thể liên kết iPad với cùng một tài khoản.";
 
 /* alert title */
-"SECONDARY_ONBOARDING_INSTALL_PRIMARY_FIRST_TITLE" = "Cài đặt Signal trên Điện thoại của bạn";
+"SECONDARY_ONBOARDING_INSTALL_PRIMARY_FIRST_TITLE" = "Cài đặt Radar trên Điện thoại của bạn";
 
 /* Link text for page with troubleshooting info shown on the QR scanning screen */
 "SECONDARY_ONBOARDING_SCAN_CODE_HELP_TEXT" = "Cần trợ giúp với các bước này";
@@ -8894,7 +9034,7 @@
 "SECONDARY_ONBOARDING_SCAN_CODE_TITLE" = "Quét mã này để liên kết tài khoản của bạn";
 
 /* header text before the user can transfer to this device */
-"SECONDARY_TRANSFER_GET_STARTED_BY_OPENING_IPAD" = "Mở Signal trên iPad cũ của bạn để chuyển tài khoản";
+"SECONDARY_TRANSFER_GET_STARTED_BY_OPENING_IPAD" = "Mở Radar trên iPad cũ của bạn để chuyển tài khoản";
 
 /* No comment provided by engineer. */
 "SECURE_SESSION_RESET" = "Đã đặt lại phiên bảo mật.";
@@ -9023,7 +9163,7 @@
 "SEPA_DONATION_NAME_PLACEHOLDER" = "Tên tài khoản ngân hàng";
 
 /* Description for the session refresh alert */
-"SESSION_REFRESH_ALERT_MESSAGE" = "Signal sử dụng bảo mật hai chiều và đôi khi sẽ cần làm mới phiên trò chuyện của bạn. Việc này không ảnh hưởng sự bảo mật của cuộc trò chuyện của bạn nhưng bạn có thể bị nhỡ tin nhắn từ liên hệ này và bạn có thể hỏi họ gửi lại.";
+"SESSION_REFRESH_ALERT_MESSAGE" = "Radar sử dụng bảo mật hai chiều và đôi khi sẽ cần làm mới phiên trò chuyện của bạn. Việc này không ảnh hưởng sự bảo mật của cuộc trò chuyện của bạn nhưng bạn có thể bị nhỡ tin nhắn từ liên hệ này và bạn có thể hỏi họ gửi lại.";
 
 /* Title for the session refresh alert */
 "SESSION_REFRESH_ALERT_TITLE" = "Đã làm mới phiên trò chuyện";
@@ -9059,7 +9199,7 @@
 "SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_COUNTRY" = "Vị trí";
 
 /* Table footer for the 'censorship circumvention' section when censorship circumvention can be manually enabled. */
-"SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_FOOTER" = "Nếu được bật, Signal sẽ thử tránh kiểm duyệt. Không bật tính năng này trừ khi bạn đang ở một nơi đang chặn Signal.";
+"SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_FOOTER" = "Nếu được bật, Radar sẽ thử tránh kiểm duyệt. Không bật tính năng này trừ khi bạn đang ở một nơi đang chặn Radar.";
 
 /* Table footer for the 'censorship circumvention' section shown when censorship circumvention has been auto-enabled based on local phone number. */
 "SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_FOOTER_AUTO_ENABLED" = "Tránh kiểm duyệt đã được bật dựa trên số điện thoại trong tài khoản của bạn.";
@@ -9071,7 +9211,7 @@
 "SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_FOOTER_NO_CONNECTION" = "Chỉ có thể bật Tránh Kiểm duyệt khi bạn đang được kết nối internet.";
 
 /* Table footer for the 'censorship circumvention' section shown when the app is connected to the Signal service. */
-"SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_FOOTER_WEBSOCKET_CONNECTED" = "Tránh kiểm duyệt là không cần thiết; bạn đã được kết nối với dịch vụ của Signal.";
+"SETTINGS_ADVANCED_CENSORSHIP_CIRCUMVENTION_FOOTER_WEBSOCKET_CONNECTED" = "Tránh kiểm duyệt là không cần thiết; bạn đã được kết nối với dịch vụ của Radar.";
 
 /* Label for the 'advanced pin settings' button. */
 "SETTINGS_ADVANCED_PIN_SETTINGS" = "Cài đặt PIN nâng cao";
@@ -9092,13 +9232,13 @@
 "SETTINGS_ADVANCED_SUBMIT_DEBUGLOG" = "Gửi Nhật ký Gỡ lỗi";
 
 /* Information on sheet about changing the app icon - first line */
-"SETTINGS_APP_ICON_EDUCATION_APP_NAME" = "Ứng dụng có tên “Signal” sẽ hiển thị trên Màn hình chính, trong mục thông báo và trong Thư viện Ứng dụng.";
+"SETTINGS_APP_ICON_EDUCATION_APP_NAME" = "Ứng dụng có tên “Radar” sẽ hiển thị trên Màn hình chính, trong mục thông báo và trong Thư viện Ứng dụng.";
 
 /* Information on sheet about changing the app icon - second line */
-"SETTINGS_APP_ICON_EDUCATION_HOME_SCREEN_DOCK" = "Bạn có thể ẩn ứng dụng có tên “Signal” khỏi màn hình chính bằng cách di chuyển ứng dụng đến thanh dock phía dưới màn hình chính.";
+"SETTINGS_APP_ICON_EDUCATION_HOME_SCREEN_DOCK" = "Bạn có thể ẩn ứng dụng có tên “Radar” khỏi màn hình chính bằng cách di chuyển ứng dụng đến thanh dock phía dưới màn hình chính.";
 
 /* The footer for the app icon selection settings page. */
-"SETTINGS_APP_ICON_FOOTER" = "Ứng dụng có tên “Signal” sẽ hiển thị trên Màn hình chính, trong mục thông báo và trong Thư viện Ứng dụng.";
+"SETTINGS_APP_ICON_FOOTER" = "Ứng dụng có tên “Radar” sẽ hiển thị trên Màn hình chính, trong mục thông báo và trong Thư viện Ứng dụng.";
 
 /* The title for the app icon selection settings page. */
 "SETTINGS_APP_ICON_TITLE" = "Biểu tượng ứng dụng";
@@ -9128,7 +9268,7 @@
 "SETTINGS_BLOCK_LIST_ADD_BUTTON" = "Thêm người dùng bị chặn";
 
 /* A label that indicates the user has no Signal contacts that they haven't blocked. */
-"SETTINGS_BLOCK_LIST_NO_CONTACTS" = "Bạn không có liên hệ nào trên Signal.";
+"SETTINGS_BLOCK_LIST_NO_CONTACTS" = "Bạn không có liên hệ nào trên Radar.";
 
 /* A label that indicates the user's search has no matching results. */
 "SETTINGS_BLOCK_LIST_NO_SEARCH_RESULTS" = "Không có kết quả";
@@ -9140,7 +9280,7 @@
 "SETTINGS_CALLING_HIDES_IP_ADDRESS_PREFERENCE_TITLE" = "Luôn Chuyển tiếp Cuộc gọi";
 
 /* User settings section footer, a detailed explanation */
-"SETTINGS_CALLING_HIDES_IP_ADDRESS_PREFERENCE_TITLE_DETAIL" = "Chuyển tiếp mọi cuộc gọi qua một máy chủ của Signal để tránh làm lộ địa chỉ IP của bạn cho các liên hệ. Bật tính năng này sẽ làm giảm chất lượng cuộc gọi.";
+"SETTINGS_CALLING_HIDES_IP_ADDRESS_PREFERENCE_TITLE_DETAIL" = "Chuyển tiếp mọi cuộc gọi qua một máy chủ của Radar để tránh làm lộ địa chỉ IP của bạn cho các liên hệ. Bật tính năng này sẽ làm giảm chất lượng cuộc gọi.";
 
 /* Label for the 'edit phone number' button in the 'change phone number' views. */
 "SETTINGS_CHANGE_PHONE_NUMBER_BACK_TO_EDIT_BUTTON" = "Sửa Số";
@@ -9299,7 +9439,7 @@
 "SETTINGS_DISAPPEARING_MESSAGES_FOOTER" = "Đặt thời gian mặc định cho tin nhắn biến mất với tất cả các cuộc trò chuyện mới bắt đầu bởi bạn.";
 
 /* Title for the 'donate to signal' link in settings. */
-"SETTINGS_DONATE" = "Ủng hộ Signal";
+"SETTINGS_DONATE" = "Ủng hộ Radar";
 
 /* Title for help button and help pages in app settings. */
 "SETTINGS_HELP" = "Hỗ trợ";
@@ -9467,7 +9607,7 @@
 "SETTINGS_NOTIFICATION_CONTENT_TITLE" = "Nội dung Thông báo";
 
 /* When the local device discovers a contact has recently installed signal, the app can generates a message encouraging the local user to say hello. Turning this switch off disables that feature. */
-"SETTINGS_NOTIFICATION_EVENTS_CONTACT_JOINED_SIGNAL" = "Liên hệ tham gia Signal";
+"SETTINGS_NOTIFICATION_EVENTS_CONTACT_JOINED_SIGNAL" = "Liên hệ tham gia Radar";
 
 /* The title for the notification settings. */
 "SETTINGS_NOTIFICATIONS" = "Thông báo";
@@ -9510,19 +9650,19 @@
 "SETTINGS_PAYMENTS_ACTIVATE_PAYMENTS_CONFIRM_AGREE" = "Kích hoạt";
 
 /* Description for the 'activate payments confirmation' UI in the payment settings. */
-"SETTINGS_PAYMENTS_ACTIVATE_PAYMENTS_CONFIRM_DESCRIPTION" = "Bạn có thể dùng Signal để gửi và nhận MobileCoin. Tất cả các khoản thanh toán đều nằm trong phạm vi điều chỉnh của Điều khoản Sử dụng cho MobileCoin và Ví MobileCoin. Bạn có thể gặp một số vấn đề và các thanh toán hoặc số dư bạn có thể mất sẽ không thể được khôi phục.";
+"SETTINGS_PAYMENTS_ACTIVATE_PAYMENTS_CONFIRM_DESCRIPTION" = "You can use Radar to send and receive Bitcoin over Lightning. All payments are subject to the Radar Terms of Use. You may encounter some issues and payments or balances you may lose can't be recovered.";
 
 /* Title for the 'activate payments confirmation' UI in the payment settings. */
 "SETTINGS_PAYMENTS_ACTIVATE_PAYMENTS_CONFIRM_TITLE" = "Kích hoạt";
 
 /* Label for the 'view payments terms' button in the 'activate payments confirmation' UI in the payment settings. */
-"SETTINGS_PAYMENTS_ACTIVATE_PAYMENTS_CONFIRM_VIEW_TERMS" = "Xem Điều khoản MobileCoin";
+"SETTINGS_PAYMENTS_ACTIVATE_PAYMENTS_CONFIRM_VIEW_TERMS" = "View Terms";
 
 /* Label for 'add money' view in the payment settings. */
 "SETTINGS_PAYMENTS_ADD_MONEY" = "Thêm quỹ";
 
 /* Explanation of the process for adding money in the 'add money' settings view. */
-"SETTINGS_PAYMENTS_ADD_MONEY_DESCRIPTION" = "Để thêm quỹ, gửi MobileCoin vào địa chỉ ví của bạn. Bắt đầu một giao dịch từ tài khoản của bạn trên một sàn trao đổi có hỗ trợ MobileCoin, sau đó quét mã QR hoặc sao chép địa chỉ ví của bạn.";
+"SETTINGS_PAYMENTS_ADD_MONEY_DESCRIPTION" = "Để thêm quỹ, gửi Bitcoin over Lightning  vào địa chỉ ví của bạn. Bắt đầu một giao dịch từ tài khoản của bạn trên một sàn trao đổi có hỗ trợ Bitcoin over Lightning , sau đó quét mã QR hoặc sao chép địa chỉ ví của bạn.";
 
 /* Indicator that the payments wallet address has been copied to the pasteboard. */
 "SETTINGS_PAYMENTS_ADD_MONEY_WALLET_ADDRESS_COPIED" = "Địa chỉ ví đã được sao chép";
@@ -9532,9 +9672,10 @@
 
 /* Format string for the 'local balance converted into local currency' indicator. Embeds: {{ %1$@ the local balance in the local currency, %2$@ the local currency code, %3$@ the date the currency conversion rate was obtained. }}.. */
 "SETTINGS_PAYMENTS_BALANCE_CONVERSION_FORMAT" = "%1$@ %2$@ ở %3$@";
+"SETTINGS_PAYMENTS_BITCOIN_UNIT" = "Đơn vị Bitcoin";
 
 /* Error message indicating that payments could not be activated because the feature is not currently available. */
-"SETTINGS_PAYMENTS_CANNOT_ACTIVATE_PAYMENTS_KILL_SWITCH" = "Thanh toán trong Signal không còn nữa. Bạn vẫn có thể chuyển quỹ vào một sàn trao đổi nhưng bạn không thể gửi và nhận thanh toán hoặc thêm quỹ.";
+"SETTINGS_PAYMENTS_CANNOT_ACTIVATE_PAYMENTS_KILL_SWITCH" = "Thanh toán trong Radar không còn nữa. Bạn vẫn có thể chuyển quỹ vào một sàn trao đổi nhưng bạn không thể gửi và nhận thanh toán hoặc thêm quỹ.";
 
 /* Error message indicating that payments could not be deactivated because the current balance is unavailable. */
 "SETTINGS_PAYMENTS_CANNOT_DEACTIVATE_PAYMENTS_NO_BALANCE" = "Không thể ngưng kích hoạt thanh toán vì số dư của bạn hiện không có sẵn. Kiểm tra kết nối của bạn và thử lại.";
@@ -9543,10 +9684,10 @@
 "SETTINGS_PAYMENTS_CANNOT_SEND_PAYMENT_NO_BALANCE" = "Không thể hoàn tất thanh toán vì số dư của bạn không có sẵn. Kiểm tra kết nối của bạn và thử lại.";
 
 /* Error message indicating that payments cannot be sent because the feature is not currently available. */
-"SETTINGS_PAYMENTS_CANNOT_SEND_PAYMENTS_KILL_SWITCH" = "Thanh toán trong Signal không còn nữa. Bạn vẫn có thể chuyển quỹ vào một sàn trao đổi nhưng bạn không thể gửi và nhận thanh toán hoặc thêm quỹ.";
+"SETTINGS_PAYMENTS_CANNOT_SEND_PAYMENTS_KILL_SWITCH" = "Thanh toán trong Radar không còn nữa. Bạn vẫn có thể chuyển quỹ vào một sàn trao đổi nhưng bạn không thể gửi và nhận thanh toán hoặc thêm quỹ.";
 
 /* Error message indicating that you cannot transfer into your payments wallet because the feature is not currently available. */
-"SETTINGS_PAYMENTS_CANNOT_TRANSFER_IN_KILL_SWITCH" = "Thanh toán trong Signal không còn nữa. Bạn vẫn có thể chuyển quỹ vào một sàn trao đổi nhưng bạn không thể gửi và nhận thanh toán hoặc thêm quỹ.";
+"SETTINGS_PAYMENTS_CANNOT_TRANSFER_IN_KILL_SWITCH" = "Thanh toán trong Radar không còn nữa. Bạn vẫn có thể chuyển quỹ vào một sàn trao đổi nhưng bạn không thể gửi và nhận thanh toán hoặc thêm quỹ.";
 
 /* Message for the 'currency conversions info' alert. */
 "SETTINGS_PAYMENTS_CURRENCY_CONVERSIONS_INFO_ALERT_MESSAGE" = "Chuyển đổi chỉ là ước tính và có thể không chính xác.";
@@ -9564,7 +9705,7 @@
 "SETTINGS_PAYMENTS_DEACTIVATE_PAYMENTS" = "Ngưng kích hoạt Thanh toán";
 
 /* Description for the 'deactivate payments confirmation' UI in the payment settings. */
-"SETTINGS_PAYMENTS_DEACTIVATE_PAYMENTS_CONFIRM_DESCRIPTION" = "Bạn sẽ không thể gửi hoặc nhận MobileCoin trong Signal nếu bạn ngưng kích hoạt thanh toán.";
+"SETTINGS_PAYMENTS_DEACTIVATE_PAYMENTS_CONFIRM_DESCRIPTION" = "You will not be able to send or receive Lightning in Radar if you deactivate payments.";
 
 /* Title for the 'deactivate payments confirmation' UI in the payment settings. */
 "SETTINGS_PAYMENTS_DEACTIVATE_PAYMENTS_CONFIRM_TITLE" = "Huỷ kích hoạt Thanh toán?";
@@ -9573,10 +9714,10 @@
 "SETTINGS_PAYMENTS_DEACTIVATE_TITLE" = "Ngưng kích hoạt Thanh toán";
 
 /* Explanation of the 'deactivate payments with balance' process in the 'deactivate payments' settings. */
-"SETTINGS_PAYMENTS_DEACTIVATE_WITH_BALANCE_EXPLANATION" = "Bạn được khuyến khích chuyển khoản quỹ của mình vào một địa chỉ ví khác trước khi ngưng kích hoạt thanh toán. Nếu bạn chọn không chuyển khoản quỹ của mình bây giờ, chúng sẽ giữ nguyên trong ví của bạn mà đã được liên kết với Signal nếu bạn kích hoạt lại thanh toán.";
+"SETTINGS_PAYMENTS_DEACTIVATE_WITH_BALANCE_EXPLANATION" = "Bạn được khuyến khích chuyển khoản quỹ của mình vào một địa chỉ ví khác trước khi ngưng kích hoạt thanh toán. Nếu bạn chọn không chuyển khoản quỹ của mình bây giờ, chúng sẽ giữ nguyên trong ví của bạn mà đã được liên kết với Radar nếu bạn kích hoạt lại thanh toán.";
 
 /* Description for the 'deactivate payments confirmation' UI in the payment settings. */
-"SETTINGS_PAYMENTS_DEACTIVATE_WITHOUT_TRANSFER_CONFIRM_DESCRIPTION" = "Số dư của bạn sẽ giữ nguyên trong ví của bạn mà đã được liên kết với Signal nếu như bạn chọn kích hoạt lại thanh toán.";
+"SETTINGS_PAYMENTS_DEACTIVATE_WITHOUT_TRANSFER_CONFIRM_DESCRIPTION" = "Số dư của bạn sẽ giữ nguyên trong ví của bạn mà đã được liên kết với Radar nếu như bạn chọn kích hoạt lại thanh toán.";
 
 /* Title for the 'deactivate payments confirmation' UI in the payment settings. */
 "SETTINGS_PAYMENTS_DEACTIVATE_WITHOUT_TRANSFER_CONFIRM_TITLE" = "Ngưng kích hoạt mà không chuyển khoản?";
@@ -9586,6 +9727,24 @@
 
 /* Error indicating that payments could not be deactivated in the payments settings. */
 "SETTINGS_PAYMENTS_DEACTIVATION_FAILED" = "Thanh toán không thể được ngưng kích hoạt";
+
+/* Label for 'delete payment wallet' button in the app settings. */
+"SETTINGS_PAYMENTS_DELETE_WALLET" = "Delete Payment Wallet";
+
+/* Error message indicating that the payment wallet could not be deleted because the current balance is unavailable. */
+"SETTINGS_PAYMENTS_DELETE_WALLET_BALANCE_UNAVAILABLE" = "Your wallet balance is not yet available. Please try again.";
+
+/* Description for the 'delete payment wallet confirmation' UI in the payment settings. */
+"SETTINGS_PAYMENTS_DELETE_WALLET_CONFIRM_DESCRIPTION" = "This will permanently delete your current payment wallet from this device and unregister its lightning username. You will lose access to your old wallet unless you have saved your recovery phrase.";
+
+/* Title for the 'delete payment wallet confirmation' UI in the payment settings. */
+"SETTINGS_PAYMENTS_DELETE_WALLET_CONFIRM_TITLE" = "Delete Payment Wallet?";
+
+/* Error message shown when deleting the payment wallet fails. */
+"SETTINGS_PAYMENTS_DELETE_WALLET_FAILED" = "Payment wallet could not be deleted";
+
+/* Error message indicating that the payment wallet cannot be deleted until the balance is zero. */
+"SETTINGS_PAYMENTS_DELETE_WALLET_REQUIRES_ZERO_BALANCE" = "You must transfer out your entire wallet balance before deleting the wallet.";
 
 /* Label for the 'payments details' view of the app settings. */
 "SETTINGS_PAYMENTS_DETAIL_VIEW_TITLE" = "Chi tiết";
@@ -9597,19 +9756,19 @@
 "SETTINGS_PAYMENTS_ENABLE_PAYMENTS_LOCK_PROMPT" = "Khóa Thanh toán";
 
 /* Description for the 'About MobileCoin' help card in the payments settings. */
-"SETTINGS_PAYMENTS_HELP_CARD_ABOUT_MOBILECOIN_DESCRIPTION" = "MobileCoin là một tiền tệ điện tử mới tập trung vào sự riêng tư.";
+"SETTINGS_PAYMENTS_HELP_CARD_ABOUT_MOBILECOIN_DESCRIPTION" = "Radar lets you send and receive Bitcoin instantly over the Lightning Network, privately and without fees.";
 
 /* Title for the 'About MobileCoin' help card in the payments settings. */
-"SETTINGS_PAYMENTS_HELP_CARD_ABOUT_MOBILECOIN_TITLE" = "Về MobileCoin";
+"SETTINGS_PAYMENTS_HELP_CARD_ABOUT_MOBILECOIN_TITLE" = "About Radar Payments";
 
 /* Description for the 'Adding to your wallet' help card in the payments settings. */
-"SETTINGS_PAYMENTS_HELP_CARD_ADDING_TO_YOUR_WALLET_DESCRIPTION" = "Bạn có thể thêm quỹ để sử dụng trong Signal bằng cách gửi MobileCoin vào địa chỉ ví của mình.";
+"SETTINGS_PAYMENTS_HELP_CARD_ADDING_TO_YOUR_WALLET_DESCRIPTION" = "You can add funds by sending Bitcoin over Lightning to your Radar wallet address.";
 
 /* Title for the 'Adding to your wallet' help card in the payments settings. */
 "SETTINGS_PAYMENTS_HELP_CARD_ADDING_TO_YOUR_WALLET_TITLE" = "Thêm quỹ";
 
 /* Description for the 'Cashing Out' help card in the payments settings. */
-"SETTINGS_PAYMENTS_HELP_CARD_CASHING_OUT_DESCRIPTION" = "Bạn có thể rút tiền mặt MobileCoin bất kì lúc nào trên một sàn trao đổi có hỗ trợ MobileCoin. Chỉ cần thực hiện một chuyển khoản đến tài khoản của bạn ở sàn trao đổi đó.";
+"SETTINGS_PAYMENTS_HELP_CARD_CASHING_OUT_DESCRIPTION" = "You can send your Bitcoin to any Lightning-compatible wallet or exchange at any time.";
 
 /* Title for the 'Cashing Out' help card in the payments settings. */
 "SETTINGS_PAYMENTS_HELP_CARD_CASHING_OUT_TITLE" = "Rút tiền";
@@ -9638,6 +9797,18 @@
 /* Indicator that the payments wallet address is invalid. */
 "SETTINGS_PAYMENTS_INVALID_WALLET_ADDRESS" = "Địa chỉ Ví Không hợp lệ";
 
+/* Label for the 'lightning logs' row in payment settings. */
+"SETTINGS_PAYMENTS_LIGHTNING_LOGS" = "Nhật ký Lightning";
+
+/* Placeholder text shown when no lightning logs have been captured yet. */
+"SETTINGS_PAYMENTS_LIGHTNING_LOGS_EMPTY" = "Chưa có nhật ký Lightning nào được ghi lại.";
+
+/* Title for the 'export lightning logs' button in the lightning logs view. */
+"SETTINGS_PAYMENTS_LIGHTNING_LOGS_EXPORT_BUTTON" = "Xuất nhật ký";
+
+/* Error message shown when exporting lightning logs fails. */
+"SETTINGS_PAYMENTS_LIGHTNING_LOGS_EXPORT_FAILED" = "Không thể xuất nhật ký Lightning.";
+
 /* Label for UISwitch based payments-lock setting that when enabled requires biometric-authentication (or passcode) to transfer funds or view the recovery phrase. */
 "SETTINGS_PAYMENTS_LOCK_SWITCH_LABEL" = "Khóa Thanh toán";
 
@@ -9663,31 +9834,31 @@
 "SETTINGS_PAYMENTS_OPT_IN_ACTIVATED_TOAST" = "Đã kích hoạt thanh toán.";
 
 /* Message for the 'payments opt-in' view in the app settings. */
-"SETTINGS_PAYMENTS_OPT_IN_MESSAGE" = "Sử dụng Signal để nhận và gửi MobileCoin, một loại tiền điện tử mới tập trung vào sự riêng tư. Kích hoạt để bắt đầu.";
+"SETTINGS_PAYMENTS_OPT_IN_MESSAGE" = "Send and receive Bitcoin instantly over the Lightning Network, right from your chats. Activate to get started.";
 
 /* Label for 'activate' button in the 'payments opt-in' view in the app settings. */
 "SETTINGS_PAYMENTS_OPT_IN_REACTIVATE_BUTTON" = "Kích hoạt lại Thanh toán";
 
 /* Title for the 'payments opt-in' view in the app settings. */
-"SETTINGS_PAYMENTS_OPT_IN_TITLE" = "Giới thiệu tính năng Thanh toán";
+"SETTINGS_PAYMENTS_OPT_IN_TITLE" = "Introducing Radar Payments";
 
 /* Button when discarding recovery phrase. */
 "SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_BUTTON" = "Bỏ qua Cụm từ Khôi phục";
 
 /* Message of confirmation alert when discarding recovery phrase. */
-"SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_MESSAGE" = "Cụm từ khôi phục giúp bạn khôi phục số dư tài khoản của mình trong trường hợp xấu nhất. Chúng tôi khuyến khích bạn lưu lại.";
+"SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_MESSAGE" = "Không có cụm từ khởi tạo, bạn sẽ không thể khôi phục số dư trong Cake Wallet hoặc các ví khác tương thích với Spark. Bạn luôn có thể lưu nó sau trong cài đặt.";
 
 /* Title of confirmation alert when discarding recovery phrase. */
 "SETTINGS_PAYMENTS_PASSPHRASE_DISCARD_CONFIRMATION_TITLE" = "Tiếp tục và không lưu?";
 
 /* Explanation of the 'payments passphrase' in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION" = "Số dư của bạn sẽ tự động khôi phục khi bạn cài lại Signal nếu bạn xác nhận mã PIN Signal của mình. Bạn cũng có thể khôi phục số dư của mình bằng cách sử dụng một cụm từ khôi phục, và đây là một cụm từ 24-từ chỉ riêng cho bạn. Ghi nó lại và lưu giữ nó ở một nơi an toàn.";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION" = "Cụm từ khởi tạo của bạn không bắt buộc để giữ an toàn cho tiền của bạn — Radar tự động xử lý khôi phục. Lưu lại giúp bạn an tâm hơn và cho phép bạn khôi phục số dư trong Cake Wallet hoặc bất kỳ ví nào khác tương thích với Spark.";
 
 /* Explanation of the 'payments passphrase' when there is a balance. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_BALANCE" = "Bạn đã nhận được số dư! Đã đến lúc lưu cụm từ khôi phục—cụm 24 từ này giống như chìa khóa giúp bạn khôi phục số dư của mình.";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_BALANCE" = "Bạn có số dư! Lưu cụm từ khởi tạo không bắt buộc, nhưng mang lại sự an tâm hơn và cho phép khôi phục số dư trong Cake Wallet hoặc các ví khác tương thích với Spark.";
 
 /* Explanation of the 'payments passphrase' when from the help card. */
-"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_HELP_CARD" = "Đã đến lúc lưu cụm từ khôi phục—cụm 24 từ này giống như chìa khóa giúp bạn khôi phục số dư của mình.";
+"SETTINGS_PAYMENTS_PASSPHRASE_EXPLANATION_FROM_HELP_CARD" = "Lưu cụm từ khởi tạo không bắt buộc, nhưng mang lại sự an tâm hơn và cho phép khôi phục số dư trong Cake Wallet hoặc các ví khác tương thích với Spark.";
 
 /* Label for the 'add money' button in the 'send payment' UI. */
 "SETTINGS_PAYMENTS_PAYMENT_ADD_MONEY" = "Thêm quỹ";
@@ -9726,13 +9897,14 @@
 "SETTINGS_PAYMENTS_PAYMENT_DETAILS_STATUS" = "Trạng thái";
 
 /* Footer string for the status section of the payment details view in the app settings. */
-"SETTINGS_PAYMENTS_PAYMENT_DETAILS_STATUS_FOOTER" = "Chi tiết giao dịch bao gồm số tiền thanh toán và thời gian giao dịch là một phần của Sổ cái MobileCoin.";
+"SETTINGS_PAYMENTS_PAYMENT_DETAILS_STATUS_FOOTER" = "Transaction details are recorded on the Bitcoin Lightning Network.";
 
 /* Footer string for the status section of the payment details view in the app settings for defragmentation transactions. */
 "SETTINGS_PAYMENTS_PAYMENT_DETAILS_STATUS_FOOTER_DEFRAGMENTATION" = "\"Phí dọn dẹp đồng xu\" được tính khi những đồng xu bạn sở hữu không thể được gộp để hoàn tất một giao dịch. Việc dọn dẹp sẽ cho phép bạn tiếp tục gửi thanh toán.";
 
 /* Message for the 'insufficient balance for payment' alert. Embeds: {{ The current payments balance }}. */
-"SETTINGS_PAYMENTS_PAYMENT_INSUFFICIENT_BALANCE_ALERT_MESSAGE_FORMAT" = "Bạn không có đủ MOB để hoàn tất thanh toán này. Số dư hiện tại của bạn là %1$@.";
+"SETTINGS_PAYMENTS_PAYMENT_INSUFFICIENT_BALANCE_ALERT_MESSAGE_FORMAT" = "Bạn không có đủ BTC để hoàn tất thanh toán này. Số dư hiện tại của bạn là %1$@.";
+"SETTINGS_PAYMENTS_PAYMENT_INSUFFICIENT_BALANCE_ALERT_MESSAGE_HIDDEN" = "Bạn không có đủ BTC để hoàn tất khoản thanh toán này.";
 
 /* Title for the 'insufficient balance for payment' alert. */
 "SETTINGS_PAYMENTS_PAYMENT_INSUFFICIENT_BALANCE_ALERT_TITLE" = "Số dư Không đủ";
@@ -9786,7 +9958,7 @@
 "SETTINGS_PAYMENTS_PAYMENTS_LOCK_PROMPT_EXPLANATION_TOUCHID" = "Giúp ngăn việc người khác sử dụng điện thoại của bạn và truy cập tài khoản thanh toán bằng cách kích hoạt Touch ID. Bạn có thể tắt tùy chọn này trong mục Cài đặt.";
 
 /* Button for payments outdated sheet. */
-"SETTINGS_PAYMENTS_PAYMENTS_OUTDATED_BUTTON" = "Cập nhật Signal";
+"SETTINGS_PAYMENTS_PAYMENTS_OUTDATED_BUTTON" = "Cập nhật Radar";
 
 /* Message for payments outdated sheet. */
 "SETTINGS_PAYMENTS_PAYMENTS_OUTDATED_MESSAGE" = "Bạn cần cập nhật để tiếp tục gửi và nhận thanh toán, và để xem số dư tài khoản mới nhất.";
@@ -9808,6 +9980,10 @@
 
 /* Label for the 'recent payments' section in the payment settings. */
 "SETTINGS_PAYMENTS_RECENT_PAYMENTS" = "Thanh toán Gần đây";
+
+
+/* Header for the 'recent' section in the payment send-to view. */
+"SETTINGS_PAYMENTS_RECENT_RECIPIENTS" = "Recent";
 
 /* Description for the 'record payments passphrase to disable pin' UI in the app settings. */
 "SETTINGS_PAYMENTS_RECORD_PASSPHRASE_DISABLE_PIN_DESCRIPTION" = "Trước khi bạn có thể tắt mã PIN của mình, bạn phải lưu lại cụm từ khôi phục thanh toán để đảm bảo bạn có thể khôi phục tài khoản thanh toán của bạn.";
@@ -9866,6 +10042,12 @@
 /* Title for the 'restore payments wallet' view of the app settings. */
 "SETTINGS_PAYMENTS_RESTORE_WALLET_TITLE" = "Cụm từ khôi phục";
 
+/* Switcher option for restoring a 12-word recovery phrase. */
+"SETTINGS_PAYMENTS_RESTORE_WALLET_WORD_COUNT_12" = "12 từ";
+
+/* Switcher option for restoring a 24-word recovery phrase. */
+"SETTINGS_PAYMENTS_RESTORE_WALLET_WORD_COUNT_24" = "24 từ";
+
 /* Format for the instructions for the 'enter word' step of the 'restore payments wallet' views. Embeds {{ the index of the current word }}. */
 "SETTINGS_PAYMENTS_RESTORE_WALLET_WORD_INSTRUCTIONS_FORMAT" = "Nhập vào từ %1$@";
 
@@ -9911,20 +10093,26 @@
 /* Label for 'send payment' button in the payment settings. */
 "SETTINGS_PAYMENTS_SEND_PAYMENT" = "Gửi Thanh toán";
 
+/* Placeholder text for the address/search field in the 'send to' payment view. */
+"SETTINGS_PAYMENTS_SEND_TO_PLACEHOLDER" = "Search or Enter";
+
 /* Label for the 'send payment to recipient' view in the payment settings. */
 "SETTINGS_PAYMENTS_SEND_TO_RECIPIENT_TITLE" = "Chọn Người nhận";
 
+/* Title for the unified 'send to' payment view. */
+"SETTINGS_PAYMENTS_SEND_TO_TITLE" = "Send to";
+
 /* Title for the 'set currency' view in the app settings. */
-"SETTINGS_PAYMENTS_SET_CURRENCY" = "Chuyển đổi Ngoại tệ";
+"SETTINGS_PAYMENTS_SET_CURRENCY" = "Tiền tệ hiển thị";
 
 /* Label for the 'payments' section of the app settings. */
 "SETTINGS_PAYMENTS_TITLE" = "Thanh toán";
 
 /* Error indicating that it is not valid to send yourself a payment. */
-"SETTINGS_PAYMENTS_TRANSFER_OUT_CANNOT_SEND_TO_SELF" = "Bạn không thể chuyển khoản vào địa chỉ ví Signal của bạn. Hãy nhập địa chỉ ví từ tài khoản của bạn ở một sàn trao đổi có hỗ trợ.";
+"SETTINGS_PAYMENTS_TRANSFER_OUT_CANNOT_SEND_TO_SELF" = "Bạn không thể chuyển khoản vào địa chỉ ví Radar của bạn. Hãy nhập địa chỉ ví từ tài khoản của bạn ở một sàn trao đổi có hỗ trợ.";
 
 /* Footer of the 'transfer currency out' view in the payment settings. */
-"SETTINGS_PAYMENTS_TRANSFER_OUT_FOOTER" = "Bạn có thể chuyển MobileCoin bằng cách hoàn tất một lần chuyển từ địa chỉ ví được cung cấp bởi sàn trao đổi. Địa chỉ ví là chuỗi số và kí tự thường hay nằm dưới mã QR.";
+"SETTINGS_PAYMENTS_TRANSFER_OUT_FOOTER" = "Transfer Bitcoin by sending to the Lightning address or invoice provided by the recipient. The address is typically displayed below the QR code.";
 
 /* Error indicating that MobileCoin public address is not valid. */
 "SETTINGS_PAYMENTS_TRANSFER_OUT_INVALID_PUBLIC_ADDRESS" = "Kiểm tra địa chỉ ví bạn đang thử chuyển khoản đến và thử lại.";
@@ -9936,7 +10124,7 @@
 "SETTINGS_PAYMENTS_TRANSFER_OUT_PLACEHOLDER" = "Đến: Quét hoặc nhập địa chỉ ví";
 
 /* Label for 'transfer currency out' view in the payment settings. */
-"SETTINGS_PAYMENTS_TRANSFER_OUT_TITLE" = "Chuyển khoản sang Sàn trao đổi";
+"SETTINGS_PAYMENTS_TRANSFER_OUT_TITLE" = "Chuyển sang bên ngoài";
 
 /* Label for the 'transfer to exchange' button in the payment settings. */
 "SETTINGS_PAYMENTS_TRANSFER_TO_EXCHANGE" = "Chuyển khoản sang Sàn trao đổi";
@@ -9984,10 +10172,10 @@
 "SETTINGS_PAYMENTS_VIEW_PASSPHRASE_TITLE" = "Cụm từ khôi phục";
 
 /* Header text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "Ghi lại 24 từ sau theo thứ tự. Lưu trữ danh sách của bạn ở một nơi bảo mật.";
+"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_EXPLANATION" = "Viết 12 từ này theo thứ tự và lưu ở nơi an toàn. Bạn có thể dùng chúng để khôi phục số dư trong Cake Wallet hoặc các ví khác tương thích với Spark.";
 
 /* Footer text for the 'review payments passphrase words' step in the 'view payments passphrase' settings. */
-"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_FOOTER_2" = "Không chia sẻ danh sách này";
+"SETTINGS_PAYMENTS_VIEW_PASSPHRASE_WORDS_FOOTER_2" = "Không chia sẻ cụm từ này với bất kỳ ai";
 
 /* Title for the content section of the  'payments lock prompt' view shown after payemts activation. */
 "SETTINGS_PAYMENTS_VIEW_PAYMENTS_LOCK_PROMPT_TITLE" = "Một Lớp Bảo vệ khác";
@@ -10005,7 +10193,7 @@
 "SETTINGS_PHONE_NUMBER_DISCOVERABILITY_DISABLED_TOAST" = "Để đổi cài đặt này, đặt mục “Ai có thể thấy số của tôi” thành “Không ai cả”.";
 
 /* The description for a sheet asking for confirmation that the user wants to set their phone number discoverability to 'nobody'. */
-"SETTINGS_PHONE_NUMBER_DISCOVERABILITY_NOBODY_CONFIRMATION_DESCRIPTION" = "Thiết lập tùy chọn “Ai có thể tìm thấy tôi bằng số điện thoại” thành “Không ai” sẽ khiến mọi người khó tìm được bạn hơn trên Signal.";
+"SETTINGS_PHONE_NUMBER_DISCOVERABILITY_NOBODY_CONFIRMATION_DESCRIPTION" = "Thiết lập tùy chọn “Ai có thể tìm thấy tôi bằng số điện thoại” thành “Không ai” sẽ khiến mọi người khó tìm được bạn hơn trên Radar.";
 
 /* The title for a sheet asking for confirmation that the user wants to set their phone number discoverability to 'nobody'. */
 "SETTINGS_PHONE_NUMBER_DISCOVERABILITY_NOBODY_CONFIRMATION_TITLE" = "Bạn có chắc không?";
@@ -10014,7 +10202,7 @@
 "SETTINGS_PHONE_NUMBER_DISCOVERABILITY_TITLE" = "Ai Có Thể Tìm Tôi Bằng Số Điện Thoại";
 
 /* Description label for Phone Number Privacy */
-"SETTINGS_PHONE_NUMBER_PRIVACY_DESCRIPTION_LABEL" = "Chọn người có thể thấy số điện thoại của bạn và người có thể liên hệ với bạn trên Signal với số đó.";
+"SETTINGS_PHONE_NUMBER_PRIVACY_DESCRIPTION_LABEL" = "Chọn người có thể thấy số điện thoại của bạn và người có thể liên hệ với bạn trên Radar với số đó.";
 
 /* The title for phone number privacy settings. */
 "SETTINGS_PHONE_NUMBER_PRIVACY_TITLE" = "Số điện thoại";
@@ -10026,16 +10214,16 @@
 "SETTINGS_PIN_REMINDER_DISABLE_CONFIRMATION_ACTION" = "Tắt Lời nhắc";
 
 /* The explanation for the dialog asking user to confirm their PIN to disable reminders */
-"SETTINGS_PIN_REMINDER_DISABLE_CONFIRMATION_EXPLANATION" = "Đảm bảo bạn đã ghi nhớ hoặc lưu trữ mã PIN của mình vì mã này không thể được khôi phục. Nếu bạn quên mã PIN, bạn sẽ mất dữ liệu khi đăng ký lại tài khoản Signal của mình. ";
+"SETTINGS_PIN_REMINDER_DISABLE_CONFIRMATION_EXPLANATION" = "Đảm bảo bạn đã ghi nhớ hoặc lưu trữ mã PIN của mình vì mã này không thể được khôi phục. Nếu bạn quên mã PIN, bạn sẽ mất dữ liệu khi đăng ký lại tài khoản Radar của mình. ";
 
 /* The title for the dialog asking user to confirm their PIN to disable reminders */
-"SETTINGS_PIN_REMINDER_DISABLE_CONFIRMATION_TITLE" = "Xác nhận mã PIN Signal";
+"SETTINGS_PIN_REMINDER_DISABLE_CONFIRMATION_TITLE" = "Xác nhận mã PIN Radar";
 
 /* Label for the 'pin reminder' switch of the privacy settings. */
 "SETTINGS_PIN_REMINDER_SWITCH_LABEL" = "Lời nhắc mã PIN";
 
 /* Footer for the 'PINs' section of the privacy settings. */
-"SETTINGS_PINS_FOOTER" = "Mã PIN của bạn giúp bảo mật thông tin lưu giữ với Signal để chỉ mình bạn mới có thể truy cập nó. Mã PIN của bạn không thể được khôi phục. Hồ sơ cá nhân của bạn, các cài đặt, và liên hệ sẽ khôi phục khi bạn cài đặt lại Signal.";
+"SETTINGS_PINS_FOOTER" = "Mã PIN của bạn giúp bảo mật thông tin lưu giữ với Radar để chỉ mình bạn mới có thể truy cập nó. Mã PIN của bạn không thể được khôi phục. Hồ sơ cá nhân của bạn, các cài đặt, và liên hệ sẽ khôi phục khi bạn cài đặt lại Radar.";
 
 /* Label for the 'pins' item of the privacy settings when the user does have a pin. */
 "SETTINGS_PINS_ITEM" = "Thay đổi mã PIN của bạn.";
@@ -10044,7 +10232,7 @@
 "SETTINGS_PINS_ITEM_CREATE" = "Tạo mã PIN";
 
 /* Title for the 'PINs' section of the privacy settings. */
-"SETTINGS_PINS_TITLE" = "Mã PIN Signal";
+"SETTINGS_PINS_TITLE" = "Mã PIN Radar";
 
 /* Footer for table section */
 "SETTINGS_PRIVACY_ADVANCED_FOOTER" = "Cài đặt tránh kiểm duyệt, proxy, chuyển tiếp cuộc gọi, và công cụ niêm phong.";
@@ -10086,7 +10274,7 @@
 "SETTINGS_REGISTRATION_LOCK_TURN_ON_ERROR_PIN_REQUIRED" = "Bạn phải tạo mã PIN để sử dụng khóa đăng ký.";
 
 /* Body for the alert confirming that the user wants to turn on registration lock. */
-"SETTINGS_REGISTRATION_LOCK_TURN_ON_MESSAGE" = "Nếu bạn quên mã PIN của Signal khi đăng kí lại với Signal, bạn sẽ không thể truy cập tài khoản trong 7 ngày.";
+"SETTINGS_REGISTRATION_LOCK_TURN_ON_MESSAGE" = "Nếu bạn quên mã PIN của Radar khi đăng kí lại với Radar, bạn sẽ không thể truy cập tài khoản trong 7 ngày.";
 
 /* Title for the alert confirming that the user wants to turn on registration lock. */
 "SETTINGS_REGISTRATION_LOCK_TURN_ON_TITLE" = "Bật Khoá Đăng ký?";
@@ -10116,19 +10304,19 @@
 "SETTINGS_SECTION_TITLE_CALLING" = "Đang gọi";
 
 /* Section footer */
-"SETTINGS_SECURITY_DETAIL" = "Sử dụng Touch ID, Face ID, hoặc mật mã thiết bị iOS của bạn để mở khoá Signal.";
+"SETTINGS_SECURITY_DETAIL" = "Sử dụng Touch ID, Face ID, hoặc mật mã thiết bị iOS của bạn để mở khoá Radar.";
 
 /* Section footer */
-"SETTINGS_SECURITY_DETAIL_FACEID" = "Sử dụng Face ID để mở khoá Signal.";
+"SETTINGS_SECURITY_DETAIL_FACEID" = "Sử dụng Face ID để mở khoá Radar.";
 
 /* Section footer */
-"SETTINGS_SECURITY_DETAIL_OPTICID" = "Sử dụng Optic ID để mở khoá Signal.";
+"SETTINGS_SECURITY_DETAIL_OPTICID" = "Sử dụng Optic ID để mở khoá Radar.";
 
 /* Section footer */
-"SETTINGS_SECURITY_DETAIL_PASSCODE" = "Sử dụng mật mã thiết bị của bạn để mở khoá Signal.";
+"SETTINGS_SECURITY_DETAIL_PASSCODE" = "Sử dụng mật mã thiết bị của bạn để mở khoá Radar.";
 
 /* Section footer */
-"SETTINGS_SECURITY_DETAIL_TOUCHID" = "Sử dụng Touch ID để mở khoá Signal.";
+"SETTINGS_SECURITY_DETAIL_TOUCHID" = "Sử dụng Touch ID để mở khoá Radar.";
 
 /* Section header */
 "SETTINGS_SECURITY_TITLE" = "Bảo mật Ứng dụng";
@@ -10149,7 +10337,7 @@
 "SETTINGS_TWO_FACTOR_AUTH_SWITCH_LABEL" = "Khóa Đăng ký";
 
 /* Footer for the 'two factor auth' section of the privacy settings when Signal PINs are available. */
-"SETTINGS_TWO_FACTOR_PINS_AUTH_FOOTER" = "Yêu cầu mã PIN Signal của bạn để đăng ký lại số điện thoại của bạn với Signal.";
+"SETTINGS_TWO_FACTOR_PINS_AUTH_FOOTER" = "Yêu cầu mã PIN Radar của bạn để đăng ký lại số điện thoại của bạn với Radar.";
 
 /* Label for the 'typing indicators' setting. */
 "SETTINGS_TYPING_INDICATORS" = "Dấu chỉ báo Đang nhập tin nhắn";
@@ -10221,7 +10409,7 @@
 "SHARE_EXTENSION_LOW_STORAGE_SPACE_TITLE" = "Dung lượng lưu trữ thấp";
 
 /* Message indicating that the share extension cannot be used until the user has registered in the main app. */
-"SHARE_EXTENSION_NOT_REGISTERED_MESSAGE" = "Mở ứng dụng Signal để đăng ký.";
+"SHARE_EXTENSION_NOT_REGISTERED_MESSAGE" = "Mở ứng dụng Radar để đăng ký.";
 
 /* Title indicating that the share extension cannot be used until the user has registered in the main app. */
 "SHARE_EXTENSION_NOT_REGISTERED_TITLE" = "Chưa Đăng ký";
@@ -10239,7 +10427,7 @@
 "SHARE_EXTENSION_UNABLE_TO_BUILD_ATTACHMENT_ALERT_TITLE" = "Không thể Chuẩn bị Tập tin đính kèm";
 
 /* Title for the 'share extension' view. */
-"SHARE_EXTENSION_VIEW_TITLE" = "Chia sẻ với Signal";
+"SHARE_EXTENSION_VIEW_TITLE" = "Chia sẻ với Radar";
 
 /* Title of alert indicating sharing suggestions failed to deactivate */
 "SHARING_SUGGESTIONS_DISABLE_ERROR" = "Không thể tắt gợi ý chia sẻ.";
@@ -10248,7 +10436,7 @@
 "SHOW_THREAD_BUTTON_TITLE" = "Hiện Cuộc trò chuyện";
 
 /* Shown in the header when the user hasn't provided a custom name for a call. */
-"SIGNAL_CALL" = "Cuộc gọi Signal";
+"SIGNAL_CALL" = "Cuộc gọi Radar";
 
 /* Placeholder of the 'Account ID' username field. */
 "SIGNAL_LOGIN_ACCOUNT_ID_PLACEHOLDER_TITLE" = "ID tài khoản";
@@ -10260,7 +10448,7 @@
 "SIGNAL_PROXY" = "Máy chủ proxy Signal";
 
 /* body sent to contacts when inviting to Install Signal */
-"SMS_INVITE_BODY" = "Tôi đang mời bạn cài đặt Signal! Đây là đường dẫn:";
+"SMS_INVITE_BODY" = "Tôi đang mời bạn cài đặt Radar! Đây là đường dẫn:";
 
 /* An error message generically indicating that something went wrong. */
 "SOMETHING_WENT_WRONG_ERROR" = "Đã xảy ra lỗi.";
@@ -10284,7 +10472,7 @@
 "SPAM_CAPTCHA_DISMISS_CONFIRMATION_TITLE" = "Tiếp tục mà Không Xác minh?";
 
 /* Body for action sheet explaining captcha requirement. */
-"SPAM_CAPTCHA_SHEET_BODY" = "Để giúp chống tin nhắn rác trên Signal, xin hãy hoàn tất xác minh.\n\nSau khi xác minh, bạn có thể tiếp tục nhắn tin. Bất kì tin nhắn bị hoãn nào sẽ tự động được gửi.";
+"SPAM_CAPTCHA_SHEET_BODY" = "Để giúp chống tin nhắn rác trên Radar, xin hãy hoàn tất xác minh.\n\nSau khi xác minh, bạn có thể tiếp tục nhắn tin. Bất kì tin nhắn bị hoãn nào sẽ tự động được gửi.";
 
 /* Title for action sheet explaining captcha requirement. */
 "SPAM_CAPTCHA_SHEET_TITLE" = "Xác minh để Tiếp tục Nhắn tin";
@@ -10356,7 +10544,7 @@
 "STICKERS_INSTALL_BUTTON" = "Thêm Nhãn dán";
 
 /* Title for the 'available built-in stickers' section of the 'manage stickers' view. */
-"STICKERS_MANAGE_VIEW_AVAILABLE_BUILT_IN_PACKS_SECTION_TITLE" = "Tuyển tập Nghệ sĩ Signal";
+"STICKERS_MANAGE_VIEW_AVAILABLE_BUILT_IN_PACKS_SECTION_TITLE" = "Tuyển tập Nghệ sĩ Radar";
 
 /* Subtitle for the section of known stickers in the manage stickers view */
 "STICKERS_MANAGE_VIEW_AVAILABLE_KNOWN_PACKS_SECTION_SUBTITLE" = "Khi bạn nhận được nhãn dán từ ai đó, gói nhãn dán sẽ xuất hiện ở đây.";
@@ -10632,19 +10820,19 @@
 "STORY_SETTINGS_LEARN_MORE_SHEET_FOOTER" = "Các liên hệ của bạn có thể thấy tên và ảnh của bạn, và nội dung bạn chia sẻ trong \"Story của tôi\" trừ khi bạn ẩn story với các liên hệ.";
 
 /* Header for the explainer sheet for signal connections */
-"STORY_SETTINGS_LEARN_MORE_SHEET_HEADER_FORMAT" = "<bold>Liên hệ Signal</bold> là những người bạn chọn để tin tưởng, bằng việc:";
+"STORY_SETTINGS_LEARN_MORE_SHEET_HEADER_FORMAT" = "<bold>Liên hệ Radar</bold> là những người bạn chọn để tin tưởng, bằng việc:";
 
 /* Label for the stories section of the settings view */
 "STORY_SETTINGS_TITLE" = "Các Story";
 
 /* Section footer for the 'viewers' section on the 'story settings' view */
-"STORY_SETTINGS_WHO_CAN_VIEW_THIS_FOOTER" = "Chọn Liên hệ Signal có thể xem story của bạn. Thay đổi không có hiệu lực với các story bạn đã gửi.";
+"STORY_SETTINGS_WHO_CAN_VIEW_THIS_FOOTER" = "Chọn Liên hệ Radar có thể xem story của bạn. Thay đổi không có hiệu lực với các story bạn đã gửi.";
 
 /* Section header for the 'viewers' section on the 'story settings' view */
 "STORY_SETTINGS_WHO_CAN_VIEW_THIS_HEADER" = "Ai Có Thể Xem Story Này";
 
 /* Header for the 'viewers' section on the 'story settings' bottom sheet */
-"STORY_SETTINGS_WHO_CAN_VIEW_THIS_SHEET_HEADER" = "Chọn các Liên hệ Signal có thể xem story của bạn. Bạn có thể thay đổi tùy chọn này bất kỳ lúc nào trong mục cài đặt sự riêng tư.";
+"STORY_SETTINGS_WHO_CAN_VIEW_THIS_SHEET_HEADER" = "Chọn các Liên hệ Radar có thể xem story của bạn. Bạn có thể thay đổi tùy chọn này bất kỳ lúc nào trong mục cài đặt sự riêng tư.";
 
 /* Tooltip text shown when the user selects a story as a destination for a long duration video that will be split into shorter segments. Embeds {{ segment duration in seconds }} */
 "STORY_VIDEO_SEGMENTATION_TOOLTIP_FORMAT" = "Các video dùng cho Story sẽ được cắt thành các đoạn dài %1$d và đăng thành nhiều story.";
@@ -10683,7 +10871,7 @@
 "SUPPORT_EMAIL_DEFAULT_DESCRIPTION" = "Nói cho chúng tôi biết về vấn đề: ";
 
 /* Message for alert dialog presented when a support email failed to send */
-"SUPPORT_EMAIL_ERROR_ALERT_DESCRIPTION" = "Xin hãy gửi yêu cầu hỗ trợ của bạn cho support@signal.org";
+"SUPPORT_EMAIL_ERROR_ALERT_DESCRIPTION" = "Xin hãy gửi yêu cầu hỗ trợ của bạn cho support@radar.chat";
 
 /* Localized label for support request email filter string. Embeds {{filter text}}. */
 "SUPPORT_EMAIL_FILTER_LABEL_FORMAT" = "Bộ lọc: %1$@";
@@ -10707,7 +10895,7 @@
 "SUPPORT_EMAIL_LOG_URL_LABEL_FORMAT" = "URL của Ghi chú: %1$@";
 
 /* Localized subject for support request emails */
-"SUPPORT_EMAIL_SUBJECT" = "Yêu cầu Hỗ trợ Signal iOS";
+"SUPPORT_EMAIL_SUBJECT" = "Yêu cầu Hỗ trợ Radar iOS";
 
 /* Header for emoji mood selection */
 "SUPPORT_EMOJI_PROMPT" = "Bạn cảm thấy thế nào? (không bắt buộc)";
@@ -10785,7 +10973,7 @@
 "SWITCH_ON" = "Bật";
 
 /* Name to display for the 'system' sender, e.g. for release notes and the onboarding story */
-"SYSTEM_ADDRESS_NAME" = "Signal";
+"SYSTEM_ADDRESS_NAME" = "Radar";
 
 /* Label for button to verify a user's safety number. */
 "SYSTEM_MESSAGE_ACTION_VERIFY_SAFETY_NUMBER" = "Xác minh";
@@ -10926,16 +11114,16 @@
 "TRANSFER_ACCOUNT_AUTHENTICATION_REASON" = "Xác thực để chuyển tài khoản của bạn";
 
 /* Button for bottom sheet shown when device transfer completes on the receiving device. Tapping will terminate the Signal app and trigger a notification to relaunch. */
-"TRANSFER_COMPLETE_SHEET_BUTTON" = "Đóng Signal";
+"TRANSFER_COMPLETE_SHEET_BUTTON" = "Đóng Radar";
 
 /* Subtitle for bottom sheet shown when device transfer completes on the receiving device. */
-"TRANSFER_COMPLETE_SHEET_SUBTITLE" = "Để bắt đầu sử dụng tài khoản của bạn trên thiết bị này, hãy đóng và mở lại Signal.";
+"TRANSFER_COMPLETE_SHEET_SUBTITLE" = "Để bắt đầu sử dụng tài khoản của bạn trên thiết bị này, hãy đóng và mở lại Radar.";
 
 /* Title for bottom sheet shown when device transfer completes on the receiving device. */
 "TRANSFER_COMPLETE_SHEET_TITLE" = "Chuyển hoàn tất";
 
 /* Notification prompting the user to relaunch Signal after a device transfer completed. */
-"TRANSFER_RELAUNCH_NOTIFICATION" = "Mở Signal để bắt đầu nhắn tin";
+"TRANSFER_RELAUNCH_NOTIFICATION" = "Mở Radar để bắt đầu nhắn tin";
 
 /* Label for a button that says 'Try Again'. */
 "TRY_AGAIN_BUTTON_TITLE" = "Hãy thử lại";
@@ -10965,25 +11153,25 @@
 "UNKNOWN_GROUP" = "Nhóm chưa biết";
 
 /* Info message recorded in conversation history when local user receives an unknown message from a linked device and needs to upgrade. */
-"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_FROM_LINKED_DEVICE" = "Một trong các thiết bị của bạn đã gửi một tin nhắn nhưng không thể xử lý và hiển thị ở đây vì tin nhắn này dùng một tính năng mới của Signal.";
+"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_FROM_LINKED_DEVICE" = "Một trong các thiết bị của bạn đã gửi một tin nhắn nhưng không thể xử lý và hiển thị ở đây vì tin nhắn này dùng một tính năng mới của Radar.";
 
 /* Info message recorded in conversation history when local user receives an unknown message and needs to upgrade. Embeds {{user's name or phone number}}. */
-"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_WITH_NAME_FORMAT" = "%1$@ đã gửi cho bạn một tin nhắn nhưng không thể xử lý hoặc hiển thị vì sử dụng tính năng Signal mới.";
+"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_WITH_NAME_FORMAT" = "%1$@ đã gửi cho bạn một tin nhắn nhưng không thể xử lý hoặc hiển thị vì sử dụng tính năng Radar mới.";
 
 /* Info message recorded in conversation history when local user receives an unknown message and needs to upgrade. */
-"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_WITHOUT_NAME" = "Bạn nhận được một tin nhắn nhưng không thể xử lý hoặc hiển thị ở đây vì tin nhắn này sử dụng một tính năng mới của Signal.";
+"UNKNOWN_PROTOCOL_VERSION_NEED_TO_UPGRADE_WITHOUT_NAME" = "Bạn nhận được một tin nhắn nhưng không thể xử lý hoặc hiển thị ở đây vì tin nhắn này sử dụng một tính năng mới của Radar.";
 
 /* Label for button that lets users upgrade the app. */
-"UNKNOWN_PROTOCOL_VERSION_UPGRADE_BUTTON" = "Cập nhật Signal Ngay";
+"UNKNOWN_PROTOCOL_VERSION_UPGRADE_BUTTON" = "Cập nhật Radar Ngay";
 
 /* Info message recorded in conversation history when local user has received an unknown unknown message from a linked device and has upgraded. */
-"UNKNOWN_PROTOCOL_VERSION_UPGRADE_COMPLETE_FROM_LINKED_DEVICE" = "Đã cập nhật phiên bản mới nhất của Signal. Bạn có thể nhận tin nhắn loại này trên thiết bị của mình.";
+"UNKNOWN_PROTOCOL_VERSION_UPGRADE_COMPLETE_FROM_LINKED_DEVICE" = "Đã cập nhật phiên bản mới nhất của Radar. Bạn có thể nhận tin nhắn loại này trên thiết bị của mình.";
 
 /* Info message recorded in conversation history when local user has received an unknown message and has upgraded. Embeds {{user's name or phone number}}. */
-"UNKNOWN_PROTOCOL_VERSION_UPGRADE_COMPLETE_WITH_NAME_FORMAT" = "Bạn có thể yêu cầu %1$@ gửi lại tin nhắn vì hiện tại bạn đang sử dụng phiên bản mới nhất của Signal.";
+"UNKNOWN_PROTOCOL_VERSION_UPGRADE_COMPLETE_WITH_NAME_FORMAT" = "Bạn có thể yêu cầu %1$@ gửi lại tin nhắn vì hiện tại bạn đang sử dụng phiên bản mới nhất của Radar.";
 
 /* Info message recorded in conversation history when local user has received an unknown message and has upgraded. */
-"UNKNOWN_PROTOCOL_VERSION_UPGRADE_COMPLETE_WITHOUT_NAME" = "Bạn có thể yêu cầu người gửi hãy gửi lại tin nhắn này vì hiện tại bạn đang sử dụng phiên bản mới nhất của Signal.";
+"UNKNOWN_PROTOCOL_VERSION_UPGRADE_COMPLETE_WITHOUT_NAME" = "Bạn có thể yêu cầu người gửi hãy gửi lại tin nhắn này vì hiện tại bạn đang sử dụng phiên bản mới nhất của Radar.";
 
 /* Label indicating an unknown user. */
 "UNKNOWN_USER" = "Vô danh";
@@ -11007,13 +11195,13 @@
 "UNLINK_CONFIRMATION_ALERT_TITLE" = "Ngừng kết nối \"%1$@\"?";
 
 /* Label warning the user that they have been unlinked from their primary device. */
-"UNLINKED_WARNING" = "Thiết bị này không còn được liên kết. Liên kết Signal lại với điện thoại của bạn để tiếp tục nhắn tin.";
+"UNLINKED_WARNING" = "Thiết bị này không còn được liên kết. Liên kết Radar lại với điện thoại của bạn để tiếp tục nhắn tin.";
 
 /* If this device has become unlinked from their primary device, they'll see a warning. This is the call to action on that warning. */
 "UNLINKED_WARNING_ACTION_TITLE" = "Liên kết lại Thiết bị";
 
 /* Alert title when unlinking device fails */
-"UNLINKING_FAILED_ALERT_TITLE" = "Signal không thể ngừng kết nối thiết bị của bạn.";
+"UNLINKING_FAILED_ALERT_TITLE" = "Radar không thể ngừng kết nối thiết bị của bạn.";
 
 /* Text for a toast confirming that the mic has been unmuted for a call. */
 "UNMUTE_CONFIRMATION_TOAST_LABEL" = "Bật micro";
@@ -11061,7 +11249,7 @@
 "UNSUPPORTED_FEATURE_ERROR" = "Thiết bị của bạn không hỗ trợ tính năng này.";
 
 /* Description for the unverified safety number change. Embeds {name of contact with identity change} */
-"UNVERIFIED_SAFETY_NUMBER_CHANGE_DESCRIPTION_FORMAT" = "Số An toàn của bạn với %1$@ đã thay đổi có thể đã thay đổi vì họ đã cài đặt lại Signal hoặc thay đổi thiết bị. Nhấn Xác thực để xác minh số an toàn mới. Điều này là không bắt buộc.";
+"UNVERIFIED_SAFETY_NUMBER_CHANGE_DESCRIPTION_FORMAT" = "Số An toàn của bạn với %1$@ đã thay đổi có thể đã thay đổi vì họ đã cài đặt lại Radar hoặc thay đổi thiết bị. Nhấn Xác thực để xác minh số an toàn mới. Điều này là không bắt buộc.";
 
 /* Action to verify a safety number after it has changed */
 "UNVERIFIED_SAFETY_NUMBER_VERIFY_ACTION" = "Xác minh";
@@ -11079,7 +11267,7 @@
 "USE_PROXY_BUTTON" = "Sử dụng proxy";
 
 /* Explanation of when you should use a signal proxy */
-"USE_PROXY_EXPLANATION" = "Chỉ dùng proxy khi bạn không thể kết nối tới Signal trên dữ liệu di động hoặc Wi-Fi.";
+"USE_PROXY_EXPLANATION" = "Chỉ dùng proxy khi bạn không thể kết nối tới Radar trên dữ liệu di động hoặc Wi-Fi.";
 
 /* Description of username links and QR codes on the username education sheet */
 "USERNAME_EDUCATION_LINK_DESCRIPTION" = "Tên người dùng có một mã QR độc nhất cùng đường dẫn để bạn có thể chia sẻ để bạn bè có thể nhanh chóng bắt đầu trò chuyện với bạn.";
@@ -11094,7 +11282,7 @@
 "USERNAME_EDUCATION_PRIVACY_TITLE" = "Sự riêng tư cho số điện thoại";
 
 /* Label for the 'set up' button on the username education sheet */
-"USERNAME_EDUCATION_SET_UP_BUTTON" = "Đặt tên người dùng Signal của bạn";
+"USERNAME_EDUCATION_SET_UP_BUTTON" = "Đặt tên người dùng Radar của bạn";
 
 /* Title to set up signal username */
 "USERNAME_EDUCATION_TITLE" = "Cách Mới để Kết Nối";
@@ -11172,13 +11360,31 @@
 "USERNAME_LOOKUP_LINK_NO_LONGER_VALID_MESSAGE" = "Tên người dùng này không còn khả dụng.";
 
 /* A message indicating that the given username is not associated with a registered Signal account. Embeds {{ a username }}. */
-"USERNAME_LOOKUP_NOT_FOUND_MESSAGE_FORMAT" = "%1$@ không phải là người dùng Signal. Hãy kiểm tra lại bạn đã nhập đầy đủ tên người dùng hay chưa.";
+"USERNAME_LOOKUP_NOT_FOUND_MESSAGE_FORMAT" = "%1$@ không phải là người dùng Radar. Hãy kiểm tra lại bạn đã nhập đầy đủ tên người dùng hay chưa.";
 
 /* Title for an action sheet indicating that the given username is not associated with a registered Signal account. */
 "USERNAME_LOOKUP_NOT_FOUND_TITLE" = "Không tìm thấy Người dùng";
 
+/* Status label shown when the entered username is available to claim. */
+"USERNAME_ONBOARDING_AVAILABLE_STATUS" = "Username Available";
+
+/* Button label to confirm the chosen username on the username setup screen during onboarding. */
+"USERNAME_ONBOARDING_CONFIRM_BUTTON" = "Confirm";
+
+/* Button label to edit the username on the existing username screen during onboarding. */
+"USERNAME_ONBOARDING_EDIT_BUTTON" = "Edit my Username";
+
+/* Subtitle shown on the username screen during onboarding when the user already has a username. */
+"USERNAME_ONBOARDING_EXISTING_SUBTITLE" = "This is your username for connecting with other users on Radar and Signal";
+
+/* Subtitle for the username setup screen during onboarding, explaining what usernames are used for on Radar and Signal. */
+"USERNAME_ONBOARDING_SUBTITLE" = "Set your custom username for connecting with other users on Radar and Signal";
+
+/* Title for the username setup screen shown during onboarding. */
+"USERNAME_ONBOARDING_TITLE" = "Your Username";
+
 /* Instructions that appear below the username QR code on a sharable exported image. */
-"USERNAME_QR_CODE_EXPORT_INSTRUCTIONS" = "Quét mã QR này bằng điện thoại của bạn để trò chuyện với tôi trên Signal.";
+"USERNAME_QR_CODE_EXPORT_INSTRUCTIONS" = "Quét mã QR này bằng điện thoại của bạn để trò chuyện với tôi trên Radar.";
 
 /* A message in a toast informing the user their username, link, and QR code have successfully been reset. Embeds {{ the user's new username }}. */
 "USERNAME_RESET_SUCCESSFUL_TOAST" = "Mã QR và đường dẫn của bạn đã được đặt lại và tên người dùng của bạn là %1$@";
