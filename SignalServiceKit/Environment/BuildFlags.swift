@@ -115,6 +115,11 @@ public enum BuildFlags {
     /// They come from Signal's update server and are written by Signal, so Radar
     /// neither fetches nor shows them. Disabled.
     public static let remoteMegaphonesAndReleaseNotes = false
+
+    /// Radar: gates the post-call quality survey. Responses (and optional debug
+    /// logs) go to Signal's `v1/call_quality_survey`, which Radar can't use.
+    /// Disabled.
+    public static let callQualitySurvey = false
 }
 
 // MARK: -

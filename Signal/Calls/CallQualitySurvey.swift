@@ -101,6 +101,9 @@ class CallQualitySurveyManager {
             return true
         }
 
+        // Radar: see BuildFlags.callQualitySurvey.
+        guard BuildFlags.callQualitySurvey else { return false }
+
         guard callSummary.isSurveyCandidate else { return false }
 
         let minimumTimeInterval: TimeInterval = .day
