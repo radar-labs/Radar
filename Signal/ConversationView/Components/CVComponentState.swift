@@ -259,6 +259,9 @@ struct CVComponentState: Equatable {
         let note: String?
         let otherUserShortName: String
         let archivedPayment: ArchivedPayment?
+        /// Real picoMob (sats) value recovered from the archived receipt blob.
+        /// Available only for incoming payments where the local key can unmask the receipt.
+        let recoveredAmountPicoMob: UInt64?
 
         static func ==(lhs: Self, rhs: Self) -> Bool {
             lhs.amount == rhs.amount
@@ -1985,6 +1988,10 @@ private extension CVComponentState.Builder {
         archivedPayment: ArchivedPayment?,
     ) -> CVComponentState {
 
+        let recoveredAmountPicoMob = archivedPayment?.receipt.flatMap {
+            SUIEnvironment.shared.paymentsImplRef.unmaskReceiptAmount(data: $0)?.value
+        }
+
         self.archivedPaymentAttachment = ArchivedPaymentAttachment(
             amount: PaymentsFormat.formatFromArchive(amount: archivedPaymentMessage.archivedPaymentInfo.amount),
             fee: PaymentsFormat.formatFromArchive(amount: archivedPaymentMessage.archivedPaymentInfo.fee),
@@ -1992,6 +1999,7 @@ private extension CVComponentState.Builder {
             // Only used for 1:1 threads, but not enforced.
             otherUserShortName: threadViewModel.shortName ?? threadViewModel.name,
             archivedPayment: archivedPayment,
+            recoveredAmountPicoMob: recoveredAmountPicoMob,
         )
 
         return build()

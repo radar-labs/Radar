@@ -4,18 +4,18 @@
 //
 
 import Foundation
-import SignalServiceKit
+public import SignalServiceKit
 import SignalUI
 
-struct ArchivedPaymentHistoryItem: PaymentsHistoryItem {
+public struct ArchivedPaymentHistoryItem: PaymentsHistoryItem {
 
     private let archivedPayment: ArchivedPayment
-    let displayName: String
+    public let displayName: String
 
     private let paymentInfo: TSArchivedPaymentInfo
-    let isIncoming: Bool
+    public let isIncoming: Bool
 
-    let address: SignalServiceKit.SignalServiceAddress?
+    public let address: SignalServiceKit.SignalServiceAddress?
 
     init?(
         archivedPayment: ArchivedPayment,
@@ -39,53 +39,57 @@ struct ArchivedPaymentHistoryItem: PaymentsHistoryItem {
         }
     }
 
-    var isOutgoing: Bool {
+    public var isOutgoing: Bool {
         !isIncoming
     }
 
-    var isUnidentified: Bool {
+    public var isUnidentified: Bool {
         archivedPayment.interactionUniqueId == nil
     }
 
-    var isFailed: Bool {
+    public var isFailed: Bool {
         return archivedPayment.status.isFailure
     }
 
-    var isDefragmentation: Bool {
+    public var isDefragmentation: Bool {
         return false
     }
 
-    var receiptData: Data? {
+    public var receiptData: Data? {
         archivedPayment.receipt
     }
 
-    var paymentAmount: TSPaymentAmount? {
-        return SUIEnvironment.shared.paymentsImplRef.unmaskReceiptAmount(
-            data: archivedPayment.receipt,
-        )?.tsPaymentAmount
+    public var paymentAmount: TSPaymentAmount? {
+        guard
+            let unmasked = SUIEnvironment.shared.paymentsImplRef.unmaskReceiptAmount(
+                data: archivedPayment.receipt,
+            )
+        else {
+            return nil
+        }
+        // picoMob field stores sats in this codebase (picoMobPerSatoshi == 1).
+        // Tag as .bitcoin so display routes through the sats/BTC branch.
+        return TSPaymentAmount(currency: .bitcoin, picoMob: unmasked.value)
     }
 
-    var formattedFeeAmount: String? {
-        guard
-            let archivedFee = paymentInfo.fee,
-            let fee = PaymentsFormat.formatFromArchive(amount: archivedFee)
-        else { return nil }
+    public var formattedFeeAmount: String? {
+        guard let fee = paymentInfo.fee else { return nil }
         return PaymentsFormat.format(
             amountString: fee,
-            withCurrencyCode: true,
+            withCurrency: .bitcoin,
             withSpace: true,
         )
     }
 
-    var paymentType: TSPaymentType {
+    public var paymentType: TSPaymentType {
         isIncoming ? .incomingPayment : .outgoingPayment
     }
 
-    var paymentState: TSPaymentState {
+    public var paymentState: TSPaymentState {
         return .incomingComplete
     }
 
-    var ledgerBlockDate: Date? {
+    public var ledgerBlockDate: Date? {
         guard
             let timestamp = archivedPayment.blockTimestamp,
             timestamp > 0
@@ -93,54 +97,74 @@ struct ArchivedPaymentHistoryItem: PaymentsHistoryItem {
         return Date(millisecondsSince1970: timestamp)
     }
 
-    var ledgerBlockIndex: UInt64? {
+    public var ledgerBlockIndex: UInt64? {
         archivedPayment.blockIndex
     }
 
-    var isUnread: Bool {
+    public var isUnread: Bool {
         return false
     }
 
-    var memoMessage: String? {
+    public var memoMessage: String? {
         paymentInfo.note
     }
 
-    var attributedPaymentAmount: NSAttributedString? {
-        guard
-            let archivedAmount = paymentInfo.amount,
-            let amount = PaymentsFormat.formatFromArchive(amount: archivedAmount)
-        else { return nil }
+    public var attributedPaymentAmount: NSAttributedString? {
+        if let recovered = paymentAmount {
+            return PaymentsFormat.formattedBalance(recovered, paymentType: paymentType, withSpace: true)
+        }
+        guard let amount = paymentInfo.amount else { return nil }
         let formattedAmount = PaymentsFormat.format(
             amountString: amount,
-            withCurrencyCode: false,
+            withCurrency: nil,
             withSpace: false,
             isIncoming: isIncoming,
         )
-        return PaymentsFormat.attributedFormat(mobileCoinString: formattedAmount, withSpace: false)
+        return PaymentsFormat.attributedFormat(bitcoinString: formattedAmount, withSpace: true)
     }
 
-    var formattedPaymentAmount: String? {
-        guard
-            let archivedAmount = paymentInfo.amount,
-            let amount = PaymentsFormat.formatFromArchive(amount: archivedAmount)
-        else { return nil }
+    public var formattedPaymentAmount: String? {
+        if let recovered = paymentAmount {
+            return PaymentsFormat.formattedBalance(
+                recovered,
+                isShortForm: true,
+                paymentType: paymentType,
+            ).string
+        }
+        guard let amount = paymentInfo.amount else { return nil }
         return PaymentsFormat.format(
             amountString: amount,
-            withCurrencyCode: true,
+            withCurrency: .bitcoin,
             withSpace: true,
         )
     }
 
-    func statusDescription(isLongForm: Bool) -> String? {
+    public var formattedTotalPaymentAmount: String? {
+        if let recovered = paymentAmount {
+            return PaymentsFormat.formattedBalance(recovered, withSpace: true).string
+        }
+        guard let amount = paymentInfo.amount else { return nil }
+        return PaymentsFormat.format(
+            amountString: amount,
+            withCurrency: .bitcoin,
+            withSpace: true,
+        )
+    }
+
+    public var formattedFiatPaymentAmount: String? {
+        return nil
+    }
+
+    public func statusDescription(isLongForm: Bool) -> String? {
         return archivedPayment.statusDescription(isOutgoing: isOutgoing)
     }
 
     /// Read status is only tracked on TSPaymentModels, so there's not really anything to do here.
-    func markAsRead(tx: SignalServiceKit.DBWriteTransaction) { }
+    public func markAsRead(tx: SignalServiceKit.DBWriteTransaction) { }
 
     /// Reload is used on payment details to track updates to the TSPaymentModel.
     /// Since ArchivedPayments aren't updated, reloading here isn't necessary.
-    func reload(tx: SignalServiceKit.DBReadTransaction) -> Self? {
+    public func reload(tx: SignalServiceKit.DBReadTransaction) -> Self? {
         return self
     }
 }

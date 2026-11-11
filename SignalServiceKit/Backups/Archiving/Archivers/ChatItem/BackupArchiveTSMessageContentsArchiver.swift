@@ -351,6 +351,7 @@ class BackupArchiveTSMessageContentsArchiver {
         {
             paymentNotificationProto.amountMob = formattedAmount
         }
+
         if
             let fee = model.mobileCoin?.feeAmount?.picoMob,
             let formattedFee = PaymentsFormat.formatForArchive(picoMob: fee)
