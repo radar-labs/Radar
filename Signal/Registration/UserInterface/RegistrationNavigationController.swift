@@ -554,12 +554,11 @@ extension RegistrationNavigationController: RegistrationSplashPresenter {
         pushViewController(controller, animated: true)
     }
 
+    /// Radar: the "link device" choice of the splash's "Restore or Transfer"
+    /// prompt. Same as upstream's "Link device" menu action on the phone number
+    /// screen: start secondary-device linking at the QR code.
     public func showRelinking() {
-        guard coordinator.switchToSecondaryDeviceLinking() else {
-            owsFailBeta("Can't switch to secondary device linking")
-            return
-        }
-        SignalApp.shared.showRelinking(appReadiness: appReadiness)
+        beginSecondaryDeviceLinking(startingAtQRCode: true)
     }
 }
 

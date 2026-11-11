@@ -1698,9 +1698,9 @@ public class RegistrationCoordinatorImpl: RegistrationCoordinator {
         // server's records (including paymentsEntropy) on conflict-retry.
         if persistedState.restoreMethod?.isBackup == true {
             try? await deps.storageServiceManager.restoreOrCreateManifestIfNecessary(
-                authedDevice: accountIdentity.authedDevice,
+                authedAccount: accountIdentity.authedAccount,
                 masterKeySource: .explicit(accountEntropyPool.getMasterKey()),
-            ).awaitable()
+            )
         }
 
         try? await deps.storageServiceManager.rotateManifest(

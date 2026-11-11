@@ -14,7 +14,6 @@ public protocol RegistrationSplashPresenter: AnyObject {
     func setHasOldDevice(_ hasOldDevice: Bool)
 
     func switchToDeviceLinkingMode()
-    func transferDevice()
     func showRelinking()
 }
 
@@ -38,19 +37,15 @@ public class RegistrationSplashViewController: OWSViewController, OWSNavigationC
 
         view.backgroundColor = .Signal.background
 
-        // Buttons in the top right corner.
-        let canSwitchModes = UIDevice.current.isIPad
-        var transferButtonTrailingAnchor: NSLayoutAnchor<NSLayoutXAxisAnchor> = contentLayoutGuide.trailingAnchor
-        if canSwitchModes {
+        if !RegistrationUtils.isPrimaryByDefault {
             let modeSwitchButton = UIButton(
                 configuration: .plain(),
                 primaryAction: UIAction { [weak self] _ in
                     self?.didTapModeSwitch()
                 },
             )
-            modeSwitchButton.configuration?.image = .init(named: UIDevice.current.isIPad ? "link" : "link-slash")
+            modeSwitchButton.configuration?.image = .link
             modeSwitchButton.tintColor = .ows_gray25
-            modeSwitchButton.accessibilityIdentifier = "registration.splash.modeSwitch"
 
             view.addSubview(modeSwitchButton)
             modeSwitchButton.translatesAutoresizingMaskIntoConstraints = false
@@ -59,28 +54,6 @@ public class RegistrationSplashViewController: OWSViewController, OWSNavigationC
                 modeSwitchButton.heightAnchor.constraint(equalToConstant: 40),
                 modeSwitchButton.trailingAnchor.constraint(equalTo: contentLayoutGuide.trailingAnchor),
                 modeSwitchButton.topAnchor.constraint(equalTo: contentLayoutGuide.topAnchor),
-            ])
-
-            transferButtonTrailingAnchor = modeSwitchButton.leadingAnchor
-        }
-
-        if BuildFlags.preRegDeviceTransfer {
-            let transferButton = UIButton(
-                configuration: .plain(),
-                primaryAction: UIAction { [weak self] _ in
-                    self?.didTapTransfer()
-                },
-            )
-            transferButton.configuration?.image = Theme.iconImage(.transfer).resizedImage(to: .square(24))
-            transferButton.accessibilityIdentifier = "registration.splash.transfer"
-
-            view.addSubview(transferButton)
-            transferButton.translatesAutoresizingMaskIntoConstraints = false
-            NSLayoutConstraint.activate([
-                transferButton.widthAnchor.constraint(equalToConstant: 40),
-                transferButton.heightAnchor.constraint(equalToConstant: 40),
-                transferButton.trailingAnchor.constraint(equalTo: transferButtonTrailingAnchor),
-                transferButton.topAnchor.constraint(equalTo: contentLayoutGuide.topAnchor),
             ])
         }
 
@@ -164,24 +137,19 @@ public class RegistrationSplashViewController: OWSViewController, OWSNavigationC
         continueButton.enableMultilineLabel()
         continueButton.accessibilityIdentifier = "registration.splash.continueButton"
 
-        let largeButtonsContainer: UIView
-        if BuildFlags.Backups.registrationFlow {
-            let restoreOrTransferButton = UIButton(
-                configuration: .largeSecondary(title: OWSLocalizedString(
-                    "ONBOARDING_SPLASH_RESTORE_OR_TRANSFER_BUTTON_TITLE",
-                    comment: "Button for restoring or transferring account in the 'onboarding splash' view.",
-                )),
-                primaryAction: UIAction { [weak self] _ in
-                    self?.didTapRestoreOrTransfer()
-                },
-            )
-            restoreOrTransferButton.enableMultilineLabel()
-            restoreOrTransferButton.accessibilityIdentifier = "registration.splash.continueButton"
+        let restoreOrTransferButton = UIButton(
+            configuration: .largeSecondary(title: OWSLocalizedString(
+                "ONBOARDING_SPLASH_RESTORE_OR_TRANSFER_BUTTON_TITLE",
+                comment: "Button for restoring or transferring account in the 'onboarding splash' view.",
+            )),
+            primaryAction: UIAction { [weak self] _ in
+                self?.didTapRestoreOrTransfer()
+            },
+        )
+        restoreOrTransferButton.enableMultilineLabel()
+        restoreOrTransferButton.accessibilityIdentifier = "registration.splash.continueButton"
 
-            largeButtonsContainer = UIStackView.verticalButtonStack(buttons: [continueButton, restoreOrTransferButton])
-        } else {
-            largeButtonsContainer = UIStackView.verticalButtonStack(buttons: [continueButton])
-        }
+        let largeButtonsContainer = UIStackView.verticalButtonStack(buttons: [continueButton, restoreOrTransferButton])
 
         // Main content view.
         let stackView = addStaticContentStackView(arrangedSubviews: [
@@ -205,11 +173,6 @@ public class RegistrationSplashViewController: OWSViewController, OWSNavigationC
     private func didTapModeSwitch() {
         Logger.info("")
         presenter?.switchToDeviceLinkingMode()
-    }
-
-    private func didTapTransfer() {
-        Logger.info("")
-        presenter?.transferDevice()
     }
 
     private func showTOSPP() {
@@ -308,23 +271,21 @@ class RestoreOrTransferPickerController: StackSheetViewController {
         )
         stackView.addArrangedSubview(hasDeviceButton)
 
-        if BuildFlags.linkedPhones {
-            let linkDeviceButton = UIButton.registrationChoiceButton(
-                title: OWSLocalizedString(
-                    "ONBOARDING_SPLASH_LINK_DEVICE_TITLE",
-                    comment: "Title for the 'link device' choice of the 'Restore or Transfer' prompt",
-                ),
-                subtitle: OWSLocalizedString(
-                    "ONBOARDING_SPLASH_LINK_DEVICE_BODY",
-                    comment: "Explanation of the 'link device' flow for the 'Restore or Transfer' prompt",
-                ),
-                iconName: "link-48",
-                primaryAction: UIAction { [weak self] _ in
-                    self?.showRelinkingBlock()
-                },
-            )
-            stackView.addArrangedSubview(linkDeviceButton)
-        }
+        let linkDeviceButton = UIButton.registrationChoiceButton(
+            title: OWSLocalizedString(
+                "ONBOARDING_SPLASH_LINK_DEVICE_TITLE",
+                comment: "Title for the 'link device' choice of the 'Restore or Transfer' prompt",
+            ),
+            subtitle: OWSLocalizedString(
+                "ONBOARDING_SPLASH_LINK_DEVICE_BODY",
+                comment: "Explanation of the 'link device' flow for the 'Restore or Transfer' prompt",
+            ),
+            iconName: "link-48",
+            primaryAction: UIAction { [weak self] _ in
+                self?.showRelinkingBlock()
+            },
+        )
+        stackView.addArrangedSubview(linkDeviceButton)
     }
 }
 
@@ -475,10 +436,6 @@ private class PreviewRegistrationSplashPresenter: RegistrationSplashPresenter {
 
     func switchToDeviceLinkingMode() {
         print("switchToDeviceLinkingMode")
-    }
-
-    func transferDevice() {
-        print("transferDevice")
     }
 
     func showRelinking() {

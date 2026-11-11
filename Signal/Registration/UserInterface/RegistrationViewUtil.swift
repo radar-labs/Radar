@@ -110,8 +110,8 @@ private struct RegistrationChoiceButtonContentConfiguration: UIContentConfigurat
     var title: String
     var subtitle: String
     var iconName: String
-    var iconRenderingMode: UIImage.RenderingMode = .alwaysTemplate
     var imageSize: CGFloat?
+    var iconRenderingMode: UIImage.RenderingMode = .alwaysTemplate
 
     func makeContentView() -> UIView & UIContentView {
         RegistrationChoiceButtonContentView(configuration: self)
