@@ -583,6 +583,8 @@ public class NotificationPresenterImpl: NotificationPresenter {
         thread: TSThread,
         transaction: DBWriteTransaction
     ) {
+        guard thread.hasPendingMessageRequest(transaction: transaction)
+                || !Self.isMoneroAddressExchangeControl(incomingMessage.body) else { return }
         _notifyUser(
             forIncomingMessage: incomingMessage,
             editTarget: nil,
@@ -597,12 +599,28 @@ public class NotificationPresenterImpl: NotificationPresenter {
         thread: TSThread,
         transaction: DBWriteTransaction
     ) {
+        guard thread.hasPendingMessageRequest(transaction: transaction)
+                || !Self.isMoneroAddressExchangeControl(incomingMessage.body) else { return }
         _notifyUser(
             forIncomingMessage: incomingMessage,
             editTarget: editTarget,
             thread: thread,
             transaction: transaction
         )
+    }
+
+    private static func isMoneroAddressExchangeControl(_ body: String?) -> Bool {
+        let prefix = "radar-monero-exchange-v1:"
+        guard let body, let marker = body.range(of: prefix) else { return false }
+        let encoded = body[marker.upperBound...].trimmingCharacters(in: .whitespacesAndNewlines)
+        guard let data = Data(base64Encoded: encoded),
+              let payload = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+              let kind = payload["kind"] as? String,
+              payload["version"] as? Int == 1,
+              let id = payload["id"] as? String, UUID(uuidString: id) != nil,
+              let network = payload["network"] as? Int, (0...2).contains(network),
+              let expiry = payload["expiresAt"] as? Double, expiry.isFinite else { return false }
+        return ["request", "address", "unavailable"].contains(kind)
     }
 
     public func notifyUserOfPollEnd(

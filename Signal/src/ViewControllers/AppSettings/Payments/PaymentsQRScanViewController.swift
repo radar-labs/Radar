@@ -7,7 +7,10 @@ import SignalServiceKit
 public import SignalUI
 
 public protocol PaymentsQRScanDelegate: AnyObject {
-    func didScanPaymentAddressQRCode(publicAddressBase58: String)
+    func didScanPaymentAddressQRCode(
+        publicAddressBase58: String,
+        paymentAmountSats: UInt64?
+    )
 }
 
 // MARK: -
@@ -102,15 +105,15 @@ extension PaymentsQRScanViewController: QRCodeScanDelegate {
         // can decode.  iOS supports many more QR code modes and
         // configurations than QRCodePayload, so the qrCodeString is
         // more reliable than qrCodeData.
-        if let qrCodeString = qrCodeString {
-            if nil != PaymentsImpl.parse(input: qrCodeString) {
-                delegate?.didScanPaymentAddressQRCode(publicAddressBase58: qrCodeString)
-                navigationController?.popViewController(animated: true)
-                return .stopScanning
-            } else if let publicAddressUrl = URL(string: qrCodeString),
-                      let inputType = PaymentsImpl.parse(url: publicAddressUrl) {
-                let publicAddressBase58 = PaymentsImpl.format(inputType: inputType)
-                delegate?.didScanPaymentAddressQRCode(publicAddressBase58: publicAddressBase58)
+        if let qrCodeString {
+            let inputType = PaymentsImpl.parse(input: qrCodeString)
+                ?? URL(string: qrCodeString).flatMap { PaymentsImpl.parse(url: $0) }
+
+            if let inputType {
+                delegate?.didScanPaymentAddressQRCode(
+                    publicAddressBase58: PaymentsImpl.format(inputType: inputType),
+                    paymentAmountSats: PaymentsImpl.bitcoinAmountSats(for: inputType)
+                )
                 navigationController?.popViewController(animated: true)
                 return .stopScanning
             }

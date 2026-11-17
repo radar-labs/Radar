@@ -12,6 +12,8 @@ public import SignalUI
 public class PaymentsTransferOutViewController: OWSTableViewController2 {
 
     private let transferAmount: TSPaymentAmount?
+    private var scannedPaymentAmount: TSPaymentAmount?
+    private var shouldAdvanceAfterQRScan = false
 
     // TODO: Should this be a text area?
     private let addressTextfield = UITextField()
@@ -79,6 +81,10 @@ public class PaymentsTransferOutViewController: OWSTableViewController2 {
         SSKEnvironment.shared.paymentsCurrenciesRef.updateConversionRates()
 
         addressTextfield.becomeFirstResponder()
+
+        guard shouldAdvanceAfterQRScan else { return }
+        shouldAdvanceAfterQRScan = false
+        didTapNext()
     }
 
     private func createViews() {
@@ -235,6 +241,7 @@ public class PaymentsTransferOutViewController: OWSTableViewController2 {
     private func didTapPaste() {
         guard let text = UIPasteboard.general.string, !text.isEmpty else { return }
         addressTextfield.text = text
+        scannedPaymentAmount = nil
         updateNavbar()
     }
 
@@ -275,7 +282,7 @@ public class PaymentsTransferOutViewController: OWSTableViewController2 {
 
         let recipient: SendPaymentRecipientImpl = .publicAddress(inputType: inputType)
         let view = SendPaymentViewController(recipient: recipient,
-                                             initialPaymentAmount: transferAmount,
+                                             initialPaymentAmount: scannedPaymentAmount ?? transferAmount,
                                              isOutgoingTransfer: true,
                                              mode: .fromTransferOutFlow)
         view.delegate = self
@@ -295,6 +302,7 @@ public class PaymentsTransferOutViewController: OWSTableViewController2 {
 
     @objc
     private func addressDidChange() {
+        scannedPaymentAmount = nil
         updateNavbar()
     }
 
@@ -332,8 +340,15 @@ extension PaymentsTransferOutViewController: SendPaymentViewDelegate {
 // MARK: -
 
 extension PaymentsTransferOutViewController: PaymentsQRScanDelegate {
-    public func didScanPaymentAddressQRCode(publicAddressBase58: String) {
+    public func didScanPaymentAddressQRCode(
+        publicAddressBase58: String,
+        paymentAmountSats: UInt64?
+    ) {
         addressTextfield.text = publicAddressBase58
+        scannedPaymentAmount = paymentAmountSats.map {
+            TSPaymentAmount(currency: .bitcoin, picoMob: $0)
+        }
+        shouldAdvanceAfterQRScan = true
         updateNavbar()
     }
 }

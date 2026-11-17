@@ -54,8 +54,8 @@ class PaymentsOnboardingCoordinator {
         guard let navController else { return }
 
         if !SSKEnvironment.shared.paymentsHelperRef.arePaymentsEnabled {
-            Task.detached(priority: .userInitiated) {
-                SSKEnvironment.shared.databaseStorageRef.write { tx in
+            Task(priority: .userInitiated) {
+                await SSKEnvironment.shared.databaseStorageRef.awaitableWrite { tx in
                     SSKEnvironment.shared.paymentsHelperRef.enablePayments(transaction: tx)
                 }
             }

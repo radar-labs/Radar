@@ -63,7 +63,10 @@ public class RegistrationIdMismatchManagerImpl: RegistrationIdMismatchManager {
                 kvStore.setBool(true, key: Constants.haveRegistrationIdsBeenChecked, transaction: $0)
             }
         } catch {
-            owsFailDebug("Failed to validate registration IDs: \(error)")
+            // This check runs in the background and is retried on the next launch
+            // unless it completes. A transient request failure must not crash the
+            // app or disable registration-related functionality.
+            Logger.warn("Failed to validate registration IDs; it will be retried: \(error)")
             return
         }
     }

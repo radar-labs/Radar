@@ -12,6 +12,7 @@ public enum PaymentsUIError: Error {
 
 public enum PaymentsError: Error {
     case notEnabled
+    case sdkNotInitialized
     case userNotRegisteredOrAppNotReady
     case userHasNoPublicAddress
     case invalidCurrency

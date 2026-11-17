@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-import CocoaLumberjack
+public import CocoaLumberjack
 import Foundation
 
 public class ScrubbingLogFormatter: NSObject, DDLogFormatter {

@@ -34,7 +34,7 @@ public class PaymentsReconciliation {
     private let operationQueue = SerialTaskQueue()
 
     @objc
-    private func reconcileIfNecessary() {
+    func reconcileIfNecessary() {
         if CurrentAppContext().isNSE {
             return
         }

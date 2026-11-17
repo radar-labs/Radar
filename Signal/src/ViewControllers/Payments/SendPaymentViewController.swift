@@ -436,15 +436,41 @@ public class SendPaymentViewController: OWSViewController {
         initialPaymentAmount: TSPaymentAmount? = nil,
         isOutgoingTransfer: Bool
     ) {
-        present(
-            fromViewController: fromViewController,
-            presentationMode: .fromConversationView(fromViewController: fromViewController),
-            delegate: delegate,
-            recipientAddress: recipientAddress,
-            initialPaymentAmount: initialPaymentAmount,
-            isOutgoingTransfer: isOutgoingTransfer,
-            mode: .fromConversationView
-        )
+        guard initialPaymentAmount == nil else {
+            present(
+                fromViewController: fromViewController,
+                presentationMode: .fromConversationView(fromViewController: fromViewController),
+                delegate: delegate,
+                recipientAddress: recipientAddress,
+                initialPaymentAmount: initialPaymentAmount,
+                isOutgoingTransfer: isOutgoingTransfer,
+                mode: .fromConversationView
+            )
+            return
+        }
+
+        let actionSheet = ActionSheetController(title: "Payments", message: nil)
+        actionSheet.addAction(ActionSheetAction(title: "Bitcoin Lightning", style: .default) { _ in
+            present(
+                fromViewController: fromViewController,
+                presentationMode: .fromConversationView(fromViewController: fromViewController),
+                delegate: delegate,
+                recipientAddress: recipientAddress,
+                isOutgoingTransfer: isOutgoingTransfer,
+                mode: .fromConversationView
+            )
+        })
+        actionSheet.addAction(ActionSheetAction(title: "Monero", style: .default) { _ in
+            MoneroSendPaymentViewController.present(
+                from: fromViewController,
+                delegate: delegate,
+                chatRecipient: recipientAddress
+            )
+        })
+        actionSheet.addAction(OWSActionSheets.cancelAction)
+        fromViewController.presentActionSheet(actionSheet)
+        return
+
     }
 
     public static func present(
@@ -463,6 +489,48 @@ public class SendPaymentViewController: OWSViewController {
             initialPaymentAmount: initialPaymentAmount,
             isOutgoingTransfer: isOutgoingTransfer,
             mode: mode
+        )
+    }
+
+    public static func presentLightningInvoice(
+        from viewController: UIViewController,
+        delegate: SendPaymentViewDelegate,
+        invoice: String
+    ) {
+        if let moneroRequest = MoneroPaymentRequest.parse(invoice) {
+            MoneroSendPaymentViewController.present(
+                from: viewController,
+                delegate: delegate,
+                request: moneroRequest
+            )
+            return
+        }
+
+        guard let inputType = PaymentsImpl.parse(input: invoice)
+                ?? URL(string: invoice).flatMap({ PaymentsImpl.parse(url: $0) })
+        else {
+            OWSActionSheets.showErrorAlert(
+                message: OWSLocalizedString(
+                    "SETTINGS_PAYMENTS_TRANSFER_OUT_INVALID_PUBLIC_ADDRESS",
+                    comment: "Error indicating that a Lightning payment input is not valid."
+                )
+            )
+            return
+        }
+
+        let recipient = SendPaymentRecipientImpl.publicAddress(inputType: inputType)
+        let paymentView = SendPaymentViewController(
+            recipient: recipient,
+            initialPaymentAmount: PaymentsImpl.bitcoinAmountSats(for: inputType).map {
+                TSPaymentAmount(currency: .bitcoin, picoMob: $0)
+            },
+            isOutgoingTransfer: true,
+            mode: .fromConversationView
+        )
+        paymentView.delegate = delegate
+        viewController.presentFormSheet(
+            OWSNavigationController(rootViewController: paymentView),
+            animated: true
         )
     }
 

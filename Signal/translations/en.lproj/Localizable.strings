@@ -9970,6 +9970,11 @@ Copyright 2026 Radar Chat, Inc.";
 
 "STAR" = "Star";
 
+"PINNED_MESSAGE_PIN_ACTION_TITLE" = "Pin Message";
+"PINNED_MESSAGE_UNPIN_ACTION_TITLE" = "Unpin Message";
+"PINNED_MESSAGE_BANNER_TITLE" = "Pinned message";
+"PINNED_MESSAGE_BANNER_VIEW" = "View";
+
 "UNSTAR" = "Unstar";
 
 "STARRED_MESSAGES" = "Starred messages";

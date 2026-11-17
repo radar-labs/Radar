@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
+import UIKit
 import SignalServiceKit
 import SignalUI
 
@@ -98,6 +99,17 @@ class PaymentSettingsMenuViewController: OWSTableViewController2 {
 
         contents.add(mainSection)
 
+        let moneroSection = OWSTableSection()
+        moneroSection.headerTitle = "MONERO"
+        moneroSection.footerTitle = "This setting hides the Monero balance without changing Bitcoin balance visibility."
+        moneroSection.add(.switch(
+            withText: "Hide Monero balance",
+            isOn: { PaymentsDisplayPreferences.shared.isMoneroBalanceHidden },
+            target: self,
+            selector: #selector(didToggleMoneroBalanceSwitch)
+        ))
+        contents.add(moneroSection)
+
         let deactivateSection = OWSTableSection()
         deactivateSection.add(.item(
             name: OWSLocalizedString(
@@ -141,6 +153,11 @@ class PaymentSettingsMenuViewController: OWSTableViewController2 {
             }
         }
         navigationController?.pushViewController(vc, animated: true)
+    }
+
+    @objc
+    private func didToggleMoneroBalanceSwitch(_ sender: UISwitch) {
+        PaymentsDisplayPreferences.shared.isMoneroBalanceHidden = sender.isOn
     }
 
     private func showRecoveryPhrase() {

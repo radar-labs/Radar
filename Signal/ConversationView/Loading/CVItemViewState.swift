@@ -124,6 +124,15 @@ struct CVItemModelBuilder: CVItemBuilding {
             }
             interactionIds.insert(interaction.uniqueId)
 
+            // Monero address exchange messages are protocol-only Signal messages.
+            // They must remain in the database for the background exchange, but have
+            // no user-visible body and therefore cannot produce a conversation cell.
+            if let message = interaction as? TSMessage,
+               let body = message.body,
+               MoneroChatPaymentMessage.displayText(for: body, isOutgoing: message.isOutgoing) == "" {
+                continue
+            }
+
             let item = addItem(interaction: interaction)
             owsAssertDebug(item != nil)
         }
@@ -479,6 +488,12 @@ struct CVItemModelBuilder: CVItemBuilding {
         let collapseCutoffTimestamp = viewStateSnapshot.collapseCutoffDate.ows_millisecondsSince1970
         if interaction.receivedAtTimestamp > collapseCutoffTimestamp {
             itemViewState.shouldHideFooter = false
+        }
+
+        if let message = interaction as? TSMessage,
+           let body = message.body,
+           MoneroChatPaymentMessage.displayText(for: body, isOutgoing: message.isOutgoing) == "" {
+            itemViewState.shouldHideFooter = true
         }
 
         if

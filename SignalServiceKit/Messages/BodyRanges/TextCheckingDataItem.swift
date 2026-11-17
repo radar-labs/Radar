@@ -63,10 +63,7 @@ public struct TextCheckingDataItem: Equatable {
         in text: String,
         using detector: NSDataDetector?
     ) -> [TextCheckingDataItem] {
-        guard let detector else {
-            return []
-        }
-        return detector.matches(in: text, options: [], range: text.entireRange).compactMap { match in
+        let detectedItems: [TextCheckingDataItem] = detector?.matches(in: text, options: [], range: text.entireRange).compactMap { match in
             guard let snippet = (text as NSString).substring(with: match.range).strippedOrNil else {
                 owsFailDebug("Invalid snippet.")
                 return nil
@@ -188,7 +185,31 @@ public struct TextCheckingDataItem: Equatable {
                 snippet: snippet,
                 url: url
             )
+        } ?? []
+
+        // NSDataDetector doesn't recognize custom Monero URI schemes. Treat valid-looking
+        // Monero URIs as links so the conversation can route them to the in-app wallet.
+        let moneroPattern = #"(?i)monero:[^\s<>]+"#
+        guard let moneroRegex = try? NSRegularExpression(pattern: moneroPattern) else {
+            return detectedItems
         }
+
+        let nsText = text as NSString
+        var result = detectedItems
+        for match in moneroRegex.matches(in: text, range: text.entireRange) {
+            result.removeAll { NSIntersectionRange($0.range, match.range).length > 0 }
+            let snippet = nsText.substring(with: match.range)
+            guard let url = URL(string: snippet), url.scheme?.lowercased() == "monero" else {
+                continue
+            }
+            result.append(TextCheckingDataItem(
+                dataType: .link,
+                range: match.range,
+                snippet: snippet,
+                url: url
+            ))
+        }
+        return result.sorted { $0.range.location < $1.range.location }
     }
 
     /// Builds a URL for passing the given address to another app to query.

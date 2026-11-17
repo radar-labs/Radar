@@ -553,6 +553,7 @@ public extension PaymentsError {
     var isPaymentsNetworkFailure: Bool {
         switch self {
         case .notEnabled,
+             .sdkNotInitialized,
              .userNotRegisteredOrAppNotReady,
              .userHasNoPublicAddress,
              .invalidCurrency,
@@ -594,6 +595,7 @@ public extension PaymentsError {
     var isExpectedFromSDK: Bool {
         switch self {
         case .notEnabled,
+             .sdkNotInitialized,
              .userNotRegisteredOrAppNotReady,
              .userHasNoPublicAddress,
              .invalidCurrency,
@@ -646,6 +648,8 @@ public func owsFailDebugUnlessMCNetworkFailure(_ error: Error,
         if paymentsError.isPaymentsNetworkFailure {
             // Log but otherwise ignore network failures.
             Logger.warn("Error: \(error)", file: file, function: function, line: line)
+        } else if case .sdkNotInitialized = paymentsError {
+            Logger.warn("Payment requested before the Breez SDK finished initializing.", file: file, function: function, line: line)
         } else if paymentsError.isExpectedFromSDK {
             Logger.warn("Error: \(error)", file: file, function: function, line: line)
         } else {

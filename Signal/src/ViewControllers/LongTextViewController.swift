@@ -331,6 +331,10 @@ class LongTextViewController: OWSViewController {
                     owsFailDebug("Should not have referenced user in long message body.")
                     return
                 case .dataItem(let dataItem):
+                    if let request = MoneroPaymentRequest.parse(dataItem.url.absoluteString) {
+                        MoneroSendPaymentViewController.present(from: self, request: request)
+                        return
+                    }
                     UIApplication.shared.open(dataItem.url, options: [:], completionHandler: nil)
                     return
                 case .mention(let mentionItem):

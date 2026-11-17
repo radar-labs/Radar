@@ -277,8 +277,10 @@ public class CVComponentBodyText: CVComponentBase, CVComponent {
 
         func bodyDisplayableText() -> DisplayableText? {
             if let body = message.body, !body.isEmpty {
+                let displayText = MoneroChatPaymentMessage.displayText(for: body, isOutgoing: message.isOutgoing) ?? body
+                guard !displayText.isEmpty else { return nil }
                 return CVComponentState.displayableBodyText(
-                    text: body,
+                    text: displayText,
                     ranges: message.bodyRanges,
                     interaction: message,
                     transaction: transaction
