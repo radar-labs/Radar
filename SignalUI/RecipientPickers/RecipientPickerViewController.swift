@@ -843,7 +843,7 @@ extension RecipientPickerViewController {
     }
 
     private func contactAccessNotAllowedReminderItem() -> OWSTableItem {
-        return OWSTableItem(customCellBlock: {
+        return OWSTableItem(customCellBlock: { [self] in
             ContactReminderTableViewCell(
                 learnMoreAction: { [weak self] in
                     guard let self else { return }

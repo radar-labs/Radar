@@ -360,7 +360,7 @@ extension ConversationViewController {
                 style: .destructive
             ) { [weak self] _ in
                 guard let self else { return }
-                TSInteraction.showDeleteForEveryoneConfirmationIfNecessary {
+                TSInteraction.showDeleteForEveryoneConfirmationIfNecessary { [self] in
                     ModalActivityIndicatorViewController.present(
                         fromViewController: self,
                         canCancel: false
@@ -537,7 +537,7 @@ extension ConversationViewController {
                         tx: $0
                     )
                 }
-                DispatchQueue.main.async {
+                DispatchQueue.main.async { [self] in
                     modalActivityIndicator.dismiss { [weak self] in
                         guard let self = self else { return }
                         self.uiMode = .normal

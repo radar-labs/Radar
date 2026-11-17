@@ -7,15 +7,16 @@ import XCTest
 @testable import Signal
 
 class AppDelegateTest: XCTestCase {
+    @MainActor
     func testApplicationShortcutItems() throws {
         func hasNewMessageShortcut(_ shortcuts: [UIApplicationShortcutItem]) -> Bool {
             shortcuts.contains(where: { $0.type.contains("quickCompose") })
         }
 
-        let unregistered = AppDelegate.applicationShortcutItems(isRegistered: false)
+        let unregistered = AppLifecycleManager.applicationShortcutItems(isRegistered: false)
         XCTAssertFalse(hasNewMessageShortcut(unregistered))
 
-        let registered = AppDelegate.applicationShortcutItems(isRegistered: true)
+        let registered = AppLifecycleManager.applicationShortcutItems(isRegistered: true)
         XCTAssertTrue(hasNewMessageShortcut(registered))
     }
 }

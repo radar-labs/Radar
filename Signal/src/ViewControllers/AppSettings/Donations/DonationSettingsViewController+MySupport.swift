@@ -574,14 +574,18 @@ extension DonationSettingsViewController {
     private func showDonateAndCancelSubscriptionAction(title: ShowDonateActionTitle) -> ActionSheetAction {
         return ActionSheetAction(title: title.localizedTitle) { _ in
             Task.detached {
-                let subscriberId = SSKEnvironment.shared.databaseStorageRef.read { tx in
-                    return DonationSubscriptionManager.getSubscriberID(transaction: tx)
+                do {
+                    let subscriberId = SSKEnvironment.shared.databaseStorageRef.read { tx in
+                        return DonationSubscriptionManager.getSubscriberID(transaction: tx)
+                    }
+                    if let subscriberId {
+                        try await DonationSubscriptionManager.cancelSubscription(for: subscriberId)
+                    }
+                    await self.loadAndUpdateState()
+                    await self.showDonateViewController(preferredDonateMode: .monthly)
+                } catch {
+                    Logger.error("Error with subscription: \(error)")
                 }
-                if let subscriberId {
-                    try await DonationSubscriptionManager.cancelSubscription(for: subscriberId)
-                }
-                await self.loadAndUpdateState()
-                await self.showDonateViewController(preferredDonateMode: .monthly)
             }
         }
     }

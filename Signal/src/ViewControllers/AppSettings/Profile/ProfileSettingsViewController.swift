@@ -693,7 +693,7 @@ class ProfileSettingsViewController: OWSTableViewController2 {
         }
 
         // Show an activity indicator to block the UI during the profile upload.
-        ModalActivityIndicatorViewController.present(fromViewController: self, canCancel: false, asyncBlock: { modalActivityIndicator in
+        ModalActivityIndicatorViewController.present(fromViewController: self, canCancel: false, asyncBlock: { [self] modalActivityIndicator in
             let databaseStorage = SSKEnvironment.shared.databaseStorageRef
             do {
                 let updatePromise = await databaseStorage.awaitableWrite { tx in

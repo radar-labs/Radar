@@ -33,7 +33,7 @@ extension GroupViewHelper {
             return
         }
 
-        let actionBlock = { @MainActor in
+        let actionBlock = { @MainActor [self] in
             GroupViewUtils.updateGroupWithActivityIndicator(
                 fromViewController: fromViewController,
                 updateBlock: { try await updateBlock(oldGroupModel, serviceId) },

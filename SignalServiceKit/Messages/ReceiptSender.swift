@@ -69,7 +69,7 @@ public class ReceiptSender: NSObject {
         super.init()
         SwiftSingletons.register(self)
 
-        appReadiness.runNowOrWhenAppDidBecomeReadyAsync {
+        appReadiness.runNowOrWhenAppDidBecomeReadyAsync { [self] in
             self.sendPendingReceiptsIfNeeded()
 
             self.observers.append(NotificationCenter.default.addObserver(

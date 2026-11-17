@@ -52,7 +52,11 @@ public class BackupArchiveAvatarFetcher {
         )
         appReadiness.runNowOrWhenMainAppDidBecomeReadyAsync { [weak self] in
             Task { [weak self] in
-                try await self?.runIfNeeded()
+                do {
+                    try await self?.runIfNeeded()
+                } catch {
+                    Logger.debug("Failed to fetch avatars: \(error)")
+                }
             }
             self?.startObserving()
         }
@@ -123,14 +127,22 @@ public class BackupArchiveAvatarFetcher {
     @objc
     private func didUpdateRegistrationState() {
         Task {
-            try await runIfNeeded()
+            do {
+                try await runIfNeeded()
+            } catch {
+                Logger.debug("Failed to fetch avatars: \(error)")
+            }
         }
     }
 
     @objc
     private func reachabililityDidChange() {
         Task {
-            try await runIfNeeded()
+            do {
+                try await runIfNeeded()
+            } catch {
+                Logger.debug("Failed to fetch avatars: \(error)")
+            }
         }
     }
 

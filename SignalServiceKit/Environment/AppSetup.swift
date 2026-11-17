@@ -2062,10 +2062,14 @@ extension AppSetup.FinalContinuation {
 
             let preKeyManager = dependenciesBridge.preKeyManager
             Task {
-                // Rotate ACI keys first since PNI keys may block on incoming messages.
-                // TODO: Don't block ACI operations if PNI operations are blocked.
-                try await preKeyManager.rotatePreKeysOnUpgradeIfNecessary(for: .aci)
-                try await preKeyManager.rotatePreKeysOnUpgradeIfNecessary(for: .pni)
+                do {
+                    // Rotate ACI keys first since PNI keys may block on incoming messages.
+                    // TODO: Don't block ACI operations if PNI operations are blocked.
+                    try await preKeyManager.rotatePreKeysOnUpgradeIfNecessary(for: .aci)
+                    try await preKeyManager.rotatePreKeysOnUpgradeIfNecessary(for: .pni)
+                } catch {
+                    Logger.warn("Failed to rotate pre-keys on upgrade: \(error)")
+                }
             }
         }
     }

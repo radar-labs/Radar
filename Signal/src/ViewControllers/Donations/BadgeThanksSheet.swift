@@ -176,7 +176,11 @@ class BadgeThanksSheet: OWSTableSheetViewController {
             // Capture this value on the main thread.
             let shouldMakeVisibleAndPrimary = self.shouldMakeVisibleAndPrimary
             Task {
-                try await self.saveVisibilityChanges(shouldMakeVisibleAndPrimary: shouldMakeVisibleAndPrimary)
+                do {
+                    try await self.saveVisibilityChanges(shouldMakeVisibleAndPrimary: shouldMakeVisibleAndPrimary)
+                } catch {
+                    Logger.error("Unable to save visibility changes: \(error)")
+                }
             }
         case let .giftReceived(_, notNowAction, _):
             notNowAction()

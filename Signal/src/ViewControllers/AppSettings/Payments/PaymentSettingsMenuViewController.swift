@@ -256,7 +256,7 @@ class PaymentSettingsMenuViewController: OWSTableViewController2 {
         ModalActivityIndicatorViewController.present(
             fromViewController: self,
             presentationDelay: 0.25,
-            asyncBlock: { modal in
+            asyncBlock: { [self] modal in
                 let result = await Result {
                     try await SUIEnvironment.shared.paymentsImplRef.deletePaymentWallet()
                 }

@@ -186,12 +186,13 @@ public class TSConstantsProduction: TSConstantsProtocol {
     // key material from during registration. These must be ordered from
     // newest to oldest, so we check the latest enclaves for backups before
     // checking earlier enclaves. Every entry must be attestable by the
-    // pinned libsignal version; a decommissioned enclave here aborts the
-    // whole restore chain instead of falling through.
-    public let svr2PreviousEnclaves: [MrEnclave] = [
-        MrEnclave("1240acbd4aa26974184844c8a46b1022d3957ac8a76c1fd8f5b1a15141ee0708"),
-        MrEnclave("29cd63c87bea751e3bfd0fbd401279192e2e5c99948b4ee9437eafc4968355fb"),
-    ]
+    // pinned libsignal version AND still running; a decommissioned enclave
+    // here aborts the whole restore chain instead of falling through.
+    //
+    // Empty since 2026-11: Signal shut down 2026Q1 (1240acbd…) and 2025Q3
+    // (29cd63c8…), both now return 404, and libsignal 0.99.4 can no longer
+    // attest 2025Q3.
+    public let svr2PreviousEnclaves: [MrEnclave] = []
 
     public let applicationGroup = "group." + Bundle.main.bundleIdPrefix + ".signal.group"
 

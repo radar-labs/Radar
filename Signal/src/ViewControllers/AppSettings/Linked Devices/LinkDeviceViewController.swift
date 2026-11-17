@@ -170,7 +170,7 @@ class LinkDeviceViewController: OWSViewController {
         _ deviceProvisioningUrl: DeviceProvisioningURL,
         shouldLinkNSync: Bool
     ) {
-        Task {
+        Task { [self] in
             do {
                 let (ephemeralBackupKey, tokenId) = try await context.provisioningManager.provision(
                     with: deviceProvisioningUrl,

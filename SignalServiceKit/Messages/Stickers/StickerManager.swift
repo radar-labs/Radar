@@ -102,11 +102,15 @@ public class StickerManager: NSObject {
         appReadiness.runNowOrWhenMainAppDidBecomeReadyAsync {
             if DependenciesBridge.shared.tsAccountManager.registrationStateWithMaybeSneakyTransaction.isRegistered {
                 Task {
-                    // This will return once all restored sticker packs have been downloaded
-                    try await self.queueLoader.loadAndRunTasks()
+                    do {
+                        // This will return once all restored sticker packs have been downloaded
+                        try await self.queueLoader.loadAndRunTasks()
 
-                    // Refresh contents after pending downloads complete
-                    StickerManager.refreshContents()
+                        // Refresh contents after pending downloads complete
+                        StickerManager.refreshContents()
+                    } catch {
+                        Logger.warn("Failed to download restored sticker packs: \(error)")
+                    }
                 }
             }
         }

@@ -55,7 +55,7 @@ final class InactiveLinkedDeviceReminderMegaphone: MegaphoneView {
         let dontRemindMeButton = Button(title: OWSLocalizedString(
             "INACTIVE_LINKED_DEVICE_REMINDER_MEGAPHONE_DONT_REMIND_ME_BUTTON",
             comment: "Title for a button in an in-app megaphone about a user's inactive linked device, indicating the user doesn't want to be reminded."
-        )) {
+        )) { [self] in
             DependenciesBridge.shared.db.asyncWrite(
                 block: { tx in
                     self.inactiveLinkedDeviceFinder.permanentlyDisableFinders(tx: tx)

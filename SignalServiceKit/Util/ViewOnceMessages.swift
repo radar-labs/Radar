@@ -47,7 +47,11 @@ public class ViewOnceMessages: NSObject {
                 }
 
                 // We need to "check for auto-completion" once per day.
-                try await Task.sleep(nanoseconds: TimeInterval.day.clampedNanoseconds)
+                do {
+                    try await Task.sleep(nanoseconds: TimeInterval.day.clampedNanoseconds)
+                } catch {
+                    return
+                }
                 Logger.info("Checking for auto-expired view once messages again because it's been a day.")
             }
         }

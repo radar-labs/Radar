@@ -359,7 +359,7 @@ public class MessageSendLog {
     public func cleanUpAndScheduleNextOccurrence() {
         AssertIsOnMainThread()
         let backgroundTask = OWSBackgroundTask(label: #function)
-        DispatchQueue.global(qos: .utility).async {
+        DispatchQueue.global(qos: .utility).async { [self] in
             defer {
                 DispatchQueue.main.async(backgroundTask.end)
             }

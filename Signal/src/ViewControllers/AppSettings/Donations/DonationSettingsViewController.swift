@@ -662,7 +662,7 @@ class DonationSettingsViewController: OWSTableViewController2 {
         donateMode: DonateViewController.DonateMode,
         clearErrorBlock: @escaping (DBWriteTransaction) -> Void
     ) -> ActionSheetAction {
-        return ActionSheetAction(title: title) { _ in
+        return ActionSheetAction(title: title) { [self] _ in
             SSKEnvironment.shared.databaseStorageRef.write { tx in
                 clearErrorBlock(tx)
             }

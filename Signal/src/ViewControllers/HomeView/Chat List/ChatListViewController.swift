@@ -259,7 +259,7 @@ public class ChatListViewController: OWSViewController, HomeTabViewController {
         }
 
         showFYISheetIfNecessary()
-        Task { try await self.checkForFailedServiceExtensionLaunches() }
+        Task { try? await self.checkForFailedServiceExtensionLaunches() }
 
         hasEverAppeared = true
         if viewState.multiSelectState.isActive {

@@ -418,7 +418,11 @@ public class AttachmentDownloadManagerImpl: AttachmentDownloadManager {
         }
 
         Task { [weak self] in
-            try await self?.queueLoader.loadAndRunTasks()
+            do {
+                try await self?.queueLoader.loadAndRunTasks()
+            } catch {
+                Logger.error("Unable to begin downloading attachments: \(error)")
+            }
         }
     }
 

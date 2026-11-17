@@ -83,7 +83,7 @@ extension ChatListViewController {
             tbc.autoPinWidthToSuperview()
             tbc.autoPinEdge(toSuperviewEdge: .bottom)
             viewState.multiSelectState.toolbar = tbc
-            let animateToolbar = {
+            let animateToolbar = { [self] in
                 // Hack to get the toolbar to update its safe area correctly after any
                 // tab bar hidden state changes. Unclear why this is needed or why it needs
                 // to be async, but without it the toolbar inherits stale safe area insets from

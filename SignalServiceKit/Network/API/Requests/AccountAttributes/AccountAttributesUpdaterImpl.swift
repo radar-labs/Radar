@@ -44,7 +44,11 @@ public class AccountAttributesUpdaterImpl: AccountAttributesUpdater {
 
         appReadiness.runNowOrWhenAppDidBecomeReadyAsync {
             Task {
-                try await self.updateAccountAttributesIfNecessaryAttempt(authedAccount: .implicit())
+                do {
+                    try await self.updateAccountAttributesIfNecessaryAttempt(authedAccount: .implicit())
+                } catch {
+                    Logger.warn("Failed to update account attributes: \(error)")
+                }
             }
         }
 
@@ -64,7 +68,11 @@ public class AccountAttributesUpdaterImpl: AccountAttributesUpdater {
     private func reachabilityDidChange() {
         appReadiness.runNowOrWhenAppDidBecomeReadyAsync {
             Task {
-                try await self.updateAccountAttributesIfNecessaryAttempt(authedAccount: .implicit())
+                do {
+                    try await self.updateAccountAttributesIfNecessaryAttempt(authedAccount: .implicit())
+                } catch {
+                    Logger.warn("Failed to update account attributes: \(error)")
+                }
             }
         }
     }
@@ -88,7 +96,11 @@ public class AccountAttributesUpdaterImpl: AccountAttributesUpdater {
         )
         tx.addSyncCompletion {
             Task {
-                try await self.updateAccountAttributesIfNecessaryAttempt(authedAccount: authedAccount)
+                do {
+                    try await self.updateAccountAttributesIfNecessaryAttempt(authedAccount: authedAccount)
+                } catch {
+                    Logger.warn("Failed to update account attributes: \(error)")
+                }
             }
         }
     }
@@ -230,7 +242,11 @@ public class AccountAttributesUpdaterImpl: AccountAttributesUpdater {
 
             // Kick off an async profile fetch (not awaited)
             Task {
-                _ = try await profileManager.fetchLocalUsersProfile(authedAccount: authedAccount)
+                do {
+                    _ = try await profileManager.fetchLocalUsersProfile(authedAccount: authedAccount)
+                } catch {
+                    Logger.warn("Failed to fetch local user profile: \(error)")
+                }
             }
 
             await db.awaitableWrite { tx in

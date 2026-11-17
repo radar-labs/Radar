@@ -647,7 +647,7 @@ open class InteractiveSheetViewController: OWSViewController {
                 }
 
                 self.backdropView?.alpha = completionState == .dismissing ? 0 : 1
-            } completion: {
+            } completion: { [self] in
                 self.sheetPanDelegate?.sheetPanDecelerationDidEnd()
                 self.heightDidChange(to: .height(finalHeight))
                 if completionState == .dismissing && self.canBeDismissed {

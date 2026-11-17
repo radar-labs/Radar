@@ -753,8 +753,12 @@ public final class MessageReceiver {
                 /// Opportunistically try and refresh our device list. If this
                 /// fails that's ok – there are other places we'll do this
                 /// refresh as well.
-                try await Retry.performWithBackoff(maxAttempts: 4) {
-                    _ = try await deviceService.refreshDevices()
+                do {
+                    try await Retry.performWithBackoff(maxAttempts: 4) {
+                        _ = try await deviceService.refreshDevices()
+                    }
+                } catch {
+                    Logger.error("Error refreshing devices: \(error)")
                 }
             }
         } else {

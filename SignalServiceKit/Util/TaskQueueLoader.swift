@@ -323,7 +323,7 @@ public actor TaskQueueLoader<Runner: TaskRecordRunner & Sendable> {
             onCancel: {
                 continuation.cancel()
                 Task {
-                    try await observerDidCancel(observerId)
+                    try? await observerDidCancel(observerId)
                 }
             }
         )
